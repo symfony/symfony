@@ -1,21 +1,79 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * The `FirewallMapInterface::getListeners()` method must return an array of 3 elements.
+ * Removed the `ContextListener::setLogoutOnUserChange()` method.
+ * Removed the `ListenerInterface`, turn your listeners into callables instead.
+ * Removed the `Firewall::handleRequest()` method, use `Firewall::callListeners()` instead.
+ * Removed the `AdvancedUserInterface`, use a custom user checker instead.
+ * Removed `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
+ * Removed `BcryptPasswordEncoder`, use `NativePasswordEncoder` instead
+ * Removed the `has_role()` function from security expressions, use `is_granted()` instead.
+ * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
+   `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
+   `SimplePreAuthenticationListener` have been removed. Use Guard instead.
+ * Removed the `Role` and `SwitchUserRole` classes. Use strings for roles instead.
+ * Removed the `getReachableRoles()` method from the `RoleHierarchyInterface`. Role hierarchies must implement
+   the `getReachableRoleNames()` method instead and return roles as strings.
+ * Removed the `getRoles()` method from the `TokenInterface`. Tokens must implement the `getRoleNames()` method
+   instead and return roles as strings.
+ * Made the `serialize` and `unserialize` methods of `AbstractToken` final and internal
+ * Removed the `serialize` and `unserialize` methods from `AuthenticationException`
+ * Added method `__serialize` and `__unserialize` to `TokenInterface`
+ * Added method `needsRehash` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
+ * Removed `ExpressionVoter::addExpressionLanguageProvider()`
+ * Made `Security::getUser()` return null when the user is not an instanceof `UserInterface`,
+   use `getToken()->getUser()` instead
+ * Removed the `AuthenticationTrustResolver` constructor arguments
+
+4.4.0
+-----
+
+ * Added method `needsRehash()` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
+ * Added `MigratingPasswordEncoder`
+
+4.3.0
+-----
+
+ * Added methods `__serialize` and `__unserialize` to the `TokenInterface`
+ * Added `SodiumPasswordEncoder` and `NativePasswordEncoder`
+ * The `Role` and `SwitchUserRole` classes are deprecated and will be removed in 5.0. Use strings for roles
+   instead.
+ * The `getReachableRoles()` method of the `RoleHierarchyInterface` is deprecated and will be removed in 5.0.
+   Role hierarchies must implement the `getReachableRoleNames()` method instead and return roles as strings.
+ * The `getRoles()` method of the `TokenInterface` is deprecated. Tokens must implement the `getRoleNames()`
+   method instead and return roles as strings.
+ * Made the `serialize()` and `unserialize()` methods of `AbstractToken` and
+  `AuthenticationException` final, use `__serialize()`/`__unserialize()` instead
+ * `AuthenticationException` doesn't implement `Serializable` anymore
+ * Deprecated the `ListenerInterface`, turn your listeners into callables instead
+ * Deprecated `Firewall::handleRequest()`, use `Firewall::callListeners()` instead
+ * Dispatch `AuthenticationSuccessEvent` on `security.authentication.success`
+ * Dispatch `AuthenticationFailureEvent` on `security.authentication.failure`
+ * Dispatch `InteractiveLoginEvent` on `security.interactive_login`
+ * Dispatch `SwitchUserEvent` on `security.switch_user`
+ * Deprecated `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
+ * Deprecated `BCryptPasswordEncoder`, use `NativePasswordEncoder` instead
+ * Added `DeauthenticatedEvent` dispatched in case the user has changed when trying to refresh the token
+
 4.2.0
 -----
 
-* added the `is_granted()` function in security expressions
-* deprecated the `has_role()` function in security expressions, use `is_granted()` instead
-* Passing custom class names to the
-  `Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver` to define
-  custom anonymous and remember me token classes is deprecated. To
-  use custom tokens, extend the existing `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`
-  or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
-* allow passing null as $filter in LdapUserProvider to get the default filter
-* accessing the user object that is not an instance of `UserInterface` from `Security::getUser()` is deprecated
-* Deprecated `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`,
-  `SimplePreAuthenticatorInterface`, `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`,
-  `SimpleFormAuthenticationListener` and `SimplePreAuthenticationListener`. Use Guard instead.
+ * added the `is_granted()` function in security expressions
+ * deprecated the `has_role()` function in security expressions, use `is_granted()` instead
+ * Passing custom class names to the
+   `Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver` to define
+   custom anonymous and remember me token classes is deprecated. To
+   use custom tokens, extend the existing `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`
+   or `Symfony\Component\Security\Core\Authentication\Token\RememberMeToken`.
+ * allow passing null as $filter in LdapUserProvider to get the default filter
+ * accessing the user object that is not an instance of `UserInterface` from `Security::getUser()` is deprecated
+ * Deprecated `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`,
+   `SimplePreAuthenticatorInterface`, `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`,
+   `SimpleFormAuthenticationListener` and `SimplePreAuthenticationListener`. Use Guard instead.
 
 4.1.0
 -----

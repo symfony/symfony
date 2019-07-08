@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Command;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -18,37 +19,49 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\Transport\Receiver\StopWhenMemoryUsageIsExceededReceiver;
-use Symfony\Component\Messenger\Transport\Receiver\StopWhenMessageCountIsExceededReceiver;
-use Symfony\Component\Messenger\Transport\Receiver\StopWhenTimeLimitIsReachedReceiver;
+use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Component\Messenger\Worker\StopWhenMemoryUsageIsExceededWorker;
+use Symfony\Component\Messenger\Worker\StopWhenMessageCountIsExceededWorker;
+use Symfony\Component\Messenger\Worker\StopWhenRestartSignalIsReceived;
+use Symfony\Component\Messenger\Worker\StopWhenTimeLimitIsReachedWorker;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.2
  */
 class ConsumeMessagesCommand extends Command
 {
-    protected static $defaultName = 'messenger:consume-messages';
+    protected static $defaultName = 'messenger:consume';
 
-    private $busLocator;
+    private $routableBus;
     private $receiverLocator;
     private $logger;
     private $receiverNames;
-    private $busNames;
+    private $retryStrategyLocator;
+    private $eventDispatcher;
+    /** @var CacheItemPoolInterface|null */
+    private $restartSignalCachePool;
 
-    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], array $busNames = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], ContainerInterface $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
     {
-        $this->busLocator = $busLocator;
+        $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
-        $this->busNames = $busNames;
+        $this->retryStrategyLocator = $retryStrategyLocator;
+        $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
+    }
+
+    public function setCachePoolForRestartSignal(CacheItemPoolInterface $restartSignalCachePool)
+    {
+        $this->restartSignalCachePool = $restartSignalCachePool;
     }
 
     /**
@@ -57,21 +70,25 @@ class ConsumeMessagesCommand extends Command
     protected function configure(): void
     {
         $defaultReceiverName = 1 === \count($this->receiverNames) ? current($this->receiverNames) : null;
-        $defaultBusName = 1 === \count($this->busNames) ? current($this->busNames) : null;
 
         $this
             ->setDefinition([
-                new InputArgument('receiver', $defaultReceiverName ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'Name of the receiver', $defaultReceiverName),
+                new InputArgument('receivers', InputArgument::IS_ARRAY, 'Names of the receivers/transports to consume in order of priority', $defaultReceiverName ? [$defaultReceiverName] : []),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
-                new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched', $defaultBusName),
+                new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
+                new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically.'),
             ])
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
 
     <info>php %command.full_name% <receiver-name></info>
+
+To receive from multiple transports, pass each name:
+
+    <info>php %command.full_name% receiver1 receiver2</info>
 
 Use the --limit option to limit the number of messages received:
 
@@ -84,6 +101,12 @@ Use the --memory-limit option to stop the worker if it exceeds a given memory us
 Use the --time-limit option to stop the worker when the given time limit (in seconds) is reached:
 
     <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
+
+Use the --bus option to specify the message bus to dispatch received messages
+to instead of trying to determine it automatically. This is required if the
+messages didn't originate from Messenger:
+
+    <info>php %command.full_name% <receiver-name> --bus=event_bus</info>
 EOF
             )
         ;
@@ -94,69 +117,94 @@ EOF
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        $style = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        if ($this->receiverNames && !$this->receiverLocator->has($receiverName = $input->getArgument('receiver'))) {
-            if (null === $receiverName) {
-                $style->block('Missing receiver argument.', null, 'error', ' ', true);
-                $input->setArgument('receiver', $style->choice('Select one of the available receivers', $this->receiverNames));
-            } elseif ($alternatives = $this->findAlternatives($receiverName, $this->receiverNames)) {
-                $style->block(sprintf('Receiver "%s" is not defined.', $receiverName), null, 'error', ' ', true);
-                if ($style->confirm(sprintf('Do you want to receive from "%s" instead? ', $alternatives[0]), false)) {
-                    $input->setArgument('receiver', $alternatives[0]);
-                }
+        if ($this->receiverNames && 0 === \count($input->getArgument('receivers'))) {
+            $io->block('Which transports/receivers do you want to consume?', null, 'fg=white;bg=blue', ' ', true);
+
+            $io->writeln('Choose which receivers you want to consume messages from in order of priority.');
+            if (\count($this->receiverNames) > 1) {
+                $io->writeln(sprintf('Hint: to consume from multiple, use a list of their names, e.g. <comment>%s</comment>', implode(', ', $this->receiverNames)));
             }
+
+            $question = new ChoiceQuestion('Select receivers to consume:', $this->receiverNames, 0);
+            $question->setMultiselect(true);
+
+            $input->setArgument('receivers', $io->askQuestion($question));
         }
 
-        $busName = $input->getOption('bus');
-        if ($this->busNames && !$this->busLocator->has($busName)) {
-            if (null === $busName) {
-                $style->block('Missing bus argument.', null, 'error', ' ', true);
-                $input->setOption('bus', $style->choice('Select one of the available buses', $this->busNames));
-            } elseif ($alternatives = $this->findAlternatives($busName, $this->busNames)) {
-                $style->block(sprintf('Bus "%s" is not defined.', $busName), null, 'error', ' ', true);
-
-                if (1 === \count($alternatives)) {
-                    if ($style->confirm(sprintf('Do you want to dispatch to "%s" instead? ', $alternatives[0]), true)) {
-                        $input->setOption('bus', $alternatives[0]);
-                    }
-                } else {
-                    $input->setOption('bus', $style->choice('Did you mean one of the following buses instead?', $alternatives, $alternatives[0]));
-                }
-            }
+        if (0 === \count($input->getArgument('receivers'))) {
+            throw new RuntimeException('Please pass at least one receiver.');
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->receiverLocator->has($receiverName = $input->getArgument('receiver'))) {
-            throw new RuntimeException(sprintf('Receiver "%s" does not exist.', $receiverName));
+        $receivers = [];
+        $retryStrategies = [];
+        foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
+            if (!$this->receiverLocator->has($receiverName)) {
+                $message = sprintf('The receiver "%s" does not exist.', $receiverName);
+                if ($this->receiverNames) {
+                    $message .= sprintf(' Valid receivers are: %s.', implode(', ', $this->receiverNames));
+                }
+
+                throw new RuntimeException($message);
+            }
+
+            if (null !== $this->retryStrategyLocator && !$this->retryStrategyLocator->has($receiverName)) {
+                throw new RuntimeException(sprintf('Receiver "%s" does not have a configured retry strategy.', $receiverName));
+            }
+
+            $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
+            $retryStrategies[$receiverName] = null !== $this->retryStrategyLocator ? $this->retryStrategyLocator->get($receiverName) : null;
         }
 
-        if (!$this->busLocator->has($busName = $input->getOption('bus'))) {
-            throw new RuntimeException(sprintf('Bus "%s" does not exist.', $busName));
-        }
+        $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $receiver = $this->receiverLocator->get($receiverName);
-        $bus = $this->busLocator->get($busName);
-
+        $worker = new Worker($receivers, $bus, $retryStrategies, $this->eventDispatcher, $this->logger);
+        $stopsWhen = [];
         if ($limit = $input->getOption('limit')) {
-            $receiver = new StopWhenMessageCountIsExceededReceiver($receiver, $limit, $this->logger);
+            $stopsWhen[] = "processed {$limit} messages";
+            $worker = new StopWhenMessageCountIsExceededWorker($worker, $limit, $this->logger);
         }
 
         if ($memoryLimit = $input->getOption('memory-limit')) {
-            $receiver = new StopWhenMemoryUsageIsExceededReceiver($receiver, $this->convertToBytes($memoryLimit), $this->logger);
+            $stopsWhen[] = "exceeded {$memoryLimit} of memory";
+            $worker = new StopWhenMemoryUsageIsExceededWorker($worker, $this->convertToBytes($memoryLimit), $this->logger);
         }
 
         if ($timeLimit = $input->getOption('time-limit')) {
-            $receiver = new StopWhenTimeLimitIsReachedReceiver($receiver, $timeLimit, $this->logger);
+            $stopsWhen[] = "been running for {$timeLimit}s";
+            $worker = new StopWhenTimeLimitIsReachedWorker($worker, $timeLimit, $this->logger);
         }
 
-        $worker = new Worker($receiver, $bus);
-        $worker->run();
+        if (null !== $this->restartSignalCachePool) {
+            $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
+            $worker = new StopWhenRestartSignalIsReceived($worker, $this->restartSignalCachePool, $this->logger);
+        }
+
+        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
+        $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 0 ? 's' : '', implode(', ', $receiverNames)));
+
+        if ($stopsWhen) {
+            $last = array_pop($stopsWhen);
+            $stopsWhen = ($stopsWhen ? implode(', ', $stopsWhen).' or ' : '').$last;
+            $io->comment("The worker will automatically exit once it has {$stopsWhen}.");
+        }
+
+        $io->comment('Quit the worker with CONTROL-C.');
+
+        if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+            $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
+        }
+
+        $worker->run([
+            'sleep' => $input->getOption('sleep') * 1000000,
+        ]);
     }
 
     private function convertToBytes(string $memoryLimit): int
@@ -171,7 +219,7 @@ EOF
             $max = (int) $max;
         }
 
-        switch (substr($memoryLimit, -1)) {
+        switch (substr(rtrim($memoryLimit, 'b'), -1)) {
             case 't': $max *= 1024;
             // no break
             case 'g': $max *= 1024;
@@ -182,22 +230,5 @@ EOF
         }
 
         return $max;
-    }
-
-    private function findAlternatives($name, array $collection)
-    {
-        $alternatives = [];
-        foreach ($collection as $item) {
-            $lev = levenshtein($name, $item);
-            if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {
-                $alternatives[$item] = isset($alternatives[$item]) ? $alternatives[$item] - $lev : $lev;
-            }
-        }
-
-        $threshold = 1e3;
-        $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
-
-        return array_keys($alternatives);
     }
 }

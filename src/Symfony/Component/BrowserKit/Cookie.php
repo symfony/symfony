@@ -119,14 +119,11 @@ class Cookie
     /**
      * Creates a Cookie instance from a Set-Cookie header value.
      *
-     * @param string      $cookie A Set-Cookie header value
-     * @param string|null $url    The base URL
-     *
      * @return static
      *
      * @throws \InvalidArgumentException
      */
-    public static function fromString($cookie, $url = null)
+    public static function fromString(string $cookie, string $url = null)
     {
         $parts = explode(';', $cookie);
 

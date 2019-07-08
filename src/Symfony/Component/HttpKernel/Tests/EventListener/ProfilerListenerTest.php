@@ -13,9 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Kernel;
@@ -36,7 +36,7 @@ class ProfilerListenerTest extends TestCase
 
         $profiler->expects($this->once())
             ->method('collect')
-            ->will($this->returnValue($profile));
+            ->willReturn($profile);
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
 
@@ -59,12 +59,12 @@ class ProfilerListenerTest extends TestCase
         $listener = new ProfilerListener($profiler, $requestStack, null, $onlyException);
 
         // master request
-        $listener->onKernelResponse(new FilterResponseEvent($kernel, $masterRequest, Kernel::MASTER_REQUEST, $response));
+        $listener->onKernelResponse(new ResponseEvent($kernel, $masterRequest, Kernel::MASTER_REQUEST, $response));
 
         // sub request
-        $listener->onKernelException(new GetResponseForExceptionEvent($kernel, $subRequest, Kernel::SUB_REQUEST, new HttpException(404)));
-        $listener->onKernelResponse(new FilterResponseEvent($kernel, $subRequest, Kernel::SUB_REQUEST, $response));
+        $listener->onKernelException(new ExceptionEvent($kernel, $subRequest, Kernel::SUB_REQUEST, new HttpException(404)));
+        $listener->onKernelResponse(new ResponseEvent($kernel, $subRequest, Kernel::SUB_REQUEST, $response));
 
-        $listener->onKernelTerminate(new PostResponseEvent($kernel, $masterRequest, $response));
+        $listener->onKernelTerminate(new TerminateEvent($kernel, $masterRequest, $response));
     }
 }

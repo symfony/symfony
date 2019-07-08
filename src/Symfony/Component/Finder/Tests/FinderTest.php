@@ -347,6 +347,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreVCS(false)->ignoreDotFiles(false));
         $this->assertIterator($this->toAbsolute([
+            '.gitignore',
             '.git',
             'foo',
             'foo/bar.tmp',
@@ -373,6 +374,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->ignoreVCS(false)->ignoreVCS(false)->ignoreDotFiles(false);
         $this->assertIterator($this->toAbsolute([
+            '.gitignore',
             '.git',
             'foo',
             'foo/bar.tmp',
@@ -399,6 +401,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreVCS(true)->ignoreDotFiles(false));
         $this->assertIterator($this->toAbsolute([
+            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'test.php',
@@ -421,6 +424,28 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testIgnoreVCSIgnored()
+    {
+        $finder = $this->buildFinder();
+        $this->assertSame(
+            $finder,
+            $finder
+                ->ignoreVCS(true)
+                ->ignoreDotFiles(true)
+                ->ignoreVCSIgnored(true)
+        );
+        $this->assertIterator($this->toAbsolute([
+            'foo',
+            'foo/bar.tmp',
+            'test.py',
+            'toto',
+            'foo bar',
+            'qux',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+        ]), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testIgnoreVCSCanBeDisabledAfterFirstIteration()
     {
         $finder = $this->buildFinder();
@@ -428,6 +453,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->ignoreDotFiles(false);
 
         $this->assertIterator($this->toAbsolute([
+            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'qux',
@@ -450,7 +476,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ]), $finder->getIterator());
 
         $finder->ignoreVCS(false);
-        $this->assertIterator($this->toAbsolute(['.git',
+        $this->assertIterator($this->toAbsolute([
+            '.gitignore',
+            '.git',
             'foo',
             'foo/bar.tmp',
             'qux',
@@ -479,6 +507,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->ignoreDotFiles(false)->ignoreVCS(false));
         $this->assertIterator($this->toAbsolute([
+            '.gitignore',
             '.git',
             '.bar',
             '.foo',
@@ -505,6 +534,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->ignoreDotFiles(false)->ignoreDotFiles(false)->ignoreVCS(false);
         $this->assertIterator($this->toAbsolute([
+            '.gitignore',
             '.git',
             '.bar',
             '.foo',
@@ -574,6 +604,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder->ignoreDotFiles(false);
         $this->assertIterator($this->toAbsolute([
+            '.gitignore',
             'foo',
             'foo/bar.tmp',
             'qux',
@@ -842,6 +873,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $expected = [
             self::$tmpDir.\DIRECTORY_SEPARATOR.'test.php',
+            __DIR__.\DIRECTORY_SEPARATOR.'GitignoreTest.php',
             __DIR__.\DIRECTORY_SEPARATOR.'FinderTest.php',
             __DIR__.\DIRECTORY_SEPARATOR.'GlobTest.php',
             self::$tmpDir.\DIRECTORY_SEPARATOR.'qux_0_1.php',
@@ -856,9 +888,18 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Finder\Exception\DirectoryNotFoundException
      */
     public function testInWithNonExistentDirectory()
+    {
+        $finder = new Finder();
+        $finder->in('foobar');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInWithNonExistentDirectoryLegacyException()
     {
         $finder = new Finder();
         $finder->in('foobar');
@@ -977,6 +1018,40 @@ class FinderTest extends Iterator\RealIteratorTestCase
         sort($ref);
 
         $this->assertEquals($ref, $paths);
+    }
+
+    public function testGetFilenameWithoutExtension()
+    {
+        $finder = $this->buildFinder()->in(self::$tmpDir)->sortByName();
+
+        $fileNames = [];
+
+        foreach ($finder as $file) {
+            $fileNames[] = $file->getFilenameWithoutExtension();
+        }
+
+        $ref = [
+            'test',
+            'toto',
+            'test',
+            'foo',
+            'bar',
+            'foo bar',
+            'qux',
+            'baz_100_1',
+            'baz_1_2',
+            'qux_0_1',
+            'qux_1000_1',
+            'qux_1002_0',
+            'qux_10_2',
+            'qux_12_0',
+            'qux_2_0',
+        ];
+
+        sort($fileNames);
+        sort($ref);
+
+        $this->assertEquals($ref, $fileNames);
     }
 
     public function testAppendWithAFinder()
@@ -1359,26 +1434,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\Finder\Finder::sortByName()" method will have a new "bool $useNaturalSort = false" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
-    public function testInheritedClassCallSortByNameWithNoArguments()
-    {
-        $finderChild = new ClassThatInheritFinder();
-        $finderChild->sortByName();
-    }
-
     protected function buildFinder()
     {
         return Finder::create();
-    }
-}
-
-class ClassThatInheritFinder extends Finder
-{
-    public function sortByName()
-    {
-        parent::sortByName();
     }
 }

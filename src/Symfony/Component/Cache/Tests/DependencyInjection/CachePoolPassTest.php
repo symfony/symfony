@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -46,6 +47,27 @@ class CachePoolPassTest extends TestCase
         $this->cachePoolPass->process($container);
 
         $this->assertSame('z3X945Jbf5', $cachePool->getArgument(0));
+    }
+
+    public function testNamespaceArgumentIsSeededWithAdapterClassName()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
+        $adapter = new Definition();
+        $adapter->setAbstract(true);
+        $adapter->addTag('cache.pool');
+        $adapter->setClass(RedisAdapter::class);
+        $container->setDefinition('app.cache_adapter', $adapter);
+        $container->setAlias('app.cache_adapter_alias', 'app.cache_adapter');
+        $cachePool = new ChildDefinition('app.cache_adapter_alias');
+        $cachePool->addArgument(null);
+        $cachePool->addTag('cache.pool');
+        $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->cachePoolPass->process($container);
+
+        $this->assertSame('xmOJ8gqF-Y', $cachePool->getArgument(0));
     }
 
     public function testNamespaceArgumentIsNotReplacedIfArrayAdapterIsUsed()

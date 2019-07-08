@@ -33,7 +33,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      */
-    public function atPath($path);
+    public function atPath(string $path);
 
     /**
      * Sets a parameter to be inserted into the violation message.
@@ -43,7 +43,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      */
-    public function setParameter($key, $value);
+    public function setParameter(string $key, string $value);
 
     /**
      * Sets all parameters to be inserted into the violation message.
@@ -66,7 +66,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @see \Symfony\Contracts\Translation\TranslatorInterface
      */
-    public function setTranslationDomain($translationDomain);
+    public function setTranslationDomain(string $translationDomain);
 
     /**
      * Sets the invalid value that caused this violation.
@@ -85,9 +85,9 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      *
-     * @see \Symfony\Contracts\Translation\TranslatorInterface::transChoice()
+     * @see \Symfony\Contracts\Translation\TranslatorInterface::trans()
      */
-    public function setPlural($number);
+    public function setPlural(int $number);
 
     /**
      * Sets the violation code.
@@ -96,7 +96,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      */
-    public function setCode($code);
+    public function setCode(?string $code);
 
     /**
      * Sets the cause of the violation.

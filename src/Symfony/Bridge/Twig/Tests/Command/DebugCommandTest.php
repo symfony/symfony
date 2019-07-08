@@ -64,32 +64,6 @@ class DebugCommandTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Loading Twig templates from the "%sResources/BarBundle/views" directory is deprecated since Symfony 4.2, use "%stemplates/bundles/BarBundle" instead.
-     */
-    public function testDeprecationForWrongBundleOverridingInLegacyPath()
-    {
-        $bundleMetadata = [
-            'TwigBundle' => 'vendor/twig-bundle/',
-            'WebProfilerBundle' => 'vendor/web-profiler-bundle/',
-        ];
-        $defaultPath = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'templates';
-        $rootDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
-
-        $tester = $this->createCommandTester([], $bundleMetadata, $defaultPath, $rootDir);
-        $ret = $tester->execute(['--filter' => 'unknown', '--format' => 'json'], ['decorated' => false]);
-
-        $expected = ['warnings' => [
-            'Path "Resources/BarBundle" not matching any bundle found',
-            'Path "templates/bundles/UnknownBundle" not matching any bundle found',
-            'Path "templates/bundles/WebProfileBundle" not matching any bundle found, did you mean "WebProfilerBundle"?',
-        ]];
-
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
-    }
-
-    /**
      * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Malformed namespaced template name "@foo" (expecting "@namespace/template_name").
      */
@@ -295,7 +269,7 @@ TXT
         $tester = $this->createCommandTester([], [], null, null, false, ['message' => $message]);
         $tester->execute([], ['decorated' => true]);
         $display = $tester->getDisplay();
-        $this->assertContains(\json_encode($message), $display);
+        $this->assertContains(json_encode($message), $display);
     }
 
     public function testWithGlobalsJson()
@@ -304,7 +278,7 @@ TXT
         $tester = $this->createCommandTester([], [], null, null, false, $globals);
         $tester->execute(['--format' => 'json'], ['decorated' => true]);
         $display = $tester->getDisplay();
-        $display = \json_decode($display, true);
+        $display = json_decode($display, true);
         $this->assertSame($globals, $display['globals']);
     }
 
@@ -313,10 +287,10 @@ TXT
         $tester = $this->createCommandTester();
         $tester->execute(['--format' => 'json'], ['decorated' => false]);
         $display = $tester->getDisplay();
-        $display1 = \json_decode($display, true);
+        $display1 = json_decode($display, true);
         $tester->execute(['--filter' => 'date', '--format' => 'json'], ['decorated' => false]);
         $display = $tester->getDisplay();
-        $display2 = \json_decode($display, true);
+        $display2 = json_decode($display, true);
         $this->assertNotSame($display1, $display2);
     }
 
@@ -342,7 +316,7 @@ TXT
         }
 
         $application = new Application();
-        $application->add(new DebugCommand($environment, $projectDir, $bundleMetadata, $defaultPath, $rootDir));
+        $application->add(new DebugCommand($environment, $projectDir, $bundleMetadata, $defaultPath, null, $rootDir));
         $command = $application->find('debug:twig');
 
         return new CommandTester($command);

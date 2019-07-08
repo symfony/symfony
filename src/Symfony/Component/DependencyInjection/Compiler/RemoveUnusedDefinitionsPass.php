@@ -20,17 +20,9 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
+class RemoveUnusedDefinitionsPass extends AbstractRecursivePass
 {
     private $connectedIds = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-    }
 
     /**
      * Processes the ContainerBuilder to remove unused definitions.
@@ -70,7 +62,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
             foreach ($container->getDefinitions() as $id => $definition) {
                 if (!isset($connectedIds[$id])) {
                     $container->removeDefinition($id);
-                    $container->resolveEnvPlaceholders(serialize($definition));
+                    $container->resolveEnvPlaceholders(!$definition->hasErrors() ? serialize($definition) : $definition);
                     $container->log($this, sprintf('Removed service "%s"; reason: unused.', $id));
                 }
             }
@@ -83,10 +75,10 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         if (!$value instanceof Reference) {
-            return parent::processValue($value);
+            return parent::processValue($value, $isRoot);
         }
 
         if (ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior()) {

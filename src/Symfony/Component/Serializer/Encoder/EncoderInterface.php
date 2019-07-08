@@ -31,7 +31,7 @@ interface EncoderInterface
      *
      * @throws UnexpectedValueException
      */
-    public function encode($data, $format, array $context = []);
+    public function encode($data, string $format, array $context = []);
 
     /**
      * Checks whether the serializer can encode to given format.
@@ -40,5 +40,5 @@ interface EncoderInterface
      *
      * @return bool
      */
-    public function supportsEncoding($format);
+    public function supportsEncoding(string $format);
 }

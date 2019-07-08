@@ -49,12 +49,12 @@ class LazyChoiceListTest extends TestCase
         $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
             ->with($this->value)
-            ->will($this->returnValue($this->loadedList));
+            ->willReturn($this->loadedList);
 
         // The same list is returned by the loader
         $this->loadedList->expects($this->exactly(2))
             ->method('getChoices')
-            ->will($this->returnValue('RESULT'));
+            ->willReturn('RESULT');
 
         $this->assertSame('RESULT', $this->list->getChoices());
         $this->assertSame('RESULT', $this->list->getChoices());
@@ -65,12 +65,12 @@ class LazyChoiceListTest extends TestCase
         $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
             ->with($this->value)
-            ->will($this->returnValue($this->loadedList));
+            ->willReturn($this->loadedList);
 
         // The same list is returned by the loader
         $this->loadedList->expects($this->exactly(2))
             ->method('getValues')
-            ->will($this->returnValue('RESULT'));
+            ->willReturn('RESULT');
 
         $this->assertSame('RESULT', $this->list->getValues());
         $this->assertSame('RESULT', $this->list->getValues());
@@ -81,12 +81,12 @@ class LazyChoiceListTest extends TestCase
         $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
             ->with($this->value)
-            ->will($this->returnValue($this->loadedList));
+            ->willReturn($this->loadedList);
 
         // The same list is returned by the loader
         $this->loadedList->expects($this->exactly(2))
             ->method('getStructuredValues')
-            ->will($this->returnValue('RESULT'));
+            ->willReturn('RESULT');
 
         $this->assertSame('RESULT', $this->list->getStructuredValues());
         $this->assertSame('RESULT', $this->list->getStructuredValues());
@@ -97,12 +97,12 @@ class LazyChoiceListTest extends TestCase
         $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
             ->with($this->value)
-            ->will($this->returnValue($this->loadedList));
+            ->willReturn($this->loadedList);
 
         // The same list is returned by the loader
         $this->loadedList->expects($this->exactly(2))
             ->method('getOriginalKeys')
-            ->will($this->returnValue('RESULT'));
+            ->willReturn('RESULT');
 
         $this->assertSame('RESULT', $this->list->getOriginalKeys());
         $this->assertSame('RESULT', $this->list->getOriginalKeys());
@@ -113,7 +113,7 @@ class LazyChoiceListTest extends TestCase
         $this->loader->expects($this->exactly(2))
             ->method('loadChoicesForValues')
             ->with(['a', 'b'])
-            ->will($this->returnValue('RESULT'));
+            ->willReturn('RESULT');
 
         $this->assertSame('RESULT', $this->list->getChoicesForValues(['a', 'b']));
         $this->assertSame('RESULT', $this->list->getChoicesForValues(['a', 'b']));
@@ -124,12 +124,12 @@ class LazyChoiceListTest extends TestCase
         $this->loader->expects($this->exactly(1))
             ->method('loadChoiceList')
             ->with($this->value)
-            ->will($this->returnValue($this->loadedList));
+            ->willReturn($this->loadedList);
 
         $this->loader->expects($this->exactly(2))
             ->method('loadChoicesForValues')
             ->with(['a', 'b'])
-            ->will($this->returnValue('RESULT'));
+            ->willReturn('RESULT');
 
         // load choice list
         $this->list->getChoices();
@@ -143,12 +143,12 @@ class LazyChoiceListTest extends TestCase
         $this->loader->expects($this->exactly(1))
             ->method('loadChoiceList')
             ->with($this->value)
-            ->will($this->returnValue($this->loadedList));
+            ->willReturn($this->loadedList);
 
         $this->loader->expects($this->exactly(2))
             ->method('loadValuesForChoices')
             ->with(['a', 'b'])
-            ->will($this->returnValue('RESULT'));
+            ->willReturn('RESULT');
 
         // load choice list
         $this->list->getChoices();

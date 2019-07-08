@@ -13,15 +13,22 @@ namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Process\PhpProcess;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
@@ -40,13 +47,11 @@ class AmqpExtIntegrationTest extends TestCase
 
     public function testItSendsAndReceivesMessages()
     {
-        $serializer = new Serializer(
-            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
-        );
+        $serializer = $this->createSerializer();
 
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
-        $connection->queue()->purge();
+        $connection->purgeQueues();
 
         $sender = new AmqpSender($connection, $serializer);
         $receiver = new AmqpReceiver($connection, $serializer);
@@ -54,25 +59,89 @@ class AmqpExtIntegrationTest extends TestCase
         $sender->send($first = new Envelope(new DummyMessage('First')));
         $sender->send($second = new Envelope(new DummyMessage('Second')));
 
-        $receivedMessages = 0;
-        $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages, $first, $second) {
-            $this->assertEquals(0 === $receivedMessages ? $first : $second, $envelope);
+        $envelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $envelopes);
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
+        $this->assertEquals($first->getMessage(), $envelope->getMessage());
+        $this->assertInstanceOf(AmqpReceivedStamp::class, $envelope->last(AmqpReceivedStamp::class));
 
-            if (2 === ++$receivedMessages) {
-                $receiver->stop();
-            }
-        });
+        $envelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $envelopes);
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
+        $this->assertEquals($second->getMessage(), $envelope->getMessage());
+
+        $this->assertEmpty(iterator_to_array($receiver->get()));
+    }
+
+    public function testRetryAndDelay()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection, $serializer);
+        $receiver = new AmqpReceiver($connection, $serializer);
+
+        // send a first message
+        $sender->send($first = new Envelope(new DummyMessage('First')));
+
+        // receive it immediately and imitate a redeliver with 2 second delay
+        $envelopes = iterator_to_array($receiver->get());
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
+        $newEnvelope = $envelope
+            ->with(new DelayStamp(2000))
+            ->with(new RedeliveryStamp(1, 'not_important'));
+        $sender->send($newEnvelope);
+        $receiver->ack($envelope);
+
+        // send a 2nd message with a shorter delay and custom routing key
+        $customRoutingKeyMessage = new DummyMessage('custom routing key');
+        $envelopeCustomRoutingKey = new Envelope($customRoutingKeyMessage, [
+            new DelayStamp(1000),
+            new AmqpStamp('my_custom_routing_key'),
+        ]);
+        $sender->send($envelopeCustomRoutingKey);
+
+        // wait for next message (but max at 3 seconds)
+        $startTime = microtime(true);
+        $envelopes = $this->receiveEnvelopes($receiver, 3);
+
+        // duration should be about 1 second
+        $this->assertApproximateDuration($startTime, 1);
+
+        // this should be the custom routing key message first
+        $this->assertCount(1, $envelopes);
+        /* @var Envelope $envelope */
+        $receiver->ack($envelopes[0]);
+        $this->assertEquals($customRoutingKeyMessage, $envelopes[0]->getMessage());
+
+        // wait for final message (but max at 3 seconds)
+        $envelopes = $this->receiveEnvelopes($receiver, 3);
+        // duration should be about 2 seconds
+        $this->assertApproximateDuration($startTime, 2);
+
+        /* @var RedeliveryStamp|null $retryStamp */
+        // verify the stamp still exists from the last send
+        $this->assertCount(1, $envelopes);
+        $retryStamp = $envelopes[0]->last(RedeliveryStamp::class);
+        $this->assertNotNull($retryStamp);
+        $this->assertSame(1, $retryStamp->getRetryCount());
+
+        $receiver->ack($envelope);
     }
 
     public function testItReceivesSignals()
     {
-        $serializer = new Serializer(
-            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
-        );
+        $serializer = $this->createSerializer();
 
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
-        $connection->queue()->purge();
+        $connection->purgeQueues();
 
         $sender = new AmqpSender($connection, $serializer);
         $sender->send(new Envelope(new DummyMessage('Hello')));
@@ -91,17 +160,20 @@ class AmqpExtIntegrationTest extends TestCase
         $signalTime = microtime(true);
         $timedOutTime = time() + 10;
 
+        // immediately after the process has started "booted", kill it
         $process->signal(15);
 
         while ($process->isRunning() && time() < $timedOutTime) {
             usleep(100 * 1000); // 100ms
         }
 
+        // make sure the process exited, after consuming only the 1 message
         $this->assertFalse($process->isRunning());
         $this->assertLessThan($amqpReadTimeout, microtime(true) - $signalTime);
         $this->assertSame($expectedOutput.<<<'TXT'
 Get envelope with message: Symfony\Component\Messenger\Tests\Fixtures\DummyMessage
 with stamps: [
+    "Symfony\\Component\\Messenger\\Transport\\AmqpExt\\AmqpReceivedStamp",
     "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp"
 ]
 Done.
@@ -110,29 +182,22 @@ TXT
             , $process->getOutput());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
-    public function testItSupportsTimeoutAndTicksNullMessagesToTheHandler()
+    public function testItCountsMessagesInQueue()
     {
-        $serializer = new Serializer(
-            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
-        );
+        $serializer = $this->createSerializer();
 
-        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), ['read_timeout' => '1']);
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
-        $connection->queue()->purge();
+        $connection->purgeQueues();
 
-        $receiver = new AmqpReceiver($connection, $serializer);
+        $sender = new AmqpSender($connection, $serializer);
 
-        $receivedMessages = 0;
-        $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages) {
-            $this->assertNull($envelope);
+        $sender->send(new Envelope(new DummyMessage('First')));
+        $sender->send(new Envelope(new DummyMessage('Second')));
+        $sender->send(new Envelope(new DummyMessage('Third')));
 
-            if (2 === ++$receivedMessages) {
-                $receiver->stop();
-            }
-        });
+        sleep(1); // give amqp a moment to have the messages ready
+        $this->assertSame(3, $connection->countMessagesInQueues());
     }
 
     private function waitForOutput(Process $process, string $output, $timeoutInSeconds = 10)
@@ -148,5 +213,37 @@ TXT
         }
 
         throw new \RuntimeException('Expected output never arrived. Got "'.$process->getOutput().'" instead.');
+    }
+
+    private function createSerializer(): SerializerInterface
+    {
+        return new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer(), new ArrayDenormalizer()], ['json' => new JsonEncoder()])
+        );
+    }
+
+    private function assertApproximateDuration($startTime, int $expectedDuration)
+    {
+        $actualDuration = microtime(true) - $startTime;
+
+        if (method_exists($this, 'assertEqualsWithDelta')) {
+            $this->assertEqualsWithDelta($expectedDuration, $actualDuration, .5, 'Duration was not within expected range');
+        } else {
+            $this->assertEquals($expectedDuration, $actualDuration, 'Duration was not within expected range', .5);
+        }
+    }
+
+    /**
+     * @return Envelope[]
+     */
+    private function receiveEnvelopes(ReceiverInterface $receiver, int $timeout): array
+    {
+        $envelopes = [];
+        $startTime = microtime(true);
+        while (0 === \count($envelopes) && $startTime + $timeout > time()) {
+            $envelopes = iterator_to_array($receiver->get());
+        }
+
+        return $envelopes;
     }
 }

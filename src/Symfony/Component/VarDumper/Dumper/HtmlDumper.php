@@ -314,13 +314,17 @@ return function (root, x) {
     }
 
     function a(e, f) {
-        addEventListener(root, e, function (e) {
+        addEventListener(root, e, function (e, n) {
             if ('A' == e.target.tagName) {
                 f(e.target, e);
             } else if ('A' == e.target.parentNode.tagName) {
                 f(e.target.parentNode, e);
-            } else if (e.target.nextElementSibling && 'A' == e.target.nextElementSibling.tagName) {
-                f(e.target.nextElementSibling, e, true);
+            } else if ((n = e.target.nextElementSibling) && 'A' == n.tagName) {
+                if (!/\bsf-dump-toggle\b/.test(n.className)) {
+                    n = n.nextElementSibling;
+                }
+
+                f(n, e, true);
             }
         });
     };
@@ -848,7 +852,13 @@ EOHTML
         } elseif ('str' === $style && 1 < $attr['length']) {
             $style .= sprintf(' title="%d%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
         } elseif ('note' === $style && false !== $c = strrpos($v, '\\')) {
-            return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $v, $style, substr($v, $c + 1));
+            if (isset($attr['file']) && $link = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
+                $link = sprintf('<a href="%s" rel="noopener noreferrer">^</a>', esc($this->utf8Encode($link)));
+            } else {
+                $link = '';
+            }
+
+            return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>%s', $v, $style, substr($v, $c + 1), $link);
         } elseif ('protected' === $style) {
             $style .= ' title="Protected property"';
         } elseif ('meta' === $style && isset($attr['title'])) {

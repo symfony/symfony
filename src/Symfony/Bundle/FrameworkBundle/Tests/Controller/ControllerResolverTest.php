@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Psr\Container\ContainerInterface as Psr11ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -49,31 +48,6 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller->getContainer());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Referencing controllers with FooBundle:Default:test is deprecated since Symfony 4.1. Use Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction instead.
-     */
-    public function testGetControllerWithBundleNotation()
-    {
-        $shortName = 'FooBundle:Default:test';
-        $parser = $this->createMockParser();
-        $parser->expects($this->once())
-            ->method('parse')
-            ->with($shortName)
-            ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction'))
-        ;
-
-        $resolver = $this->createControllerResolver(null, null, $parser);
-        $request = Request::create('/');
-        $request->attributes->set('_controller', $shortName);
-
-        $controller = $resolver->getController($request);
-
-        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller[0]);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller[0]->getContainer());
-        $this->assertSame('testAction', $controller[1]);
-    }
-
     public function testContainerAwareControllerGetsContainerWhenNotSet()
     {
         class_exists(AbstractControllerTest::class);
@@ -93,8 +67,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Auto-injection of the container for "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController" is deprecated since Symfony 4.2. Configure it as a service instead.
+     * @expectedException \LogicException
+     * @expectedExceptionMessage "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController" has no container set, did you forget to define it as a service subscriber?
      */
     public function testAbstractControllerGetsContainerWhenNotSet()
     {
@@ -115,10 +89,10 @@ class ControllerResolverTest extends ContainerControllerResolverTest
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Auto-injection of the container for "Symfony\Bundle\FrameworkBundle\Tests\Controller\DummyController" is deprecated since Symfony 4.2. Configure it as a service instead.
+     * @expectedException \LogicException
+     * @expectedExceptionMessage "Symfony\Bundle\FrameworkBundle\Tests\Controller\DummyController" has no container set, did you forget to define it as a service subscriber?
      */
-    public function testAbstractControllerServiceWithFcqnIdGetsContainerWhenNotSet()
+    public function testAbstractControllerServiceWithFqcnIdGetsContainerWhenNotSet()
     {
         class_exists(AbstractControllerTest::class);
 
@@ -176,17 +150,13 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($controllerContainer, $controller->getContainer());
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null, ControllerNameParser $parser = null)
+    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null)
     {
-        if (!$parser) {
-            $parser = $this->createMockParser();
-        }
-
         if (!$container) {
             $container = $this->createMockContainer();
         }
 
-        return new ControllerResolver($container, $parser, $logger);
+        return new ControllerResolver($container, $logger);
     }
 
     protected function createMockParser()

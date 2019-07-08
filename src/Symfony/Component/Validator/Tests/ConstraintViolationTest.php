@@ -64,7 +64,7 @@ EOF;
             'some_value',
             null,
             null,
-            0
+            '0'
         );
 
         $expected = <<<'EOF'

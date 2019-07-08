@@ -20,8 +20,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Formats debug file links.
  *
  * @author Jérémy Romey <jeremy@free-agent.fr>
+ *
+ * @final
  */
-class FileLinkFormatter implements \Serializable
+class FileLinkFormatter
 {
     private $fileLinkFormat;
     private $requestStack;
@@ -45,7 +47,7 @@ class FileLinkFormatter implements \Serializable
         $this->urlFormat = $urlFormat;
     }
 
-    public function format($file, $line)
+    public function format(string $file, int $line)
     {
         if ($fmt = $this->getFileLinkFormat()) {
             for ($i = 1; isset($fmt[$i]); ++$i) {
@@ -64,23 +66,17 @@ class FileLinkFormatter implements \Serializable
     /**
      * @internal
      */
-    public function serialize()
+    public function __sleep(): array
     {
-        return serialize($this->getFileLinkFormat());
+        $this->fileLinkFormat = $this->getFileLinkFormat();
+
+        return ['fileLinkFormat'];
     }
 
     /**
      * @internal
      */
-    public function unserialize($serialized)
-    {
-        $this->fileLinkFormat = unserialize($serialized, ['allowed_classes' => false]);
-    }
-
-    /**
-     * @internal
-     */
-    public static function generateUrlFormat(UrlGeneratorInterface $router, $routeName, $queryString)
+    public static function generateUrlFormat(UrlGeneratorInterface $router, $routeName, $queryString): ?string
     {
         try {
             return $router->generate($routeName).$queryString;
@@ -94,13 +90,11 @@ class FileLinkFormatter implements \Serializable
         if ($this->fileLinkFormat) {
             return $this->fileLinkFormat;
         }
+
         if ($this->requestStack && $this->baseDir && $this->urlFormat) {
             $request = $this->requestStack->getMasterRequest();
-            if ($request instanceof Request) {
-                if ($this->urlFormat instanceof \Closure && !$this->urlFormat = ($this->urlFormat)()) {
-                    return;
-                }
 
+            if ($request instanceof Request && (!$this->urlFormat instanceof \Closure || $this->urlFormat = ($this->urlFormat)())) {
                 return [
                     $request->getSchemeAndHttpHost().$request->getBasePath().$this->urlFormat,
                     $this->baseDir.\DIRECTORY_SEPARATOR, '',

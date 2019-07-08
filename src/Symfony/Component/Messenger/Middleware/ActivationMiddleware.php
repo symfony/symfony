@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\Envelope;
  * Execute the inner middleware according to an activation strategy.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @experimental in 4.2
  */
 class ActivationMiddleware implements MiddlewareInterface
 {

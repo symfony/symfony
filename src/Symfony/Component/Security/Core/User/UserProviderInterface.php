@@ -39,13 +39,11 @@ interface UserProviderInterface
      * This method must throw UsernameNotFoundException if the user is not
      * found.
      *
-     * @param string $username The username
-     *
      * @return UserInterface
      *
      * @throws UsernameNotFoundException if the user is not found
      */
-    public function loadUserByUsername($username);
+    public function loadUserByUsername(string $username);
 
     /**
      * Refreshes the user.
@@ -65,9 +63,7 @@ interface UserProviderInterface
     /**
      * Whether this provider supports the given user class.
      *
-     * @param string $class
-     *
      * @return bool
      */
-    public function supportsClass($class);
+    public function supportsClass(string $class);
 }

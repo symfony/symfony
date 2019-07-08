@@ -12,10 +12,10 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
-use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -26,10 +26,13 @@ use Symfony\Contracts\Service\ResetInterface;
 class EventDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     protected $dispatcher;
+    private $requestStack;
+    private $currentRequest;
 
-    public function __construct(EventDispatcherInterface $dispatcher = null)
+    public function __construct(EventDispatcherInterface $dispatcher = null, RequestStack $requestStack = null)
     {
         $this->dispatcher = $dispatcher;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -37,6 +40,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        $this->currentRequest = $this->requestStack && $this->requestStack->getMasterRequest() !== $request ? $request : null;
         $this->data = [
             'called_listeners' => [],
             'not_called_listeners' => [],
@@ -55,13 +59,10 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
 
     public function lateCollect()
     {
-        if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
-            $this->setCalledListeners($this->dispatcher->getCalledListeners());
-            $this->setNotCalledListeners($this->dispatcher->getNotCalledListeners());
-        }
-
         if ($this->dispatcher instanceof TraceableEventDispatcher) {
-            $this->setOrphanedEvents($this->dispatcher->getOrphanedEvents());
+            $this->setCalledListeners($this->dispatcher->getCalledListeners($this->currentRequest));
+            $this->setNotCalledListeners($this->dispatcher->getNotCalledListeners($this->currentRequest));
+            $this->setOrphanedEvents($this->dispatcher->getOrphanedEvents($this->currentRequest));
         }
 
         $this->data = $this->cloneVar($this->data);

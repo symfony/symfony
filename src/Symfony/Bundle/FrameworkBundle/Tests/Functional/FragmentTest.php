@@ -18,14 +18,23 @@ class FragmentTest extends WebTestCase
      */
     public function testFragment($insulate)
     {
-        $client = $this->createClient(['test_case' => 'Fragment', 'root_config' => 'config.yml']);
+        $client = $this->createClient(['test_case' => 'Fragment', 'root_config' => 'config.yml', 'debug' => true]);
         if ($insulate) {
             $client->insulate();
         }
 
         $client->request('GET', '/fragment_home');
 
-        $this->assertEquals('bar txt--html--es--fr', $client->getResponse()->getContent());
+        $this->assertEquals(<<<TXT
+bar txt
+--
+html
+--
+es
+--
+fr
+TXT
+            , $client->getResponse()->getContent());
     }
 
     public function getConfigs()

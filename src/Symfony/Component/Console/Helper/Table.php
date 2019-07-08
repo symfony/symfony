@@ -101,11 +101,8 @@ class Table
 
     /**
      * Sets a style definition.
-     *
-     * @param string     $name  The style name
-     * @param TableStyle $style A TableStyle instance
      */
-    public static function setStyleDefinition($name, TableStyle $style)
+    public static function setStyleDefinition(string $name, TableStyle $style)
     {
         if (!self::$styles) {
             self::$styles = self::initStyles();
@@ -117,11 +114,9 @@ class Table
     /**
      * Gets a style definition by name.
      *
-     * @param string $name The style name
-     *
      * @return TableStyle
      */
-    public static function getStyleDefinition($name)
+    public static function getStyleDefinition(string $name)
     {
         if (!self::$styles) {
             self::$styles = self::initStyles();
@@ -161,15 +156,12 @@ class Table
     /**
      * Sets table column style.
      *
-     * @param int               $columnIndex Column index
-     * @param TableStyle|string $name        The style name or a TableStyle instance
+     * @param TableStyle|string $name The style name or a TableStyle instance
      *
      * @return $this
      */
-    public function setColumnStyle($columnIndex, $name)
+    public function setColumnStyle(int $columnIndex, $name)
     {
-        $columnIndex = (int) $columnIndex;
-
         $this->columnStyles[$columnIndex] = $this->resolveStyle($name);
 
         return $this;
@@ -180,11 +172,9 @@ class Table
      *
      * If style was not set, it returns the global table style.
      *
-     * @param int $columnIndex Column index
-     *
      * @return TableStyle
      */
-    public function getColumnStyle($columnIndex)
+    public function getColumnStyle(int $columnIndex)
     {
         return $this->columnStyles[$columnIndex] ?? $this->getStyle();
     }
@@ -192,22 +182,17 @@ class Table
     /**
      * Sets the minimum width of a column.
      *
-     * @param int $columnIndex Column index
-     * @param int $width       Minimum column width in characters
-     *
      * @return $this
      */
-    public function setColumnWidth($columnIndex, $width)
+    public function setColumnWidth(int $columnIndex, int $width)
     {
-        $this->columnWidths[(int) $columnIndex] = (int) $width;
+        $this->columnWidths[$columnIndex] = $width;
 
         return $this;
     }
 
     /**
      * Sets the minimum width of all columns.
-     *
-     * @param array $widths
      *
      * @return $this
      */

@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FileType extends AbstractType
 {
@@ -159,7 +159,7 @@ class FileType extends AbstractType
         }
 
         if (null !== $this->translator) {
-            $message = $this->translator->trans($messageTemplate, $messageParameters);
+            $message = $this->translator->trans($messageTemplate, $messageParameters, 'validators');
         } else {
             $message = strtr($messageTemplate, $messageParameters);
         }

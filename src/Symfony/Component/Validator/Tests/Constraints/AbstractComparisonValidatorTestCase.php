@@ -148,20 +148,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider provideValidComparisonsToPropertyPath
-     */
-    public function testValidComparisonToPropertyPathOnArray($comparedValue)
-    {
-        $constraint = $this->createConstraint(['propertyPath' => '[root][value]']);
-
-        $this->setObject(['root' => ['value' => 5]]);
-
-        $this->validator->validate($comparedValue, $constraint);
-
-        $this->assertNoViolation();
-    }
-
     public function testNoViolationOnNullObjectWithPropertyPath()
     {
         $constraint = $this->createConstraint(['propertyPath' => 'propertyPath']);
@@ -226,6 +212,28 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->buildViolation('Constraint Message')
             ->setParameter('{{ value }}', $dirtyValueAsString)
             ->setParameter('{{ compared_value }}', $comparedValueString)
+            ->setParameter('{{ compared_value_type }}', $comparedValueType)
+            ->setCode($this->getErrorCode())
+            ->assertRaised();
+    }
+
+    public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
+    {
+        list($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType) = current($this->provideAllInvalidComparisons());
+
+        $constraint = $this->createConstraint(['propertyPath' => 'value']);
+        $constraint->message = 'Constraint Message';
+
+        $object = new ComparisonTest_Class($comparedValue);
+
+        $this->setObject($object);
+
+        $this->validator->validate($dirtyValue, $constraint);
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', $dirtyValueAsString)
+            ->setParameter('{{ compared_value }}', $comparedValueString)
+            ->setParameter('{{ compared_value_path }}', 'value')
             ->setParameter('{{ compared_value_type }}', $comparedValueType)
             ->setCode($this->getErrorCode())
             ->assertRaised();

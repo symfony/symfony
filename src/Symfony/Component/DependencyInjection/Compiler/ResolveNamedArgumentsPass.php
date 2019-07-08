@@ -26,7 +26,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         if (!$value instanceof Definition) {
             return parent::processValue($value, $isRoot);
@@ -51,6 +51,10 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                     $class = $r instanceof \ReflectionMethod ? $r->class : $this->currentId;
                     $method = $r->getName();
                     $parameters = $r->getParameters();
+                }
+
+                if (isset($key[0]) && '$' !== $key[0] && !class_exists($key)) {
+                    throw new InvalidArgumentException(sprintf('Invalid service "%s": did you forget to add the "$" prefix to argument "%s"?', $this->currentId, $key));
                 }
 
                 if (isset($key[0]) && '$' === $key[0]) {

@@ -18,6 +18,8 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -268,6 +270,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals([new Reference('baz'), 'getClass'], $services['new_factory2']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(['BazClass', 'getInstance'], $services['new_factory3']->getFactory(), '->load() parses the factory tag');
         $this->assertSame([null, 'getInstance'], $services['new_factory4']->getFactory(), '->load() accepts factory tag without class');
+        $this->assertEquals([new Reference('baz'), '__invoke'], $services['new_factory5']->getFactory(), '->load() accepts service reference as invokable factory');
 
         $aliases = $container->getAliases();
         $this->assertArrayHasKey('alias_for_foo', $aliases, '->load() parses <service> elements');
@@ -316,6 +319,23 @@ class XmlFileLoaderTest extends TestCase
         }
     }
 
+    public function testParseTaggedArgumentsWithIndexBy()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_with_tagged_arguments.xml');
+
+        $this->assertCount(1, $container->getDefinition('foo')->getTag('foo_tag'));
+        $this->assertCount(1, $container->getDefinition('foo_tagged_iterator')->getArguments());
+        $this->assertCount(1, $container->getDefinition('foo_tagged_locator')->getArguments());
+
+        $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar');
+        $this->assertEquals($taggedIterator, $container->getDefinition('foo_tagged_iterator')->getArgument(0));
+
+        $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', true);
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_tagged_locator')->getArgument(0));
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
@@ -344,12 +364,27 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('services_deprecated.xml');
 
         $this->assertTrue($container->getDefinition('foo')->isDeprecated());
-        $message = 'The "foo" service is deprecated. You should stop using it, as it will soon be removed.';
+        $message = 'The "foo" service is deprecated. You should stop using it, as it will be removed in the future.';
         $this->assertSame($message, $container->getDefinition('foo')->getDeprecationMessage('foo'));
 
         $this->assertTrue($container->getDefinition('bar')->isDeprecated());
         $message = 'The "bar" service is deprecated.';
         $this->assertSame($message, $container->getDefinition('bar')->getDeprecationMessage('bar'));
+    }
+
+    public function testDeprecatedAliases()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('deprecated_alias_definitions.xml');
+
+        $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
+        $message = 'The "alias_for_foo" service alias is deprecated. You should stop using it, as it will be removed in the future.';
+        $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecationMessage('alias_for_foo'));
+
+        $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
+        $message = 'The "alias_for_foobar" service alias is deprecated.';
+        $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecationMessage('alias_for_foobar'));
     }
 
     public function testConvertDomElementToArray()
@@ -614,7 +649,7 @@ class XmlFileLoaderTest extends TestCase
         $fixturesDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR;
         $this->assertContains((string) new FileResource($fixturesDir.'xml'.\DIRECTORY_SEPARATOR.'services_prototype.xml'), $resources);
 
-        $prototypeRealPath = \realpath(__DIR__.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Prototype');
+        $prototypeRealPath = realpath(__DIR__.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Prototype');
         $globResource = new GlobResource(
             $fixturesDir.'Prototype',
             '/*',

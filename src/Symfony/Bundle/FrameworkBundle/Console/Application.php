@@ -19,8 +19,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\ErrorCatcher\Exception\FatalThrowableError;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -62,15 +62,13 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->kernel->boot();
-
-        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
-
         $this->registerCommands();
 
         if ($this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);
         }
+
+        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
 
         return parent::doRun($input, $output);
     }

@@ -17,11 +17,17 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class IntegerToLocalizedStringTransformerTest extends TestCase
 {
+    private $defaultLocale;
+
     protected function setUp()
     {
-        parent::setUp();
-
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
+    }
+
+    protected function tearDown()
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function transformWithRoundingProvider()
@@ -85,18 +91,6 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a precision as the first value to %s::__construct() is deprecated since Symfony 4.2 and support for it will be dropped in 5.0.
-     * @dataProvider transformWithRoundingProvider
-     */
-    public function testTransformWithRoundingUsingLegacyConstructorSignature($input, $output, $roundingMode)
-    {
-        $transformer = new IntegerToLocalizedStringTransformer(null, null, $roundingMode);
-
-        $this->assertEquals($output, $transformer->transform($input));
-    }
-
     public function testReverseTransform()
     {
         // Since we test against "de_AT", we need the full implementation
@@ -125,25 +119,6 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         \Locale::setDefault('de_DE');
 
         $transformer = new IntegerToLocalizedStringTransformer(true);
-
-        $this->assertEquals(1234, $transformer->reverseTransform('1.234'));
-        $this->assertEquals(12345, $transformer->reverseTransform('12.345'));
-        $this->assertEquals(1234, $transformer->reverseTransform('1234'));
-        $this->assertEquals(12345, $transformer->reverseTransform('12345'));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a precision as the first value to %s::__construct() is deprecated since Symfony 4.2 and support for it will be dropped in 5.0.
-     */
-    public function testReverseTransformWithGroupingUsingLegacyConstructorSignature()
-    {
-        // Since we test against "de_DE", we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
-
-        \Locale::setDefault('de_DE');
-
-        $transformer = new IntegerToLocalizedStringTransformer(null, true);
 
         $this->assertEquals(1234, $transformer->reverseTransform('1.234'));
         $this->assertEquals(12345, $transformer->reverseTransform('12.345'));
@@ -208,18 +183,6 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     public function testReverseTransformWithRounding($input, $output, $roundingMode)
     {
         $transformer = new IntegerToLocalizedStringTransformer(null, $roundingMode);
-
-        $this->assertEquals($output, $transformer->reverseTransform($input));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a precision as the first value to %s::__construct() is deprecated since Symfony 4.2 and support for it will be dropped in 5.0.
-     * @dataProvider reverseTransformWithRoundingProvider
-     */
-    public function testReverseTransformWithRoundingUsingLegacyConstructorSignature($input, $output, $roundingMode)
-    {
-        $transformer = new IntegerToLocalizedStringTransformer(null, null, $roundingMode);
 
         $this->assertEquals($output, $transformer->reverseTransform($input));
     }

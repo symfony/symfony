@@ -52,7 +52,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validateProperty($object, $propertyName, $groups = null);
+    public function validateProperty($object, string $propertyName, $groups = null);
 
     /**
      * Validates a value against the constraints specified for an object's
@@ -67,7 +67,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null);
+    public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null);
 
     /**
      * Starts a new validation context and returns a validator for that context.

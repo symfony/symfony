@@ -85,13 +85,6 @@ class HtmlDumperTest extends TestCase
     <span class=sf-dump-meta>class</span>: "<span class=sf-dump-str title="Symfony\Component\VarDumper\Tests\Dumper\HtmlDumperTest
 55 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Dumper</span><span class=sf-dump-ellipsis>\</span>HtmlDumperTest</span>"
     <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\Dumper\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {<a class=sf-dump-ref>#%d</a> &%s;}
-    <span class=sf-dump-meta>parameters</span>: {<samp>
-      <span class=sf-dump-meta>\$a</span>: {}
-      <span class=sf-dump-meta>&amp;\$b</span>: {<samp>
-        <span class=sf-dump-meta>typeHint</span>: "<span class=sf-dump-str title="3 characters">PDO</span>"
-        <span class=sf-dump-meta>default</span>: <span class=sf-dump-const>null</span>
-      </samp>}
-    </samp>}
     <span class=sf-dump-meta>file</span>: "<span class=sf-dump-str title="{$var['file']}
 %d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class=sf-dump-ellipsis>%e</span>Tests%eFixtures%edumb-var.php</span>"
     <span class=sf-dump-meta>line</span>: "<span class=sf-dump-str title="%d characters">{$var['line']} to {$var['line']}</span>"

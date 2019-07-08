@@ -68,7 +68,7 @@ class StreamOutput extends Output
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($message, $newline)
+    protected function doWrite(string $message, bool $newline)
     {
         if ($newline) {
             $message .= PHP_EOL;

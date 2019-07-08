@@ -27,7 +27,7 @@ final class Key
         $this->resource = $resource;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->resource;
     }
@@ -74,15 +74,12 @@ final class Key
      *
      * @return float|null Remaining lifetime in seconds. Null when the key won't expire.
      */
-    public function getRemainingLifetime()
+    public function getRemainingLifetime(): ?float
     {
         return null === $this->expiringTime ? null : $this->expiringTime - microtime(true);
     }
 
-    /**
-     * @return bool
-     */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return null !== $this->expiringTime && $this->expiringTime <= microtime(true);
     }

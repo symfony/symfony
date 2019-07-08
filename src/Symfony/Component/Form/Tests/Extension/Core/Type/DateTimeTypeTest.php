@@ -301,6 +301,7 @@ class DateTimeTypeTest extends BaseTypeTest
     public function testSubmitDifferentPattern()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => false,
             'date_format' => 'MM*yyyy*dd',
             'date_widget' => 'single_text',
             'time_widget' => 'single_text',
@@ -470,17 +471,6 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertArrayNotHasKey('type', $view->vars);
     }
 
-    public function testDontPassHtml5TypeIfNotHtml5Format()
-    {
-        $view = $this->factory->create(static::TESTED_TYPE, null, [
-            'widget' => 'single_text',
-            'format' => 'yyyy-MM-dd HH:mm',
-        ])
-            ->createView();
-
-        $this->assertArrayNotHasKey('type', $view->vars);
-    }
-
     public function testDontPassHtml5TypeIfNotSingleText()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
@@ -489,6 +479,19 @@ class DateTimeTypeTest extends BaseTypeTest
             ->createView();
 
         $this->assertArrayNotHasKey('type', $view->vars);
+    }
+
+    public function testSingleTextWidgetWithCustomNonHtml5Format()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, new \DateTime('2019-02-13 19:12:13'), [
+            'html5' => false,
+            'widget' => 'single_text',
+            'date_format' => \IntlDateFormatter::SHORT,
+            'format' => null,
+        ]);
+        $view = $form->createView();
+
+        $this->assertSame('2/13/19, 7:12:13 PM', $view->vars['value']);
     }
 
     public function testDateTypeChoiceErrorsBubbleUp()
@@ -670,5 +673,20 @@ class DateTimeTypeTest extends BaseTypeTest
             'Compound text field' => ['text', ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']], $expectedData],
             'Compound choice field' => ['choice', ['date' => ['year' => '2018', 'month' => '11', 'day' => '11'], 'time' => ['hour' => '21', 'minute' => '23']], $expectedData],
         ];
+    }
+
+    public function testSubmitStringWithCustomInputFormat(): void
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'input_format' => 'd/m/Y H:i:s P',
+        ]);
+
+        $form->submit('2018-01-14T21:29:00');
+
+        $this->assertSame('14/01/2018 21:29:00 +00:00', $form->getData());
     }
 }

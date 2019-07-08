@@ -81,12 +81,9 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param Application $application
-     * @param string|null $namespace
-     *
      * @return \DOMDocument
      */
-    public function getApplicationDocument(Application $application, $namespace = null)
+    public function getApplicationDocument(Application $application, string $namespace = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($rootXml = $dom->createElement('symfony'));

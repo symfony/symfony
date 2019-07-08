@@ -80,6 +80,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->idReader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->idReader->expects($this->any())
+            ->method('isSingleId')
+            ->willReturn(true)
+        ;
+
         $this->objectLoader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface')->getMock();
         $this->obj1 = (object) ['name' => 'A'];
         $this->obj2 = (object) ['name' => 'B'];
@@ -150,7 +155,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader
+            null
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -188,10 +193,6 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->idReader
         );
 
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
         $this->repository->expects($this->never())
             ->method('findAll');
 
@@ -214,10 +215,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
         $this->repository->expects($this->once())
             ->method('findAll')
             ->willReturn($choices);
@@ -237,10 +234,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         );
 
         $value = [$this->idReader, 'getIdValue'];
-
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
 
         $this->repository->expects($this->never())
             ->method('findAll');
@@ -303,10 +296,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj2, $this->obj3];
 
         $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
-        $this->idReader->expects($this->any())
             ->method('getIdField')
             ->willReturn('idField');
 
@@ -342,10 +331,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
         $this->repository->expects($this->once())
             ->method('findAll')
             ->willReturn($choices);
@@ -369,10 +354,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         $value = [$this->idReader, 'getIdValue'];
 
         $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
-        $this->idReader->expects($this->any())
             ->method('getIdField')
             ->willReturn('idField');
 
@@ -392,5 +373,20 @@ class DoctrineChoiceLoaderTest extends TestCase
             ]);
 
         $this->assertSame([$this->obj2], $loader->loadChoicesForValues(['2'], $value));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The second argument `$idReader` of "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader::__construct" must be null when the query cannot be optimized because of composite id fields.
+     */
+    public function testPassingIdReaderWithoutSingleIdEntity()
+    {
+        $idReader = $this->createMock(IdReader::class);
+        $idReader->expects($this->once())
+            ->method('isSingleId')
+            ->willReturn(false)
+        ;
+
+        new DoctrineChoiceLoader($this->om, $this->class, $idReader, $this->objectLoader);
     }
 }

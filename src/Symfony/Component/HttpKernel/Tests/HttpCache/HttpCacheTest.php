@@ -1508,6 +1508,44 @@ class HttpCacheTest extends HttpCacheTestCase
         // Surrogate request
         $cache->handle($request, HttpKernelInterface::SUB_REQUEST);
     }
+
+    public function testTraceHeaderNameCanBeChanged()
+    {
+        $this->cacheConfig['trace_header'] = 'X-My-Header';
+        $this->setNextResponse();
+        $this->request('GET', '/');
+
+        $this->assertTrue($this->response->headers->has('X-My-Header'));
+    }
+
+    public function testTraceLevelDefaultsToFullIfDebug()
+    {
+        $this->setNextResponse();
+        $this->request('GET', '/');
+
+        $this->assertTrue($this->response->headers->has('X-Symfony-Cache'));
+        $this->assertEquals('GET /: miss', $this->response->headers->get('X-Symfony-Cache'));
+    }
+
+    public function testTraceLevelDefaultsToNoneIfNotDebug()
+    {
+        $this->cacheConfig['debug'] = false;
+        $this->setNextResponse();
+        $this->request('GET', '/');
+
+        $this->assertFalse($this->response->headers->has('X-Symfony-Cache'));
+    }
+
+    public function testTraceLevelShort()
+    {
+        $this->cacheConfig['trace_level'] = 'short';
+
+        $this->setNextResponse();
+        $this->request('GET', '/');
+
+        $this->assertTrue($this->response->headers->has('X-Symfony-Cache'));
+        $this->assertEquals('miss', $this->response->headers->get('X-Symfony-Cache'));
+    }
 }
 
 class TestKernel implements HttpKernelInterface

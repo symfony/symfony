@@ -50,7 +50,7 @@ class ResolveBindingsPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unused binding "$quz" in service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy".
+     * @expectedExceptionMessage A binding is configured for an argument named "$quz" for service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy", but no corresponding argument has been found. It may be unused and should be removed, or it may have a typo.
      */
     public function testUnusedBinding()
     {

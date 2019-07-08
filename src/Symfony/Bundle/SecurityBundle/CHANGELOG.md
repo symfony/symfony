@@ -1,10 +1,34 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * Removed the ability to configure encoders using `argon2i` or `bcrypt` as algorithm, use `auto` instead
+ * The `simple_form` and `simple_preauth` authentication listeners have been removed,
+   use Guard instead.
+ * The `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes have been removed,
+   use Guard instead.
+ * Removed `LogoutUrlHelper` and `SecurityHelper` templating helpers, use Twig instead
+ * Removed the `logout_on_user_change` firewall option
+ * Removed the `threads` encoder option
+ * Removed the `security.authentication.trust_resolver.anonymous_class` parameter
+ * Removed the `security.authentication.trust_resolver.rememberme_class` parameter
+
+4.3.0
+-----
+
+ * Added new encoder types: `auto` (recommended), `native` and `sodium`
+ * The normalization of the cookie names configured in the `logout.delete_cookies`
+   option is deprecated and will be disabled in Symfony 5.0. This affects to cookies
+   with dashes in their names. For example, starting from Symfony 5.0, the `my-cookie`
+   name will delete `my-cookie` (with a dash) instead of `my_cookie` (with an underscore).
+ * Deprecated configuring encoders using `argon2i` as algorithm, use `auto` instead
+
 4.2.0
 -----
 
- * Using the `security.authentication.trust_resolver.anonymous_class` and 
+ * Using the `security.authentication.trust_resolver.anonymous_class` and
    `security.authentication.trust_resolver.rememberme_class` parameters to define
    the token classes is deprecated. To use custom tokens extend the existing
    `Symfony\Component\Security\Core\Authentication\Token\AnonymousToken`.
@@ -17,7 +41,7 @@ CHANGELOG
  * Deprecated the `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes, use Guard instead.
  * Added `port` in access_control
  * Added individual voter decisions to the profiler
- 
+
 4.1.0
 -----
 
@@ -50,7 +74,7 @@ CHANGELOG
  * Tagging voters with the `security.voter` tag without implementing the
    `VoterInterface` on the class is now deprecated and will be removed in 4.0.
  * [BC BREAK] `FirewallContext::getListeners()` now returns `\Traversable|array`
- * added info about called security listeners in profiler 
+ * added info about called security listeners in profiler
  * Added `logout_on_user_change` to the firewall options. This config item will
    trigger a logout when the user has changed. Should be set to true to avoid
    deprecations in the configuration.

@@ -12,9 +12,8 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -24,6 +23,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
@@ -31,8 +31,10 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  * for instance).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
  */
-abstract class AbstractPreAuthenticatedListener implements ListenerInterface
+abstract class AbstractPreAuthenticatedListener
 {
     protected $logger;
     private $tokenStorage;
@@ -53,7 +55,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     /**
      * Handles pre-authentication.
      */
-    final public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
 
@@ -92,7 +94,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 
             if (null !== $this->dispatcher) {
                 $loginEvent = new InteractiveLoginEvent($request, $token);
-                $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+                $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
             }
         } catch (AuthenticationException $e) {
             $this->clearToken($e);

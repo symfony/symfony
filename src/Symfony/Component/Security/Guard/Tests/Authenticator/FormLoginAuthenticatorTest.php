@@ -103,7 +103,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
         return true;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
     {
     }
 

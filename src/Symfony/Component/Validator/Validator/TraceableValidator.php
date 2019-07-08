@@ -105,7 +105,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty($object, $propertyName, $groups = null)
+    public function validateProperty($object, string $propertyName, $groups = null)
     {
         return $this->validator->validateProperty($object, $propertyName, $groups);
     }
@@ -113,7 +113,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null)
+    public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null)
     {
         return $this->validator->validatePropertyValue($objectOrClass, $propertyName, $value, $groups);
     }

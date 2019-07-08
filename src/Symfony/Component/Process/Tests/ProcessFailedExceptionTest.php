@@ -27,7 +27,7 @@ class ProcessFailedExceptionTest extends TestCase
         $process = $this->getMockBuilder('Symfony\Component\Process\Process')->setMethods(['isSuccessful'])->setConstructorArgs([['php']])->getMock();
         $process->expects($this->once())
             ->method('isSuccessful')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         if (method_exists($this, 'expectException')) {
             $this->expectException(\InvalidArgumentException::class);
@@ -55,31 +55,31 @@ class ProcessFailedExceptionTest extends TestCase
         $process = $this->getMockBuilder('Symfony\Component\Process\Process')->setMethods(['isSuccessful', 'getOutput', 'getErrorOutput', 'getExitCode', 'getExitCodeText', 'isOutputDisabled', 'getWorkingDirectory'])->setConstructorArgs([[$cmd]])->getMock();
         $process->expects($this->once())
             ->method('isSuccessful')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $process->expects($this->once())
             ->method('getOutput')
-            ->will($this->returnValue($output));
+            ->willReturn($output);
 
         $process->expects($this->once())
             ->method('getErrorOutput')
-            ->will($this->returnValue($errorOutput));
+            ->willReturn($errorOutput);
 
         $process->expects($this->once())
             ->method('getExitCode')
-            ->will($this->returnValue($exitCode));
+            ->willReturn($exitCode);
 
         $process->expects($this->once())
             ->method('getExitCodeText')
-            ->will($this->returnValue($exitText));
+            ->willReturn($exitText);
 
         $process->expects($this->once())
             ->method('isOutputDisabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $process->expects($this->once())
             ->method('getWorkingDirectory')
-            ->will($this->returnValue($workingDirectory));
+            ->willReturn($workingDirectory);
 
         $exception = new ProcessFailedException($process);
 
@@ -103,7 +103,7 @@ class ProcessFailedExceptionTest extends TestCase
         $process = $this->getMockBuilder('Symfony\Component\Process\Process')->setMethods(['isSuccessful', 'isOutputDisabled', 'getExitCode', 'getExitCodeText', 'getOutput', 'getErrorOutput', 'getWorkingDirectory'])->setConstructorArgs([[$cmd]])->getMock();
         $process->expects($this->once())
             ->method('isSuccessful')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $process->expects($this->never())
             ->method('getOutput');
@@ -113,19 +113,19 @@ class ProcessFailedExceptionTest extends TestCase
 
         $process->expects($this->once())
             ->method('getExitCode')
-            ->will($this->returnValue($exitCode));
+            ->willReturn($exitCode);
 
         $process->expects($this->once())
             ->method('getExitCodeText')
-            ->will($this->returnValue($exitText));
+            ->willReturn($exitText);
 
         $process->expects($this->once())
             ->method('isOutputDisabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $process->expects($this->once())
             ->method('getWorkingDirectory')
-            ->will($this->returnValue($workingDirectory));
+            ->willReturn($workingDirectory);
 
         $exception = new ProcessFailedException($process);
 

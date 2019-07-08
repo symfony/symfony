@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Exception;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
- *
- * @experimental in 4.2
  */
 class LogicException extends \LogicException implements ExceptionInterface
 {

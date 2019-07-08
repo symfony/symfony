@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\AbstractClassCon
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\ActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\DefaultValueController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\ExplicitLocalizedActionPathController;
+use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\GlobalDefaultsClass;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\InvokableController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\InvokableLocalizedController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\LocalizedActionPathController;
@@ -35,6 +36,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\PrefixedActionLo
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\PrefixedActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RouteWithPrefixController;
+use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\Utf8ActionControllers;
 
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
@@ -89,11 +91,8 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo" in "Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController"?
-     * @expectedDeprecation A placeholder name must be a string (1 given). Did you forget to specify the placeholder key for the requirement "\d+" in "Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController"?
-     * @expectedDeprecation A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo" of route "foo" in "Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController::foo()"?
-     * @expectedDeprecation A placeholder name must be a string (1 given). Did you forget to specify the placeholder key for the requirement "\d+" of route "foo" in "Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController::foo()"?
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"
      */
     public function testRequirementsWithoutPlaceholderName()
     {
@@ -159,6 +158,32 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals('/the/path', $routes->get('post.en')->getPath());
     }
 
+    public function testGlobalDefaultsRoutesLoadWithAnnotation()
+    {
+        $routes = $this->loader->load(GlobalDefaultsClass::class);
+        $this->assertCount(2, $routes);
+
+        $specificLocaleRoute = $routes->get('specific_locale');
+
+        $this->assertSame('/defaults/specific-locale', $specificLocaleRoute->getPath());
+        $this->assertSame('s_locale', $specificLocaleRoute->getDefault('_locale'));
+        $this->assertSame('g_format', $specificLocaleRoute->getDefault('_format'));
+
+        $specificFormatRoute = $routes->get('specific_format');
+
+        $this->assertSame('/defaults/specific-format', $specificFormatRoute->getPath());
+        $this->assertSame('g_locale', $specificFormatRoute->getDefault('_locale'));
+        $this->assertSame('s_format', $specificFormatRoute->getDefault('_format'));
+    }
+
+    public function testUtf8RoutesLoadWithAnnotation()
+    {
+        $routes = $this->loader->load(Utf8ActionControllers::class);
+        $this->assertCount(2, $routes);
+        $this->assertTrue($routes->get('one')->getOption('utf8'), 'The route must accept utf8');
+        $this->assertFalse($routes->get('two')->getOption('utf8'), 'The route must not accept utf8');
+    }
+
     public function testRouteWithPathWithPrefix()
     {
         $routes = $this->loader->load(PrefixedActionPathController::class);
@@ -205,12 +230,12 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $reader
             ->expects($this->exactly(1))
             ->method('getClassAnnotations')
-            ->will($this->returnValue([new RouteAnnotation($classRouteData1), new RouteAnnotation($classRouteData2)]))
+            ->willReturn([new RouteAnnotation($classRouteData1), new RouteAnnotation($classRouteData2)])
         ;
         $reader
             ->expects($this->once())
             ->method('getMethodAnnotations')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
         $loader = new class($reader) extends AnnotationClassLoader {
             protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
@@ -276,6 +301,34 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertCount(2, $routes);
         $this->assertEquals('/en/suffix', $routes->get('action.en')->getPath());
         $this->assertEquals('/nl/suffix', $routes->get('action.nl')->getPath());
+    }
+
+    /**
+     * @requires function mb_strtolower
+     */
+    public function testDefaultRouteName()
+    {
+        $methodRouteData = [
+            'name' => null,
+        ];
+
+        $reader = $this->getReader();
+        $reader
+            ->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->willReturn([new RouteAnnotation($methodRouteData)])
+        ;
+
+        $loader = new class($reader) extends AnnotationClassLoader {
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            {
+            }
+        };
+        $routeCollection = $loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\EncodingClass');
+
+        $defaultName = array_keys($routeCollection->all())[0];
+
+        $this->assertSame($defaultName, 'symfony_component_routing_tests_fixtures_annotatedclasses_encodingclass_routeàction');
     }
 
     public function testLoadingRouteWithPrefix()

@@ -68,11 +68,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
     /**
      * Adds a route.
-     *
-     * @param string $name  The route name
-     * @param Route  $route A Route instance
      */
-    public function add($name, Route $route)
+    public function add(string $name, Route $route)
     {
         unset($this->routes[$name]);
 
@@ -92,11 +89,9 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Gets a route by name.
      *
-     * @param string $name The route name
-     *
      * @return Route|null A Route instance or null when not found
      */
-    public function get($name)
+    public function get(string $name)
     {
         return isset($this->routes[$name]) ? $this->routes[$name] : null;
     }
@@ -133,12 +128,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
     /**
      * Adds a prefix to the path of all child routes.
-     *
-     * @param string $prefix       An optional prefix to add before each pattern of the route collection
-     * @param array  $defaults     An array of default values
-     * @param array  $requirements An array of requirements
      */
-    public function addPrefix($prefix, array $defaults = [], array $requirements = [])
+    public function addPrefix(string $prefix, array $defaults = [], array $requirements = [])
     {
         $prefix = trim(trim($prefix), '/');
 
@@ -172,12 +163,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
     /**
      * Sets the host pattern on all routes.
-     *
-     * @param string $pattern      The pattern
-     * @param array  $defaults     An array of default values
-     * @param array  $requirements An array of requirements
      */
-    public function setHost($pattern, array $defaults = [], array $requirements = [])
+    public function setHost(?string $pattern, array $defaults = [], array $requirements = [])
     {
         foreach ($this->routes as $route) {
             $route->setHost($pattern);
@@ -190,10 +177,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Sets a condition on all routes.
      *
      * Existing conditions will be overridden.
-     *
-     * @param string $condition The condition
      */
-    public function setCondition($condition)
+    public function setCondition(?string $condition)
     {
         foreach ($this->routes as $route) {
             $route->setCondition($condition);
@@ -204,8 +189,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds defaults to all routes.
      *
      * An existing default value under the same name in a route will be overridden.
-     *
-     * @param array $defaults An array of default values
      */
     public function addDefaults(array $defaults)
     {
@@ -220,8 +203,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds requirements to all routes.
      *
      * An existing requirement under the same name in a route will be overridden.
-     *
-     * @param array $requirements An array of requirements
      */
     public function addRequirements(array $requirements)
     {
@@ -236,8 +217,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds options to all routes.
      *
      * An existing option value under the same name in a route will be overridden.
-     *
-     * @param array $options An array of options
      */
     public function addOptions(array $options)
     {

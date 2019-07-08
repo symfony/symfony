@@ -79,6 +79,15 @@ class ClockMock
         return \date($format, $timestamp);
     }
 
+    public static function gmdate($format, $timestamp = null)
+    {
+        if (null === $timestamp) {
+            $timestamp = self::time();
+        }
+
+        return \gmdate($format, $timestamp);
+    }
+
     public static function register($class)
     {
         $self = \get_called_class();
@@ -122,6 +131,10 @@ function date(\$format, \$timestamp = null)
     return \\$self::date(\$format, \$timestamp);
 }
 
+function gmdate(\$format, \$timestamp = null)
+{
+    return \\$self::gmdate(\$format, \$timestamp);
+}
 EOPHP
             );
         }

@@ -20,17 +20,19 @@ class DateTypeTest extends BaseTypeTest
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 
     private $defaultTimezone;
+    private $defaultLocale;
 
     protected function setUp()
     {
         parent::setUp();
         $this->defaultTimezone = date_default_timezone_get();
+        $this->defaultLocale = \Locale::getDefault();
     }
 
     protected function tearDown()
     {
         date_default_timezone_set($this->defaultTimezone);
-        \Locale::setDefault('en');
+        \Locale::setDefault($this->defaultLocale);
     }
 
     /**
@@ -76,6 +78,7 @@ class DateTypeTest extends BaseTypeTest
             'widget' => 'single_text',
             'input' => 'datetime',
             'format' => 'yyyy',
+            'html5' => false,
         ]);
 
         $form->submit('2010');
@@ -93,6 +96,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -114,6 +118,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -136,6 +141,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -157,6 +163,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -180,6 +187,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -270,6 +278,7 @@ class DateTypeTest extends BaseTypeTest
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
+            'html5' => false,
             'widget' => 'single_text',
             'input' => 'datetime',
         ]);
@@ -286,6 +295,7 @@ class DateTypeTest extends BaseTypeTest
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
+            'html5' => false,
             'widget' => 'single_text',
             'input' => 'string',
         ]);
@@ -302,6 +312,7 @@ class DateTypeTest extends BaseTypeTest
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
+            'html5' => false,
             'widget' => 'single_text',
             'input' => 'timestamp',
         ]);
@@ -320,6 +331,7 @@ class DateTypeTest extends BaseTypeTest
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
+            'html5' => false,
             'widget' => 'single_text',
             'input' => 'array',
         ]);
@@ -368,6 +380,7 @@ class DateTypeTest extends BaseTypeTest
     {
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => '0',
+            'html5' => false,
             'widget' => 'single_text',
             'input' => 'string',
         ]);
@@ -394,6 +407,7 @@ class DateTypeTest extends BaseTypeTest
         $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
             'format' => 'wrong',
+            'html5' => false,
         ]);
     }
 
@@ -456,6 +470,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => 'America/New_York',
             'input' => 'string',
@@ -478,6 +493,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => 'America/New_York',
             'input' => 'datetime',
@@ -856,6 +872,7 @@ class DateTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
             'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
         ])
             ->createView();
 
@@ -1036,5 +1053,20 @@ class DateTypeTest extends BaseTypeTest
             'Compound text fields' => ['text', ['year' => '2018', 'month' => '11', 'day' => '11'], $expectedData],
             'Compound choice fields' => ['choice', ['year' => '2018', 'month' => '11', 'day' => '11'], $expectedData],
         ];
+    }
+
+    public function testSubmitStringWithCustomInputFormat(): void
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'string',
+            'input_format' => 'd/m/Y',
+        ]);
+
+        $form->submit('2018-01-14');
+
+        $this->assertSame('14/01/2018', $form->getData());
     }
 }

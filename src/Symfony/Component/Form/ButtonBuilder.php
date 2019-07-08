@@ -60,6 +60,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
         $this->name = $name;
         $this->options = $options;
+
+        FormConfigBuilder::validateName($name);
     }
 
     /**

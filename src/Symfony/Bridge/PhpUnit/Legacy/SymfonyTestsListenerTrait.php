@@ -53,7 +53,7 @@ class SymfonyTestsListenerTrait
             Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
         }
 
-        $enableDebugClassLoader = \class_exists('Symfony\Component\Debug\DebugClassLoader');
+        $enableDebugClassLoader = class_exists('Symfony\Component\Debug\DebugClassLoader');
 
         foreach ($mockedNamespaces as $type => $namespaces) {
             if (!\is_array($namespaces)) {
@@ -284,7 +284,8 @@ class SymfonyTestsListenerTrait
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
                 $error = serialize(array('deprecation' => $deprecation[1], 'class' => $className, 'method' => $test->getName(false), 'triggering_file' => isset($deprecation[2]) ? $deprecation[2] : null));
                 if ($deprecation[0]) {
-                    @trigger_error($error, E_USER_DEPRECATED);
+                    // unsilenced on purpose
+                    trigger_error($error, E_USER_DEPRECATED);
                 } else {
                     @trigger_error($error, E_USER_DEPRECATED);
                 }

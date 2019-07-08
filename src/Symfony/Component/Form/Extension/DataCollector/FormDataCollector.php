@@ -27,6 +27,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final
  */
 class FormDataCollector extends DataCollector implements FormDataCollectorInterface
 {
@@ -216,7 +218,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'form';
     }
@@ -224,12 +226,15 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
 
-    public function serialize()
+    /**
+     * @internal
+     */
+    public function __sleep()
     {
         foreach ($this->data['forms_by_hash'] as &$form) {
             if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {
@@ -237,13 +242,15 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             }
         }
 
-        return serialize($this->cloneVar($this->data));
+        $this->data = $this->cloneVar($this->data);
+
+        return parent::__sleep();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getCasters()
+    protected function getCasters(): array
     {
         return parent::getCasters() + [
             \Exception::class => function (\Exception $e, array $a, Stub $s) {

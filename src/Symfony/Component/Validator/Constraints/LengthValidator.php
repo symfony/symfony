@@ -30,7 +30,7 @@ class LengthValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Length');
         }
 
-        if (null === $value || '' === $value) {
+        if (null === $value || ('' === $value && $constraint->allowEmptyString)) {
             return;
         }
 
@@ -39,6 +39,10 @@ class LengthValidator extends ConstraintValidator
         }
 
         $stringValue = (string) $value;
+
+        if (null !== $constraint->normalizer) {
+            $stringValue = ($constraint->normalizer)($stringValue);
+        }
 
         if (!$invalidCharset = !@mb_check_encoding($stringValue, $constraint->charset)) {
             $length = mb_strlen($stringValue, $constraint->charset);

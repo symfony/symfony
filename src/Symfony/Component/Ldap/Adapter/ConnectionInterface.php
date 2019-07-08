@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Ldap\Adapter;
 
+use Symfony\Component\Ldap\Exception\AlreadyExistsException;
+use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
+
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
  */
@@ -24,10 +28,11 @@ interface ConnectionInterface
     public function isBound();
 
     /**
-     * Binds the connection against a DN and password.
+     * Binds the connection against a user's DN and password.
      *
-     * @param string $dn       The user's DN
-     * @param string $password The associated password
+     * @throws AlreadyExistsException      When the connection can't be created because of an LDAP_ALREADY_EXISTS error
+     * @throws ConnectionTimeoutException  When the connection can't be created because of an LDAP_TIMEOUT error
+     * @throws InvalidCredentialsException When the connection can't be created because of an LDAP_INVALID_CREDENTIALS error
      */
-    public function bind($dn = null, $password = null);
+    public function bind(string $dn = null, string $password = null);
 }

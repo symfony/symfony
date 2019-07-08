@@ -56,19 +56,19 @@ class SerializerTest extends TestCase
     }
 
     /**
-     * @expectedDeprecation Passing normalizers ("stdClass") which do not implement either "Symfony\Component\Serializer\Normalizer\NormalizerInterface" or "Symfony\Component\Serializer\Normalizer\DenormalizerInterface" has been deprecated since Symfony 4.2.
-     * @group legacy
+     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The class "stdClass" neither implements "Symfony\Component\Serializer\Normalizer\NormalizerInterface" nor "Symfony\Component\Serializer\Normalizer\DenormalizerInterface".
      */
-    public function testDeprecationErrorOnInvalidNormalizer()
+    public function testItThrowsExceptionOnInvalidNormalizer()
     {
         new Serializer([new \stdClass()]);
     }
 
     /**
-     * @expectedDeprecation Passing encoders ("stdClass") which do not implement either "Symfony\Component\Serializer\Encoder\EncoderInterface" or "Symfony\Component\Serializer\Encoder\DecoderInterface" has been deprecated since Symfony 4.2.
-     * @group legacy
+     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The class "stdClass" neither implements "Symfony\Component\Serializer\Encoder\EncoderInterface" nor "Symfony\Component\Serializer\Encoder\DecoderInterface"
      */
-    public function testDeprecationErrorOnInvalidEncoder()
+    public function testItThrowsExceptionOnInvalidEncoder()
     {
         new Serializer([], [new \stdClass()]);
     }
@@ -384,14 +384,14 @@ class SerializerTest extends TestCase
         $example = new AbstractDummyFirstChild('foo-value', 'bar-value');
 
         $loaderMock = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
-        $loaderMock->method('hasMetadataFor')->will($this->returnValueMap([
+        $loaderMock->method('hasMetadataFor')->willReturnMap([
             [
                 AbstractDummy::class,
                 true,
             ],
-        ]));
+        ]);
 
-        $loaderMock->method('getMetadataFor')->will($this->returnValueMap([
+        $loaderMock->method('getMetadataFor')->willReturnMap([
             [
                 AbstractDummy::class,
                 new ClassMetadata(
@@ -402,7 +402,7 @@ class SerializerTest extends TestCase
                     ])
                 ),
             ],
-        ]));
+        ]);
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
         $serializer = new Serializer([new ObjectNormalizer(null, null, null, null, $discriminatorResolver)], ['json' => new JsonEncoder()]);

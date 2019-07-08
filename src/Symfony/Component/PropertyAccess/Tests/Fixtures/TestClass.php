@@ -25,6 +25,7 @@ class TestClass
     private $publicAccessorWithMoreRequiredParameters;
     private $publicIsAccessor;
     private $publicHasAccessor;
+    private $publicCanAccessor;
     private $publicGetter;
     private $date;
 
@@ -39,6 +40,7 @@ class TestClass
         $this->publicAccessorWithMoreRequiredParameters = $value;
         $this->publicIsAccessor = $value;
         $this->publicHasAccessor = $value;
+        $this->publicCanAccessor = $value;
         $this->publicGetter = $value;
     }
 
@@ -100,6 +102,16 @@ class TestClass
     public function hasPublicHasAccessor()
     {
         return $this->publicHasAccessor;
+    }
+
+    public function setPublicCanAccessor($value)
+    {
+        $this->publicCanAccessor = $value;
+    }
+
+    public function canPublicCanAccessor()
+    {
+        return $this->publicCanAccessor;
     }
 
     public function publicGetSetter($value = null)

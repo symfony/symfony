@@ -128,13 +128,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
-                ->booleanNode('strict_variables')
-                    ->defaultValue(function () {
-                        @trigger_error('Relying on the default value ("false") of the "twig.strict_variables" configuration option is deprecated since Symfony 4.1. You should use "%kernel.debug%" explicitly instead, which will be the new default in 5.0.', E_USER_DEPRECATED);
-
-                        return false;
-                    })
-                ->end()
+                ->booleanNode('strict_variables')->defaultValue('%kernel.debug%')->end()
                 ->scalarNode('auto_reload')->end()
                 ->integerNode('optimizations')->min(-1)->end()
                 ->scalarNode('default_path')

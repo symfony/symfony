@@ -28,25 +28,20 @@ interface TemplateReferenceInterface
     /**
      * Sets a template parameter.
      *
-     * @param string $name  The parameter name
-     * @param string $value The parameter value
-     *
      * @return $this
      *
      * @throws \InvalidArgumentException if the parameter name is not supported
      */
-    public function set($name, $value);
+    public function set(string $name, string $value);
 
     /**
      * Gets a template parameter.
-     *
-     * @param string $name The parameter name
      *
      * @return string The parameter value
      *
      * @throws \InvalidArgumentException if the parameter name is not supported
      */
-    public function get($name);
+    public function get(string $name);
 
     /**
      * Returns the path to the template.

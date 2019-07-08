@@ -39,7 +39,7 @@ class XmlFileLoader extends FileLoader
      * @throws \InvalidArgumentException when the file cannot be loaded or when the XML cannot be
      *                                   parsed because it does not validate against the scheme
      */
-    public function load($file, $type = null)
+    public function load($file, string $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -91,7 +91,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return \is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
     }
@@ -168,6 +168,7 @@ class XmlFileLoader extends FileLoader
 
         $this->setCurrentDir(\dirname($path));
 
+        /** @var RouteCollection[] $imported */
         $imported = $this->import($resource, ('' !== $type ? $type : null), false, $file);
 
         if (!\is_array($imported)) {
@@ -311,6 +312,15 @@ class XmlFileLoader extends FileLoader
             }
 
             $defaults['_controller'] = $controller;
+        }
+        if ($node->hasAttribute('locale')) {
+            $defaults['_locale'] = $node->getAttribute('locale');
+        }
+        if ($node->hasAttribute('format')) {
+            $defaults['_format'] = $node->getAttribute('format');
+        }
+        if ($node->hasAttribute('utf8')) {
+            $options['utf8'] = XmlUtils::phpize($node->getAttribute('utf8'));
         }
 
         return [$defaults, $requirements, $options, $condition, $paths, $prefixes];

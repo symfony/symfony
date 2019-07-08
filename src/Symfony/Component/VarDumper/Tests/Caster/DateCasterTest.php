@@ -94,10 +94,6 @@ EODUMP;
      */
     public function testDumpInterval($intervalSpec, $ms, $invert, $expected)
     {
-        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
-            $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
-        }
-
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
@@ -114,10 +110,6 @@ EODUMP;
      */
     public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected)
     {
-        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
-            $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
-        }
-
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
@@ -134,10 +126,6 @@ EODUMP;
      */
     public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds)
     {
-        if ($ms && \PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
-            $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
-        }
-
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
         $stub = new Stub();
 
@@ -371,10 +359,6 @@ EODUMP;
             ['2017-01-01', 'P1D', '2017-01-04', \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) to 2017-01-04 00:00:00.0', '1) 2017-01-02%a2) 2017-01-03'],
             ['2017-01-01', 'P1D', 2, \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) recurring 2 time/s', '1) 2017-01-02%a2) 2017-01-03'],
         ];
-
-        if (\PHP_VERSION_ID < 70107) {
-            array_walk($periods, function (&$i) { $i[5] = ''; });
-        }
 
         return $periods;
     }

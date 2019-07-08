@@ -233,6 +233,19 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame('hello', $result);
     }
 
+    public function testGetEnvTrim()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('trim', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return " hello\n";
+        });
+
+        $this->assertSame('hello', $result);
+    }
+
     /**
      * @dataProvider validJson
      */
@@ -317,7 +330,7 @@ class EnvVarProcessorTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Invalid configuration: env var "key:foo" does not contain a key specifier.
+     * @expectedExceptionMessage Invalid env "key:foo": a key specifier should be provided.
      */
     public function testGetEnvKeyInvalidKey()
     {
@@ -355,7 +368,7 @@ class EnvVarProcessorTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvNotFoundException
      * @expectedExceptionMessage Key "index" not found in
      * @dataProvider invalidArrayValues
      */
@@ -419,5 +432,58 @@ class EnvVarProcessorTest extends TestCase
                 'index' => 'password',
             ];
         }));
+    }
+
+    /**
+     * @dataProvider validNullables
+     */
+    public function testGetEnvNullable($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+        $result = $processor->getEnv('default', ':foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+        $this->assertSame($processed, $result);
+    }
+
+    public function validNullables()
+    {
+        return [
+            ['hello', 'hello'],
+            ['', null],
+            ['null', 'null'],
+            ['Null', 'Null'],
+            ['NULL', 'NULL'],
+         ];
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvNotFoundException
+     * @expectedExceptionMessage missing-file
+     */
+    public function testRequireMissingFile()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('require', '/missing-file', function ($name) {
+            return $name;
+        });
+    }
+
+    public function testRequireFile()
+    {
+        $path = __DIR__.'/Fixtures/php/return_foo_string.php';
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('require', $path, function ($name) use ($path) {
+            $this->assertSame($path, $name);
+
+            return $path;
+        });
+
+        $this->assertEquals('foo', $result);
     }
 }

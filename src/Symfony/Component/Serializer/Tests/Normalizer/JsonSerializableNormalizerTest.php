@@ -55,11 +55,11 @@ class JsonSerializableNormalizerTest extends TestCase
         $this->serializer
             ->expects($this->once())
             ->method('normalize')
-            ->will($this->returnCallback(function ($data) {
+            ->willReturnCallback(function ($data) {
                 $this->assertArraySubset(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $data);
 
                 return 'string_object';
-            }))
+            })
         ;
 
         $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
@@ -70,32 +70,16 @@ class JsonSerializableNormalizerTest extends TestCase
      */
     public function testCircularNormalize()
     {
-        $this->doTestCircularNormalize();
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\CircularReferenceException
-     */
-    public function testLegacyCircularNormalize()
-    {
-        $this->doTestCircularNormalize(true);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\CircularReferenceException
-     */
-    private function doTestCircularNormalize(bool $legacy = false)
-    {
-        $legacy ? $this->normalizer->setCircularReferenceLimit(1) : $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
+        $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
         $this->serializer
             ->expects($this->once())
             ->method('normalize')
-            ->will($this->returnCallback(function ($data, $format, $context) {
+            ->willReturnCallback(function ($data, $format, $context) {
                 $this->normalizer->normalize($data['qux'], $format, $context);
 
                 return 'string_object';
-            }))
+            })
         ;
 
         $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));

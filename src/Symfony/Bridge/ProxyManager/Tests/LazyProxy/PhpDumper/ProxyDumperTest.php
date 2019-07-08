@@ -14,6 +14,7 @@ namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
 /**
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper}.
@@ -108,17 +109,6 @@ class ProxyDumperTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Missing factory code to construct the service "foo".
-     */
-    public function testGetProxyFactoryCodeWithoutCustomMethod()
-    {
-        $definition = new Definition(__CLASS__);
-        $definition->setLazy(true);
-        $this->dumper->getProxyFactoryCode($definition, 'foo');
-    }
-
     public function testGetProxyFactoryCodeForInterface()
     {
         $class = DummyClass::class;
@@ -182,6 +172,7 @@ EOPHP;
         $definitions = [
             [new Definition(__CLASS__), true],
             [new Definition('stdClass'), true],
+            [new Definition(DumperInterface::class), true],
             [new Definition(uniqid('foo', true)), false],
             [new Definition(), false],
         ];

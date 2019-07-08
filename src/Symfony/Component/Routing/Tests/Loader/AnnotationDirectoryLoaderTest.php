@@ -29,18 +29,18 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     public function testLoad()
     {
-        $this->reader->expects($this->exactly(3))->method('getClassAnnotation');
+        $this->reader->expects($this->exactly(4))->method('getClassAnnotation');
 
         $this->reader
             ->expects($this->any())
             ->method('getMethodAnnotations')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $this->reader
             ->expects($this->any())
             ->method('getClassAnnotations')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
@@ -52,18 +52,19 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BazClass',
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\FooClass',
+            'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\EncodingClass',
         ]);
 
         $this->reader
             ->expects($this->any())
             ->method('getMethodAnnotations')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $this->reader
             ->expects($this->any())
             ->method('getClassAnnotations')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
@@ -92,7 +93,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->reader
             ->expects($this->any())
             ->method('getMethodAnnotations')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php');

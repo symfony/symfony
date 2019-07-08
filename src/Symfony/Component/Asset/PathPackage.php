@@ -51,13 +51,9 @@ class PathPackage extends Package
     /**
      * {@inheritdoc}
      */
-    public function getUrl($path)
+    public function getUrl(string $path)
     {
-        if ($this->isAbsoluteUrl($path)) {
-            return $path;
-        }
-
-        $versionedPath = $this->getVersionStrategy()->applyVersion($path);
+        $versionedPath = parent::getUrl($path);
 
         // if absolute or begins with /, we're done
         if ($this->isAbsoluteUrl($versionedPath) || ($versionedPath && '/' === $versionedPath[0])) {

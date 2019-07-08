@@ -1,4 +1,3 @@
-
 Symfony\Component\Form\Tests\Console\Descriptor\FooType (empty_data)
 ====================================================================
 
@@ -22,6 +21,6 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (empty_data)
  ---------------- ----------------------%s 
   Allowed values   -                    %s 
  ---------------- ----------------------%s 
-  Normalizer       -                    %s 
+  Normalizers      -                    %s
  ---------------- ----------------------%s 
 

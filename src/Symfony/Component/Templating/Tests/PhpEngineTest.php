@@ -86,7 +86,7 @@ class PhpEngineTest extends TestCase
         $foo = new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('foo');
         $engine->set($foo);
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('\LogicException');
+        $this->expectException('\LogicException');
 
         unset($engine['foo']);
     }
@@ -219,7 +219,7 @@ class ProjectTemplateLoader extends Loader
         return false;
     }
 
-    public function isFresh(TemplateReferenceInterface $template, $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time)
     {
         return false;
     }

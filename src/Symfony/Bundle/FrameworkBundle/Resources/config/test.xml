@@ -11,7 +11,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="test.client" class="Symfony\Bundle\FrameworkBundle\Client" shared="false" public="true">
+        <service id="test.client" class="Symfony\Bundle\FrameworkBundle\KernelBrowser" shared="false" public="true">
             <argument type="service" id="kernel" />
             <argument>%test.client.parameters%</argument>
             <argument type="service" id="test.client.history" />

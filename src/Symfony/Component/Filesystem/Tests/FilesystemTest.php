@@ -456,20 +456,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(400, $file);
     }
 
-    public function testChmodWithWrongModLeavesPreviousPermissionsUntouched()
-    {
-        $this->markAsSkippedIfChmodIsMissing();
-
-        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'file';
-        touch($dir);
-
-        $permissions = fileperms($dir);
-
-        $this->filesystem->chmod($dir, 'Wrongmode');
-
-        $this->assertSame($permissions, fileperms($dir));
-    }
-
     public function testChmodRecursive()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -1332,44 +1318,50 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileNotExists($targetPath.'target');
     }
 
-    public function testMirrorWithCustomIterator()
+    public function testMirrorAvoidCopyingTargetDirectoryIfInSourceDirectory()
     {
         $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+        $directory = $sourcePath.'directory'.\DIRECTORY_SEPARATOR;
+        $file1 = $directory.'file1';
+        $file2 = $sourcePath.'file2';
+
         mkdir($sourcePath);
+        mkdir($directory);
+        file_put_contents($file1, 'FILE1');
+        file_put_contents($file2, 'FILE2');
 
-        $file = $sourcePath.\DIRECTORY_SEPARATOR.'file';
-        file_put_contents($file, 'FILE');
+        $targetPath = $sourcePath.'target'.\DIRECTORY_SEPARATOR;
 
-        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->filesystem->symlink($targetPath, $sourcePath.'target_simlink');
+        }
 
-        $splFile = new \SplFileInfo($file);
-        $iterator = new \ArrayObject([$splFile]);
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['delete' => true]);
 
-        $this->filesystem->mirror($sourcePath, $targetPath, $iterator);
+        $this->assertTrue($this->filesystem->exists($targetPath));
+        $this->assertTrue($this->filesystem->exists($targetPath.'directory'));
 
-        $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($file, $targetPath.\DIRECTORY_SEPARATOR.'file');
+        $this->assertFileEquals($file1, $targetPath.'directory'.\DIRECTORY_SEPARATOR.'file1');
+        $this->assertFileEquals($file2, $targetPath.'file2');
+
+        $this->assertFalse($this->filesystem->exists($targetPath.'target_simlink'));
+        $this->assertFalse($this->filesystem->exists($targetPath.'target'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
-     * @expectedExceptionMessageRegExp /Unable to mirror "(.*)" directory/
-     */
-    public function testMirrorWithCustomIteratorWithRelativePath()
+    public function testMirrorFromSubdirectoryInToParentDirectory()
     {
-        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
-        $realSourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
-        mkdir($realSourcePath);
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR;
+        $sourcePath = $targetPath.'bar'.\DIRECTORY_SEPARATOR;
+        $file1 = $sourcePath.'file1';
+        $file2 = $sourcePath.'file2';
 
-        $file = $realSourcePath.'file';
-        file_put_contents($file, 'FILE');
+        $this->filesystem->mkdir($sourcePath);
+        file_put_contents($file1, 'FILE1');
+        file_put_contents($file2, 'FILE2');
 
-        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+        $this->filesystem->mirror($sourcePath, $targetPath);
 
-        $splFile = new \SplFileInfo($file);
-        $iterator = new \ArrayObject([$splFile]);
-
-        $this->filesystem->mirror($sourcePath, $targetPath, $iterator);
+        $this->assertFileEquals($file1, $targetPath.'file1');
     }
 
     /**
@@ -1391,7 +1383,6 @@ class FilesystemTest extends FilesystemTestCase
             ['var/lib', false],
             ['../var/lib', false],
             ['', false],
-            [null, false],
         ];
     }
 
@@ -1518,16 +1509,6 @@ class FilesystemTest extends FilesystemTestCase
         }
     }
 
-    public function testDumpFileWithArray()
-    {
-        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
-
-        $this->filesystem->dumpFile($filename, ['bar']);
-
-        $this->assertFileExists($filename);
-        $this->assertStringEqualsFile($filename, 'bar');
-    }
-
     public function testDumpFileWithResource()
     {
         $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
@@ -1589,6 +1570,33 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->dumpFile($filename, 'foo');
 
         $this->filesystem->appendToFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertStringEqualsFile($filename, 'foobar');
+
+        // skip mode check on Windows
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->assertFilePermissions(664, $filename);
+            umask($oldMask);
+        }
+    }
+
+    public function testAppendToFileWithResource()
+    {
+        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'bar.txt';
+
+        // skip mode check on Windows
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $oldMask = umask(0002);
+        }
+
+        $this->filesystem->dumpFile($filename, 'foo');
+
+        $resource = fopen('php://memory', 'rw');
+        fwrite($resource, 'bar');
+        fseek($resource, 0);
+
+        $this->filesystem->appendToFile($filename, $resource);
 
         $this->assertFileExists($filename);
         $this->assertStringEqualsFile($filename, 'foobar');

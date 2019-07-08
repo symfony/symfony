@@ -297,19 +297,17 @@ Form
    `ArrayAccess` in `ResizeFormListener::preSubmit` method has been removed.
 
  * Using callable strings as choice options in ChoiceType is not supported
-   anymore in favor of passing PropertyPath instances.
+   anymore.
 
    Before:
 
    ```php
-   'choice_value' => new PropertyPath('range'),
    'choice_label' => 'strtoupper',
    ```
 
    After:
 
    ```php
-   'choice_value' => 'range',
    'choice_label' => function ($choice) {
        return strtoupper($choice);
    },

@@ -9,9 +9,6 @@ framework:
     router: true
     session: true
     request: true
-    templating:
-        enabled: true
-        engines: ['php']
     assets: true
     translator: true
     validation: true

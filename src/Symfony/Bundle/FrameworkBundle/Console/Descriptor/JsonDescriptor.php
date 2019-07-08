@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -178,6 +179,14 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerEnvVars(array $envs, array $options = [])
+    {
+        throw new LogicException('Using the JSON format to debug environment variables is not supported.');
+    }
+
+    /**
      * Writes data as json.
      *
      * @return array|string
@@ -185,6 +194,7 @@ class JsonDescriptor extends Descriptor
     private function writeData(array $data, array $options)
     {
         $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;
+
         $this->write(json_encode($data, $flags | JSON_PRETTY_PRINT)."\n");
     }
 
@@ -193,7 +203,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function getRouteData(Route $route)
     {
-        return [
+        $data = [
             'path' => $route->getPath(),
             'pathRegex' => $route->compile()->getRegex(),
             'host' => '' !== $route->getHost() ? $route->getHost() : 'ANY',
@@ -205,6 +215,12 @@ class JsonDescriptor extends Descriptor
             'requirements' => $route->getRequirements() ?: 'NO CUSTOM',
             'options' => $route->getOptions(),
         ];
+
+        if ('' !== $route->getCondition()) {
+            $data['condition'] = $route->getCondition();
+        }
+
+        return $data;
     }
 
     private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false): array

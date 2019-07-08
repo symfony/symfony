@@ -34,7 +34,7 @@ class LoaderTest extends TestCase
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('foo.xml')
-            ->will($this->returnValue($resolvedLoader));
+            ->willReturn($resolvedLoader);
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
@@ -52,7 +52,7 @@ class LoaderTest extends TestCase
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('FOOBAR')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
@@ -66,13 +66,13 @@ class LoaderTest extends TestCase
         $resolvedLoader->expects($this->once())
             ->method('load')
             ->with('foo')
-            ->will($this->returnValue('yes'));
+            ->willReturn('yes');
 
         $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('foo')
-            ->will($this->returnValue($resolvedLoader));
+            ->willReturn($resolvedLoader);
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
@@ -86,13 +86,13 @@ class LoaderTest extends TestCase
         $resolvedLoader->expects($this->once())
             ->method('load')
             ->with('foo', 'bar')
-            ->will($this->returnValue('yes'));
+            ->willReturn('yes');
 
         $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('foo', 'bar')
-            ->will($this->returnValue($resolvedLoader));
+            ->willReturn($resolvedLoader);
 
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
@@ -103,11 +103,11 @@ class LoaderTest extends TestCase
 
 class ProjectLoader1 extends Loader
 {
-    public function load($resource, $type = null)
+    public function load($resource, string $type = null)
     {
     }
 
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return \is_string($resource) && 'foo' === pathinfo($resource, PATHINFO_EXTENSION);
     }

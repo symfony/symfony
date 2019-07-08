@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed `TwigEngine` class, use `\Twig\Environment` instead.
+ * removed `transChoice` filter and token
+ * `HttpFoundationExtension` requires a `UrlHelper` on instantiation
+
+4.4.0
+-----
+
+ * deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
+   `DebugCommand::__construct()` method, swap the variables position.
+
+4.3.0
+-----
+
+ * added the `form_parent()` function that allows to reliably retrieve the parent form in Twig templates
+ * added the `workflow_transition_blockers()` function
+ * deprecated the `$requestStack` and `$requestContext` arguments of the 
+   `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
+   instance as the only argument instead
+
 4.2.0
 -----
 

@@ -12,7 +12,10 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\AbstractConnection;
+use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,6 +25,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Connection extends AbstractConnection
 {
+    private const LDAP_INVALID_CREDENTIALS = '0x31';
+    private const LDAP_TIMEOUT = '0x55';
+    private const LDAP_ALREADY_EXISTS = '0x44';
+
     /** @var bool */
     private $bound = false;
 
@@ -44,14 +51,23 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function bind($dn = null, $password = null)
+    public function bind(string $dn = null, string $password = null)
     {
         if (!$this->connection) {
             $this->connect();
         }
 
         if (false === @ldap_bind($this->connection, $dn, $password)) {
-            throw new ConnectionException(ldap_error($this->connection));
+            $error = ldap_error($this->connection);
+            switch (ldap_errno($this->connection)) {
+                case self::LDAP_INVALID_CREDENTIALS:
+                    throw new InvalidCredentialsException($error);
+                case self::LDAP_TIMEOUT:
+                    throw new ConnectionTimeoutException($error);
+                case self::LDAP_ALREADY_EXISTS:
+                    throw new AlreadyExistsException($error);
+            }
+            throw new ConnectionException($error);
         }
 
         $this->bound = true;
@@ -69,14 +85,14 @@ class Connection extends AbstractConnection
         return $this->connection;
     }
 
-    public function setOption($name, $value)
+    public function setOption(string $name, $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
             throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
         }
     }
 
-    public function getOption($name)
+    public function getOption(string $name)
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
             throw new LdapException(sprintf('Could not retrieve value for option "%s".', $name));

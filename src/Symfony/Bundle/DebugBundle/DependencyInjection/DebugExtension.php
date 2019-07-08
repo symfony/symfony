@@ -17,6 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\VarDumper\Caster\ReflectionCaster;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
  * DebugExtension.
@@ -40,6 +43,16 @@ class DebugExtension extends Extension
             ->addMethodCall('setMaxItems', [$config['max_items']])
             ->addMethodCall('setMinDepth', [$config['min_depth']])
             ->addMethodCall('setMaxString', [$config['max_string_length']]);
+
+        if (method_exists(ReflectionCaster::class, 'unsetClosureFileInfo')) {
+            $container->getDefinition('var_dumper.cloner')
+                ->addMethodCall('addCasters', [ReflectionCaster::UNSET_CLOSURE_FILE_INFO]);
+        }
+
+        if (method_exists(HtmlDumper::class, 'setTheme') && 'dark' !== $config['theme']) {
+            $container->getDefinition('var_dumper.html_dumper')
+                ->addMethodCall('setTheme', [$config['theme']]);
+        }
 
         if (null === $config['dump_destination']) {
             $container->getDefinition('var_dumper.command.server_dump')
@@ -67,6 +80,14 @@ class DebugExtension extends Extension
             ;
             $container->getDefinition('var_dumper.command.server_dump')
                 ->setClass(ServerDumpPlaceholderCommand::class)
+            ;
+        }
+
+        if (method_exists(CliDumper::class, 'setDisplayOptions')) {
+            $container->getDefinition('var_dumper.cli_dumper')
+                ->addMethodCall('setDisplayOptions', [[
+                    'fileLinkFormat' => new Reference('debug.file_link_formatter', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE),
+                ]])
             ;
         }
     }

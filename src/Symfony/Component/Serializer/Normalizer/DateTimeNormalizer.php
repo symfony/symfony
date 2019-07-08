@@ -25,6 +25,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     const FORMAT_KEY = 'datetime_format';
     const TIMEZONE_KEY = 'datetime_timezone';
 
+
     /**
      * In PHP, the $timezone parameter and the current timezone are ignored when the $time parameter either is a UNIX timestamp (e.g. @946684800) or specifies a timezone (e.g. 2010-01-28T15:00:00+02:00).
      *
@@ -42,10 +43,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         \DateTime::class => true,
     ];
 
-    /**
-     * @param array $defaultContext
-     */
-    public function __construct($defaultContext = [], \DateTimeZone $timezone = null)
+    public function __construct(array $defaultContext = [])
     {
         $this->defaultContext = [
             self::FORMAT_KEY => \DateTime::RFC3339,
@@ -73,7 +71,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      *
      * @throws InvalidArgumentException
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof \DateTimeInterface) {
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
@@ -93,7 +91,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \DateTimeInterface;
     }
@@ -103,7 +101,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, string $format = null, array $context = [])
     {
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);
@@ -151,7 +149,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, string $format = null)
     {
         return isset(self::$supportedTypes[$type]);
     }

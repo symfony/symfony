@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
@@ -40,7 +42,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
     /**
      * @dataProvider itAddsHandledStampsProvider
      */
-    public function testItAddsHandledStamps(array $handlers, array $expectedStamps)
+    public function testItAddsHandledStamps(array $handlers, array $expectedStamps, bool $nextIsCalled)
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
@@ -49,7 +51,11 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
             DummyMessage::class => $handlers,
         ]));
 
-        $envelope = $middleware->handle($envelope, $this->getStackMock());
+        try {
+            $envelope = $middleware->handle($envelope, $this->getStackMock($nextIsCalled));
+        } catch (HandlerFailedException $e) {
+            $envelope = $e->getEnvelope();
+        }
 
         $this->assertEquals($expectedStamps, $envelope->all(HandledStamp::class));
     }
@@ -64,25 +70,46 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $second->method('__invoke')->willReturn(null);
         $secondClass = \get_class($second);
 
+        $failing = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $failing->method('__invoke')->will($this->throwException(new \Exception('handler failed.')));
+
         yield 'A stamp is added' => [
             [$first],
             [new HandledStamp('first result', $firstClass.'::__invoke')],
+            true,
         ];
 
         yield 'A stamp is added per handler' => [
-            [$first, $second],
             [
-                new HandledStamp('first result', $firstClass.'::__invoke'),
-                new HandledStamp(null, $secondClass.'::__invoke'),
+                new HandlerDescriptor($first, ['alias' => 'first']),
+                new HandlerDescriptor($second, ['alias' => 'second']),
             ],
+            [
+                new HandledStamp('first result', $firstClass.'::__invoke@first'),
+                new HandledStamp(null, $secondClass.'::__invoke@second'),
+            ],
+            true,
         ];
 
-        yield 'Yielded locator alias is used' => [
-            ['first_alias' => $first, $second],
+        yield 'It tries all handlers' => [
             [
-                new HandledStamp('first result', $firstClass.'::__invoke', 'first_alias'),
-                new HandledStamp(null, $secondClass.'::__invoke'),
+                new HandlerDescriptor($first, ['alias' => 'first']),
+                new HandlerDescriptor($failing, ['alias' => 'failing']),
+                new HandlerDescriptor($second, ['alias' => 'second']),
             ],
+            [
+                new HandledStamp('first result', $firstClass.'::__invoke@first'),
+                new HandledStamp(null, $secondClass.'::__invoke@second'),
+            ],
+            false,
+        ];
+
+        yield 'It ignores duplicated handler' => [
+            [$first, $first],
+            [
+                new HandledStamp('first result', $firstClass.'::__invoke'),
+            ],
+            true,
         ];
     }
 

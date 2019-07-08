@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -25,6 +26,15 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
     use Traits\BindTrait;
     use Traits\PublicTrait;
 
+    private $path;
+
+    public function __construct(ServicesConfigurator $parent, Definition $definition, string $path = null)
+    {
+        parent::__construct($parent, $definition, null, []);
+
+        $this->path = $path;
+    }
+
     /**
      * Adds a tag for this definition.
      *
@@ -32,7 +42,7 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
      *
      * @throws InvalidArgumentException when an invalid tag name or attribute is provided
      */
-    final public function tag(string $name, array $attributes = [])
+    final public function tag(string $name, array $attributes = []): object
     {
         if ('' === $name) {
             throw new InvalidArgumentException('The tag name in "_defaults" must be a non-empty string.');
@@ -51,10 +61,8 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
 
     /**
      * Defines an instanceof-conditional to be applied to following service definitions.
-     *
-     * @return InstanceofConfigurator
      */
-    final public function instanceof(string $fqcn)
+    final public function instanceof(string $fqcn): InstanceofConfigurator
     {
         return $this->parent->instanceof($fqcn);
     }

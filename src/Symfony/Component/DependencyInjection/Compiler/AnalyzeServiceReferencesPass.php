@@ -27,14 +27,13 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements RepeatablePassInterface
+class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 {
     private $graph;
     private $currentDefinition;
     private $onlyConstructorArguments;
     private $hasProxyDumper;
     private $lazy;
-    private $expressionLanguage;
     private $byConstructor;
     private $definitions;
     private $aliases;
@@ -47,14 +46,6 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         $this->onlyConstructorArguments = $onlyConstructorArguments;
         $this->hasProxyDumper = $hasProxyDumper;
         $this->enableExpressionProcessing();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**
@@ -82,7 +73,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         }
     }
 
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         $lazy = $this->lazy;
         $inExpression = $this->inExpression();
@@ -140,11 +131,41 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         $this->byConstructor = true;
         $this->processValue($value->getFactory());
         $this->processValue($value->getArguments());
+
+        $properties = $value->getProperties();
+        $setters = $value->getMethodCalls();
+
+        // Any references before a "wither" are part of the constructor-instantiation graph
+        $lastWitherIndex = null;
+        foreach ($setters as $k => $call) {
+            if ($call[2] ?? false) {
+                $lastWitherIndex = $k;
+            }
+        }
+
+        if (null !== $lastWitherIndex) {
+            $this->processValue($properties);
+            $setters = $properties = [];
+
+            foreach ($value->getMethodCalls() as $k => $call) {
+                if (null === $lastWitherIndex) {
+                    $setters[] = $call;
+                    continue;
+                }
+
+                if ($lastWitherIndex === $k) {
+                    $lastWitherIndex = null;
+                }
+
+                $this->processValue($call);
+            }
+        }
+
         $this->byConstructor = $byConstructor;
 
         if (!$this->onlyConstructorArguments) {
-            $this->processValue($value->getProperties());
-            $this->processValue($value->getMethodCalls());
+            $this->processValue($properties);
+            $this->processValue($setters);
             $this->processValue($value->getConfigurator());
         }
         $this->lazy = $lazy;

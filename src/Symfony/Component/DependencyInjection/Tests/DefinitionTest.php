@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
@@ -35,6 +37,9 @@ class DefinitionTest extends TestCase
 
         $def->setFactory('Foo::bar');
         $this->assertEquals(['Foo', 'bar'], $def->getFactory(), '->setFactory() converts string static method call to the array');
+
+        $def->setFactory($ref = new Reference('baz'));
+        $this->assertSame([$ref, '__invoke'], $def->getFactory(), '->setFactory() converts service reference to class invoke call');
         $this->assertSame(['factory' => true], $def->getChanges());
     }
 
@@ -95,10 +100,16 @@ class DefinitionTest extends TestCase
         $this->assertEquals([['foo', ['foo']]], $def->getMethodCalls(), '->getMethodCalls() returns the methods to call');
         $this->assertSame($def, $def->addMethodCall('bar', ['bar']), '->addMethodCall() implements a fluent interface');
         $this->assertEquals([['foo', ['foo']], ['bar', ['bar']]], $def->getMethodCalls(), '->addMethodCall() adds a method to call');
+        $this->assertSame($def, $def->addMethodCall('foobar', ['foobar'], true), '->addMethodCall() implements a fluent interface with third parameter');
+        $this->assertEquals([['foo', ['foo']], ['bar', ['bar']], ['foobar', ['foobar'], true]], $def->getMethodCalls(), '->addMethodCall() adds a method to call');
         $this->assertTrue($def->hasMethodCall('bar'), '->hasMethodCall() returns true if first argument is a method to call registered');
         $this->assertFalse($def->hasMethodCall('no_registered'), '->hasMethodCall() returns false if first argument is not a method to call registered');
         $this->assertSame($def, $def->removeMethodCall('bar'), '->removeMethodCall() implements a fluent interface');
+        $this->assertTrue($def->hasMethodCall('foobar'), '->hasMethodCall() returns true if first argument is a method to call registered');
+        $this->assertSame($def, $def->removeMethodCall('foobar'), '->removeMethodCall() implements a fluent interface');
         $this->assertEquals([['foo', ['foo']]], $def->getMethodCalls(), '->removeMethodCall() removes a method to call');
+        $this->assertSame($def, $def->setMethodCalls([['foobar', ['foobar'], true]]), '->setMethodCalls() implements a fluent interface with third parameter');
+        $this->assertEquals([['foobar', ['foobar'], true]], $def->getMethodCalls(), '->addMethodCall() adds a method to call');
     }
 
     /**
@@ -164,7 +175,9 @@ class DefinitionTest extends TestCase
         $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
         $this->assertSame($def, $def->setDeprecated(true), '->setDeprecated() implements a fluent interface');
         $this->assertTrue($def->isDeprecated(), '->isDeprecated() returns true if the instance should not be used anymore.');
-        $this->assertSame('The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return a formatted message template');
+
+        $def->setDeprecated(true, '%service_id%');
+        $this->assertSame('deprecated_service', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return given formatted message template');
     }
 
     /**
@@ -184,6 +197,7 @@ class DefinitionTest extends TestCase
             "With \ns" => ["invalid \n message %service_id%"],
             'With */s' => ['invalid */ message %service_id%'],
             'message not containing require %service_id% variable' => ['this is deprecated'],
+            'template not containing require %service_id% variable' => [true],
         ];
     }
 
@@ -375,7 +389,7 @@ class DefinitionTest extends TestCase
     public function testAddError()
     {
         $def = new Definition('stdClass');
-        $this->assertEmpty($def->getErrors());
+        $this->assertFalse($def->hasErrors());
         $def->addError('First error');
         $def->addError('Second error');
         $this->assertSame(['First error', 'Second error'], $def->getErrors());

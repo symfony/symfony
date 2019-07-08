@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:framework="http://symfony.com/schema/dic/symfony">
+
+    <framework:config>
+        <framework:property-info enabled="true" />
+        <framework:validation>
+            <framework:auto-mapping namespace="App\">
+                <framework:service>foo</framework:service>
+                <framework:service>bar</framework:service>
+            </framework:auto-mapping>
+            <framework:auto-mapping namespace="Symfony\">
+                <framework:service>a</framework:service>
+                <framework:service>b</framework:service>
+            </framework:auto-mapping>
+            <framework:auto-mapping namespace="Foo\" />
+        </framework:validation>
+    </framework:config>
+</container>

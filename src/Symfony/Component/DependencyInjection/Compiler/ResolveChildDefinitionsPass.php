@@ -28,7 +28,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
 {
     private $currentPath;
 
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         if (!$value instanceof Definition) {
             return parent::processValue($value, $isRoot);
@@ -176,9 +176,8 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
         }
 
-        foreach (array_merge($parentDef->getErrors(), $definition->getErrors()) as $v) {
-            $def->addError($v);
-        }
+        $def->addError($parentDef);
+        $def->addError($definition);
 
         // these attributes are always taken from the child
         $def->setAbstract($definition->isAbstract());

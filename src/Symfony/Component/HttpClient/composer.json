@@ -1,0 +1,47 @@
+{
+    "name": "symfony/http-client",
+    "type": "library",
+    "description": "Symfony HttpClient component",
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "provide": {
+        "php-http/client-implementation": "*",
+        "psr/http-client-implementation": "1.0",
+        "symfony/http-client-implementation": "1.1"
+    },
+    "require": {
+        "php": "^7.2.9",
+        "psr/log": "^1.0",
+        "symfony/http-client-contracts": "^1.1.4",
+        "symfony/polyfill-php73": "^1.11"
+    },
+    "require-dev": {
+        "nyholm/psr7": "^1.0",
+        "php-http/httplug": "^1.0|^2.0",
+        "psr/http-client": "^1.0",
+        "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/process": "^4.4|^5.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\HttpClient\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.0-dev"
+        }
+    }
+}

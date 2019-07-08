@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -45,8 +45,8 @@ class ResponseListenerTest extends TestCase
     {
         $response = new Response('foo');
 
-        $event = new FilterResponseEvent($this->kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+        $event = new ResponseEvent($this->kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('', $event->getResponse()->headers->get('content-type'));
     }
@@ -58,8 +58,8 @@ class ResponseListenerTest extends TestCase
 
         $response = new Response('foo');
 
-        $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+        $event = new ResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('ISO-8859-15', $response->getCharset());
     }
@@ -72,8 +72,8 @@ class ResponseListenerTest extends TestCase
         $response = new Response('foo');
         $response->setCharset('ISO-8859-1');
 
-        $event = new FilterResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+        $event = new ResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('ISO-8859-1', $response->getCharset());
     }
@@ -87,8 +87,8 @@ class ResponseListenerTest extends TestCase
         $request = Request::create('/');
         $request->setRequestFormat('application/json');
 
-        $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('ISO-8859-15', $response->getCharset());
     }

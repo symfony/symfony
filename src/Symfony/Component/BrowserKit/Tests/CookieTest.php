@@ -103,7 +103,7 @@ class CookieTest extends TestCase
 
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         Cookie::fromString('foo');
     }
 
@@ -116,7 +116,7 @@ class CookieTest extends TestCase
 
     public function testFromStringThrowsAnExceptionIfUrlIsNotValid()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         Cookie::fromString('foo=bar', 'foobar');
     }
 

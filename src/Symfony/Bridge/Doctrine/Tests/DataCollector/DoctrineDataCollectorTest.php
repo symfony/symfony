@@ -102,6 +102,18 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][1]['explainable']);
     }
 
+    public function testCollectQueryWithNoTypes()
+    {
+        $queries = [
+            ['sql' => 'SET sql_mode=(SELECT REPLACE(@@sql_mode, \'ONLY_FULL_GROUP_BY\', \'\'))', 'params' => [], 'types' => null, 'executionMS' => 1],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+
+        $collectedQueries = $c->getQueries();
+        $this->assertSame([], $collectedQueries['default'][0]['types']);
+    }
+
     public function testReset()
     {
         $queries = [
@@ -166,20 +178,20 @@ class DoctrineDataCollectorTest extends TestCase
             ->getMock();
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->will($this->returnValue(new MySqlPlatform()));
+            ->willReturn(new MySqlPlatform());
 
         $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
         $registry
             ->expects($this->any())
             ->method('getConnectionNames')
-            ->will($this->returnValue(['default' => 'doctrine.dbal.default_connection']));
+            ->willReturn(['default' => 'doctrine.dbal.default_connection']);
         $registry
             ->expects($this->any())
             ->method('getManagerNames')
-            ->will($this->returnValue(['default' => 'doctrine.orm.default_entity_manager']));
+            ->willReturn(['default' => 'doctrine.orm.default_entity_manager']);
         $registry->expects($this->any())
             ->method('getConnection')
-            ->will($this->returnValue($connection));
+            ->willReturn($connection);
 
         $logger = $this->getMockBuilder('Doctrine\DBAL\Logging\DebugStack')->getMock();
         $logger->queries = $queries;

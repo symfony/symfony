@@ -48,21 +48,6 @@ class XmlEncoderTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testSetRootNodeName()
-    {
-        $obj = new ScalarDummy();
-        $obj->xmlFoo = 'foo';
-
-        $this->encoder->setRootNodeName('test');
-        $expected = '<?xml version="1.0"?>'."\n".
-            '<test>foo</test>'."\n";
-
-        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
-    }
-
-    /**
      * @expectedException        \Symfony\Component\Serializer\Exception\UnexpectedValueException
      * @expectedExceptionMessage Document types are not allowed.
      */
@@ -547,16 +532,6 @@ XML;
 
     public function testDecodePreserveComments()
     {
-        $this->doTestDecodePreserveComments();
-    }
-
-    public function testLegacyDecodePreserveComments()
-    {
-        $this->doTestDecodePreserveComments(true);
-    }
-
-    private function doTestDecodePreserveComments(bool $legacy = false)
-    {
         $source = <<<'XML'
 <?xml version="1.0"?>
 <people>
@@ -572,14 +547,10 @@ XML;
 </people>
 XML;
 
-        if ($legacy) {
-            $this->encoder = new XmlEncoder('people', null, [XML_PI_NODE]);
-        } else {
-            $this->encoder = new XmlEncoder([
-                XmlEncoder::ROOT_NODE_NAME => 'people',
-                XmlEncoder::DECODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
-            ]);
-        }
+        $this->encoder = new XmlEncoder([
+            XmlEncoder::ROOT_NODE_NAME => 'people',
+            XmlEncoder::DECODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
+        ]);
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
         $this->encoder->setSerializer($serializer);
 
@@ -593,21 +564,7 @@ XML;
 
     public function testDecodeAlwaysAsCollection()
     {
-        $this->doTestDecodeAlwaysAsCollection();
-    }
-
-    public function testLegacyDecodeAlwaysAsCollection()
-    {
-        $this->doTestDecodeAlwaysAsCollection(true);
-    }
-
-    private function doTestDecodeAlwaysAsCollection(bool $legacy = false)
-    {
-        if ($legacy) {
-            $this->encoder = new XmlEncoder('response', null);
-        } else {
-            $this->encoder = new XmlEncoder([XmlEncoder::ROOT_NODE_NAME => 'response']);
-        }
+        $this->encoder = new XmlEncoder([XmlEncoder::ROOT_NODE_NAME => 'response']);
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
         $this->encoder->setSerializer($serializer);
 
@@ -809,24 +766,10 @@ XML;
 
     public function testEncodeWithoutPi()
     {
-        $this->doTestEncodeWithoutPi();
-    }
-
-    public function testLegacyEncodeWithoutPi()
-    {
-        $this->doTestEncodeWithoutPi(true);
-    }
-
-    private function doTestEncodeWithoutPi(bool $legacy = false)
-    {
-        if ($legacy) {
-            $encoder = new XmlEncoder('response', null, [], [XML_PI_NODE]);
-        } else {
-            $encoder = new XmlEncoder([
-                XmlEncoder::ROOT_NODE_NAME => 'response',
-                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
-            ]);
-        }
+        $encoder = new XmlEncoder([
+            XmlEncoder::ROOT_NODE_NAME => 'response',
+            XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
+        ]);
 
         $expected = '<response/>';
 
@@ -835,24 +778,10 @@ XML;
 
     public function testEncodeWithoutComment()
     {
-        $this->doTestEncodeWithoutComment();
-    }
-
-    public function testLegacyEncodeWithoutComment()
-    {
-        $this->doTestEncodeWithoutComment(true);
-    }
-
-    private function doTestEncodeWithoutComment(bool $legacy = false)
-    {
-        if ($legacy) {
-            $encoder = new XmlEncoder('response', null, [], [XML_COMMENT_NODE]);
-        } else {
-            $encoder = new XmlEncoder([
-                XmlEncoder::ROOT_NODE_NAME => 'response',
-                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_COMMENT_NODE],
-            ]);
-        }
+        $encoder = new XmlEncoder([
+            XmlEncoder::ROOT_NODE_NAME => 'response',
+            XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_COMMENT_NODE],
+        ]);
 
         $expected = <<<'XML'
 <?xml version="1.0"?>

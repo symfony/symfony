@@ -34,7 +34,7 @@ class LoggerTest extends TestCase
 
     protected function setUp()
     {
-        $this->tmpFile = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'log';
+        $this->tmpFile = tempnam(sys_get_temp_dir(), 'log');
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile);
     }
 
@@ -149,7 +149,7 @@ class LoggerTest extends TestCase
         }
         $dummy->expects($this->atLeastOnce())
             ->method('__toString')
-            ->will($this->returnValue('DUMMY'));
+            ->willReturn('DUMMY');
 
         $this->logger->warning($dummy);
 

@@ -16,7 +16,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -107,7 +106,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Creates an empty form configuration.
      *
-     * @param string|int               $name       The form name
+     * @param string|null              $name       The form name
      * @param string|null              $dataClass  The class of the form's data
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
@@ -115,7 +114,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters
      */
-    public function __construct($name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = [])
+    public function __construct(?string $name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = [])
     {
         self::validateName($name);
 
@@ -767,17 +766,12 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string|int|null $name The tested form name
-     *
-     * @throws UnexpectedTypeException  if the name is not a string or an integer
      * @throws InvalidArgumentException if the name contains invalid characters
+     *
+     * @internal
      */
-    public static function validateName($name)
+    final public static function validateName(?string $name)
     {
-        if (null !== $name && !\is_string($name) && !\is_int($name)) {
-            throw new UnexpectedTypeException($name, 'string, integer or null');
-        }
-
         if (!self::isValidName($name)) {
             throw new InvalidArgumentException(sprintf('The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").', $name));
         }
@@ -792,12 +786,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *   * starts with a letter, digit or underscore
      *   * contains only letters, digits, numbers, underscores ("_"),
      *     hyphens ("-") and colons (":")
-     *
-     * @param string|null $name The tested form name
-     *
-     * @return bool Whether the name is valid
      */
-    public static function isValidName($name)
+    final public static function isValidName(?string $name): bool
     {
         return '' === $name || null === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }

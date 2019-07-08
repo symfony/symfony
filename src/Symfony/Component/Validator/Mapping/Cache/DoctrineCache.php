@@ -36,7 +36,7 @@ final class DoctrineCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function has($class)
+    public function has(string $class): bool
     {
         return $this->cache->contains($class);
     }
@@ -44,7 +44,7 @@ final class DoctrineCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function read($class)
+    public function read(string $class)
     {
         return $this->cache->fetch($class);
     }

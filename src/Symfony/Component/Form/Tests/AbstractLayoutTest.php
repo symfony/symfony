@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\SkippedTestError;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
@@ -1508,26 +1509,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
-    {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', '2011-02-03 04:05:06', [
-            'input' => 'string',
-            'date_widget' => 'choice',
-            'time_widget' => 'choice',
-            'widget' => 'single_text',
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
-        ]);
-
-        $this->assertWidgetMatchesXpath($form->createView(), [],
-'/input
-    [@type="datetime-local"]
-    [@name="name"]
-    [@value="2011-02-03T04:05:06"]
-'
-        );
-    }
-
     public function testDateChoice()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', date('Y').'-02-03', [
@@ -1868,6 +1849,23 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
+    public function testRenderNumberWithHtml5NumberType()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
+            'html5' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+'/input
+    [@type="number"]
+    [@name="name"]
+    [@value="1234.56"]
+'
+        );
+    }
+
     public function testPassword()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar');
@@ -1921,6 +1919,36 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@name="name"]
     [@value="10"]
     [contains(.., "%")]
+'
+        );
+    }
+
+    public function testPercentNoSymbol()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+'/input
+    [@type="text"]
+    [@name="name"]
+    [@value="10"]
+    [not(contains(.., "%"))]
+'
+        );
+    }
+
+    public function testPercentCustomSymbol()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+'/input
+    [@type="text"]
+    [@name="name"]
+    [@value="10"]
+    [contains(.., "‱")]
 '
         );
     }
@@ -2227,12 +2255,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/select
     [@name="name"]
     [not(@required)]
-    [./optgroup
-        [@label="Europe"]
-        [./option[@value="Europe/Vienna"][@selected="selected"][.="Vienna"]]
-    ]
-    [count(./optgroup)>10]
-    [count(.//option)>200]
+    [./option[@value="Europe/Vienna"][@selected="selected"][.="Europe / Vienna"]]
+    [count(./option)>200]
 '
         );
     }
@@ -2247,8 +2271,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/select
     [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Timezone[/trans]"]]
-    [count(./optgroup)>10]
-    [count(.//option)>201]
+    [count(./option)>201]
 '
         );
     }
@@ -2586,6 +2609,90 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@type="color"]
     [@name="name"]
     [@value="#0000ff"]
+'
+        );
+    }
+
+    public function testLabelWithTranslationParameters()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $html = $this->renderLabel($form->createView(), 'Address is %address%', [
+            'label_translation_parameters' => [
+                '%address%' => 'Paris, rue de la Paix',
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html,
+            '/label
+    [@for="name"]
+    [.="[trans]Address is Paris, rue de la Paix[/trans]"]
+'
+        );
+    }
+
+    public function testHelpWithTranslationParameters()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => 'for company %company%',
+            'help_translation_parameters' => [
+                '%company%' => 'ACME Ltd.',
+            ],
+        ]);
+        $html = $this->renderHelp($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/*
+    [@id="name_help"]
+    [.="[trans]for company ACME Ltd.[/trans]"]
+'
+        );
+    }
+
+    public function testAttributesWithTranslationParameters()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'attr' => [
+                'title' => 'Message to %company%',
+                'placeholder' => 'Enter a message to %company%',
+            ],
+            'attr_translation_parameters' => [
+                '%company%' => 'ACME Ltd.',
+            ],
+        ]);
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/input
+    [@title="[trans]Message to ACME Ltd.[/trans]"]
+    [@placeholder="[trans]Enter a message to ACME Ltd.[/trans]"]
+'
+        );
+    }
+
+    public function testButtonWithTranslationParameters()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', [
+                'label' => 'Submit to %company%',
+                'label_translation_parameters' => [
+                    '%company%' => 'ACME Ltd.',
+                ],
+            ])
+            ->getForm();
+        $view = $form->get('mybutton')->createView();
+        $html = $this->renderWidget($view, ['label_format' => 'form.%name%']);
+
+        $this->assertMatchesXpath($html,
+            '/button
+    [.="[trans]Submit to ACME Ltd.[/trans]"]
 '
         );
     }

@@ -24,7 +24,7 @@ abstract class AbstractUriElement
     protected $node;
 
     /**
-     * @var string The method to use for the element
+     * @var string|null The method to use for the element
      */
     protected $method;
 
@@ -36,7 +36,7 @@ abstract class AbstractUriElement
     /**
      * @param \DOMElement $node       A \DOMElement instance
      * @param string      $currentUri The URI of the page where the link is embedded (or the base href)
-     * @param string      $method     The method to use for the link (GET by default)
+     * @param string|null $method     The method to use for the link (GET by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
@@ -70,7 +70,7 @@ abstract class AbstractUriElement
      */
     public function getMethod()
     {
-        return $this->method;
+        return $this->method ?? 'GET';
     }
 
     /**
@@ -136,7 +136,7 @@ abstract class AbstractUriElement
      *
      * @return string
      */
-    protected function canonicalizePath($path)
+    protected function canonicalizePath(string $path)
     {
         if ('' === $path || '/' === $path) {
             return $path;

@@ -42,7 +42,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->validator->expects($this->once())
             ->method('validate')
             ->with($this->equalTo($form))
-            ->will($this->returnValue(new ConstraintViolationList()));
+            ->willReturn(new ConstraintViolationList());
 
         // specific data is irrelevant
         $form->submit([]);
@@ -63,7 +63,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
             ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
             ->add('field', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']]),
+                    new Length(['min' => 10, 'allowEmptyString' => true, 'groups' => ['First']]),
                     new Email(['groups' => ['Second']]),
                 ],
             ])

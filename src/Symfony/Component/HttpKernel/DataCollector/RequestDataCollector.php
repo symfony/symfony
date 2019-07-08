@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -252,6 +252,18 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return $this->data['content'];
     }
 
+    public function isJsonRequest()
+    {
+        return 1 === preg_match('{^application/(?:\w+\++)*json$}i', $this->data['request_headers']['content-type']);
+    }
+
+    public function getPrettyJson()
+    {
+        $decoded = json_decode($this->getContent());
+
+        return JSON_ERROR_NONE === json_last_error() ? json_encode($decoded, JSON_PRETTY_PRINT) : null;
+    }
+
     public function getContentType()
     {
         return $this->data['content_type'];
@@ -338,12 +350,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return isset($this->data['forward_token']) ? $this->data['forward_token'] : null;
     }
 
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event)
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;

@@ -164,7 +164,7 @@ class TimeType extends AbstractType
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'H:i:s')
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
@@ -257,6 +257,7 @@ class TimeType extends AbstractType
             'seconds' => range(0, 59),
             'widget' => 'choice',
             'input' => 'datetime',
+            'input_format' => 'H:i:s',
             'with_minutes' => true,
             'with_seconds' => false,
             'model_timezone' => null,
@@ -298,6 +299,7 @@ class TimeType extends AbstractType
         $resolver->setAllowedTypes('hours', 'array');
         $resolver->setAllowedTypes('minutes', 'array');
         $resolver->setAllowedTypes('seconds', 'array');
+        $resolver->setAllowedTypes('input_format', 'string');
     }
 
     /**

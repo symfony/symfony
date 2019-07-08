@@ -44,7 +44,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
-    public function __construct(\DOMElement $node, string $currentUri, string $method = null, string $baseHref = null)
+    public function __construct(\DOMElement $node, string $currentUri = null, string $method = null, string $baseHref = null)
     {
         parent::__construct($node, $currentUri, $method);
         $this->baseHref = $baseHref;
@@ -251,23 +251,29 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
-     * Returns true if the named field exists.
+     * Gets the form name.
      *
-     * @param string $name The field name
+     * If no name is defined on the form, an empty string is returned.
+     */
+    public function getName(): string
+    {
+        return $this->node->getAttribute('name');
+    }
+
+    /**
+     * Returns true if the named field exists.
      *
      * @return bool true if the field exists, false otherwise
      */
-    public function has($name)
+    public function has(string $name)
     {
         return $this->fields->has($name);
     }
 
     /**
      * Removes a field from the form.
-     *
-     * @param string $name The field name
      */
-    public function remove($name)
+    public function remove(string $name)
     {
         $this->fields->remove($name);
     }
@@ -275,13 +281,11 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets a named field.
      *
-     * @param string $name The field name
-     *
      * @return FormField The field instance
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function get($name)
+    public function get(string $name)
     {
         return $this->fields->get($name);
     }

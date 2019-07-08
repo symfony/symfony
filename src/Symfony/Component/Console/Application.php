@@ -41,9 +41,9 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\ErrorCatcher\ErrorHandler;
+use Symfony\Component\ErrorCatcher\Exception\FatalThrowableError;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * An Application is the container for a collection of commands.
@@ -78,10 +78,6 @@ class Application
     private $singleCommand = false;
     private $initialized;
 
-    /**
-     * @param string $name    The name of the application
-     * @param string $version The version of the application
-     */
     public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
     {
         $this->name = $name;
@@ -90,6 +86,9 @@ class Application
         $this->defaultCommand = 'list';
     }
 
+    /**
+     * @final
+     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -235,7 +234,7 @@ class Application
             if (!($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) || 1 !== \count($alternatives = $e->getAlternatives()) || !$input->isInteractive()) {
                 if (null !== $this->dispatcher) {
                     $event = new ConsoleErrorEvent($input, $output, $e);
-                    $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+                    $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
 
                     if (0 === $event->getExitCode()) {
                         return 0;
@@ -254,7 +253,7 @@ class Application
             if (!$style->confirm(sprintf('Do you want to run "%s" instead? ', $alternative), false)) {
                 if (null !== $this->dispatcher) {
                     $event = new ConsoleErrorEvent($input, $output, $e);
-                    $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+                    $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
 
                     return $event->getExitCode();
                 }
@@ -339,12 +338,10 @@ class Application
 
     /**
      * Sets whether to catch exceptions or not during commands execution.
-     *
-     * @param bool $boolean Whether to catch exceptions or not during commands execution
      */
-    public function setCatchExceptions($boolean)
+    public function setCatchExceptions(bool $boolean)
     {
-        $this->catchExceptions = (bool) $boolean;
+        $this->catchExceptions = $boolean;
     }
 
     /**
@@ -359,12 +356,10 @@ class Application
 
     /**
      * Sets whether to automatically exit after a command execution or not.
-     *
-     * @param bool $boolean Whether to automatically exit after a command execution or not
      */
-    public function setAutoExit($boolean)
+    public function setAutoExit(bool $boolean)
     {
-        $this->autoExit = (bool) $boolean;
+        $this->autoExit = $boolean;
     }
 
     /**
@@ -379,10 +374,8 @@ class Application
 
     /**
      * Sets the application name.
-     *
-     * @param string $name The application name
-     */
-    public function setName($name)
+     **/
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -399,10 +392,8 @@ class Application
 
     /**
      * Sets the application version.
-     *
-     * @param string $version The application version
      */
-    public function setVersion($version)
+    public function setVersion(string $version)
     {
         $this->version = $version;
     }
@@ -428,11 +419,9 @@ class Application
     /**
      * Registers a new command.
      *
-     * @param string $name The command name
-     *
      * @return Command The newly created command
      */
-    public function register($name)
+    public function register(string $name)
     {
         return $this->add(new Command($name));
     }
@@ -491,13 +480,11 @@ class Application
     /**
      * Returns a registered command by name or alias.
      *
-     * @param string $name The command name or alias
-     *
      * @return Command A Command object
      *
      * @throws CommandNotFoundException When given command name does not exist
      */
-    public function get($name)
+    public function get(string $name)
     {
         $this->init();
 
@@ -522,11 +509,9 @@ class Application
     /**
      * Returns true if the command exists, false otherwise.
      *
-     * @param string $name The command name or alias
-     *
      * @return bool true if the command exists, false otherwise
      */
-    public function has($name)
+    public function has(string $name)
     {
         $this->init();
 
@@ -557,13 +542,11 @@ class Application
     /**
      * Finds a registered namespace by a name or an abbreviation.
      *
-     * @param string $namespace A namespace or abbreviation to search for
-     *
      * @return string A registered namespace
      *
      * @throws NamespaceNotFoundException When namespace is incorrect or ambiguous
      */
-    public function findNamespace($namespace)
+    public function findNamespace(string $namespace)
     {
         $allNamespaces = $this->getNamespaces();
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $namespace);
@@ -599,17 +582,28 @@ class Application
      * Contrary to get, this command tries to find the best
      * match if you give it an abbreviation of a name or alias.
      *
-     * @param string $name A command name or a command alias
-     *
      * @return Command A Command instance
      *
      * @throws CommandNotFoundException When command name is incorrect or ambiguous
      */
-    public function find($name)
+    public function find(string $name)
     {
         $this->init();
 
         $aliases = [];
+
+        foreach ($this->commands as $command) {
+            foreach ($command->getAliases() as $alias) {
+                if (!$this->has($alias)) {
+                    $this->commands[$alias] = $command;
+                }
+            }
+        }
+
+        if ($this->has($name)) {
+            return $this->get($name);
+        }
+
         $allCommands = $this->commandLoader ? array_merge($this->commandLoader->getNames(), array_keys($this->commands)) : array_keys($this->commands);
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
@@ -650,8 +644,7 @@ class Application
             }));
         }
 
-        $exact = \in_array($name, $commands, true) || isset($aliases[$name]);
-        if (\count($commands) > 1 && !$exact) {
+        if (\count($commands) > 1) {
             $usableWidth = $this->terminal->getWidth() - 10;
             $abbrevs = array_values($commands);
             $maxLen = 0;
@@ -671,7 +664,7 @@ class Application
             throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $name, $suggestions), array_values($commands));
         }
 
-        return $this->get($exact ? $name : reset($commands));
+        return $this->get(reset($commands));
     }
 
     /**
@@ -679,11 +672,9 @@ class Application
      *
      * The array keys are the full names and the values the command instances.
      *
-     * @param string $namespace A namespace name
-     *
      * @return Command[] An array of Command instances
      */
-    public function all($namespace = null)
+    public function all(string $namespace = null)
     {
         $this->init();
 
@@ -723,11 +714,9 @@ class Application
     /**
      * Returns an array of possible abbreviations given a set of names.
      *
-     * @param array $names An array of names
-     *
-     * @return array An array of abbreviations
+     * @return string[][] An array of abbreviations
      */
-    public static function getAbbreviations($names)
+    public static function getAbbreviations(array $names)
     {
         $abbrevs = [];
         foreach ($names as $name) {
@@ -770,7 +759,7 @@ class Application
 
             if (false !== strpos($message, "class@anonymous\0")) {
                 $message = preg_replace_callback('/class@anonymous\x00.*?\.php0x?[0-9a-fA-F]++/', function ($m) {
-                    return \class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
+                    return class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
                 }, $message);
             }
 
@@ -920,7 +909,7 @@ class Application
         $e = null;
 
         try {
-            $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+            $this->dispatcher->dispatch($event, ConsoleEvents::COMMAND);
 
             if ($event->commandShouldRun()) {
                 $exitCode = $command->run($input, $output);
@@ -929,7 +918,7 @@ class Application
             }
         } catch (\Throwable $e) {
             $event = new ConsoleErrorEvent($input, $output, $e, $command);
-            $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+            $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
             $e = $event->getError();
 
             if (0 === $exitCode = $event->getExitCode()) {
@@ -938,7 +927,7 @@ class Application
         }
 
         $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
-        $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+        $this->dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
 
         if (null !== $e) {
             throw $e;
@@ -1005,11 +994,9 @@ class Application
     /**
      * Returns abbreviated suggestions in string format.
      *
-     * @param array $abbrevs Abbreviated suggestions to convert
-     *
      * @return string A formatted string of abbreviated suggestions
      */
-    private function getAbbreviationSuggestions($abbrevs)
+    private function getAbbreviationSuggestions(array $abbrevs)
     {
         return '    '.implode("\n    ", $abbrevs);
     }
@@ -1019,12 +1006,9 @@ class Application
      *
      * This method is not part of public API and should not be used directly.
      *
-     * @param string $name  The full name of the command
-     * @param string $limit The maximum number of parts of the namespace
-     *
      * @return string The namespace of the command
      */
-    public function extractNamespace($name, $limit = null)
+    public function extractNamespace(string $name, int $limit = null)
     {
         $parts = explode(':', $name);
         array_pop($parts);
@@ -1036,12 +1020,9 @@ class Application
      * Finds alternative of $name among $collection,
      * if nothing is found in $collection, try in $abbrevs.
      *
-     * @param string   $name       The string
-     * @param iterable $collection The collection
-     *
      * @return string[] A sorted array of similar string
      */
-    private function findAlternatives($name, $collection)
+    private function findAlternatives(string $name, iterable $collection)
     {
         $threshold = 1e3;
         $alternatives = [];
@@ -1086,12 +1067,9 @@ class Application
     /**
      * Sets the default Command name.
      *
-     * @param string $commandName     The Command name
-     * @param bool   $isSingleCommand Set to true if there is only one command in this application
-     *
      * @return self
      */
-    public function setDefaultCommand($commandName, $isSingleCommand = false)
+    public function setDefaultCommand(string $commandName, bool $isSingleCommand = false)
     {
         $this->defaultCommand = $commandName;
 
@@ -1146,11 +1124,9 @@ class Application
     /**
      * Returns all namespaces of the command name.
      *
-     * @param string $name The full name of the command
-     *
      * @return string[] The namespaces of the command
      */
-    private function extractAllNamespaces($name)
+    private function extractAllNamespaces(string $name)
     {
         // -1 as third argument is needed to skip the command short name when exploding
         $parts = explode(':', $name, -1);

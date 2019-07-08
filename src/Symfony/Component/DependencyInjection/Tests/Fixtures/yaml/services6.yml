@@ -34,6 +34,7 @@ services:
     new_factory2: { class: FooBarClass, factory: ['@baz', getClass]}
     new_factory3: { class: FooBarClass, factory: [BazClass, getInstance]}
     new_factory4: { class: BazClass, factory: [~, getInstance]}
+    new_factory5: { class: FooBarClass, factory: '@baz' }
     Acme\WithShortCutArgs: [foo, '@baz']
     alias_for_foo: '@foo'
     another_alias_for_foo:

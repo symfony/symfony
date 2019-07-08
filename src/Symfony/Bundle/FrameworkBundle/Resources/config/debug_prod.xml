@@ -18,9 +18,11 @@
             <argument type="service" id="logger" on-invalid="null" />
             <argument>null</argument><!-- Log levels map for enabled error levels -->
             <argument>%debug.error_handler.throw_at%</argument>
-            <argument>true</argument>
-            <argument type="service" id="debug.file_link_formatter"></argument>
-            <argument>true</argument>
+            <argument>%kernel.debug%</argument>
+            <argument type="service" id="debug.file_link_formatter" />
+            <argument>%kernel.debug%</argument>
+            <argument>%kernel.charset%</argument>
+            <argument type="service" id="error_catcher.error_formatter" on-invalid="null" />
         </service>
 
         <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter">

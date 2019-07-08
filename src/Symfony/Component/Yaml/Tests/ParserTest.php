@@ -525,6 +525,20 @@ EOF;
         $this->parser->parse($yaml, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Mapping values are not allowed in multi-line blocks at line 2 (near "dbal:wrong").
+     */
+    public function testMappingKeyInMultiLineStringTriggersDeprecationNotice()
+    {
+        $yaml = <<<'EOF'
+data:
+    dbal:wrong
+        default_connection: monolith
+EOF;
+        $this->parser->parse($yaml);
+    }
+
     public function testCanParseContentWithTrailingSpaces()
     {
         $yaml = "items:  \n  foo: bar";

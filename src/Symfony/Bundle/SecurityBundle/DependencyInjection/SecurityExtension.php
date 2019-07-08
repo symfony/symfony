@@ -29,9 +29,11 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
+use Twig\Extension\AbstractExtension;
 
 /**
  * SecurityExtension.
@@ -97,8 +99,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
-        $loader->load('templating_php.xml');
-        $loader->load('templating_twig.xml');
+
+        if (class_exists(AbstractExtension::class)) {
+            $loader->load('templating_twig.xml');
+        }
+
         $loader->load('collectors.xml');
         $loader->load('guard.xml');
 
@@ -551,30 +556,27 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ];
         }
 
-        // bcrypt encoder
-        if ('bcrypt' === $config['algorithm']) {
+        if ('native' === $config['algorithm']) {
             return [
-                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => [$config['cost']],
+                'class' => NativePasswordEncoder::class,
+                'arguments' => [
+                    $config['time_cost'],
+                    (($config['memory_cost'] ?? 0) << 10) ?: null,
+                    $config['cost'],
+                ],
             ];
         }
 
-        // Argon2i encoder
-        if ('argon2i' === $config['algorithm']) {
-            if (!Argon2iPasswordEncoder::isSupported()) {
-                if (\extension_loaded('sodium') && !\defined('SODIUM_CRYPTO_PWHASH_SALTBYTES')) {
-                    throw new InvalidConfigurationException('The installed libsodium version does not have support for Argon2i. Use Bcrypt instead.');
-                }
-
-                throw new InvalidConfigurationException('Argon2i algorithm is not supported. Install the libsodium extension or use BCrypt instead.');
+        if ('sodium' === $config['algorithm']) {
+            if (!SodiumPasswordEncoder::isSupported()) {
+                throw new InvalidConfigurationException('Libsodium is not available. Install the sodium extension or use "auto" instead.');
             }
 
             return [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
+                'class' => SodiumPasswordEncoder::class,
                 'arguments' => [
-                    $config['memory_cost'],
                     $config['time_cost'],
-                    $config['threads'],
+                    (($config['memory_cost'] ?? 0) << 10) ?: null,
                 ],
             ];
         }
@@ -697,20 +699,32 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->expressions[$id] = new Reference($id);
     }
 
-    private function createRequestMatcher($container, $path = null, $host = null, int $port = null, $methods = [], $ip = null, array $attributes = [])
+    private function createRequestMatcher(ContainerBuilder $container, $path = null, $host = null, int $port = null, $methods = [], array $ips = null, array $attributes = [])
     {
         if ($methods) {
             $methods = array_map('strtoupper', (array) $methods);
         }
 
-        $id = '.security.request_matcher.'.ContainerBuilder::hash([$path, $host, $port, $methods, $ip, $attributes]);
+        if (null !== $ips) {
+            foreach ($ips as $ip) {
+                $container->resolveEnvPlaceholders($ip, null, $usedEnvs);
+
+                if (!$usedEnvs && !$this->isValidIp($ip)) {
+                    throw new \LogicException(sprintf('The given value "%s" in the "security.access_control" config option is not a valid IP address.', $ip));
+                }
+
+                $usedEnvs = null;
+            }
+        }
+
+        $id = '.security.request_matcher.'.ContainerBuilder::hash([$path, $host, $port, $methods, $ips, $attributes]);
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];
         }
 
         // only add arguments that are necessary
-        $arguments = [$path, $host, $methods, $ip, $attributes, null, $port];
+        $arguments = [$path, $host, $methods, $ips, $attributes, null, $port];
         while (\count($arguments) > 0 && !end($arguments)) {
             array_pop($arguments);
         }
@@ -753,5 +767,31 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         // first assemble the factories
         return new MainConfiguration($this->factories, $this->userProviderFactories);
+    }
+
+    private function isValidIp(string $cidr): bool
+    {
+        $cidrParts = explode('/', $cidr);
+
+        if (1 === \count($cidrParts)) {
+            return false !== filter_var($cidrParts[0], FILTER_VALIDATE_IP);
+        }
+
+        $ip = $cidrParts[0];
+        $netmask = $cidrParts[1];
+
+        if (!ctype_digit($netmask)) {
+            return false;
+        }
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $netmask <= 32;
+        }
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            return $netmask <= 128;
+        }
+
+        return false;
     }
 }

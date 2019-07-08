@@ -125,36 +125,28 @@ class LoggerTest extends TestCase
         }
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Bridge\Monolog\Logger::getLogs()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
     public function testInheritedClassCallGetLogsWithoutArgument()
     {
         $loggerChild = new ClassThatInheritLogger('test');
-        $loggerChild->getLogs();
+        $this->assertNull($loggerChild->getLogs());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Bridge\Monolog\Logger::countErrors()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
     public function testInheritedClassCallCountErrorsWithoutArgument()
     {
         $loggerChild = new ClassThatInheritLogger('test');
-        $loggerChild->countErrors();
+        $this->assertEquals(0, $loggerChild->countErrors());
     }
 }
 
 class ClassThatInheritLogger extends Logger
 {
-    public function getLogs()
+    public function getLogs(Request $request = null)
     {
-        parent::getLogs();
+        parent::getLogs($request);
     }
 
-    public function countErrors()
+    public function countErrors(Request $request = null)
     {
-        parent::countErrors();
+        parent::countErrors($request);
     }
 }

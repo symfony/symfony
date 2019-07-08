@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Twig\Environment;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
@@ -37,10 +38,10 @@ class DebugCommand extends Command
     private $projectDir;
     private $bundlesMetadata;
     private $twigDefaultPath;
-    private $rootDir;
     private $filesystemLoaders;
+    private $fileLinkFormatter;
 
-    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, string $rootDir = null)
+    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 
@@ -48,7 +49,7 @@ class DebugCommand extends Command
         $this->projectDir = $projectDir;
         $this->bundlesMetadata = $bundlesMetadata;
         $this->twigDefaultPath = $twigDefaultPath;
-        $this->rootDir = $rootDir;
+        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     protected function configure()
@@ -106,16 +107,28 @@ EOF
 
     private function displayPathsText(SymfonyStyle $io, string $name)
     {
-        $files = $this->findTemplateFiles($name);
+        $file = new \ArrayIterator($this->findTemplateFiles($name));
         $paths = $this->getLoaderPaths($name);
 
         $io->section('Matched File');
-        if ($files) {
-            $io->success(array_shift($files));
+        if ($file->valid()) {
+            if ($fileLink = $this->getFileLink($file->key())) {
+                $io->block($file->current(), 'OK', sprintf('fg=black;bg=green;href=%s', $fileLink), ' ', true);
+            } else {
+                $io->success($file->current());
+            }
+            $file->next();
 
-            if ($files) {
+            if ($file->valid()) {
                 $io->section('Overridden Files');
-                $io->listing($files);
+                do {
+                    if ($fileLink = $this->getFileLink($file->key())) {
+                        $io->text(sprintf('* <href=%s>%s</>', $fileLink, $file->current()));
+                    } else {
+                        $io->text(sprintf('* %s', $file->current()));
+                    }
+                    $file->next();
+                } while ($file->valid());
             }
         } else {
             $alternatives = [];
@@ -370,22 +383,6 @@ EOF
         $alternatives = [];
         $bundleNames = [];
 
-        if ($this->rootDir && $this->projectDir) {
-            $folders = glob($this->rootDir.'/Resources/*/views', GLOB_ONLYDIR);
-            $relativePath = ltrim(substr($this->rootDir.\DIRECTORY_SEPARATOR.'Resources/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
-            $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
-                if (0 === strpos($absolutePath, $this->projectDir)) {
-                    $name = basename(\dirname($absolutePath));
-                    $path = ltrim($relativePath.$name, \DIRECTORY_SEPARATOR);
-                    $carry[$name] = $path;
-
-                    @trigger_error(sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $absolutePath, $this->twigDefaultPath.'/bundles/'.$name), E_USER_DEPRECATED);
-                }
-
-                return $carry;
-            }, $bundleNames);
-        }
-
         if ($this->twigDefaultPath && $this->projectDir) {
             $folders = glob($this->twigDefaultPath.'/bundles/*', GLOB_ONLYDIR);
             $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
@@ -459,9 +456,9 @@ EOF
 
                 if (is_file($filename)) {
                     if (false !== $realpath = realpath($filename)) {
-                        $files[] = $this->getRelativePath($realpath);
+                        $files[$realpath] = $this->getRelativePath($realpath);
                     } else {
-                        $files[] = $this->getRelativePath($filename);
+                        $files[$filename] = $this->getRelativePath($filename);
                     }
                 }
             }
@@ -568,5 +565,14 @@ EOF
         }
 
         return $this->filesystemLoaders;
+    }
+
+    private function getFileLink(string $absolutePath): string
+    {
+        if (null === $this->fileLinkFormatter) {
+            return '';
+        }
+
+        return (string) $this->fileLinkFormatter->format($absolutePath, 1);
     }
 }

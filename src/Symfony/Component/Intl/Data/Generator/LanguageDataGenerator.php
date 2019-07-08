@@ -84,6 +84,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         'zh' => 'zho',
     ];
     private static $blacklist = [
+        'root' => true, // Absolute root language
         'mul' => true, // Multiple languages
         'mis' => true, // Uncoded language
         'und' => true, // Unknown language

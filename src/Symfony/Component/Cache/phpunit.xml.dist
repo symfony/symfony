@@ -40,7 +40,8 @@
                             <element key="1"><string>Doctrine\Common\Cache</string></element>
                             <element key="2"><string>Symfony\Component\Cache</string></element>
                             <element key="3"><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
-                            <element key="4"><string>Symfony\Component\Cache\Traits</string></element>
+                            <element key="4"><string>Symfony\Component\Cache\Tests\Traits</string></element>
+                            <element key="5"><string>Symfony\Component\Cache\Traits</string></element>
                         </array>
                     </element>
                 </array>

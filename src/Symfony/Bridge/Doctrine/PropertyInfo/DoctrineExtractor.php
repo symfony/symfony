@@ -11,12 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\PropertyInfo;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -26,24 +27,14 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface
+class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
     private $entityManager;
     private $classMetadataFactory;
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct($entityManager)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        if ($entityManager instanceof EntityManagerInterface) {
-            $this->entityManager = $entityManager;
-        } elseif ($entityManager instanceof ClassMetadataFactory) {
-            @trigger_error(sprintf('Injecting an instance of "%s" in "%s" is deprecated since Symfony 4.2, inject an instance of "%s" instead.', ClassMetadataFactory::class, __CLASS__, EntityManagerInterface::class), E_USER_DEPRECATED);
-            $this->classMetadataFactory = $entityManager;
-        } else {
-            throw new \TypeError(sprintf('$entityManager must be an instance of "%s", "%s" given.', EntityManagerInterface::class, \is_object($entityManager) ? \get_class($entityManager) : \gettype($entityManager)));
-        }
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -51,12 +42,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
      */
     public function getProperties($class, array $context = [])
     {
-        try {
-            $metadata = $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
-        } catch (MappingException $exception) {
-            return;
-        } catch (OrmMappingException $exception) {
-            return;
+        if (null === $metadata = $this->getMetadata($class)) {
+            return null;
         }
 
         $properties = array_merge($metadata->getFieldNames(), $metadata->getAssociationNames());
@@ -77,12 +64,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
      */
     public function getTypes($class, $property, array $context = [])
     {
-        try {
-            $metadata = $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
-        } catch (MappingException $exception) {
-            return;
-        } catch (OrmMappingException $exception) {
-            return;
+        if (null === $metadata = $this->getMetadata($class)) {
+            return null;
         }
 
         if ($metadata->hasAssociation($property)) {
@@ -173,6 +156,39 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
                     return $builtinType ? [new Type($builtinType, $nullable)] : null;
             }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isReadable($class, $property, array $context = [])
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isWritable($class, $property, array $context = [])
+    {
+        if (
+            null === ($metadata = $this->getMetadata($class))
+            || ClassMetadata::GENERATOR_TYPE_NONE === $metadata->generatorType
+            || !\in_array($property, $metadata->getIdentifierFieldNames(), true)
+        ) {
+            return null;
+        }
+
+        return false;
+    }
+
+    private function getMetadata(string $class): ?ClassMetadata
+    {
+        try {
+            return $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
+        } catch (MappingException | OrmMappingException $exception) {
+            return null;
         }
     }
 

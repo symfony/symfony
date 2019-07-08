@@ -50,7 +50,6 @@ class ContainerDebugCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services (deprecated)'),
                 new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Used to show arguments in services'),
                 new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Used to show hidden (internal) services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all services with a specific tag'),
@@ -58,6 +57,8 @@ class ContainerDebugCommand extends Command
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
                 new InputOption('types', null, InputOption::VALUE_NONE, 'Displays types (classes/interfaces) available in the container'),
+                new InputOption('env-var', null, InputOption::VALUE_REQUIRED, 'Displays a specific environment variable used in the container'),
+                new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Displays environment variables used in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
@@ -74,6 +75,14 @@ To get specific information about a service, specify its name:
 To see available types that can be used for autowiring, use the <info>--types</info> flag:
 
   <info>php %command.full_name% --types</info>
+
+To see environment variables used by the container, use the <info>--env-vars</info> flag:
+
+  <info>php %command.full_name% --env-vars</info>
+
+Display a specific environment variable by specifying its name with the <info>--env-var</info> option:
+
+  <info>php %command.full_name% --env-var=APP_ENV</info>
 
 Use the --tags option to display tagged <comment>public</comment> services grouped by tag:
 
@@ -106,17 +115,17 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getOption('show-private')) {
-            @trigger_error('The "--show-private" option no longer has any effect and is deprecated since Symfony 4.1.', E_USER_DEPRECATED);
-        }
-
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
         $this->validateInput($input);
         $object = $this->getContainerBuilder();
 
-        if ($input->getOption('types')) {
+        if ($input->getOption('env-vars')) {
+            $options = ['env-vars' => true];
+        } elseif ($envVar = $input->getOption('env-var')) {
+            $options = ['env-vars' => true, 'name' => $envVar];
+        } elseif ($input->getOption('types')) {
             $options = [];
             $options['filter'] = [$this, 'filterToServiceTypes'];
         } elseif ($input->getOption('parameters')) {
@@ -145,9 +154,14 @@ EOF
         $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
+        $options['is_debug'] = $this->getApplication()->getKernel()->isDebug();
 
         try {
             $helper->describe($io, $object, $options);
+
+            if (isset($options['id']) && isset($this->getApplication()->getKernel()->getContainer()->getRemovedIds()[$options['id']])) {
+                $errorIo->note(sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));
+            }
         } catch (ServiceNotFoundException $e) {
             if ('' !== $e->getId() && '@' === $e->getId()[0]) {
                 throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, [substr($e->getId(), 1)]);
@@ -156,7 +170,7 @@ EOF
             throw $e;
         }
 
-        if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && $input->isInteractive()) {
+        if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && !$input->getOption('env-vars') && !$input->getOption('env-var') && $input->isInteractive()) {
             if ($input->getOption('tags')) {
                 $errorIo->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
             } elseif ($input->getOption('parameters')) {
@@ -194,11 +208,9 @@ EOF
     /**
      * Loads the ContainerBuilder from the cache.
      *
-     * @return ContainerBuilder
-     *
      * @throws \LogicException
      */
-    protected function getContainerBuilder()
+    protected function getContainerBuilder(): ContainerBuilder
     {
         if ($this->containerBuilder) {
             return $this->containerBuilder;

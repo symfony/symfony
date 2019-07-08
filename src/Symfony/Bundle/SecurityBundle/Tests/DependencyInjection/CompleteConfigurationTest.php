@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
-use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
@@ -282,10 +282,9 @@ abstract class CompleteConfigurationTest extends TestCase
                 'hash_algorithm' => 'sha512',
                 'key_length' => 40,
                 'ignore_case' => false,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
-                'threads' => null,
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -294,10 +293,9 @@ abstract class CompleteConfigurationTest extends TestCase
                 'ignore_case' => false,
                 'encode_as_base64' => true,
                 'iterations' => 5000,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
-                'threads' => null,
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -305,19 +303,30 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => ['sha1', false, 5, 30],
             ],
             'JMS\FooBundle\Entity\User6' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => [15],
+                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'algorithm' => 'auto',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     public function testEncodersWithLibsodium()
     {
-        if (!Argon2iPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Argon2i algorithm is not supported.');
+        if (!SodiumPasswordEncoder::isSupported()) {
+            $this->markTestSkipped('Libsodium is not available.');
         }
 
-        $container = $this->getContainer('argon2i_encoder');
+        $container = $this->getContainer('sodium_encoder');
 
         $this->assertEquals([[
             'JMS\FooBundle\Entity\User1' => [
@@ -331,10 +340,9 @@ abstract class CompleteConfigurationTest extends TestCase
                 'hash_algorithm' => 'sha512',
                 'key_length' => 40,
                 'ignore_case' => false,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
-                'threads' => null,
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -343,10 +351,9 @@ abstract class CompleteConfigurationTest extends TestCase
                 'ignore_case' => false,
                 'encode_as_base64' => true,
                 'iterations' => 5000,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
-                'threads' => null,
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -354,12 +361,12 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => ['sha1', false, 5, 30],
             ],
             'JMS\FooBundle\Entity\User6' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => [15],
+                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
+                'arguments' => [8, 102400, 15],
             ],
             'JMS\FooBundle\Entity\User7' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-                'arguments' => [256, 1, 2],
+                'class' => 'Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder',
+                'arguments' => [8, 128 * 1024 * 1024],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
@@ -460,50 +467,6 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $this->getContainer('listener_provider');
         $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "simple_form" security listener is deprecated Symfony 4.2, use Guard instead.
-     */
-    public function testSimpleAuth()
-    {
-        $container = $this->getContainer('simple_auth');
-        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $listeners = [];
-        $configs = [];
-        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
-            $contextDef = $container->getDefinition($contextId);
-            $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
-
-            $configDef = $container->getDefinition((string) $arguments['index_3']);
-            $configs[] = array_values($configDef->getArguments());
-        }
-
-        $this->assertSame([[
-            'simple_auth',
-            'security.user_checker',
-            null,
-            true,
-            false,
-            'security.user.provider.concrete.default',
-            'simple_auth',
-            'security.authentication.form_entry_point.simple_auth',
-            null,
-            null,
-            ['simple_form', 'anonymous',
-            ],
-            null,
-        ]], $configs);
-
-        $this->assertSame([[
-            'security.channel_listener',
-            'security.context_listener.0',
-            'security.authentication.listener.simple_form.simple_auth',
-            'security.authentication.listener.anonymous.simple_auth',
-            'security.access_listener',
-        ]], $listeners);
     }
 
     protected function getContainer($file)

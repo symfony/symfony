@@ -12,8 +12,13 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumberType extends AbstractType
@@ -26,8 +31,23 @@ class NumberType extends AbstractType
         $builder->addViewTransformer(new NumberToLocalizedStringTransformer(
             $options['scale'],
             $options['grouping'],
-            $options['rounding_mode']
+            $options['rounding_mode'],
+            $options['html5'] ? 'en' : null
         ));
+
+        if ('string' === $options['input']) {
+            $builder->addModelTransformer(new StringToFloatTransformer($options['scale']));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        if ($options['html5']) {
+            $view->vars['type'] = 'number';
+        }
     }
 
     /**
@@ -41,6 +61,8 @@ class NumberType extends AbstractType
             'grouping' => false,
             'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             'compound' => false,
+            'input' => 'number',
+            'html5' => false,
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [
@@ -52,8 +74,17 @@ class NumberType extends AbstractType
             NumberToLocalizedStringTransformer::ROUND_UP,
             NumberToLocalizedStringTransformer::ROUND_CEILING,
         ]);
-
+        $resolver->setAllowedValues('input', ['number', 'string']);
         $resolver->setAllowedTypes('scale', ['null', 'int']);
+        $resolver->setAllowedTypes('html5', 'bool');
+
+        $resolver->setNormalizer('grouping', function (Options $options, $value) {
+            if (true === $value && $options['html5']) {
+                throw new LogicException('Cannot use the "grouping" option when the "html5" option is enabled.');
+            }
+
+            return $value;
+        });
     }
 
     /**

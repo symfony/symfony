@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyAccess\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
@@ -98,6 +99,16 @@ class PropertyAccessorTest extends TestCase
     public function testGetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
         $this->propertyAccessor->getValue($objectOrArray, $path);
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingProperty
+     */
+    public function testGetValueReturnsNullIfPropertyNotFoundAndExceptionIsDisabled($objectOrArray, $path)
+    {
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()->disableExceptionOnInvalidPropertyPath()->getPropertyAccessor();
+
+        $this->assertNull($this->propertyAccessor->getValue($objectOrArray, $path), $path);
     }
 
     /**
@@ -450,6 +461,7 @@ class PropertyAccessorTest extends TestCase
             [new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'],
             [new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'],
             [new TestClass('Bernhard'), 'publicGetSetter', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicCanAccessor', 'Bernhard'],
 
             // Methods are camelized
             [new TestClass('Bernhard'), 'public_accessor', 'Bernhard'],
@@ -615,6 +627,25 @@ class PropertyAccessorTest extends TestCase
         $propertyAccessor = new PropertyAccessor(false, false, new ArrayAdapter());
 
         $this->assertEquals($value, $propertyAccessor->getValue($obj, 'foo'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testAnonymousClassReadThrowExceptionOnInvalidPropertyPath()
+    {
+        $obj = $this->generateAnonymousClass('bar');
+
+        $this->propertyAccessor->getValue($obj, 'invalid_property');
+    }
+
+    public function testAnonymousClassReadReturnsNullOnInvalidPropertyWithDisabledException()
+    {
+        $obj = $this->generateAnonymousClass('bar');
+
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()->disableExceptionOnInvalidPropertyPath()->getPropertyAccessor();
+
+        $this->assertNull($this->propertyAccessor->getValue($obj, 'invalid_property'));
     }
 
     public function testAnonymousClassWrite()

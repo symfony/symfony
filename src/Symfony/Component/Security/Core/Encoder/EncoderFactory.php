@@ -84,6 +84,20 @@ class EncoderFactory implements EncoderFactoryInterface
 
     private function getEncoderConfigFromAlgorithm($config)
     {
+        if ('auto' === $config['algorithm']) {
+            $encoderChain = [];
+            // "plaintext" is not listed as any leaked hashes could then be used to authenticate directly
+            foreach ([SodiumPasswordEncoder::isSupported() ? 'sodium' : 'native', 'pbkdf2', $config['hash_algorithm']] as $algo) {
+                $config['algorithm'] = $algo;
+                $encoderChain[] = $this->createEncoder($config);
+            }
+
+            return [
+                'class' => MigratingPasswordEncoder::class,
+                'arguments' => $encoderChain,
+            ];
+        }
+
         switch ($config['algorithm']) {
             case 'plaintext':
                 return [
@@ -102,19 +116,22 @@ class EncoderFactory implements EncoderFactoryInterface
                     ],
                 ];
 
-            case 'bcrypt':
+            case 'native':
                 return [
-                    'class' => BCryptPasswordEncoder::class,
-                    'arguments' => [$config['cost']],
+                    'class' => NativePasswordEncoder::class,
+                    'arguments' => [
+                        $config['time_cost'] ?? null,
+                        (($config['memory_cost'] ?? 0) << 10) ?: null,
+                        $config['cost'] ?? null,
+                    ],
                 ];
 
-            case 'argon2i':
+            case 'sodium':
                 return [
-                    'class' => Argon2iPasswordEncoder::class,
+                    'class' => SodiumPasswordEncoder::class,
                     'arguments' => [
-                        $config['memory_cost'],
-                        $config['time_cost'],
-                        $config['threads'],
+                        $config['time_cost'] ?? null,
+                        (($config['memory_cost'] ?? 0) << 10) ?: null,
                     ],
                 ];
         }

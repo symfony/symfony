@@ -1,0 +1,11 @@
+framework:
+    workflows:
+        my_workflow:
+            type: state_machine
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+            places: [first, middle, last]
+            transitions:
+                go:
+                    from: first
+                    to: [last, middle ]

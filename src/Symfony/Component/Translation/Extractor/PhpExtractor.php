@@ -50,25 +50,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         ],
         [
             '->',
-            'transChoice',
-            '(',
-            self::MESSAGE_TOKEN,
-            ',',
-            self::METHOD_ARGUMENTS_TOKEN,
-            ',',
-            self::METHOD_ARGUMENTS_TOKEN,
-            ',',
-            self::DOMAIN_TOKEN,
-        ],
-        [
-            '->',
             'trans',
-            '(',
-            self::MESSAGE_TOKEN,
-        ],
-        [
-            '->',
-            'transChoice',
             '(',
             self::MESSAGE_TOKEN,
         ],
@@ -81,9 +63,8 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     {
         $files = $this->extractFiles($resource);
         foreach ($files as $file) {
-            $this->parseTokens(token_get_all(file_get_contents($file)), $catalog);
+            $this->parseTokens(token_get_all(file_get_contents($file)), $catalog, $file);
 
-            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
             gc_mem_caches();
         }
     }
@@ -91,7 +72,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function setPrefix($prefix)
+    public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;
     }
@@ -195,11 +176,8 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
     /**
      * Extracts trans message from PHP tokens.
-     *
-     * @param array            $tokens
-     * @param MessageCatalogue $catalog
      */
-    protected function parseTokens($tokens, MessageCatalogue $catalog)
+    protected function parseTokens(array $tokens, MessageCatalogue $catalog, string $filename)
     {
         $tokenIterator = new \ArrayIterator($tokens);
 
@@ -237,6 +215,10 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
                 if ($message) {
                     $catalog->set($message, $this->prefix.$message, $domain);
+                    $metadata = $catalog->getMetadata($message, $domain) ?? [];
+                    $normalizedFilename = preg_replace('{[\\\\/]+}', '/', $filename);
+                    $metadata['sources'][] = $normalizedFilename.':'.$tokens[$key][2];
+                    $catalog->setMetadata($message, $metadata, $domain);
                     break;
                 }
             }

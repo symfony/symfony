@@ -15,7 +15,7 @@ return function (ContainerConfigurator $c) {
         ->decorate('decorated', 'decorator42')
         ->args([ref('decorator42')]);
 
-    $s->set('listener_aggregator', FooClass::class)->public()->args([tagged('listener')]);
+    $s->set('listener_aggregator', FooClass::class)->public()->args([tagged_iterator('listener')]);
 
     $s->set(null, stdClass::class)->tag('listener');
 };

@@ -31,6 +31,9 @@ class Route
     private $methods = [];
     private $schemes = [];
     private $condition;
+    private $locale;
+    private $format;
+    private $utf8;
 
     /**
      * @param array $data An array of key/value parameters
@@ -51,6 +54,21 @@ class Route
         if (isset($data['path']) && \is_array($data['path'])) {
             $data['localized_paths'] = $data['path'];
             unset($data['path']);
+        }
+
+        if (isset($data['locale'])) {
+            $data['defaults']['_locale'] = $data['locale'];
+            unset($data['locale']);
+        }
+
+        if (isset($data['format'])) {
+            $data['defaults']['_format'] = $data['format'];
+            unset($data['format']);
+        }
+
+        if (isset($data['utf8'])) {
+            $data['options']['utf8'] = filter_var($data['utf8'], FILTER_VALIDATE_BOOLEAN) ?: false;
+            unset($data['utf8']);
         }
 
         foreach ($data as $key => $value) {

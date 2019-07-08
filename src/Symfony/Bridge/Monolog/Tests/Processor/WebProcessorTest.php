@@ -15,6 +15,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\WebProcessor;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class WebProcessorTest extends TestCase
 {
@@ -87,15 +88,15 @@ class WebProcessorTest extends TestCase
         $request->server->replace($server);
         $request->headers->replace($server);
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+        $event = $this->getMockBuilder(ResponseEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
         $event->expects($this->any())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $event->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         return [$event, $server];
     }

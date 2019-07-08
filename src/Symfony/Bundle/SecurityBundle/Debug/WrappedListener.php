@@ -11,16 +11,17 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * Wraps a security listener for calls record.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
+ *
+ * @internal
  */
-final class WrappedListener implements ListenerInterface
+final class WrappedListener
 {
     private $response;
     private $listener;
@@ -28,7 +29,7 @@ final class WrappedListener implements ListenerInterface
     private $stub;
     private static $hasVarDumper;
 
-    public function __construct(ListenerInterface $listener)
+    public function __construct(callable $listener)
     {
         $this->listener = $listener;
 
@@ -37,13 +38,10 @@ final class WrappedListener implements ListenerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $startTime = microtime(true);
-        $this->listener->handle($event);
+        ($this->listener)($event);
         $this->time = microtime(true) - $startTime;
         $this->response = $event->getResponse();
     }
@@ -56,7 +54,7 @@ final class WrappedListener implements ListenerInterface
         return $this->listener->{$method}(...$arguments);
     }
 
-    public function getWrappedListener(): ListenerInterface
+    public function getWrappedListener(): callable
     {
         return $this->listener;
     }

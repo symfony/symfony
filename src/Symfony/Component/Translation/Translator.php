@@ -15,21 +15,19 @@ use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
-use Symfony\Component\Translation\Formatter\ChoiceMessageFormatterInterface;
 use Symfony\Component\Translation\Formatter\IntlFormatterInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Translator implements LegacyTranslatorInterface, TranslatorInterface, TranslatorBagInterface
+class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface
 {
     /**
      * @var MessageCatalogueInterface[]
@@ -111,7 +109,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      * @param string          $format The name of the loader (@see addResource())
      * @param LoaderInterface $loader A LoaderInterface instance
      */
-    public function addLoader($format, LoaderInterface $loader)
+    public function addLoader(string $format, LoaderInterface $loader)
     {
         $this->loaders[$format] = $loader;
     }
@@ -126,10 +124,14 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public function addResource($format, $resource, $locale, $domain = null)
+    public function addResource(string $format, $resource, string $locale, string $domain = null)
     {
         if (null === $domain) {
             $domain = 'messages';
+        }
+
+        if (null === $locale) {
+            @trigger_error(sprintf('Passing "null" to the third argument of the "%s" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.', __METHOD__), E_USER_DEPRECATED);
         }
 
         $this->assertValidLocale($locale);
@@ -182,7 +184,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     /**
      * Gets the fallback locales.
      *
-     * @internal since Symfony 4.2
+     * @internal
      *
      * @return array The fallback locales
      */
@@ -221,44 +223,8 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
      */
-    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), E_USER_DEPRECATED);
-
-        if (!$this->formatter instanceof ChoiceMessageFormatterInterface) {
-            throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', \get_class($this->formatter)));
-        }
-
-        if (null === $domain) {
-            $domain = 'messages';
-        }
-
-        $id = (string) $id;
-        $catalogue = $this->getCatalogue($locale);
-        $locale = $catalogue->getLocale();
-        while (!$catalogue->defines($id, $domain)) {
-            if ($cat = $catalogue->getFallbackCatalogue()) {
-                $catalogue = $cat;
-                $locale = $catalogue->getLocale();
-            } else {
-                break;
-            }
-        }
-
-        if ($this->hasIntlFormatter && $catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
-            return $this->formatter->formatIntl($catalogue->get($id, $domain), $locale, ['%count%' => $number] + $parameters);
-        }
-
-        return $this->formatter->choiceFormat($catalogue->get($id, $domain), $number, $locale, $parameters);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCatalogue($locale = null)
+    public function getCatalogue(string $locale = null)
     {
         if (null === $locale) {
             $locale = $this->getLocale();
@@ -286,7 +252,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     /**
      * @param string $locale
      */
-    protected function loadCatalogue($locale)
+    protected function loadCatalogue(string $locale)
     {
         if (null === $this->cacheDir) {
             $this->initializeCatalogue($locale);
@@ -298,7 +264,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     /**
      * @param string $locale
      */
-    protected function initializeCatalogue($locale)
+    protected function initializeCatalogue(string $locale)
     {
         $this->assertValidLocale($locale);
 
@@ -395,7 +361,10 @@ EOF
         return $this->cacheDir.'/catalogue.'.$locale.'.'.strtr(substr(base64_encode(hash('sha256', serialize($this->fallbackLocales), true)), 0, 7), '/', '_').'.php';
     }
 
-    private function doLoadCatalogue($locale): void
+    /**
+     * @internal
+     */
+    protected function doLoadCatalogue($locale): void
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 
@@ -430,7 +399,7 @@ EOF
     protected function computeFallbackLocales($locale)
     {
         if (null === $this->parentLocales) {
-            $parentLocales = \json_decode(\file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
+            $parentLocales = json_decode(file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
         }
 
         $locales = [];

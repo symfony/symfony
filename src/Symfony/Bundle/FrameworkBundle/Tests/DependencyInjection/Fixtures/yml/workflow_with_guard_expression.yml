@@ -2,18 +2,16 @@ framework:
     workflows:
         article:
             type: workflow
-            marking_store:
-                type: multiple_state
             supports:
-            - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
-            initial_place: draft
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+            initial_marking: [draft]
             places:
-            - draft
-            - wait_for_journalist
-            - approved_by_journalist
-            - wait_for_spellchecker
-            - approved_by_spellchecker
-            - published
+                - draft
+                - wait_for_journalist
+                - approved_by_journalist
+                - wait_for_spellchecker
+                - approved_by_spellchecker
+                - published
             transitions:
                 request_review:
                     from: [draft]

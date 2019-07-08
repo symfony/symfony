@@ -44,7 +44,7 @@ class GuardListener
         $this->validator = $validator;
     }
 
-    public function onTransition(GuardEvent $event, $eventName)
+    public function onTransition(GuardEvent $event, string $eventName)
     {
         if (!isset($this->configuration[$eventName])) {
             return;
@@ -80,19 +80,11 @@ class GuardListener
             throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow %s.', $event->getWorkflowName()));
         }
 
-        if (null !== $this->roleHierarchy) {
-            $roles = $this->roleHierarchy->getReachableRoles($token->getRoles());
-        } else {
-            $roles = $token->getRoles();
-        }
-
         $variables = [
             'token' => $token,
             'user' => $token->getUser(),
             'subject' => $event->getSubject(),
-            'roles' => array_map(function ($role) {
-                return $role->getRole();
-            }, $roles),
+            'role_names' => $this->roleHierarchy->getReachableRoleNames($token->getRoleNames()),
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
             // needed for the is_* expression function

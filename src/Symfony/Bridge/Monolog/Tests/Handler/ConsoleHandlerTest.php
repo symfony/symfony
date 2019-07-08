@@ -50,7 +50,7 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->atLeastOnce())
             ->method('getVerbosity')
-            ->will($this->returnValue($verbosity))
+            ->willReturn($verbosity)
         ;
         $handler = new ConsoleHandler($output, true, $map);
         $this->assertSame($isHandling, $handler->isHandling(['level' => $level]),
@@ -114,12 +114,12 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->at(0))
             ->method('getVerbosity')
-            ->will($this->returnValue(OutputInterface::VERBOSITY_QUIET))
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
         ;
         $output
             ->expects($this->at(1))
             ->method('getVerbosity')
-            ->will($this->returnValue(OutputInterface::VERBOSITY_DEBUG))
+            ->willReturn(OutputInterface::VERBOSITY_DEBUG)
         ;
         $handler = new ConsoleHandler($output);
         $this->assertFalse($handler->isHandling(['level' => Logger::NOTICE]),
@@ -144,7 +144,7 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->any())
             ->method('getVerbosity')
-            ->will($this->returnValue(OutputInterface::VERBOSITY_DEBUG))
+            ->willReturn(OutputInterface::VERBOSITY_DEBUG)
         ;
         $output
             ->expects($this->once())
@@ -196,12 +196,12 @@ class ConsoleHandlerTest extends TestCase
         });
 
         $event = new ConsoleCommandEvent(new Command('foo'), $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock(), $output);
-        $dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+        $dispatcher->dispatch($event, ConsoleEvents::COMMAND);
         $this->assertContains('Before command message.', $out = $output->fetch());
         $this->assertContains('After command message.', $out);
 
         $event = new ConsoleTerminateEvent(new Command('foo'), $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock(), $output, 0);
-        $dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+        $dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
         $this->assertContains('Before terminate message.', $out = $output->fetch());
         $this->assertContains('After terminate message.', $out);
     }

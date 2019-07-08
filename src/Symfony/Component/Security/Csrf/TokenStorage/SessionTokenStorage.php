@@ -44,7 +44,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId)
+    public function getToken(string $tokenId)
     {
         if (!$this->session->isStarted()) {
             $this->session->start();
@@ -60,19 +60,19 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setToken($tokenId, $token)
+    public function setToken(string $tokenId, string $token)
     {
         if (!$this->session->isStarted()) {
             $this->session->start();
         }
 
-        $this->session->set($this->namespace.'/'.$tokenId, (string) $token);
+        $this->session->set($this->namespace.'/'.$tokenId, $token);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasToken($tokenId)
+    public function hasToken(string $tokenId)
     {
         if (!$this->session->isStarted()) {
             $this->session->start();
@@ -84,7 +84,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function removeToken($tokenId)
+    public function removeToken(string $tokenId)
     {
         if (!$this->session->isStarted()) {
             $this->session->start();

@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -49,6 +48,22 @@ class AutowirePassTest extends TestCase
 
         $this->assertCount(1, $container->getDefinition('bar')->getArguments());
         $this->assertEquals(Foo::class, (string) $container->getDefinition('bar')->getArgument(0));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+     * @expectedExceptionMessage Cannot autowire service "Symfony\Component\DependencyInjection\Tests\CompilerEslaAction": argument "$notExisting" of method "Symfony\Component\DependencyInjection\Tests\Compiler\ElsaAction::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotExisting" but this class was not found.
+     */
+    public function testProcessNotExistingActionParam()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(Foo::class);
+        $barDefinition = $container->register(__NAMESPACE__.'EslaAction', __NAMESPACE__.'\ElsaAction');
+        $barDefinition->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
     }
 
     public function testProcessVariadic()
@@ -637,7 +652,7 @@ class AutowirePassTest extends TestCase
         }
 
         $this->assertNotNull($e);
-        $this->assertSame('Cannot autowire service "setter_injection_collision": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionCollision::setMultipleInstancesForOneArg()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "c1", "c2".', $e->getMessage());
+        $this->assertSame('Cannot autowire service "setter_injection_collision": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionCollision::setMultipleInstancesForOneArg()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "c1", "c2".', (string) $e->getMessage());
     }
 
     /**
@@ -920,9 +935,7 @@ class AutowirePassTest extends TestCase
 
         (new AutowirePass())->process($container);
 
-        $erroredDefinition = new Definition(MissingClass::class);
-
-        $this->assertEquals($erroredDefinition->addError('Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'), $container->getDefinition('.errored.some_locator.'.MissingClass::class));
+        $this->assertSame(['Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'], $container->getDefinition('.errored.some_locator.'.MissingClass::class)->getErrors());
     }
 
     public function testNamedArgumentAliasResolveCollisions()

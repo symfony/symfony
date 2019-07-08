@@ -58,20 +58,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testNormalizeUsingFormatPassedInConstructor($format, $output, $input)
     {
-        $this->doTestNormalizeUsingFormatPassedInConstructor($format, $output, $input);
-    }
-
-    /**
-     * @dataProvider dataProviderISO
-     */
-    public function testLegacyNormalizeUsingFormatPassedInConstructor($format, $output, $input)
-    {
-        $this->doTestNormalizeUsingFormatPassedInConstructor($format, $output, $input, true);
-    }
-
-    private function doTestNormalizeUsingFormatPassedInConstructor($format, $output, $input, bool $legacy = false)
-    {
-        $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
+        $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
         $this->assertEquals($output, $normalizer->normalize(new \DateInterval($input)));
     }
 
@@ -108,20 +95,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testDenormalizeUsingFormatPassedInConstructor($format, $input, $output)
     {
-        $this->doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output);
-    }
-
-    /**
-     * @dataProvider dataProviderISO
-     */
-    public function testLegacyDenormalizeUsingFormatPassedInConstructor($format, $input, $output)
-    {
-        $this->doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output, true);
-    }
-
-    private function doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output, bool $legacy = false)
-    {
-        $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
+        $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
         $this->assertDateIntervalEquals(new \DateInterval($output), $normalizer->denormalize($input, \DateInterval::class));
     }
 

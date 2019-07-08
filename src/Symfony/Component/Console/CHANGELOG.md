@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed `TableStyle::setCrossingChar()` method in favor of `TableStyle::setDefaultCrossingChar()`
+ * removed `TableStyle::setHorizontalBorderChar()` method in favor of `TableStyle::setDefaultCrossingChars()`
+ * removed `TableStyle::getHorizontalBorderChar()` method in favor of `TableStyle::getBorderChars()`
+ * removed `TableStyle::setVerticalBorderChar()` method in favor of `TableStyle::setVerticalBorderChars()`
+ * removed `TableStyle::getVerticalBorderChar()` method in favor of `TableStyle::getBorderChars()`
+ * `ProcessHelper::run()` accepts only `array|Symfony\Component\Process\Process` for its `command` argument
+ * `Application::setDispatcher` accepts only `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` 
+    for its `dispatcher` argument
+
+4.3.0
+-----
+
+ * added support for hyperlinks
+ * added `ProgressBar::iterate()` method that simplify updating the progress bar when iterating
+ * added `Question::setAutocompleterCallback()` to provide a callback function
+   that dynamically generates suggestions as the user types
+
 4.2.0
 -----
 

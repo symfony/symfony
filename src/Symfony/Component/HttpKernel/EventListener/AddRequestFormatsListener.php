@@ -12,13 +12,15 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Adds configured formats to each request.
  *
  * @author Gildas Quemener <gildas.quemener@gmail.com>
+ *
+ * @final
  */
 class AddRequestFormatsListener implements EventSubscriberInterface
 {
@@ -32,7 +34,7 @@ class AddRequestFormatsListener implements EventSubscriberInterface
     /**
      * Adds request formats.
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
         foreach ($this->formats as $format => $mimeTypes) {
@@ -43,8 +45,8 @@ class AddRequestFormatsListener implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return [KernelEvents::REQUEST => ['onKernelRequest', 1]];
+        return [KernelEvents::REQUEST => ['onKernelRequest', 100]];
     }
 }

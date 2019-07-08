@@ -28,7 +28,7 @@ use Symfony\Component\Yaml\Yaml;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8',
     ];
     private $yamlParser;
 
@@ -42,7 +42,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
      */
-    public function load($file, $type = null)
+    public function load($file, string $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -118,12 +118,21 @@ class YamlFileLoader extends FileLoader
 
         foreach ($requirements as $placeholder => $requirement) {
             if (\is_int($placeholder)) {
-                @trigger_error(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s"?', $placeholder, $requirement, $name, $path), E_USER_DEPRECATED);
+                throw new \InvalidArgumentException(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s"?', $placeholder, $requirement, $name, $path));
             }
         }
 
         if (isset($config['controller'])) {
             $defaults['_controller'] = $config['controller'];
+        }
+        if (isset($config['locale'])) {
+            $defaults['_locale'] = $config['locale'];
+        }
+        if (isset($config['format'])) {
+            $defaults['_format'] = $config['format'];
+        }
+        if (isset($config['utf8'])) {
+            $options['utf8'] = $config['utf8'];
         }
 
         if (\is_array($config['path'])) {
@@ -165,6 +174,15 @@ class YamlFileLoader extends FileLoader
 
         if (isset($config['controller'])) {
             $defaults['_controller'] = $config['controller'];
+        }
+        if (isset($config['locale'])) {
+            $defaults['_locale'] = $config['locale'];
+        }
+        if (isset($config['format'])) {
+            $defaults['_format'] = $config['format'];
+        }
+        if (isset($config['utf8'])) {
+            $options['utf8'] = $config['utf8'];
         }
 
         $this->setCurrentDir(\dirname($path));

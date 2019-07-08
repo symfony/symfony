@@ -16,8 +16,8 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\AuthenticationEvents;
-use Symfony\Component\Security\Core\Event\AuthenticationEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
@@ -139,7 +139,7 @@ class AuthenticationProviderManagerTest extends TestCase
         $dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(AuthenticationEvents::AUTHENTICATION_FAILURE, $this->equalTo(new AuthenticationFailureEvent($token, $exception)));
+            ->with($this->equalTo(new AuthenticationFailureEvent($token, $exception)), AuthenticationEvents::AUTHENTICATION_FAILURE);
 
         $manager = new AuthenticationProviderManager([$provider]);
         $manager->setEventDispatcher($dispatcher);
@@ -164,7 +164,7 @@ class AuthenticationProviderManagerTest extends TestCase
         $dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(AuthenticationEvents::AUTHENTICATION_SUCCESS, $this->equalTo(new AuthenticationEvent($token)));
+            ->with($this->equalTo(new AuthenticationSuccessEvent($token)), AuthenticationEvents::AUTHENTICATION_SUCCESS);
 
         $manager = new AuthenticationProviderManager([$provider]);
         $manager->setEventDispatcher($dispatcher);
@@ -177,13 +177,13 @@ class AuthenticationProviderManagerTest extends TestCase
         $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
         $provider->expects($this->once())
                  ->method('supports')
-                 ->will($this->returnValue($supports))
+                 ->willReturn($supports)
         ;
 
         if (null !== $token) {
             $provider->expects($this->once())
                      ->method('authenticate')
-                     ->will($this->returnValue($token))
+                     ->willReturn($token)
             ;
         } elseif (null !== $exception) {
             $provider->expects($this->once())

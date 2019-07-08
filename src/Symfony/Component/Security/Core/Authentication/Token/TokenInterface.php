@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\Role;
-
 /**
  * TokenInterface is the interface for the user authentication information.
  *
@@ -33,9 +31,9 @@ interface TokenInterface extends \Serializable
     /**
      * Returns the user roles.
      *
-     * @return Role[] An array of Role instances
+     * @return string[] The associated roles
      */
-    public function getRoles();
+    public function getRoleNames(): array;
 
     /**
      * Returns the user credentials.
@@ -82,10 +80,8 @@ interface TokenInterface extends \Serializable
 
     /**
      * Sets the authenticated flag.
-     *
-     * @param bool $isAuthenticated The authenticated flag
      */
-    public function setAuthenticated($isAuthenticated);
+    public function setAuthenticated(bool $isAuthenticated);
 
     /**
      * Removes sensitive information from the token.
@@ -109,28 +105,33 @@ interface TokenInterface extends \Serializable
     /**
      * Returns true if the attribute exists.
      *
-     * @param string $name The attribute name
-     *
      * @return bool true if the attribute exists, false otherwise
      */
-    public function hasAttribute($name);
+    public function hasAttribute(string $name);
 
     /**
      * Returns an attribute value.
-     *
-     * @param string $name The attribute name
      *
      * @return mixed The attribute value
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
-    public function getAttribute($name);
+    public function getAttribute(string $name);
 
     /**
      * Sets an attribute.
      *
-     * @param string $name  The attribute name
-     * @param mixed  $value The attribute value
+     * @param mixed $value The attribute value
      */
-    public function setAttribute($name, $value);
+    public function setAttribute(string $name, $value);
+
+    /**
+     * Returns all the necessary state of the object for serialization purposes.
+     */
+    public function __serialize(): array;
+
+    /**
+     * Restores the object state from an array given by __serialize().
+     */
+    public function __unserialize(array $data): void;
 }

@@ -31,6 +31,8 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
 
         foreach ($container->getAliases() as $id => $alias) {
             $aliasId = (string) $alias;
+            $this->currentId = $id;
+
             if ($aliasId !== $defId = $this->getDefinitionId($aliasId, $container)) {
                 $container->setAlias($id, $defId)->setPublic($alias->isPublic())->setPrivate($alias->isPrivate());
             }
@@ -40,29 +42,38 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
-        if ($value instanceof Reference) {
-            $defId = $this->getDefinitionId($id = (string) $value, $this->container);
-
-            if ($defId !== $id) {
-                return new Reference($defId, $value->getInvalidBehavior());
-            }
+        if (!$value instanceof Reference) {
+            return parent::processValue($value, $isRoot);
         }
 
-        return parent::processValue($value);
+        $defId = $this->getDefinitionId($id = (string) $value, $this->container);
+
+        return $defId !== $id ? new Reference($defId, $value->getInvalidBehavior()) : $value;
     }
 
     private function getDefinitionId(string $id, ContainerBuilder $container): string
     {
+        if (!$container->hasAlias($id)) {
+            return $id;
+        }
+
+        $alias = $container->getAlias($id);
+
+        if ($alias->isDeprecated()) {
+            @trigger_error(sprintf('%s. It is being referenced by the "%s" %s.', rtrim($alias->getDeprecationMessage($id), '. '), $this->currentId, $container->hasDefinition($this->currentId) ? 'service' : 'alias'), E_USER_DEPRECATED);
+        }
+
         $seen = [];
-        while ($container->hasAlias($id)) {
+        do {
             if (isset($seen[$id])) {
                 throw new ServiceCircularReferenceException($id, array_merge(array_keys($seen), [$id]));
             }
+
             $seen[$id] = true;
             $id = (string) $container->getAlias($id);
-        }
+        } while ($container->hasAlias($id));
 
         return $id;
     }

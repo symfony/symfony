@@ -18,8 +18,6 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  * Leverages a message bus to expect a single, synchronous message handling and return its result.
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @experimental in 4.2
  */
 trait HandleTrait
 {
@@ -52,7 +50,7 @@ trait HandleTrait
 
         if (\count($handledStamps) > 1) {
             $handlers = implode(', ', array_map(function (HandledStamp $stamp): string {
-                return sprintf('"%s"', $stamp->getHandlerAlias() ?? $stamp->getCallableName());
+                return sprintf('"%s"', $stamp->getHandlerName());
             }, $handledStamps));
 
             throw new LogicException(sprintf('Message of type "%s" was handled multiple times. Only one handler is expected when using "%s::%s()", got %d: %s.', \get_class($envelope->getMessage()), \get_class($this), __FUNCTION__, \count($handledStamps), $handlers));

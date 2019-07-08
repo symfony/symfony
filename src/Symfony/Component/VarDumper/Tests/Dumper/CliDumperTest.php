@@ -81,13 +81,6 @@ array:24 [
   "closure" => Closure(\$a, PDO &\$b = null) {#%d
     class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
     this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {#%d …}
-    parameters: {
-      \$a: {}
-      &\$b: {
-        typeHint: "PDO"
-        default: null
-      }
-    }
     file: "%s%eTests%eFixtures%edumb-var.php"
     line: "{$var['line']} to {$var['line']}"
   }
@@ -232,9 +225,8 @@ EOTXT
         $var[] = &$v;
         $var[''] = 2;
 
-        if (\PHP_VERSION_ID >= 70200) {
-            $this->assertDumpMatchesFormat(
-                <<<'EOTXT'
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
 array:4 [
   0 => {}
   1 => &1 null
@@ -242,23 +234,9 @@ array:4 [
   "" => 2
 ]
 EOTXT
-                ,
-                $var
-            );
-        } else {
-            $this->assertDumpMatchesFormat(
-                <<<'EOTXT'
-array:4 [
-  "0" => {}
-  "1" => &1 null
-  0 => &1 null
-  "" => 2
-]
-EOTXT
-                ,
-                $var
-            );
-        }
+            ,
+            $var
+        );
     }
 
     public function testObjectCast()
@@ -266,28 +244,15 @@ EOTXT
         $var = (object) [1 => 1];
         $var->{1} = 2;
 
-        if (\PHP_VERSION_ID >= 70200) {
-            $this->assertDumpMatchesFormat(
-                <<<'EOTXT'
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
 {
   +"1": 2
 }
 EOTXT
-                ,
-                $var
-            );
-        } else {
-            $this->assertDumpMatchesFormat(
-                <<<'EOTXT'
-{
-  +1: 1
-  +"1": 2
-}
-EOTXT
-                ,
-                $var
-            );
-        }
+            ,
+            $var
+        );
     }
 
     public function testClosedResource()

@@ -2,11 +2,9 @@ framework:
     workflows:
         article:
             type: workflow
-            marking_store:
-                type: multiple_state
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
-            initial_place: draft
+            initial_marking: [draft]
             places:
                 # simple format
                 - draft
@@ -29,11 +27,9 @@ framework:
                     from: [approved_by_journalist, approved_by_spellchecker]
                     to: [published]
         pull_request:
-            marking_store:
-                type: single_state
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
-            initial_place: start
+            initial_marking: start
             metadata:
                 title: workflow title
             places:

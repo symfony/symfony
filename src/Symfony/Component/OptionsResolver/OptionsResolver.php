@@ -57,7 +57,7 @@ class OptionsResolver implements Options
     /**
      * A list of normalizer closures.
      *
-     * @var \Closure[]
+     * @var \Closure[][]
      */
     private $normalizers = [];
 
@@ -163,7 +163,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function setDefault($option, $value)
+    public function setDefault(string $option, $value)
     {
         // Setting is not possible once resolving starts, because then lazy
         // options could manipulate the state of the object, leading to
@@ -257,7 +257,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether a default value is set
      */
-    public function hasDefault($option)
+    public function hasDefault(string $option)
     {
         return \array_key_exists($option, $this->defaults);
     }
@@ -294,7 +294,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is required
      */
-    public function isRequired($option)
+    public function isRequired(string $option)
     {
         return isset($this->required[$option]);
     }
@@ -322,7 +322,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is missing
      */
-    public function isMissing($option)
+    public function isMissing(string $option)
     {
         return isset($this->required[$option]) && !\array_key_exists($option, $this->defaults);
     }
@@ -375,7 +375,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is defined
      */
-    public function isDefined($option)
+    public function isDefined(string $option)
     {
         return isset($this->defined[$option]);
     }
@@ -474,7 +474,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setNormalizer($option, \Closure $normalizer)
+    public function setNormalizer(string $option, \Closure $normalizer)
     {
         if ($this->locked) {
             throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
@@ -484,7 +484,56 @@ class OptionsResolver implements Options
             throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
         }
 
-        $this->normalizers[$option] = $normalizer;
+        $this->normalizers[$option] = [$normalizer];
+
+        // Make sure the option is processed
+        unset($this->resolved[$option]);
+
+        return $this;
+    }
+
+    /**
+     * Adds a normalizer for an option.
+     *
+     * The normalizer should be a closure with the following signature:
+     *
+     *     function (Options $options, $value): mixed {
+     *         // ...
+     *     }
+     *
+     * The closure is invoked when {@link resolve()} is called. The closure
+     * has access to the resolved values of other options through the passed
+     * {@link Options} instance.
+     *
+     * The second parameter passed to the closure is the value of
+     * the option.
+     *
+     * The resolved option value is set to the return value of the closure.
+     *
+     * @param string   $option       The option name
+     * @param \Closure $normalizer   The normalizer
+     * @param bool     $forcePrepend If set to true, prepend instead of appending
+     *
+     * @return $this
+     *
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     */
+    public function addNormalizer(string $option, \Closure $normalizer, bool $forcePrepend = false): self
+    {
+        if ($this->locked) {
+            throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
+        }
+
+        if (!isset($this->defined[$option])) {
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
+        }
+
+        if ($forcePrepend) {
+            array_unshift($this->normalizers[$option], $normalizer);
+        } else {
+            $this->normalizers[$option][] = $normalizer;
+        }
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -513,7 +562,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setAllowedValues($option, $allowedValues)
+    public function setAllowedValues(string $option, $allowedValues)
     {
         if ($this->locked) {
             throw new AccessException('Allowed values cannot be set from a lazy option or normalizer.');
@@ -554,7 +603,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function addAllowedValues($option, $allowedValues)
+    public function addAllowedValues(string $option, $allowedValues)
     {
         if ($this->locked) {
             throw new AccessException('Allowed values cannot be added from a lazy option or normalizer.');
@@ -595,7 +644,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setAllowedTypes($option, $allowedTypes)
+    public function setAllowedTypes(string $option, $allowedTypes)
     {
         if ($this->locked) {
             throw new AccessException('Allowed types cannot be set from a lazy option or normalizer.');
@@ -630,7 +679,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function addAllowedTypes($option, $allowedTypes)
+    public function addAllowedTypes(string $option, $allowedTypes)
     {
         if ($this->locked) {
             throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
@@ -779,7 +828,7 @@ class OptionsResolver implements Options
      * Returns the resolved value of an option.
      *
      * @param string $option             The option name
-     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not (true by default)
+     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not
      *
      * @return mixed The option value
      *
@@ -791,13 +840,11 @@ class OptionsResolver implements Options
      * @throws OptionDefinitionException If there is a cyclic dependency between
      *                                   lazy options and/or normalizers
      */
-    public function offsetGet($option/*, bool $triggerDeprecation = true*/)
+    public function offsetGet($option, bool $triggerDeprecation = true)
     {
         if (!$this->locked) {
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');
         }
-
-        $triggerDeprecation = 1 === \func_num_args() || \func_get_arg(1);
 
         // Shortcut for resolved options
         if (isset($this->resolved[$option]) || \array_key_exists($option, $this->resolved)) {
@@ -966,15 +1013,15 @@ class OptionsResolver implements Options
                 throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', array_keys($this->calling))));
             }
 
-            $normalizer = $this->normalizers[$option];
-
             // The following section must be protected from cyclic
             // calls. Set $calling for the current $option to detect a cyclic
             // dependency
             // BEGIN
             $this->calling[$option] = true;
             try {
-                $value = $normalizer($this, $value);
+                foreach ($this->normalizers[$option] as $normalizer) {
+                    $value = $normalizer($this, $value);
+                }
             } finally {
                 unset($this->calling[$option]);
             }

@@ -58,9 +58,9 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 // Detect wrapped values that encode for their expiry and creation duration
                 // For compactness, these values are packed in the key of an array using
                 // magic numbers in the form 9D-..-..-..-..-00-..-..-..-5F
-                if (\is_array($v) && 1 === \count($v) && 10 === \strlen($k = \key($v)) && "\x9D" === $k[0] && "\0" === $k[5] && "\x5F" === $k[9]) {
+                if (\is_array($v) && 1 === \count($v) && 10 === \strlen($k = key($v)) && "\x9D" === $k[0] && "\0" === $k[5] && "\x5F" === $k[9]) {
                     $item->value = $v[$k];
-                    $v = \unpack('Ve/Nc', \substr($k, 1, -1));
+                    $v = unpack('Ve/Nc', substr($k, 1, -1));
                     $item->metadata[CacheItem::METADATA_EXPIRY] = $v['e'] + CacheItem::METADATA_EXPIRY_OFFSET;
                     $item->metadata[CacheItem::METADATA_CTIME] = $v['c'];
                 } elseif ($innerItem instanceof CacheItem) {
@@ -103,9 +103,9 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             return $this->doGet($this, $key, $callback, $beta, $metadata);
         }
 
-        return $this->pool->get($this->getId($key), function ($innerItem) use ($key, $callback) {
+        return $this->pool->get($this->getId($key), function ($innerItem, bool &$save) use ($key, $callback) {
             $item = ($this->createCacheItem)($key, $innerItem);
-            $item->set($value = $callback($item));
+            $item->set($value = $callback($item, $save));
             ($this->setInnerItem)($innerItem, (array) $item);
 
             return $value;

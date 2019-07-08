@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -19,18 +18,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.
@@ -84,7 +84,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     public function terminate(Request $request, Response $response)
     {
-        $this->dispatcher->dispatch(KernelEvents::TERMINATE, new PostResponseEvent($this, $request, $response));
+        $this->dispatcher->dispatch(new TerminateEvent($this, $request, $response), KernelEvents::TERMINATE);
     }
 
     /**
@@ -122,8 +122,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->requestStack->push($request);
 
         // request
-        $event = new GetResponseEvent($this, $request, $type);
-        $this->dispatcher->dispatch(KernelEvents::REQUEST, $event);
+        $event = new RequestEvent($this, $request, $type);
+        $this->dispatcher->dispatch($event, KernelEvents::REQUEST);
 
         if ($event->hasResponse()) {
             return $this->filterResponse($event->getResponse(), $request, $type);
@@ -134,15 +134,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". The route is wrongly configured.', $request->getPathInfo()));
         }
 
-        $event = new FilterControllerEvent($this, $controller, $request, $type);
-        $this->dispatcher->dispatch(KernelEvents::CONTROLLER, $event);
+        $event = new ControllerEvent($this, $controller, $request, $type);
+        $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER);
         $controller = $event->getController();
 
         // controller arguments
         $arguments = $this->argumentResolver->getArguments($request, $controller);
 
-        $event = new FilterControllerArgumentsEvent($this, $controller, $arguments, $request, $type);
-        $this->dispatcher->dispatch(KernelEvents::CONTROLLER_ARGUMENTS, $event);
+        $event = new ControllerArgumentsEvent($this, $controller, $arguments, $request, $type);
+        $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER_ARGUMENTS);
         $controller = $event->getController();
         $arguments = $event->getArguments();
 
@@ -151,8 +151,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // view
         if (!$response instanceof Response) {
-            $event = new GetResponseForControllerResultEvent($this, $request, $type, $response);
-            $this->dispatcher->dispatch(KernelEvents::VIEW, $event);
+            $event = new ViewEvent($this, $request, $type, $response);
+            $this->dispatcher->dispatch($event, KernelEvents::VIEW);
 
             if ($event->hasResponse()) {
                 $response = $event->getResponse();
@@ -184,9 +184,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function filterResponse(Response $response, Request $request, int $type)
     {
-        $event = new FilterResponseEvent($this, $request, $type, $response);
+        $event = new ResponseEvent($this, $request, $type, $response);
 
-        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->finishRequest($request, $type);
 
@@ -202,7 +202,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function finishRequest(Request $request, int $type)
     {
-        $this->dispatcher->dispatch(KernelEvents::FINISH_REQUEST, new FinishRequestEvent($this, $request, $type));
+        $this->dispatcher->dispatch(new FinishRequestEvent($this, $request, $type), KernelEvents::FINISH_REQUEST);
         $this->requestStack->pop();
     }
 
@@ -217,8 +217,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleException(\Exception $e, Request $request, int $type): Response
     {
-        $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
-        $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+        $event = new ExceptionEvent($this, $request, $type, $e);
+        $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
 
         // a listener might have replaced the exception
         $e = $event->getException();

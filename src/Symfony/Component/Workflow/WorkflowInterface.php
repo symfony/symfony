@@ -23,51 +23,39 @@ interface WorkflowInterface
     /**
      * Returns the object's Marking.
      *
-     * @param object $subject A subject
-     *
      * @return Marking The Marking
      *
      * @throws LogicException
      */
-    public function getMarking($subject);
+    public function getMarking(object $subject);
 
     /**
      * Returns true if the transition is enabled.
      *
-     * @param object $subject        A subject
-     * @param string $transitionName A transition
-     *
      * @return bool true if the transition is enabled
      */
-    public function can($subject, $transitionName);
+    public function can(object $subject, string $transitionName);
 
     /**
      * Builds a TransitionBlockerList to know why a transition is blocked.
-     *
-     * @param object $subject A subject
      */
-    public function buildTransitionBlockerList($subject, string $transitionName): TransitionBlockerList;
+    public function buildTransitionBlockerList(object $subject, string $transitionName): TransitionBlockerList;
 
     /**
      * Fire a transition.
-     *
-     * @param object $subject        A subject
-     * @param string $transitionName A transition
      *
      * @return Marking The new Marking
      *
      * @throws LogicException If the transition is not applicable
      */
-    public function apply($subject, $transitionName);
+    public function apply(object $subject, string $transitionName, array $context = []);
 
     /**
      * Returns all enabled transitions.
      *
-     * @param object $subject A subject
-     *
      * @return Transition[] All enabled transitions
      */
-    public function getEnabledTransitions($subject);
+    public function getEnabledTransitions(object $subject);
 
     /**
      * @return string

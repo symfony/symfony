@@ -192,6 +192,10 @@ class Request
 
     protected static $requestFactory;
 
+    /**
+     * @var string|null
+     */
+    private $preferredFormat;
     private $isHostValid = true;
     private $isForwardedValid = true;
 
@@ -708,8 +712,7 @@ class Request
         }
 
         if (null === $session) {
-            @trigger_error(sprintf('Calling "%s()" when no session has been set is deprecated since Symfony 4.1 and will throw an exception in 5.0. Use "hasSession()" instead.', __METHOD__), E_USER_DEPRECATED);
-            // throw new \BadMethodCallException('Session has not been set');
+            throw new \BadMethodCallException('Session has not been set.');
         }
 
         return $session;
@@ -1343,6 +1346,8 @@ class Request
      *  * _format request attribute
      *  * $default
      *
+     * @see getPreferredFormat
+     *
      * @param string|null $default The default format
      *
      * @return string|null The request format
@@ -1437,17 +1442,10 @@ class Request
      *
      * @see https://tools.ietf.org/html/rfc7231#section-4.2.1
      *
-     * @param bool $andCacheable Adds the additional condition that the method should be cacheable. True by default.
-     *
      * @return bool
      */
-    public function isMethodSafe(/* $andCacheable = true */)
+    public function isMethodSafe()
     {
-        if (!\func_num_args() || func_get_arg(0)) {
-            // setting $andCacheable to false should be deprecated in 4.1
-            throw new \BadMethodCallException('Checking only for cacheable HTTP methods with Symfony\Component\HttpFoundation\Request::isMethodSafe() is not supported.');
-        }
-
         return \in_array($this->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE']);
     }
 
@@ -1560,6 +1558,30 @@ class Request
     public function isNoCache()
     {
         return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
+    }
+
+    /**
+     * Gets the preferred format for the response by inspecting, in the following order:
+     *   * the request format set using setRequestFormat
+     *   * the values of the Accept HTTP header
+     *   * the content type of the body of the request.
+     */
+    public function getPreferredFormat(?string $default = 'html'): ?string
+    {
+        if (null !== $this->preferredFormat) {
+            return $this->preferredFormat;
+        }
+
+        $preferredFormat = null;
+        foreach ($this->getAcceptableContentTypes() as $contentType) {
+            if ($preferredFormat = $this->getFormat($contentType)) {
+                break;
+            }
+        }
+
+        $this->preferredFormat = $this->getRequestFormat($preferredFormat ?: $this->getContentType());
+
+        return $this->preferredFormat ?: $default;
     }
 
     /**
@@ -1907,7 +1929,7 @@ class Request
         }
     }
 
-    /*
+    /**
      * Returns the prefix as encoded in the string when the string starts with
      * the given prefix, false otherwise.
      *

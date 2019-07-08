@@ -30,6 +30,14 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('monolog.logger_prototype');
+        $definition->setConfigurator([__CLASS__, 'configureLogger']);
         $definition->addMethodCall('pushProcessor', [new Reference('debug.log_processor')]);
+    }
+
+    public static function configureLogger($logger)
+    {
+        if (method_exists($logger, 'removeDebugLogger') && \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+            $logger->removeDebugLogger();
+        }
     }
 }

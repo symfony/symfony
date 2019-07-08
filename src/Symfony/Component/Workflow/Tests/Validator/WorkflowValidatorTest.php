@@ -14,27 +14,6 @@ class WorkflowValidatorTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
-     * @expectedExceptionMessage The marking store of workflow "foo" can not store many places.
-     */
-    public function testSinglePlaceWorkflowValidatorAndComplexWorkflow()
-    {
-        $definition = $this->createComplexWorkflowDefinition();
-
-        (new WorkflowValidator(true))->validate($definition, 'foo');
-    }
-
-    public function testSinglePlaceWorkflowValidatorAndSimpleWorkflow()
-    {
-        $definition = $this->createSimpleWorkflowDefinition();
-
-        (new WorkflowValidator(true))->validate($definition, 'foo');
-
-        // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
      * @expectedExceptionMessage All transitions for a place must have an unique name. Multiple transitions named "t1" where found for place "a" in workflow "foo".
      */
     public function testWorkflowWithInvalidNames()

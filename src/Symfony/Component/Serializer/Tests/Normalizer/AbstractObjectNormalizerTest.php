@@ -161,16 +161,6 @@ class AbstractObjectNormalizerTest extends TestCase
             'allow_extra_attributes' => false,
         ]);
     }
-
-    public function testSkipNullValues()
-    {
-        $dummy = new Dummy();
-        $dummy->bar = 'present';
-
-        $normalizer = new ObjectNormalizer();
-        $result = $normalizer->normalize($dummy, null, [AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
-        $this->assertSame(['bar' => 'present'], $result);
-    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -347,4 +337,8 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
     {
         $this->serializer = $serializer;
     }
+}
+
+abstract class ObjectSerializerDenormalizer implements SerializerInterface, DenormalizerInterface
+{
 }

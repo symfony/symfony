@@ -24,14 +24,15 @@ final class Definition
 {
     private $places = [];
     private $transitions = [];
-    private $initialPlace;
+    private $initialPlaces = [];
     private $metadataStore;
 
     /**
-     * @param string[]     $places
-     * @param Transition[] $transitions
+     * @param string[]             $places
+     * @param Transition[]         $transitions
+     * @param string|string[]|null $initialPlaces
      */
-    public function __construct(array $places, array $transitions, string $initialPlace = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -41,17 +42,17 @@ final class Definition
             $this->addTransition($transition);
         }
 
-        $this->setInitialPlace($initialPlace);
+        $this->setInitialPlaces($initialPlaces);
 
         $this->metadataStore = $metadataStore ?: new InMemoryMetadataStore();
     }
 
     /**
-     * @return string|null
+     * @return string[]
      */
-    public function getInitialPlace()
+    public function getInitialPlaces(): array
     {
-        return $this->initialPlace;
+        return $this->initialPlaces;
     }
 
     /**
@@ -75,23 +76,27 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlace(string $place = null)
+    private function setInitialPlaces($places = null)
     {
-        if (null === $place) {
+        if (!$places) {
             return;
         }
 
-        if (!isset($this->places[$place])) {
-            throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
+        $places = (array) $places;
+
+        foreach ($places as $place) {
+            if (!isset($this->places[$place])) {
+                throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
+            }
         }
 
-        $this->initialPlace = $place;
+        $this->initialPlaces = $places;
     }
 
     private function addPlace(string $place)
     {
         if (!\count($this->places)) {
-            $this->initialPlace = $place;
+            $this->initialPlaces = [$place];
         }
 
         $this->places[$place] = $place;

@@ -22,8 +22,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * A console command to debug Messenger information.
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
- *
- * @experimental in 4.2
  */
 class DebugCommand extends Command
 {
@@ -84,7 +82,9 @@ EOF
             foreach ($handlersByMessage as $message => $handlers) {
                 $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $message)];
                 foreach ($handlers as $handler) {
-                    $tableRows[] = [sprintf('    handled by <info>%s</>', $handler)];
+                    $tableRows[] = [
+                        sprintf('    handled by <info>%s</>', $handler[0]).$this->formatConditions($handler[1]),
+                    ];
                 }
             }
 
@@ -96,5 +96,19 @@ EOF
                 $io->warning(sprintf('No handled message found in bus "%s".', $bus));
             }
         }
+    }
+
+    private function formatConditions(array $options): string
+    {
+        if (!$options) {
+            return '';
+        }
+
+        $optionsMapping = [];
+        foreach ($options as $key => $value) {
+            $optionsMapping[] = ' '.$key.'='.$value;
+        }
+
+        return ' (when'.implode(', ', $optionsMapping).')';
     }
 }

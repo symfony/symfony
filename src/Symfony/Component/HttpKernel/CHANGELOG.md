@@ -1,6 +1,53 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed the first and second constructor argument of `ConfigDataCollector` 
+ * removed `ConfigDataCollector::getApplicationName()` 
+ * removed `ConfigDataCollector::getApplicationVersion()`
+ * removed support for `Symfony\Component\Templating\EngineInterface` in `HIncludeFragmentRenderer`, use a `Twig\Environment` only
+ * removed `TranslatorListener` in favor of `LocaleAwareListener`
+ * removed `getRootDir()` and `getName()` from `Kernel` and `KernelInterface`
+ * removed `FilterControllerArgumentsEvent`, use `ControllerArgumentsEvent` instead
+ * removed `FilterControllerEvent`, use `ControllerEvent` instead
+ * removed `FilterResponseEvent`, use `ResponseEvent` instead
+ * removed `GetResponseEvent`, use `RequestEvent` instead
+ * removed `GetResponseForControllerResultEvent`, use `ViewEvent` instead
+ * removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
+ * removed `PostResponseEvent`, use `TerminateEvent` instead
+ * removed `SaveSessionListener` in favor of `AbstractSessionListener` 
+ * removed `Client`, use `HttpKernelBrowser` instead
+ * added method `getProjectDir()` to `KernelInterface`
+ * removed methods `serialize` and `unserialize` from `DataCollector`, store the serialized state in the data property instead
+ * made `ProfilerStorageInterface` internal
+
+4.3.0
+-----
+
+ * renamed `Client` to `HttpKernelBrowser`
+ * `KernelInterface` doesn't extend `Serializable` anymore
+ * deprecated the `Kernel::serialize()` and `unserialize()` methods
+ * increased the priority of `Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener`
+ * made `Symfony\Component\HttpKernel\EventListener\LocaleListener` set the default locale early
+ * deprecated `TranslatorListener` in favor of `LocaleAwareListener`
+ * added the registration of all `LocaleAwareInterface` implementations into the `LocaleAwareListener`
+ * made `FileLinkFormatter` final and not implement `Serializable` anymore
+ * the base `DataCollector` doesn't implement `Serializable` anymore, you should
+   store all the serialized state in the data property instead
+ * `DumpDataCollector` has been marked as `final`
+ * added an event listener to prevent search engines from indexing applications in debug mode.
+ * renamed `FilterControllerArgumentsEvent` to `ControllerArgumentsEvent`
+ * renamed `FilterControllerEvent` to `ControllerEvent`
+ * renamed `FilterResponseEvent` to `ResponseEvent`
+ * renamed `GetResponseEvent` to `RequestEvent`
+ * renamed `GetResponseForControllerResultEvent` to `ViewEvent`
+ * renamed `GetResponseForExceptionEvent` to `ExceptionEvent`
+ * renamed `PostResponseEvent` to `TerminateEvent`
+ * added `HttpClientKernel` for handling requests with an `HttpClientInterface` instance
+ * added `trace_header` and `trace_level` configuration options to `HttpCache`
+
 4.2.0
 -----
 

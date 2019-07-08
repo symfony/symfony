@@ -29,17 +29,8 @@
             <call method="setRequestStack"><argument type="service" id="request_stack" on-invalid="ignore" /></call>
         </service>
 
-        <service id="twig.cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer">
-            <tag name="kernel.cache_warmer" />
-            <tag name="container.service_subscriber" id="twig" />
-            <argument type="service" id="Psr\Container\ContainerInterface" />
-            <argument type="service" id="templating.finder" on-invalid="ignore" />
-            <argument type="collection" /> <!-- Twig paths -->
-        </service>
-
         <service id="twig.template_iterator" class="Symfony\Bundle\TwigBundle\TemplateIterator">
             <argument type="service" id="kernel" />
-            <argument>%kernel.root_dir%</argument>
             <argument type="collection" /> <!-- Twig paths -->
             <argument>%twig.default_path%</argument>
         </service>
@@ -108,8 +99,7 @@
         </service>
 
         <service id="twig.extension.httpfoundation" class="Symfony\Bridge\Twig\Extension\HttpFoundationExtension">
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="router.request_context" on-invalid="ignore" />
+            <argument type="service" id="url_helper" />
         </service>
 
         <service id="twig.extension.debug" class="Twig\Extension\DebugExtension" />

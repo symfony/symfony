@@ -44,8 +44,10 @@ class TranslationUpdateCommand extends Command
     private $defaultLocale;
     private $defaultTransPath;
     private $defaultViewsPath;
+    private $transPaths;
+    private $viewsPaths;
 
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null)
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $viewsPaths = [])
     {
         parent::__construct();
 
@@ -55,6 +57,8 @@ class TranslationUpdateCommand extends Command
         $this->defaultLocale = $defaultLocale;
         $this->defaultTransPath = $defaultTransPath;
         $this->defaultViewsPath = $defaultViewsPath;
+        $this->transPaths = $transPaths;
+        $this->viewsPaths = $viewsPaths;
     }
 
     /**
@@ -73,6 +77,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
+                new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version', '1.2'),
             ])
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
@@ -118,28 +123,13 @@ EOF
         }
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
-        $rootDir = $kernel->getContainer()->getParameter('kernel.root_dir');
 
         // Define Root Paths
-        $transPaths = [];
-        if (is_dir($dir = $rootDir.'/Resources/translations')) {
-            if ($dir !== $this->defaultTransPath) {
-                $notice = sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
-                @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
-            }
-            $transPaths[] = $dir;
-        }
+        $transPaths = $this->transPaths;
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = [];
-        if (is_dir($dir = $rootDir.'/Resources/views')) {
-            if ($dir !== $this->defaultViewsPath) {
-                $notice = sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
-                @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
-            }
-            $viewsPaths[] = $dir;
-        }
+        $viewsPaths = $this->viewsPaths;
         if ($this->defaultViewsPath) {
             $viewsPaths[] = $this->defaultViewsPath;
         }
@@ -153,19 +143,9 @@ EOF
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath;
                 }
-                if (is_dir($dir = sprintf('%s/Resources/%s/translations', $rootDir, $foundBundle->getName()))) {
-                    $transPaths[] = $dir;
-                    $notice = sprintf('Storing translations files for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $foundBundle->getName(), $dir);
-                    @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
-                }
                 $viewsPaths = [$foundBundle->getPath().'/Resources/views'];
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath;
-                }
-                if (is_dir($dir = sprintf('%s/Resources/%s/views', $rootDir, $foundBundle->getName()))) {
-                    $viewsPaths[] = $dir;
-                    $notice = sprintf('Storing templates for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $foundBundle->getName(), $dir);
-                    @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
                 }
                 $currentName = $foundBundle->getName();
             } catch (\InvalidArgumentException $e) {
@@ -173,20 +153,7 @@ EOF
                 $path = $input->getArgument('bundle');
 
                 $transPaths = [$path.'/translations'];
-                if (is_dir($dir = $path.'/Resources/translations')) {
-                    if ($dir !== $this->defaultTransPath) {
-                        @trigger_error(sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/translations'), E_USER_DEPRECATED);
-                    }
-                    $transPaths[] = $dir;
-                }
-
                 $viewsPaths = [$path.'/templates'];
-                if (is_dir($dir = $path.'/Resources/views')) {
-                    if ($dir !== $this->defaultViewsPath) {
-                        @trigger_error(sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/templates'), E_USER_DEPRECATED);
-                    }
-                    $viewsPaths[] = $dir;
-                }
 
                 if (!is_dir($transPaths[0]) && !isset($transPaths[1])) {
                     throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
@@ -202,7 +169,7 @@ EOF
         $errorIo->comment('Parsing templates...');
         $this->extractor->setPrefix($input->getOption('prefix'));
         foreach ($viewsPaths as $path) {
-            if (is_dir($path)) {
+            if (is_dir($path) || is_file($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }
         }
@@ -262,7 +229,7 @@ EOF
             }
 
             if ('xlf' === $input->getOption('output-format')) {
-                $errorIo->comment('Xliff output version is <info>1.2</info>');
+                $errorIo->comment(sprintf('Xliff output version is <info>%s</info>', $input->getOption('xliff-version')));
             }
 
             $resultMessage = sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
@@ -287,7 +254,7 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $input->getOption('output-format'), ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale]);
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $input->getOption('xliff-version')]);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

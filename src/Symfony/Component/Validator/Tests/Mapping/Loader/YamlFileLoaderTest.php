@@ -69,7 +69,7 @@ class YamlFileLoaderTest extends TestCase
             $loader->loadClassMetadata($metadata);
         } catch (\InvalidArgumentException $e) {
             // Call again. Again an exception should be thrown
-            $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('\InvalidArgumentException');
+            $this->expectException('\InvalidArgumentException');
             $loader->loadClassMetadata($metadata);
         }
     }

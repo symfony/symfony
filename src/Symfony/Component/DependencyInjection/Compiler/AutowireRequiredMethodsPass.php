@@ -23,7 +23,7 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         $value = parent::processValue($value, $isRoot);
 
@@ -35,6 +35,7 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
         }
 
         $alreadyCalledMethods = [];
+        $withers = [];
 
         foreach ($value->getMethodCalls() as list($method)) {
             $alreadyCalledMethods[strtolower($method)] = true;
@@ -50,7 +51,11 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
             while (true) {
                 if (false !== $doc = $r->getDocComment()) {
                     if (false !== stripos($doc, '@required') && preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
-                        $value->addMethodCall($reflectionMethod->name);
+                        if (preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@return\s++static[\s\*]#i', $doc)) {
+                            $withers[] = [$reflectionMethod->name, [], true];
+                        } else {
+                            $value->addMethodCall($reflectionMethod->name, []);
+                        }
                         break;
                     }
                     if (false === stripos($doc, '@inheritdoc') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+(?:\{@inheritdoc\}|@inheritdoc)(?:\s|\*/$)#i', $doc)) {
@@ -62,6 +67,15 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
                 } catch (\ReflectionException $e) {
                     break; // method has no prototype
                 }
+            }
+        }
+
+        if ($withers) {
+            // Prepend withers to prevent creating circular loops
+            $setters = $value->getMethodCalls();
+            $value->setMethodCalls($withers);
+            foreach ($setters as $call) {
+                $value->addMethodCall($call[0], $call[1], $call[2] ?? false);
             }
         }
 

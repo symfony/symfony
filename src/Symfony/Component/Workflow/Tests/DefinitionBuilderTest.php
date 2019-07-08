@@ -9,13 +9,13 @@ use Symfony\Component\Workflow\Transition;
 
 class DefinitionBuilderTest extends TestCase
 {
-    public function testSetInitialPlace()
+    public function testSetInitialPlaces()
     {
         $builder = new DefinitionBuilder(['a', 'b']);
-        $builder->setInitialPlace('b');
+        $builder->setInitialPlaces('b');
         $definition = $builder->build();
 
-        $this->assertEquals('b', $definition->getInitialPlace());
+        $this->assertEquals(['b'], $definition->getInitialPlaces());
     }
 
     public function testAddTransition()

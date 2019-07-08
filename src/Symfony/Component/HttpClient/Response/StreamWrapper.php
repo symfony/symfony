@@ -1,0 +1,231 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\HttpClient\Response;
+
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
+
+/**
+ * Allows turning ResponseInterface instances to PHP streams.
+ *
+ * @author Nicolas Grekas <p@tchwork.com>
+ */
+class StreamWrapper
+{
+    /** @var resource */
+    public $context;
+
+    /** @var HttpClientInterface */
+    private $client;
+
+    /** @var ResponseInterface */
+    private $response;
+
+    /** @var resource|null */
+    private $content;
+
+    /** @var resource|null */
+    private $handle;
+
+    private $eof = false;
+    private $offset = 0;
+
+    /**
+     * Creates a PHP stream resource from a ResponseInterface.
+     *
+     * @param resource|null $contentBuffer The seekable resource where the response body is buffered
+     * @param resource|null $selectHandle  The resource handle that should be monitored when
+     *                                     stream_select() is used on the created stream
+     *
+     * @return resource
+     */
+    public static function createResource(ResponseInterface $response, HttpClientInterface $client = null, $contentBuffer = null, $selectHandle = null)
+    {
+        if (null === $client && !method_exists($response, 'stream')) {
+            throw new \InvalidArgumentException(sprintf('Providing a client to "%s()" is required when the response doesn\'t have any "stream()" method.', __CLASS__));
+        }
+
+        if (false === stream_wrapper_register('symfony', __CLASS__, STREAM_IS_URL)) {
+            throw new \RuntimeException(error_get_last()['message'] ?? 'Registering the "symfony" stream wrapper failed.');
+        }
+
+        try {
+            $context = [
+                'client' => $client ?? $response,
+                'response' => $response,
+                'content' => $contentBuffer,
+                'handle' => $selectHandle,
+            ];
+
+            return fopen('symfony://'.$response->getInfo('url'), 'r', false, stream_context_create(['symfony' => $context])) ?: null;
+        } finally {
+            stream_wrapper_unregister('symfony');
+        }
+    }
+
+    public function stream_open(string $path, string $mode, int $options): bool
+    {
+        if ('r' !== $mode) {
+            if ($options & STREAM_REPORT_ERRORS) {
+                trigger_error(sprintf('Invalid mode "%s": only "r" is supported.', $mode), E_USER_WARNING);
+            }
+
+            return false;
+        }
+
+        $context = stream_context_get_options($this->context)['symfony'] ?? null;
+        $this->client = $context['client'] ?? null;
+        $this->response = $context['response'] ?? null;
+        $this->content = $context['content'] ?? null;
+        $this->handle = $context['handle'] ?? null;
+        $this->context = null;
+
+        if (null !== $this->client && null !== $this->response) {
+            return true;
+        }
+
+        if ($options & STREAM_REPORT_ERRORS) {
+            trigger_error('Missing options "client" or "response" in "symfony" stream context.', E_USER_WARNING);
+        }
+
+        return false;
+    }
+
+    public function stream_read(int $count)
+    {
+        if (null !== $this->content) {
+            // Empty the internal activity list
+            foreach ($this->client->stream([$this->response], 0) as $chunk) {
+                try {
+                    $chunk->isTimeout();
+                } catch (ExceptionInterface $e) {
+                    trigger_error($e->getMessage(), E_USER_WARNING);
+
+                    return false;
+                }
+            }
+
+            if (0 !== fseek($this->content, $this->offset)) {
+                return false;
+            }
+
+            if ('' !== $data = fread($this->content, $count)) {
+                fseek($this->content, 0, SEEK_END);
+                $this->offset += \strlen($data);
+
+                return $data;
+            }
+        }
+
+        foreach ($this->client->stream([$this->response]) as $chunk) {
+            try {
+                $this->eof = true;
+                $this->eof = !$chunk->isTimeout();
+                $this->eof = $chunk->isLast();
+
+                if ('' !== $data = $chunk->getContent()) {
+                    $this->offset += \strlen($data);
+
+                    return $data;
+                }
+            } catch (ExceptionInterface $e) {
+                trigger_error($e->getMessage(), E_USER_WARNING);
+
+                return false;
+            }
+        }
+
+        return '';
+    }
+
+    public function stream_tell(): int
+    {
+        return $this->offset;
+    }
+
+    public function stream_eof(): bool
+    {
+        return $this->eof;
+    }
+
+    public function stream_seek(int $offset, int $whence = SEEK_SET): bool
+    {
+        if (null === $this->content || 0 !== fseek($this->content, 0, SEEK_END)) {
+            return false;
+        }
+
+        $size = ftell($this->content);
+
+        if (SEEK_CUR === $whence) {
+            $offset += $this->offset;
+        }
+
+        if (SEEK_END === $whence || $size < $offset) {
+            foreach ($this->client->stream([$this->response]) as $chunk) {
+                try {
+                    // Chunks are buffered in $this->content already
+                    $size += \strlen($chunk->getContent());
+
+                    if (SEEK_END !== $whence && $offset <= $size) {
+                        break;
+                    }
+                } catch (ExceptionInterface $e) {
+                    trigger_error($e->getMessage(), E_USER_WARNING);
+
+                    return false;
+                }
+            }
+
+            if (SEEK_END === $whence) {
+                $offset += $size;
+            }
+        }
+
+        if (0 <= $offset && $offset <= $size) {
+            $this->eof = false;
+            $this->offset = $offset;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function stream_cast(int $castAs)
+    {
+        if (STREAM_CAST_FOR_SELECT === $castAs) {
+            return $this->handle ?? false;
+        }
+
+        return false;
+    }
+
+    public function stream_stat(): array
+    {
+        return [
+            'dev' => 0,
+            'ino' => 0,
+            'mode' => 33060,
+            'nlink' => 0,
+            'uid' => 0,
+            'gid' => 0,
+            'rdev' => 0,
+            'size' => (int) ($this->response->getHeaders(false)['content-length'][0] ?? 0),
+            'atime' => 0,
+            'mtime' => strtotime($this->response->getHeaders(false)['last-modified'][0] ?? '') ?: 0,
+            'ctime' => 0,
+            'blksize' => 0,
+            'blocks' => 0,
+        ];
+    }
+}

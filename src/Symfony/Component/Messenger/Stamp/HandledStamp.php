@@ -11,62 +11,40 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
+
 /**
  * Stamp identifying a message handled by the `HandleMessageMiddleware` middleware
  * and storing the handler returned value.
  *
+ * This is used by synchronous command buses expecting a return value and the retry logic
+ * to only execute handlers that didn't succeed.
+ *
  * @see \Symfony\Component\Messenger\Middleware\HandleMessageMiddleware
+ * @see \Symfony\Component\Messenger\HandleTrait
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @experimental in 4.2
  */
 final class HandledStamp implements StampInterface
 {
     private $result;
-    private $callableName;
-    private $handlerAlias;
+    private $handlerName;
 
     /**
      * @param mixed $result The returned value of the message handler
      */
-    public function __construct($result, string $callableName, string $handlerAlias = null)
+    public function __construct($result, string $handlerName)
     {
         $this->result = $result;
-        $this->callableName = $callableName;
-        $this->handlerAlias = $handlerAlias;
+        $this->handlerName = $handlerName;
     }
 
     /**
      * @param mixed $result The returned value of the message handler
      */
-    public static function fromCallable(callable $handler, $result, string $handlerAlias = null): self
+    public static function fromDescriptor(HandlerDescriptor $handler, $result): self
     {
-        if (\is_array($handler)) {
-            if (\is_object($handler[0])) {
-                return new self($result, \get_class($handler[0]).'::'.$handler[1], $handlerAlias);
-            }
-
-            return new self($result, $handler[0].'::'.$handler[1], $handlerAlias);
-        }
-
-        if (\is_string($handler)) {
-            return new self($result, $handler, $handlerAlias);
-        }
-
-        if ($handler instanceof \Closure) {
-            $r = new \ReflectionFunction($handler);
-            if (false !== strpos($r->name, '{closure}')) {
-                return new self($result, 'Closure', $handlerAlias);
-            }
-            if ($class = $r->getClosureScopeClass()) {
-                return new self($result, $class->name.'::'.$r->name, $handlerAlias);
-            }
-
-            return new self($result, $r->name, $handlerAlias);
-        }
-
-        return new self($result, \get_class($handler).'::__invoke', $handlerAlias);
+        return new self($result, $handler->getName());
     }
 
     /**
@@ -77,13 +55,8 @@ final class HandledStamp implements StampInterface
         return $this->result;
     }
 
-    public function getCallableName(): string
+    public function getHandlerName(): string
     {
-        return $this->callableName;
-    }
-
-    public function getHandlerAlias(): ?string
-    {
-        return $this->handlerAlias;
+        return $this->handlerName;
     }
 }

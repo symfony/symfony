@@ -70,7 +70,7 @@ Suppose that you have the following security configuration in your application:
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
-        App\Entity\User: bcrypt
+        App\Entity\User: auto
 </comment>
 
 If you execute the command non-interactively, the first available configured
@@ -180,7 +180,7 @@ EOF
         })->setHidden(true)->setMaxAttempts(20);
     }
 
-    private function generateSalt()
+    private function generateSalt(): string
     {
         return base64_encode(random_bytes(30));
     }

@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
@@ -31,6 +33,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         'cache_dir' => null,
         'debug' => false,
         'resource_files' => [],
+        'scanned_directories' => [],
     ];
 
     /**
@@ -47,6 +50,11 @@ class Translator extends BaseTranslator implements WarmableInterface
     private $resources = [];
 
     private $resourceFiles;
+
+    /**
+     * @var string[]
+     */
+    private $scannedDirectories;
 
     /**
      * Constructor.
@@ -78,6 +86,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         $this->options = array_merge($this->options, $options);
         $this->resourceLocales = array_keys($this->options['resource_files']);
         $this->resourceFiles = $this->options['resource_files'];
+        $this->scannedDirectories = $this->options['scanned_directories'];
 
         parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug']);
     }
@@ -120,6 +129,16 @@ class Translator extends BaseTranslator implements WarmableInterface
         parent::initializeCatalogue($locale);
     }
 
+    protected function doLoadCatalogue($locale): void
+    {
+        parent::doLoadCatalogue($locale);
+
+        foreach ($this->scannedDirectories as $directory) {
+            $resourceClass = file_exists($directory) ? DirectoryResource::class : FileExistenceResource::class;
+            $this->catalogues[$locale]->addResource(new $resourceClass($directory));
+        }
+    }
+
     protected function initialize()
     {
         if ($this->resourceFiles) {
@@ -146,7 +165,10 @@ class Translator extends BaseTranslator implements WarmableInterface
         foreach ($filesByLocale as $locale => $files) {
             foreach ($files as $key => $file) {
                 // filename is domain.locale.format
-                list($domain, $locale, $format) = explode('.', basename($file), 3);
+                $fileNameParts = explode('.', basename($file));
+                $format = array_pop($fileNameParts);
+                $locale = array_pop($fileNameParts);
+                $domain = implode('.', $fileNameParts);
                 $this->addResource($format, $file, $locale, $domain);
             }
         }

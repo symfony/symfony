@@ -79,15 +79,14 @@ class AppKernel extends Kernel
         $container->register('logger', NullLogger::class);
     }
 
-    public function serialize()
+    public function __sleep()
     {
-        return serialize([$this->varDir, $this->testCase, $this->rootConfig, $this->getEnvironment(), $this->isDebug()]);
+        return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
     }
 
-    public function unserialize($str)
+    public function __wakeup()
     {
-        $a = unserialize($str);
-        $this->__construct($a[0], $a[1], $a[2], $a[3], $a[4]);
+        $this->__construct($this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug);
     }
 
     protected function getKernelParameters()

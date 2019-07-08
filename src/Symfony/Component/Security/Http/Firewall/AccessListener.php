@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
@@ -23,8 +23,10 @@ use Symfony\Component\Security\Http\AccessMapInterface;
  * AccessListener enforces access control rules.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
-class AccessListener implements ListenerInterface
+class AccessListener
 {
     private $tokenStorage;
     private $accessDecisionManager;
@@ -45,7 +47,7 @@ class AccessListener implements ListenerInterface
      * @throws AccessDeniedException
      * @throws AuthenticationCredentialsNotFoundException
      */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         if (null === $token = $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');

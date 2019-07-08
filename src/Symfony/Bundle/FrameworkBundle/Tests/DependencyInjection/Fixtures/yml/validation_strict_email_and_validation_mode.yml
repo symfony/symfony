@@ -1,4 +1,0 @@
-framework:
-    validation:
-        strict_email: true
-        email_validation_mode: html5

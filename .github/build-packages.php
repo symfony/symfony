@@ -57,7 +57,7 @@ foreach ($dirs as $k => $dir) {
     $versions = @file_get_contents('https://repo.packagist.org/p/'.$package->name.'.json') ?: sprintf('{"packages":{"%s":{"dev-master":%s}}}', $package->name, file_get_contents($dir.'/composer.json'));
     $versions = json_decode($versions)->packages->{$package->name};
 
-    if ($package->version === str_replace('-dev', '.x-dev', $versions->{'dev-master'}->extra->{'branch-alias'}->{'dev-master'})) {
+    if (isset($versions->{'dev-master'}) && $package->version === str_replace('-dev', '.x-dev', $versions->{'dev-master'}->extra->{'branch-alias'}->{'dev-master'})) {
         unset($versions->{'dev-master'});
     }
 

@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -38,6 +38,8 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * Response instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
 class ExceptionListener
 {
@@ -85,7 +87,7 @@ class ExceptionListener
     /**
      * Handles security related exceptions.
      */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event)
     {
         $exception = $event->getException();
         do {
@@ -99,7 +101,7 @@ class ExceptionListener
         } while (null !== $exception = $exception->getPrevious());
     }
 
-    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception): void
+    private function handleAuthenticationException(ExceptionEvent $event, AuthenticationException $exception): void
     {
         if (null !== $this->logger) {
             $this->logger->info('An AuthenticationException was thrown; redirecting to authentication entry point.', ['exception' => $exception]);
@@ -113,7 +115,7 @@ class ExceptionListener
         }
     }
 
-    private function handleAccessDeniedException(GetResponseForExceptionEvent $event, AccessDeniedException $exception)
+    private function handleAccessDeniedException(ExceptionEvent $event, AccessDeniedException $exception)
     {
         $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
 
@@ -206,7 +208,7 @@ class ExceptionListener
     protected function setTargetPath(Request $request)
     {
         // session isn't required when using HTTP basic authentication mechanism for example
-        if ($request->hasSession() && $request->isMethodSafe(false) && !$request->isXmlHttpRequest()) {
+        if ($request->hasSession() && $request->isMethodSafe() && !$request->isXmlHttpRequest()) {
             $this->saveTargetPath($request->getSession(), $this->providerKey, $request->getUri());
         }
     }

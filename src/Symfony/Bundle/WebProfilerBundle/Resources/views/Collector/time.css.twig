@@ -1,0 +1,105 @@
+/* Variables */
+
+.sf-profiler-timeline {
+    --color-default: #777;
+    --color-section: #999;
+    --color-event-listener: #00B8F5;
+    --color-template: #66CC00;
+    --color-doctrine: #FF6633;
+    --color-messenger-middleware: #BDB81E;
+    --color-controller-argument-value-resolver: #8c5de6;
+}
+
+/* Legend */
+
+.sf-profiler-timeline .legends .timeline-category {
+    border: none;
+    background: none;
+    border-left: 1em solid transparent;
+    line-height: 1em;
+    margin: 0 1em 0 0;
+    padding: 0 0.5em;
+    display: none;
+    opacity: 0.5;
+}
+
+.sf-profiler-timeline .legends .timeline-category.active {
+    opacity: 1;
+}
+
+.sf-profiler-timeline .legends .timeline-category.present {
+    display: inline-block;
+}
+
+.sf-profiler-timeline .legends .{{ classnames.default|raw }} { border-color: var(--color-default); }
+.sf-profiler-timeline .legends .{{ classnames.section|raw }} { border-color: var(--color-section); }
+.sf-profiler-timeline .legends .{{ classnames.event_listener|raw }} { border-color: var(--color-event-listener); }
+.sf-profiler-timeline .legends .{{ classnames.template|raw }} { border-color: var(--color-template); }
+.sf-profiler-timeline .legends .{{ classnames.doctrine|raw }} { border-color: var(--color-doctrine); }
+.sf-profiler-timeline .legends .{{ classnames['messenger.middleware']|raw }} { border-color: var(--color-messenger-middleware); }
+.sf-profiler-timeline .legends .{{ classnames['controller.argument_value_resolver']|raw }} { border-color: var(--color-controller-argument-value-resolver); }
+
+.timeline-graph {
+    margin: 1em 0;
+    width: 100%;
+    background-color: var(--table-background);
+    border: 1px solid var(--table-border);
+}
+
+/* Typography */
+
+.timeline-graph .timeline-label {
+    font-family: var(--font-sans-serif);
+    font-size: 12px;
+    line-height: 12px;
+    font-weight: normal;
+    fill: var(--color-text);
+}
+
+.timeline-graph .timeline-label .timeline-sublabel {
+    margin-left: 1em;
+    fill: var(--color-muted);
+}
+
+.timeline-graph .timeline-subrequest,
+.timeline-graph .timeline-border {
+    fill: none;
+    stroke: var(--table-border);
+    stroke-width: 1px;
+}
+
+.timeline-graph .timeline-subrequest {
+    fill: url(#subrequest);
+    fill-opacity: 0.5;
+}
+
+.timeline-subrequest-pattern {
+    fill: var(--table-border);
+}
+
+/* Timeline periods */
+
+.timeline-graph .timeline-period {
+    stroke-width: 0;
+}
+.timeline-graph .{{ classnames.default|raw }} .timeline-period {
+    fill: var(--color-default);
+}
+.timeline-graph .{{ classnames.section|raw }} .timeline-period {
+    fill: var(--color-section);
+}
+.timeline-graph .{{ classnames.event_listener|raw }} .timeline-period {
+    fill: var(--color-event-listener);
+}
+.timeline-graph .{{ classnames.template|raw }} .timeline-period {
+    fill: var(--color-template);
+}
+.timeline-graph .{{ classnames.doctrine|raw }} .timeline-period {
+    fill: var(--color-doctrine);
+}
+.timeline-graph .{{ classnames['messenger.middleware']|raw }} .timeline-period {
+    fill: var(--color-messenger-middleware);
+}
+.timeline-graph .{{ classnames['controller.argument_value_resolver']|raw }} .timeline-period {
+    fill: var(--color-controller-argument-value-resolver);
+}

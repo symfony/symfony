@@ -29,7 +29,7 @@ class SecurityTest extends TestCase
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $container = $this->createContainer('security.token_storage', $tokenStorage);
 
@@ -45,12 +45,12 @@ class SecurityTest extends TestCase
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
         $token->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($userInToken));
+            ->willReturn($userInToken);
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $container = $this->createContainer('security.token_storage', $tokenStorage);
 
@@ -64,32 +64,10 @@ class SecurityTest extends TestCase
 
         yield ['string_username', null];
 
-        //yield [new StringishUser(), null]; // 5.0 behavior
+        yield [new StringishUser(), null];
 
         $user = new User('nice_user', 'foo');
         yield [$user, $user];
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Accessing the user object "Symfony\Component\Security\Core\Tests\StringishUser" that is not an instance of "Symfony\Component\Security\Core\User\UserInterface" from "Symfony\Component\Security\Core\Security::getUser()" is deprecated since Symfony 4.2, use "getToken()->getUser()" instead.
-     */
-    public function testGetUserLegacy()
-    {
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
-        $token->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue($user = new StringishUser()));
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-
-        $tokenStorage->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $container = $this->createContainer('security.token_storage', $tokenStorage);
-
-        $security = new Security($container);
-        $this->assertSame($user, $security->getUser());
     }
 
     public function testIsGranted()
@@ -99,7 +77,7 @@ class SecurityTest extends TestCase
         $authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('SOME_ATTRIBUTE', 'SOME_SUBJECT')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $container = $this->createContainer('security.authorization_checker', $authorizationChecker);
 
@@ -114,7 +92,7 @@ class SecurityTest extends TestCase
         $container->expects($this->atLeastOnce())
             ->method('get')
             ->with($serviceId)
-            ->will($this->returnValue($serviceObject));
+            ->willReturn($serviceObject);
 
         return $container;
     }

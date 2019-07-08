@@ -42,12 +42,14 @@ class AssetsInstallCommand extends Command
     protected static $defaultName = 'assets:install';
 
     private $filesystem;
+    private $projectDir;
 
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Filesystem $filesystem, string $projectDir)
     {
         parent::__construct();
 
         $this->filesystem = $filesystem;
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -256,15 +258,15 @@ EOT
         return self::METHOD_COPY;
     }
 
-    private function getPublicDirectory(ContainerInterface $container)
+    private function getPublicDirectory(ContainerInterface $container): string
     {
         $defaultPublicDir = 'public';
 
-        if (!$container->hasParameter('kernel.project_dir')) {
+        if (null === $this->projectDir && !$container->hasParameter('kernel.project_dir')) {
             return $defaultPublicDir;
         }
 
-        $composerFilePath = $container->getParameter('kernel.project_dir').'/composer.json';
+        $composerFilePath = ($this->projectDir ?? $container->getParameter('kernel.project_dir')).'/composer.json';
 
         if (!file_exists($composerFilePath)) {
             return $defaultPublicDir;

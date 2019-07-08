@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Exception;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.2
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

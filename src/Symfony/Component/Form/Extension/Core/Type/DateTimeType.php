@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
@@ -176,7 +177,7 @@ class DateTimeType extends AbstractType
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
@@ -216,12 +217,12 @@ class DateTimeType extends AbstractType
 
         // Defaults to the value of "widget"
         $dateWidget = function (Options $options) {
-            return $options['widget'];
+            return 'single_text' === $options['widget'] ? null : $options['widget'];
         };
 
         // Defaults to the value of "widget"
         $timeWidget = function (Options $options) {
-            return $options['widget'];
+            return 'single_text' === $options['widget'] ? null : $options['widget'];
         };
 
         $resolver->setDefaults([
@@ -251,6 +252,7 @@ class DateTimeType extends AbstractType
             'empty_data' => function (Options $options) {
                 return $options['compound'] ? [] : '';
             },
+            'input_format' => 'Y-m-d H:i:s',
         ]);
 
         // Don't add some defaults in order to preserve the defaults
@@ -292,6 +294,37 @@ class DateTimeType extends AbstractType
             'text',
             'choice',
         ]);
+
+        $resolver->setAllowedTypes('input_format', 'string');
+
+        $resolver->setNormalizer('date_format', function (Options $options, $dateFormat) {
+            if (null !== $dateFormat && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
+                throw new LogicException(sprintf('Cannot use the "date_format" option of the %s with an HTML5 date.', self::class));
+            }
+
+            return $dateFormat;
+        });
+        $resolver->setNormalizer('date_widget', function (Options $options, $dateWidget) {
+            if (null !== $dateWidget && 'single_text' === $options['widget']) {
+                throw new LogicException(sprintf('Cannot use the "date_widget" option of the %s when the "widget" option is set to "single_text".', self::class));
+            }
+
+            return $dateWidget;
+        });
+        $resolver->setNormalizer('time_widget', function (Options $options, $timeWidget) {
+            if (null !== $timeWidget && 'single_text' === $options['widget']) {
+                throw new LogicException(sprintf('Cannot use the "time_widget" option of the %s when the "widget" option is set to "single_text".', self::class));
+            }
+
+            return $timeWidget;
+        });
+        $resolver->setNormalizer('html5', function (Options $options, $html5) {
+            if ($html5 && self::HTML5_FORMAT !== $options['format']) {
+                throw new LogicException(sprintf('Cannot use the "format" option of %s when the "html5" option is disabled.', self::class));
+            }
+
+            return $html5;
+        });
     }
 
     /**

@@ -1,6 +1,78 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
+   set to `single_text` is not supported anymore.
+ * The `format` option of `DateType` and `DateTimeType` cannot be used when the `html5` option is enabled.
+ * Using names for buttons that do not start with a letter, a digit, or an underscore throw an exception
+ * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons throw an exception.
+ * removed the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
+ * removed `getExtendedType()` method of the `FormTypeExtensionInterface`
+ * added static `getExtendedTypes()` method to the `FormTypeExtensionInterface`
+ * calling to `FormRenderer::searchAndRenderBlock()` method for fields which were already rendered throw a `BadMethodCallException`
+ * removed the `regions` option of the `TimezoneType`
+ * removed the `$scale` argument of the `IntegerToLocalizedStringTransformer`
+ * removed `TemplatingExtension` and `TemplatingRendererEngine` classes, use Twig instead
+ * passing a null message when instantiating a `Symfony\Component\Form\FormError` is not allowed
+ * removed support for using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
+
+4.4.0
+-----
+
+ * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
+
+4.3.0
+-----
+
+ * added a `symbol` option to the `PercentType` that allows to disable or customize the output of the percent character
+ * Using the `format` option of `DateType` and `DateTimeType` when the `html5` option is enabled is deprecated.
+ * Using names for buttons that do not start with a letter, a digit, or an underscore is deprecated and will lead to an
+   exception in 5.0.
+ * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons is deprecated and
+   will lead to an exception in 5.0.
+ * added `html5` option to `NumberType` that allows to render `type="number"` input fields
+ * deprecated using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget`
+   option is set to `single_text`
+ * added `block_prefix` option to `BaseType`.
+ * added `help_html` option to display the `help` text as HTML.
+ * `FormError` doesn't implement `Serializable` anymore
+ * `FormDataCollector` has been marked as `final`
+ * added `label_translation_parameters`, `attr_translation_parameters`, `help_translation_parameters` options 
+   to `FormType` to pass translation parameters to form labels, attributes (`placeholder` and `title`) and help text respectively.
+   The passed parameters will replace placeholders in translation messages.
+   
+   ```php
+   class OrderType extends AbstractType
+   {
+       public function buildForm(FormBuilderInterface $builder, array $options)
+       {
+           $builder->add('comment', TextType::class, [
+               'label' => 'Comment to the order to %company%',
+               'label_translation_parameters' => [
+                   '%company%' => 'Acme',
+               ],
+               'help' => 'The address of the %company% is %address%',
+               'help_translation_parameters' => [
+                   '%company%' => 'Acme Ltd.',
+                   '%address%' => '4 Form street, Symfonyville',
+               ],
+           ])
+       }
+   }
+   ```
+ * added the `input_format` option to `DateType`, `DateTimeType`, and `TimeType` to specify the input format when setting
+   the `input` option to `string`
+ * dispatch `PreSubmitEvent` on `form.pre_submit`
+ * dispatch `SubmitEvent` on `form.submit`
+ * dispatch `PostSubmitEvent` on `form.post_submit`
+ * dispatch `PreSetDataEvent` on `form.pre_set_data`
+ * dispatch `PostSetDataEvent` on `form.post_set_data`
+ * added an `input` option to `NumberType`
+ * removed default option grouping in `TimezoneType`, use `group_by` instead
+
 4.2.0
 -----
 

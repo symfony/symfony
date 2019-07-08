@@ -138,6 +138,9 @@ class DoctrineDataCollector extends DataCollector
         if (!\is_array($query['params'])) {
             $query['params'] = [$query['params']];
         }
+        if (!\is_array($query['types'])) {
+            $query['types'] = [];
+        }
         foreach ($query['params'] as $j => $param) {
             if (isset($query['types'][$j])) {
                 // Transform the param according to the type

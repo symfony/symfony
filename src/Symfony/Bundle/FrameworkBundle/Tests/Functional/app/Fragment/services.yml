@@ -1,0 +1,6 @@
+services:
+    _defaults:
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController:
+        tags: ['controller.service_arguments']

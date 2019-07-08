@@ -15,8 +15,6 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @experimental in 4.2
  */
 final class ValidationStamp implements StampInterface
 {

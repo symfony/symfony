@@ -14,6 +14,8 @@ namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
@@ -209,6 +211,25 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
+     * @dataProvider defaultValueProvider
+     */
+    public function testExtractWithDefaultValue($property, $type)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes(DefaultValue::class, $property, []));
+    }
+
+    public function defaultValueProvider()
+    {
+        return [
+            ['defaultInt', [new Type(Type::BUILTIN_TYPE_INT, false)]],
+            ['defaultFloat', [new Type(Type::BUILTIN_TYPE_FLOAT, false)]],
+            ['defaultString', [new Type(Type::BUILTIN_TYPE_STRING, false)]],
+            ['defaultArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false)]],
+            ['defaultNull', null],
+        ];
+    }
+
+    /**
      * @dataProvider getReadableProperties
      */
     public function testIsReadable($property, $expected)
@@ -272,6 +293,27 @@ class ReflectionExtractorTest extends TestCase
         $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'analyses'));
         $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'feet'));
         $this->assertEquals(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class));
+    }
+
+    public function testPrivatePropertyExtractor()
+    {
+        $privateExtractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PRIVATE | ReflectionExtractor::ALLOW_PROTECTED);
+        $properties = $privateExtractor->getProperties(Dummy::class);
+
+        $this->assertContains('bar', $properties);
+        $this->assertContains('baz', $properties);
+
+        $this->assertTrue($privateExtractor->isReadable(Dummy::class, 'bar'));
+        $this->assertTrue($privateExtractor->isReadable(Dummy::class, 'baz'));
+
+        $protectedExtractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED);
+        $properties = $protectedExtractor->getProperties(Dummy::class);
+
+        $this->assertNotContains('bar', $properties);
+        $this->assertContains('baz', $properties);
+
+        $this->assertFalse($protectedExtractor->isReadable(Dummy::class, 'bar'));
+        $this->assertTrue($protectedExtractor->isReadable(Dummy::class, 'baz'));
     }
 
     /**

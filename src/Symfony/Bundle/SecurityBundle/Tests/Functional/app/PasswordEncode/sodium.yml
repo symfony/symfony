@@ -1,0 +1,7 @@
+imports:
+    - { resource: config.yml }
+
+security:
+    encoders:
+        Custom\Class\Sodium\User:
+            algorithm: sodium

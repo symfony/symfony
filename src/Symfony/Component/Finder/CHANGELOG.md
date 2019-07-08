@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * added `$useNaturalSort` argument to `Finder::sortByName()`
+
+4.3.0
+-----
+
+ * added Finder::ignoreVCSIgnored() to ignore files based on rules listed in .gitignore
+
 4.2.0
 -----
 

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed `PhpProcess::setPhpBinary()`
+ * `Process` must be instantiated with a command array, use `Process::fromShellCommandline()` when the command should be parsed by the shell
+ * removed `Process::setCommandLine()`
+
 4.2.0
 -----
 

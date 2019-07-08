@@ -40,12 +40,12 @@ class DebugCommandTest extends TestCase
     {
         $command = new DebugCommand([
             'command_bus' => [
-                DummyCommand::class => [DummyCommandHandler::class],
-                MultipleBusesMessage::class => [MultipleBusesMessageHandler::class],
+                DummyCommand::class => [[DummyCommandHandler::class, []]],
+                MultipleBusesMessage::class => [[MultipleBusesMessageHandler::class, []]],
             ],
             'query_bus' => [
-                DummyQuery::class => [DummyQueryHandler::class],
-                MultipleBusesMessage::class => [MultipleBusesMessageHandler::class],
+                DummyQuery::class => [[DummyQueryHandler::class, []]],
+                MultipleBusesMessage::class => [[MultipleBusesMessageHandler::class, []]],
             ],
         ]);
 

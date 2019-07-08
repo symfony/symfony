@@ -45,7 +45,7 @@ class DebugCommandTest extends TestCase
 Built-in form types (Symfony\Component\Form\Extension\Core\Type)
 ----------------------------------------------------------------
 
- IntegerType, TimezoneType
+ IntegerType
 
 Service form types
 ------------------
@@ -64,6 +64,15 @@ TXT
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")', $tester->getDisplay());
+    }
+
+    public function testDebugDateTimeType()
+    {
+        $tester = $this->createCommandTester();
+        $tester->execute(['class' => 'DateTime'], ['decorated' => false, 'interactive' => false]);
+
+        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $this->assertContains('Symfony\Component\Form\Extension\Core\Type\DateTimeType (Block prefix: "datetime")', $tester->getDisplay());
     }
 
     public function testDebugFormTypeOption()
@@ -142,6 +151,45 @@ TXT
     public function testDebugInvalidFormType()
     {
         $this->createCommandTester()->execute(['class' => 'test']);
+    }
+
+    public function testDebugCustomFormTypeOption()
+    {
+        $tester = $this->createCommandTester([], [FooType::class]);
+        $ret = $tester->execute(['class' => FooType::class, 'option' => 'foo'], ['decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringMatchesFormat(<<<'TXT'
+
+Symfony\Component\Form\Tests\Command\FooType (foo)
+==================================================
+
+ ---------------- -----------%s
+  Required         true      %s
+ ---------------- -----------%s
+  Default          -         %s
+ ---------------- -----------%s
+  Allowed types    [         %s
+                     "string"%s
+                   ]         %s
+ ---------------- -----------%s
+  Allowed values   [         %s
+                     "bar",  %s
+                     "baz"   %s
+                   ]         %s
+ ---------------- -----------%s
+  Normalizers      [         %s
+                     Closure(%s
+                       class:%s
+                       this: %s
+                       file: %s
+                       line: %s
+                     }       %s
+                   ]         %s
+ ---------------- -----------%s
+
+TXT
+            , $tester->getDisplay(true));
     }
 
     private function createCommandTester(array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [])

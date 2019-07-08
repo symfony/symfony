@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ErrorCatcher\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -53,6 +54,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\KernelInterface')->getMock();
 
         $this->container = new ContainerBuilder();
+        $this->container->register('error_catcher.renderer.html', HtmlErrorRenderer::class);
         $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
         $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'))->setPublic(true);
         $this->container->register('twig', 'Twig\Environment')->setPublic(true);

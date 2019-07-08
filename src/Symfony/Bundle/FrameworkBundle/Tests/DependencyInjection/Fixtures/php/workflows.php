@@ -6,13 +6,10 @@ $container->loadFromExtension('framework', [
     'workflows' => [
         'article' => [
             'type' => 'workflow',
-            'marking_store' => [
-                'type' => 'multiple_state',
-            ],
             'supports' => [
                 FrameworkExtensionTest::class,
             ],
-            'initial_place' => 'draft',
+            'initial_marking' => ['draft'],
             'places' => [
                 'draft',
                 'wait_for_journalist',
@@ -41,13 +38,10 @@ $container->loadFromExtension('framework', [
             ],
         ],
         'pull_request' => [
-            'marking_store' => [
-                'type' => 'single_state',
-            ],
             'supports' => [
                 FrameworkExtensionTest::class,
             ],
-            'initial_place' => 'start',
+            'initial_marking' => 'start',
             'metadata' => [
                 'title' => 'workflow title',
             ],

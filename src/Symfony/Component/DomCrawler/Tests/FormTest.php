@@ -327,6 +327,18 @@ class FormTest extends TestCase
         $this->assertEquals('POST', $form->getMethod(), '->getMethod() returns the method attribute value of the form');
     }
 
+    public function testGetName()
+    {
+        $form = $this->createForm('<form name="foo"><input type="submit" /></form>');
+        $this->assertSame('foo', $form->getName());
+    }
+
+    public function testGetNameOnFormWithoutName()
+    {
+        $form = $this->createForm('<form><input type="submit" /></form>');
+        $this->assertSame('', $form->getName());
+    }
+
     public function testGetSetValue()
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
@@ -862,13 +874,13 @@ class FormTest extends TestCase
         $field
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name))
+            ->willReturn($name)
         ;
 
         $field
             ->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue($value))
+            ->willReturn($value)
         ;
 
         return $field;

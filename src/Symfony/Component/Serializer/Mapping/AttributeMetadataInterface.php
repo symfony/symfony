@@ -34,7 +34,7 @@ interface AttributeMetadataInterface
      *
      * @param string $group
      */
-    public function addGroup($group);
+    public function addGroup(string $group);
 
     /**
      * Gets groups of this attribute.
@@ -48,7 +48,7 @@ interface AttributeMetadataInterface
      *
      * @param int|null $maxDepth
      */
-    public function setMaxDepth($maxDepth);
+    public function setMaxDepth(?int $maxDepth);
 
     /**
      * Gets the serialization max depth for this attribute.

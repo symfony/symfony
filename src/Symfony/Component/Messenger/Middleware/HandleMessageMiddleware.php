@@ -11,18 +11,22 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.2
  */
 class HandleMessageMiddleware implements MiddlewareInterface
 {
+    use LoggerAwareTrait;
+
     private $handlersLocator;
     private $allowNoHandlers;
 
@@ -30,6 +34,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
     {
         $this->handlersLocator = $handlersLocator;
         $this->allowNoHandlers = $allowNoHandlers;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -41,13 +46,50 @@ class HandleMessageMiddleware implements MiddlewareInterface
     {
         $handler = null;
         $message = $envelope->getMessage();
-        foreach ($this->handlersLocator->getHandlers($envelope) as $alias => $handler) {
-            $envelope = $envelope->with(HandledStamp::fromCallable($handler, $handler($message), \is_string($alias) ? $alias : null));
+
+        $context = [
+            'message' => $message,
+            'class' => \get_class($message),
+        ];
+
+        $exceptions = [];
+        foreach ($this->handlersLocator->getHandlers($envelope) as $handlerDescriptor) {
+            if ($this->messageHasAlreadyBeenHandled($envelope, $handlerDescriptor)) {
+                continue;
+            }
+
+            try {
+                $handler = $handlerDescriptor->getHandler();
+                $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $handler($message));
+                $envelope = $envelope->with($handledStamp);
+                $this->logger->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
+            } catch (\Throwable $e) {
+                $exceptions[] = $e;
+            }
         }
-        if (null === $handler && !$this->allowNoHandlers) {
-            throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', \get_class($envelope->getMessage())));
+
+        if (null === $handler) {
+            if (!$this->allowNoHandlers) {
+                throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $context['class']));
+            }
+
+            $this->logger->info('No handler for message {class}', $context);
+        }
+
+        if (\count($exceptions)) {
+            throw new HandlerFailedException($envelope, $exceptions);
         }
 
         return $stack->next()->handle($envelope, $stack);
+    }
+
+    private function messageHasAlreadyBeenHandled(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool
+    {
+        $some = array_filter($envelope
+            ->all(HandledStamp::class), function (HandledStamp $stamp) use ($handlerDescriptor) {
+                return $stamp->getHandlerName() === $handlerDescriptor->getName();
+            });
+
+        return \count($some) > 0;
     }
 }

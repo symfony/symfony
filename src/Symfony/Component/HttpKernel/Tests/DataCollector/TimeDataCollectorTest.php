@@ -44,7 +44,7 @@ class TimeDataCollectorTest extends TestCase
         $this->assertEquals(0, $c->getStartTime());
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
-        $kernel->expects($this->once())->method('getStartTime')->will($this->returnValue(123456));
+        $kernel->expects($this->once())->method('getStartTime')->willReturn(123456);
 
         $c = new TimeDataCollector($kernel);
         $request = new Request();
@@ -52,6 +52,6 @@ class TimeDataCollectorTest extends TestCase
 
         $c->collect($request, new Response());
         $this->assertEquals(123456000, $c->getStartTime());
-        $this->assertSame(\class_exists(Stopwatch::class, false), $c->isStopwatchInstalled());
+        $this->assertSame(class_exists(Stopwatch::class, false), $c->isStopwatchInstalled());
     }
 }

@@ -28,19 +28,19 @@ class FirewallMapTest extends TestCase
             ->expects($this->once())
             ->method('matches')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
-        $map->add($notMatchingMatcher, [$this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock()]);
+        $map->add($notMatchingMatcher, [function () {}]);
 
         $matchingMatcher = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestMatcher')->getMock();
         $matchingMatcher
             ->expects($this->once())
             ->method('matches')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
-        $theListener = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock();
+        $theListener = function () {};
         $theException = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ExceptionListener')->disableOriginalConstructor()->getMock();
 
         $map->add($matchingMatcher, [$theListener], $theException);
@@ -51,7 +51,7 @@ class FirewallMapTest extends TestCase
             ->method('matches')
         ;
 
-        $map->add($tooLateMatcher, [$this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock()]);
+        $map->add($tooLateMatcher, [function () {}]);
 
         list($listeners, $exception) = $map->getListeners($request);
 
@@ -70,12 +70,12 @@ class FirewallMapTest extends TestCase
             ->expects($this->once())
             ->method('matches')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
-        $map->add($notMatchingMatcher, [$this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock()]);
+        $map->add($notMatchingMatcher, [function () {}]);
 
-        $theListener = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock();
+        $theListener = function () {};
         $theException = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ExceptionListener')->disableOriginalConstructor()->getMock();
 
         $map->add(null, [$theListener], $theException);
@@ -86,7 +86,7 @@ class FirewallMapTest extends TestCase
             ->method('matches')
         ;
 
-        $map->add($tooLateMatcher, [$this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock()]);
+        $map->add($tooLateMatcher, [function () {}]);
 
         list($listeners, $exception) = $map->getListeners($request);
 
@@ -105,10 +105,10 @@ class FirewallMapTest extends TestCase
             ->expects($this->once())
             ->method('matches')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
-        $map->add($notMatchingMatcher, [$this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock()]);
+        $map->add($notMatchingMatcher, [function () {}]);
 
         list($listeners, $exception) = $map->getListeners($request);
 

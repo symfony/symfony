@@ -122,7 +122,9 @@ class HttpCacheTestCase extends TestCase
 
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
 
-        $this->cacheConfig['debug'] = true;
+        if (!isset($this->cacheConfig['debug'])) {
+            $this->cacheConfig['debug'] = true;
+        }
 
         $this->esi = $esi ? new Esi() : null;
         $this->cache = new HttpCache($this->kernel, $this->store, $this->esi, $this->cacheConfig);

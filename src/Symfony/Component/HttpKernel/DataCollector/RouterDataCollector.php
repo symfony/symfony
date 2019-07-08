@@ -14,11 +14,9 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * RouterDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterDataCollector extends DataCollector
@@ -69,7 +67,7 @@ class RouterDataCollector extends DataCollector
     /**
      * Remembers the controller associated to each request.
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event)
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }

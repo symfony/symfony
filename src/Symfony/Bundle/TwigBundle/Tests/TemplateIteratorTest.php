@@ -18,25 +18,23 @@ class TemplateIteratorTest extends TestCase
     public function testGetIterator()
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
-        $bundle->expects($this->any())->method('getName')->will($this->returnValue('BarBundle'));
-        $bundle->expects($this->any())->method('getPath')->will($this->returnValue(__DIR__.'/Fixtures/templates/BarBundle'));
+        $bundle->expects($this->any())->method('getName')->willReturn('BarBundle');
+        $bundle->expects($this->any())->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')->disableOriginalConstructor()->getMock();
-        $kernel->expects($this->any())->method('getBundles')->will($this->returnValue([
+        $kernel->expects($this->any())->method('getBundles')->willReturn([
             $bundle,
-        ]));
-        $iterator = new TemplateIterator($kernel, __DIR__.'/Fixtures/templates', [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
+        ]);
+        $iterator = new TemplateIterator($kernel, [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
 
         $sorted = iterator_to_array($iterator);
         sort($sorted);
         $this->assertEquals(
             [
-                '@Bar/base.html.twig',
                 '@Bar/index.html.twig',
                 '@Bar/layout.html.twig',
                 '@Foo/index.html.twig',
                 'layout.html.twig',
-                'sub/sub.html.twig',
             ],
             $sorted
         );

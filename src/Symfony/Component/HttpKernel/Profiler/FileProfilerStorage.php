@@ -47,7 +47,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method, $start = null, $end = null, $statusCode = null)
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null)
     {
         $file = $this->getIndexFilename();
 

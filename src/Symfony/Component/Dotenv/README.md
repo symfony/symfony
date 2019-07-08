@@ -2,7 +2,7 @@ Dotenv Component
 ================
 
 Symfony Dotenv parses `.env` files to make environment variables stored in them
-accessible via `getenv()`, `$_ENV`, or `$_SERVER`.
+accessible via `$_SERVER`, `$_ENV` and optionally `getenv()`.
 
 Resources
 ---------

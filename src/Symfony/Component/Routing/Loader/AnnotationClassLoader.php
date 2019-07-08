@@ -94,7 +94,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
      *
      * @throws \InvalidArgumentException When route can't be parsed
      */
-    public function load($class, $type = null)
+    public function load($class, string $type = null)
     {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
@@ -143,7 +143,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         foreach ($requirements as $placeholder => $requirement) {
             if (\is_int($placeholder)) {
-                @trigger_error(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s::%s()"?', $placeholder, $requirement, $name, $class->getName(), $method->getName()), E_USER_DEPRECATED);
+                throw new \InvalidArgumentException(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s::%s()"?', $placeholder, $requirement, $name, $class->getName(), $method->getName()));
             }
         }
 
@@ -248,7 +248,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
      */
     protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
     {
-        $name = strtolower(str_replace('\\', '_', $class->name).'_'.$method->name);
+        $name = str_replace('\\', '_', $class->name).'_'.$method->name;
+        $name = \function_exists('mb_strtolower') && preg_match('//u', $name) ? mb_strtolower($name, 'UTF-8') : strtolower($name);
         if ($this->defaultRouteIndex > 0) {
             $name .= '_'.$this->defaultRouteIndex;
         }
@@ -302,7 +303,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
             foreach ($globals['requirements'] as $placeholder => $requirement) {
                 if (\is_int($placeholder)) {
-                    @trigger_error(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" in "%s"?', $placeholder, $requirement, $class->getName()), E_USER_DEPRECATED);
+                    throw new \InvalidArgumentException(sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" in "%s"?', $placeholder, $requirement, $class->getName()));
                 }
             }
         }

@@ -27,7 +27,7 @@ class RouterTest extends TestCase
      */
     public function testConstructThrowsOnNonSymfonyNorPsr11Container()
     {
-        new Router($this->getMockBuilder(ContainerInterface::class)->getMock(), 'foo');
+        new Router($this->createMock(ContainerInterface::class), 'foo');
     }
 
     public function testGenerateWithServiceParam()
@@ -473,6 +473,24 @@ class RouterTest extends TestCase
         $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
     }
 
+    public function testBooleanContainerParametersWithinRouteCondition()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('foo');
+        $route->setCondition('%parameter.true% or %parameter.false%');
+
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag(['parameter.true' => true, 'parameter.false' => false]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertSame('1 or 0', $route->getCondition());
+    }
+
     public function getNonStringValues()
     {
         return [[null], [false], [true], [new \stdClass()], [['foo', 'bar']], [[[]]]];
@@ -488,7 +506,7 @@ class RouterTest extends TestCase
         $loader
             ->expects($this->any())
             ->method('load')
-            ->will($this->returnValue($routes))
+            ->willReturn($routes)
         ;
 
         $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(['get'])->getMock();
@@ -496,7 +514,7 @@ class RouterTest extends TestCase
         $sc
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($loader))
+            ->willReturn($loader)
         ;
 
         return $sc;
@@ -509,7 +527,7 @@ class RouterTest extends TestCase
         $loader
             ->expects($this->any())
             ->method('load')
-            ->will($this->returnValue($routes))
+            ->willReturn($routes)
         ;
 
         $sc = $this->getMockBuilder(ContainerInterface::class)->getMock();
@@ -517,7 +535,7 @@ class RouterTest extends TestCase
         $sc
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($loader))
+            ->willReturn($loader)
         ;
 
         return $sc;
@@ -529,9 +547,9 @@ class RouterTest extends TestCase
         $bag
             ->expects($this->any())
             ->method('get')
-            ->will($this->returnCallback(function ($key) use ($params) {
+            ->willReturnCallback(function ($key) use ($params) {
                 return isset($params[$key]) ? $params[$key] : null;
-            }))
+            })
         ;
 
         return $bag;

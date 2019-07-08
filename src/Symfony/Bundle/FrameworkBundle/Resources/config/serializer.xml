@@ -32,6 +32,8 @@
 
         <!-- Normalizer -->
         <service id="serializer.normalizer.constraint_violation_list" class="Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer">
+            <argument type="collection" />
+            <argument type="service" id="serializer.name_converter.metadata_aware" />
             <!-- Run before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-915" />
         </service>
@@ -42,6 +44,7 @@
         </service>
 
         <service id="serializer.normalizer.data_uri" class="Symfony\Component\Serializer\Normalizer\DataUriNormalizer">
+            <argument type="service" id="mime_types" on-invalid="null" />
             <!-- Run before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-920" />
         </service>
@@ -95,10 +98,15 @@
             <tag name="kernel.cache_warmer" />
         </service>
 
-        <service id="serializer.mapping.cache.symfony" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
+        <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">
             <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
             <argument>%serializer.mapping.cache.file%</argument>
             <argument type="service" id="cache.serializer" />
+        </service>
+
+        <service id="serializer.mapping.cache_class_metadata_factory" decorates="serializer.mapping.class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory">
+            <argument type="service" id="serializer.mapping.cache_class_metadata_factory.inner" />
+            <argument type="service" id="serializer.mapping.cache.symfony" />
         </service>
 
         <!-- Encoders -->

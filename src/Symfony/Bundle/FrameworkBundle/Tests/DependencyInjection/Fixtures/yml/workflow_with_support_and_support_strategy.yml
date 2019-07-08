@@ -1,8 +1,7 @@
 framework:
     workflows:
         my_workflow:
-            marking_store:
-                type: multiple_state
+            type: workflow
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
             support_strategy: foobar

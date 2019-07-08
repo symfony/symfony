@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -32,23 +33,65 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {
-    const ENABLE_MAX_DEPTH = 'enable_max_depth';
-    const DEPTH_KEY_PATTERN = 'depth_%s::%s';
-    const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
-    const SKIP_NULL_VALUES = 'skip_null_values';
-    const MAX_DEPTH_HANDLER = 'max_depth_handler';
-    const EXCLUDE_FROM_CACHE_KEY = 'exclude_from_cache_key';
+    /**
+     * Set to true to respect the max depth metadata on fields.
+     */
+    public const ENABLE_MAX_DEPTH = 'enable_max_depth';
+
+    /**
+     * How to track the current depth in the context.
+     */
+    public const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+
+    /**
+     * While denormalizing, we can verify that types match.
+     *
+     * You can disable this by setting this flag to true.
+     */
+    public const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
+
+    /**
+     * Flag to control whether fields with the value `null` should be output
+     * when normalizing or omitted.
+     */
+    public const SKIP_NULL_VALUES = 'skip_null_values';
+
+    /**
+     * Callback to allow to set a value for an attribute when the max depth has
+     * been reached.
+     *
+     * If no callback is given, the attribute is skipped. If a callable is
+     * given, its return value is used (even if null).
+     *
+     * The arguments are:
+     *
+     * - mixed  $attributeValue value of this field
+     * - object $object         the whole object being normalized
+     * - string $attributeName  name of the attribute being normalized
+     * - string $format         the requested format
+     * - array  $context        the serialization context
+     */
+    public const MAX_DEPTH_HANDLER = 'max_depth_handler';
+
+    /**
+     * Specify which context key are not relevant to determine which attributes
+     * of an object to (de)normalize.
+     */
+    public const EXCLUDE_FROM_CACHE_KEY = 'exclude_from_cache_key';
+
+    /**
+     * Flag to tell the denormalizer to also populate existing objects on
+     * attributes of the main object.
+     *
+     * Setting this to true is only useful if you also specify the root object
+     * in OBJECT_TO_POPULATE.
+     */
+    public const DEEP_OBJECT_TO_POPULATE = 'deep_object_to_populate';
 
     private $propertyTypeExtractor;
     private $typesCache = [];
     private $attributesCache = [];
 
-    /**
-     * @deprecated since Symfony 4.2
-     *
-     * @var callable|null
-     */
-    private $maxDepthHandler;
     private $objectClassResolver;
 
     /**
@@ -78,7 +121,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
@@ -86,7 +129,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -119,8 +162,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new InvalidArgumentException(sprintf('The "%s" given in the context is not callable.', self::MAX_DEPTH_HANDLER));
             }
         } else {
-            // already validated in constructor resp by type declaration of setMaxDepthHandler
-            $maxDepthHandler = $this->defaultContext[self::MAX_DEPTH_HANDLER] ?? $this->maxDepthHandler;
+            $maxDepthHandler = null;
         }
 
         foreach ($attributes as $attribute) {
@@ -137,7 +179,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             /**
              * @var callable|null
              */
-            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? $this->callbacks[$attribute] ?? null;
+            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? null;
             if ($callback) {
                 $attributeValue = $callback($attributeValue, $object, $attribute, $format, $context);
             }
@@ -191,7 +233,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    protected function getAttributes($object, $format = null, array $context)
+    protected function getAttributes($object, string $format = null, array $context)
     {
         $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
         $key = $class.'-'.$context['cache_key'];
@@ -232,7 +274,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    abstract protected function extractAttributes($object, $format = null, array $context = []);
+    abstract protected function extractAttributes($object, string $format = null, array $context = []);
 
     /**
      * Gets the attribute value.
@@ -244,32 +286,20 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return mixed
      */
-    abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = []);
+    abstract protected function getAttributeValue($object, string $attribute, string $format = null, array $context = []);
 
     /**
-     * Sets a handler function that will be called when the max depth is reached.
-     *
-     * @deprecated since Symfony 4.2
+     * {@inheritdoc}
      */
-    public function setMaxDepthHandler(?callable $handler): void
+    public function supportsDenormalization($data, $type, string $format = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "max_depth_handler" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->maxDepthHandler = $handler;
+        return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
-    {
-        return \class_exists($type) || (\interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -295,11 +325,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
+            if ($context[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
+                try {
+                    $context[self::OBJECT_TO_POPULATE] = $this->getAttributeValue($object, $attribute, $format, $context);
+                } catch (NoSuchPropertyException $e) {
+                }
+            }
+
             $value = $this->validateAndDenormalize($class, $attribute, $value, $format, $context);
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {
-                throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
+                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": %s.', $attribute, $class, $e->getMessage()), $e->getCode(), $e);
             }
         }
 
@@ -503,18 +540,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * We must not mix up the attribute cache between parent and children.
      *
      * {@inheritdoc}
+     *
+     * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute/*, string $format = null */)
+    protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
-        if (\func_num_args() >= 3) {
-            $format = \func_get_arg(2);
-        } else {
-            // will be deprecated in version 4
-            $format = null;
-        }
-
         $context = parent::createChildContext($parentContext, $attribute, $format);
-        // format is already included in the cache_key of the parent.
         $context['cache_key'] = $this->getCacheKey($format, $context);
 
         return $context;
@@ -538,8 +569,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         try {
             return md5($format.serialize([
                 'context' => $context,
-                'ignored' => $this->ignoredAttributes,
-                'camelized' => $this->camelizedAttributes,
+                'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
         } catch (\Exception $exception) {
             // The context cannot be serialized, skip the cache

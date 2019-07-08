@@ -46,10 +46,8 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
 
     /**
      * Set a query string to use in order to find a DN for the username.
-     *
-     * @param string $queryString
      */
-    public function setQueryString($queryString)
+    public function setQueryString(string $queryString)
     {
         $this->queryString = $queryString;
     }
@@ -57,7 +55,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
     /**
      * {@inheritdoc}
      */
-    protected function retrieveUser($username, UsernamePasswordToken $token)
+    protected function retrieveUser(string $username, UsernamePasswordToken $token)
     {
         if (AuthenticationProviderInterface::USERNAME_NONE_PROVIDED === $username) {
             throw new UsernameNotFoundException('Username can not be null');

@@ -49,7 +49,6 @@ interface StoreInterface
      * @param float $ttl amount of seconds to keep the lock in the store
      *
      * @throws LockConflictedException
-     * @throws NotSupportedException
      */
     public function putOffExpiration(Key $key, $ttl);
 

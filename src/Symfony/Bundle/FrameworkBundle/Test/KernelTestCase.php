@@ -23,7 +23,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 abstract class KernelTestCase extends TestCase
 {
-    use KernelShutdownOnTearDownTrait;
+    use TestCaseSetUpTearDownTrait;
 
     protected static $class;
 
@@ -36,6 +36,11 @@ abstract class KernelTestCase extends TestCase
      * @var ContainerInterface
      */
     protected static $container;
+
+    protected function doTearDown(): void
+    {
+        static::ensureKernelShutdown();
+    }
 
     /**
      * @return string The Kernel class name

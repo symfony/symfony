@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -132,6 +133,14 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerEnvVars(array $envs, array $options = [])
+    {
+        throw new LogicException('Using the XML format to debug environment variables is not supported.');
+    }
+
+    /**
      * Writes DOM document.
      *
      * @return \DOMDocument|string
@@ -213,6 +222,11 @@ class XmlDescriptor extends Descriptor
                 $optionXML->setAttribute('key', $name);
                 $optionXML->appendChild(new \DOMText($this->formatValue($value)));
             }
+        }
+
+        if ('' !== $route->getCondition()) {
+            $routeXML->appendChild($conditionXML = $dom->createElement('condition'));
+            $conditionXML->appendChild(new \DOMText($route->getCondition()));
         }
 
         return $dom;
@@ -343,6 +357,9 @@ class XmlDescriptor extends Descriptor
             foreach ($calls as $callData) {
                 $callsXML->appendChild($callXML = $dom->createElement('call'));
                 $callXML->setAttribute('method', $callData[0]);
+                if ($callData[2] ?? false) {
+                    $callXML->setAttribute('returns-clone', 'true');
+                }
             }
         }
 

@@ -35,6 +35,16 @@ final class Dotenv
     private $data;
     private $end;
     private $values;
+    private $usePutenv = true;
+
+    /**
+     * @var bool If `putenv()` should be used to define environment variables or not.
+     *           Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     */
+    public function __construct(bool $usePutenv = false)
+    {
+        $this->usePutenv = $usePutenv;
+    }
 
     /**
      * Loads one or several .env files.
@@ -126,7 +136,10 @@ final class Dotenv
                 continue;
             }
 
-            putenv("$name=$value");
+            if ($this->usePutenv) {
+                putenv("$name=$value");
+            }
+
             $_ENV[$name] = $value;
             if ($notHttpName) {
                 $_SERVER[$name] = $value;
@@ -140,7 +153,11 @@ final class Dotenv
         if ($updateLoadedVars) {
             unset($loadedVars['']);
             $loadedVars = implode(',', array_keys($loadedVars));
-            putenv('SYMFONY_DOTENV_VARS='.$_ENV['SYMFONY_DOTENV_VARS'] = $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars);
+            $_ENV['SYMFONY_DOTENV_VARS'] = $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars;
+
+            if ($this->usePutenv) {
+                putenv('SYMFONY_DOTENV_VARS='.$loadedVars);
+            }
         }
     }
 
@@ -194,7 +211,7 @@ final class Dotenv
         }
     }
 
-    private function lexVarname()
+    private function lexVarname(): string
     {
         // var name + optional export
         if (!preg_match('/(export[ \t]++)?('.self::VARNAME_REGEX.')/A', $this->data, $matches, 0, $this->cursor)) {
@@ -222,7 +239,7 @@ final class Dotenv
         return $matches[2];
     }
 
-    private function lexValue()
+    private function lexValue(): string
     {
         if (preg_match('/[ \t]*+(?:#.*)?$/Am', $this->data, $matches, 0, $this->cursor)) {
             $this->moveCursor($matches[0]);
@@ -269,9 +286,6 @@ final class Dotenv
                     if ($this->cursor === $this->end) {
                         throw $this->createFormatException('Missing quote to end the value');
                     }
-                }
-                if ("\n" === $this->data[$this->cursor]) {
-                    throw $this->createFormatException('Missing quote to end the value');
                 }
                 ++$this->cursor;
                 $value = str_replace(['\\"', '\r', '\n'], ['"', "\r", "\n"], $value);
@@ -320,7 +334,7 @@ final class Dotenv
         return $v;
     }
 
-    private function lexNestedExpression()
+    private function lexNestedExpression(): string
     {
         ++$this->cursor;
         $value = '';
@@ -382,7 +396,7 @@ final class Dotenv
                 throw new \LogicException('Resolving commands requires the Symfony Process component.');
             }
 
-            $process = \method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline('echo '.$matches[0]) : new Process('echo '.$matches[0]);
+            $process = method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline('echo '.$matches[0]) : new Process('echo '.$matches[0]);
             $process->inheritEnvironmentVariables(true);
             $process->setEnv($this->values);
             try {
@@ -453,7 +467,7 @@ final class Dotenv
         $this->lineno += substr_count($text, "\n");
     }
 
-    private function createFormatException($message)
+    private function createFormatException($message): FormatException
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }

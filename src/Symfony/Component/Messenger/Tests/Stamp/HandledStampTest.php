@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 
@@ -19,54 +20,22 @@ class HandledStampTest extends TestCase
 {
     public function testConstruct()
     {
-        $stamp = new HandledStamp('some result', 'FooHandler::__invoke()', 'foo');
+        $stamp = new HandledStamp('some result', 'FooHandler::__invoke()');
 
         $this->assertSame('some result', $stamp->getResult());
-        $this->assertSame('FooHandler::__invoke()', $stamp->getCallableName());
-        $this->assertSame('foo', $stamp->getHandlerAlias());
+        $this->assertSame('FooHandler::__invoke()', $stamp->getHandlerName());
 
         $stamp = new HandledStamp('some result', 'FooHandler::__invoke()');
 
         $this->assertSame('some result', $stamp->getResult());
-        $this->assertSame('FooHandler::__invoke()', $stamp->getCallableName());
-        $this->assertNull($stamp->getHandlerAlias());
+        $this->assertSame('FooHandler::__invoke()', $stamp->getHandlerName());
     }
 
-    /**
-     * @dataProvider provideCallables
-     */
-    public function testFromCallable(callable $handler, ?string $expectedHandlerString)
+    public function testFromDescriptor()
     {
-        /** @var HandledStamp $stamp */
-        $stamp = HandledStamp::fromCallable($handler, 'some_result', 'alias');
-        $this->assertStringMatchesFormat($expectedHandlerString, $stamp->getCallableName());
-        $this->assertSame('alias', $stamp->getHandlerAlias(), 'alias is forwarded to construct');
+        $stamp = HandledStamp::fromDescriptor(new HandlerDescriptor(new DummyCommandHandler()), 'some_result');
+
+        $this->assertEquals(DummyCommandHandler::class.'::__invoke', $stamp->getHandlerName());
         $this->assertSame('some_result', $stamp->getResult(), 'result is forwarded to construct');
-    }
-
-    public function provideCallables()
-    {
-        yield [function () {}, 'Closure'];
-        yield ['var_dump', 'var_dump'];
-        yield [new DummyCommandHandler(), DummyCommandHandler::class.'::__invoke'];
-        yield [
-            [new DummyCommandHandlerWithSpecificMethod(), 'handle'],
-            DummyCommandHandlerWithSpecificMethod::class.'::handle',
-        ];
-        yield [\Closure::fromCallable(function () {}), 'Closure'];
-        yield [\Closure::fromCallable(new DummyCommandHandler()), DummyCommandHandler::class.'::__invoke'];
-        yield [\Closure::bind(\Closure::fromCallable(function () {}), new \stdClass()), 'Closure'];
-        yield [new class() {
-            public function __invoke()
-            {
-            }
-        }, 'class@anonymous%sHandledStampTest.php%s::__invoke'];
-    }
-}
-
-class DummyCommandHandlerWithSpecificMethod
-{
-    public function handle(): void
-    {
     }
 }

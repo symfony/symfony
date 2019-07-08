@@ -188,6 +188,13 @@ class SplCaster
         return $a;
     }
 
+    public static function castWeakReference(\WeakReference $c, array $a, Stub $stub, $isNested)
+    {
+        $a[Caster::PREFIX_VIRTUAL.'object'] = $c->get();
+
+        return $a;
+    }
+
     private static function castSplArray($c, array $a, Stub $stub, $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;

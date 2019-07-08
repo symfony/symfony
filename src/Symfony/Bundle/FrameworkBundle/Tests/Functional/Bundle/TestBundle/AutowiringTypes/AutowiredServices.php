@@ -13,23 +13,17 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Auto
 
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class AutowiredServices
 {
     private $annotationReader;
-    private $frameworkBundleEngine;
-    private $engine;
     private $dispatcher;
     private $cachePool;
 
-    public function __construct(Reader $annotationReader = null, FrameworkBundleEngineInterface $frameworkBundleEngine, EngineInterface $engine, EventDispatcherInterface $dispatcher, CacheItemPoolInterface $cachePool)
+    public function __construct(Reader $annotationReader = null, EventDispatcherInterface $dispatcher, CacheItemPoolInterface $cachePool)
     {
         $this->annotationReader = $annotationReader;
-        $this->frameworkBundleEngine = $frameworkBundleEngine;
-        $this->engine = $engine;
         $this->dispatcher = $dispatcher;
         $this->cachePool = $cachePool;
     }
@@ -37,16 +31,6 @@ class AutowiredServices
     public function getAnnotationReader()
     {
         return $this->annotationReader;
-    }
-
-    public function getFrameworkBundleEngine()
-    {
-        return $this->frameworkBundleEngine;
-    }
-
-    public function getEngine()
-    {
-        return $this->engine;
     }
 
     public function getDispatcher()

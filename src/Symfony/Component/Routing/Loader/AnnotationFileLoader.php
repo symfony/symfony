@@ -50,7 +50,7 @@ class AnnotationFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */
-    public function load($file, $type = null)
+    public function load($file, string $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -65,7 +65,6 @@ class AnnotationFileLoader extends FileLoader
             $collection->addCollection($this->loader->load($class, $type));
         }
 
-        // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
         gc_mem_caches();
 
         return $collection;
@@ -74,7 +73,7 @@ class AnnotationFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return \is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'annotation' === $type);
     }

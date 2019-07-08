@@ -35,8 +35,8 @@ class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
         $this->assertSame($headers, $exception->getHeaders());
     }
 
-    protected function createException()
+    protected function createException(string $message = null, \Throwable $previous = null, ?int $code = 0, array $headers = [])
     {
-        return new TooManyRequestsHttpException();
+        return new TooManyRequestsHttpException(null, $message, $previous, $code, $headers);
     }
 }

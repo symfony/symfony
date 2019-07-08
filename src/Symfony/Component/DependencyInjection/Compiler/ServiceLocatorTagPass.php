@@ -27,11 +27,18 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 final class ServiceLocatorTagPass extends AbstractRecursivePass
 {
-    protected function processValue($value, $isRoot = false)
+    use PriorityTaggedServiceTrait;
+
+    protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof ServiceLocatorArgument) {
+            if ($value->getTaggedIteratorArgument()) {
+                $value->setValues($this->findAndSortTaggedServices($value->getTaggedIteratorArgument(), $this->container));
+            }
+
             return self::register($this->container, $value->getValues());
         }
+
         if (!$value instanceof Definition || !$value->hasTag('container.service_locator')) {
             return parent::processValue($value, $isRoot);
         }
@@ -80,13 +87,9 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param Reference[]      $refMap
-     * @param string|null      $callerId
-     *
-     * @return Reference
+     * @param Reference[] $refMap
      */
-    public static function register(ContainerBuilder $container, array $refMap, $callerId = null)
+    public static function register(ContainerBuilder $container, array $refMap, string $callerId = null): Reference
     {
         foreach ($refMap as $id => $ref) {
             if (!$ref instanceof Reference) {
@@ -101,7 +104,11 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             ->setPublic(false)
             ->addTag('container.service_locator');
 
-        if (!$container->has($id = '.service_locator.'.ContainerBuilder::hash($locator))) {
+        if (null !== $callerId && $container->hasDefinition($callerId)) {
+            $locator->setBindings($container->getDefinition($callerId)->getBindings());
+        }
+
+        if (!$container->hasDefinition($id = '.service_locator.'.ContainerBuilder::hash($locator))) {
             $container->setDefinition($id, $locator);
         }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -253,18 +254,18 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             'expression' => 'false',
         ]);
 
-        $expressionLanguage = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ExpressionLanguage')->getMock();
+        $expressionLanguage = $this->getMockBuilder(ExpressionLanguage::class)->getMock();
 
         $used = false;
 
         $expressionLanguage->method('evaluate')
-            ->will($this->returnCallback(function () use (&$used) {
+            ->willReturnCallback(function () use (&$used) {
                 $used = true;
 
                 return true;
-            }));
+            });
 
-        $validator = new ExpressionValidator(null, $expressionLanguage);
+        $validator = new ExpressionValidator($expressionLanguage);
         $validator->initialize($this->createContext());
         $validator->validate(null, $constraint);
 

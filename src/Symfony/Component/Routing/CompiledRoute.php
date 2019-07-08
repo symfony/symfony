@@ -49,12 +49,9 @@ class CompiledRoute implements \Serializable
         $this->variables = $variables;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             'vars' => $this->variables,
             'path_prefix' => $this->staticPrefix,
             'path_regex' => $this->regex,
@@ -63,16 +60,19 @@ class CompiledRoute implements \Serializable
             'host_regex' => $this->hostRegex,
             'host_tokens' => $this->hostTokens,
             'host_vars' => $this->hostVariables,
-        ]);
+        ];
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
-    public function unserialize($serialized)
+    final public function serialize(): string
     {
-        $data = unserialize($serialized, ['allowed_classes' => false]);
+        return serialize($this->__serialize());
+    }
 
+    public function __unserialize(array $data): void
+    {
         $this->variables = $data['vars'];
         $this->staticPrefix = $data['path_prefix'];
         $this->regex = $data['path_regex'];
@@ -81,6 +81,14 @@ class CompiledRoute implements \Serializable
         $this->hostRegex = $data['host_regex'];
         $this->hostTokens = $data['host_tokens'];
         $this->hostVariables = $data['host_vars'];
+    }
+
+    /**
+     * @internal
+     */
+    final public function unserialize($serialized)
+    {
+        $this->__unserialize(unserialize($serialized, ['allowed_classes' => false]));
     }
 
     /**

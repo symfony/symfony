@@ -44,7 +44,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         }
     }
 
-    private function processDefinition(ContainerBuilder $container, $id, Definition $definition)
+    private function processDefinition(ContainerBuilder $container, string $id, Definition $definition)
     {
         $instanceofConditionals = $definition->getInstanceofConditionals();
         $autoconfiguredInstanceof = $definition->isAutoconfigured() ? $container->getAutoconfiguredInstanceof() : [];

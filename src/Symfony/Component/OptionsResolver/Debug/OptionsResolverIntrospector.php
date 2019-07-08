@@ -85,6 +85,14 @@ class OptionsResolverIntrospector
      */
     public function getNormalizer(string $option): \Closure
     {
+        return current($this->getNormalizers($option));
+    }
+
+    /**
+     * @throws NoConfigurationException when no normalizer is configured
+     */
+    public function getNormalizers(string $option): array
+    {
         return ($this->get)('normalizers', $option, sprintf('No normalizer was set for the "%s" option.', $option));
     }
 

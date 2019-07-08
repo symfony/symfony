@@ -58,7 +58,7 @@ class AnonymousAuthenticationProviderTest extends TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setMethods(['getSecret'])->disableOriginalConstructor()->getMock();
         $token->expects($this->any())
               ->method('getSecret')
-              ->will($this->returnValue($secret))
+              ->willReturn($secret)
         ;
 
         return $token;

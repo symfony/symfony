@@ -46,15 +46,6 @@ class TranslationExtensionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @dataProvider getTransChoiceTests
-     */
-    public function testTransChoice($template, $expected, array $variables = [])
-    {
-        $this->testTrans($template, $expected, $variables);
-    }
-
-    /**
      * @expectedException        \Twig\Error\SyntaxError
      * @expectedExceptionMessage Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.
      */
@@ -70,16 +61,6 @@ class TranslationExtensionTest extends TestCase
     public function testTransComplexBody()
     {
         $output = $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
-    }
-
-    /**
-     * @group legacy
-     * @expectedException        \Twig\Error\SyntaxError
-     * @expectedExceptionMessage A message inside a transchoice tag must be a simple text in "index" at line 2.
-     */
-    public function testTransChoiceComplexBody()
-    {
-        $output = $this->getTemplate("{% transchoice count %}\n{{ 1 + 2 }}{% endtranschoice %}")->render();
     }
 
     public function getTransTests()
@@ -139,69 +120,6 @@ class TranslationExtensionTest extends TestCase
             ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans(count=count) }}', 'There is 5 apples', ['count' => 5]],
             ['{{ text|trans(count=5, arguments={\'%name%\': \'Symfony\'}) }}', 'There is 5 apples (Symfony)', ['text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)']],
             ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans({}, "messages", "fr", count) }}', 'There is 5 apples', ['count' => 5]],
-        ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function getTransChoiceTests()
-    {
-        return [
-            // trans tag
-            ['{% trans %}Hello{% endtrans %}', 'Hello'],
-            ['{% trans %}%name%{% endtrans %}', 'Symfony', ['name' => 'Symfony']],
-
-            ['{% trans from elsewhere %}Hello{% endtrans %}', 'Hello'],
-
-            ['{% trans %}Hello %name%{% endtrans %}', 'Hello Symfony', ['name' => 'Symfony']],
-            ['{% trans with { \'%name%\': \'Symfony\' } %}Hello %name%{% endtrans %}', 'Hello Symfony'],
-            ['{% set vars = { \'%name%\': \'Symfony\' } %}{% trans with vars %}Hello %name%{% endtrans %}', 'Hello Symfony'],
-
-            ['{% trans into "fr"%}Hello{% endtrans %}', 'Hello'],
-
-            // transchoice
-            [
-                '{% transchoice count from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is no apples',
-                ['count' => 0],
-            ],
-            [
-                '{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is 5 apples',
-                ['count' => 5],
-            ],
-            [
-                '{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony)',
-                ['count' => 5, 'name' => 'Symfony'],
-            ],
-            [
-                '{% transchoice count with { \'%name%\': \'Symfony\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony)',
-                ['count' => 5],
-            ],
-            [
-                '{% transchoice count into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is no apples',
-                ['count' => 0],
-            ],
-            [
-                '{% transchoice 5 into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is 5 apples',
-            ],
-
-            // trans filter
-            ['{{ "Hello"|trans }}', 'Hello'],
-            ['{{ name|trans }}', 'Symfony', ['name' => 'Symfony']],
-            ['{{ hello|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
-            ['{% set vars = { \'%name%\': \'Symfony\' } %}{{ hello|trans(vars) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
-            ['{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'],
-
-            // transchoice filter
-            ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|transchoice(count) }}', 'There is 5 apples', ['count' => 5]],
-            ['{{ text|transchoice(5, {\'%name%\': \'Symfony\'}) }}', 'There is 5 apples (Symfony)', ['text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)']],
-            ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|transchoice(count, {}, "messages", "fr") }}', 'There is 5 apples', ['count' => 5]],
         ];
     }
 

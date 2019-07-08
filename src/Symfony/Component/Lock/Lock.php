@@ -66,7 +66,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function acquire($blocking = false)
+    public function acquire($blocking = false): ?bool
     {
         try {
             if ($blocking) {
@@ -83,6 +83,11 @@ final class Lock implements LockInterface, LoggerAwareInterface
             }
 
             if ($this->key->isExpired()) {
+                try {
+                    $this->release();
+                } catch (\Exception $e) {
+                    // swallow exception to not hide the original issue
+                }
                 throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $this->key));
             }
 
@@ -120,6 +125,11 @@ final class Lock implements LockInterface, LoggerAwareInterface
             $this->dirty = true;
 
             if ($this->key->isExpired()) {
+                try {
+                    $this->release();
+                } catch (\Exception $e) {
+                    // swallow exception to not hide the original issue
+                }
                 throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $this->key));
             }
 
@@ -169,7 +179,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return $this->key->isExpired();
     }

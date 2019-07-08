@@ -390,6 +390,11 @@ class Parser
                         if (0 === $this->offset && !$deprecatedUsage && isset($line[0]) && ' ' === $line[0]) {
                             throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
                         }
+
+                        if (false !== strpos($line, ': ')) {
+                            throw new ParseException('Mapping values are not allowed in multi-line blocks.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                        }
+
                         if ('' === trim($line)) {
                             $value .= "\n";
                         } elseif (!$previousLineWasNewline && !$previousLineWasTerminatedWithBackslash) {

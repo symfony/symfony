@@ -42,7 +42,9 @@ class NullAdapter implements AdapterInterface, CacheInterface
      */
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
-        return $callback(($this->createCacheItem)($key));
+        $save = true;
+
+        return $callback(($this->createCacheItem)($key), $save);
     }
 
     /**

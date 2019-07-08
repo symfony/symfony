@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel;
 
 class TranslationDebugCommandTest extends TestCase
 {
@@ -65,23 +64,6 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/unused/', $tester->getDisplay());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Storing translations in the "%ssf_translation%s/Resources/translations" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/translations" directory instead.
-     * @expectedDeprecation Loading Twig templates from the "%ssf_translation%s/Resources/views" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/templates" directory instead.
-     */
-    public function testDebugLegacyDefaultDirectory()
-    {
-        $this->fs->mkdir($this->translationDir.'/Resources/translations');
-        $this->fs->mkdir($this->translationDir.'/Resources/views');
-
-        $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
-        $tester->execute(['locale' => 'en']);
-
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
-    }
-
     public function testDebugDefaultRootDirectory()
     {
         $this->fs->remove($this->translationDir);
@@ -90,7 +72,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/translations');
         $this->fs->mkdir($this->translationDir.'/templates');
 
-        $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
+        $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar'], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
         $tester->execute(['locale' => 'en']);
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
@@ -145,7 +127,7 @@ class TranslationDebugCommandTest extends TestCase
     /**
      * @return CommandTester
      */
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null)
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null, array $transPaths = [], array $viewsPaths = [])
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
@@ -154,26 +136,26 @@ class TranslationDebugCommandTest extends TestCase
         $translator
             ->expects($this->any())
             ->method('getFallbackLocales')
-            ->will($this->returnValue(['en']));
+            ->willReturn(['en']);
 
         $extractor = $this->getMockBuilder('Symfony\Component\Translation\Extractor\ExtractorInterface')->getMock();
         $extractor
             ->expects($this->any())
             ->method('extract')
-            ->will(
-                $this->returnCallback(function ($path, $catalogue) use ($extractedMessages) {
+            ->willReturnCallback(
+                function ($path, $catalogue) use ($extractedMessages) {
                     $catalogue->add($extractedMessages);
-                })
+                }
             );
 
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Reader\TranslationReader')->getMock();
         $loader
             ->expects($this->any())
             ->method('read')
-            ->will(
-                $this->returnCallback(function ($path, $catalogue) use ($loadedMessages) {
+            ->willReturnCallback(
+                function ($path, $catalogue) use ($loadedMessages) {
                     $catalogue->add($loadedMessages);
-                })
+                }
             );
 
         if (null === $kernel) {
@@ -181,23 +163,17 @@ class TranslationDebugCommandTest extends TestCase
                 ['foo', $this->getBundle($this->translationDir)],
                 ['test', $this->getBundle('test')],
             ];
-            if (HttpKernel\Kernel::VERSION_ID < 40000) {
-                $returnValues = [
-                    ['foo', true, $this->getBundle($this->translationDir)],
-                    ['test', true, $this->getBundle('test')],
-                ];
-            }
             $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
             $kernel
                 ->expects($this->any())
                 ->method('getBundle')
-                ->will($this->returnValueMap($returnValues));
+                ->willReturnMap($returnValues);
         }
 
         $kernel
             ->expects($this->any())
             ->method('getBundles')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $container = new Container();
         $container->setParameter('kernel.root_dir', $this->translationDir);
@@ -205,9 +181,9 @@ class TranslationDebugCommandTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getContainer')
-            ->will($this->returnValue($container));
+            ->willReturn($container);
 
-        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates');
+        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $viewsPaths);
 
         $application = new Application($kernel);
         $application->add($command);
@@ -221,7 +197,7 @@ class TranslationDebugCommandTest extends TestCase
         $bundle
             ->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue($path))
+            ->willReturn($path)
         ;
 
         return $bundle;

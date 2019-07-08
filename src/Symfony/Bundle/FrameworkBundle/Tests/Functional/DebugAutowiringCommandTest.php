@@ -72,4 +72,29 @@ class DebugAutowiringCommandTest extends WebTestCase
         $this->assertContains('No autowirable classes or interfaces found matching "foo_fake"', $tester->getErrorOutput());
         $this->assertEquals(1, $tester->getStatusCode());
     }
+
+    public function testSearchNotAliasedService()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:autowiring', 'search' => 'redirect']);
+
+        $this->assertContains(' more concrete service would be displayed when adding the "--all" option.', $tester->getDisplay());
+    }
+
+    public function testSearchNotAliasedServiceWithAll()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:autowiring', 'search' => 'redirect', '--all' => true]);
+        $this->assertContains('Pro-tip: use interfaces in your type-hints instead of classes to benefit from the dependency inversion principle.', $tester->getDisplay());
+    }
 }

@@ -11,13 +11,13 @@ Design Principles
 
  * contracts are split by domain, each into their own sub-namespaces;
  * contracts are small and consistent sets of PHP interfaces, traits, normative
-   docblocks and reference test suites when applicable, etc.;
+   docblocks and reference test suites when applicable, ...;
  * all contracts must have a proven implementation to enter this repository;
  * they must be backward compatible with existing Symfony components.
 
 Packages that implement specific contracts should list them in the "provide"
-section of their "composer.json" file, using the `symfony/*-contracts-implementation`
-convention (e.g. `"provide": { "symfony/cache-contracts-implementation": "1.0" }`).
+section of their "composer.json" file, using the `symfony/*-implementation`
+convention (e.g. `"provide": { "symfony/cache-implementation": "1.0" }`).
 
 FAQ
 ---
@@ -43,22 +43,6 @@ the group has different goals and different processes. Here, we're focusing on
 providing abstractions that are useful on their own while still compatible with
 implementations provided by Symfony. Although not the main target, we hope that
 the declared contracts will directly or indirectly contribute to the PHP-FIG.
-
-### Why isn't this package split into several packages?
-
-Putting all interfaces in one package eases discoverability and dependency
-management. Instead of dealing with a myriad of small packages and the
-corresponding matrix of versions, you just need to deal with one package and one
-version. Also when using IDE autocompletion or just reading the source code, it
-makes it easier to figure out which contracts are provided.
-
-There are two downsides to this approach: you may have unused files in your
-`vendor/` directory, and in the future, it will be impossible to use two
-different sub-namespaces in different major versions of the package. For the
-"unused files" downside, it has no practical consequences: their file sizes are
-very small, and there is no performance overhead at all since they are never
-loaded. For major versions, this package follows the Symfony BC + deprecation
-policies, with an additional restriction to never remove deprecated interfaces.
 
 Resources
 ---------

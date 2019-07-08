@@ -83,30 +83,4 @@ class ExpressionLanguageTest extends TestCase
             [$usernamePasswordToken, "is_granted('ROLE_USER')", true],
         ];
     }
-
-    /**
-     * @dataProvider provideLegacyHasRole
-     * @group legacy
-     */
-    public function testLegacyHasRole($expression, $result, $roles = [])
-    {
-        $expressionLanguage = new ExpressionLanguage();
-        $context = ['roles' => $roles];
-
-        $this->assertEquals($result, $expressionLanguage->evaluate($expression, $context));
-    }
-
-    public function provideLegacyHasRole()
-    {
-        $roles = ['ROLE_USER', 'ROLE_ADMIN'];
-
-        return [
-            ["has_role('ROLE_FOO')", false],
-            ["has_role('ROLE_USER')", false],
-            ["has_role('ROLE_ADMIN')", false],
-            ["has_role('ROLE_FOO')", false, $roles],
-            ["has_role('ROLE_USER')", true, $roles],
-            ["has_role('ROLE_ADMIN')", true, $roles],
-        ];
-    }
 }

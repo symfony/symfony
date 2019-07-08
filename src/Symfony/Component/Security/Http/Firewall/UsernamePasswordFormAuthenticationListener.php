@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -28,6 +27,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * UsernamePasswordFormAuthenticationListener is the default implementation of
@@ -85,7 +85,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             $password = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']);
         }
 
-        if (!\is_string($username) && (!\is_object($username) || !\method_exists($username, '__toString'))) {
+        if (!\is_string($username) && (!\is_object($username) || !method_exists($username, '__toString'))) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], \gettype($username)));
         }
 

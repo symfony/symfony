@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger\Handler;
  * Handlers can implement this interface to handle multiple messages.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.2
  */
 interface MessageSubscriberInterface extends MessageHandlerInterface
 {
@@ -32,13 +30,14 @@ interface MessageSubscriberInterface extends MessageHandlerInterface
      *     yield FirstMessage::class => ['priority' => 0];
      *     yield SecondMessage::class => ['priority => -10];
      *
-     * It can also specify a method, a priority and/or a bus per message:
+     * It can also specify a method, a priority, a bus and/or a transport per message:
      *
      *     yield FirstMessage::class => ['method' => 'firstMessageMethod'];
      *     yield SecondMessage::class => [
      *         'method' => 'secondMessageMethod',
      *         'priority' => 20,
      *         'bus' => 'my_bus_name',
+     *         'from_transport' => 'your_transport_name',
      *     ];
      *
      * The benefit of using `yield` instead of returning an array is that you can `yield` multiple times the

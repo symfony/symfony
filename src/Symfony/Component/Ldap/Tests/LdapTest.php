@@ -42,7 +42,7 @@ class LdapTest extends TestCase
         $this->adapter
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
+            ->willReturn($connection)
         ;
         $this->ldap->bind('foo', 'bar');
     }
@@ -52,9 +52,9 @@ class LdapTest extends TestCase
         $this->adapter
             ->expects($this->once())
             ->method('escape')
-            ->with('foo', 'bar', 'baz')
+            ->with('foo', 'bar', 0)
         ;
-        $this->ldap->escape('foo', 'bar', 'baz');
+        $this->ldap->escape('foo', 'bar', 0);
     }
 
     public function testLdapQuery()
@@ -78,7 +78,7 @@ class LdapTest extends TestCase
 
     public function testCreateWithInvalidAdapterName()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(DriverNotFoundException::class);
+        $this->expectException(DriverNotFoundException::class);
         Ldap::create('foo');
     }
 }

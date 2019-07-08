@@ -16,9 +16,9 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
-        "symfony/cache": "~3.4|~4.0",
-        "symfony/contracts": "^1.0"
+        "php": "^7.2.9",
+        "symfony/cache": "^4.4|^5.0",
+        "symfony/service-contracts": "^1.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ExpressionLanguage\\": "" },
@@ -29,7 +29,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     }
 }

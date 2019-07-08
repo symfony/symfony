@@ -53,24 +53,6 @@ class TwigNodeProvider
         );
     }
 
-    public static function getTransChoiceFilter($message, $domain = null, $arguments = null)
-    {
-        if (!$arguments) {
-            $arguments = $domain ? [
-                new ConstantExpression(0, 0),
-                new ArrayExpression([], 0),
-                new ConstantExpression($domain, 0),
-            ] : [];
-        }
-
-        return new FilterExpression(
-            new ConstantExpression($message, 0),
-            new ConstantExpression('transchoice', 0),
-            new Node($arguments),
-            0
-        );
-    }
-
     public static function getTransTag($message, $domain = null)
     {
         return new TransNode(

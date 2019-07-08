@@ -36,7 +36,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
-        if (!\class_exists(PropertyAccess::class)) {
+        if (!class_exists(PropertyAccess::class)) {
             throw new LogicException('The ObjectNormalizer class requires the "PropertyAccess" component. Install "symfony/property-access" to use it.');
         }
 
@@ -60,7 +60,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes($object, string $format = null, array $context = [])
     {
         // If not using groups, detect manually
         $attributes = [];
@@ -118,7 +118,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
+    protected function getAttributeValue($object, $attribute, string $format = null, array $context = [])
     {
         $cacheKey = \get_class($object);
         if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {

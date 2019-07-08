@@ -61,7 +61,7 @@ class CollectionTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
         ]);
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $form->setData(new \stdClass());
     }
 

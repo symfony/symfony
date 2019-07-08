@@ -1,0 +1,52 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Messenger\Exception;
+
+use Symfony\Component\Messenger\Envelope;
+
+class HandlerFailedException extends RuntimeException
+{
+    private $exceptions;
+    private $envelope;
+
+    /**
+     * @param \Throwable[] $exceptions
+     */
+    public function __construct(Envelope $envelope, array $exceptions)
+    {
+        $firstFailure = current($exceptions);
+
+        parent::__construct(
+            1 === \count($exceptions)
+                ? $firstFailure->getMessage()
+                : sprintf('%d handlers failed. First failure is: "%s"', \count($exceptions), $firstFailure->getMessage()),
+            $firstFailure->getCode(),
+            $firstFailure
+        );
+
+        $this->envelope = $envelope;
+        $this->exceptions = $exceptions;
+    }
+
+    public function getEnvelope(): Envelope
+    {
+        return $this->envelope;
+    }
+
+    /**
+     * @return \Throwable[]
+     */
+    public function getNestedExceptions(): array
+    {
+        return $this->exceptions;
+    }
+}

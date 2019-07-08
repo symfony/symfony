@@ -399,6 +399,32 @@ class RequestTest extends TestCase
         $this->assertEquals('xml', $dup->getRequestFormat());
     }
 
+    public function testGetPreferredFormat()
+    {
+        $request = new Request();
+        $this->assertNull($request->getPreferredFormat(null));
+        $this->assertSame('html', $request->getPreferredFormat());
+        $this->assertSame('json', $request->getPreferredFormat('json'));
+
+        $request->setRequestFormat('atom');
+        $request->headers->set('Accept', 'application/ld+json');
+        $request->headers->set('Content-Type', 'application/merge-patch+json');
+        $this->assertSame('atom', $request->getPreferredFormat());
+
+        $request = new Request();
+        $request->headers->set('Accept', 'application/xml');
+        $request->headers->set('Content-Type', 'application/json');
+        $this->assertSame('xml', $request->getPreferredFormat());
+
+        $request = new Request();
+        $request->headers->set('Accept', 'application/xml');
+        $this->assertSame('xml', $request->getPreferredFormat());
+
+        $request = new Request();
+        $request->headers->set('Accept', 'application/json;q=0.8,application/xml;q=0.9');
+        $this->assertSame('xml', $request->getPreferredFormat());
+    }
+
     /**
      * @dataProvider getFormatToMimeTypeMapProviderWithAdditionalNullFormat
      */
@@ -1603,15 +1629,6 @@ class RequestTest extends TestCase
         $this->assertObjectHasAttribute('attributeName', $session);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling "Symfony\Component\HttpFoundation\Request::getSession()" when no session has been set is deprecated since Symfony 4.1 and will throw an exception in 5.0. Use "hasSession()" instead.
-     */
-    public function testGetSessionNullable()
-    {
-        (new Request())->getSession();
-    }
-
     public function testHasPreviousSession()
     {
         $request = new Request();
@@ -2115,7 +2132,7 @@ class RequestTest extends TestCase
     {
         $request = new Request();
         $request->setMethod($method);
-        $this->assertEquals($safe, $request->isMethodSafe(false));
+        $this->assertEquals($safe, $request->isMethodSafe());
     }
 
     public function methodSafeProvider()
@@ -2132,16 +2149,6 @@ class RequestTest extends TestCase
             ['TRACE', true],
             ['CONNECT', false],
         ];
-    }
-
-    /**
-     * @expectedException \BadMethodCallException
-     */
-    public function testMethodSafeChecksCacheable()
-    {
-        $request = new Request();
-        $request->setMethod('OPTIONS');
-        $request->isMethodSafe();
     }
 
     /**

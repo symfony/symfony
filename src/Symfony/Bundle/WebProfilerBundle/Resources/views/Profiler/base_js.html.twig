@@ -136,6 +136,10 @@
             var row = document.createElement('tr');
             request.DOMNode = row;
 
+            var requestNumberCell = document.createElement('td');
+            requestNumberCell.textContent = index + 1;
+            row.appendChild(requestNumberCell);
+
             var profilerCell = document.createElement('td');
             profilerCell.textContent = 'n/a';
             row.appendChild(profilerCell);
@@ -208,11 +212,11 @@
             pendingRequests--;
             var row = request.DOMNode;
             /* Unpack the children from the row */
-            var profilerCell = row.children[0];
-            var methodCell = row.children[1];
-            var statusCodeCell = row.children[3];
+            var profilerCell = row.children[1];
+            var methodCell = row.children[2];
+            var statusCodeCell = row.children[4];
             var statusCodeElem = statusCodeCell.children[0];
-            var durationCell = row.children[5];
+            var durationCell = row.children[6];
 
             if (request.error) {
                 row.className = 'sf-ajax-request sf-ajax-request-error';
@@ -552,7 +556,7 @@
 
                 /* create the tab navigation for each group of tabs */
                 for (var i = 0; i < tabGroups.length; i++) {
-                    var tabs = tabGroups[i].querySelectorAll('.tab');
+                    var tabs = tabGroups[i].querySelectorAll(':scope > .tab');
                     var tabNavigation = document.createElement('ul');
                     tabNavigation.className = 'tab-navigation';
 
@@ -578,7 +582,7 @@
 
                 /* display the active tab and add the 'click' event listeners */
                 for (i = 0; i < tabGroups.length; i++) {
-                    tabNavigation = tabGroups[i].querySelectorAll('.tab-navigation li');
+                    tabNavigation = tabGroups[i].querySelectorAll(':scope > .tab-navigation li');
 
                     for (j = 0; j < tabNavigation.length; j++) {
                         tabId = tabNavigation[j].getAttribute('data-tab-id');

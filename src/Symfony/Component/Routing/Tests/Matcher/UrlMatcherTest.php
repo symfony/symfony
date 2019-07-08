@@ -187,6 +187,26 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => '$péß^a|'], $matcher->match('/bar'));
     }
 
+    public function testMatchImportantVariable()
+    {
+        $collection = new RouteCollection();
+        $collection->add('index', new Route('/index.{!_format}', ['_format' => 'xml']));
+
+        $matcher = $this->getUrlMatcher($collection);
+        $this->assertEquals(['_route' => 'index', '_format' => 'xml'], $matcher->match('/index.xml'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testShortPathDoesNotMatchImportantVariable()
+    {
+        $collection = new RouteCollection();
+        $collection->add('index', new Route('/index.{!_format}', ['_format' => 'xml']));
+
+        $this->getUrlMatcher($collection)->match('/index');
+    }
+
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
@@ -232,7 +252,7 @@ class UrlMatcherTest extends TestCase
         $matcher = $this->getUrlMatcher($collection);
 
         $this->assertEquals(['_route' => 'foo'], $matcher->match('/foo1'));
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $this->assertEquals([], $matcher->match('/foo'));
     }
 
@@ -301,7 +321,7 @@ class UrlMatcherTest extends TestCase
         // z and _format are optional.
         $this->assertEquals(['w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'default-z', '_format' => 'html', '_route' => 'test'], $matcher->match('/wwwwwxy'));
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $matcher->match('/wxy.html');
     }
 
@@ -316,7 +336,7 @@ class UrlMatcherTest extends TestCase
 
         // Usually the character in front of an optional parameter can be left out, e.g. with pattern '/get/{what}' just '/get' would match.
         // But here the 't' in 'get' is not a separating character, so it makes no sense to match without it.
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $matcher->match('/ge');
     }
 
@@ -727,6 +747,7 @@ class UrlMatcherTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedExceptionMessage No routes found for "/".
      */
     public function testSchemeAndMethodMismatch()
     {

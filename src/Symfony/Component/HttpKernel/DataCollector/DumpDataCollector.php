@@ -25,6 +25,8 @@ use Symfony\Component\VarDumper\Server\Connection;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final
  */
 class DumpDataCollector extends DataCollector implements DataDumperInterface
 {
@@ -85,6 +87,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             $this->isCollected = false;
         }
 
+        if (!$this->dataCount) {
+            $this->data = [];
+        }
         $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
         ++$this->dataCount;
 
@@ -95,6 +100,10 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        if (!$this->dataCount) {
+            $this->data = [];
+        }
+
         // Sub-requests and programmatic calls stay in the collected profile.
         if ($this->dumper || ($this->requestStack && $this->requestStack->getMasterRequest() !== $request) || $request->isXmlHttpRequest() || $request->headers->has('Origin')) {
             return;
@@ -113,6 +122,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {
                 $dumper = new CliDumper('php://output', $this->charset);
+                if (method_exists($dumper, 'setDisplayOptions')) {
+                    $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
+                }
             }
 
             foreach ($this->data as $dump) {
@@ -133,37 +145,47 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->clonesIndex = 0;
     }
 
-    public function serialize()
+    /**
+     * @internal
+     */
+    public function __sleep(): array
     {
+        if (!$this->dataCount) {
+            $this->data = [];
+        }
+
         if ($this->clonesCount !== $this->clonesIndex) {
-            return 'a:0:{}';
+            return [];
         }
 
         $this->data[] = $this->fileLinkFormat;
         $this->data[] = $this->charset;
-        $ser = serialize($this->data);
-        $this->data = [];
         $this->dataCount = 0;
         $this->isCollected = true;
 
-        return $ser;
+        return parent::__sleep();
     }
 
-    public function unserialize($data)
+    /**
+     * @internal
+     */
+    public function __wakeup()
     {
-        $this->data = unserialize($data);
+        parent::__wakeup();
+
         $charset = array_pop($this->data);
         $fileLinkFormat = array_pop($this->data);
         $this->dataCount = \count($this->data);
+
         self::__construct($this->stopwatch, $fileLinkFormat, $charset);
     }
 
-    public function getDumpsCount()
+    public function getDumpsCount(): int
     {
         return $this->dataCount;
     }
 
-    public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1)
+    public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1): array
     {
         $data = fopen('php://memory', 'r+b');
 
@@ -174,6 +196,10 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             throw new \InvalidArgumentException(sprintf('Invalid dump format: %s', $format));
         }
         $dumps = [];
+
+        if (!$this->dataCount) {
+            return $this->data = [];
+        }
 
         foreach ($this->data as $dump) {
             $dumper->dump($dump['data']->withMaxDepth($maxDepthLimit)->withMaxItemsPerDepth($maxItemsPerDepth));
@@ -186,14 +212,14 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         return $dumps;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'dump';
     }
 
     public function __destruct()
     {
-        if (0 === $this->clonesCount-- && !$this->isCollected && $this->data) {
+        if (0 === $this->clonesCount-- && !$this->isCollected && $this->dataCount) {
             $this->clonesCount = 0;
             $this->isCollected = true;
 
@@ -215,6 +241,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {
                 $dumper = new CliDumper('php://output', $this->charset);
+                if (method_exists($dumper, 'setDisplayOptions')) {
+                    $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
+                }
             }
 
             foreach ($this->data as $i => $dump) {

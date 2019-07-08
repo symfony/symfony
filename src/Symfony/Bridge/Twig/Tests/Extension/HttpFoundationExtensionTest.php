@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\Routing\RequestContext;
 
 class HttpFoundationExtensionTest extends TestCase
@@ -26,7 +27,7 @@ class HttpFoundationExtensionTest extends TestCase
     {
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
-        $extension = new HttpFoundationExtension($stack);
+        $extension = new HttpFoundationExtension(new UrlHelper($stack));
 
         $this->assertEquals($expected, $extension->generateAbsoluteUrl($path));
     }
@@ -64,7 +65,7 @@ class HttpFoundationExtensionTest extends TestCase
         }
 
         $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
-        $extension = new HttpFoundationExtension(new RequestStack(), $requestContext);
+        $extension = new HttpFoundationExtension(new UrlHelper(new RequestStack(), $requestContext));
 
         $this->assertEquals($expected, $extension->generateAbsoluteUrl($path));
     }
@@ -78,7 +79,7 @@ class HttpFoundationExtensionTest extends TestCase
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
         }
 
-        $extension = new HttpFoundationExtension(new RequestStack());
+        $extension = new HttpFoundationExtension(new UrlHelper(new RequestStack()));
 
         $this->assertEquals($path, $extension->generateAbsoluteUrl($path));
     }
@@ -104,7 +105,7 @@ class HttpFoundationExtensionTest extends TestCase
 
         $stack = new RequestStack();
         $stack->push($request);
-        $extension = new HttpFoundationExtension($stack);
+        $extension = new HttpFoundationExtension(new UrlHelper($stack));
 
         $this->assertEquals(
             'http://localhost/app/web/bundles/framework/css/structure.css',
@@ -123,7 +124,7 @@ class HttpFoundationExtensionTest extends TestCase
 
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
-        $extension = new HttpFoundationExtension($stack);
+        $extension = new HttpFoundationExtension(new UrlHelper($stack));
 
         $this->assertEquals($expected, $extension->generateRelativePath($path));
     }

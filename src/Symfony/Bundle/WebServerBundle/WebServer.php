@@ -25,6 +25,13 @@ class WebServer
     const STARTED = 0;
     const STOPPED = 1;
 
+    private $pidFileDirectory;
+
+    public function __construct(string $pidFileDirectory = null)
+    {
+        $this->pidFileDirectory = $pidFileDirectory;
+    }
+
     public function run(WebServerConfig $config, $disableOutput = true, callable $callback = null)
     {
         if ($this->isRunning()) {
@@ -166,6 +173,6 @@ class WebServer
 
     private function getDefaultPidFile()
     {
-        return getcwd().'/.web-server-pid';
+        return ($this->pidFileDirectory ?? getcwd()).'/.web-server-pid';
     }
 }

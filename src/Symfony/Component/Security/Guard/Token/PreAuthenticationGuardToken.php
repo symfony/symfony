@@ -58,7 +58,7 @@ class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInt
         return $this->credentials;
     }
 
-    public function setAuthenticated($authenticated)
+    public function setAuthenticated(bool $authenticated)
     {
         throw new \LogicException('The PreAuthenticationGuardToken is *never* authenticated.');
     }

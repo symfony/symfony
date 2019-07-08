@@ -38,11 +38,11 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
         $manager->expects($this->any())
             ->method('getManager')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $manager->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         return [
             new CoreExtension(),

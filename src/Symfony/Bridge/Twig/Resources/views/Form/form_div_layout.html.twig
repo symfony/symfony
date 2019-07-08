@@ -170,7 +170,7 @@
 {%- endblock dateinterval_widget -%}
 
 {%- block number_widget -%}
-    {# type="number" doesn't work with floats #}
+    {# type="number" doesn't work with floats in localized formats #}
     {%- set type = type|default('text') -%}
     {{ block('form_widget_simple') }}
 {%- endblock number_widget -%}
@@ -196,7 +196,7 @@
 
 {%- block percent_widget -%}
     {%- set type = type|default('text') -%}
-    {{ block('form_widget_simple') }} %
+    {{ block('form_widget_simple') }}{% if symbol %} {{ symbol|default('%') }}{% endif %}
 {%- endblock percent_widget -%}
 
 {%- block password_widget -%}
@@ -232,7 +232,7 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) }}</button>
 {%- endblock button_widget -%}
 
 {%- block submit_widget -%}
@@ -279,7 +279,7 @@
             {%- if translation_domain is same as(false) -%}
                 {{- label -}}
             {%- else -%}
-                {{- label|trans({}, translation_domain) -}}
+                {{- label|trans(label_translation_parameters, translation_domain) -}}
             {%- endif -%}
         </{{ element|default('label') }}>
     {%- endif -%}
@@ -294,9 +294,17 @@
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
         <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if translation_domain is same as(false) -%}
-                {{- help -}}
+                {%- if help_html is same as(false) -%}
+                    {{- help -}}
+                {%- else -%}
+                    {{- help|raw -}}
+                {%- endif -%}
             {%- else -%}
-                {{- help|trans({}, translation_domain) -}}
+                {%- if help_html is same as(false) -%}
+                    {{- help|trans(help_translation_parameters, translation_domain) -}}
+                {%- else -%}
+                    {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
+                {%- endif -%}
             {%- endif -%}
         </p>
     {%- endif -%}
@@ -317,7 +325,7 @@
     {%- if help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
-    <div>
+    <div {% with {attr: row_attr|default({})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}
         {{- form_errors(form) -}}
         {{- form_widget(form, widget_attr) -}}
@@ -326,7 +334,7 @@
 {%- endblock form_row -%}
 
 {%- block button_row -%}
-    <div>
+    <div {% with {attr: row_attr|default({})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_widget(form) -}}
     </div>
 {%- endblock button_row -%}
@@ -399,7 +407,7 @@
 {# Support #}
 
 {%- block form_rows -%}
-    {% for child in form if not child.rendered %}
+    {% for child in form|filter(child => not child.rendered) %}
         {{- form_row(child) -}}
     {% endfor %}
 {%- endblock form_rows -%}
@@ -425,7 +433,7 @@
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans({}, translation_domain) }}"
+            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) }}"
         {%- elseif attrvalue is same as(true) -%}
             {{- attrname }}="{{ attrname }}"
         {%- elseif attrvalue is not same as(false) -%}

@@ -24,7 +24,7 @@ class DefinitionBuilder
 {
     private $places = [];
     private $transitions = [];
-    private $initialPlace;
+    private $initialPlaces;
     private $metadataStore;
 
     /**
@@ -42,7 +42,7 @@ class DefinitionBuilder
      */
     public function build()
     {
-        return new Definition($this->places, $this->transitions, $this->initialPlace, $this->metadataStore);
+        return new Definition($this->places, $this->transitions, $this->initialPlaces, $this->metadataStore);
     }
 
     /**
@@ -54,33 +54,31 @@ class DefinitionBuilder
     {
         $this->places = [];
         $this->transitions = [];
-        $this->initialPlace = null;
+        $this->initialPlaces = null;
         $this->metadataStore = null;
 
         return $this;
     }
 
     /**
-     * @param string $place
+     * @param string|string[]|null $initialPlaces
      *
      * @return $this
      */
-    public function setInitialPlace($place)
+    public function setInitialPlaces($initialPlaces)
     {
-        $this->initialPlace = $place;
+        $this->initialPlaces = $initialPlaces;
 
         return $this;
     }
 
     /**
-     * @param string $place
-     *
      * @return $this
      */
-    public function addPlace($place)
+    public function addPlace(string $place)
     {
         if (!$this->places) {
-            $this->initialPlace = $place;
+            $this->initialPlaces = $place;
         }
 
         $this->places[$place] = $place;
@@ -134,17 +132,5 @@ class DefinitionBuilder
         $this->metadataStore = $metadataStore;
 
         return $this;
-    }
-
-    /**
-     * @deprecated since Symfony 4.1, use the clear() method instead.
-     *
-     * @return $this
-     */
-    public function reset()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "clear()" method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->clear();
     }
 }

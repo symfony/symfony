@@ -20,8 +20,10 @@ use Symfony\Component\Finder\Glob;
  * Only existence/removal is tracked (not mtimes.)
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final
  */
-class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface, \Serializable
+class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 {
     private $prefix;
     private $pattern;
@@ -37,7 +39,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(?string $prefix, string $pattern, bool $recursive, bool $forExclusion = false, array $excludedPrefixes = [])
+    public function __construct(string $prefix, string $pattern, bool $recursive, bool $forExclusion = false, array $excludedPrefixes = [])
     {
         $this->prefix = realpath($prefix) ?: (file_exists($prefix) ? $prefix : false);
         $this->pattern = $pattern;
@@ -50,7 +52,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
         }
     }
 
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return $this->prefix;
     }
@@ -58,7 +60,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'glob.'.$this->prefix.$this->pattern.(int) $this->recursive;
     }
@@ -66,7 +68,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp): bool
     {
         $hash = $this->computeHash();
 
@@ -80,24 +82,16 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
     /**
      * @internal
      */
-    public function serialize()
+    public function __sleep(): array
     {
         if (null === $this->hash) {
             $this->hash = $this->computeHash();
         }
 
-        return serialize([$this->prefix, $this->pattern, $this->recursive, $this->hash, $this->forExclusion, $this->excludedPrefixes]);
+        return ['prefix', 'pattern', 'recursive', 'hash', 'forExclusion', 'excludedPrefixes'];
     }
 
-    /**
-     * @internal
-     */
-    public function unserialize($serialized)
-    {
-        list($this->prefix, $this->pattern, $this->recursive, $this->hash, $this->forExclusion, $this->excludedPrefixes) = unserialize($serialized) + [4 => false, []];
-    }
-
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         if (!file_exists($this->prefix) || (!$this->recursive && '' === $this->pattern)) {
             return;
@@ -177,7 +171,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
         }
     }
 
-    private function computeHash()
+    private function computeHash(): string
     {
         $hash = hash_init('md5');
 

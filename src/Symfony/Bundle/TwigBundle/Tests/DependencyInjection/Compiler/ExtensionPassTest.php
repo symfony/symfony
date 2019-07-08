@@ -24,7 +24,6 @@ class ExtensionPassTest extends TestCase
         $container->setParameter('kernel.debug', false);
 
         $container->register('twig.app_variable', '\Symfony\Bridge\Twig\AppVariable');
-        $container->register('templating', '\Symfony\Bundle\TwigBundle\TwigEngine');
         $container->register('twig.extension.yaml');
         $container->register('twig.extension.debug.stopwatch');
         $container->register('twig.extension.expression');
@@ -33,14 +32,9 @@ class ExtensionPassTest extends TestCase
         $nativeTwigLoader->addMethodCall('addPath', []);
         $container->setDefinition('twig.loader.native_filesystem', $nativeTwigLoader);
 
-        $filesystemLoader = new Definition('\Symfony\Bundle\TwigBundle\Loader\FilesystemLoader');
-        $filesystemLoader->setArguments([null, null, null]);
-        $filesystemLoader->addMethodCall('addPath', []);
-        $container->setDefinition('twig.loader.filesystem', $filesystemLoader);
-
         $extensionPass = new ExtensionPass();
         $extensionPass->process($container);
 
-        $this->assertCount(2, $filesystemLoader->getMethodCalls());
+        $this->assertCount(1, $nativeTwigLoader->getMethodCalls());
     }
 }

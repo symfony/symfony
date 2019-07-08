@@ -75,13 +75,11 @@ class ApplicationDescription
     }
 
     /**
-     * @param string $name
-     *
      * @return Command
      *
      * @throws CommandNotFoundException
      */
-    public function getCommand($name)
+    public function getCommand(string $name)
     {
         if (!isset($this->commands[$name]) && !isset($this->aliases[$name])) {
             throw new CommandNotFoundException(sprintf('Command %s does not exist.', $name));

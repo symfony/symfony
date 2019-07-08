@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimpleFormFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimplePreAuthenticationFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -198,11 +196,6 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
-            ->booleanNode('logout_on_user_change')
-                ->defaultTrue()
-                ->info('When true, it will trigger a logout for the user if something has changed. Note: No-Op option since 4.0. Will always be true.')
-                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.1.')
-            ->end()
             ->arrayNode('logout')
                 ->treatTrueLike([])
                 ->canBeUnset()
@@ -218,6 +211,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->fixXmlConfig('delete_cookie')
                 ->children()
                     ->arrayNode('delete_cookies')
+                        ->normalizeKeys(false)
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return \is_array($v) && \is_int(key($v)); })
                             ->then(function ($v) { return array_map(function ($v) { return ['name' => $v]; }, $v); })
@@ -265,10 +259,6 @@ class MainConfiguration implements ConfigurationInterface
                 $factoryNode = $firewallNodeBuilder->arrayNode($name)
                     ->canBeUnset()
                 ;
-
-                if ($factory instanceof SimplePreAuthenticationFactory || $factory instanceof SimpleFormFactory) {
-                    $factoryNode->setDeprecated(sprintf('The "%s" security listener is deprecated Symfony 4.2, use Guard instead.', $name));
-                }
 
                 if ($factory instanceof AbstractFactory) {
                     $abstractFactoryKeys[] = $name;
@@ -368,9 +358,10 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->arrayNode('encoders')
                     ->example([
-                        'App\Entity\User1' => 'bcrypt',
+                        'App\Entity\User1' => 'auto',
                         'App\Entity\User2' => [
-                            'algorithm' => 'bcrypt',
+                            'algorithm' => 'auto',
+                            'time_cost' => 8,
                             'cost' => 13,
                         ],
                     ])
@@ -390,11 +381,10 @@ class MainConfiguration implements ConfigurationInterface
                             ->integerNode('cost')
                                 ->min(4)
                                 ->max(31)
-                                ->defaultValue(13)
+                                ->defaultNull()
                             ->end()
                             ->scalarNode('memory_cost')->defaultNull()->end()
                             ->scalarNode('time_cost')->defaultNull()->end()
-                            ->scalarNode('threads')->defaultNull()->end()
                             ->scalarNode('id')->end()
                         ->end()
                     ->end()

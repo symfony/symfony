@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Languages;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -42,14 +41,9 @@ class LanguageValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        if (!class_exists(Intl::class)) {
-            throw new LogicException('The "symfony/intl" component is required to use the Language constraint.');
-        }
-
         $value = (string) $value;
-        $languages = Intl::getLanguageBundle()->getLanguageNames();
 
-        if (!isset($languages[$value])) {
+        if (!Languages::exists($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)

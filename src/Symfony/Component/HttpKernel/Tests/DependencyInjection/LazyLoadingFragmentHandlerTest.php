@@ -21,15 +21,15 @@ class LazyLoadingFragmentHandlerTest extends TestCase
     public function testRender()
     {
         $renderer = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface')->getMock();
-        $renderer->expects($this->once())->method('getName')->will($this->returnValue('foo'));
-        $renderer->expects($this->any())->method('render')->will($this->returnValue(new Response()));
+        $renderer->expects($this->once())->method('getName')->willReturn('foo');
+        $renderer->expects($this->any())->method('render')->willReturn(new Response());
 
         $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
-        $requestStack->expects($this->any())->method('getCurrentRequest')->will($this->returnValue(Request::create('/')));
+        $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn(Request::create('/'));
 
         $container = $this->getMockBuilder('Psr\Container\ContainerInterface')->getMock();
         $container->expects($this->once())->method('has')->with('foo')->willReturn(true);
-        $container->expects($this->once())->method('get')->will($this->returnValue($renderer));
+        $container->expects($this->once())->method('get')->willReturn($renderer);
 
         $handler = new LazyLoadingFragmentHandler($container, $requestStack, false);
 

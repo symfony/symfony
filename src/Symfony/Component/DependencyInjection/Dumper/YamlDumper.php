@@ -155,11 +155,13 @@ class YamlDumper extends Dumper
 
     private function addServiceAlias(string $alias, Alias $id): string
     {
+        $deprecated = $id->isDeprecated() ? sprintf("        deprecated: %s\n", $id->getDeprecationMessage('%alias_id%')) : '';
+
         if ($id->isPrivate()) {
-            return sprintf("    %s: '@%s'\n", $alias, $id);
+            return sprintf("    %s: '@%s'\n%s", $alias, $id, $deprecated);
         }
 
-        return sprintf("    %s:\n        alias: %s\n        public: %s\n", $alias, $id, $id->isPublic() ? 'true' : 'false');
+        return sprintf("    %s:\n        alias: %s\n        public: %s\n%s", $alias, $id, $id->isPublic() ? 'true' : 'false', $deprecated);
     }
 
     private function addServices(): string
@@ -230,9 +232,25 @@ class YamlDumper extends Dumper
             $value = $value->getValues()[0];
         }
         if ($value instanceof ArgumentInterface) {
-            if ($value instanceof TaggedIteratorArgument) {
-                return new TaggedValue('tagged', $value->getTag());
+            $tag = $value;
+
+            if ($value instanceof TaggedIteratorArgument || ($value instanceof ServiceLocatorArgument && $tag = $value->getTaggedIteratorArgument())) {
+                if (null === $tag->getIndexAttribute()) {
+                    $content = $tag->getTag();
+                } else {
+                    $content = [
+                        'tag' => $tag->getTag(),
+                        'index_by' => $tag->getIndexAttribute(),
+                    ];
+
+                    if (null !== $tag->getDefaultIndexMethod()) {
+                        $content['default_index_method'] = $tag->getDefaultIndexMethod();
+                    }
+                }
+
+                return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator', $content);
             }
+
             if ($value instanceof IteratorArgument) {
                 $tag = 'iterator';
             } elseif ($value instanceof ServiceLocatorArgument) {
@@ -285,7 +303,7 @@ class YamlDumper extends Dumper
         return sprintf('%%%s%%', $id);
     }
 
-    private function getExpressionCall($expression)
+    private function getExpressionCall(string $expression)
     {
         return sprintf('@=%s', $expression);
     }

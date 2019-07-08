@@ -15,36 +15,77 @@ use Symfony\Component\Messenger\Envelope;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.2
  */
 class StackMiddleware implements MiddlewareInterface, StackInterface
 {
-    private $middlewareIterator;
+    private $stack;
+    private $offset = 0;
 
-    public function __construct(\Iterator $middlewareIterator = null)
+    /**
+     * @param iterable|MiddlewareInterface[]|MiddlewareInterface|null $middlewareIterator
+     */
+    public function __construct($middlewareIterator = null)
     {
-        $this->middlewareIterator = $middlewareIterator;
+        $this->stack = new MiddlewareStack();
+
+        if (null === $middlewareIterator) {
+            return;
+        }
+
+        if ($middlewareIterator instanceof \Iterator) {
+            $this->stack->iterator = $middlewareIterator;
+        } elseif ($middlewareIterator instanceof MiddlewareInterface) {
+            $this->stack->stack[] = $middlewareIterator;
+        } elseif (!is_iterable($middlewareIterator)) {
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be iterable of %s, %s given.', __METHOD__, MiddlewareInterface::class, \is_object($middlewareIterator) ? \get_class($middlewareIterator) : \gettype($middlewareIterator)));
+        } else {
+            $this->stack->iterator = (function () use ($middlewareIterator) {
+                yield from $middlewareIterator;
+            })();
+        }
     }
 
     public function next(): MiddlewareInterface
     {
-        if (null === $iterator = $this->middlewareIterator) {
-            return $this;
-        }
-        $iterator->next();
-
-        if (!$iterator->valid()) {
-            $this->middlewareIterator = null;
-
+        if (null === $next = $this->stack->next($this->offset)) {
             return $this;
         }
 
-        return $iterator->current();
+        ++$this->offset;
+
+        return $next;
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         return $envelope;
+    }
+}
+
+/**
+ * @internal
+ */
+class MiddlewareStack
+{
+    public $iterator;
+    public $stack = [];
+
+    public function next(int $offset): ?MiddlewareInterface
+    {
+        if (isset($this->stack[$offset])) {
+            return $this->stack[$offset];
+        }
+
+        if (null === $this->iterator) {
+            return null;
+        }
+
+        $this->iterator->next();
+
+        if (!$this->iterator->valid()) {
+            return $this->iterator = null;
+        }
+
+        return $this->stack[] = $this->iterator->current();
     }
 }

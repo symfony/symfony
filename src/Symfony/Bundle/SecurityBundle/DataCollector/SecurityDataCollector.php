@@ -18,12 +18,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
@@ -91,19 +90,15 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             ];
         } else {
             $inheritedRoles = [];
-            $assignedRoles = $token->getRoles();
+            $assignedRoles = $token->getRoleNames();
 
             $impersonatorUser = null;
-            foreach ($assignedRoles as $role) {
-                if ($role instanceof SwitchUserRole) {
-                    $impersonatorUser = $role->getSource()->getUsername();
-                    break;
-                }
+            if ($token instanceof SwitchUserToken) {
+                $impersonatorUser = $token->getOriginalToken()->getUsername();
             }
 
             if (null !== $this->roleHierarchy) {
-                $allRoles = $this->roleHierarchy->getReachableRoles($assignedRoles);
-                foreach ($allRoles as $role) {
+                foreach ($this->roleHierarchy->getReachableRoleNames($assignedRoles) as $role) {
                     if (!\in_array($role, $assignedRoles, true)) {
                         $inheritedRoles[] = $role;
                     }
@@ -129,8 +124,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
-                'roles' => array_map(function (Role $role) { return $role->getRole(); }, $assignedRoles),
-                'inherited_roles' => array_unique(array_map(function (Role $role) { return $role->getRole(); }, $inheritedRoles)),
+                'roles' => $assignedRoles,
+                'inherited_roles' => array_unique($inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             ];
         }

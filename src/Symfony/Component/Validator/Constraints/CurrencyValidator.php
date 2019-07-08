@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -43,14 +42,9 @@ class CurrencyValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        if (!class_exists(Intl::class)) {
-            throw new LogicException('The "symfony/intl" component is required to use the Currency constraint.');
-        }
-
         $value = (string) $value;
-        $currencies = Intl::getCurrencyBundle()->getCurrencyNames();
 
-        if (!isset($currencies[$value])) {
+        if (!Currencies::exists($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Currency::NO_SUCH_CURRENCY_ERROR)

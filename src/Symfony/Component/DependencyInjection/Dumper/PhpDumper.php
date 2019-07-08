@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphEdge;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphNode;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -218,6 +219,7 @@ class PhpDumper extends Dumper
         $code =
             $this->startClass($options['class'], $baseClass, $baseClassWithNamespace).
             $this->addServices($services).
+            $this->addDeprecatedAliases().
             $this->addDefaultParametersMethod()
         ;
 
@@ -338,7 +340,10 @@ EOF;
         return $this->proxyDumper;
     }
 
-    private function analyzeCircularReferences($sourceId, array $edges, &$checkedNodes, &$currentPath = [])
+    /**
+     * @param ServiceReferenceGraphEdge[] $edges
+     */
+    private function analyzeCircularReferences(string $sourceId, array $edges, array &$checkedNodes, array &$currentPath = [])
     {
         $checkedNodes[$sourceId] = true;
         $currentPath[$sourceId] = $sourceId;
@@ -367,7 +372,7 @@ EOF;
         unset($currentPath[$sourceId]);
     }
 
-    private function connectCircularReferences($sourceId, &$currentPath, &$subPath = [])
+    private function connectCircularReferences(string $sourceId, array &$currentPath, array &$subPath = [])
     {
         $subPath[$sourceId] = $sourceId;
         $currentPath[$sourceId] = $sourceId;
@@ -390,7 +395,7 @@ EOF;
         unset($subPath[$sourceId]);
     }
 
-    private function collectLineage($class, array &$lineage)
+    private function collectLineage(string $class, array &$lineage)
     {
         if (isset($lineage[$class])) {
             return;
@@ -505,7 +510,14 @@ EOF;
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $instantiation = '';
 
-        if (!$isProxyCandidate && $definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {
+        $lastWitherIndex = null;
+        foreach ($definition->getMethodCalls() as $k => $call) {
+            if ($call[2] ?? false) {
+                $lastWitherIndex = $k;
+            }
+        }
+
+        if (!$isProxyCandidate && $definition->isShared() && !isset($this->singleUsePrivateIds[$id]) && null === $lastWitherIndex) {
             $instantiation = sprintf('$this->%s[%s] = %s', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $this->doExport($id), $isSimpleInstance ? '' : '$instance');
         } elseif (!$isSimpleInstance) {
             $instantiation = '$instance';
@@ -523,7 +535,7 @@ EOF;
 
     private function isTrivialInstance(Definition $definition): bool
     {
-        if ($definition->getErrors()) {
+        if ($definition->hasErrors()) {
             return true;
         }
         if ($definition->isSynthetic() || $definition->getFile() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
@@ -562,16 +574,32 @@ EOF;
         return true;
     }
 
-    private function addServiceMethodCalls(Definition $definition, string $variableName = 'instance'): string
+    private function addServiceMethodCalls(Definition $definition, string $variableName, ?string $sharedNonLazyId): string
     {
+        $lastWitherIndex = null;
+        foreach ($definition->getMethodCalls() as $k => $call) {
+            if ($call[2] ?? false) {
+                $lastWitherIndex = $k;
+            }
+        }
+
         $calls = '';
-        foreach ($definition->getMethodCalls() as $call) {
+        foreach ($definition->getMethodCalls() as $k => $call) {
             $arguments = [];
             foreach ($call[1] as $value) {
                 $arguments[] = $this->dumpValue($value);
             }
 
-            $calls .= $this->wrapServiceConditionals($call[1], sprintf("        \$%s->%s(%s);\n", $variableName, $call[0], implode(', ', $arguments)));
+            $witherAssignation = '';
+
+            if ($call[2] ?? false) {
+                if (null !== $sharedNonLazyId && $lastWitherIndex === $k) {
+                    $witherAssignation = sprintf('$this->%s[\'%s\'] = ', $definition->isPublic() ? 'services' : 'privates', $sharedNonLazyId);
+                }
+                $witherAssignation .= sprintf('$%s = ', $variableName);
+            }
+
+            $calls .= $this->wrapServiceConditionals($call[1], sprintf("        %s\$%s->%s(%s);\n", $witherAssignation, $variableName, $call[0], implode(', ', $arguments)));
         }
 
         return $calls;
@@ -816,7 +844,7 @@ EOTXT
             }
 
             $code .= $this->addServiceProperties($inlineDef, $name);
-            $code .= $this->addServiceMethodCalls($inlineDef, $name);
+            $code .= $this->addServiceMethodCalls($inlineDef, $name, !$this->getProxyDumper()->isProxyCandidate($inlineDef) && $inlineDef->isShared() && !isset($this->singleUsePrivateIds[$id]) ? $id : null);
             $code .= $this->addServiceConfigurator($inlineDef, $name);
         }
 
@@ -953,7 +981,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class $class extends $baseClass
 {
@@ -1121,6 +1149,15 @@ EOF;
             }
         }
 
+        $aliases = $this->container->getAliases();
+        foreach ($aliases as $alias => $id) {
+            if (!$id->isDeprecated()) {
+                continue;
+            }
+            $id = (string) $id;
+            $code .= '            '.$this->doExport($alias).' => '.$this->doExport($this->generateMethodName($alias)).",\n";
+        }
+
         return $code ? "        \$this->methodMap = [\n{$code}        ];\n" : '';
     }
 
@@ -1147,6 +1184,10 @@ EOF;
         $code = "        \$this->aliases = [\n";
         ksort($aliases);
         foreach ($aliases as $alias => $id) {
+            if ($id->isDeprecated()) {
+                continue;
+            }
+
             $id = (string) $id;
             while (isset($aliases[$id])) {
                 $id = (string) $aliases[$id];
@@ -1155,6 +1196,39 @@ EOF;
         }
 
         return $code."        ];\n";
+    }
+
+    private function addDeprecatedAliases(): string
+    {
+        $code = '';
+        $aliases = $this->container->getAliases();
+        foreach ($aliases as $alias => $definition) {
+            if (!$definition->isDeprecated()) {
+                continue;
+            }
+            $public = $definition->isPublic() ? 'public' : 'private';
+            $id = (string) $definition;
+            $methodNameAlias = $this->generateMethodName($alias);
+            $idExported = $this->export($id);
+            $messageExported = $this->export($definition->getDeprecationMessage($alias));
+            $code = <<<EOF
+
+    /*{$this->docStar}
+     * Gets the $public '$alias' alias.
+     *
+     * @return object The "$id" service.
+     */
+    protected function {$methodNameAlias}()
+    {
+        @trigger_error($messageExported, E_USER_DEPRECATED);
+
+        return \$this->get($idExported);
+    }
+
+EOF;
+        }
+
+        return $code;
     }
 
     private function addInlineRequires(): string
@@ -1214,9 +1288,8 @@ EOF;
 
         $code = <<<'EOF'
 
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
-        $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
         }
@@ -1231,9 +1304,8 @@ EOF;
         return $this->parameters[$name];
     }
 
-    public function hasParameter($name)
+    public function hasParameter(string $name)
     {
-        $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
             return true;
         }
@@ -1241,7 +1313,7 @@ EOF;
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter(string $name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
@@ -1264,7 +1336,7 @@ EOF;
 
 EOF;
         if (!$this->asFiles) {
-            $code = preg_replace('/^.*buildParameters.*\n.*\n.*\n/m', '', $code);
+            $code = preg_replace('/^.*buildParameters.*\n.*\n.*\n\n?/m', '', $code);
         }
 
         if ($dynamicPhp) {
@@ -1502,12 +1574,13 @@ EOF;
 
                 if ($value instanceof ServiceLocatorArgument) {
                     $serviceMap = '';
+                    $serviceTypes = '';
                     foreach ($value->getValues() as $k => $v) {
                         if (!$v) {
                             continue;
                         }
                         $definition = $this->container->findDefinition($id = (string) $v);
-                        $load = !($e = $definition->getErrors()) ? $this->asFiles && !$this->isHotPath($definition) : reset($e);
+                        $load = !($definition->hasErrors() && $e = $definition->getErrors()) ? $this->asFiles && !$this->isHotPath($definition) : reset($e);
                         $serviceMap .= sprintf("\n            %s => [%s, %s, %s, %s],",
                             $this->export($k),
                             $this->export($definition->isShared() ? ($definition->isPublic() ? 'services' : 'privates') : false),
@@ -1515,17 +1588,18 @@ EOF;
                             $this->export(ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $v->getInvalidBehavior() && !\is_string($load) ? $this->generateMethodName($id).($load ? '.php' : '') : null),
                             $this->export($load)
                         );
+                        $serviceTypes .= sprintf("\n            %s => %s,", $this->export($k), $this->export($v instanceof TypedReference ? $v->getType() : '?'));
                         $this->locatedIds[$id] = true;
                     }
                     $this->addGetService = true;
 
-                    return sprintf('new \%s($this->getService, [%s%s])', ServiceLocator::class, $serviceMap, $serviceMap ? "\n        " : '');
+                    return sprintf('new \%s($this->getService, [%s%s], [%s%s])', ServiceLocator::class, $serviceMap, $serviceMap ? "\n        " : '', $serviceTypes, $serviceTypes ? "\n        " : '');
                 }
             } finally {
                 list($this->definitionVariables, $this->referenceVariables) = $scope;
             }
         } elseif ($value instanceof Definition) {
-            if ($e = $value->getErrors()) {
+            if ($value->hasErrors() && $e = $value->getErrors()) {
                 $this->addThrow = true;
 
                 return sprintf('$this->throw(%s)', $this->export(reset($e)));
@@ -1634,7 +1708,7 @@ EOF;
                     return $code;
                 }
             } elseif ($this->isTrivialInstance($definition)) {
-                if ($e = $definition->getErrors()) {
+                if ($definition->hasErrors() && $e = $definition->getErrors()) {
                     $this->addThrow = true;
 
                     return sprintf('$this->throw(%s)', $this->export(reset($e)));
@@ -1819,7 +1893,7 @@ EOF;
         return $this->doExport($value, true);
     }
 
-    private function doExport($value, $resolveEnv = false)
+    private function doExport($value, bool $resolveEnv = false)
     {
         $shouldCacheValue = $resolveEnv && \is_string($value);
         if ($shouldCacheValue && isset($this->exportedVariables[$value])) {

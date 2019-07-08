@@ -16,8 +16,12 @@ security:
             iterations: 5
             key_length: 30
         JMS\FooBundle\Entity\User6:
-            algorithm: bcrypt
+            algorithm: native
+            time_cost: 8
+            memory_cost: 100
             cost: 15
+        JMS\FooBundle\Entity\User7:
+            algorithm: auto
 
     providers:
         default:

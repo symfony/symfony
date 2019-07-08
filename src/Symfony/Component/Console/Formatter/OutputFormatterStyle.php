@@ -52,7 +52,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
     private $foreground;
     private $background;
+    private $href;
     private $options = [];
+    private $handlesHrefGracefully;
 
     /**
      * Initializes output formatter style.
@@ -75,13 +77,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Sets style foreground color.
-     *
-     * @param string|null $color The color name
-     *
-     * @throws InvalidArgumentException When the color name isn't defined
+     * {@inheritdoc}
      */
-    public function setForeground($color = null)
+    public function setForeground(string $color = null)
     {
         if (null === $color) {
             $this->foreground = null;
@@ -97,13 +95,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Sets style background color.
-     *
-     * @param string|null $color The color name
-     *
-     * @throws InvalidArgumentException When the color name isn't defined
+     * {@inheritdoc}
      */
-    public function setBackground($color = null)
+    public function setBackground(string $color = null)
     {
         if (null === $color) {
             $this->background = null;
@@ -118,14 +112,15 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         $this->background = static::$availableBackgroundColors[$color];
     }
 
+    public function setHref(string $url): void
+    {
+        $this->href = $url;
+    }
+
     /**
-     * Sets some specific style option.
-     *
-     * @param string $option The option name
-     *
-     * @throws InvalidArgumentException When the option name isn't defined
+     * {@inheritdoc}
      */
-    public function setOption($option)
+    public function setOption(string $option)
     {
         if (!isset(static::$availableOptions[$option])) {
             throw new InvalidArgumentException(sprintf('Invalid option specified: "%s". Expected one of (%s)', $option, implode(', ', array_keys(static::$availableOptions))));
@@ -137,13 +132,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Unsets some specific style option.
-     *
-     * @param string $option The option name
-     *
-     * @throws InvalidArgumentException When the option name isn't defined
+     * {@inheritdoc}
      */
-    public function unsetOption($option)
+    public function unsetOption(string $option)
     {
         if (!isset(static::$availableOptions[$option])) {
             throw new InvalidArgumentException(sprintf('Invalid option specified: "%s". Expected one of (%s)', $option, implode(', ', array_keys(static::$availableOptions))));
@@ -168,16 +159,16 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Applies the style to a given text.
-     *
-     * @param string $text The text to style
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function apply($text)
+    public function apply(string $text)
     {
         $setCodes = [];
         $unsetCodes = [];
+
+        if (null === $this->handlesHrefGracefully) {
+            $this->handlesHrefGracefully = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR') && !getenv('KONSOLE_VERSION');
+        }
 
         if (null !== $this->foreground) {
             $setCodes[] = $this->foreground['set'];
@@ -187,11 +178,14 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
             $setCodes[] = $this->background['set'];
             $unsetCodes[] = $this->background['unset'];
         }
-        if (\count($this->options)) {
-            foreach ($this->options as $option) {
-                $setCodes[] = $option['set'];
-                $unsetCodes[] = $option['unset'];
-            }
+
+        foreach ($this->options as $option) {
+            $setCodes[] = $option['set'];
+            $unsetCodes[] = $option['unset'];
+        }
+
+        if (null !== $this->href && $this->handlesHrefGracefully) {
+            $text = "\033]8;;$this->href\033\\$text\033]8;;\033\\";
         }
 
         if (0 === \count($setCodes)) {

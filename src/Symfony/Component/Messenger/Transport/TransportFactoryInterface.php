@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+
 /**
  * Creates a Messenger transport.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.2
  */
 interface TransportFactoryInterface
 {
-    public function createTransport(string $dsn, array $options): TransportInterface;
+    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface;
 
     public function supports(string $dsn, array $options): bool;
 }

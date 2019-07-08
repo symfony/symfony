@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\SurrogateListener;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -31,8 +31,8 @@ class SurrogateListenerTest extends TestCase
         $listener = new SurrogateListener(new Esi());
 
         $dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
-        $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
-        $dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
+        $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
     }
@@ -45,8 +45,8 @@ class SurrogateListenerTest extends TestCase
         $listener = new SurrogateListener(new Esi());
 
         $dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
-        $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
-        $dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
+        $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('content="ESI/1.0"', $event->getResponse()->headers->get('Surrogate-Control'));
     }
@@ -59,8 +59,8 @@ class SurrogateListenerTest extends TestCase
         $listener = new SurrogateListener(new Esi());
 
         $dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
-        $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
-        $dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+        $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
+        $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
     }

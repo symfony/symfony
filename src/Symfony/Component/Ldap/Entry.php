@@ -42,7 +42,7 @@ class Entry
      *
      * @return bool
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name)
     {
         return isset($this->attributes[$name]);
     }
@@ -57,7 +57,7 @@ class Entry
      *
      * @return array|null
      */
-    public function getAttribute($name)
+    public function getAttribute(string $name)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
     }
@@ -78,7 +78,7 @@ class Entry
      * @param string $name
      * @param array  $value
      */
-    public function setAttribute($name, array $value)
+    public function setAttribute(string $name, array $value)
     {
         $this->attributes[$name] = $value;
     }
@@ -88,7 +88,7 @@ class Entry
      *
      * @param string $name
      */
-    public function removeAttribute($name)
+    public function removeAttribute(string $name)
     {
         unset($this->attributes[$name]);
     }

@@ -15,33 +15,35 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
+use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.2
  */
 abstract class MiddlewareTestCase extends TestCase
 {
     protected function getStackMock(bool $nextIsCalled = true)
     {
+        if (!$nextIsCalled) {
+            $stack = $this->createMock(StackInterface::class);
+            $stack
+                ->expects($this->never())
+                ->method('next')
+            ;
+
+            return $stack;
+        }
+
         $nextMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $nextMiddleware
-            ->expects($nextIsCalled ? $this->once() : $this->never())
+            ->expects($this->once())
             ->method('handle')
             ->willReturnCallback(function (Envelope $envelope, StackInterface $stack): Envelope {
                 return $envelope;
             })
         ;
 
-        $stack = $this->createMock(StackInterface::class);
-        $stack
-            ->expects($nextIsCalled ? $this->once() : $this->never())
-            ->method('next')
-            ->willReturn($nextMiddleware)
-        ;
-
-        return $stack;
+        return new StackMiddleware($nextMiddleware);
     }
 
     protected function getThrowingStackMock(\Throwable $throwable = null)
@@ -53,13 +55,6 @@ abstract class MiddlewareTestCase extends TestCase
             ->willThrowException($throwable ?? new \RuntimeException('Thrown from next middleware.'))
         ;
 
-        $stack = $this->createMock(StackInterface::class);
-        $stack
-            ->expects($this->once())
-            ->method('next')
-            ->willReturn($nextMiddleware)
-        ;
-
-        return $stack;
+        return new StackMiddleware($nextMiddleware);
     }
 }

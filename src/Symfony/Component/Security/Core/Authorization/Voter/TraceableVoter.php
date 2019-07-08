@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Event\VoteEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Decorates voter classes to send result events.
@@ -37,7 +37,7 @@ class TraceableVoter implements VoterInterface
     {
         $result = $this->voter->vote($token, $subject, $attributes);
 
-        $this->eventDispatcher->dispatch('debug.security.authorization.vote', new VoteEvent($this->voter, $subject, $attributes, $result));
+        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $result), 'debug.security.authorization.vote');
 
         return $result;
     }

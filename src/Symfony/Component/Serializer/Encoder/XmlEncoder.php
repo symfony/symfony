@@ -71,29 +71,15 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     private $format;
     private $context;
 
-    /**
-     * @param array $defaultContext
-     */
-    public function __construct($defaultContext = [], int $loadOptions = null, array $decoderIgnoredNodeTypes = [XML_PI_NODE, XML_COMMENT_NODE], array $encoderIgnoredNodeTypes = [])
+    public function __construct(array $defaultContext = [])
     {
-        if (!\is_array($defaultContext)) {
-            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
-
-            $defaultContext = [
-                self::DECODER_IGNORED_NODE_TYPES => $decoderIgnoredNodeTypes,
-                self::ENCODER_IGNORED_NODE_TYPES => $encoderIgnoredNodeTypes,
-                self::LOAD_OPTIONS => $loadOptions ?? LIBXML_NONET | LIBXML_NOBLANKS,
-                self::ROOT_NODE_NAME => (string) $defaultContext,
-            ];
-        }
-
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = [])
+    public function encode($data, string $format, array $context = [])
     {
         $encoderIgnoredNodeTypes = $context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
         $ignorePiNode = \in_array(XML_PI_NODE, $encoderIgnoredNodeTypes, true);
@@ -121,7 +107,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = [])
+    public function decode(string $data, string $format, array $context = [])
     {
         if ('' === trim($data)) {
             throw new NotEncodableValueException('Invalid XML data, it can not be empty.');
@@ -190,7 +176,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format)
+    public function supportsEncoding(string $format)
     {
         return self::FORMAT === $format;
     }
@@ -198,37 +184,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format)
+    public function supportsDecoding(string $format)
     {
         return self::FORMAT === $format;
-    }
-
-    /**
-     * Sets the root node name.
-     *
-     * @deprecated since Symfony 4.2
-     *
-     * @param string $name Root node name
-     */
-    public function setRootNodeName($name)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the context instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->defaultContext[self::ROOT_NODE_NAME] = $name;
-    }
-
-    /**
-     * Returns the root node name.
-     *
-     * @deprecated since Symfony 4.2
-     *
-     * @return string
-     */
-    public function getRootNodeName()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the context instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->defaultContext[self::ROOT_NODE_NAME];
     }
 
     final protected function appendXMLString(\DOMNode $node, string $val): bool

@@ -725,10 +725,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame(['test'], $form->getData());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyNullChoices()
+    public function testNullChoices()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'multiple' => false,
@@ -1841,12 +1838,11 @@ class ChoiceTypeTest extends BaseTypeTest
     {
         $builder = $this->factory->createBuilder();
         $builder->add('choice', static::TESTED_TYPE, [
-                'choices' => [
-                    '1' => '1',
-                    '2' => '2',
-                ],
-            ]
-        );
+            'choices' => [
+                '1' => '1',
+                '2' => '2',
+            ],
+        ]);
         $builder->add('subChoice', 'Symfony\Component\Form\Tests\Fixtures\ChoiceSubType');
         $form = $builder->getForm();
 

@@ -84,6 +84,80 @@ class PhpFileLoaderTest extends TestCase
         );
     }
 
+    public function testLoadingRouteWithDefaults()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('defaults.php');
+
+        $this->assertCount(1, $routes);
+
+        $defaultsRoute = $routes->get('defaults');
+
+        $this->assertSame('/defaults', $defaultsRoute->getPath());
+        $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
+        $this->assertSame('html', $defaultsRoute->getDefault('_format'));
+    }
+
+    public function testLoadingImportedRoutesWithDefaults()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('importer-with-defaults.php');
+
+        $this->assertCount(2, $routes);
+
+        $expectedRoutes = new RouteCollection();
+        $expectedRoutes->add('one', $localeRoute = new Route('/defaults/one'));
+        $localeRoute->setDefault('_locale', 'g_locale');
+        $localeRoute->setDefault('_format', 'g_format');
+        $expectedRoutes->add('two', $formatRoute = new Route('/defaults/two'));
+        $formatRoute->setDefault('_locale', 'g_locale');
+        $formatRoute->setDefault('_format', 'g_format');
+        $formatRoute->setDefault('specific', 'imported');
+
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/imported-with-defaults.php'));
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/importer-with-defaults.php'));
+
+        $this->assertEquals($expectedRoutes, $routes);
+    }
+
+    public function testLoadingUtf8Route()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
+        $routes = $loader->load('utf8.php');
+
+        $this->assertCount(2, $routes);
+
+        $expectedRoutes = new RouteCollection();
+        $expectedRoutes->add('some_route', new Route('/'));
+
+        $expectedRoutes->add('some_utf8_route', $route = new Route('/utf8'));
+        $route->setOption('utf8', true);
+
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/utf8.php'));
+
+        $this->assertEquals($expectedRoutes, $routes);
+    }
+
+    public function testLoadingUtf8ImportedRoutes()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
+        $routes = $loader->load('importer-with-utf8.php');
+
+        $this->assertCount(2, $routes);
+
+        $expectedRoutes = new RouteCollection();
+        $expectedRoutes->add('utf8_one', $one = new Route('/one'));
+        $one->setOption('utf8', true);
+
+        $expectedRoutes->add('utf8_two', $two = new Route('/two'));
+        $two->setOption('utf8', true);
+
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/imported-with-utf8.php'));
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/importer-with-utf8.php'));
+
+        $this->assertEquals($expectedRoutes, $routes);
+    }
+
     public function testRoutingConfigurator()
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);

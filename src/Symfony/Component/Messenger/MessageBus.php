@@ -18,8 +18,6 @@ use Symfony\Component\Messenger\Middleware\StackMiddleware;
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Matthias Noback <matthiasnoback@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.2
  */
 class MessageBus implements MessageBusInterface
 {
@@ -35,29 +33,38 @@ class MessageBus implements MessageBusInterface
         } elseif (\is_array($middlewareHandlers)) {
             $this->middlewareAggregate = new \ArrayObject($middlewareHandlers);
         } else {
-            $this->middlewareAggregate = new class() {
-                public $aggregate;
-                public $iterator;
+            // $this->middlewareAggregate should be an instance of IteratorAggregate.
+            // When $middlewareHandlers is an Iterator, we wrap it to ensure it is lazy-loaded and can be rewound.
+            $this->middlewareAggregate = new class($middlewareHandlers) implements \IteratorAggregate {
+                private $middlewareHandlers;
+                private $cachedIterator;
+
+                public function __construct($middlewareHandlers)
+                {
+                    $this->middlewareHandlers = $middlewareHandlers;
+                }
 
                 public function getIterator()
                 {
-                    return $this->aggregate = new \ArrayObject(iterator_to_array($this->iterator, false));
+                    if (null === $this->cachedIterator) {
+                        $this->cachedIterator = new \ArrayObject(iterator_to_array($this->middlewareHandlers, false));
+                    }
+
+                    return $this->cachedIterator;
                 }
             };
-            $this->middlewareAggregate->aggregate = &$this->middlewareAggregate;
-            $this->middlewareAggregate->iterator = $middlewareHandlers;
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message): Envelope
+    public function dispatch($message, array $stamps = []): Envelope
     {
         if (!\is_object($message)) {
             throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object, but got %s.', __METHOD__, \gettype($message)));
         }
-        $envelope = $message instanceof Envelope ? $message : new Envelope($message);
+        $envelope = Envelope::wrap($message, $stamps);
         $middlewareIterator = $this->middlewareAggregate->getIterator();
 
         while ($middlewareIterator instanceof \IteratorAggregate) {

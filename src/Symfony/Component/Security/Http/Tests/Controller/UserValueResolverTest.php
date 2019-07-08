@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
@@ -35,7 +35,7 @@ class UserValueResolverTest extends TestCase
     public function testResolveNoUser()
     {
         $mock = $this->getMockBuilder(UserInterface::class)->getMock();
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = new UsernamePasswordToken('username', 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
@@ -57,8 +57,7 @@ class UserValueResolverTest extends TestCase
     public function testResolve()
     {
         $user = $this->getMockBuilder(UserInterface::class)->getMock();
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
-        $token->expects($this->any())->method('getUser')->willReturn($user);
+        $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
@@ -72,8 +71,7 @@ class UserValueResolverTest extends TestCase
     public function testIntegration()
     {
         $user = $this->getMockBuilder(UserInterface::class)->getMock();
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
-        $token->expects($this->any())->method('getUser')->willReturn($user);
+        $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
@@ -83,7 +81,7 @@ class UserValueResolverTest extends TestCase
 
     public function testIntegrationNoUser()
     {
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = new UsernamePasswordToken('username', 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 

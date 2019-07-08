@@ -364,7 +364,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function hasPropertyMetadata($property)
+    public function hasPropertyMetadata(string $property)
     {
         return \array_key_exists($property, $this->members);
     }
@@ -372,7 +372,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getPropertyMetadata($property)
+    public function getPropertyMetadata(string $property)
     {
         if (!isset($this->members[$property])) {
             return [];

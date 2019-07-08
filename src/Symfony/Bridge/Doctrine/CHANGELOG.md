@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field, throws an exception; pass `null` instead
+ * not explicitly passing an instance of `IdReader` to `DoctrineChoiceLoader` when it can optimize single id field, will not apply any optimization
+ * `DoctrineExtractor` now requires an `EntityManagerInterface` on instantiation
+
+4.4.0
+-----
+
+ * added `DoctrineClearEntityManagerMiddleware`
+
+
+4.3.0
+-----
+
+ * changed guessing of DECIMAL to set the `input` option of `NumberType` to string
+ * deprecated not passing an `IdReader` to the `DoctrineChoiceLoader` when query can be optimized with a single id field
+ * deprecated passing an `IdReader` to the `DoctrineChoiceLoader` when entities have a composite id
+ * added two Messenger middleware: `DoctrinePingConnectionMiddleware` and `DoctrineCloseConnectionMiddleware`
+
 4.2.0
 -----
 

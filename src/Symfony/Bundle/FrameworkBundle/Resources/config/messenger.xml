@@ -9,11 +9,15 @@
 
         <!-- Asynchronous -->
         <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
-            <argument type="collection" /> <!-- Per message sender iterators -->
-            <argument type="collection" /> <!-- Messages to send and handle -->
+            <argument type="collection" /> <!-- Per message senders map -->
+            <argument /> <!-- senders locator -->
         </service>
         <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
+            <tag name="monolog.logger" channel="messenger" />
             <argument type="service" id="messenger.senders_locator" />
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
         </service>
 
         <!-- Message encoding/decoding -->
@@ -22,24 +26,31 @@
             <argument /> <!-- Format -->
             <argument type="collection" /> <!-- Context -->
         </service>
+        <service id="Symfony\Component\Messenger\Transport\Serialization\SerializerInterface" alias="messenger.default_serializer" />
+
+        <service id="messenger.transport.native_php_serializer" class="Symfony\Component\Messenger\Transport\Serialization\PhpSerializer" />
 
         <!-- Middleware -->
         <service id="messenger.middleware.handle_message" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">
+            <tag name="monolog.logger" channel="messenger" />
             <argument /> <!-- Bus handler resolver -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
         </service>
+
+        <service id="messenger.middleware.add_bus_name_stamp_middleware" class="Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware" abstract="true" />
+
+        <service id="messenger.middleware.dispatch_after_current_bus" class="Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware" />
 
         <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
             <argument type="service" id="validator" />
         </service>
 
+        <service id="messenger.middleware.failed_message_processing_middleware" class="Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware" />
+
         <service id="messenger.middleware.traceable" class="Symfony\Component\Messenger\Middleware\TraceableMiddleware" abstract="true">
             <argument type="service" id="debug.stopwatch" />
-        </service>
-
-        <!-- Logging -->
-        <service id="messenger.middleware.logging" class="Symfony\Component\Messenger\Middleware\LoggingMiddleware">
-            <tag name="monolog.logger" channel="messenger" />
-            <argument type="service" id="logger" />
         </service>
 
         <!-- Discovery -->
@@ -50,13 +61,53 @@
 
         <!-- transports -->
         <service id="messenger.transport_factory" class="Symfony\Component\Messenger\Transport\TransportFactory">
-            <argument type="tagged" tag="messenger.transport_factory" />
+            <argument type="tagged_iterator" tag="messenger.transport_factory" />
         </service>
 
         <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
             <tag name="messenger.transport_factory" />
-            <argument type="service" id="messenger.transport.serializer" />
-            <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="messenger.transport.redis.factory" class="Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory">
+            <tag name="messenger.transport_factory" />
+        </service>
+
+        <service id="messenger.transport.sync.factory" class="Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory">
+            <tag name="messenger.transport_factory" />
+            <argument type="service" id="messenger.routable_message_bus" />
+        </service>
+
+        <service id="messenger.transport.in_memory.factory" class="Symfony\Component\Messenger\Transport\InMemoryTransportFactory">
+            <tag name="messenger.transport_factory" />
+            <tag name="kernel.reset" method="reset" />
+        </service>
+
+        <!-- retry -->
+        <service id="messenger.retry_strategy_locator">
+            <tag name="container.service_locator" />
+            <argument type="collection" />
+        </service>
+
+        <service id="messenger.retry.abstract_multiplier_retry_strategy" class="Symfony\Component\Messenger\Retry\MultiplierRetryStrategy" abstract="true">
+            <argument /> <!-- max retries -->
+            <argument /> <!-- delay ms -->
+            <argument /> <!-- multiplier -->
+            <argument /> <!-- max delay ms -->
+        </service>
+
+        <!-- failed handling -->
+        <service id="messenger.failure.send_failed_message_to_failure_transport_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="messenger" />
+            <argument type="service" id="messenger.routable_message_bus" />
+            <argument /> <!-- Failure transport name -->
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <!-- routable message bus -->
+        <service id="messenger.routable_message_bus" class="Symfony\Component\Messenger\RoutableMessageBus">
+            <argument /> <!-- Message bus locator -->
+            <argument type="service" id="messenger.default_bus" />
         </service>
     </services>
 </container>

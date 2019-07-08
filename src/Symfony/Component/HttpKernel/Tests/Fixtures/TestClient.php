@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
-use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
-class TestClient extends Client
+class TestClient extends HttpKernelBrowser
 {
     protected function getScript($request)
     {

@@ -57,11 +57,6 @@ class FormConfigTest extends TestCase
             [123],
             // NULL is allowed
             [null],
-            // Other types are not
-            [1.23, 'Symfony\Component\Form\Exception\UnexpectedTypeException'],
-            [5., 'Symfony\Component\Form\Exception\UnexpectedTypeException'],
-            [true, 'Symfony\Component\Form\Exception\UnexpectedTypeException'],
-            [new \stdClass(), 'Symfony\Component\Form\Exception\UnexpectedTypeException'],
         ];
     }
 

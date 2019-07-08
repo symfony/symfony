@@ -18,11 +18,11 @@ use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router as BaseRouter;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * This Router creates the Loader only when the cache is empty.
@@ -165,6 +165,10 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             }
 
             $resolved = ($this->paramFetcher)($match[1]);
+
+            if (\is_bool($resolved)) {
+                $resolved = (string) (int) $resolved;
+            }
 
             if (\is_string($resolved) || is_numeric($resolved)) {
                 $this->collectedParameters[$match[1]] = $resolved;

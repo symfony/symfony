@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+require_once __DIR__.'/Fixtures/includes/autowiring_classes.php';
 require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
@@ -36,6 +37,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
+use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
@@ -88,7 +91,7 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.
+     * @expectedDeprecation The "deprecated_foo" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testCreateDeprecatedService()
     {
@@ -291,6 +294,22 @@ class ContainerBuilderTest extends TestCase
         }
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "foobar" service alias is deprecated. You should stop using it, as it will be removed in the future.
+     */
+    public function testDeprecatedAlias()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass');
+
+        $alias = new Alias('foo');
+        $alias->setDeprecated();
+        $builder->setAlias('foobar', $alias);
+
+        $builder->get('foobar');
+    }
+
     public function testGetAliases()
     {
         $builder = new ContainerBuilder();
@@ -308,8 +327,8 @@ class ContainerBuilderTest extends TestCase
         $builder->register('bar', 'stdClass');
         $this->assertFalse($builder->hasAlias('bar'));
 
-        $builder->set('foobar', 'stdClass');
-        $builder->set('moo', 'stdClass');
+        $builder->set('foobar', new \stdClass());
+        $builder->set('moo', new \stdClass());
         $this->assertCount(2, $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
     }
 
@@ -770,6 +789,20 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame('someFooBar', $container->getParameter('baz'));
     }
 
+    public function testFallbackEnv()
+    {
+        putenv('DUMMY_FOO=foo');
+
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', '%env(DUMMY_FOO)%');
+        $container->setParameter('bar', 'bar%env(default:foo:DUMMY_BAR)%');
+
+        $container->compile(true);
+        putenv('DUMMY_FOO');
+
+        $this->assertSame('barfoo', $container->getParameter('bar'));
+    }
+
     public function testCastEnv()
     {
         $container = new ContainerBuilder();
@@ -1026,14 +1059,14 @@ class ContainerBuilderTest extends TestCase
         $container->registerExtension($extension = new \ProjectExtension());
         $this->assertSame($container->getExtension('project'), $extension, '->registerExtension() registers an extension');
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('LogicException');
+        $this->expectException('LogicException');
         $container->getExtension('no_registered');
     }
 
     public function testRegisteredButNotLoadedExtension()
     {
         $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface')->getMock();
-        $extension->expects($this->once())->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->once())->method('getAlias')->willReturn('project');
         $extension->expects($this->never())->method('load');
 
         $container = new ContainerBuilder();
@@ -1045,7 +1078,7 @@ class ContainerBuilderTest extends TestCase
     public function testRegisteredAndLoadedExtension()
     {
         $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface')->getMock();
-        $extension->expects($this->exactly(2))->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->exactly(2))->method('getAlias')->willReturn('project');
         $extension->expects($this->once())->method('load')->with([['foo' => 'bar']]);
 
         $container = new ContainerBuilder();
@@ -1566,6 +1599,22 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $this->assertSame(['service_container'], array_keys($container->getDefinitions()));
+    }
+
+    public function testWither()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', Wither::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+
+        $container->compile();
+
+        $wither = $container->get('wither');
+        $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 }
 

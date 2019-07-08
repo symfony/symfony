@@ -234,6 +234,8 @@
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
     <xsd:attribute name="tag" type="xsd:string" />
+    <xsd:attribute name="index-by" type="xsd:string" />
+    <xsd:attribute name="default-index-method" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">
@@ -241,6 +243,7 @@
       <xsd:element name="argument" type="argument" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="returns-clone" type="boolean" />
   </xsd:complexType>
 
   <xsd:simpleType name="parameter_type">
@@ -261,7 +264,8 @@
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
       <xsd:enumeration value="service_locator" />
-      <xsd:enumeration value="tagged" />
+      <xsd:enumeration value="tagged_iterator" />
+      <xsd:enumeration value="tagged_locator" />
     </xsd:restriction>
   </xsd:simpleType>
 

@@ -37,8 +37,6 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * If this returns false, the authenticator will be skipped.
      *
-     * @param Request $request
-     *
      * @return bool
      */
     public function supports(Request $request);
@@ -59,8 +57,6 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      * Or for an API token that's on a header, you might use:
      *
      *      return ['api_key' => $request->headers->get('X-API-TOKEN')];
-     *
-     * @param Request $request
      *
      * @return mixed Any non-null value
      *
@@ -112,12 +108,9 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @see AbstractGuardAuthenticator
      *
-     * @param UserInterface $user
-     * @param string        $providerKey The provider (i.e. firewall) key
-     *
      * @return GuardTokenInterface
      */
-    public function createAuthenticatedToken(UserInterface $user, $providerKey);
+    public function createAuthenticatedToken(UserInterface $user, string $providerKey);
 
     /**
      * Called when authentication executed, but failed (e.g. wrong username password).
@@ -144,13 +137,9 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      * If you return null, the current request will continue, and the user
      * will be authenticated. This makes sense, for example, with an API.
      *
-     * @param Request        $request
-     * @param TokenInterface $token
-     * @param string         $providerKey The provider (i.e. firewall) key
-     *
      * @return Response|null
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey);
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey);
 
     /**
      * Does this method support remember me cookies?

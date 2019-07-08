@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Handler;
 
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
@@ -50,6 +51,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         OutputInterface::VERBOSITY_VERY_VERBOSE => Logger::INFO,
         OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
     ];
+    private $consoleFormaterOptions;
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -58,7 +60,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      * @param array                $verbosityLevelMap Array that maps the OutputInterface verbosity to a minimum logging
      *                                                level (leave empty to use the default mapping)
      */
-    public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [])
+    public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [], array $consoleFormaterOptions = [])
     {
         parent::__construct(Logger::DEBUG, $bubble);
         $this->output = $output;
@@ -66,12 +68,14 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         if ($verbosityLevelMap) {
             $this->verbosityLevelMap = $verbosityLevelMap;
         }
+
+        $this->consoleFormaterOptions = $consoleFormaterOptions;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record)
+    public function isHandling(array $record): bool
     {
         return $this->updateLevel() && parent::isHandling($record);
     }
@@ -79,7 +83,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record)
+    public function handle(array $record): bool
     {
         // we have to update the logging level each time because the verbosity of the
         // console output might have changed in the meantime (it is not immutable)
@@ -97,7 +101,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * Disables the output.
      */
-    public function close()
+    public function close(): void
     {
         $this->output = null;
 
@@ -140,7 +144,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * {@inheritdoc}
      */
-    protected function write(array $record)
+    protected function write(array $record): void
     {
         // at this point we've determined for sure that we want to output the record, so use the output's own verbosity
         $this->output->write((string) $record['formatted'], false, $this->output->getVerbosity());
@@ -149,19 +153,19 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultFormatter()
+    protected function getDefaultFormatter(): FormatterInterface
     {
         if (!class_exists(CliDumper::class)) {
             return new LineFormatter();
         }
         if (!$this->output) {
-            return new ConsoleFormatter();
+            return new ConsoleFormatter($this->consoleFormaterOptions);
         }
 
-        return new ConsoleFormatter([
+        return new ConsoleFormatter(array_replace([
             'colors' => $this->output->isDecorated(),
             'multiline' => OutputInterface::VERBOSITY_DEBUG <= $this->output->getVerbosity(),
-        ]);
+        ], $this->consoleFormaterOptions));
     }
 
     /**

@@ -56,4 +56,35 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
             ]);
         });
     }
+
+    /**
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
+     * @expectedExceptionMessage A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" where found on StateMachine "article".
+     */
+    public function testWorkflowValidationStateMachine()
+    {
+        $this->createContainerFromClosure(function ($container) {
+            $container->loadFromExtension('framework', [
+                'workflows' => [
+                    'article' => [
+                        'type' => 'state_machine',
+                        'supports' => [
+                            __CLASS__,
+                        ],
+                        'places' => [
+                            'a',
+                            'b',
+                            'c',
+                        ],
+                        'transitions' => [
+                            'a_to_b' => [
+                                'from' => ['a'],
+                                'to' => ['b', 'c'],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+        });
+    }
 }

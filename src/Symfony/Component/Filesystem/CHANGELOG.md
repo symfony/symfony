@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * `Filesystem::dumpFile()` and `appendToFile()` don't accept arrays anymore
+
+4.4.0
+-----
+
+ * support for passing a `null` value to `Filesystem::isAbsolutePath()` is deprecated and will be removed in 5.0
+
+4.3.0
+-----
+
+ * support for passing arrays to `Filesystem::dumpFile()` is deprecated and will be removed in 5.0
+ * support for passing arrays to `Filesystem::appendToFile()` is deprecated and will be removed in 5.0
+
 4.0.0
 -----
 

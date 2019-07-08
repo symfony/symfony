@@ -1,0 +1,338 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-28T05:46:07Z
+
+A redraw should be triggered every x ms, and everything y %, whichever comes first. Would be the best IMHO.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-02-28T10:08:10Z
+
+TBH I don't see how that's useful. Anyway, that would be separate option. Neither old nor new option is based on %. So I would leave that to separate PR if someone wants that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-28T10:12:32Z
+
+By "%" I mean "step" of course. The display should be updated whenever the bar grows by more than Y "pixels", or has been redrawn since 1s. That's useful for DX, showing something happens.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-02-28T10:25:10Z
+
+> That's useful for DX, showing something happens.
+
+Yes so set it to redraw each 0.1 seconds and be done with it. What's the use case when that's not enough?
+
+This PR solves the issue when you set $max to high value like 141977190. Advancing by 1% would mean lot of steps and user would be stuck seeing progressbar in same state if you calculate redrawing based on percentage / pixels. Also, **calculating %/pixels requires to know $max value**.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-28T11:48:31Z
+
+> Yes so set it to redraw each 0.1 seconds
+
+that's not enough with fast moving progress bars, where this strategy creates visual saccades / is jerky (while the current step-based logic doesn't) - so no, it's not enough in all cases
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-02-28T12:14:13Z
+
+I disagree that 10FPS is jerky for progress bar, no matter the speed of advancing. But you are free to set higher frequency. Also default value in Symfony 5 can be point of discussion.
+
+I don't see how is it useful if progress bar redraws itself more often than human eye can see. If progress bar goes from 0 to 100% in less than 100ms/10ms/1ms, do you really consider it useful to show each step all the way? There is a point when it's useless to redraw progress bar because you won't notice it changed in between time interval anyway.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-28T12:25:33Z
+
+Yes, 100ms is way too slow for the eye. 40ms is the absolute minimum visual refresh period (24fps).
+You're telling me I can set to 40ms. But that's something that I don't have to care about with the current logic, based on steps. With the time based redraw you're proposing, I suddenly will have to. For this reason, your proposal is not enhancing the situation yet - it's just moving the problem somewhere else IMHO.
+I doubt it is really more complex to have code deal with both conditions to trigger a redraw.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-02-28T12:50:35Z
+
+You won't have to care about that in Symfony 5, where there will be default FPS set. You also won't have to then care about other problems I mentioned, like calculating percentage (which is impossible to do if $max is unknown), negative performance impact and unresponsive progress bar.
+
+That said, I don't care so much about deprecating it, it's your codebase. I consider time-based frequency superior on all fronts, but will leave old frequency in place if symfony team decides.
+
+If you want to redraw based on whichever condition is triggered first, I would need you to consider these things first though:
+- Default redraw frequency is 1/step. If I set time-based redraw frequency, it will never be applied, because default frequency will be always triggered first. User specifies time-based redraw frequency, but this option is ignored, unless he increases old frequency as well. Do you think this is ok, or how do you propose code to handle such situation?
+- My problem I'm solving with this PR is that $max is unknown and speed of advancing is also unknown. Therefore I don't care about redraw frequency based on steps at all. Are you aware of the fact that in such case, if I want time-based redraw frequency always apply instead of step-based redraw frequency, I will have to call `setRedrawFrequency(PHP_INT_MAX)` for time-based redraw frequency to be usable? Do you consider this ok?
+
+Before doing any more work around this, I would also like to hear other opinions first. Thanks!
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-09T14:21:46Z
+
+Bumping this, feature freeze is coming. Can somebody take a look?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-04-01T12:55:17Z
+
+I've got feedback people don't really understand what is this for. So I guess that's why is this not gaining any traction. I'll try to simplify explanation what is this for then:
+___
+First, let's ask what is redraw frequency in ProgressBar for, why would you need to adjust it? Several reasons:
+1. To avoid flickering
+1. To increase performance
+1. To decrease amount of writes to non-console streams
+
+Let's show example:
+
+```php
+$maxSteps           = 100000000;
+$redrawFrequency    = 1000000;
+
+$progressBar = new ProgressBar(new ConsoleOutput(), $maxSteps);
+$progressBar->setRedrawFrequency($redrawFrequency);
+for ($i=0; $i<= $maxSteps; $i += 100) {
+    $progressBar->setProgress($i);
+}
+```
+
+This is the output on my machine, might be different on yours:
+![ezgif-4-6f45fb2a40](https://user-images.githubusercontent.com/496233/38173296-2be92698-35bc-11e8-8af9-5895f64b9f1b.gif)
+
+Now let's set redrawFrequency **wrong**:
+```diff
+- $redrawFrequency    = 1000000;
++ $redrawFrequency    = 1;
+```
+
+Result:
+![ezgif-4-ad817e1834](https://user-images.githubusercontent.com/496233/38173299-44482400-35bc-11e8-88b6-83b480d55905.gif)
+
+Now, bear in mind these are GIFs, they don't have much FPS. Normally, you will see much more flickering. But this is good enough, you see plenty flickering even there, in second GIF.
+
+So, what can you see in these GIFs?
+1. First GIF looks more smooth, despite doing less redraws
+2. First progress finishes MUCH quicker. To be precise, progressbar with original settings finishes in 1,6s, second progressbar takes 146,52s, that's 90x slower!
+
+Now, you understand importance of setting correct redraw frequency. So, what am I solving with this PR?
+1. Without this patch, to set correct parameters of snippet I have shown, you absolutely need to know `$maxSteps` to be able to set correct `$redrawFrequency`. OR, you need to know how often is `setProgress` going to be called, so you can estimate redrawFrequency based on that. In real life, lot of times this is **unknown**, so you *can't* set this up, you can only estimate this. With my PR, you **don't need to care**. For real, change second constructor argument of ProgressBar in my example to `null` and play with it.
+2. Problem is you need to care about `redrawFrequency` at all. My ultimate goal is to set sane default settings out of the box (this is what is 100ms hardcoded in my patch for), so you won't need to play with it at all to have reasonable redraw speed without jeopardizing performance. Working everytime, with no dependency on `$maxSteps`, no dependency on speed of your task, without having to set anything.
+
+### Real use case:
+
+I have a project called [stdinho](https://github.com/ostrolucky/stdinho) which uses ProgressBar to show progress of stdin/stdout streaming speed. Since input is via stdin, program has no idea about size it will get beforehand. I could estimate redraw frequency, *if I knew speed of streaming*. This speed is very different depending if I/O is via network, if server is slow, what type of disk is used etc. So it's impossible to set it correctly and setting it incorrectly have major performance penalty for speed of this streaming. So I had to give up on Symfony ProgressBar, I copied it and did changes I needed to its code directly.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-01T19:10:14Z
+
+If we merge this feature, can't it be implemented in a way that does not delete the old API (e.g. by creating a new class that internally uses the existing one)? I see a lot of use cases that work pretty well with the current approach and do not need to be rewritten it not entirely necessary.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-04-01T20:27:35Z
+
+I mean, old API don't have to be deleted, but the way I see it, it just becomes redundant. Old frequency is more limited and more easy to burn yourself by setting wrong frequency. Also, name of old API is wrong for whole time, because frequency is usually dependent on time. From wiki:
+> Frequency is the number of occurrences of a repeating event per unit of time.
+
+Old API lies. It isn't dependent on time. New frequency conforms to definition.
+
+We can also ease transition by setting default argument *now*, so all that users need to do in 4.x is just remove setRedrawFrequency call.
+
+ProgressBar is very human-facing part and humans don't care so much if old and new frequency is exactly same, so this isn't covered via BC promise.
+
+We can also not remove setRedrawFrequency, but add to it second, boolean argument which signals time-based frequency. Deprecation will complain if it isn't set, but will stop complaining in Symfony 5 and just consider input to be time-based frequency. This means applications will keep working with no changes. Downside is if given argument isn't adjusted, ProgressBar will be redrawn much less frequently than intended originally, so not sure if this is a way.
+
+We can also play a long game and just deprecate calling setRedrawFrequency with float value. And in Symfony 5 it will be allowed again, but will mean this is time-based frequency.
+
+There are lot of options how to handle this, someone just needs to decide what to do.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-05-22T11:11:21Z
+
+bump (will rebase when it's clear how to move this forward)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-05-22T16:00:42Z
+
+@ostrolucky the main focus of the core team these days is on finishing 4.1, as the release is due in approximately 1 week. We'll get back to focus to all next PRs after it
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-07-22T00:42:47Z
+
+Would approach of introducing new class `OutputThrottledByFrequency` which is just a decorator of OutputInterface be more welcome?
+
+// edit: forget it that won't work, as ProgressBar does multiple write/writeln writes when redrawing
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-08-14T00:31:54Z
+
+Update:
+- rebased
+- made tests pass
+- bumped FPS, no longer configurable though (see screencast, I think it should be enough for everybody now)
+- made this default (this isn't API break so why bother with ridiculously complicated upgrade strategy)
+- dropped deprecation (since I see it's controversial, might be better to be done in separate PR if anybody decides to do that)
+
+Some visualization:
+- setRedrawFrequency(1) (which was default before this PR): https://asciinema.org/a/odDzjluH2BhJL3xjsc1qkFZ1m (cut short because it was over 2 minutes and couldn't upload)
+- 10FPS https://asciinema.org/a/QMFGYG4AuVW8HTfj7SamkjGdS
+- 20FPS https://asciinema.org/a/38bzKbeEdnQT5uSu2T9HQA874
+
+@nicolas-grekas is this the jerkyness you talked about you wanted to solve? https://asciinema.org/a/EyZ89dHtAxmrSquB5hklfd2Bd I found it can't be solved when combined with both, because time & step % both race between each other
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-08-25T19:31:47Z
+
+bump
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-09-10T21:42:47Z
+
+bump
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-09-11T07:12:19Z
+
+I had several issues that triggering to many draws in the progress bar actually slowed down my process by a factor of 4-5. So I would love this change as it is good enough ™️ and solves several real issues.
+And not sure whether my CLI actually needs 60 FPS... 20 should be enough and we could even increase it in the future.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-10-07T10:20:56Z
+
+bump
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-09T13:39:02Z
+
+What needs to be done here to move this forward?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-12-16T08:57:15Z
+
+cc @fabpot this one seems useful and it seems ready IMHO.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-01-06T19:24:34Z
+
+@fabpot can you take over please?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-02-16T21:40:23Z
+
+Comment addressed.
+
+FPS increased to 25 (redraw each 0.04 sec).
+
+> there's the usual "BC policy"
+
+I'm sorry, I don't see how is BC policy affecting this. It seems to me fully backwards compatible. BC policy is for interfaces, I didn't change any. Only thing that is changed is there will be less redraws in interactive mode by default. That shouldn't be risky change. You may want to remove outdated deprecation label (and add performance label).
+
+To remind importance of this PR, following
+```php
+$maxSteps = 1000000;
+$progressBar = new ProgressBar(new ConsoleOutput(), $maxSteps);
+for ($i=0; $i<= $maxSteps; $i++) {
+    $progressBar->advance();
+}
+```
+takes 212s without this PR (`redrawFrequency` 1) and 1,96s with this PR (did a new benchmark).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-06T15:21:28Z
+
+As discussed at #eufossa hackathon, we could have this spec/new methods:
+```
+$progress->setMaxSteps(100000); <- when not redraw freq is defined, default to max/20
+$progress->rejectRedrawFasterThan(0.01); <- defaults to 0s - ie always accept
+$progress->forceRedrawSlowerThan(1); <- defaults to 1s
+```
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-04-07T09:52:34Z
+
+Unfortunately I can't use these defaults combined :(
+
+Max/20 + force redraw 1 second would make progressbar draw either once per second or once per 20%, which is too low from what people are used. Trying to figure out way to move forward.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T19:31:02Z
+
+Don't hesitate to push what you have, I'd like to understand what you mean.
+I you have a small repo to run the progress bar, I'm interested too :)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-04-17T22:45:04Z
+
+Well it's simple. What I understond as suggested default step freq would cause to redraw like this by default
+
+![Untitled](https://user-images.githubusercontent.com/496233/56325414-6890d900-6172-11e9-87c5-e81681b5193d.gif)
+
+Playing with basic example in https://github.com/symfony/symfony/pull/26339#issuecomment-464388538 is enough, I don't have any fancy reproducers, just play with `setRedrawFrequency` values.
+
+Since this is hard to merge as it is, I'm for now removing change of default behaviour. Just new methods added which aid anybody experiencing issues like I have.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-13T10:33:15Z
+
+What about this added patch? It works well with your example:
+```diff
+--- a/src/Symfony/Component/Console/Helper/ProgressBar.php
++++ b/src/Symfony/Component/Console/Helper/ProgressBar.php
+@@ -31,7 +31,7 @@ final class ProgressBar
+     private $progressChar = '>';
+     private $format;
+     private $internalFormat;
+-    private $redrawFreq = 1;
++    private $redrawFreq;
+     private $lastWriteTime;
+     private $minSecondsBetweenRedraws = 0;
+     private $maxSecondsBetweenRedraws = 1;
+@@ -318,8 +318,9 @@ final class ProgressBar
+             $step = 0;
+         }
+
+-        $prevPeriod = (int) ($this->step / $this->redrawFreq);
+-        $currPeriod = (int) ($step / $this->redrawFreq);
++        $redrawFreq = $this->redrawFreq ?? (($this->max ?: 20) / 20);
++        $prevPeriod = (int) ($this->step / $redrawFreq);
++        $currPeriod = (int) ($step / $redrawFreq);
+         $this->step = $step;
+         $this->percent = $this->max ? (float) $this->step / $this->max : 0;
+         $timeInterval = microtime(true) - $this->lastWriteTime;
+```
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-05-14T08:04:54Z
+
+That causes same result as I posted in latest gif. And this is how it looks like without setting maximum:
+![ezgif-3-f4d12f9b2fa3](https://user-images.githubusercontent.com/496233/57681222-919c7080-762f-11e9-9572-abc3681e5f29.gif)
+
+And of course, since this changes default, some test cases would have to be changed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-23T08:32:06Z
+
+@ostrolucky I push forced on your branch to rebase on latest 4.4, add a CHANGELOG, and fix what I understood from your last GIF. Am I right that the issue you wanted to showcase was the cursor moving back when preventRedrawFasterThan is used? If yes, that's fixed. If not, please share the exact code you ran because right now this is cryptic to me.
+
+To me, this PR is ready:
+- we can set a minimum time between redraws to prevent flooding the console. This is disabled by default.
+- When a max step is set, we don't draw more than each 10% or each time a max duration between redraws is reached - set to 1s by default
+- When no max step is set, we display a progress bar that moves always forward, but never more often than the minimum time between redraws

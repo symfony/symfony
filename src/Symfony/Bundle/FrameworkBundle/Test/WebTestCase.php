@@ -39,6 +39,10 @@ abstract class WebTestCase extends KernelTestCase
      */
     protected static function createClient(array $options = [], array $server = [])
     {
+        if (true === static::$booted) {
+            @trigger_error(sprintf('Booting the kernel before calling %s::%s is deprecated and will throw in Symfony 5.0, the kernel should only be booted once.', __CLASS__, __METHOD__), E_USER_DEPRECATED);
+        }
+
         $kernel = static::bootKernel($options);
 
         try {

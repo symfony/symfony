@@ -56,6 +56,16 @@ class Application extends BaseApplication
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if ($this->kernel->getContainer()->has('services_resetter')) {
+            $this->kernel->getContainer()->get('services_resetter')->reset();
+        }
+    }
+
+    /**
      * Runs the current application.
      *
      * @return int 0 if everything went fine, or an error code

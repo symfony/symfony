@@ -3,6 +3,7 @@ CHANGELOG
 
 4.4.0
 -----
+
 * Added button to clear the ajax request tab
 
 4.3.0

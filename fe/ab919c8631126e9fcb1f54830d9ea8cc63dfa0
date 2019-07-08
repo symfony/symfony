@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Stadly at 2019-04-27T13:10:19Z
+
+@nicolas-grekas This should probably be added to the `3.4` milestone rather than `next`?
+
+---------------------------------------------------------------------------
+
+by Stadly at 2019-06-18T06:58:26Z
+
+For those who need a MO loader that handles plurals, I have created a package providing this, while we're waiting for this PR to be merged.
+
+https://github.com/Stadly/PhpTranslation

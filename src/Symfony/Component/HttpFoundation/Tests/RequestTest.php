@@ -2435,7 +2435,7 @@ class RequestTest extends TestCase
         $request = Request::create('/');
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
         $request->headers->set('X-Forwarded-Host', 'test.example.com');
-        $request->headers->set('X-Forwarded-Port', null);
+        $request->headers->set('X-Forwarded-Port', '');
 
         $this->assertSame(80, $request->getPort());
     }

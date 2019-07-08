@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * excluded language code `root`
+
 4.3.0
 -----
 

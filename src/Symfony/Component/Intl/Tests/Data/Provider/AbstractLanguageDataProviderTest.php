@@ -480,7 +480,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'ro_MD',
         'rof',
         'rom',
-        'root',
         'rtm',
         'ru',
         'rue',

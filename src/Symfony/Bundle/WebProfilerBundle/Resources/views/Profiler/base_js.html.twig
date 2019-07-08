@@ -24,6 +24,19 @@
 
         var profilerStorageKey = 'symfony/profiler/';
 
+        var addEventListener;
+
+        var el = document.createElement('div');
+        if (!('addEventListener' in el)) {
+            addEventListener = function (element, eventName, callback) {
+                element.attachEvent('on' + eventName, callback);
+            };
+        } else {
+            addEventListener = function (element, eventName, callback) {
+                element.addEventListener(eventName, callback, false);
+            };
+        }
+
         var request = function(url, onSuccess, onError, payload, options) {
             var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
             options = options || {};
@@ -118,6 +131,13 @@
                 removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
                 removeClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
             }
+
+            addEventListener(document.querySelector('.sf-toolbar-ajax-clear'), 'click', function() {
+                requestStack = [];
+                renderAjaxRequests();
+                successStreak = 4;
+                document.querySelector('.sf-toolbar-ajax-request-list').innerHTML = '';
+            });
         };
 
         var startAjaxRequest = function(index) {
@@ -254,19 +274,6 @@
 
             renderAjaxRequests();
         };
-
-        var addEventListener;
-
-        var el = document.createElement('div');
-        if (!('addEventListener' in el)) {
-            addEventListener = function (element, eventName, callback) {
-                element.attachEvent('on' + eventName, callback);
-            };
-        } else {
-            addEventListener = function (element, eventName, callback) {
-                element.addEventListener(eventName, callback, false);
-            };
-        }
 
         {% if excluded_ajax_paths is defined %}
             if (window.fetch && window.fetch.polyfill === undefined) {

@@ -18,6 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class WebServerExtensionTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLoad()
     {
         $container = new ContainerBuilder();

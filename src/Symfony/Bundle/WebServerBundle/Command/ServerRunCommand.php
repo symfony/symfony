@@ -26,6 +26,8 @@ use Symfony\Component\Process\Process;
  * Runs Symfony application using a local web server.
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
+ *
+ * @deprecated since version 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
  */
 class ServerRunCommand extends Command
 {
@@ -90,6 +92,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        @trigger_error('Using the WebserverBundle is deprecated since 4.4. The new Symfony local server has more features, you can use it instead.', E_USER_DEPRECATED);
+
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         if (null === $documentRoot = $input->getOption('docroot')) {

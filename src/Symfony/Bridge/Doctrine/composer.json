@@ -19,12 +19,12 @@
         "php": "^5.5.9|>=7.0.8",
         "doctrine/common": "~2.4",
         "symfony/polyfill-ctype": "~1.8",
-        "symfony/polyfill-mbstring": "~1.0"
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/form": "^3.3.10|~4.0"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.8|~3.0|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
-        "symfony/form": "^3.3.10|~4.0",
         "symfony/http-kernel": "~2.8|~3.0|~4.0",
         "symfony/property-access": "~2.8|~3.0|~4.0",
         "symfony/property-info": "~2.8|3.0|~4.0",

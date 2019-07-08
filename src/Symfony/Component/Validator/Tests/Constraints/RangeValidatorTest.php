@@ -143,16 +143,16 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Range([
             'min' => 10,
             'max' => 20,
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
 
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation('myMaxMessage')
+        $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $formattedValue)
-            ->setParameter('{{ limit }}', 20)
-            ->setCode(Range::TOO_HIGH_ERROR)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 
@@ -164,16 +164,16 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Range([
             'min' => 10,
             'max' => 20,
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
 
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation('myMinMessage')
+        $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $formattedValue)
-            ->setParameter('{{ limit }}', 10)
-            ->setCode(Range::TOO_LOW_ERROR)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 
@@ -327,16 +327,16 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Range([
             'min' => 'March 10, 2014',
             'max' => 'March 20, 2014',
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
 
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation('myMaxMessage')
+        $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ limit }}', 'Mar 20, 2014, 12:00 AM')
-            ->setCode(Range::TOO_HIGH_ERROR)
+            ->setParameter('{{ min }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ max }}', 'Mar 20, 2014, 12:00 AM')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 
@@ -352,16 +352,16 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Range([
             'min' => 'March 10, 2014',
             'max' => 'March 20, 2014',
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
 
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation('myMinMessage')
+        $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ limit }}', 'Mar 10, 2014, 12:00 AM')
-            ->setCode(Range::TOO_LOW_ERROR)
+            ->setParameter('{{ min }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ max }}', 'Mar 20, 2014, 12:00 AM')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 
@@ -527,18 +527,18 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Range([
             'minPropertyPath' => 'min',
             'maxPropertyPath' => 'max',
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
 
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation('myMaxMessage')
+        $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $formattedValue)
-            ->setParameter('{{ limit }}', 20)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
             ->setParameter('{{ max_limit_path }}', 'max')
             ->setParameter('{{ min_limit_path }}', 'min')
-            ->setCode(Range::TOO_HIGH_ERROR)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 
@@ -552,18 +552,18 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Range([
             'minPropertyPath' => 'min',
             'maxPropertyPath' => 'max',
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
 
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation('myMinMessage')
+        $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $formattedValue)
-            ->setParameter('{{ limit }}', 10)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
             ->setParameter('{{ max_limit_path }}', 'max')
             ->setParameter('{{ min_limit_path }}', 'min')
-            ->setCode(Range::TOO_LOW_ERROR)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 
@@ -713,18 +713,18 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Range([
             'minPropertyPath' => 'min',
             'maxPropertyPath' => 'max',
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
 
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation('myMaxMessage')
+        $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ limit }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ min }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ max }}', 'Mar 20, 2014, 12:00 AM')
             ->setParameter('{{ max_limit_path }}', 'max')
             ->setParameter('{{ min_limit_path }}', 'min')
-            ->setCode(Range::TOO_HIGH_ERROR)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 
@@ -742,18 +742,18 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Range([
             'minPropertyPath' => 'min',
             'maxPropertyPath' => 'max',
-            'minMessage' => 'myMinMessage',
-            'maxMessage' => 'myMaxMessage',
+            'notInRangeMessage' => 'myNotInRangeMessage',
         ]);
 
         $this->validator->validate($value, $constraint);
 
-        $this->buildViolation('myMinMessage')
+        $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
-            ->setParameter('{{ limit }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ min }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ max }}', 'Mar 20, 2014, 12:00 AM')
             ->setParameter('{{ max_limit_path }}', 'max')
             ->setParameter('{{ min_limit_path }}', 'min')
-            ->setCode(Range::TOO_LOW_ERROR)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
 }

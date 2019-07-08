@@ -238,7 +238,6 @@ class ConnectionTest extends TestCase
             'expectedQueue' => 'default',
             'expectedAutoSetup' => true,
         ];
-
     }
 
     /**

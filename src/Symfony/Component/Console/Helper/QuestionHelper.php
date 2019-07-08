@@ -331,7 +331,7 @@ class QuestionHelper extends Helper
         return $fullChoice;
     }
 
-    private function mostRecentlyEnteredValue($entered)
+    private function mostRecentlyEnteredValue(string $entered)
     {
         // Determine the most recent value that the user entered
         if (false === strpos($entered, ',')) {

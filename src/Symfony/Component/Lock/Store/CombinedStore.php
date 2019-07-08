@@ -27,7 +27,7 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class CombinedStore implements StoreInterface, PersistStoreInterface, LoggerAwareInterface
+class CombinedStore implements StoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
     use ExpiringStoreTrait;

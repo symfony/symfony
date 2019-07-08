@@ -16,7 +16,6 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockStorageException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -29,7 +28,7 @@ use Symfony\Component\Lock\StoreInterface;
  * @author Romain Neutron <imprec@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class FlockStore implements StoreInterface, BlockingStoreInterface, PersistStoreInterface
+class FlockStore implements StoreInterface, BlockingStoreInterface
 {
     private $lockPath;
 

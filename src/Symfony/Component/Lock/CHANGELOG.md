@@ -4,8 +4,9 @@ CHANGELOG
 4.4.0
 -----
 
- * added InvalidTtlException
- 
+ * added InvalidTtlException  
+ * deprecated `Symfony\Component\Lock\StoreInterface` in favor of `Symfony\Component\Lock\BlockingStoreInterface` and `Symfony\Component\Lock\PersistStoreInterface`
+   
 4.2.0
 -----
 

@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -21,7 +23,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class SemaphoreStore implements StoreInterface
+class SemaphoreStore implements StoreInterface, PersistStoreInterface, BlockingStoreInterface
 {
     /**
      * Returns whether or not the store is supported.
@@ -111,5 +113,13 @@ class SemaphoreStore implements StoreInterface
     public function exists(Key $key)
     {
         return $key->hasState(__CLASS__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsWaitAndSave(): bool
+    {
+        return true;
     }
 }

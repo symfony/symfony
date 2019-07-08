@@ -16,6 +16,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -23,7 +24,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
  */
-class ZookeeperStore implements StoreInterface
+class ZookeeperStore implements StoreInterface, PersistStoreInterface
 {
     use ExpiringStoreTrait;
 
@@ -87,6 +88,7 @@ class ZookeeperStore implements StoreInterface
      */
     public function waitAndSave(Key $key)
     {
+        @trigger_error(sprintf('%s::%s has been deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', \get_class($this), __METHOD__), E_USER_DEPRECATED);
         throw new NotSupportedException();
     }
 

@@ -17,6 +17,7 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -24,7 +25,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class RedisStore implements StoreInterface
+class RedisStore implements StoreInterface, PersistStoreInterface
 {
     use ExpiringStoreTrait;
 
@@ -77,6 +78,7 @@ class RedisStore implements StoreInterface
      */
     public function waitAndSave(Key $key)
     {
+        @trigger_error(sprintf('%s::%s has been deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', \get_class($this), __METHOD__), E_USER_DEPRECATED);
         throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));
     }
 

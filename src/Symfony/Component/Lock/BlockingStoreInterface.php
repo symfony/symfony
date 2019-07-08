@@ -15,13 +15,9 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 
 /**
- * StoreInterface defines an interface to manipulate a lock store.
- *
- * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @deprecated "Symfony\Component\Lock\StoreInterface" is deprecated since Symfony 4.4 and has been split into "Symfony\Component\Lock\PersistStoreInterface", "Symfony\Component\Lock\BlockingStoreInterface".'
+ * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-interface StoreInterface extends PersistStoreInterface
+interface BlockingStoreInterface
 {
     /**
      * Waits until a key becomes free, then stores the resource.
@@ -32,4 +28,9 @@ interface StoreInterface extends PersistStoreInterface
      * @throws NotSupportedException
      */
     public function waitAndSave(Key $key);
+
+    /**
+     * Checks if the store can wait until a key becomes free before storing the resource.
+     */
+    public function supportsWaitAndSave(): bool;
 }

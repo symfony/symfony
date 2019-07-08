@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-05-26T16:27:09Z
+
+fabbot failure is a false positive
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-04T10:18:57Z
+
+@chalasr update to 4.4 and review fixed
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-05T05:34:33Z
+
+AppVeyor failure is unrelated, PR rebased

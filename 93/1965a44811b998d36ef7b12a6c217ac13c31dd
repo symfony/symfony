@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-23T16:29:30Z
+
+Could you please add a test case?
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2019-06-30T22:49:34Z
+
+@nicolas-grekas I've added a test for this.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2019-07-01T08:21:53Z
+
+Hmm, strange, its failing on the tests. But passes locally. I'll take a look at that this evening.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2019-07-01T08:24:59Z
+
+I'm a little confused, it is failing on php 5.5, but is fine on php 7.0+. Nothing I changed should affect 5.5, any ideas?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-04T21:12:26Z
+
+@alexbowers PHP changed how `substr()` behaved when the start parameter is the same as the length of the string (see also https://www.php.net/manual/en/function.substr.php and https://3v4l.org/tfZgp).
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2019-07-04T23:47:22Z
+
+Ah, thank you @xabbuh
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2019-07-04T23:54:32Z
+
+Hmm, can AppVeyor be re-ran?
+
+I can't see any cause for it failing.

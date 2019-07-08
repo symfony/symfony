@@ -17,6 +17,7 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\Store\CombinedStore;
 use Symfony\Component\Lock\Store\RedisStore;
+use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
@@ -267,8 +268,8 @@ class CombinedStoreTest extends AbstractStoreTest
 
     public function testPutOffExpirationIgnoreNonExpiringStorage()
     {
-        $store1 = $this->getMockBuilder([PersistStoreInterface::class, BlockingStoreInterface::class])->getMock();
-        $store2 = $this->getMockBuilder([PersistStoreInterface::class, BlockingStoreInterface::class])->getMock();
+        $store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
 
         $store = new CombinedStore([$store1, $store2], $this->strategy);
 

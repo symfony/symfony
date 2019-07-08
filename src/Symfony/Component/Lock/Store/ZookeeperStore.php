@@ -16,7 +16,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -24,7 +23,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
  */
-class ZookeeperStore implements StoreInterface, PersistStoreInterface
+class ZookeeperStore implements StoreInterface
 {
     use ExpiringStoreTrait;
 

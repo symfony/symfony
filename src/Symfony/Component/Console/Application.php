@@ -45,6 +45,7 @@ use Symfony\Component\ErrorCatcher\ErrorHandler;
 use Symfony\Component\ErrorCatcher\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * An Application is the container for a collection of commands.
@@ -61,7 +62,7 @@ use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Application
+class Application implements ResetInterface
 {
     private $commands = [];
     private $wantHelps = false;
@@ -274,6 +275,13 @@ class Application
         $this->runningCommand = null;
 
         return $exitCode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
     }
 
     public function setHelperSet(HelperSet $helperSet)

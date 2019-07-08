@@ -33,7 +33,7 @@ class NullDumper implements DumperInterface
     /**
      * {@inheritdoc}
      */
-    public function getProxyFactoryCode(Definition $definition, $id, $factoryCode = null): string
+    public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode): string
     {
         return '';
     }

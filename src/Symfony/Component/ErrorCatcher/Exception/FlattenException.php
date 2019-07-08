@@ -36,7 +36,7 @@ class FlattenException
     private $file;
     private $line;
 
-    public static function createFromThrowable(\Throwable $exception, ?int $statusCode = null, array $headers = []): self
+    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
     {
         $e = new static();
         $e->setMessage($exception->getMessage());

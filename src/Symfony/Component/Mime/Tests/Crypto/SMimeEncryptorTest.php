@@ -16,6 +16,9 @@ use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 
+/**
+ * @requires extension openssl
+ */
 class SMimeEncryptorTest extends SMimeTestCase
 {
     public function testEncryptMessage()

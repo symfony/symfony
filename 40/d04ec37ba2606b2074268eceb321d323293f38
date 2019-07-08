@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2018-11-19T22:58:41Z
+
+Hey, I'd appreciate if you can check how this fares against latest dev-master of monolog. Interfaces are now considered stable and while there are a few things I still want to look at before releasing, I'm trying to wrap up soon (and definitely before Symfony 4.3). I'd like to make sure it won't prevent Symfony projects from upgrading before I tag anything though.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-20T12:09:02Z
+
+>     * SwiftMailerHandler is broken with Monolog 2 and php 7.1.
+
+what is broken here ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-11-20T14:46:06Z
+
+> Hey, I'd appreciate if you can check how this fares against latest dev-master of monolog.
+
+@Seldaek I can look into this on the weekend.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-11-20T14:48:16Z
+
+> what is broken here ?
+
+@stof see [this comment](https://github.com/symfony/symfony/issues/27857#issuecomment-403520089)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-12-02T14:45:21Z
+
+I've updated the PR for the latest master of Monolog.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-04-06T16:37:06Z
+
+I've updated the PR during the `EU-FOSSA` hackathon. With my modifications, I was able to integrate Monolog 2 into a Symfony 4 application.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-04-06T17:33:55Z
+
+@Seldaek Have you ever considered making php 7.2 a requirement for Monolog 2? That would save us quite some pain here. 😅
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-04-08T07:38:37Z
+
+I already bumped from 7.0 to 7.1.. I am not sure what the 7.2 change would help with, but I feel like that's a bit much. I really need to get there with finalizing monolog 2 though :/
+
+---------------------------------------------------------------------------
+
+by stof at 2019-05-16T13:03:52Z
+
+@Seldaek PHP 7.2 is less strict than PHP 7.1 about adding/removing typehints in child classes for some cases. See the PR description.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-05-16T13:15:58Z
+
+Ok well I guess it could be considered as the release was delayed so much anyway.. But it means it won't be compatible with Symfony 4 requirements at all then.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-29T12:25:19Z
+
+Since it does not look like this will be merged into 4.3 anymore: I would suggest to rebase the patch against master, set all handlers to final and apply the interface changes required for Monolog 2. That would mean that version 5.0 of the bridge would be compatible with Monolog 1 and 2 while the Bridge 4.4 would support Monolog 1 only.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-06-30T16:23:11Z
+
+@derrabus if 4.4 is not an option then I guess this sounds good. I will try and push for a 2.0 again.. sorry for the delay.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-06-30T16:25:06Z
+
+Sorry my comment above was regarding the symfony 5/4 note, but regarding monolog requiring php 7.2 I am still not 100% sure. Will need to think about it some more. I'll add an issue too to see if anyone has feedback.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-01T09:53:54Z
+
+I've updated the PR for master. It should be safe to merge now.
+
+> regarding monolog requiring php 7.2 I am still not 100% sure.
+
+If we made Monolog 2 support a Symfony-5-only feature, the php requirement of Monolog would not matter anymore because Symfony 5 itself will require php 7.2.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-07-08T09:59:34Z
+
+Looks all good to me from a quick glance..
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-08T10:03:22Z
+
+There's no way to M2 compatible with SF4.4, right?
+This means M1 should accept bug fixes for 3-4 more years ideally.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-07-08T10:08:52Z
+
+I think it was mostly possible, at least if you are on php 7.2, if not I think then there was a hack needed for swiftmailer handler? @derrabus probably has more of an overview..
+
+I'd definitely prefer having Symfony 4.4 support Monolog 2 as well, but regardless Monolog 1 is super stable at this point so keeping maintenance up for a few more years is not that much work.

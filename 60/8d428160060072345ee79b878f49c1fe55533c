@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-26T18:01:57Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-27T16:43:33Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-28T15:17:52Z
+
+@jderusse I can do that in another PR when this one is merged to avoid having to much things in this one WDYT ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-29T10:37:45Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-29T10:46:19Z
+
+AppVeyor failure is not related
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-08T11:33:34Z
+
+fabbot has some interesting fixes :)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-08T13:10:19Z
+
+cc @fabpot fixed.

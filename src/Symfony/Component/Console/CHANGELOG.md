@@ -4,7 +4,8 @@ CHANGELOG
 4.4.0
 -----
 
-* added `Question::setTrimmable` default to true to allow the answer to be trimmed
+ * added `Question::setTrimmable` default to true to allow the answer to be trimmed
+ * added method `preventRedrawFasterThan()` and `forceRedrawSlowerThan()` on `ProgressBar`
 
 4.3.0
 -----

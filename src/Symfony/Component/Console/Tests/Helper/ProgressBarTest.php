@@ -944,4 +944,58 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(5, $bar->getBarWidth(), stream_get_contents($output->getStream()));
         putenv('COLUMNS=120');
     }
+
+    public function testForceRedrawSlowerThan(): void
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setRedrawFrequency(4); // disable step based redraws
+        $bar->start();
+        $bar->setProgress(1); // No treshold hit, no redraw
+        $bar->forceRedrawSlowerThan(2);
+        sleep(1);
+        $bar->setProgress(2); // Still no redraw because redraw is forced after 2 seconds only
+        sleep(1);
+        $bar->setProgress(3); // 1+1 = 2 -> redraw finally
+        $bar->setProgress(4); // step based redraw freq hit, redraw even without sleep
+        $bar->setProgress(5); // No treshold hit, no redraw
+        $bar->preventRedrawFasterThan(3);
+        sleep(2);
+        $bar->setProgress(6); // No redraw even though 2 seconds passed. Throttling has priority
+        $bar->preventRedrawFasterThan(2);
+        $bar->setProgress(7); // Throttling relaxed, draw
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    3 [--->------------------------]').
+            $this->generateOutput('    4 [---->-----------------------]').
+            $this->generateOutput('    7 [------->--------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testPreventRedrawFasterThan()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setRedrawFrequency(1);
+        $bar->preventRedrawFasterThan(1);
+        $bar->start();
+        $bar->setProgress(1); // Too fast, should not draw
+        sleep(1);
+        $bar->setProgress(2); // 1 second passed, draw
+        $bar->preventRedrawFasterThan(2);
+        sleep(1);
+        $bar->setProgress(3); // 1 second passed but we changed threshold, should not draw
+        sleep(1);
+        $bar->setProgress(4); // 1+1 seconds = 2 seconds passed which conforms threshold, draw
+        $bar->setProgress(5); // No treshold hit, no redraw
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    2 [-->-------------------------]').
+            $this->generateOutput('    4 [---->-----------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
 }

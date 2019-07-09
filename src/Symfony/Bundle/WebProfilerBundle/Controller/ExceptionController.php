@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Loader\ExistsLoaderInterface;
 
 /**
  * ExceptionController.
@@ -97,7 +95,7 @@ class ExceptionController
 
         $template = $this->getTemplate();
 
-        if (!$this->templateExists($template)) {
+        if (!$this->twig->getLoader()->exists($template)) {
             return new Response($this->errorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
         }
 
@@ -107,23 +105,5 @@ class ExceptionController
     protected function getTemplate()
     {
         return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
-    }
-
-    // to be removed when the minimum required version of Twig is >= 2.0
-    protected function templateExists(string $template)
-    {
-        $loader = $this->twig->getLoader();
-        if ($loader instanceof ExistsLoaderInterface) {
-            return $loader->exists($template);
-        }
-
-        try {
-            $loader->getSource($template);
-
-            return true;
-        } catch (LoaderError $e) {
-        }
-
-        return false;
     }
 }

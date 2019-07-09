@@ -11,13 +11,26 @@
 
 namespace Symfony\Component\Debug\Exception;
 
-use Symfony\Component\ErrorCatcher\Exception\UndefinedFunctionException as BaseUndefinedFunctionException;
-
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', UndefinedFunctionException::class, BaseUndefinedFunctionException::class), E_USER_DEPRECATED);
-
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\Exception\UndefinedFunctionException instead.
+ * Undefined Function Exception.
+ *
+ * @author Konstanton Myakshin <koc-dp@yandex.ru>
  */
-class UndefinedFunctionException extends BaseUndefinedFunctionException
+class UndefinedFunctionException extends FatalErrorException
 {
+    public function __construct(string $message, \ErrorException $previous)
+    {
+        parent::__construct(
+            $message,
+            $previous->getCode(),
+            $previous->getSeverity(),
+            $previous->getFile(),
+            $previous->getLine(),
+            null,
+            true,
+            null,
+            $previous->getPrevious()
+        );
+        $this->setTrace($previous->getTrace());
+    }
 }

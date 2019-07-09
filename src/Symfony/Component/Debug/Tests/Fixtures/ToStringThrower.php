@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\ErrorCatcher\Tests\Fixtures;
+namespace Symfony\Component\Debug\Tests\Fixtures;
 
 class ToStringThrower
 {

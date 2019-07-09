@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher;
+namespace Symfony\Component\Debug;
 
 function headers_sent()
 {
@@ -21,7 +21,7 @@ function header($str, $replace = true, $status = null)
     Tests\testHeader($str, $replace, $status);
 }
 
-namespace Symfony\Component\ErrorCatcher\Tests;
+namespace Symfony\Component\Debug\Tests;
 
 function testHeader()
 {

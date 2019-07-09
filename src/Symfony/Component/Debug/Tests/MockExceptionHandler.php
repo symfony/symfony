@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests;
+namespace Symfony\Component\Debug\Tests;
 
-use Symfony\Component\ErrorCatcher\ExceptionHandler;
+use Symfony\Component\Debug\ExceptionHandler;
 
 class MockExceptionHandler extends ExceptionHandler
 {

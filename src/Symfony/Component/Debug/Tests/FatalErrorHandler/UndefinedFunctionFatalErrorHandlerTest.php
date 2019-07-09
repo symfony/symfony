@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests\FatalErrorHandler;
+namespace Symfony\Component\Debug\Tests\FatalErrorHandler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorCatcher\Exception\FatalErrorException;
-use Symfony\Component\ErrorCatcher\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
+use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 
 class UndefinedFunctionFatalErrorHandlerTest extends TestCase
 {
@@ -25,7 +25,7 @@ class UndefinedFunctionFatalErrorHandlerTest extends TestCase
         $handler = new UndefinedFunctionFatalErrorHandler();
         $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
 
-        $this->assertInstanceOf('Symfony\Component\ErrorCatcher\Exception\UndefinedFunctionException', $exception);
+        $this->assertInstanceOf('Symfony\Component\Debug\Exception\UndefinedFunctionException', $exception);
         // class names are case insensitive and PHP do not return the same
         $this->assertSame(strtolower($translatedMessage), strtolower($exception->getMessage()));
         $this->assertSame($error['type'], $exception->getSeverity());
@@ -43,7 +43,7 @@ class UndefinedFunctionFatalErrorHandlerTest extends TestCase
                     'file' => 'foo.php',
                     'message' => 'Call to undefined function test_namespaced_function()',
                 ],
-                "Attempted to call function \"test_namespaced_function\" from the global namespace.\nDid you mean to call \"\\symfony\\component\\errorcatcher\\tests\\fatalerrorhandler\\test_namespaced_function\"?",
+                "Attempted to call function \"test_namespaced_function\" from the global namespace.\nDid you mean to call \"\\symfony\\component\\debug\\tests\\fatalerrorhandler\\test_namespaced_function\"?",
             ],
             [
                 [
@@ -52,7 +52,7 @@ class UndefinedFunctionFatalErrorHandlerTest extends TestCase
                     'file' => 'foo.php',
                     'message' => 'Call to undefined function Foo\\Bar\\Baz\\test_namespaced_function()',
                 ],
-                "Attempted to call function \"test_namespaced_function\" from namespace \"Foo\\Bar\\Baz\".\nDid you mean to call \"\\symfony\\component\\errorcatcher\\tests\\fatalerrorhandler\\test_namespaced_function\"?",
+                "Attempted to call function \"test_namespaced_function\" from namespace \"Foo\\Bar\\Baz\".\nDid you mean to call \"\\symfony\\component\\debug\\tests\\fatalerrorhandler\\test_namespaced_function\"?",
             ],
             [
                 [

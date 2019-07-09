@@ -3,7 +3,7 @@ Test rethrowing in custom exception handler
 --FILE--
 <?php
 
-namespace Symfony\Component\ErrorCatcher;
+namespace Symfony\Component\Debug;
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {

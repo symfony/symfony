@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 
@@ -47,7 +47,7 @@ class LockableTraitTest extends TestCase
             $store = new FlockStore();
         }
 
-        $lock = (new Factory($store))->createLock($command->getName());
+        $lock = (new LockFactory($store))->createLock($command->getName());
         $lock->acquire();
 
         $tester = new CommandTester($command);

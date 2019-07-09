@@ -103,6 +103,7 @@
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },
     "conflict": {
+        "monolog/monolog": ">=2",
         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
         "phpdocumentor/type-resolver": "<0.3.0",
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"

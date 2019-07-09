@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-04T18:52:02Z
+
+ErrorRendeder instead of ErrorDumper?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-04T18:52:40Z
+
+I will also remove from the current `ErrorCatcher` everything unrelated to the future `ErrorDumper` and make it work. Later, as last step, let's create/rename both components to `ErrorHandler` and `ErrorDumper` respectively.
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-04T20:04:16Z
+
+Status: Needs Review
+
+(low/high Travis's failures are gone after merge)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-04T20:06:24Z
+
+> ErrorRenderer instead of ErrorDumper?
+
+That one is nice too. Personally, I like `ErrorDumper` it feels like `VarDumper` but for errors. Let's rename it for another PR.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-05T11:39:53Z
+
+Thanks Nicolas! now Travis's low tests pass.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-08T06:51:56Z
+
+It would make sense to me to remove error-catcher from the composer.json of the Debug component.
+This means using the legacy FlattenException in ExceptionHandler, which is OK.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-08T13:33:59Z
+
+@nicolas-grekas it's done now, thanks.

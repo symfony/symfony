@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-10T23:05:34Z
+
+This PR should target the 4.4 branch. If you only add a `@method` annotation to the `BundleInterface` instead of the real method, it's not a BC break anymore.
+
+---------------------------------------------------------------------------
+
+by garak at 2019-06-11T06:45:59Z
+
+> This PR should target the 4.4 branch. If you only add a `@method` annotation to the `BundleInterface` instead of the real method, it's not a BC break anymore.
+
+So, should I close this PR and open another one on 4.4?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-20T06:41:38Z
+
+@garak No, you change the target of this PR without creating a new one.
+
+---------------------------------------------------------------------------
+
+by garak at 2019-06-20T06:51:52Z
+
+@fabpot I just tried to change target to 4.4. and a bunch of stuff popped up.
+Maybe a new PR is a better option... unless you can suggest a way to get rid of such mess
+Thanks
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-20T12:26:29Z
+
+@garak rebase your PR locally on 4.4 and push again, that should resolve the mess.
+
+---------------------------------------------------------------------------
+
+by garak at 2019-06-20T13:14:16Z
+
+I rebased upon 4.4.
+I followed suggestion from @derrabus and replaced actual method with an annotation inside interface.
+I also updated initial PR comment.
+
+Hope everything is fine
+
+---------------------------------------------------------------------------
+
+by garak at 2019-06-29T15:16:47Z
+
+I still see "Status: Needs Work" label. Should I do something else?
+
+---------------------------------------------------------------------------
+
+by garak at 2019-07-08T13:36:07Z
+
+Friendly reminder: did needed work, do I need to do some more?
+
+---------------------------------------------------------------------------
+
+by garak at 2019-07-08T14:40:32Z
+
+I addressed all notes from @fabpot, I guess. Some portions of code are not shown as modified, but they are, actually.
+I also added a small expectation in tests, I couldn't find any direct tests of AssetsInstallCommand. Failures in CI are unrelated

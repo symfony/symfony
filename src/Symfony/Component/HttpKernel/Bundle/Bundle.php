@@ -135,7 +135,7 @@ abstract class Bundle implements BundleInterface
     {
     }
 
-    public function getPublicPath(): string
+    public function getPublicDir(): string
     {
         return 'Resources/public';
     }

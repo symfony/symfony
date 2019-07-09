@@ -40,7 +40,7 @@
         "symfony/translation-contracts": "^1.1",
         "symfony/var-dumper": "^4.4|^5.0",
         "psr/cache": "~1.0",
-        "twig/twig": "^1.34|^2.4"
+        "twig/twig": "^2.4"
     },
     "provide": {
         "psr/log-implementation": "1.0"
@@ -51,7 +51,7 @@
         "symfony/dependency-injection": "<4.4",
         "symfony/translation": "<4.4",
         "symfony/var-dumper": "<4.4",
-        "twig/twig": "<1.34|<2.4,>=2"
+        "twig/twig": "<2.4"
     },
     "suggest": {
         "symfony/browser-kit": "",

@@ -137,3 +137,9 @@ Validator
    when the `min` option is used.
    Set it to `true` to keep the current behavior and `false` to reject empty strings.
    In 5.0, it'll become optional and will default to `false`.
+
+WebProfilerBundle
+-----------------
+
+ * Deprecated the `ExceptionController::templateExists()` method
+ * Deprecated the `TemplateManager::templateExists()` method

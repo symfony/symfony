@@ -477,6 +477,12 @@ Validator
  * The `egulias/email-validator` component is now required for using the `Email` constraint in strict mode
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
 
+WebProfilerBundle
+-----------------
+
+ * Removed the `ExceptionController::templateExists()` method
+ * Removed the `TemplateManager::templateExists()` method
+
 Workflow
 --------
 

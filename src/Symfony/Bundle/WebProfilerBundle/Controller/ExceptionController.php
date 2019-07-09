@@ -101,7 +101,7 @@ class ExceptionController
 
         $template = $this->getTemplate();
 
-        if (!$this->templateExists($template)) {
+        if (!$this->templateExists($template, false)) {
             return new Response($this->errorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
         }
 
@@ -113,9 +113,15 @@ class ExceptionController
         return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
     }
 
-    // to be removed when the minimum required version of Twig is >= 2.0
-    protected function templateExists($template)
+    /**
+     * @deprecated since Symfony 4.4
+     */
+    protected function templateExists($template/*, bool $triggerDeprecation = true */)
     {
+        if (1 === \func_num_args()) {
+            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use the "exists()" method of the Twig loader instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $loader = $this->twig->getLoader();
         if ($loader instanceof ExistsLoaderInterface) {
             return $loader->exists($template);

@@ -76,7 +76,7 @@ class Deprecation
             // No-op
         }
         $line = $trace[$i];
-        $this->trigerringFilePathType = $this->getPathType($file);
+        $this->triggeringFilePathType = $this->getPathType($file);
         if (isset($line['object']) || isset($line['class'])) {
             if (isset($line['class']) && 0 === strpos($line['class'], SymfonyTestsListenerFor::class)) {
                 $parsedMsg = unserialize($this->message);
@@ -88,7 +88,7 @@ class Deprecation
                 // then we need to use the serialized information to determine
                 // if the error has been triggered from vendor code.
                 if (isset($parsedMsg['triggering_file'])) {
-                    $this->trigerringFilePathType = $this->getPathType($parsedMsg['triggering_file']);
+                    $this->triggeringFilePathType = $this->getPathType($parsedMsg['triggering_file']);
                 }
 
                 return;
@@ -177,10 +177,10 @@ class Deprecation
      */
     public function getType()
     {
-        if (self::PATH_TYPE_SELF === $this->trigerringFilePathType) {
+        if (self::PATH_TYPE_SELF === $this->triggeringFilePathType) {
             return self::TYPE_SELF;
         }
-        if (self::PATH_TYPE_UNDETERMINED === $this->trigerringFilePathType) {
+        if (self::PATH_TYPE_UNDETERMINED === $this->triggeringFilePathType) {
             return self::TYPE_UNDETERMINED;
         }
         $erroringFile = $erroringPackage = null;

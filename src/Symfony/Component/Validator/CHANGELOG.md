@@ -15,8 +15,8 @@ CHANGELOG
  * Added new `minPropertyPath` and `maxPropertyPath` options
    to `Range` constraint in order to get the value to compare
    from an array or object
- * added the `limit_path` parameter in violations when using 
-   `Range` constraint with the `minPropertyPath` or
+ * added the `min_limit_path` and `max_limit_path` parameters in violations when using 
+   `Range` constraint with respectively the `minPropertyPath` and
    `maxPropertyPath` options.
 
 4.3.0

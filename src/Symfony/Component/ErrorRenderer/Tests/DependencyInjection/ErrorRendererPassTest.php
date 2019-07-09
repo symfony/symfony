@@ -9,42 +9,42 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests\DependencyInjection;
+namespace Symfony\Component\ErrorRenderer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\ErrorCatcher\DependencyInjection\ErrorCatcherPass;
-use Symfony\Component\ErrorCatcher\DependencyInjection\LazyLoadingErrorFormatter;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\JsonErrorRenderer;
+use Symfony\Component\ErrorRenderer\DependencyInjection\ErrorRendererPass;
+use Symfony\Component\ErrorRenderer\DependencyInjection\LazyLoadingErrorRenderer;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\JsonErrorRenderer;
 
-class ErrorCatcherPassTest extends TestCase
+class ErrorRendererPassTest extends TestCase
 {
     public function testProcess()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
-        $definition = $container->register('error_catcher.error_formatter', LazyLoadingErrorFormatter::class)
+        $definition = $container->register('error_renderer', LazyLoadingErrorRenderer::class)
             ->addArgument([])
         ;
-        $container->register('error_catcher.renderer.html', HtmlErrorRenderer::class)
-            ->addTag('error_catcher.renderer')
+        $container->register('error_renderer.renderer.html', HtmlErrorRenderer::class)
+            ->addTag('error_renderer.renderer')
         ;
-        $container->register('error_catcher.renderer.json', JsonErrorRenderer::class)
-            ->addTag('error_catcher.renderer')
+        $container->register('error_renderer.renderer.json', JsonErrorRenderer::class)
+            ->addTag('error_renderer.renderer')
         ;
 
-        (new ErrorCatcherPass())->process($container);
+        (new ErrorRendererPass())->process($container);
 
         $serviceLocatorDefinition = $container->getDefinition((string) $definition->getArgument(0));
         $this->assertSame(ServiceLocator::class, $serviceLocatorDefinition->getClass());
 
         $expected = [
-            'html' => new ServiceClosureArgument(new Reference('error_catcher.renderer.html')),
-            'json' => new ServiceClosureArgument(new Reference('error_catcher.renderer.json')),
+            'html' => new ServiceClosureArgument(new Reference('error_renderer.renderer.html')),
+            'json' => new ServiceClosureArgument(new Reference('error_renderer.renderer.json')),
         ];
         $this->assertEquals($expected, $serviceLocatorDefinition->getArgument(0));
     }

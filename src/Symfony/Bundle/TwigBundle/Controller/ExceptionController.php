@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
-use Symfony\Component\ErrorCatcher\Exception\FlattenException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;

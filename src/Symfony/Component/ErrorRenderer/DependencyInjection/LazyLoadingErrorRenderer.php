@@ -9,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\DependencyInjection;
+namespace Symfony\Component\ErrorRenderer\DependencyInjection;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorFormatter;
+use Symfony\Component\ErrorRenderer\ErrorRenderer;
 
 /**
  * Lazily loads error renderers from the dependency injection container.
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class LazyLoadingErrorFormatter extends ErrorFormatter
+class LazyLoadingErrorRenderer extends ErrorRenderer
 {
     private $container;
     private $initialized = [];

@@ -140,7 +140,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
 
             foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED) as $p) {
                 yield $p->getDocComment().$p;
-                yield print_r($defaults[$p->name], true);
+                yield print_r($defaults[$p->name] ?? null, true);
             }
         }
 

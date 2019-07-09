@@ -60,7 +60,7 @@ class ExceptionController
         $exception = $this->profiler->loadProfile($token)->getCollector('exception')->getException();
         $template = $this->getTemplate();
 
-        if (!$this->twig->getLoader()->exists($template)) {
+        if (!$this->templateExists($template)) {
             $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
 
             return new Response($handler->getContent($exception), 200, ['Content-Type' => 'text/html']);

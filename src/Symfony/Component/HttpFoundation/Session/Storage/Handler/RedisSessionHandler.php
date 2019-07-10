@@ -63,7 +63,7 @@ class RedisSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
-    protected function doRead($sessionId): string
+    protected function doRead($sessionId)
     {
         return $this->redis->get($this->prefix.$sessionId) ?: '';
     }

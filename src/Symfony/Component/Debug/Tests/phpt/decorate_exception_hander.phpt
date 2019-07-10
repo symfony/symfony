@@ -26,6 +26,7 @@ if (true) {
 
 ?>
 --EXPECTF--
+%A
 object(Symfony\Component\Debug\Exception\ClassNotFoundException)#%d (8) {
   ["message":protected]=>
   string(131) "Attempted to load class "missing" from namespace "Symfony\Component\Debug".

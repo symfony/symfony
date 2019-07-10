@@ -14,7 +14,7 @@ namespace Symfony\Component\Debug\Exception;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "Symfony\Component\ErrorRenderer\Exception\FlattenException" instead.', FlattenException::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', FlattenException::class, \Symfony\Component\ErrorRenderer\Exception\FlattenException::class), E_USER_DEPRECATED);
 
 /**
  * FlattenException wraps a PHP Error or Exception to be able to serialize it.

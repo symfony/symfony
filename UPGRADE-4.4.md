@@ -6,6 +6,12 @@ Cache
 
  * Added argument `$prefix` to `AdapterInterface::clear()`
 
+Debug
+-----
+
+ * Deprecated `FlattenException`, use the `FlattenException` of the `ErrorRenderer` component
+ * Deprecated the whole component in favor of `ErrorHandler` component
+
 DependencyInjection
 -------------------
 

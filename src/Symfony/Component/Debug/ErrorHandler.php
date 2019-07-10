@@ -23,6 +23,8 @@ use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ErrorHandler::class, \Symfony\Component\ErrorHandler\ErrorHandler::class), E_USER_DEPRECATED);
+
 /**
  * A generic ErrorHandler for the PHP engine.
  *
@@ -47,6 +49,8 @@ use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
  * @final since Symfony 4.3
+ *
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\ErrorHandler instead.
  */
 class ErrorHandler
 {

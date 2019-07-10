@@ -12,7 +12,7 @@
 namespace Symfony\Component\ErrorRenderer\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;

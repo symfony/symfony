@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 
+/**
+ * @group legacy
+ */
 class UndefinedFunctionFatalErrorHandlerTest extends TestCase
 {
     /**

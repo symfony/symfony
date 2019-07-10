@@ -38,6 +38,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -1566,6 +1567,20 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $this->assertSame(['service_container'], array_keys($container->getDefinitions()));
+    }
+
+    public function testScalarService()
+    {
+        $c = new ContainerBuilder();
+        $c->register('foo', 'string')
+            ->setPublic(true)
+            ->setFactory([ScalarFactory::class, 'getSomeValue'])
+        ;
+
+        $c->compile();
+
+        $this->assertTrue($c->has('foo'));
+        $this->assertSame('some value', $c->get('foo'));
     }
 }
 

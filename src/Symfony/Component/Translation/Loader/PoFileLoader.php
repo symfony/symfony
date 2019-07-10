@@ -126,23 +126,24 @@ class PoFileLoader extends FileLoader
      */
     private function addMessage(array &$messages, array $item)
     {
-        if (\is_array($item['translated'])) {
-            $messages[stripcslashes($item['ids']['singular'])] = stripcslashes($item['translated'][0]);
+        if (!empty($item['ids']['singular'])) {
+            $id = stripcslashes($item['ids']['singular']);
             if (isset($item['ids']['plural'])) {
-                $plurals = $item['translated'];
-                // PO are by definition indexed so sort by index.
-                ksort($plurals);
-                // Make sure every index is filled.
-                end($plurals);
-                $count = key($plurals);
-                // Fill missing spots with '-'.
-                $empties = array_fill(0, $count + 1, '-');
-                $plurals += $empties;
-                ksort($plurals);
-                $messages[stripcslashes($item['ids']['plural'])] = stripcslashes(implode('|', $plurals));
+                $id .= '|'.stripcslashes($item['ids']['plural']);
             }
-        } elseif (!empty($item['ids']['singular'])) {
-            $messages[stripcslashes($item['ids']['singular'])] = stripcslashes($item['translated']);
+
+            $translated = (array) $item['translated'];
+            // PO are by definition indexed so sort by index.
+            ksort($translated);
+            // Make sure every index is filled.
+            end($translated);
+            $count = key($translated);
+            // Fill missing spots with '-'.
+            $empties = array_fill(0, $count + 1, '-');
+            $translated += $empties;
+            ksort($translated);
+
+            $messages[$id] = stripcslashes(implode('|', $translated));
         }
     }
 }

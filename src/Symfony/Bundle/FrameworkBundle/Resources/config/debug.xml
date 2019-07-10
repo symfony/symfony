@@ -9,6 +9,7 @@
 
         <service id="debug.event_dispatcher" class="Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher" decorates="event_dispatcher">
             <tag name="monolog.logger" channel="event" />
+            <tag name="kernel.reset" method="reset" />
             <argument type="service" id="debug.event_dispatcher.inner" />
             <argument type="service" id="debug.stopwatch" />
             <argument type="service" id="logger" on-invalid="null" />

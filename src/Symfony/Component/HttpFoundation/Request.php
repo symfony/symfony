@@ -913,8 +913,8 @@ class Request
             $pos = strrpos($host, ':');
         }
 
-        if (false !== $pos) {
-            return (int) substr($host, $pos + 1);
+        if (false !== $pos && $port = substr($host, $pos + 1)) {
+            return (int) $port;
         }
 
         return 'https' === $this->getScheme() ? 443 : 80;

@@ -2303,6 +2303,18 @@ class RequestTest extends TestCase
 
         $this->assertSame(443, $request->getPort());
     }
+
+    public function testTrustedPortDoesNotDefaultToZero()
+    {
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_ALL);
+
+        $request = Request::create('/');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $request->headers->set('X-Forwarded-Host', 'test.example.com');
+        $request->headers->set('X-Forwarded-Port', '');
+
+        $this->assertSame(80, $request->getPort());
+    }
 }
 
 class RequestContentProxy extends Request

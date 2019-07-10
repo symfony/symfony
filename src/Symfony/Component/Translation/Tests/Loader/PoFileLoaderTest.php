@@ -35,8 +35,7 @@ class PoFileLoaderTest extends TestCase
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals([
-            'foo' => 'bar',
-            'foos' => 'bar|bars',
+            'foo|foos' => 'bar|bars',
             '{0} no foos|one foo|%count% foos' => '{0} no bars|one bar|%count% bars',
         ], $catalogue->all('domain1'));
         $this->assertEquals('en', $catalogue->getLocale());
@@ -93,10 +92,8 @@ class PoFileLoaderTest extends TestCase
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $messages = $catalogue->all('domain1');
-        $this->assertArrayHasKey('escaped "foo"', $messages);
-        $this->assertArrayHasKey('escaped "foos"', $messages);
-        $this->assertEquals('escaped "bar"', $messages['escaped "foo"']);
-        $this->assertEquals('escaped "bar"|escaped "bars"', $messages['escaped "foos"']);
+        $this->assertArrayHasKey('escaped "foo"|escaped "foos"', $messages);
+        $this->assertEquals('escaped "bar"|escaped "bars"', $messages['escaped "foo"|escaped "foos"']);
     }
 
     public function testSkipFuzzyTranslations()
@@ -109,5 +106,17 @@ class PoFileLoaderTest extends TestCase
         $this->assertArrayHasKey('foo1', $messages);
         $this->assertArrayNotHasKey('foo2', $messages);
         $this->assertArrayHasKey('foo3', $messages);
+    }
+
+    public function testMissingPlurals()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../fixtures/missing-plurals.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals([
+            'foo|foos' => '-|bar|-|bars',
+        ], $catalogue->all('domain1'));
+        $this->assertEquals('en', $catalogue->getLocale());
     }
 }

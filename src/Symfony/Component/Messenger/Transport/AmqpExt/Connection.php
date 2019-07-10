@@ -189,9 +189,7 @@ class Connection
             $this->exchange(),
             $body,
             $this->getRoutingKeyForMessage($amqpStamp),
-            [
-                'headers' => $headers,
-            ],
+            $headers,
             $amqpStamp
         );
     }
@@ -221,20 +219,21 @@ class Connection
             $this->getDelayExchange(),
             $body,
             $this->getRoutingKeyForDelay($delay, $routingKey),
-            [
-                'headers' => $headers,
-            ],
+            $headers,
             $amqpStamp
         );
     }
 
-    private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $attributes = [], AmqpStamp $amqpStamp = null)
+    private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $headers = [], AmqpStamp $amqpStamp = null)
     {
+        $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
+        $attributes['headers'] = array_merge($headers, $attributes['headers'] ?? []);
+
         $exchange->publish(
             $body,
             $routingKey,
             $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM,
-            array_merge($amqpStamp ? $amqpStamp->getAttributes() : [], $attributes)
+            $attributes
         );
     }
 

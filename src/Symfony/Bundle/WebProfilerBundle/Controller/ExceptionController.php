@@ -64,7 +64,7 @@ class ExceptionController
         $exception = $this->profiler->loadProfile($token)->getCollector('exception')->getException();
         $template = $this->getTemplate();
 
-        if (!$this->twig->getLoader()->exists($template)) {
+        if (!$this->templateExists($template)) {
             return new Response($this->errorRenderer->getBody($exception), 200, ['Content-Type' => 'text/html']);
         }
 

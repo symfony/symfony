@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-if [[ $1 == force ]]; then
-    docker pull jakzal/php-intl
-fi;
+[[ $1 == force ]] && docker pull jakzal/php-intl
+[[ ! -d /tmp/symfony/icu ]] && mkdir -p /tmp/symfony/icu
 
 docker run \
     -it --rm --name symfony-intl \

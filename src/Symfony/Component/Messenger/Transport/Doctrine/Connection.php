@@ -74,22 +74,19 @@ class Connection
             parse_str($components['query'], $query);
         }
 
-        $configuration = [
-            'connection' => $components['host'],
-            'table_name' => $options['table_name'] ?? ($query['table_name'] ?? self::DEFAULT_OPTIONS['table_name']),
-            'queue_name' => $options['queue_name'] ?? ($query['queue_name'] ?? self::DEFAULT_OPTIONS['queue_name']),
-            'redeliver_timeout' => $options['redeliver_timeout'] ?? ($query['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout']),
-            'auto_setup' => $options['auto_setup'] ?? ($query['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup']),
-        ];
+        $configuration = ['connection' => $components['host']];
+        $configuration += $options + $query + self::DEFAULT_OPTIONS;
+
+        $configuration['auto_setup'] = filter_var($configuration['auto_setup'], FILTER_VALIDATE_BOOLEAN);
 
         // check for extra keys in options
-        $optionsExtraKeys = array_diff(array_keys($options), array_keys($configuration));
+        $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found : [%s]. Allowed options are [%s]', implode(', ', $optionsExtraKeys), implode(', ', self::DEFAULT_OPTIONS)));
         }
 
         // check for extra keys in options
-        $queryExtraKeys = array_diff(array_keys($query), array_keys($configuration));
+        $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s]', implode(', ', $queryExtraKeys), implode(', ', self::DEFAULT_OPTIONS)));
         }

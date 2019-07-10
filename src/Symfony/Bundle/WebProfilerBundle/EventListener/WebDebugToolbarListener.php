@@ -16,8 +16,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Profiler\ProfileStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
@@ -44,8 +47,9 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $mode;
     protected $excludedAjaxPaths;
     private $cspHandler;
+    private $profileStack;
 
-    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null)
+    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null, ProfileStack $profileStack = null)
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
@@ -53,6 +57,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->mode = $mode;
         $this->excludedAjaxPaths = $excludedAjaxPaths;
         $this->cspHandler = $cspHandler;
+        $this->profileStack = $profileStack;
     }
 
     public function isEnabled()
@@ -65,11 +70,38 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $response = $event->getResponse();
         $request = $event->getRequest();
 
-        if ($response->headers->has('X-Debug-Token') && null !== $this->urlGenerator) {
+        $hasProfile = $this->profileStack instanceof ProfileStack ? $this->profileStack->has($request) : $response->headers->has('X-Debug-Token');
+
+        if ($hasProfile && null !== $this->urlGenerator) {
+            $panel = null;
+
+            if ($this->profileStack instanceof ProfileStack) {
+                $profile = $this->profileStack->get($request);
+
+                $token = $profile->getToken();
+
+                foreach ($profile->getCollectors() as $collector) {
+                    if ($collector instanceof ExceptionDataCollector && $collector->hasException()) {
+                        $panel = $collector->getName();
+
+                        break;
+                    }
+
+                    if ($collector instanceof DumpDataCollector && $collector->getDumpsCount() > 0) {
+                        $panel = $collector->getName();
+                    }
+                }
+            } else {
+                $token = $response->headers->get('X-Debug-Token');
+            }
+
             try {
                 $response->headers->set(
                     'X-Debug-Token-Link',
-                    $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL)
+                    $this->urlGenerator->generate('_profiler', [
+                        'token' => $token,
+                        'panel' => $panel,
+                    ], UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
                 $response->headers->set('X-Debug-Error', \get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
@@ -87,7 +119,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             return;
         }
 
-        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects && 'html' === $request->getRequestFormat()) {
+        if ($hasProfile && $response->isRedirect() && $this->interceptRedirects && 'html' === $request->getRequestFormat()) {
             if ($request->hasSession() && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
                 // keep current flashes for one more request if using AutoExpireFlashBag
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
@@ -99,7 +131,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         }
 
         if (self::DISABLED === $this->mode
-            || !$response->headers->has('X-Debug-Token')
+            || !$hasProfile
             || $response->isRedirection()
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()

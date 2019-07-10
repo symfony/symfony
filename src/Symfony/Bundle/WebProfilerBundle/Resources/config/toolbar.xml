@@ -15,6 +15,7 @@
             <argument type="service" id="router" on-invalid="ignore" />
             <argument /> <!-- paths that should be excluded from the AJAX requests shown in the toolbar -->
             <argument type="service" id="web_profiler.csp.handler" />
+            <argument type="service" id="profile_stack" />
         </service>
     </services>
 </container>

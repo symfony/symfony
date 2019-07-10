@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\Profiler\ProfileStack;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -73,6 +74,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('data_collector.templates', []);
         $this->container->set('kernel', $this->kernel);
         $this->container->addCompilerPass(new RegisterListenersPass());
+        $this->container->register('profile_stack', ProfileStack::class);
     }
 
     protected function tearDown(): void

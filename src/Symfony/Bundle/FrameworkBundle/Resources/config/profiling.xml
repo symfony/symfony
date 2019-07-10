@@ -24,6 +24,9 @@
             <argument>null</argument>
             <argument>%profiler_listener.only_exceptions%</argument>
             <argument>%profiler_listener.only_master_requests%</argument>
+            <argument type="service" id="profile_stack" />
         </service>
+
+        <service id="profile_stack" class="Symfony\Component\HttpKernel\Profiler\ProfileStack" />
     </services>
 </container>

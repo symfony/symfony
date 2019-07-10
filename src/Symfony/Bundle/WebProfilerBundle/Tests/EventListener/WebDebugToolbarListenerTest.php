@@ -16,8 +16,13 @@ use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\HttpKernel\Profiler\ProfileStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class WebDebugToolbarListenerTest extends TestCase
@@ -243,7 +248,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $urlGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with('_profiler', ['token' => 'xxxxxxxx'], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->with('_profiler', ['token' => 'xxxxxxxx', 'panel' => null], UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn('http://mydomain.com/_profiler/xxxxxxxx')
         ;
 
@@ -264,7 +269,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $urlGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with('_profiler', ['token' => 'xxxxxxxx'])
+            ->with('_profiler', ['token' => 'xxxxxxxx', 'panel' => null])
             ->willThrowException(new \Exception('foo'))
         ;
 
@@ -285,7 +290,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $urlGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with('_profiler', ['token' => 'xxxxxxxx'])
+            ->with('_profiler', ['token' => 'xxxxxxxx', 'panel' => null])
             ->willThrowException(new \Exception("This\nmultiline\r\ntabbed text should\tcome out\r on\n \ta single plain\r\nline"))
         ;
 
@@ -295,6 +300,97 @@ class WebDebugToolbarListenerTest extends TestCase
         $listener->onKernelResponse($event);
 
         $this->assertEquals('Exception: This multiline tabbed text should come out on a single plain line', $response->headers->get('X-Debug-Error'));
+    }
+
+    public function testToolbarIsInjectedWithProfileStack()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+
+        $event = new ResponseEvent($this->getKernelMock(), $request = $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', null, $profileStack = new ProfileStack());
+
+        $profileStack->set($request, new Profile('foobar'));
+
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
+    }
+
+    /**
+     * @dataProvider linksToPanelsProvider
+     */
+    public function testLinksToPanels(DataCollectorInterface $dataCollector, Request $request, Response $response)
+    {
+        $urlGenerator = $this->getUrlGeneratorMock();
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('_profiler', ['token' => $token = 'xxxxxx', 'panel' => $dataCollector->getName()], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn($expectedLink = 'http://mydomain.com/_profiler/'.$dataCollector->getName());
+
+        $event = new ResponseEvent($this->getKernelMock(), $request, HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, $urlGenerator, '', null, $profileStack = new ProfileStack());
+
+        $profileStack->set($request, $profile = new Profile($token));
+        $profile->addCollector($dataCollector);
+        $profile->addCollector($this->createMock(DataCollectorInterface::class));
+
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals($expectedLink, $response->headers->get('X-Debug-Token-Link'));
+    }
+
+    public function linksToPanelsProvider()
+    {
+        $exceptionDataCollector = new ExceptionDataCollector();
+        $exceptionDataCollector->collect($request = new Request(), $response = new Response(), new \DomainException());
+
+        yield [$exceptionDataCollector, $request, $response];
+
+        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector
+            ->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn('dump');
+        $dumpDataCollector
+            ->expects($this->atLeastOnce())
+            ->method('getDumpsCount')
+            ->willReturn(1);
+
+        yield [$dumpDataCollector, new Request(), new Response()];
+    }
+
+    public function testLinkToExceptionPanelPriority()
+    {
+        $exceptionDataCollector = new ExceptionDataCollector();
+        $exceptionDataCollector->collect($request = new Request(), $response = new Response(), new \DomainException());
+
+        $urlGenerator = $this->getUrlGeneratorMock();
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('_profiler', ['token' => $token = 'xxxxxx', 'panel' => $exceptionDataCollector->getName()], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn($expectedLink = 'http://mydomain.com/_profiler/'.$exceptionDataCollector->getName());
+
+        $event = new ResponseEvent($this->getKernelMock(), $request, HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, $urlGenerator, '', null, $profileStack = new ProfileStack());
+
+        $profileStack->set($request, $profile = new Profile($token));
+        $profile->addCollector($exceptionDataCollector);
+
+        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector
+            ->expects($this->never())
+            ->method('getDumpsCount');
+
+        $profile->addCollector($dumpDataCollector);
+
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals($expectedLink, $response->headers->get('X-Debug-Token-Link'));
     }
 
     protected function getRequestMock($isXmlHttpRequest = false, $requestFormat = 'html', $hasSession = true)

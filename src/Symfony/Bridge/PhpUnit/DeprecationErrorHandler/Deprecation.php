@@ -170,6 +170,20 @@ class Deprecation
     }
 
     /**
+     * @return bool
+     */
+    public function isMuted()
+    {
+        if (!isset($this->trace[0]['class'])) {
+            return false;
+        }
+
+        return 0 === strpos($this->trace[0]['class'], 'PHPUnit\\') && \in_array($this->message, [
+            'Function ReflectionType::__toString() is deprecated',
+        ], true);
+    }
+
+    /**
      * Tells whether both the calling package and the called package are vendor
      * packages.
      *

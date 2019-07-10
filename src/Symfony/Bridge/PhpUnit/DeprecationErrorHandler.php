@@ -39,12 +39,14 @@ class DeprecationErrorHandler
         'otherCount' => 0,
         'remaining directCount' => 0,
         'remaining indirectCount' => 0,
+        'mutedCount' => 0,
         'unsilenced' => [],
         'remaining self' => [],
         'legacy' => [],
         'other' => [],
         'remaining direct' => [],
         'remaining indirect' => [],
+        'muted' => [],
     ];
 
     private static $isRegistered = false;
@@ -128,7 +130,7 @@ class DeprecationErrorHandler
         }
 
         $deprecation = new Deprecation($msg, debug_backtrace(), $file);
-        $group = 'other';
+        $group = $deprecation->isMuted() ? 'muted' : 'other';
 
         if ($deprecation->originatesFromAnObject()) {
             $class = $deprecation->originatingClass();
@@ -139,6 +141,8 @@ class DeprecationErrorHandler
                 $group = 'unsilenced';
             } elseif ($deprecation->isLegacy(self::$utilPrefix)) {
                 $group = 'legacy';
+            } elseif ($deprecation->isMuted()) {
+                $group = 'muted';
             } else {
                 $group = [
                     Deprecation::TYPE_SELF => 'remaining self',
@@ -186,6 +190,9 @@ class DeprecationErrorHandler
         }
 
         $groups = ['unsilenced', 'remaining self', 'remaining direct', 'remaining indirect', 'legacy', 'other'];
+        if ($configuration->scream()) {
+            $groups[] = 'muted';
+        }
 
         $this->displayDeprecations($groups, $configuration);
 

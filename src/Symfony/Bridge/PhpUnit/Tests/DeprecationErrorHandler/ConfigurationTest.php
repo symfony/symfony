@@ -128,6 +128,17 @@ class ConfigurationTest extends TestCase
         ]));
     }
 
+    public function testItIgnoresMutedDeprecations()
+    {
+        $configuration = Configuration::fromUrlEncodedString('max[total]=0');
+        $this->assertTrue($configuration->tolerates([
+            'mutedCount' => 9000,
+            'remaining selfCount' => 0,
+            'remaining directCount' => 0,
+            'remaining indirectCount' => 0,
+        ]));
+    }
+
     public function testIndirectThresholdIsUsedAsADefaultForDirectAndSelfThreshold()
     {
         $configuration = Configuration::fromUrlEncodedString('max[indirect]=1');
@@ -179,6 +190,18 @@ class ConfigurationTest extends TestCase
     {
         $configuration = Configuration::fromUrlEncodedString('disabled');
         $this->assertFalse($configuration->isEnabled());
+    }
+
+    public function testMutedDeprecationsAreHiddenByDefault()
+    {
+        $configuration = Configuration::fromUrlEncodedString('');
+        $this->assertFalse($configuration->scream());
+    }
+
+    public function testMutedDeprecationsCanBeShownAnyway()
+    {
+        $configuration = Configuration::fromUrlEncodedString('scream=true');
+        $this->assertTrue($configuration->scream());
     }
 
     public function testItCanBeShushed()

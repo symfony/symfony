@@ -221,7 +221,7 @@ class MessengerPass implements CompilerPassInterface
             throw new RuntimeException(sprintf('Invalid handler service "%s": type-hint of argument "$%s" in method "%s::__invoke()" must be a class , "%s" given.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), $type));
         }
 
-        return [(string) $parameters[0]->getType()];
+        return [$parameters[0]->getType()->getName()];
     }
 
     private function registerReceivers(ContainerBuilder $container, array $busIds)

@@ -295,6 +295,16 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
     }
 
+    public function testScalarService()
+    {
+        $c = new Container();
+
+        $c->set('foo', 'some value');
+
+        $this->assertTrue($c->has('foo'));
+        $this->assertSame('some value', $c->get('foo'));
+    }
+
     public function testInitialized()
     {
         $sc = new ProjectServiceContainer();

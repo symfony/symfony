@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -1224,6 +1225,25 @@ class PhpDumperTest extends TestCase
 
         $container->set('foo5', $foo5 = new \stdClass());
         $this->assertSame($foo5, $locator->get('foo5'));
+    }
+
+    public function testScalarService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'string')
+            ->setPublic(true)
+            ->setFactory([ScalarFactory::class, 'getSomeValue'])
+        ;
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Scalar_Service']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Scalar_Service();
+
+        $this->assertTrue($container->has('foo'));
+        $this->assertSame('some value', $container->get('foo'));
     }
 
     public function testWither()

@@ -26,7 +26,7 @@ class TraceableEventDispatcherTest extends TestCase
     public function testStopwatchSections()
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch = new Stopwatch());
-        $kernel = $this->getHttpKernel($dispatcher, function () { return new Response(); });
+        $kernel = $this->getHttpKernel($dispatcher, function () { return new Response('', 200, ['X-Debug-Token' => '292e1e']); });
         $request = Request::create('/');
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);

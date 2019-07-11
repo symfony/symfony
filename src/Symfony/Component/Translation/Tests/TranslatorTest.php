@@ -193,16 +193,6 @@ class TranslatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing "null" to the third argument of the "Symfony\Component\Translation\Translator::addResource" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.
-     */
-    public function testAddResourceNull()
-    {
-        $translator = new Translator('fr');
-        $translator->addResource('array', ['foo' => 'foofoo'], null);
-    }
-
     public function testAddResourceAfterTrans()
     {
         $translator = new Translator('fr');
@@ -393,17 +383,6 @@ class TranslatorTest extends TestCase
 
         $this->assertEquals('OK', $translator->trans('test'));
         $this->assertEquals('OK', $translator->trans('test', [], null, $locale));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing "null" to the third argument of the "Symfony\Component\Translation\Translator::addResource" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.
-     */
-    public function testTransNullLocale()
-    {
-        $translator = new Translator(null);
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', ['test' => 'OK'], null);
     }
 
     /**

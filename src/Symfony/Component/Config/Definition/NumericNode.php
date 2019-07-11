@@ -22,6 +22,7 @@ class NumericNode extends ScalarNode
 {
     protected $min;
     protected $max;
+    protected $allowEmptyValue = false;
 
     public function __construct(?string $name, NodeInterface $parent = null, $min = null, $max = null, string $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR)
     {
@@ -36,6 +37,10 @@ class NumericNode extends ScalarNode
     protected function finalizeValue($value)
     {
         $value = parent::finalizeValue($value);
+
+        if ($this->allowEmptyValue && $this->isValueEmpty($value)) {
+            return $value;
+        }
 
         $errorMsg = null;
         if (isset($this->min) && $value < $this->min) {
@@ -58,7 +63,12 @@ class NumericNode extends ScalarNode
      */
     protected function isValueEmpty($value)
     {
-        // a numeric value cannot be empty
-        return false;
+        // assume environment variables are never empty (which in practice is likely to be true during runtime)
+        // not doing so breaks many configs that are valid today
+        if ($this->isHandlingPlaceholder()) {
+            return false;
+        }
+
+        return null === $value;
     }
 }

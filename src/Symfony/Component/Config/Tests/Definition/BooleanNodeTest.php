@@ -46,6 +46,14 @@ class BooleanNodeTest extends TestCase
         ];
     }
 
+    public function testValidEmptyValue()
+    {
+        $node = new BooleanNode('test');
+        $node->setAllowEmptyValue(true);
+
+        $this->assertNull($node->finalize(null));
+    }
+
     /**
      * @dataProvider getInvalidValues
      */

@@ -20,11 +20,17 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 class BooleanNode extends ScalarNode
 {
+    protected $allowEmptyValue = false;
+
     /**
      * {@inheritdoc}
      */
     protected function validateType($value)
     {
+        if ($this->allowEmptyValue && $this->isValueEmpty($value)) {
+            return;
+        }
+
         if (!\is_bool($value)) {
             $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected boolean, but got %s.', $this->getPath(), \gettype($value)));
             if ($hint = $this->getInfo()) {
@@ -41,8 +47,13 @@ class BooleanNode extends ScalarNode
      */
     protected function isValueEmpty($value)
     {
-        // a boolean value cannot be empty
-        return false;
+        // assume environment variables are never empty (which in practice is likely to be true during runtime)
+        // not doing so breaks many configs that are valid today
+        if ($this->isHandlingPlaceholder()) {
+            return false;
+        }
+
+        return null === $value;
     }
 
     /**

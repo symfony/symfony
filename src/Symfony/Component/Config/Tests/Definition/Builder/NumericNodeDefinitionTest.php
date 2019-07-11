@@ -14,6 +14,8 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\FloatNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition as NumericNodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class NumericNodeDefinitionTest extends TestCase
 {
@@ -79,11 +81,22 @@ class NumericNodeDefinitionTest extends TestCase
         $this->assertEquals(4.5, $node->finalize(4.5));
     }
 
-    public function testCannotBeEmptyThrowsAnException()
+    public function testCannotBeEmpty()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');
-        $this->expectExceptionMessage('->cannotBeEmpty() is not applicable to NumericNodeDefinition.');
-        $def = new IntegerNodeDefinition('foo');
-        $def->cannotBeEmpty();
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid type for path "foo". Expected int, but got NULL.');
+        $node = new NumericNodeDefinition('foo');
+        $node->allowEmptyValue();
+        $node->cannotBeEmpty();
+
+        $node->getNode()->finalize(null);
+    }
+
+    public function testAllowEmptyValue()
+    {
+        $node = new NumericNodeDefinition('foo');
+        $node->allowEmptyValue();
+
+        $this->assertNull($node->getNode()->finalize(null));
     }
 }

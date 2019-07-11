@@ -13,17 +13,10 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class BooleanNodeDefinitionTest extends TestCase
 {
-    public function testCannotBeEmptyThrowsAnException()
-    {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');
-        $this->expectExceptionMessage('->cannotBeEmpty() is not applicable to BooleanNodeDefinition.');
-        $def = new BooleanNodeDefinition('foo');
-        $def->cannotBeEmpty();
-    }
-
     public function testSetDeprecated()
     {
         $def = new BooleanNodeDefinition('foo');
@@ -33,5 +26,24 @@ class BooleanNodeDefinitionTest extends TestCase
 
         $this->assertTrue($node->isDeprecated());
         $this->assertSame('The "foo" node is deprecated.', $node->getDeprecationMessage($node->getName(), $node->getPath()));
+    }
+
+    public function testCannotBeEmpty()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid type for path "foo". Expected boolean, but got NULL.');
+        $node = new BooleanNodeDefinition('foo');
+        $node->allowEmptyValue();
+        $node->cannotBeEmpty();
+
+        $node->getNode()->finalize(null);
+    }
+
+    public function testAllowEmptyValue()
+    {
+        $node = new BooleanNodeDefinition('foo');
+        $node->allowEmptyValue();
+
+        $this->assertNull($node->getNode()->finalize(null));
     }
 }

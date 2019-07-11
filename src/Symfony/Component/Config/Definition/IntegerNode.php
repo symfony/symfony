@@ -25,6 +25,10 @@ class IntegerNode extends NumericNode
      */
     protected function validateType($value)
     {
+        if ($this->allowEmptyValue && $this->isValueEmpty($value)) {
+            return;
+        }
+
         if (!\is_int($value)) {
             $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected int, but got %s.', $this->getPath(), \gettype($value)));
             if ($hint = $this->getInfo()) {

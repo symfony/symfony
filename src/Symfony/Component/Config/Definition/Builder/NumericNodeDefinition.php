@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
-use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
-
 /**
  * Abstract class that contains common code of integer and float node definitions.
  *
@@ -22,6 +20,13 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
 {
     protected $min;
     protected $max;
+
+    public function __construct(?string $name, NodeParentInterface $parent = null)
+    {
+        parent::__construct($name, $parent);
+
+        $this->allowEmptyValue = false;
+    }
 
     /**
      * Ensures that the value is smaller than the given reference.
@@ -61,13 +66,10 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws InvalidDefinitionException
-     */
-    public function cannotBeEmpty()
+    public function allowEmptyValue(): self
     {
-        throw new InvalidDefinitionException('->cannotBeEmpty() is not applicable to NumericNodeDefinition.');
+        $this->allowEmptyValue = true;
+
+        return $this;
     }
 }

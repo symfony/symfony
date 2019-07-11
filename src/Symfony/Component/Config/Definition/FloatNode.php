@@ -25,6 +25,10 @@ class FloatNode extends NumericNode
      */
     protected function validateType($value)
     {
+        if ($this->allowEmptyValue && $this->isValueEmpty($value)) {
+            return;
+        }
+
         // Integers are also accepted, we just cast them
         if (\is_int($value)) {
             $value = (float) $value;

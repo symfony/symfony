@@ -47,6 +47,14 @@ class IntegerNodeTest extends TestCase
         ];
     }
 
+    public function testValidEmptyValue()
+    {
+        $node = new IntegerNode('test');
+        $node->setAllowEmptyValue(true);
+
+        $this->assertNull($node->finalize(null));
+    }
+
     /**
      * @dataProvider getInvalidValues
      */

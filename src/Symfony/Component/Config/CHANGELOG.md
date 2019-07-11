@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added `allowEmptyValue` method to `NumericNodeDefinition` and `BooleanNodeDefinition` to accept `null` values.
+
 5.0.0
 -----
 

@@ -66,7 +66,7 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
         return $this;
     }
 
-    public function allowEmptyValue(): self
+    public function allowNull(): self
     {
         $this->allowEmptyValue = true;
 

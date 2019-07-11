@@ -33,16 +33,16 @@ class BooleanNodeDefinitionTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid type for path "foo". Expected boolean, but got NULL.');
         $node = new BooleanNodeDefinition('foo');
-        $node->allowEmptyValue();
+        $node->allowNull();
         $node->cannotBeEmpty();
 
         $node->getNode()->finalize(null);
     }
 
-    public function testAllowEmptyValue()
+    public function testAllowNull()
     {
         $node = new BooleanNodeDefinition('foo');
-        $node->allowEmptyValue();
+        $node->allowNull();
 
         $this->assertNull($node->getNode()->finalize(null));
     }

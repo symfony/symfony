@@ -48,7 +48,7 @@ class BooleanNodeDefinition extends ScalarNodeDefinition
         return parent::cannotBeEmpty();
     }
 
-    public function allowEmptyValue(): self
+    public function allowNull(): self
     {
         $this->allowEmptyValue = true;
         $this->nullEquivalent = null;

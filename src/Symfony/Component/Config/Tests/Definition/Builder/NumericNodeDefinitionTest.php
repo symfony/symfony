@@ -86,16 +86,16 @@ class NumericNodeDefinitionTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid type for path "foo". Expected int, but got NULL.');
         $node = new NumericNodeDefinition('foo');
-        $node->allowEmptyValue();
+        $node->allowNull();
         $node->cannotBeEmpty();
 
         $node->getNode()->finalize(null);
     }
 
-    public function testAllowEmptyValue()
+    public function testAllowNull()
     {
         $node = new NumericNodeDefinition('foo');
-        $node->allowEmptyValue();
+        $node->allowNull();
 
         $this->assertNull($node->getNode()->finalize(null));
     }

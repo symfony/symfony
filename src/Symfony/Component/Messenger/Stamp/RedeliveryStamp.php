@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-use Symfony\Component\ErrorCatcher\Exception\FlattenException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 
 /**

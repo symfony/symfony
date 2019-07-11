@@ -1,7 +1,7 @@
 {
-    "name": "symfony/error-catcher",
+    "name": "symfony/error-renderer",
     "type": "library",
-    "description": "Symfony ErrorCatcher Component",
+    "description": "Symfony ErrorRenderer Component",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",
@@ -29,7 +29,7 @@
         "symfony/http-kernel": "<4.4"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\ErrorCatcher\\": "" },
+        "psr-4": { "Symfony\\Component\\ErrorRenderer\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

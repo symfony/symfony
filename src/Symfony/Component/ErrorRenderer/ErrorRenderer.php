@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\ErrorRenderer;
+namespace Symfony\Component\ErrorRenderer;
 
-use Symfony\Component\ErrorCatcher\Exception\ErrorRendererNotFoundException;
-use Symfony\Component\ErrorCatcher\Exception\FlattenException;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 /**
  * Formats an exception to be used as response content.
@@ -23,7 +24,7 @@ use Symfony\Component\ErrorCatcher\Exception\FlattenException;
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class ErrorFormatter
+class ErrorRenderer
 {
     private $renderers = [];
 

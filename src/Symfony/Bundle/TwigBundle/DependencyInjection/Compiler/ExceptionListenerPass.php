@@ -27,8 +27,8 @@ class ExceptionListenerPass implements CompilerPassInterface
             return;
         }
 
-        // register the exception controller only if required dependencies do exist
-        if (!class_exists('Symfony\Component\ErrorCatcher\Exception\FlattenException') || !interface_exists('Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
+        // register the exception controller only if Twig is enabled and required dependencies do exist
+        if (!class_exists('Symfony\Component\ErrorRenderer\Exception\FlattenException') || !interface_exists('Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
             $container->removeDefinition('twig.exception_listener');
         }
     }

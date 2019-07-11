@@ -9,23 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests\ErrorRenderer;
+namespace Symfony\Component\ErrorRenderer\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorFormatter;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorRendererInterface;
-use Symfony\Component\ErrorCatcher\Exception\FlattenException;
+use Symfony\Component\ErrorRenderer\ErrorRenderer;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
-class ErrorFormatterTest extends TestCase
+class ErrorRendererTest extends TestCase
 {
     /**
-     * @expectedException \Symfony\Component\ErrorCatcher\Exception\ErrorRendererNotFoundException
+     * @expectedException \Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException
      * @expectedExceptionMessage No error renderer found for format "foo".
      */
     public function testErrorRendererNotFound()
     {
         $exception = FlattenException::createFromThrowable(new \Exception('foo'));
-        (new ErrorFormatter([]))->render($exception, 'foo');
+        (new ErrorRenderer([]))->render($exception, 'foo');
     }
 
     /**
@@ -33,13 +33,13 @@ class ErrorFormatterTest extends TestCase
      */
     public function testInvalidErrorRenderer()
     {
-        new ErrorFormatter([new \stdClass()]);
+        new ErrorRenderer([new \stdClass()]);
     }
 
     public function testCustomErrorRenderer()
     {
         $renderers = [new FooErrorRenderer()];
-        $errorRenderer = new ErrorFormatter($renderers);
+        $errorRenderer = new ErrorRenderer($renderers);
 
         $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
         $this->assertSame('Foo', $errorRenderer->render($exception, 'foo'));

@@ -9,23 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\DependencyInjection;
+namespace Symfony\Component\ErrorRenderer\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class ErrorCatcherPass implements CompilerPassInterface
+class ErrorRendererPass implements CompilerPassInterface
 {
     private $rendererService;
     private $rendererTag;
 
-    public function __construct(string $rendererService = 'error_catcher.error_formatter', string $rendererTag = 'error_catcher.renderer')
+    public function __construct(string $rendererService = 'error_renderer', string $rendererTag = 'error_renderer.renderer')
     {
         $this->rendererService = $rendererService;
         $this->rendererTag = $rendererTag;

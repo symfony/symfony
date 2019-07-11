@@ -19,9 +19,9 @@ use Symfony\Component\Lock\Exception\NotSupportedException;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
- * @deprecated "Symfony\Component\Lock\StoreInterface" is deprecated since Symfony 4.4 and has been split into "Symfony\Component\Lock\PersistStoreInterface", "Symfony\Component\Lock\BlockingStoreInterface".'
+ * @deprecated since Symfony 4.4, use PersistingStoreInterface and BlockingStoreInterface instead
  */
-interface StoreInterface extends PersistStoreInterface
+interface StoreInterface extends PersistingStoreInterface
 {
     /**
      * Waits until a key becomes free, then stores the resource.

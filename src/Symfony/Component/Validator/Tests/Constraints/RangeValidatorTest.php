@@ -419,40 +419,12 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTenToTwenty
      */
-    public function testValidValuesMinPropertyPathOnArray($value)
-    {
-        $this->setObject(['root' => ['value' => 10]]);
-
-        $this->validator->validate($value, new Range([
-            'minPropertyPath' => '[root][value]',
-        ]));
-
-        $this->assertNoViolation();
-    }
-
-    /**
-     * @dataProvider getTenToTwenty
-     */
     public function testValidValuesMaxPropertyPath($value)
     {
         $this->setObject(new Limit(20));
 
         $this->validator->validate($value, new Range([
             'maxPropertyPath' => 'value',
-        ]));
-
-        $this->assertNoViolation();
-    }
-
-    /**
-     * @dataProvider getTenToTwenty
-     */
-    public function testValidValuesMaxPropertyPathOnArray($value)
-    {
-        $this->setObject(['root' => ['value' => 20]]);
-
-        $this->validator->validate($value, new Range([
-            'maxPropertyPath' => '[root][value]',
         ]));
 
         $this->assertNoViolation();

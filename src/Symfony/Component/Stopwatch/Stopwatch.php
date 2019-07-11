@@ -99,10 +99,16 @@ class Stopwatch
      * @param string      $name     The event name
      * @param string|null $category The event category
      *
+     * @throws \LogicException When the name is not entered as a string.
+     *
      * @return StopwatchEvent
      */
     public function start($name, $category = null)
     {
+        if (!\is_string($name)) {
+            throw new \LogicException('You must enter the name in the form of a string.');
+        }
+
         return end($this->activeSections)->startEvent($name, $category);
     }
 

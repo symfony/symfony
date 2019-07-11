@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\ErrorRenderer;
+namespace Symfony\Component\ErrorRenderer\ErrorRenderer;
 
-use Symfony\Component\ErrorCatcher\Exception\FlattenException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>

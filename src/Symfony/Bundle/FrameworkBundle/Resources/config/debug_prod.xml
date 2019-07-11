@@ -22,7 +22,7 @@
             <argument type="service" id="debug.file_link_formatter" />
             <argument>%kernel.debug%</argument>
             <argument>%kernel.charset%</argument>
-            <argument type="service" id="error_catcher.error_formatter" on-invalid="null" />
+            <argument type="service" id="error_renderer" on-invalid="null" />
         </service>
 
         <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter">

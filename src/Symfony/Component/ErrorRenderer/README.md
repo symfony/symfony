@@ -1,7 +1,7 @@
-ErrorCatcher Component
+ErrorRenderer Component
 ======================
 
-The ErrorCatcher component provides tools to manage and display errors and exceptions.
+The ErrorRenderer component provides tools to display errors and exceptions.
 
 Resources
 ---------

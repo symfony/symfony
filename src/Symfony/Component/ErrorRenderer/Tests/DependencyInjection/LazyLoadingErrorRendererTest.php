@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests\DependencyInjection;
+namespace Symfony\Component\ErrorRenderer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\ErrorCatcher\DependencyInjection\LazyLoadingErrorFormatter;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorRendererInterface;
-use Symfony\Component\ErrorCatcher\Exception\FlattenException;
+use Symfony\Component\ErrorRenderer\DependencyInjection\LazyLoadingErrorRenderer;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
-class LazyLoadingErrorFormatterTest extends TestCase
+class LazyLoadingErrorRendererTest extends TestCase
 {
     /**
-     * @expectedException \Symfony\Component\ErrorCatcher\Exception\ErrorRendererNotFoundException
+     * @expectedException \Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException
      * @expectedExceptionMessage No error renderer found for format "foo".
      */
     public function testInvalidErrorRenderer()
@@ -29,7 +29,7 @@ class LazyLoadingErrorFormatterTest extends TestCase
         $container->expects($this->once())->method('has')->with('foo')->willReturn(false);
 
         $exception = FlattenException::createFromThrowable(new \Exception('Foo'));
-        (new LazyLoadingErrorFormatter($container))->render($exception, 'foo');
+        (new LazyLoadingErrorRenderer($container))->render($exception, 'foo');
     }
 
     public function testCustomErrorRenderer()
@@ -47,7 +47,7 @@ class LazyLoadingErrorFormatterTest extends TestCase
             ->willReturn(new FooErrorRenderer())
         ;
 
-        $errorRenderer = new LazyLoadingErrorFormatter($container);
+        $errorRenderer = new LazyLoadingErrorRenderer($container);
 
         $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
         $this->assertSame('Foo', $errorRenderer->render($exception, 'foo'));

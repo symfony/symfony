@@ -33,7 +33,7 @@ use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\RegisterReverseContainerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\ErrorCatcher\DependencyInjection\ErrorCatcherPass;
+use Symfony\Component\ErrorRenderer\DependencyInjection\ErrorRendererPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\HttpFoundation\Request;
@@ -91,7 +91,7 @@ class FrameworkBundle extends Bundle
             KernelEvents::FINISH_REQUEST,
         ];
 
-        $container->addCompilerPass(new ErrorCatcherPass());
+        $container->addCompilerPass(new ErrorRendererPass());
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);

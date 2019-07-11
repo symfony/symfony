@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests\ErrorRenderer;
+namespace Symfony\Component\ErrorRenderer\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorCatcher\Exception\FlattenException;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 class HtmlErrorRendererTest extends TestCase
 {

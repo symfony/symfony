@@ -14,7 +14,7 @@ namespace Symfony\Component\Debug\Exception;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "Symfony\Component\ErrorCatcher\Exception\FlattenException" instead.', FlattenException::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "Symfony\Component\ErrorRenderer\Exception\FlattenException" instead.', FlattenException::class), E_USER_DEPRECATED);
 
 /**
  * FlattenException wraps a PHP Error or Exception to be able to serialize it.
@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\Exception\FlattenException instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorRenderer\Exception\FlattenException instead.
  */
 class FlattenException
 {
@@ -39,11 +39,11 @@ class FlattenException
     private $line;
 
     /**
-     * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\Exception::createFromThrowable() instead.
+     * @deprecated since Symfony 4.4, use Symfony\Component\ErrorRenderer\Exception::createFromThrowable() instead.
      */
     public static function create(\Exception $exception, $statusCode = null, array $headers = [])
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\Exception::createFromThrowable() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use Symfony\Component\ErrorRenderer\Exception::createFromThrowable() instead.', __METHOD__), E_USER_DEPRECATED);
 
         return static::createFromThrowable($exception, $statusCode, $headers);
     }

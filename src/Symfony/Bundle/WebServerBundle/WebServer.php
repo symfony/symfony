@@ -19,6 +19,8 @@ use Symfony\Component\Process\Process;
  * Manages a local HTTP web server.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
  */
 class WebServer
 {

@@ -1,5 +1,13 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
 msgid "foo"
 msgid_plural "foos"
 msgstr[0] "bar"
 msgstr[1] "bars"
 
+msgid "{0} no foos|one foo|%count% foos"
+msgstr "{0} no bars|one bar|%count% bars"

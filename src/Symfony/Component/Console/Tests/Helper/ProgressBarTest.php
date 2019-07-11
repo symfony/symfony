@@ -38,7 +38,7 @@ class ProgressBarTest extends TestCase
 
     public function testMultipleStart()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start();
         $bar->advance();
         $bar->start();
@@ -54,7 +54,7 @@ class ProgressBarTest extends TestCase
 
     public function testAdvance()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start();
         $bar->advance();
 
@@ -68,7 +68,7 @@ class ProgressBarTest extends TestCase
 
     public function testAdvanceWithStep()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start();
         $bar->advance(5);
 
@@ -82,7 +82,7 @@ class ProgressBarTest extends TestCase
 
     public function testAdvanceMultipleTimes()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start();
         $bar->advance(3);
         $bar->advance(2);
@@ -98,7 +98,7 @@ class ProgressBarTest extends TestCase
 
     public function testAdvanceOverMax()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
         $bar->setProgress(9);
         $bar->advance();
         $bar->advance();
@@ -114,7 +114,7 @@ class ProgressBarTest extends TestCase
 
     public function testRegress()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start();
         $bar->advance();
         $bar->advance();
@@ -132,7 +132,7 @@ class ProgressBarTest extends TestCase
 
     public function testRegressWithStep()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start();
         $bar->advance(4);
         $bar->advance(4);
@@ -150,7 +150,7 @@ class ProgressBarTest extends TestCase
 
     public function testRegressMultipleTimes()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start();
         $bar->advance(3);
         $bar->advance(3);
@@ -170,7 +170,7 @@ class ProgressBarTest extends TestCase
 
     public function testRegressBelowMin()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
         $bar->setProgress(1);
         $bar->advance(-1);
         $bar->advance(-1);
@@ -192,7 +192,7 @@ class ProgressBarTest extends TestCase
         ;
 
         // max in construct, no format
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
         $bar->start();
         $bar->advance(10);
         $bar->finish();
@@ -201,7 +201,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
 
         // max in start, no format
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start(10);
         $bar->advance(10);
         $bar->finish();
@@ -210,7 +210,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
 
         // max in construct, explicit format before
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
         $bar->setFormat('normal');
         $bar->start();
         $bar->advance(10);
@@ -220,7 +220,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
 
         // max in start, explicit format before
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setFormat('normal');
         $bar->start(10);
         $bar->advance(10);
@@ -232,7 +232,7 @@ class ProgressBarTest extends TestCase
 
     public function testCustomizations()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
         $bar->setBarWidth(10);
         $bar->setBarCharacter('_');
         $bar->setEmptyBarCharacter(' ');
@@ -251,7 +251,7 @@ class ProgressBarTest extends TestCase
 
     public function testDisplayWithoutStart()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, 0);
         $bar->display();
 
         rewind($output->getStream());
@@ -263,7 +263,7 @@ class ProgressBarTest extends TestCase
 
     public function testDisplayWithQuietVerbosity()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(true, StreamOutput::VERBOSITY_QUIET), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(true, StreamOutput::VERBOSITY_QUIET), 50, 0);
         $bar->display();
 
         rewind($output->getStream());
@@ -275,7 +275,7 @@ class ProgressBarTest extends TestCase
 
     public function testFinishWithoutStart()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, 0);
         $bar->finish();
 
         rewind($output->getStream());
@@ -287,7 +287,7 @@ class ProgressBarTest extends TestCase
 
     public function testPercent()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, 0);
         $bar->start();
         $bar->display();
         $bar->advance();
@@ -305,7 +305,7 @@ class ProgressBarTest extends TestCase
 
     public function testOverwriteWithShorterLine()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, 0);
         $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%%');
         $bar->start();
         $bar->display();
@@ -331,7 +331,7 @@ class ProgressBarTest extends TestCase
         $stream = $this->getOutputStream(true);
         $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
 
-        $bar = new ProgressBar($output, 50);
+        $bar = new ProgressBar($output, 50, 0);
         $bar->start();
         $bar->display();
         $bar->advance();
@@ -354,8 +354,8 @@ class ProgressBarTest extends TestCase
         $output1 = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
         $output2 = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
 
-        $progress = new ProgressBar($output1, 50);
-        $progress2 = new ProgressBar($output2, 50);
+        $progress = new ProgressBar($output1, 50, 0);
+        $progress2 = new ProgressBar($output2, 50, 0);
 
         $progress->start();
         $progress2->start();
@@ -385,8 +385,8 @@ class ProgressBarTest extends TestCase
 
         ProgressBar::setFormatDefinition('test', '%current%/%max% [%bar%] %percent:3s%% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.');
 
-        $progress = new ProgressBar($output1, 50);
-        $progress2 = new ProgressBar($output2, 50);
+        $progress = new ProgressBar($output1, 50, 0);
+        $progress2 = new ProgressBar($output2, 50, 0);
         $progress2->setFormat('test');
 
         $progress->start();
@@ -409,7 +409,7 @@ class ProgressBarTest extends TestCase
 
     public function testStartWithMax()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setFormat('%current%/%max% [%bar%]');
         $bar->start(50);
         $bar->advance();
@@ -424,7 +424,7 @@ class ProgressBarTest extends TestCase
 
     public function testSetCurrentProgress()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, 0);
         $bar->start();
         $bar->display();
         $bar->advance();
@@ -444,14 +444,14 @@ class ProgressBarTest extends TestCase
 
     public function testSetCurrentBeforeStarting()
     {
-        $bar = new ProgressBar($this->getOutputStream());
+        $bar = new ProgressBar($this->getOutputStream(), 0, 0);
         $bar->setProgress(15);
         $this->assertNotNull($bar->getStartTime());
     }
 
     public function testRedrawFrequency()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 6);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 6, 0);
         $bar->setRedrawFrequency(2);
         $bar->start();
         $bar->setProgress(1);
@@ -471,7 +471,7 @@ class ProgressBarTest extends TestCase
 
     public function testRedrawFrequencyIsAtLeastOneIfZeroGiven()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setRedrawFrequency(0);
         $bar->start();
         $bar->advance();
@@ -486,7 +486,7 @@ class ProgressBarTest extends TestCase
 
     public function testRedrawFrequencyIsAtLeastOneIfSmallerOneGiven()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setRedrawFrequency(0.9);
         $bar->start();
         $bar->advance();
@@ -501,7 +501,7 @@ class ProgressBarTest extends TestCase
 
     public function testMultiByteSupport()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->start();
         $bar->setBarCharacter('■');
         $bar->advance(3);
@@ -516,7 +516,7 @@ class ProgressBarTest extends TestCase
 
     public function testClear()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, 0);
         $bar->start();
         $bar->setProgress(25);
         $bar->clear();
@@ -532,7 +532,7 @@ class ProgressBarTest extends TestCase
 
     public function testPercentNotHundredBeforeComplete()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 200);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 200, 0);
         $bar->start();
         $bar->display();
         $bar->advance(199);
@@ -550,7 +550,7 @@ class ProgressBarTest extends TestCase
 
     public function testNonDecoratedOutput()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(false), 200);
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 200, 0);
         $bar->start();
 
         for ($i = 0; $i < 200; ++$i) {
@@ -578,7 +578,7 @@ class ProgressBarTest extends TestCase
 
     public function testNonDecoratedOutputWithClear()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(false), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 50, 0);
         $bar->start();
         $bar->setProgress(25);
         $bar->clear();
@@ -596,7 +596,7 @@ class ProgressBarTest extends TestCase
 
     public function testNonDecoratedOutputWithoutMax()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(false));
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
         $bar->start();
         $bar->advance();
 
@@ -611,10 +611,10 @@ class ProgressBarTest extends TestCase
     public function testParallelBars()
     {
         $output = $this->getOutputStream();
-        $bar1 = new ProgressBar($output, 2);
-        $bar2 = new ProgressBar($output, 3);
+        $bar1 = new ProgressBar($output, 2, 0);
+        $bar2 = new ProgressBar($output, 3, 0);
         $bar2->setProgressCharacter('#');
-        $bar3 = new ProgressBar($output);
+        $bar3 = new ProgressBar($output, 0, 0);
 
         $bar1->start();
         $output->write("\n");
@@ -671,7 +671,7 @@ class ProgressBarTest extends TestCase
     {
         $output = $this->getOutputStream();
 
-        $bar = new ProgressBar($output);
+        $bar = new ProgressBar($output, 0, 0);
         $bar->start();
         $bar->advance();
         $bar->advance();
@@ -692,7 +692,7 @@ class ProgressBarTest extends TestCase
     public function testSettingMaxStepsDuringProgressing()
     {
         $output = $this->getOutputStream();
-        $bar = new ProgressBar($output);
+        $bar = new ProgressBar($output, 0, 0);
         $bar->start();
         $bar->setProgress(2);
         $bar->setMaxSteps(10);
@@ -716,7 +716,7 @@ class ProgressBarTest extends TestCase
     {
         $output = $this->getOutputStream();
 
-        $bar = new ProgressBar($output);
+        $bar = new ProgressBar($output, 0, 0);
         putenv('COLUMNS=12');
         $bar->start();
         $bar->advance();
@@ -735,7 +735,7 @@ class ProgressBarTest extends TestCase
         ProgressBar::setPlaceholderFormatterDefinition('remaining_steps', function (ProgressBar $bar) {
             return $bar->getMaxSteps() - $bar->getProgress();
         });
-        $bar = new ProgressBar($output = $this->getOutputStream(), 3);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
         $bar->setFormat(' %remaining_steps% [%bar%]');
 
         $bar->start();
@@ -753,7 +753,7 @@ class ProgressBarTest extends TestCase
 
     public function testMultilineFormat()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 3);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
         $bar->setFormat("%bar%\nfoobar");
 
         $bar->start();
@@ -775,7 +775,7 @@ class ProgressBarTest extends TestCase
     {
         putenv('COLUMNS=156');
 
-        $bar = new ProgressBar($output = $this->getOutputStream(), 15);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 15, 0);
         ProgressBar::setPlaceholderFormatterDefinition('memory', function (ProgressBar $bar) {
             static $i = 0;
             $mem = 100000 * $i;
@@ -833,7 +833,7 @@ class ProgressBarTest extends TestCase
 
     public function testSetFormat()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setFormat('normal');
         $bar->start();
         rewind($output->getStream());
@@ -842,7 +842,7 @@ class ProgressBarTest extends TestCase
             stream_get_contents($output->getStream())
         );
 
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
         $bar->setFormat('normal');
         $bar->start();
         rewind($output->getStream());
@@ -857,7 +857,7 @@ class ProgressBarTest extends TestCase
      */
     public function testFormatsWithoutMax($format)
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setFormat($format);
         $bar->start();
 
@@ -882,7 +882,7 @@ class ProgressBarTest extends TestCase
 
     public function testIterate(): void
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
 
         $this->assertEquals([1, 2], iterator_to_array($bar->iterate([1, 2])));
 
@@ -898,7 +898,7 @@ class ProgressBarTest extends TestCase
 
     public function testIterateUncountable(): void
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
 
         $this->assertEquals([1, 2], iterator_to_array($bar->iterate((function () {
             yield 1;
@@ -931,7 +931,7 @@ class ProgressBarTest extends TestCase
     {
         putenv('COLUMNS=10');
 
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setFormat("%bar%\n0123456789");
 
         // before starting
@@ -943,5 +943,59 @@ class ProgressBarTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(5, $bar->getBarWidth(), stream_get_contents($output->getStream()));
         putenv('COLUMNS=120');
+    }
+
+    public function testForceRedrawSlowerThan(): void
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->setRedrawFrequency(4); // disable step based redraws
+        $bar->start();
+        $bar->setProgress(1); // No treshold hit, no redraw
+        $bar->forceRedrawSlowerThan(2);
+        sleep(1);
+        $bar->setProgress(2); // Still no redraw because redraw is forced after 2 seconds only
+        sleep(1);
+        $bar->setProgress(3); // 1+1 = 2 -> redraw finally
+        $bar->setProgress(4); // step based redraw freq hit, redraw even without sleep
+        $bar->setProgress(5); // No treshold hit, no redraw
+        $bar->preventRedrawFasterThan(3);
+        sleep(2);
+        $bar->setProgress(6); // No redraw even though 2 seconds passed. Throttling has priority
+        $bar->preventRedrawFasterThan(2);
+        $bar->setProgress(7); // Throttling relaxed, draw
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    3 [--->------------------------]').
+            $this->generateOutput('    4 [---->-----------------------]').
+            $this->generateOutput('    7 [------->--------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testPreventRedrawFasterThan()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->setRedrawFrequency(1);
+        $bar->preventRedrawFasterThan(1);
+        $bar->start();
+        $bar->setProgress(1); // Too fast, should not draw
+        sleep(1);
+        $bar->setProgress(2); // 1 second passed, draw
+        $bar->preventRedrawFasterThan(2);
+        sleep(1);
+        $bar->setProgress(3); // 1 second passed but we changed threshold, should not draw
+        sleep(1);
+        $bar->setProgress(4); // 1+1 seconds = 2 seconds passed which conforms threshold, draw
+        $bar->setProgress(5); // No treshold hit, no redraw
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    2 [-->-------------------------]').
+            $this->generateOutput('    4 [---->-----------------------]'),
+            stream_get_contents($output->getStream())
+        );
     }
 }

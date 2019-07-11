@@ -418,6 +418,21 @@ class ConnectionTest extends TestCase
         $connection->channel();
     }
 
+    public function testAmqpStampHeadersAreUsed()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createMock(\AMQPConnection::class),
+            $this->createMock(\AMQPChannel::class),
+            $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->once())->method('publish')->with('body', null, AMQP_NOPARAM, ['headers' => ['Foo' => 'X', 'Bar' => 'Y']]);
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body', ['Foo' => 'X'], 0, new AmqpStamp(null, AMQP_NOPARAM, ['headers' => ['Bar' => 'Y']]));
+    }
+
     public function testItCanPublishWithTheDefaultRoutingKey()
     {
         $factory = new TestAmqpFactory(

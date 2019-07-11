@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * @author Guillaume Gammelin <ggammelin@gmail.com>
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-final class AmqpStamp implements StampInterface
+final class AmqpStamp implements NonSendableStampInterface
 {
     private $routingKey;
     private $flags;

@@ -157,61 +157,86 @@ class ConnectionTest extends TestCase
     /**
      * @dataProvider buildConfigurationProvider
      */
-    public function testBuildConfiguration($dsn, $options, $expectedManager, $expectedTableName, $expectedRedeliverTimeout, $expectedQueue)
+    public function testBuildConfiguration($dsn, $options, $expectedConnection, $expectedTableName, $expectedRedeliverTimeout, $expectedQueue, $expectedAutoSetup)
     {
         $config = Connection::buildConfiguration($dsn, $options);
-        $this->assertEquals($expectedManager, $config['connection']);
+        $this->assertEquals($expectedConnection, $config['connection']);
         $this->assertEquals($expectedTableName, $config['table_name']);
         $this->assertEquals($expectedRedeliverTimeout, $config['redeliver_timeout']);
         $this->assertEquals($expectedQueue, $config['queue_name']);
+        $this->assertEquals($expectedAutoSetup, $config['auto_setup']);
     }
 
     public function buildConfigurationProvider()
     {
-        return [
-            [
-                'dsn' => 'doctrine://default',
-                'options' => [],
-                'expectedManager' => 'default',
-                'expectedTableName' => 'messenger_messages',
-                'expectedRedeliverTimeout' => 3600,
-                'expectedQueue' => 'default',
+        yield 'no options' => [
+            'dsn' => 'doctrine://default',
+            'options' => [],
+            'expectedConnection' => 'default',
+            'expectedTableName' => 'messenger_messages',
+            'expectedRedeliverTimeout' => 3600,
+            'expectedQueue' => 'default',
+            'expectedAutoSetup' => true,
+        ];
+
+        yield  'test options array' => [
+            'dsn' => 'doctrine://default',
+            'options' => [
+                'table_name' => 'name_from_options',
+                'redeliver_timeout' => 1800,
+                'queue_name' => 'important',
+                'auto_setup' => false,
             ],
-            // test options from options array
-            [
-                'dsn' => 'doctrine://default',
-                'options' => [
-                    'table_name' => 'name_from_options',
-                    'redeliver_timeout' => 1800,
-                    'queue_name' => 'important',
-                ],
-                'expectedManager' => 'default',
-                'expectedTableName' => 'name_from_options',
-                'expectedRedeliverTimeout' => 1800,
-                'expectedQueue' => 'important',
+            'expectedConnection' => 'default',
+            'expectedTableName' => 'name_from_options',
+            'expectedRedeliverTimeout' => 1800,
+            'expectedQueue' => 'important',
+            'expectedAutoSetup' => false,
+        ];
+
+        yield 'options from dsn' => [
+            'dsn' => 'doctrine://default?table_name=name_from_dsn&redeliver_timeout=1200&queue_name=normal&auto_setup=false',
+            'options' => [],
+            'expectedConnection' => 'default',
+            'expectedTableName' => 'name_from_dsn',
+            'expectedRedeliverTimeout' => 1200,
+            'expectedQueue' => 'normal',
+            'expectedAutoSetup' => false,
+        ];
+
+        yield 'options from options array wins over options from dsn' => [
+            'dsn' => 'doctrine://default?table_name=name_from_dsn&redeliver_timeout=1200&queue_name=normal&auto_setup=true',
+            'options' => [
+                'table_name' => 'name_from_options',
+                'redeliver_timeout' => 1800,
+                'queue_name' => 'important',
+                'auto_setup' => false,
             ],
-            // tests options from dsn
-            [
-                'dsn' => 'doctrine://default?table_name=name_from_dsn&redeliver_timeout=1200&queue_name=normal',
-                'options' => [],
-                'expectedManager' => 'default',
-                'expectedTableName' => 'name_from_dsn',
-                'expectedRedeliverTimeout' => 1200,
-                'expectedQueue' => 'normal',
-            ],
-            // test options from options array wins over options from dsn
-            [
-                'dsn' => 'doctrine://default?table_name=name_from_dsn&redeliver_timeout=1200&queue_name=normal',
-                'options' => [
-                    'table_name' => 'name_from_options',
-                    'redeliver_timeout' => 1800,
-                    'queue_name' => 'important',
-                ],
-                'expectedManager' => 'default',
-                'expectedTableName' => 'name_from_options',
-                'expectedRedeliverTimeout' => 1800,
-                'expectedQueue' => 'important',
-            ],
+            'expectedConnection' => 'default',
+            'expectedTableName' => 'name_from_options',
+            'expectedRedeliverTimeout' => 1800,
+            'expectedQueue' => 'important',
+            'expectedAutoSetup' => false,
+        ];
+
+        yield 'options from dsn with falsey boolean' => [
+            'dsn' => 'doctrine://default?auto_setup=0',
+            'options' => [],
+            'expectedConnection' => 'default',
+            'expectedTableName' => 'messenger_messages',
+            'expectedRedeliverTimeout' => 3600,
+            'expectedQueue' => 'default',
+            'expectedAutoSetup' => false,
+        ];
+
+        yield 'options from dsn with thruthy boolean' => [
+            'dsn' => 'doctrine://default?auto_setup=1',
+            'options' => [],
+            'expectedConnection' => 'default',
+            'expectedTableName' => 'messenger_messages',
+            'expectedRedeliverTimeout' => 3600,
+            'expectedQueue' => 'default',
+            'expectedAutoSetup' => true,
         ];
     }
 

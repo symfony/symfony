@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -20,6 +24,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class RangeValidator extends ConstraintValidator
 {
+    private $propertyAccessor;
+
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
+    {
+        $this->propertyAccessor = $propertyAccessor;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -42,8 +53,8 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
-        $min = $constraint->min;
-        $max = $constraint->max;
+        $min = $this->getLimit($constraint->minPropertyPath, $constraint->min, $constraint);
+        $max = $this->getLimit($constraint->maxPropertyPath, $constraint->max, $constraint);
 
         // Convert strings to DateTimes if comparing another DateTime
         // This allows to compare with any date/time value supported by
@@ -59,22 +70,66 @@ class RangeValidator extends ConstraintValidator
             }
         }
 
-        if (null !== $constraint->max && $value > $max) {
-            $this->context->buildViolation($constraint->maxMessage)
+        if (null !== $max && $value > $max) {
+            $violationBuilder = $this->context->buildViolation($constraint->maxMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE))
-                ->setCode(Range::TOO_HIGH_ERROR)
-                ->addViolation();
+                ->setCode(Range::TOO_HIGH_ERROR);
+
+            if (null !== $constraint->maxPropertyPath) {
+                $violationBuilder->setParameter('{{ max_limit_path }}', $constraint->maxPropertyPath);
+            }
+
+            if (null !== $constraint->minPropertyPath) {
+                $violationBuilder->setParameter('{{ min_limit_path }}', $constraint->minPropertyPath);
+            }
+
+            $violationBuilder->addViolation();
 
             return;
         }
 
-        if (null !== $constraint->min && $value < $min) {
-            $this->context->buildViolation($constraint->minMessage)
+        if (null !== $min && $value < $min) {
+            $violationBuilder = $this->context->buildViolation($constraint->minMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))
-                ->setCode(Range::TOO_LOW_ERROR)
-                ->addViolation();
+                ->setCode(Range::TOO_LOW_ERROR);
+
+            if (null !== $constraint->maxPropertyPath) {
+                $violationBuilder->setParameter('{{ max_limit_path }}', $constraint->maxPropertyPath);
+            }
+
+            if (null !== $constraint->minPropertyPath) {
+                $violationBuilder->setParameter('{{ min_limit_path }}', $constraint->minPropertyPath);
+            }
+
+            $violationBuilder->addViolation();
         }
+    }
+
+    private function getLimit($propertyPath, $default, Constraint $constraint)
+    {
+        if (null === $propertyPath) {
+            return $default;
+        }
+
+        if (null === $object = $this->context->getObject()) {
+            return $default;
+        }
+
+        try {
+            return $this->getPropertyAccessor()->getValue($object, $propertyPath);
+        } catch (NoSuchPropertyException $e) {
+            throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: %s', $propertyPath, \get_class($constraint), $e->getMessage()), 0, $e);
+        }
+    }
+
+    private function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        if (null === $this->propertyAccessor) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

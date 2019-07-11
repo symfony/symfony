@@ -56,6 +56,10 @@ trait FilesystemCommonTrait
         $ok = true;
 
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
+            if ('' !== $namespace && 0 !== strpos($this->getFileKey($file), $namespace)) {
+                continue;
+            }
+
             $ok = ($file->isDir() || $this->doUnlink($file) || !file_exists($file)) && $ok;
         }
 
@@ -112,6 +116,11 @@ trait FilesystemCommonTrait
         }
 
         return $dir.substr($hash, 2, 20);
+    }
+
+    private function getFileKey(string $file): string
+    {
+        return '';
     }
 
     /**

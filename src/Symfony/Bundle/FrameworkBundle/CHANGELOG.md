@@ -26,6 +26,7 @@ CHANGELOG
  * Deprecated the `controller_name_converter` and `resolve_controller_name_subscriber` services
  * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`
  * Added support for configuring chained cache pools
+ * Deprecated booting the kernel before running `WebTestCase::createClient()`
 
 4.3.0
 -----

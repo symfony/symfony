@@ -168,10 +168,14 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(string $prefix = '')
     {
         $event = $this->start(__FUNCTION__);
         try {
+            if ($this->pool instanceof AdapterInterface) {
+                return $event->result = $this->pool->clear($prefix);
+            }
+
             return $event->result = $this->pool->clear();
         } finally {
             $event->end = microtime(true);

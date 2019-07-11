@@ -252,6 +252,26 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'qux'));
     }
+
+    public function testClearPrefix()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        $cache->clear();
+
+        $item = $cache->getItem('foobar');
+        $cache->save($item->set(1));
+
+        $item = $cache->getItem('barfoo');
+        $cache->save($item->set(2));
+
+        $cache->clear('foo');
+        $this->assertFalse($cache->hasItem('foobar'));
+        $this->assertTrue($cache->hasItem('barfoo'));
+    }
 }
 
 class NotUnserializable

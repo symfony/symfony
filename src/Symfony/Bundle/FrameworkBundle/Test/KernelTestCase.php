@@ -37,6 +37,8 @@ abstract class KernelTestCase extends TestCase
      */
     protected static $container;
 
+    protected static $booted;
+
     protected function doTearDown(): void
     {
         static::ensureKernelShutdown();
@@ -72,6 +74,7 @@ abstract class KernelTestCase extends TestCase
 
         static::$kernel = static::createKernel($options);
         static::$kernel->boot();
+        static::$booted = true;
 
         $container = static::$kernel->getContainer();
         static::$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
@@ -126,6 +129,7 @@ abstract class KernelTestCase extends TestCase
         if (null !== static::$kernel) {
             $container = static::$kernel->getContainer();
             static::$kernel->shutdown();
+            static::$booted = false;
             if ($container instanceof ResetInterface) {
                 $container->reset();
             }

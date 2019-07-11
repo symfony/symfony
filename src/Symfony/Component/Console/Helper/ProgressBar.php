@@ -32,6 +32,10 @@ final class ProgressBar
     private $format;
     private $internalFormat;
     private $redrawFreq = 1;
+    private $writeCount;
+    private $lastWriteTime;
+    private $minSecondsBetweenRedraws = 0;
+    private $maxSecondsBetweenRedraws = 1;
     private $output;
     private $step = 0;
     private $max;
@@ -51,7 +55,7 @@ final class ProgressBar
      * @param OutputInterface $output An OutputInterface instance
      * @param int             $max    Maximum steps (0 if unknown)
      */
-    public function __construct(OutputInterface $output, int $max = 0)
+    public function __construct(OutputInterface $output, int $max = 0, float $minSecondsBetweenRedraws = 0.1)
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -61,12 +65,17 @@ final class ProgressBar
         $this->setMaxSteps($max);
         $this->terminal = new Terminal();
 
+        if (0 < $minSecondsBetweenRedraws) {
+            $this->redrawFreq = null;
+            $this->minSecondsBetweenRedraws = $minSecondsBetweenRedraws;
+        }
+
         if (!$this->output->isDecorated()) {
             // disable overwrite when output does not support ANSI codes.
             $this->overwrite = false;
 
             // set a reasonable redraw frequency so output isn't flooded
-            $this->setRedrawFrequency($max / 10);
+            $this->redrawFreq = null;
         }
 
         $this->startTime = time();
@@ -183,6 +192,11 @@ final class ProgressBar
         return $this->percent;
     }
 
+    public function getBarOffset(): int
+    {
+        return floor($this->max ? $this->percent * $this->barWidth : (null === $this->redrawFreq ? min(5, $this->barWidth / 15) * $this->writeCount : $this->step) % $this->barWidth);
+    }
+
     public function setBarWidth(int $size)
     {
         $this->barWidth = max(1, $size);
@@ -238,9 +252,19 @@ final class ProgressBar
      *
      * @param int|float $freq The frequency in steps
      */
-    public function setRedrawFrequency(int $freq)
+    public function setRedrawFrequency(?int $freq)
     {
-        $this->redrawFreq = max($freq, 1);
+        $this->redrawFreq = null !== $freq ? max(1, $freq) : null;
+    }
+
+    public function preventRedrawFasterThan(float $intervalInSeconds): void
+    {
+        $this->minSecondsBetweenRedraws = $intervalInSeconds;
+    }
+
+    public function forceRedrawSlowerThan(float $intervalInSeconds): void
+    {
+        $this->maxSecondsBetweenRedraws = $intervalInSeconds;
     }
 
     /**
@@ -248,7 +272,7 @@ final class ProgressBar
      *
      * @param int|null $max Number of steps to complete the bar (0 if indeterminate), if null it will be inferred from $iterable
      */
-    public function iterate(iterable $iterable, ?int $max = null): iterable
+    public function iterate(iterable $iterable, int $max = null): iterable
     {
         $this->start($max ?? (is_countable($iterable) ? \count($iterable) : 0));
 
@@ -305,11 +329,27 @@ final class ProgressBar
             $step = 0;
         }
 
-        $prevPeriod = (int) ($this->step / $this->redrawFreq);
-        $currPeriod = (int) ($step / $this->redrawFreq);
+        $redrawFreq = $this->redrawFreq ?? (($this->max ?: 10) / 10);
+        $prevPeriod = (int) ($this->step / $redrawFreq);
+        $currPeriod = (int) ($step / $redrawFreq);
         $this->step = $step;
         $this->percent = $this->max ? (float) $this->step / $this->max : 0;
-        if ($prevPeriod !== $currPeriod || $this->max === $step) {
+        $timeInterval = microtime(true) - $this->lastWriteTime;
+
+        // Draw regardless of other limits
+        if ($this->max === $step) {
+            $this->display();
+
+            return;
+        }
+
+        // Throttling
+        if ($timeInterval < $this->minSecondsBetweenRedraws) {
+            return;
+        }
+
+        // Draw each step period, but not too late
+        if ($prevPeriod !== $currPeriod || $timeInterval >= $this->maxSecondsBetweenRedraws) {
             $this->display();
         }
     }
@@ -413,8 +453,10 @@ final class ProgressBar
         }
 
         $this->firstRun = false;
+        $this->lastWriteTime = microtime(true);
 
         $this->output->write($message);
+        ++$this->writeCount;
     }
 
     private function determineBestFormat(): string
@@ -436,7 +478,7 @@ final class ProgressBar
     {
         return [
             'bar' => function (self $bar, OutputInterface $output) {
-                $completeBars = floor($bar->getMaxSteps() > 0 ? $bar->getProgressPercent() * $bar->getBarWidth() : $bar->getProgress() % $bar->getBarWidth());
+                $completeBars = $bar->getBarOffset();
                 $display = str_repeat($bar->getBarCharacter(), $completeBars);
                 if ($completeBars < $bar->getBarWidth()) {
                     $emptyBars = $bar->getBarWidth() - $completeBars - Helper::strlenWithoutDecoration($output->getFormatter(), $bar->getProgressCharacter());

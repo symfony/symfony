@@ -193,9 +193,17 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(string $prefix = '')
     {
-        $this->values = $this->expiries = [];
+        if ('' !== $prefix) {
+            foreach ($this->values as $key => $value) {
+                if (0 === strpos($key, $prefix)) {
+                    unset($this->values[$key], $this->expiries[$key]);
+                }
+            }
+        } else {
+            $this->values = $this->expiries = [];
+        }
 
         return true;
     }

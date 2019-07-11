@@ -19,6 +19,7 @@ use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
+use Symfony\Component\Lock\Exception\NotSupportedException;
 
 /**
  * Lock is the default implementation of the LockInterface.
@@ -36,12 +37,12 @@ final class Lock implements LockInterface, LoggerAwareInterface
     private $dirty = false;
 
     /**
-     * @param Key            $key         Resource to lock
-     * @param StoreInterface $store       Store used to handle lock persistence
-     * @param float|null     $ttl         Maximum expected lock duration in seconds
-     * @param bool           $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
+     * @param Key                   $key         Resource to lock
+     * @param PersistStoreInterface $store       Store used to handle lock persistence
+     * @param float|null            $ttl         Maximum expected lock duration in seconds
+     * @param bool                  $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
-    public function __construct(Key $key, StoreInterface $store, float $ttl = null, bool $autoRelease = true)
+    public function __construct(Key $key, PersistStoreInterface $store, float $ttl = null, bool $autoRelease = true)
     {
         $this->store = $store;
         $this->key = $key;
@@ -70,6 +71,9 @@ final class Lock implements LockInterface, LoggerAwareInterface
     {
         try {
             if ($blocking) {
+                if (!$this->store instanceof StoreInterface && !($this->store instanceof BlockingStoreInterface && $this->store->supportsWaitAndSave())) {
+                    throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', \get_class($this->store)));
+                }
                 $this->store->waitAndSave($this->key);
             } else {
                 $this->store->save($this->key);

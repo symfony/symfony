@@ -14,8 +14,10 @@ namespace Symfony\Component\Lock\Store;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
+use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -24,7 +26,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
+class RetryTillSaveStore implements PersistStoreInterface, BlockingStoreInterface, StoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -33,11 +35,11 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     private $retryCount;
 
     /**
-     * @param StoreInterface $decorated  The decorated StoreInterface
-     * @param int            $retrySleep Duration in ms between 2 retry
-     * @param int            $retryCount Maximum amount of retry
+     * @param PersistStoreInterface $decorated  The decorated StoreInterface
+     * @param int                   $retrySleep Duration in ms between 2 retry
+     * @param int                   $retryCount Maximum amount of retry
      */
-    public function __construct(StoreInterface $decorated, int $retrySleep = 100, int $retryCount = PHP_INT_MAX)
+    public function __construct(PersistStoreInterface $decorated, int $retrySleep = 100, int $retryCount = PHP_INT_MAX)
     {
         $this->decorated = $decorated;
         $this->retrySleep = $retrySleep;
@@ -98,5 +100,13 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
     public function exists(Key $key)
     {
         return $this->decorated->exists($key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsWaitAndSave(): bool
+    {
+        return true;
     }
 }

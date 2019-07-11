@@ -15,6 +15,11 @@ CHANGELOG
  * Removed the `security.authentication.trust_resolver.anonymous_class` parameter
  * Removed the `security.authentication.trust_resolver.rememberme_class` parameter
 
+4.4.0
+-----
+
+* Deprecated the usage of "query_string" without a "search_dn" and a "search_password" config key in Ldap factories.
+
 4.3.0
 -----
 

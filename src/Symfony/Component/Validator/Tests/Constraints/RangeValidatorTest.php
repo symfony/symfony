@@ -389,4 +389,408 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->setCode(Range::INVALID_CHARACTERS_ERROR)
             ->assertRaised();
     }
+
+    public function testNoViolationOnNullObjectWithPropertyPaths()
+    {
+        $this->setObject(null);
+
+        $this->validator->validate(1, new Range([
+            'minPropertyPath' => 'minPropertyPath',
+            'maxPropertyPath' => 'maxPropertyPath',
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMinPropertyPath($value)
+    {
+        $this->setObject(new Limit(10));
+
+        $this->validator->validate($value, new Range([
+            'minPropertyPath' => 'value',
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMinPropertyPathOnArray($value)
+    {
+        $this->setObject(['root' => ['value' => 10]]);
+
+        $this->validator->validate($value, new Range([
+            'minPropertyPath' => '[root][value]',
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMaxPropertyPath($value)
+    {
+        $this->setObject(new Limit(20));
+
+        $this->validator->validate($value, new Range([
+            'maxPropertyPath' => 'value',
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMaxPropertyPathOnArray($value)
+    {
+        $this->setObject(['root' => ['value' => 20]]);
+
+        $this->validator->validate($value, new Range([
+            'maxPropertyPath' => '[root][value]',
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMinMaxPropertyPath($value)
+    {
+        $this->setObject(new MinMax(10, 20));
+
+        $this->validator->validate($value, new Range([
+            'minPropertyPath' => 'min',
+            'maxPropertyPath' => 'max',
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getLessThanTen
+     */
+    public function testInvalidValuesMinPropertyPath($value, $formattedValue)
+    {
+        $this->setObject(new Limit(10));
+
+        $constraint = new Range([
+            'minPropertyPath' => 'value',
+            'minMessage' => 'myMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 10)
+            ->setParameter('{{ min_limit_path }}', 'value')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getMoreThanTwenty
+     */
+    public function testInvalidValuesMaxPropertyPath($value, $formattedValue)
+    {
+        $this->setObject(new Limit(20));
+
+        $constraint = new Range([
+            'maxPropertyPath' => 'value',
+            'maxMessage' => 'myMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 20)
+            ->setParameter('{{ max_limit_path }}', 'value')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getMoreThanTwenty
+     */
+    public function testInvalidValuesCombinedMaxPropertyPath($value, $formattedValue)
+    {
+        $this->setObject(new MinMax(10, 20));
+
+        $constraint = new Range([
+            'minPropertyPath' => 'min',
+            'maxPropertyPath' => 'max',
+            'minMessage' => 'myMinMessage',
+            'maxMessage' => 'myMaxMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMaxMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 20)
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getLessThanTen
+     */
+    public function testInvalidValuesCombinedMinPropertyPath($value, $formattedValue)
+    {
+        $this->setObject(new MinMax(10, 20));
+
+        $constraint = new Range([
+            'minPropertyPath' => 'min',
+            'maxPropertyPath' => 'max',
+            'minMessage' => 'myMinMessage',
+            'maxMessage' => 'myMaxMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMinMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 10)
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getLessThanTen
+     */
+    public function testViolationOnNullObjectWithDefinedMin($value, $formattedValue)
+    {
+        $this->setObject(null);
+
+        $this->validator->validate($value, new Range([
+            'min' => 10,
+            'maxPropertyPath' => 'max',
+            'minMessage' => 'myMessage',
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 10)
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getMoreThanTwenty
+     */
+    public function testViolationOnNullObjectWithDefinedMax($value, $formattedValue)
+    {
+        $this->setObject(null);
+
+        $this->validator->validate($value, new Range([
+            'minPropertyPath' => 'min',
+            'max' => 20,
+            'maxMessage' => 'myMessage',
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 20)
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getTenthToTwentiethMarch2014
+     */
+    public function testValidDatesMinPropertyPath($value)
+    {
+        $this->setObject(new Limit('March 10, 2014'));
+
+        $this->validator->validate($value, new Range(['minPropertyPath' => 'value']));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenthToTwentiethMarch2014
+     */
+    public function testValidDatesMaxPropertyPath($value)
+    {
+        $this->setObject(new Limit('March 20, 2014'));
+
+        $constraint = new Range(['maxPropertyPath' => 'value']);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenthToTwentiethMarch2014
+     */
+    public function testValidDatesMinMaxPropertyPath($value)
+    {
+        $this->setObject(new MinMax('March 10, 2014', 'March 20, 2014'));
+
+        $constraint = new Range(['minPropertyPath' => 'min', 'maxPropertyPath' => 'max']);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getSoonerThanTenthMarch2014
+     */
+    public function testInvalidDatesMinPropertyPath($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $this->setObject(new Limit('March 10, 2014'));
+
+        $constraint = new Range([
+            'minPropertyPath' => 'value',
+            'minMessage' => 'myMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ limit }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ min_limit_path }}', 'value')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getLaterThanTwentiethMarch2014
+     */
+    public function testInvalidDatesMaxPropertyPath($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $this->setObject(new Limit('March 20, 2014'));
+
+        $constraint = new Range([
+            'maxPropertyPath' => 'value',
+            'maxMessage' => 'myMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ limit }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ max_limit_path }}', 'value')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getLaterThanTwentiethMarch2014
+     */
+    public function testInvalidDatesCombinedMaxPropertyPath($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $this->setObject(new MinMax('March 10, 2014', 'March 20, 2014'));
+
+        $constraint = new Range([
+            'minPropertyPath' => 'min',
+            'maxPropertyPath' => 'max',
+            'minMessage' => 'myMinMessage',
+            'maxMessage' => 'myMaxMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMaxMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ limit }}', 'Mar 20, 2014, 12:00 AM')
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getSoonerThanTenthMarch2014
+     */
+    public function testInvalidDatesCombinedMinPropertyPath($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $this->setObject(new MinMax('March 10, 2014', 'March 20, 2014'));
+
+        $constraint = new Range([
+            'minPropertyPath' => 'min',
+            'maxPropertyPath' => 'max',
+            'minMessage' => 'myMinMessage',
+            'maxMessage' => 'myMaxMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMinMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ limit }}', 'Mar 10, 2014, 12:00 AM')
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+}
+
+final class Limit
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+}
+
+final class MinMax
+{
+    private $min;
+    private $max;
+
+    public function __construct($min, $max)
+    {
+        $this->min = $min;
+        $this->max = $max;
+    }
+
+    public function getMin()
+    {
+        return $this->min;
+    }
+
+    public function getMax()
+    {
+        return $this->max;
+    }
 }

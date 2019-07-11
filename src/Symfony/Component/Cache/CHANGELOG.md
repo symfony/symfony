@@ -13,6 +13,7 @@ CHANGELOG
 -----
 
  * added support for connecting to Redis Sentinel clusters
+ * added argument `$prefix` to `AdapterInterface::clear()`
 
 4.3.0
 -----

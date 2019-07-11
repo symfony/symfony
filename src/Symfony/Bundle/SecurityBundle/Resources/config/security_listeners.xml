@@ -166,6 +166,8 @@
             <argument /> <!-- UserChecker -->
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- LDAP -->
+            <argument /> <!-- search dn -->
+            <argument /> <!-- search password -->
             <argument /> <!-- Base DN -->
             <argument>%security.authentication.hide_user_not_found%</argument>
         </service>

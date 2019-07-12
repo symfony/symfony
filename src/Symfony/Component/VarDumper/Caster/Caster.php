@@ -158,7 +158,6 @@ class Caster
             unset($a['__PHP_Incomplete_Class_Name']);
         }
 
-
         return $a;
     }
 }

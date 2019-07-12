@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;

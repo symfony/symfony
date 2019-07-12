@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\UnknownSenderException;

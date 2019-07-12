@@ -20,7 +20,6 @@ use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

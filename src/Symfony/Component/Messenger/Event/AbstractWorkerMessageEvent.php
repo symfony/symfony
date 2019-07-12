@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Event;
 
 use Symfony\Component\Messenger\Envelope;
 
-/**
- */
 abstract class AbstractWorkerMessageEvent
 {
     private $envelope;

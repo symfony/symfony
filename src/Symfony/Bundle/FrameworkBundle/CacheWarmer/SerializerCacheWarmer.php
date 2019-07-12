@@ -56,10 +56,10 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
             foreach ($loader->getMappedClasses() as $mappedClass) {
                 try {
                     $metadataFactory->getMetadataFor($mappedClass);
-                } catch (\ReflectionException $e) {
-                    // ignore failing reflection
                 } catch (AnnotationException $e) {
                     // ignore failing annotations
+                } catch (\Exception $e) {
+                    $this->ignoreAutoloadException($mappedClass, $e);
                 }
             }
         }

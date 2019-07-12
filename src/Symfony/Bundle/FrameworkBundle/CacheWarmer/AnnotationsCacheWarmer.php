@@ -64,17 +64,8 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
             }
             try {
                 $this->readAllComponents($reader, $class);
-            } catch (\ReflectionException $e) {
-                // ignore failing reflection
-            } catch (AnnotationException $e) {
-                /*
-                 * Ignore any AnnotationException to not break the cache warming process if an Annotation is badly
-                 * configured or could not be found / read / etc.
-                 *
-                 * In particular cases, an Annotation in your code can be used and defined only for a specific
-                 * environment but is always added to the annotations.map file by some Symfony default behaviors,
-                 * and you always end up with a not found Annotation.
-                 */
+            } catch (\Exception $e) {
+                $this->ignoreAutoloadException($class, $e);
             }
         }
 
@@ -84,14 +75,32 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     private function readAllComponents(Reader $reader, $class)
     {
         $reflectionClass = new \ReflectionClass($class);
-        $reader->getClassAnnotations($reflectionClass);
+
+        try {
+            $reader->getClassAnnotations($reflectionClass);
+        } catch (AnnotationException $e) {
+            /*
+             * Ignore any AnnotationException to not break the cache warming process if an Annotation is badly
+             * configured or could not be found / read / etc.
+             *
+             * In particular cases, an Annotation in your code can be used and defined only for a specific
+             * environment but is always added to the annotations.map file by some Symfony default behaviors,
+             * and you always end up with a not found Annotation.
+             */
+        }
 
         foreach ($reflectionClass->getMethods() as $reflectionMethod) {
-            $reader->getMethodAnnotations($reflectionMethod);
+            try {
+                $reader->getMethodAnnotations($reflectionMethod);
+            } catch (AnnotationException $e) {
+            }
         }
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $reader->getPropertyAnnotations($reflectionProperty);
+            try {
+                $reader->getPropertyAnnotations($reflectionProperty);
+            } catch (AnnotationException $e) {
+            }
         }
     }
 }

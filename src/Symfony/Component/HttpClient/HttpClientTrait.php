@@ -180,7 +180,7 @@ trait HttpClientTrait
             }
 
             if ('auth_ntlm' === $name) {
-                throw new InvalidArgumentException(sprintf('Option "%s" is not supported by %s, try using CurlHttpClient instead.', __CLASS__));
+                throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by %s, try using CurlHttpClient instead.', __CLASS__));
             }
 
             throw new InvalidArgumentException(sprintf('Unsupported option "%s" passed to %s, did you mean "%s"?', $name, __CLASS__, implode('", "', $alternatives ?: array_keys($defaultOptions))));

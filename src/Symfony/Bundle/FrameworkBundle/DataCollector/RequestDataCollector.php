@@ -49,7 +49,7 @@ class RequestDataCollector extends BaseRequestCollector implements EventSubscrib
      * Gets the parsed forward controller.
      *
      * @return array|bool An array with keys 'token' the forward profile token, and
-     *                    'controller' the parsed forward controller, false otherwise
+     * 'controller' the parsed forward controller, false otherwise
      */
     public function getForward()
     {

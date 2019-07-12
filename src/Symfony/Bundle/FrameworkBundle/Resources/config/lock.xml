@@ -26,7 +26,7 @@
 
         <service id="lock.strategy.majority" class="Symfony\Component\Lock\Strategy\ConsensusStrategy" />
 
-        <service id="lock.factory.abstract" class="Symfony\Component\Lock\Factory" abstract="true">
+        <service id="lock.factory.abstract" class="Symfony\Component\Lock\LockFactory" abstract="true">
             <tag name="monolog.logger" channel="lock" />
             <argument /> <!-- Store -->
             <call method="setLogger">

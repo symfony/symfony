@@ -29,7 +29,7 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function write($path, $locale, $data, $fallback = true)
+    public function write(string $path, string $locale, $data, bool $fallback = true)
     {
         $file = fopen($path.'/'.$locale.'.txt', 'w');
 

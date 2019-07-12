@@ -37,7 +37,7 @@ class BufferedBundleReader implements BundleReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read($path, $locale)
+    public function read(string $path, string $locale)
     {
         $hash = $path.'//'.$locale;
 

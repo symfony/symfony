@@ -23,7 +23,7 @@ class JsonBundleWriter implements BundleWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function write($path, $locale, $data)
+    public function write(string $path, string $locale, $data)
     {
         if ($data instanceof \Traversable) {
             $data = iterator_to_array($data);

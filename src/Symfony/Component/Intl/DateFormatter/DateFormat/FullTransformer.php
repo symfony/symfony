@@ -118,7 +118,7 @@ class FullTransformer
      *
      * @throws \InvalidArgumentException When the value can not be matched with pattern
      */
-    public function parse(\DateTime $dateTime, $value)
+    public function parse(\DateTime $dateTime, string $value)
     {
         $reverseMatchingRegExp = $this->getReverseMatchingRegExp($this->pattern);
         $reverseMatchingRegExp = '/^'.$reverseMatchingRegExp.'$/';

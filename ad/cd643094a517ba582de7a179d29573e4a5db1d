@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-09T08:16:30Z
+
+One difference though is that `getCacheDir()` and `getLogDir()` are returning absolute paths. Here, we return relative paths.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-09T08:22:40Z
+
+I haven't thought about that 🤔  To me, "dir" can mean both relative and absolute, such as in this example:
+
+![composer-dir](https://user-images.githubusercontent.com/73419/60871641-6f8c2c80-a233-11e9-99af-511efea0a5fa.png)
+
+But if this is confusing to people, we can close this.
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-07-09T08:42:53Z
+
+As `dir` stands for `directory`, it doesn't assume absolute or relative paths
+
+> A directory is a "folder", a place where you can put files or other directories (and special files, devices, symlinks...). It is a container for filesystem objects.
+>
+> A path is a string that specify how to reach a filesystem object (and this object can be a file, a directory, a special file, ...).
+>
+> Example: you have (probably, depending on your system) a file where system messages are logged, called syslog.
+>
+> [ ... ]
+>
+> https://unix.stackexchange.com/questions/131561/what-is-the-difference-between-path-and-directory

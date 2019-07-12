@@ -18,6 +18,8 @@ CHANGELOG
  * added the `min_limit_path` and `max_limit_path` parameters in violations when using 
    `Range` constraint with respectively the `minPropertyPath` and
    `maxPropertyPath` options.
+ * added a new `notInRangeMessage` options to the `Range` constraint that will
+   be used in the violation builder when both `min` and `max` are not null.
 
 4.3.0
 -----

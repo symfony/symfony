@@ -74,7 +74,7 @@ class MemcachedStore implements StoreInterface
      */
     public function waitAndSave(Key $key)
     {
-        @trigger_error(sprintf('%s has been deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', __METHOD__));
+        @trigger_error(sprintf('%s() is deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', __METHOD__));
         throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));
     }
 

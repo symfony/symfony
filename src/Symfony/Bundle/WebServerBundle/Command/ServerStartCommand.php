@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  *
- * @deprecated since version 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
+ * @deprecated since Symfony 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
  */
 class ServerStartCommand extends Command
 {
@@ -92,7 +92,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        @trigger_error('Using the WebserverBundle is deprecated since 4.4. The new Symfony local server has more features, you can use it instead.', E_USER_DEPRECATED);
+        @trigger_error('Using the WebserverBundle is deprecated since Symfony 4.4. The new Symfony local server has more features, you can use it instead.', E_USER_DEPRECATED);
 
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 

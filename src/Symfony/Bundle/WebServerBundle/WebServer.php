@@ -20,7 +20,7 @@ use Symfony\Component\Process\Process;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since version 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
+ * @deprecated since Symfony 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
  */
 class WebServer
 {

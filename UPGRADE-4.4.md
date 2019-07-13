@@ -143,3 +143,8 @@ WebProfilerBundle
 
  * Deprecated the `ExceptionController::templateExists()` method
  * Deprecated the `TemplateManager::templateExists()` method
+
+WebServerBundle
+---------------
+
+ * The bundle is deprecated and will be removed in 5.0.

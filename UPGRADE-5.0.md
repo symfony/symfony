@@ -560,3 +560,8 @@ Yaml
 
  * The parser is now stricter and will throw a `ParseException` when a
    mapping is found inside a multi-line string.
+
+WebServerBundle
+---------------
+
+ * The bundle has been removed.

@@ -15,6 +15,7 @@
         <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
             <tag name="monolog.logger" channel="messenger" />
             <argument type="service" id="messenger.senders_locator" />
+            <argument type="service" id="event_dispatcher" />
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>

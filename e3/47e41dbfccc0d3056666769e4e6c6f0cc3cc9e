@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-09T22:02:54Z
+
+Can we please add a test? And yes, I know that that test would be skipped in our current CI setup, but still… 😅
+
+---------------------------------------------------------------------------
+
+by tvandervorm at 2019-07-10T11:24:43Z
+
+> Can we please add a test? And yes, I know that that test would be skipped in our current CI setup, but still… sweat_smile
+
+I'd be happy to write a testcase for this issue, but it's not clear to me how I could do this without breaking the test for PHP < 7.4 . The most straightforward way would be to add a line to `testHashedSignature()` in `ReflectionClassResourceTest`, but this will cause the currently passing PHP7.1. & PHP7.3 tests to fail.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-10T11:28:53Z
+
+Adding a new test case annotation with `@requires PHP 7.4` should, right?
+
+---------------------------------------------------------------------------
+
+by tvandervorm at 2019-07-10T11:30:33Z
+
+ah, I wasn't aware one could specify PHP versions in annotations like that, will give it a go, thanks
+
+---------------------------------------------------------------------------
+
+by tvandervorm at 2019-07-14T12:00:07Z
+
+I added a little testcase, which I tested with both PHP7.2 & PHP 7.4. It gets skipped in the first case, passes in the second case and fails in the second case if I revert my change, so it does what it should do.
+
+Now, I've always been taught that dependencies between tests should be avoided, which I failed to do here. However, the alternative would be to copy/paste the content of `testHashedSignature()`, which seems ugly to me as well. Let me know what is preferred, I'll change it if needed.
+
+Finally, I tried whether the `@requires` annotation gets taken into account for `@dataProvider` functions, which would've been the cleanest solution, this is sadly not the case however.

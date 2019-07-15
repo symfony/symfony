@@ -55,7 +55,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase
@@ -1550,6 +1549,14 @@ abstract class FrameworkExtensionTest extends TestCase
             'pin-sha256' => ['14s5erg62v1v8471g2revg48r7==', 'jsda84hjtyd4821bgfesd215bsfg5412='],
             'md5' => 'sdhtb481248721thbr=',
         ], $defaultOptions['peer_fingerprint']);
+    }
+
+    public function testMailer(): void
+    {
+        $container = $this->createContainerFromFile('mailer');
+
+        $this->assertTrue($container->hasAlias('mailer'));
+        $this->assertTrue($container->hasDefinition('mailer.default_transport'));
     }
 
     protected function createContainer(array $data = [])

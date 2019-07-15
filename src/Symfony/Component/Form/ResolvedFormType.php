@@ -93,6 +93,11 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     public function createBuilder(FormFactoryInterface $factory, $name, array $options = [])
     {
+        if (\is_int($name)) {
+            @trigger_error(sprintf('Passing an integer name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
+            $name = (string) $name;
+        }
+
         try {
             $options = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $e) {
@@ -218,6 +223,11 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     protected function newBuilder($name, $dataClass, FormFactoryInterface $factory, array $options)
     {
+        if (\is_int($name)) {
+            @trigger_error(sprintf('Passing an integer name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
+            $name = (string) $name;
+        }
+
         if ($this->innerType instanceof ButtonTypeInterface) {
             return new ButtonBuilder($name, $options);
         }

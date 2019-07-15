@@ -35,6 +35,11 @@ class FormFactory implements FormFactoryInterface
      */
     public function createNamed($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
     {
+        if (\is_int($name)) {
+            @trigger_error(sprintf('Passing an integer name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
+            $name = (string) $name;
+        }
+
         return $this->createNamedBuilder($name, $type, $data, $options)->getForm();
     }
 
@@ -63,6 +68,11 @@ class FormFactory implements FormFactoryInterface
      */
     public function createNamedBuilder($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
     {
+        if (\is_int($name)) {
+            @trigger_error(sprintf('Passing an integer name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
+            $name = (string) $name;
+        }
+
         if (null !== $data && !\array_key_exists('data', $options)) {
             $options['data'] = $data;
         }

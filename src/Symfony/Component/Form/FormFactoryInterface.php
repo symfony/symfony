@@ -38,10 +38,10 @@ interface FormFactoryInterface
      *
      * @see createNamedBuilder()
      *
-     * @param string|int $name    The name of the form
-     * @param string     $type    The type of the form
-     * @param mixed      $data    The initial data
-     * @param array      $options The options
+     * @param string $name    The name of the form
+     * @param string $type    The type of the form
+     * @param mixed  $data    The initial data
+     * @param array  $options The options
      *
      * @return FormInterface The form
      *
@@ -81,10 +81,10 @@ interface FormFactoryInterface
     /**
      * Returns a form builder.
      *
-     * @param string|int $name    The name of the form
-     * @param string     $type    The type of the form
-     * @param mixed      $data    The initial data
-     * @param array      $options The options
+     * @param string $name    The name of the form
+     * @param string $type    The type of the form
+     * @param mixed  $data    The initial data
+     * @param array  $options The options
      *
      * @return FormBuilderInterface The form builder
      *

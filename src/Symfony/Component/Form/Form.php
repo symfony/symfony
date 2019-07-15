@@ -843,8 +843,13 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         if (!$child instanceof FormInterface) {
-            if (!\is_string($child) && !\is_int($child)) {
-                throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormInterface');
+            if (\is_int($child)) {
+                @trigger_error(sprintf('Passing an integer child name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
+                $child = (string) $child;
+            }
+
+            if (!\is_string($child)) {
+                throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormInterface');
             }
 
             $child = (string) $child;

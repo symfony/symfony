@@ -62,8 +62,13 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             return $this;
         }
 
-        if (!\is_string($child) && !\is_int($child)) {
-            throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormBuilderInterface');
+        if (\is_int($child)) {
+            @trigger_error(sprintf('Passing an integer child name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
+            $child = (string) $child;
+        }
+
+        if (!\is_string($child)) {
+            throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormBuilderInterface');
         }
 
         if (null !== $type && !\is_string($type) && !$type instanceof FormTypeInterface) {
@@ -86,6 +91,11 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
+        if (\is_int($name)) {
+            @trigger_error(sprintf('Passing an integer name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
+            $name = (string) $name;
+        }
+
         if (null === $type && null === $this->getDataClass()) {
             $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
         }
@@ -104,6 +114,10 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
+
+        if (\is_int($name)) {
+            @trigger_error(sprintf('Passing an integer name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         if (isset($this->unresolvedChildren[$name])) {
@@ -126,6 +140,10 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
+        if (\is_int($name)) {
+            @trigger_error(sprintf('Passing an integer name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
+        }
+
         unset($this->unresolvedChildren[$name], $this->children[$name]);
 
         return $this;
@@ -138,6 +156,10 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
+
+        if (\is_int($name)) {
+            @trigger_error(sprintf('Passing an integer name to "%s" is deprecated since Symfony 4.4. Pass a string instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         return isset($this->unresolvedChildren[$name]) || isset($this->children[$name]);
@@ -241,7 +263,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     private function resolveChildren()
     {
         foreach ($this->unresolvedChildren as $name => $info) {
-            $this->children[$name] = $this->create($name, $info[0], $info[1]);
+            $this->children[$name] = $this->create((string) $name, $info[0], $info[1]);
         }
 
         $this->unresolvedChildren = [];

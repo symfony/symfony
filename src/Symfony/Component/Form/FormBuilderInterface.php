@@ -23,9 +23,9 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * If you add a nested group, this group should also be represented in the
      * object hierarchy.
      *
-     * @param string|int|FormBuilderInterface $child
-     * @param string|null                     $type
-     * @param array                           $options
+     * @param string|FormBuilderInterface $child
+     * @param string|null                 $type
+     * @param array                       $options
      *
      * @return self
      */

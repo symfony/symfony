@@ -11,26 +11,13 @@
 
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
-class TestClassSetValue
+class TestAdderRemoverInvalidMethods
 {
-    protected $value;
-
-    public function getValue()
+    public function addFoo($foo)
     {
-        return $this->value;
     }
 
-    public function setValue($value)
-    {
-        $this->value = $value;
-    }
-
-    public function __construct($value)
-    {
-        $this->value = $value;
-    }
-
-    private function setFoo()
+    public function removeBar($foo)
     {
     }
 }

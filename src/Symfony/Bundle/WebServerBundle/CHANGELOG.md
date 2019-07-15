@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 4.4.0
----------------
+-----
 
  * The bundle is deprecated and will be removed in 5.0.
 

@@ -307,6 +307,7 @@ Lock
 
  * Removed `Symfony\Component\Lock\StoreInterface` in favor of `Symfony\Component\Lock\BlockingStoreInterface` and
    `Symfony\Component\Lock\PersistStoreInterface`.
+ * Removed `Factory`, use `LockFactory` instead
 
 Messenger
 ---------

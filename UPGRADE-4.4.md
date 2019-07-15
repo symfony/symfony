@@ -100,6 +100,7 @@ Lock
 
  * Deprecated `Symfony\Component\Lock\StoreInterface` in favor of `Symfony\Component\Lock\BlockingStoreInterface` and
    `Symfony\Component\Lock\PersistStoreInterface`.
+ * `Factory` is deprecated, use `LockFactory` instead
 
 Messenger
 ---------

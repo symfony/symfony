@@ -1952,6 +1952,8 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('mailer.xml');
+
+        $container->getDefinition('mailer.mailer')->setArgument(2, $config['async']);
         $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
 
         $recipients = $config['envelope']['recipients'] ?? null;

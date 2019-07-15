@@ -23,16 +23,22 @@ class Mailer implements MailerInterface
 {
     private $transport;
     private $bus;
+    private $async;
 
-    public function __construct(TransportInterface $transport, MessageBusInterface $bus = null)
+    public function __construct(TransportInterface $transport, MessageBusInterface $bus = null, bool $async = false)
     {
+        if ($async && null === $bus) {
+            throw new \LogicException('You cannot send messages asynchronously as the Symfony Messenger Component is not installed. Try running "composer require symfony/messenger".');
+        }
+
         $this->transport = $transport;
         $this->bus = $bus;
+        $this->async = $async;
     }
 
     public function send(RawMessage $message, SmtpEnvelope $envelope = null): void
     {
-        if (null === $this->bus) {
+        if (!$this->async) {
             $this->transport->send($message, $envelope);
 
             return;

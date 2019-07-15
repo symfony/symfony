@@ -152,8 +152,8 @@ class DebugClassLoader
                     include $file;
 
                     return;
-                } else {
-                    include $file;
+                } elseif (false === include $file) {
+                    return;
                 }
             } else {
                 \call_user_func($this->classLoader, $class);

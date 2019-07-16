@@ -236,6 +236,39 @@ class UploadedFile extends File
         throw new FileException($this->getErrorMessage());
     }
 
+    public function moveAndRename(string $targetDirectory, string $fileNamePattern)
+    {
+        $fileName = str_replace(
+            [
+                '[contenthash]',
+                '[day]',
+                '[extension]',
+                '[month]',
+                '[name]',
+                '[randomhash]',
+                '[slug]',
+                '[timestamp]',
+                '[uuid]',
+                '[year]',
+            ],
+            [
+                sha1_file($this->getRealPath()),
+                date('d'),
+                $this->getExtension(),
+                date('m'),
+                $this->getBasename(),
+                bin2hex(random_bytes(20)),
+                transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $this->getBasename()),
+                time(),
+                $this->generateUuid4(),
+                date('Y'),
+            ],
+            $fileNamePattern
+        );
+
+        return $this->move($targetDirectory, $fileName);
+    }
+
     /**
      * Returns the maximum size of an uploaded file as configured in php.ini.
      *
@@ -293,5 +326,16 @@ class UploadedFile extends File
         $message = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
 
         return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
+    }
+
+    private function generateUuid4()
+    {
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
     }
 }

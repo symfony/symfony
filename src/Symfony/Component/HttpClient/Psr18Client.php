@@ -92,7 +92,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
                 }
             }
 
-            $body = isset(class_uses($response)[ResponseTrait::class]) ? $response->toStream() : StreamWrapper::createResource($response, $this->client);
+            $body = isset(class_uses($response)[ResponseTrait::class]) ? $response->toStream(false) : StreamWrapper::createResource($response, $this->client);
 
             return $psrResponse->withBody($this->streamFactory->createStreamFromResource($body));
         } catch (TransportExceptionInterface $e) {

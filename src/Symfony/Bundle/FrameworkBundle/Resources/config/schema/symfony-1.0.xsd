@@ -33,6 +33,7 @@
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="mailer" type="mailer" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -542,5 +543,9 @@
 
     <xsd:complexType name="http_header" mixed="true">
         <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="mailer">
+        <xsd:attribute name="dsn" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

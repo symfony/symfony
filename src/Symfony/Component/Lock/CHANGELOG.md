@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* `Factory` has been removed, use `LockFactory` instead.
+* `StoreInterface` has been removed, use `BlockingStoreInterface` and `PersistingStoreInterface` instead.
+
 4.4.0
 -----
 

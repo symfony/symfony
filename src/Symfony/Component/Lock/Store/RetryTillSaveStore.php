@@ -18,7 +18,6 @@ use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
-use Symfony\Component\Lock\StoreInterface;
 
 /**
  * RetryTillSaveStore is a PersistingStoreInterface implementation which decorate a non blocking PersistingStoreInterface to provide a
@@ -26,7 +25,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class RetryTillSaveStore implements BlockingStoreInterface, StoreInterface, LoggerAwareInterface
+class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 

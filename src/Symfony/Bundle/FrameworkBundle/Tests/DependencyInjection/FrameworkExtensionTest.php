@@ -1557,6 +1557,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasAlias('mailer'));
         $this->assertTrue($container->hasDefinition('mailer.default_transport'));
+        $this->assertSame('smtp://example.com', $container->getDefinition('mailer.default_transport')->getArgument(0));
     }
 
     protected function createContainer(array $data = [])

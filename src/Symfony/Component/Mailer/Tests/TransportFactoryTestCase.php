@@ -69,11 +69,15 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
-    public function testUnsupportedSchemeException(Dsn $dsn): void
+    public function testUnsupportedSchemeException(Dsn $dsn, string $message = null): void
     {
         $factory = $this->getFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
+        if (null !== $message) {
+            $this->expectExceptionMessage($message);
+        }
+
         $factory->create($dsn);
     }
 

@@ -60,7 +60,10 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield [new Dsn('foo', 'postmark', self::USER)];
+        yield [
+            new Dsn('foo', 'postmark', self::USER),
+            'The "foo" scheme is not supported for mailer "postmark". Supported schemes are: "api", "smtp".',
+        ];
     }
 
     public function incompleteDsnProvider(): iterable

@@ -86,7 +86,10 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield [new Dsn('foo', 'ses', self::USER, self::PASSWORD)];
+        yield [
+            new Dsn('foo', 'ses', self::USER, self::PASSWORD),
+            'The "foo" scheme is not supported for mailer "ses". Supported schemes are: "api", "http", "smtp".',
+        ];
     }
 
     public function incompleteDsnProvider(): iterable

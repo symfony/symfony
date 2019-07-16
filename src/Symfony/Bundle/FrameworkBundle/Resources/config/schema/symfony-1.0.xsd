@@ -555,6 +555,16 @@
     </xsd:complexType>
 
     <xsd:complexType name="mailer">
+        <xsd:sequence>
+            <xsd:element name="envelope" type="mailer_envelope" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
         <xsd:attribute name="dsn" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="mailer_envelope">
+        <xsd:sequence>
+            <xsd:element name="sender" type="xsd:string" />
+            <xsd:element name="recipients" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
     </xsd:complexType>
 </xsd:schema>

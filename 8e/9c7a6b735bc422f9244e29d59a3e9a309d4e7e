@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-15T20:44:12Z
+
+All translations are merged into 3.4 (even for translations that are not needed for 3.4).
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-15T20:49:34Z
+
+@fabpot  So should I open PR for 4.4 branch to embed translation for #32435 also?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-15T20:57:47Z
+
+The translation for #32435 should be done in 3.4  as well
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-15T21:19:46Z
+
+Rebased on 3.4, added all missing translations.

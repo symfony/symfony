@@ -7,6 +7,12 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
-        <framework:mailer dsn="smtp://example.com" />
+        <framework:mailer dsn="smtp://example.com">
+            <framework:envelope>
+                <framework:sender>sender@example.org</framework:sender>
+                <framework:recipients>redirected@example.org</framework:recipients>
+                <framework:recipients>redirected1@example.org</framework:recipients>
+            </framework:envelope>
+        </framework:mailer>
     </framework:config>
 </container>

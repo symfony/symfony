@@ -1588,6 +1588,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasAlias('mailer'));
         $this->assertTrue($container->hasDefinition('mailer.default_transport'));
         $this->assertSame('smtp://example.com', $container->getDefinition('mailer.default_transport')->getArgument(0));
+        $this->assertTrue($container->hasDefinition('mailer.envelope_listener'));
+        $l = $container->getDefinition('mailer.envelope_listener');
+        $this->assertSame('sender@example.org', $l->getArgument(0));
+        $this->assertSame(['redirected@example.org', 'redirected1@example.org'], $l->getArgument(1));
     }
 
     protected function createContainer(array $data = [])

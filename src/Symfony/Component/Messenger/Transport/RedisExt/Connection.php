@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\RedisExt;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Dsn;
 
 /**
  * A Redis connection.
@@ -56,11 +57,11 @@ class Connection
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 
         if (isset($connectionCredentials['auth']) && !$this->connection->auth($connectionCredentials['auth'])) {
-            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
+            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $this->connection->getLastError()));
         }
 
         if (($dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex']) && !$this->connection->select($dbIndex)) {
-            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
+            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $this->connection->getLastError()));
         }
 
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];
@@ -73,25 +74,24 @@ class Connection
 
     public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
     {
-        if (false === $parsedUrl = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
-        }
+        return self::fromDsnObject(Dsn::fromString($dsn, $redisOptions), $redis);
+    }
 
-        $pathParts = explode('/', $parsedUrl['path'] ?? '');
+    public static function fromDsnObject(Dsn $dsn, \Redis $redis = null): self
+    {
+        $pathParts = explode('/', $dsn->getPath() ?? '');
 
-        $stream = $pathParts[1] ?? $redisOptions['stream'] ?? null;
-        $group = $pathParts[2] ?? $redisOptions['group'] ?? null;
-        $consumer = $pathParts[3] ?? $redisOptions['consumer'] ?? null;
+        $stream = $pathParts[1] ?? $dsn->getOption('stream');
+        $group = $pathParts[2] ?? $dsn->getOption('group');
+        $consumer = $pathParts[3] ?? $dsn->getOption('consumer');
 
         $connectionCredentials = [
-            'host' => $parsedUrl['host'] ?? '127.0.0.1',
-            'port' => $parsedUrl['port'] ?? 6379,
-            'auth' => $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+            'host' => $dsn->getHost() ?? '127.0.0.1',
+            'port' => $dsn->getPort() ?? 6379,
+            'auth' => $dsn->getPassword() ?? $dsn->getUser(),
         ];
 
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $redisOptions);
-        }
+        $redisOptions = $dsn->getOptions();
 
         $autoSetup = null;
         if (\array_key_exists('auto_setup', $redisOptions)) {

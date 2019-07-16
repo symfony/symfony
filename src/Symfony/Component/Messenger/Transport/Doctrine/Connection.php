@@ -22,6 +22,7 @@ use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Dsn;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
@@ -68,30 +69,20 @@ class Connection
 
     public static function buildConfiguration(string $dsn, array $options = []): array
     {
-        if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Doctrine Messenger DSN "%s" is invalid.', $dsn));
-        }
+        return self::buildConfigurationFromDsnObject(Dsn::fromString($dsn, $options));
+    }
 
-        $query = [];
-        if (isset($components['query'])) {
-            parse_str($components['query'], $query);
-        }
-
-        $configuration = ['connection' => $components['host']];
-        $configuration += $options + $query + self::DEFAULT_OPTIONS;
+    public static function buildConfigurationFromDsnObject(Dsn $dsn): array
+    {
+        $configuration = ['connection' => $dsn->getHost()];
+        $options = $dsn->getOptions();
+        $configuration += $options + self::DEFAULT_OPTIONS;
 
         $configuration['auto_setup'] = filter_var($configuration['auto_setup'], FILTER_VALIDATE_BOOLEAN);
 
-        // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
             throw new InvalidArgumentException(sprintf('Unknown option found : [%s]. Allowed options are [%s]', implode(', ', $optionsExtraKeys), implode(', ', self::DEFAULT_OPTIONS)));
-        }
-
-        // check for extra keys in options
-        $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
-        if (0 < \count($queryExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s]', implode(', ', $queryExtraKeys), implode(', ', self::DEFAULT_OPTIONS)));
         }
 
         return $configuration;

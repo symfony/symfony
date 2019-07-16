@@ -29,21 +29,26 @@ class TransportFactory implements TransportFactoryInterface
         $this->factories = $factories;
     }
 
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function fromString(string $dsn, array $options, SerializerInterface $serializer, string $name): TransportInterface
+    {
+        return $this->createTransport(Dsn::fromString($dsn, $options), $serializer, $name);
+    }
+
+    public function createTransport(Dsn $dsn, SerializerInterface $serializer, string $name): TransportInterface
     {
         foreach ($this->factories as $factory) {
-            if ($factory->supports($dsn, $options)) {
-                return $factory->createTransport($dsn, $options, $serializer);
+            if ($factory->supports($dsn)) {
+                return $factory->createTransport($dsn, $serializer, $name);
             }
         }
 
         throw new InvalidArgumentException(sprintf('No transport supports the given Messenger DSN "%s".', $dsn));
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(Dsn $dsn): bool
     {
         foreach ($this->factories as $factory) {
-            if ($factory->supports($dsn, $options)) {
+            if ($factory->supports($dsn)) {
                 return true;
             }
         }

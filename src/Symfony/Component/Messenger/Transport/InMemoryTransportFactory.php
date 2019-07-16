@@ -24,14 +24,14 @@ class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterf
      */
     private $createdTransports = [];
 
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(Dsn $dsn, SerializerInterface $serializer, string $name): TransportInterface
     {
         return $this->createdTransports[] = new InMemoryTransport();
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(Dsn $dsn): bool
     {
-        return 0 === strpos($dsn, 'in-memory://');
+        return 'in-memory' === $dsn->getScheme();
     }
 
     public function reset()

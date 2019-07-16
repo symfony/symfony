@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Transport\RedisExt;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Transport\Dsn;
 use Symfony\Component\Messenger\Transport\RedisExt\Connection;
 use Symfony\Component\Messenger\Transport\RedisExt\RedisTransport;
 use Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory;
@@ -22,21 +23,31 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class RedisTransportFactoryTest extends TestCase
 {
-    public function testSupportsOnlyRedisTransports()
+    /**
+     * @dataProvider supportsProvider
+     */
+    public function testSupports(Dsn $dsn, bool $supports): void
     {
         $factory = new RedisTransportFactory();
 
-        $this->assertTrue($factory->supports('redis://localhost', []));
-        $this->assertFalse($factory->supports('sqs://localhost', []));
-        $this->assertFalse($factory->supports('invalid-dsn', []));
+        $this->assertSame($supports, $factory->supports($dsn));
     }
 
-    public function testCreateTransport()
+    public function supportsProvider(): iterable
     {
-        $factory = new RedisTransportFactory();
-        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://localhost', ['foo' => 'bar']), $serializer);
+        yield [Dsn::fromString('redis://localhost'), true];
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('redis://localhost', ['foo' => 'bar'], $serializer));
+        yield [Dsn::fromString('foo://localhost'), false];
+    }
+
+    public function testCreate(): void
+    {
+        $serializer = $this->createMock(SerializerInterface::class);
+
+        $dsn = Dsn::fromString('redis://localhost', ['foo' => 'bar']);
+        $expectedTransport = new RedisTransport(Connection::fromDsnObject($dsn), $serializer);
+        $factory = new RedisTransportFactory();
+
+        $this->assertEquals($expectedTransport, $factory->createTransport($dsn, $serializer, 'redis'));
     }
 }

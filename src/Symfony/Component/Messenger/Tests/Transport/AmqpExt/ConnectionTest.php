@@ -28,7 +28,7 @@ class ConnectionTest extends TestCase
     public function testItCannotBeConstructedWithAWrongDsn()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('The given AMQP DSN "amqp://:" is invalid.');
+        $this->expectExceptionMessage('The "amqp://:" messenger DSN is invalid.');
         Connection::fromDsn('amqp://:');
     }
 

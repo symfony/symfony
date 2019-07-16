@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Sync;
 
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\Dsn;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -28,13 +29,13 @@ class SyncTransportFactory implements TransportFactoryInterface
         $this->messageBus = $messageBus;
     }
 
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(Dsn $dsn, SerializerInterface $serializer, string $name): TransportInterface
     {
         return new SyncTransport($this->messageBus);
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(Dsn $dsn): bool
     {
-        return 0 === strpos($dsn, 'sync://');
+        return 'sync' === $dsn->getScheme();
     }
 }

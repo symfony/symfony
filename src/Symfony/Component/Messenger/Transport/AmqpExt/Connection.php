@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Transport\Dsn;
 
 /**
  * An AMQP connection.
@@ -98,34 +99,31 @@ class Connection
      */
     public static function fromDsn(string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
     {
-        if (false === $parsedUrl = parse_url($dsn)) {
-            // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
-            if ('amqp://' !== $dsn) {
-                throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
-            }
+        return self::fromDsnObject(Dsn::fromString($dsn, $options), $amqpFactory);
+    }
 
-            $parsedUrl = [];
-        }
-
-        $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
+    public static function fromDsnObject(Dsn $dsn, AmqpFactory $amqpFactory = null): self
+    {
+        $pathParts = $dsn->getPath() ? explode('/', trim($dsn->getPath(), '/')) : [];
         $exchangeName = $pathParts[1] ?? 'messages';
         parse_str($parsedUrl['query'] ?? '', $parsedQuery);
+        $vhost = isset($pathParts[0]) ? urldecode($pathParts[0]) : '/';
 
         $amqpOptions = array_replace_recursive([
-            'host' => $parsedUrl['host'] ?? 'localhost',
-            'port' => $parsedUrl['port'] ?? 5672,
-            'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
+            'host' => $dsn->getHost() ?? 'localhost',
+            'port' => $dsn->getPort() ?? 5672,
+            'vhost' => $vhost,
             'exchange' => [
                 'name' => $exchangeName,
             ],
-        ], $options, $parsedQuery);
+        ], $dsn->getOptions());
 
-        if (isset($parsedUrl['user'])) {
-            $amqpOptions['login'] = $parsedUrl['user'];
+        if ($user = $dsn->getUser()) {
+            $amqpOptions['login'] = $user;
         }
 
-        if (isset($parsedUrl['pass'])) {
-            $amqpOptions['password'] = $parsedUrl['pass'];
+        if ($password = $dsn->getPassword()) {
+            $amqpOptions['password'] = $password;
         }
 
         if (!isset($amqpOptions['queues'])) {

@@ -9,22 +9,44 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
+namespace Symfony\Component\Messenger\Tests\Transport\Sync;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\Dsn;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
 
 class SyncTransportFactoryTest extends TestCase
 {
-    public function testCreateTransport()
+    /**
+     * @dataProvider supportsProvider
+     */
+    public function testSupports(Dsn $dsn, bool $supports): void
+    {
+        $bus = $this->createMock(MessageBusInterface::class);
+        $factory = new SyncTransportFactory($bus);
+
+        $this->assertSame($supports, $factory->supports($dsn));
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [Dsn::fromString('sync://'), true];
+
+        yield [Dsn::fromString('foo://localhost'), false];
+    }
+
+    public function testCreate(): void
     {
         $serializer = $this->createMock(SerializerInterface::class);
         $bus = $this->createMock(MessageBusInterface::class);
+
+        $dsn = Dsn::fromString('sync://');
+        $expectedTransport = new SyncTransport($bus);
         $factory = new SyncTransportFactory($bus);
-        $transport = $factory->createTransport('sync://', [], $serializer);
-        $this->assertInstanceOf(SyncTransport::class, $transport);
+
+        $this->assertEquals($expectedTransport, $factory->createTransport($dsn, $serializer, 'sync'));
     }
 }

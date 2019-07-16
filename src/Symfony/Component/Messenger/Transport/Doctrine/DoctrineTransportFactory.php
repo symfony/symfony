@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Doctrine;
 
 use Doctrine\Common\Persistence\ConnectionRegistry;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Dsn;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -29,10 +30,9 @@ class DoctrineTransportFactory implements TransportFactoryInterface
         $this->registry = $registry;
     }
 
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(Dsn $dsn, SerializerInterface $serializer, string $name): TransportInterface
     {
-        unset($options['transport_name']);
-        $configuration = Connection::buildConfiguration($dsn, $options);
+        $configuration = Connection::buildConfigurationFromDsnObject($dsn);
 
         try {
             $driverConnection = $this->registry->getConnection($configuration['connection']);
@@ -45,8 +45,8 @@ class DoctrineTransportFactory implements TransportFactoryInterface
         return new DoctrineTransport($connection, $serializer);
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(Dsn $dsn): bool
     {
-        return 0 === strpos($dsn, 'doctrine://');
+        return 'doctrine' === $dsn->getScheme();
     }
 }

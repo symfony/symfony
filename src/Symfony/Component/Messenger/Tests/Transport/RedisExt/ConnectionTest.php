@@ -35,14 +35,6 @@ class ConnectionTest extends TestCase
         }
     }
 
-    public function testFromInvalidDsn()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given Redis DSN "redis://" is invalid.');
-
-        Connection::fromDsn('redis://');
-    }
-
     public function testFromDsn()
     {
         $this->assertEquals(
@@ -212,16 +204,16 @@ class ConnectionTest extends TestCase
 
         try {
             $connection->add('message', []);
+            $this->fail(sprintf('Expected that "%s" was thrown.', TransportException::class));
         } catch (TransportException $e) {
+            $this->assertSame('xadd error', $e->getMessage());
         }
-
-        $this->assertSame('xadd error', $e->getMessage());
 
         try {
             $connection->ack('1');
+            $this->fail(sprintf('Expected that "%s" was thrown.', TransportException::class));
         } catch (TransportException $e) {
+            $this->assertSame('xack error', $e->getMessage());
         }
-
-        $this->assertSame('xack error', $e->getMessage());
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Dsn;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -34,36 +35,38 @@ class InMemoryTransportFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider provideDSN
+     * @dataProvider supportsProvider
      */
-    public function testSupports(string $dsn, bool $expected = true)
+    public function testSupports(Dsn $dsn, bool $supports): void
     {
-        $this->assertSame($expected, $this->factory->supports($dsn, []), 'InMemoryTransportFactory::supports returned unexpected result.');
+        $this->assertSame($supports, $this->factory->supports($dsn));
     }
 
-    public function testCreateTransport()
+    public function supportsProvider(): iterable
     {
-        /** @var SerializerInterface $serializer */
+        yield [Dsn::fromString('in-memory://'), true];
+
+        yield [Dsn::fromString('foo://localhost'), false];
+    }
+
+    public function testCreate(): void
+    {
         $serializer = $this->createMock(SerializerInterface::class);
 
-        $this->assertInstanceOf(InMemoryTransport::class, $this->factory->createTransport('in-memory://', [], $serializer));
+        $dsn = Dsn::fromString('in-memory://');
+        $expectedTransport = new InMemoryTransport();
+
+        $this->assertEquals($expectedTransport, $this->factory->createTransport($dsn, $serializer, 'in-memory'));
     }
 
-    public function testResetCreatedTransports()
+    public function testResetCreatedTransports(): void
     {
-        $transport = $this->factory->createTransport('in-memory://', [], $this->createMock(SerializerInterface::class));
+        $dsn = Dsn::fromString('in-memory://');
+        $transport = $this->factory->createTransport($dsn, $this->createMock(SerializerInterface::class), 'in-memory');
         $transport->send(Envelope::wrap(new DummyMessage('Hello.')));
 
         $this->assertCount(1, $transport->get());
         $this->factory->reset();
         $this->assertCount(0, $transport->get());
-    }
-
-    public function provideDSN(): array
-    {
-        return [
-            'Supported' => ['in-memory://foo'],
-            'Unsupported' => ['amqp://bar', false],
-        ];
     }
 }

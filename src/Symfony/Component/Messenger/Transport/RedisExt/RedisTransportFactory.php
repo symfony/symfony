@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
+use Symfony\Component\Messenger\Transport\Dsn;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -21,15 +22,13 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class RedisTransportFactory implements TransportFactoryInterface
 {
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(Dsn $dsn, SerializerInterface $serializer, string $name): TransportInterface
     {
-        unset($options['transport_name']);
-
-        return new RedisTransport(Connection::fromDsn($dsn, $options), $serializer);
+        return new RedisTransport(Connection::fromDsnObject($dsn), $serializer);
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(Dsn $dsn): bool
     {
-        return 0 === strpos($dsn, 'redis://');
+        return 'redis' === $dsn->getScheme();
     }
 }

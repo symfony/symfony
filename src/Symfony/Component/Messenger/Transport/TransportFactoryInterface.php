@@ -11,16 +11,23 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * Creates a Messenger transport.
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
+ * @author Konstantin Myakshin <molodchick@gmail.com>
  */
 interface TransportFactoryInterface
 {
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface;
+    /**
+     * @param string $name Transport name
+     *
+     * @throws TransportException In case when transport couldn't be created
+     */
+    public function createTransport(Dsn $dsn, SerializerInterface $serializer, string $name): TransportInterface;
 
-    public function supports(string $dsn, array $options): bool;
+    public function supports(Dsn $dsn): bool;
 }

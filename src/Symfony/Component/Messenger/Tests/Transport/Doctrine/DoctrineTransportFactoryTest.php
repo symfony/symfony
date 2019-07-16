@@ -15,24 +15,35 @@ use Doctrine\Common\Persistence\ConnectionRegistry;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory;
+use Symfony\Component\Messenger\Transport\Dsn;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class DoctrineTransportFactoryTest extends TestCase
 {
-    public function testSupports()
+    /**
+     * @dataProvider supportsProvider
+     */
+    public function testSupports(Dsn $dsn, bool $supports): void
     {
         $factory = new DoctrineTransportFactory(
             $this->createMock(ConnectionRegistry::class)
         );
 
-        $this->assertTrue($factory->supports('doctrine://default', []));
-        $this->assertFalse($factory->supports('amqp://localhost', []));
+        $this->assertSame($supports, $factory->supports($dsn));
     }
 
-    public function testCreateTransport()
+    public function supportsProvider(): iterable
+    {
+        yield [Dsn::fromString('doctrine://localhost'), true];
+
+        yield [Dsn::fromString('foo://localhost'), false];
+    }
+
+    public function testCreate(): void
     {
         $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
@@ -48,15 +59,16 @@ class DoctrineTransportFactoryTest extends TestCase
         $factory = new DoctrineTransportFactory($registry);
         $serializer = $this->createMock(SerializerInterface::class);
 
-        $this->assertEquals(
-            new DoctrineTransport(new Connection(Connection::buildConfiguration('doctrine://default'), $driverConnection), $serializer),
-            $factory->createTransport('doctrine://default', [], $serializer)
-        );
+        $dsn = Dsn::fromString('doctrine://default');
+        $connection = new Connection(Connection::buildConfigurationFromDsnObject($dsn), $driverConnection);
+        $expectedTransport = new DoctrineTransport($connection, $serializer);
+
+        $this->assertEquals($expectedTransport, $factory->createTransport($dsn, $serializer, 'doctrine'));
     }
 
-    public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
+    public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound(): void
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
+        $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN "doctrine://default".');
         $registry = $this->createMock(ConnectionRegistry::class);
         $registry->expects($this->once())
@@ -66,6 +78,7 @@ class DoctrineTransportFactoryTest extends TestCase
             });
 
         $factory = new DoctrineTransportFactory($registry);
-        $factory->createTransport('doctrine://default', [], $this->createMock(SerializerInterface::class));
+        $dsn = Dsn::fromString('doctrine://default');
+        $factory->createTransport($dsn, $this->createMock(SerializerInterface::class), 'doctrine');
     }
 }

@@ -687,7 +687,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $transportFactory = $container->getDefinition('messenger.transport.customised')->getFactory();
         $transportArguments = $container->getDefinition('messenger.transport.customised')->getArguments();
 
-        $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
+        $this->assertEquals([new Reference('messenger.transport_factory'), 'fromString'], $transportFactory);
         $this->assertCount(3, $transportArguments);
         $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $transportArguments[0]);
         $this->assertEquals(['queue' => ['name' => 'Queue'], 'transport_name' => 'customised'], $transportArguments[1]);
@@ -699,7 +699,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $transportFactory = $container->getDefinition('messenger.transport.redis')->getFactory();
         $transportArguments = $container->getDefinition('messenger.transport.redis')->getArguments();
 
-        $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
+        $this->assertEquals([new Reference('messenger.transport_factory'), 'fromString'], $transportFactory);
         $this->assertCount(3, $transportArguments);
         $this->assertSame('redis://127.0.0.1:6379/messages', $transportArguments[0]);
 

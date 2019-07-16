@@ -63,18 +63,18 @@ final class CurlResponse implements ResponseInterface
         }
 
         if (null === $content = &$this->content) {
-            $content = ($options['buffer'] ?? true) ? fopen('php://temp', 'w+') : null;
+            $content = true === $options['buffer'] ? fopen('php://temp', 'w+') : null;
         } else {
             // Move the pushed response to the activity list
             if (ftell($content)) {
                 rewind($content);
                 $multi->handlesActivity[$id][] = stream_get_contents($content);
             }
-            $content = ($options['buffer'] ?? true) ? $content : null;
+            $content = true === $options['buffer'] ? $content : null;
         }
 
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect, $logger): int {
-            return self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect, $logger);
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect, $logger, &$content): int {
+            return self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect, $logger, $content);
         });
 
         if (null === $options) {
@@ -280,7 +280,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * Parses header lines as curl yields them to us.
      */
-    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, CurlClientState $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
+    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, CurlClientState $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger, &$content = null): int
     {
         if (!\in_array($waitFor = @curl_getinfo($ch, CURLINFO_PRIVATE), ['headers', 'destruct'], true)) {
             return \strlen($data); // Ignore HTTP trailers
@@ -346,6 +346,10 @@ final class CurlResponse implements ResponseInterface
 
             if ('destruct' === $waitFor) {
                 return 0;
+            }
+
+            if ($options['buffer'] instanceof \Closure && !$content && $options['buffer']($headers)) {
+                $content = fopen('php://temp', 'w+');
             }
 
             curl_setopt($ch, CURLOPT_PRIVATE, 'content');

@@ -1600,7 +1600,7 @@ class FrameworkExtension extends Extension
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
 
-                        $storeDefinition = new Definition(StoreInterface::class);
+                        $storeDefinition = new Definition(PersistStoreInterface::class);
                         $storeDefinition->setPublic(false);
                         $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
                         $storeDefinition->setArguments([new Reference($connectionDefinitionId)]);

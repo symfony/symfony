@@ -238,33 +238,18 @@ class UploadedFile extends File
 
     public function moveAndRename(string $targetDirectory, string $fileNamePattern)
     {
-        $fileName = str_replace(
-            [
-                '[contenthash]',
-                '[day]',
-                '[extension]',
-                '[month]',
-                '[name]',
-                '[randomhash]',
-                '[slug]',
-                '[timestamp]',
-                '[uuid]',
-                '[year]',
-            ],
-            [
-                sha1_file($this->getRealPath()),
-                date('d'),
-                $this->getExtension(),
-                date('m'),
-                $this->getBasename(),
-                bin2hex(random_bytes(20)),
-                transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $this->getBasename()),
-                time(),
-                $this->generateUuid4(),
-                date('Y'),
-            ],
-            $fileNamePattern
-        );
+        $fileName = strtr($fileNamePattern, [
+            '[contenthash]' => sha1_file($this->getRealPath()),,
+            '[day]' => date('d'),
+            '[extension]' => $this->getExtension(),
+            '[month]' => date('m'),
+            '[name]' => $this->getBasename(),
+            '[randomhash]' => bin2hex(random_bytes(20)),
+            '[slug]' => transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $this->getBasename()),
+            '[timestamp]' => time(),
+            '[uuid]' => $this->generateUuid4(),
+            '[year]' => date('Y'),
+        ]);
 
         return $this->move($targetDirectory, $fileName);
     }

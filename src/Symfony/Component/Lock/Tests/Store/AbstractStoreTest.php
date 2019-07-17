@@ -14,7 +14,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\PersistStoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -22,7 +22,7 @@ use Symfony\Component\Lock\StoreInterface;
 abstract class AbstractStoreTest extends TestCase
 {
     /**
-     * @return StoreInterface
+     * @return PersistStoreInterface
      */
     abstract protected function getStore();
 

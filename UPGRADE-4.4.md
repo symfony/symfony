@@ -71,6 +71,7 @@ Form
 FrameworkBundle
 ---------------
 
+ * Deprecated booting the kernel before running `WebTestCase::createClient()`.
  * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
  * The `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
    has been deprecated.
@@ -90,7 +91,16 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Implementing the `BundleInterface` without implementing the `getPublicDir()` method is deprecated.
+   This method will be added to the interface in 5.0.
  * The `DebugHandlersListener` class has been marked as `final`
+
+Lock
+----
+
+ * Deprecated `Symfony\Component\Lock\StoreInterface` in favor of `Symfony\Component\Lock\BlockingStoreInterface` and
+   `Symfony\Component\Lock\PersistStoreInterface`.
+ * `Factory` is deprecated, use `LockFactory` instead
 
 Messenger
 ---------
@@ -143,3 +153,8 @@ WebProfilerBundle
 
  * Deprecated the `ExceptionController::templateExists()` method
  * Deprecated the `TemplateManager::templateExists()` method
+
+WebServerBundle
+---------------
+
+ * The bundle is deprecated and will be removed in 5.0.

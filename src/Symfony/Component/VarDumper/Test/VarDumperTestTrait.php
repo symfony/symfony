@@ -19,6 +19,29 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 trait VarDumperTestTrait
 {
+    /**
+     * @internal
+     */
+    private $varDumperConfig = [
+        'casters' => [],
+        'flags' => null,
+    ];
+
+    protected function setUpVarDumper(array $casters, int $flags = null): void
+    {
+        $this->varDumperConfig['casters'] = $casters;
+        $this->varDumperConfig['flags'] = $flags;
+    }
+
+    /**
+     * @after
+     */
+    protected function tearDownVarDumper(): void
+    {
+        $this->varDumperConfig['casters'] = [];
+        $this->varDumperConfig['flags'] = null;
+    }
+
     public function assertDumpEquals($expected, $data, $filter = 0, $message = '')
     {
         $this->assertSame($this->prepareExpectation($expected, $filter), $this->getDump($data, null, $filter), $message);
@@ -31,11 +54,14 @@ trait VarDumperTestTrait
 
     protected function getDump($data, $key = null, $filter = 0)
     {
-        $flags = getenv('DUMP_LIGHT_ARRAY') ? CliDumper::DUMP_LIGHT_ARRAY : 0;
-        $flags |= getenv('DUMP_STRING_LENGTH') ? CliDumper::DUMP_STRING_LENGTH : 0;
-        $flags |= getenv('DUMP_COMMA_SEPARATOR') ? CliDumper::DUMP_COMMA_SEPARATOR : 0;
+        if (null === $flags = $this->varDumperConfig['flags']) {
+            $flags = getenv('DUMP_LIGHT_ARRAY') ? CliDumper::DUMP_LIGHT_ARRAY : 0;
+            $flags |= getenv('DUMP_STRING_LENGTH') ? CliDumper::DUMP_STRING_LENGTH : 0;
+            $flags |= getenv('DUMP_COMMA_SEPARATOR') ? CliDumper::DUMP_COMMA_SEPARATOR : 0;
+        }
 
         $cloner = new VarCloner();
+        $cloner->addCasters($this->varDumperConfig['casters']);
         $cloner->setMaxItems(-1);
         $dumper = new CliDumper(null, null, $flags);
         $dumper->setColors(false);

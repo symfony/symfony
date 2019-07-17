@@ -540,7 +540,7 @@ class TextDescriptor extends Descriptor
 
         try {
             if (\is_array($controller)) {
-                $r = new \ReflectionMethod($controller);
+                $r = new \ReflectionMethod($controller[0], $controller[1]);
             } elseif ($controller instanceof \Closure) {
                 $r = new \ReflectionFunction($controller);
             } elseif (method_exists($controller, '__invoke')) {

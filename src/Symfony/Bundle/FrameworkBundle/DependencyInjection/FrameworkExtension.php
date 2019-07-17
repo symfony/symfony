@@ -70,11 +70,18 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Lock;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Mailer\Bridge\Amazon\Factory\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Google\Factory\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailchimp\Factory\MandrillTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailgun\Factory\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Factory\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Factory\SendgridTransportFactory;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
@@ -1441,7 +1448,7 @@ class FrameworkExtension extends Extension
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
 
-                        $storeDefinition = new Definition(StoreInterface::class);
+                        $storeDefinition = new Definition(PersistStoreInterface::class);
                         $storeDefinition->setPublic(false);
                         $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
                         $storeDefinition->setArguments([new Reference($connectionDefinitionId)]);
@@ -1486,11 +1493,13 @@ class FrameworkExtension extends Extension
                 $container->setAlias(StoreInterface::class, new Alias('lock.store', false));
                 $container->setAlias(PersistStoreInterface::class, new Alias('lock.store', false));
                 $container->setAlias(Factory::class, new Alias('lock.factory', false));
+                $container->setAlias(LockFactory::class, new Alias('lock.factory', false));
                 $container->setAlias(LockInterface::class, new Alias('lock', false));
             } else {
                 $container->registerAliasForArgument('lock.'.$resourceName.'.store', StoreInterface::class, $resourceName.'.lock.store');
                 $container->registerAliasForArgument('lock.'.$resourceName.'.store', PersistStoreInterface::class, $resourceName.'.lock.store');
                 $container->registerAliasForArgument('lock.'.$resourceName.'.factory', Factory::class, $resourceName.'.lock.factory');
+                $container->registerAliasForArgument('lock.'.$resourceName.'.factory', LockFactory::class, $resourceName.'.lock.factory');
                 $container->registerAliasForArgument('lock.'.$resourceName, LockInterface::class, $resourceName.'.lock');
             }
         }
@@ -1793,7 +1802,23 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('mailer.xml');
+        $loader->load('mailer_transports.xml');
         $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
+
+        $classToServices = [
+            SesTransportFactory::class => 'mailer.transport_factory.amazon',
+            GmailTransportFactory::class => 'mailer.transport_factory.gmail',
+            MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
+            MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
+            PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
+            SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
+        ];
+
+        foreach ($classToServices as $class => $service) {
+            if (!class_exists($class)) {
+                $container->removeDefinition($service);
+            }
+        }
 
         $recipients = $config['envelope']['recipients'] ?? null;
         $sender = $config['envelope']['sender'] ?? null;

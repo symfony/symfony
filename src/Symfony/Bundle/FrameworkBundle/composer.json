@@ -72,6 +72,7 @@
         "symfony/dotenv": "<4.4",
         "symfony/dom-crawler": "<4.4",
         "symfony/form": "<4.4",
+        "symfony/lock": "<4.4",
         "symfony/messenger": "<4.4",
         "symfony/property-info": "<4.4",
         "symfony/serializer": "<4.4",

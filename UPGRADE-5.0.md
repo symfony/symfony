@@ -208,6 +208,8 @@ Form
 FrameworkBundle
 ---------------
 
+ * Dropped support for booting the kernel before running `WebTestCase::createClient()`. `createClient()` will throw an
+   exception if the kernel was already booted before.
  * Removed the `framework.templating` option, use Twig instead.
  * The project dir argument of the constructor of `AssetsInstallCommand` is required.
  * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`
@@ -275,6 +277,7 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * The `getPublicDir()` method has been added to the `BundleInterface`.
  * Removed `Client`, use `HttpKernelBrowser` instead
  * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
  * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
@@ -300,6 +303,13 @@ Intl
  * Removed `Intl::getCurrencyBundle()`, use `Currencies` instead
  * Removed `Intl::getLocaleBundle()`, use `Locales` instead
  * Removed `Intl::getRegionBundle()`, use `Countries` instead
+
+Lock
+----
+
+ * Removed `Symfony\Component\Lock\StoreInterface` in favor of `Symfony\Component\Lock\BlockingStoreInterface` and
+   `Symfony\Component\Lock\PersistStoreInterface`.
+ * Removed `Factory`, use `LockFactory` instead
 
 Messenger
 ---------
@@ -583,3 +593,8 @@ Yaml
 
  * The parser is now stricter and will throw a `ParseException` when a
    mapping is found inside a multi-line string.
+
+WebServerBundle
+---------------
+
+ * The bundle has been removed.

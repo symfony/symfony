@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
@@ -118,6 +119,37 @@ class WorkerTest extends TestCase
 
         // old message acknowledged
         $this->assertSame(1, $receiver->getAcknowledgeCount());
+    }
+
+    public function testUnrecoverableMessageHandlingExceptionPreventsRetries()
+    {
+        $envelope1 = new Envelope(new DummyMessage('Unwrapped Exception'), [new SentStamp('Some\Sender', 'transport1')]);
+        $envelope2 = new Envelope(new DummyMessage('Wrapped Exception'), [new SentStamp('Some\Sender', 'transport1')]);
+
+        $receiver = new DummyReceiver([
+            [$envelope1],
+            [$envelope2],
+        ]);
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus->expects($this->at(0))->method('dispatch')->willThrowException(new UnrecoverableMessageHandlingException());
+        $bus->expects($this->at(1))->method('dispatch')->willThrowException(
+            new HandlerFailedException($envelope2, [new UnrecoverableMessageHandlingException()])
+        );
+
+        $retryStrategy = $this->getMockBuilder(RetryStrategyInterface::class)->getMock();
+        $retryStrategy->expects($this->never())->method('isRetryable')->willReturn(true);
+
+        $worker = new Worker(['transport1' => $receiver], $bus, ['transport1' => $retryStrategy]);
+        $worker->run([], function (?Envelope $envelope) use ($worker) {
+            // stop after the messages finish
+            if (null === $envelope) {
+                $worker->stop();
+            }
+        });
+
+        // message was rejected
+        $this->assertSame(2, $receiver->getRejectCount());
     }
 
     public function testDispatchCausesRejectWhenNoRetry()

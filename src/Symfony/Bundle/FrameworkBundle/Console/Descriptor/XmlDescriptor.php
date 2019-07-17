@@ -106,6 +106,11 @@ class XmlDescriptor extends Descriptor
         throw new LogicException('Using the XML format to debug environment variables is not supported.');
     }
 
+    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    {
+        throw new LogicException('Using the XML format to print the deprecations is not supported.');
+    }
+
     private function writeDocument(\DOMDocument $dom)
     {
         $dom->formatOutput = true;

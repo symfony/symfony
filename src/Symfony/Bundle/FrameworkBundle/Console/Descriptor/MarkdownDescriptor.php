@@ -104,6 +104,11 @@ class MarkdownDescriptor extends Descriptor
         }
     }
 
+    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    {
+        throw new LogicException('Using the Markdown format to print the deprecations is not supported.');
+    }
+
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];

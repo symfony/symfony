@@ -154,6 +154,11 @@ class JsonDescriptor extends Descriptor
         throw new LogicException('Using the JSON format to debug environment variables is not supported.');
     }
 
+    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    {
+        throw new LogicException('Using the JSON format to print the deprecations is not supported.');
+    }
+
     private function writeData(array $data, array $options)
     {
         $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;

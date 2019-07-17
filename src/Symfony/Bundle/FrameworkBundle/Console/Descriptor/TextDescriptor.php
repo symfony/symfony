@@ -353,6 +353,32 @@ class TextDescriptor extends Descriptor
         $options['output']->table($tableHeaders, $tableRows);
     }
 
+    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    {
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.cache_dir'), $builder->getParameter('kernel.container_class'));
+        if (!file_exists($containerDeprecationFilePath)) {
+            $options['output']->warning('The deprecation file does not exist, please try warming the cache first.');
+
+            return;
+        }
+
+        $logs = unserialize(file_get_contents($containerDeprecationFilePath));
+        if (0 === \count($logs)) {
+            $options['output']->success('There are no deprecations in the logs!');
+
+            return;
+        }
+
+        $formattedLogs = [];
+        $remainingCount = 0;
+        foreach ($logs as $log) {
+            $formattedLogs[] = sprintf("%sx: %s \n      in %s:%s", $log['count'], $log['message'], $log['file'], $log['line']);
+            $remainingCount += $log['count'];
+        }
+        $options['output']->title(sprintf('Remaining deprecations (%s)', $remainingCount));
+        $options['output']->listing($formattedLogs);
+    }
+
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         if ($alias->isPublic()) {

@@ -62,12 +62,17 @@ class ContainerDebugCommand extends Command
                 new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Displays environment variables used in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
+                new InputOption('deprecations', null, InputOption::VALUE_NONE, 'To output the deprecations generated when compiling and warming the cache'),
             ])
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
   <info>php %command.full_name%</info>
+  
+To see deprecations generated during container compilation and cache warmup, use the <info>--deprecations</info> flag:
+  
+  <info>php %command.full_name% --deprecations</info>
 
 To get specific information about a service, specify its name:
 
@@ -149,6 +154,8 @@ EOF
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
             $options = ['id' => $name];
+        } elseif ($input->getOption('deprecations')) {
+            $options = ['deprecations' => true];
         } else {
             $options = [];
         }

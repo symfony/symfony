@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
@@ -201,6 +202,12 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, true);
+            if ($parameter->hasType() === true
+                && in_array($parameter->getType()->getName(), ['string']) === true
+                && $this->container->hasParameter($parameter->name) === true
+            ) {
+                $type = 'string';
+            }
 
             if (!$type) {
                 if (isset($arguments[$index])) {
@@ -280,7 +287,7 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
-     * @return TypedReference|null A reference to the service matching the given type, if any
+     * @return TypedReference|null|Parameter A reference to the service matching the given type, if any
      */
     private function getAutowiredReference(TypedReference $reference)
     {
@@ -289,6 +296,12 @@ class AutowirePass extends AbstractRecursivePass
 
         if ($type !== (string) $reference) {
             return $reference;
+        }
+
+        if (in_array($type, ['string', 'int', 'array'])) {
+            if ($this->container->hasParameter($reference->getName())) {
+                return new Parameter($reference->getName());
+            }
         }
 
         if (null !== $name = $reference->getName()) {

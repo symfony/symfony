@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
+ * Render accept attribute for `FileType` if mime types is used in assert validator
 
 4.3.0
 -----

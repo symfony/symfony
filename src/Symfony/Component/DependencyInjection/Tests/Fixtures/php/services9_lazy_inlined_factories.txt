@@ -1,0 +1,206 @@
+Array
+(
+    [Container%s/removed-ids.php] => <?php
+
+return [
+    'Psr\\Container\\ContainerInterface' => true,
+    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+];
+
+    [Container%s/ProjectServiceContainer.php] => <?php
+
+namespace Container%s;
+
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+
+/**
+ * This class has been auto-generated
+ * by the Symfony Dependency Injection Component.
+ *
+ * @final since Symfony 3.3
+ */
+class ProjectServiceContainer extends Container
+{
+    private $buildParameters;
+    private $containerDir;
+    private $parameters;
+    private $targetDirs = [];
+
+    public function __construct(array $buildParameters = [], $containerDir = __DIR__)
+    {
+        $dir = $this->targetDirs[0] = \dirname($containerDir);
+        for ($i = 1; $i <= 5; ++$i) {
+            $this->targetDirs[$i] = $dir = \dirname($dir);
+        }
+        $this->buildParameters = $buildParameters;
+        $this->containerDir = $containerDir;
+        $this->parameters = $this->getDefaultParameters();
+
+        $this->services = $this->privates = [];
+        $this->methodMap = [
+            'lazy_foo' => 'getLazyFooService',
+        ];
+
+        $this->aliases = [];
+    }
+
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
+    }
+
+    public function isCompiled()
+    {
+        return true;
+    }
+
+    public function getRemovedIds()
+    {
+        return require $this->containerDir.\DIRECTORY_SEPARATOR.'removed-ids.php';
+    }
+
+    protected function createProxy($class, \Closure $factory)
+    {
+        class_exists($class, false) || class_alias(__NAMESPACE__."\\$class", $class, false);
+
+        return $factory();
+    }
+
+    /**
+     * Gets the public 'lazy_foo' shared service.
+     *
+     * @return \Bar\FooClass
+     */
+    protected function getLazyFooService($lazyLoad = true)
+    {
+        if ($lazyLoad) {
+            return $this->services['lazy_foo'] = $this->createProxy('FooClass_%s', function () {
+                return \FooClass_%s::staticProxyConstructor(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
+                    $wrappedInstance = $this->getLazyFooService(false);
+
+                    $proxy->setProxyInitializer(null);
+
+                    return true;
+                });
+            });
+        }
+
+        include_once $this->targetDirs[0].'/Fixtures/includes/foo_lazy.php';
+
+        return new \Bar\FooClass(new \Bar\FooLazyClass());
+    }
+
+    public function getParameter($name)
+    {
+        $name = (string) $name;
+        if (isset($this->buildParameters[$name])) {
+            return $this->buildParameters[$name];
+        }
+
+        if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
+            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+        }
+        if (isset($this->loadedDynamicParameters[$name])) {
+            return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
+        }
+
+        return $this->parameters[$name];
+    }
+
+    public function hasParameter($name)
+    {
+        $name = (string) $name;
+        if (isset($this->buildParameters[$name])) {
+            return true;
+        }
+
+        return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
+    }
+
+    public function setParameter($name, $value)
+    {
+        throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
+    }
+
+    public function getParameterBag()
+    {
+        if (null === $this->parameterBag) {
+            $parameters = $this->parameters;
+            foreach ($this->loadedDynamicParameters as $name => $loaded) {
+                $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
+            }
+            foreach ($this->buildParameters as $name => $value) {
+                $parameters[$name] = $value;
+            }
+            $this->parameterBag = new FrozenParameterBag($parameters);
+        }
+
+        return $this->parameterBag;
+    }
+
+    private $loadedDynamicParameters = [];
+    private $dynamicParameters = [];
+
+    /**
+     * Computes a dynamic parameter.
+     *
+     * @param string $name The name of the dynamic parameter to load
+     *
+     * @return mixed The value of the dynamic parameter
+     *
+     * @throws InvalidArgumentException When the dynamic parameter does not exist
+     */
+    private function getDynamicParameter($name)
+    {
+        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
+    }
+
+    /**
+     * Gets the default parameters.
+     *
+     * @return array An array of the default parameters
+     */
+    protected function getDefaultParameters()
+    {
+        return [
+            'container.dumper.inline_factories' => true,
+            'container.dumper.inline_class_loader' => true,
+        ];
+    }
+}
+include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/foo.php';
+
+class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
+{
+%A
+}
+
+    [ProjectServiceContainer.php] => <?php
+
+// This file has been auto-generated by the Symfony Dependency Injection Component for internal use.
+
+if (\class_exists(\Container%s\ProjectServiceContainer::class, false)) {
+    // no-op
+} elseif (!include __DIR__.'/Container%s/ProjectServiceContainer.php') {
+    touch(__DIR__.'/Container%s.legacy');
+
+    return;
+}
+
+if (!\class_exists(ProjectServiceContainer::class, false)) {
+    \class_alias(\Container%s\ProjectServiceContainer::class, ProjectServiceContainer::class, false);
+}
+
+return new \Container%s\ProjectServiceContainer([
+    'container.build_hash' => '%s',
+    'container.build_id' => '%s',
+    'container.build_time' => 1563381341,
+], __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
+
+)

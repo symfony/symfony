@@ -83,6 +83,7 @@ FrameworkBundle
    has been deprecated.
  * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`.
  * The `controller_name_converter` and `resolve_controller_name_subscriber` services have been deprecated.
+ * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
 
 HttpClient
 ----------
@@ -128,6 +129,12 @@ PropertyAccess
 --------------
 
  * Deprecated passing `null` as 2nd argument of `PropertyAccessor::createCache()` method (`$defaultLifetime`), pass `0` instead.
+
+Routing
+-------
+
+ * Deprecated `ServiceRouterLoader` in favor of `ContainerLoader`.
+ * Deprecated `ObjectRouteLoader` in favor of `ObjectLoader`.
 
 Security
 --------

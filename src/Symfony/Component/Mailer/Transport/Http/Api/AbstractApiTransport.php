@@ -11,42 +11,23 @@
 
 namespace Symfony\Component\Mailer\Transport\Http\Api;
 
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\SmtpEnvelope;
-use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class AbstractApiTransport extends AbstractTransport
+abstract class AbstractApiTransport extends AbstractHttpTransport
 {
-    protected $client;
+    abstract protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface;
 
-    public function __construct(HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
-    {
-        $this->client = $client;
-        if (null === $client) {
-            if (!class_exists(HttpClient::class)) {
-                throw new \LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
-            }
-
-            $this->client = HttpClient::create();
-        }
-
-        parent::__construct($dispatcher, $logger);
-    }
-
-    abstract protected function doSendEmail(Email $email, SmtpEnvelope $envelope): void;
-
-    protected function doSend(SentMessage $message): void
+    protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         try {
             $email = MessageConverter::toEmail($message->getOriginalMessage());
@@ -54,7 +35,7 @@ abstract class AbstractApiTransport extends AbstractTransport
             throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: %s', __CLASS__, $e->getMessage()), 0, $e);
         }
 
-        $this->doSendEmail($email, $message->getEnvelope());
+        return $this->doSendApi($email, $message->getEnvelope());
     }
 
     protected function getRecipients(Email $email, SmtpEnvelope $envelope): array

@@ -12,13 +12,14 @@
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Http;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Kevin Verschaeve
@@ -39,7 +40,7 @@ class MailgunTransport extends AbstractHttpTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
-    protected function doSend(SentMessage $message): void
+    protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         $body = new FormDataPart([
             'to' => implode(',', $this->stringifyAddresses($message->getEnvelope()->getRecipients())),
@@ -59,7 +60,9 @@ class MailgunTransport extends AbstractHttpTransport
         if (200 !== $response->getStatusCode()) {
             $error = $response->toArray(false);
 
-            throw new TransportException(sprintf('Unable to send an email: %s (code %s).', $error['message'], $response->getStatusCode()));
+            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $error['message'], $response->getStatusCode()), $response);
         }
+
+        return $response;
     }
 }

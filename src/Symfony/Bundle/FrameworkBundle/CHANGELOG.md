@@ -17,6 +17,7 @@ CHANGELOG
  * Added new `error_controller` configuration to handle system exceptions
  * Added sort option for `translation:update` command.
  * [BC Break] The `framework.messenger.routing.senders` config key is not deep merged anymore.
+ * Added `debug:container --deprecations` command to see compile-time deprecations
 
 4.3.0
 -----
@@ -42,8 +43,8 @@ CHANGELOG
    options if you're using Symfony's serializer.
  * [BC Break] Removed the `framework.messenger.routing.send_and_handle` configuration.
    Instead of setting it to true, configure a `SyncTransport` and route messages to it.
- * Added information about deprecated aliases in `debug:autowiring` 
- * Added php ini session options `sid_length` and `sid_bits_per_character` 
+ * Added information about deprecated aliases in `debug:autowiring`
+ * Added php ini session options `sid_length` and `sid_bits_per_character`
    to the `session` section of the configuration
  * Added support for Translator paths, Twig paths in translation commands.
  * Added support for PHP files with translations in translation commands.

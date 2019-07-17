@@ -191,6 +191,14 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    {
+        throw new LogicException('Using the JSON format to print the deprecations is not supported.');
+    }
+
+    /**
      * Writes data as json.
      */
     private function writeData(array $data, array $options)

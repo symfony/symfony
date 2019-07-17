@@ -143,6 +143,14 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
+    {
+        throw new LogicException('Using the XML format to print the deprecations is not supported.');
+    }
+
+    /**
      * Writes DOM document.
      */
     private function writeDocument(\DOMDocument $dom)

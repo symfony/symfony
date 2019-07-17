@@ -64,6 +64,9 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ContainerBuilder && isset($options['parameter']):
                 $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter'])), $options);
                 break;
+            case $object instanceof ContainerBuilder && isset($options['deprecations']):
+                $this->describeContainerDeprecations($object, $options);
+                break;
             case $object instanceof ContainerBuilder:
                 $this->describeContainerServices($object, $options);
                 break;
@@ -131,6 +134,11 @@ abstract class Descriptor implements DescriptorInterface
      * * tag: filters described services by given tag
      */
     abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = []);
+
+    /**
+     * Describes container deprecations.
+     */
+    abstract protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []);
 
     /**
      * Describes a service definition.

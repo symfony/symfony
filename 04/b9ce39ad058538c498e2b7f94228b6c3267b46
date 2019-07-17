@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-16T15:11:46Z
+
+as a bug fix this would need to be in 3.4
+
+---------------------------------------------------------------------------
+
+by mathroc at 2019-07-16T19:13:23Z
+
+thank for the review. I've rebased on 3.4 and address the comments here, let me know if anything else is needed

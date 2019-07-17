@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by Koc at 2019-06-30T19:04:08Z
+
+@fabpot I've fixed comments from code review. Now working on adding tests (I've updated TODO list in PR header)
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-07T19:39:14Z
+
+I've fixed tests and removed BC-breaks, so bc-break label non-actual anymore. More tests for all factories should be added, but I need 1 week more due to vacation.
+
+BTW PR is ready for another round of review.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-15T20:46:46Z
+
+Not sure if this PR is ready now but fabbot has an interesting patch to apply.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-15T21:53:36Z
+
+Almost ready. Failure caused because #32553 not merged yet.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-16T06:13:10Z
+
+@Koc #32553 has been merged now
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-16T20:03:40Z
+
+Finally PR is ready 🎉
+
+Travis is green except `deps=high` (because master hasn't this PR yet). To be honest I still haven't performed manual testing of the branch, but we already have test for DI extension and each factory properly tested.

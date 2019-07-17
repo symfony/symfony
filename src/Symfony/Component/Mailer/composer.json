@@ -24,6 +24,7 @@
     },
     "require-dev": {
         "symfony/amazon-mailer": "^4.4|^5.0",
+        "symfony/filesystem": "^4.4|^5.0",
         "symfony/google-mailer": "^4.4|^5.0",
         "symfony/http-client-contracts": "^1.1",
         "symfony/mailgun-mailer": "^4.4|^5.0",

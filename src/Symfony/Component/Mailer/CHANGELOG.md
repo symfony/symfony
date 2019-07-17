@@ -10,6 +10,7 @@ CHANGELOG
  * Added possibility to register custom transport for dsn by implementing
    `Symfony\Component\Mailer\Transport\TransportFactoryInterface` and tagging with `mailer.transport_factory` tag in DI.
  * Added `Symfony\Component\Mailer\Test\TransportFactoryTestCase` to ease testing custom transport factories.
+ * Added the File transport
 
 4.3.0
 -----

@@ -163,7 +163,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
-    public function setDefault($option, $value)
+    public function setDefault(string $option, $value)
     {
         // Setting is not possible once resolving starts, because then lazy
         // options could manipulate the state of the object, leading to
@@ -257,7 +257,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether a default value is set
      */
-    public function hasDefault($option)
+    public function hasDefault(string $option)
     {
         return \array_key_exists($option, $this->defaults);
     }
@@ -294,7 +294,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is required
      */
-    public function isRequired($option)
+    public function isRequired(string $option)
     {
         return isset($this->required[$option]);
     }
@@ -322,7 +322,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is missing
      */
-    public function isMissing($option)
+    public function isMissing(string $option)
     {
         return isset($this->required[$option]) && !\array_key_exists($option, $this->defaults);
     }
@@ -375,7 +375,7 @@ class OptionsResolver implements Options
      *
      * @return bool Whether the option is defined
      */
-    public function isDefined($option)
+    public function isDefined(string $option)
     {
         return isset($this->defined[$option]);
     }
@@ -474,7 +474,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setNormalizer($option, \Closure $normalizer)
+    public function setNormalizer(string $option, \Closure $normalizer)
     {
         if ($this->locked) {
             throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
@@ -562,7 +562,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setAllowedValues($option, $allowedValues)
+    public function setAllowedValues(string $option, $allowedValues)
     {
         if ($this->locked) {
             throw new AccessException('Allowed values cannot be set from a lazy option or normalizer.');
@@ -603,7 +603,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function addAllowedValues($option, $allowedValues)
+    public function addAllowedValues(string $option, $allowedValues)
     {
         if ($this->locked) {
             throw new AccessException('Allowed values cannot be added from a lazy option or normalizer.');
@@ -644,7 +644,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setAllowedTypes($option, $allowedTypes)
+    public function setAllowedTypes(string $option, $allowedTypes)
     {
         if ($this->locked) {
             throw new AccessException('Allowed types cannot be set from a lazy option or normalizer.');
@@ -679,7 +679,7 @@ class OptionsResolver implements Options
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function addAllowedTypes($option, $allowedTypes)
+    public function addAllowedTypes(string $option, $allowedTypes)
     {
         if ($this->locked) {
             throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
@@ -828,7 +828,7 @@ class OptionsResolver implements Options
      * Returns the resolved value of an option.
      *
      * @param string $option             The option name
-     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not (true by default)
+     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not
      *
      * @return mixed The option value
      *
@@ -840,13 +840,11 @@ class OptionsResolver implements Options
      * @throws OptionDefinitionException If there is a cyclic dependency between
      *                                   lazy options and/or normalizers
      */
-    public function offsetGet($option/*, bool $triggerDeprecation = true*/)
+    public function offsetGet($option, bool $triggerDeprecation = true)
     {
         if (!$this->locked) {
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');
         }
-
-        $triggerDeprecation = 1 === \func_num_args() || func_get_arg(1);
 
         // Shortcut for resolved options
         if (isset($this->resolved[$option]) || \array_key_exists($option, $this->resolved)) {

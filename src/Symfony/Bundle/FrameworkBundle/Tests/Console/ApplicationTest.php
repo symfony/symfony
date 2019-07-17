@@ -104,29 +104,6 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('alias'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand" class is deprecated since Symfony 4.2, use "Symfony\Component\Console\Command\Command" with dependency injection instead.
-     */
-    public function testBundleCommandsHaveRightContainer()
-    {
-        $command = $this->getMockForAbstractClass('Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand', ['foo'], '', true, true, true, ['setContainer']);
-        $command->setCode(function () {});
-        $command->expects($this->exactly(2))->method('setContainer');
-
-        $application = new Application($this->getKernel([], true));
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-        $application->add($command);
-        $tester = new ApplicationTester($application);
-
-        // set container is called here
-        $tester->run(['command' => 'foo']);
-
-        // as the container might have change between two runs, setContainer must called again
-        $tester->run(['command' => 'foo']);
-    }
-
     public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName()
     {
         $command = new Command('example');

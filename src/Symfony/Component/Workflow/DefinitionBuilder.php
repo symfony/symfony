@@ -61,22 +61,6 @@ class DefinitionBuilder
     }
 
     /**
-     * @deprecated since Symfony 4.3. Use setInitialPlaces() instead.
-     *
-     * @param string $place
-     *
-     * @return $this
-     */
-    public function setInitialPlace($place)
-    {
-        @trigger_error(sprintf('Calling %s::setInitialPlace() is deprecated since Symfony 4.3. Call setInitialPlaces() instead.', __CLASS__), E_USER_DEPRECATED);
-
-        $this->initialPlaces = $place;
-
-        return $this;
-    }
-
-    /**
      * @param string|string[]|null $initialPlaces
      *
      * @return $this
@@ -89,11 +73,9 @@ class DefinitionBuilder
     }
 
     /**
-     * @param string $place
-     *
      * @return $this
      */
-    public function addPlace($place)
+    public function addPlace(string $place)
     {
         if (!$this->places) {
             $this->initialPlaces = $place;
@@ -150,17 +132,5 @@ class DefinitionBuilder
         $this->metadataStore = $metadataStore;
 
         return $this;
-    }
-
-    /**
-     * @deprecated since Symfony 4.1, use the clear() method instead.
-     *
-     * @return $this
-     */
-    public function reset()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "clear()" method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->clear();
     }
 }

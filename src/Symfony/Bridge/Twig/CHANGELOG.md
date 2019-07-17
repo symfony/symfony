@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed `TwigEngine` class, use `\Twig\Environment` instead.
+ * removed `transChoice` filter and token
+ * `HttpFoundationExtension` requires a `UrlHelper` on instantiation
+
 4.4.0
 -----
 

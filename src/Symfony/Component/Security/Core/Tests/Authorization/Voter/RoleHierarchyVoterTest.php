@@ -18,17 +18,6 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 class RoleHierarchyVoterTest extends RoleVoterTest
 {
     /**
-     * @group legacy
-     * @dataProvider getVoteTests
-     */
-    public function testVote($roles, $attributes, $expected)
-    {
-        $voter = new RoleHierarchyVoter(new RoleHierarchy(['ROLE_FOO' => ['ROLE_FOOBAR']]));
-
-        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
-    }
-
-    /**
      * @dataProvider getVoteTests
      */
     public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
@@ -43,28 +32,6 @@ class RoleHierarchyVoterTest extends RoleVoterTest
         return array_merge(parent::getVoteTests(), [
             [['ROLE_FOO'], ['ROLE_FOOBAR'], VoterInterface::ACCESS_GRANTED],
         ]);
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider getLegacyVoteOnRoleObjectsTests
-     */
-    public function testVoteOnRoleObjects($roles, $attributes, $expected)
-    {
-        $voter = new RoleHierarchyVoter(new RoleHierarchy(['ROLE_FOO' => ['ROLE_FOOBAR']]));
-
-        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider getVoteWithEmptyHierarchyTests
-     */
-    public function testVoteWithEmptyHierarchy($roles, $attributes, $expected)
-    {
-        $voter = new RoleHierarchyVoter(new RoleHierarchy([]));
-
-        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
     }
 
     /**

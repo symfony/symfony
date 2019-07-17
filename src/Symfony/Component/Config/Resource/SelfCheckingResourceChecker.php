@@ -28,7 +28,7 @@ class SelfCheckingResourceChecker implements ResourceCheckerInterface
         return $metadata instanceof SelfCheckingResourceInterface;
     }
 
-    public function isFresh(ResourceInterface $resource, $timestamp)
+    public function isFresh(ResourceInterface $resource, int $timestamp)
     {
         /* @var SelfCheckingResourceInterface $resource */
         return $resource->isFresh($timestamp);

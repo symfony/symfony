@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
+   set to `single_text` is not supported anymore.
+ * The `format` option of `DateType` and `DateTimeType` cannot be used when the `html5` option is enabled.
+ * Using names for buttons that do not start with a letter, a digit, or an underscore throw an exception
+ * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons throw an exception.
+ * removed the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
+ * removed `getExtendedType()` method of the `FormTypeExtensionInterface`
+ * added static `getExtendedTypes()` method to the `FormTypeExtensionInterface`
+ * calling to `FormRenderer::searchAndRenderBlock()` method for fields which were already rendered throw a `BadMethodCallException`
+ * removed the `regions` option of the `TimezoneType`
+ * removed the `$scale` argument of the `IntegerToLocalizedStringTransformer`
+ * removed `TemplatingExtension` and `TemplatingRendererEngine` classes, use Twig instead
+ * passing a null message when instantiating a `Symfony\Component\Form\FormError` is not allowed
+ * removed support for using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
+
 4.4.0
 -----
 

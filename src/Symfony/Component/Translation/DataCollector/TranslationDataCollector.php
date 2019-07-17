@@ -97,7 +97,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     }
 
     /**
-     * @internal since Symfony 4.2
+     * @internal
      */
     public function getFallbackLocales()
     {

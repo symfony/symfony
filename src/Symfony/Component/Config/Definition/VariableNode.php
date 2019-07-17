@@ -56,15 +56,15 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean True if this entity will accept empty values
      */
-    public function setAllowEmptyValue($boolean)
+    public function setAllowEmptyValue(bool $boolean)
     {
-        $this->allowEmptyValue = (bool) $boolean;
+        $this->allowEmptyValue = $boolean;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -84,14 +84,13 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
         // deny environment variables only when using custom validators
         // this avoids ever passing an empty value to final validation closures
         if (!$this->allowEmptyValue && $this->isHandlingPlaceholder() && $this->finalValidationClosures) {
-            @trigger_error(sprintf('Setting path "%s" to an environment variable is deprecated since Symfony 4.3. Remove "cannotBeEmpty()", "validate()" or include a prefix/suffix value instead.', $this->getPath()), E_USER_DEPRECATED);
-//            $e = new InvalidConfigurationException(sprintf('The path "%s" cannot contain an environment variable when empty values are not allowed by definition and are validated.', $this->getPath(), json_encode($value)));
-//            if ($hint = $this->getInfo()) {
-//                $e->addHint($hint);
-//            }
-//            $e->setPath($this->getPath());
-//
-//            throw $e;
+            $e = new InvalidConfigurationException(sprintf('The path "%s" cannot contain an environment variable when empty values are not allowed by definition and are validated.', $this->getPath(), json_encode($value)));
+            if ($hint = $this->getInfo()) {
+                $e->addHint($hint);
+            }
+            $e->setPath($this->getPath());
+
+            throw $e;
         }
 
         if (!$this->allowEmptyValue && $this->isValueEmpty($value)) {

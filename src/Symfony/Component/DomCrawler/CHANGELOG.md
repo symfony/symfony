@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* Added argument `$selector` to ``Crawler::children()`
+* Added argument `$default` to ``Crawler::text()` and `html()`
+
 4.4.0
 -----
 

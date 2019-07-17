@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Workflow;
 
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Workflow\Event\AnnounceEvent;
 use Symfony\Component\Workflow\Event\CompletedEvent;
 use Symfony\Component\Workflow\Event\EnteredEvent;
@@ -43,14 +42,14 @@ class Workflow implements WorkflowInterface
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
-        $this->dispatcher = null !== $dispatcher ? LegacyEventDispatcherProxy::decorate($dispatcher) : null;
+        $this->dispatcher = $dispatcher;
         $this->name = $name;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMarking($subject)
+    public function getMarking(object $subject)
     {
         $marking = $this->markingStore->getMarking($subject);
 
@@ -92,7 +91,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function can($subject, $transitionName)
+    public function can(object $subject, string $transitionName)
     {
         $transitions = $this->definition->getTransitions();
         $marking = $this->getMarking($subject);
@@ -115,7 +114,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function buildTransitionBlockerList($subject, string $transitionName): TransitionBlockerList
+    public function buildTransitionBlockerList(object $subject, string $transitionName): TransitionBlockerList
     {
         $transitions = $this->definition->getTransitions();
         $marking = $this->getMarking($subject);
@@ -151,7 +150,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function apply($subject, $transitionName, array $context = [])
+    public function apply(object $subject, string $transitionName, array $context = [])
     {
         $marking = $this->getMarking($subject);
 
@@ -203,7 +202,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getEnabledTransitions($subject)
+    public function getEnabledTransitions(object $subject)
     {
         $enabledTransitions = [];
         $marking = $this->getMarking($subject);
@@ -250,7 +249,7 @@ class Workflow implements WorkflowInterface
         return $this->definition->getMetadataStore();
     }
 
-    private function buildTransitionBlockerListForTransition($subject, Marking $marking, Transition $transition)
+    private function buildTransitionBlockerListForTransition(object $subject, Marking $marking, Transition $transition)
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {
@@ -273,7 +272,7 @@ class Workflow implements WorkflowInterface
         return new TransitionBlockerList();
     }
 
-    private function guardTransition($subject, Marking $marking, Transition $transition): ?GuardEvent
+    private function guardTransition(object $subject, Marking $marking, Transition $transition): ?GuardEvent
     {
         if (null === $this->dispatcher) {
             return null;
@@ -288,7 +287,7 @@ class Workflow implements WorkflowInterface
         return $event;
     }
 
-    private function leave($subject, Transition $transition, Marking $marking): void
+    private function leave(object $subject, Transition $transition, Marking $marking): void
     {
         $places = $transition->getFroms();
 
@@ -308,7 +307,7 @@ class Workflow implements WorkflowInterface
         }
     }
 
-    private function transition($subject, Transition $transition, Marking $marking, array $context): array
+    private function transition(object $subject, Transition $transition, Marking $marking, array $context): array
     {
         if (null === $this->dispatcher) {
             return $context;
@@ -324,7 +323,7 @@ class Workflow implements WorkflowInterface
         return $event->getContext();
     }
 
-    private function enter($subject, Transition $transition, Marking $marking): void
+    private function enter(object $subject, Transition $transition, Marking $marking): void
     {
         $places = $transition->getTos();
 
@@ -344,7 +343,7 @@ class Workflow implements WorkflowInterface
         }
     }
 
-    private function entered($subject, Transition $transition = null, Marking $marking): void
+    private function entered(object $subject, ?Transition $transition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -362,7 +361,7 @@ class Workflow implements WorkflowInterface
         }
     }
 
-    private function completed($subject, Transition $transition, Marking $marking): void
+    private function completed(object $subject, Transition $transition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -375,7 +374,7 @@ class Workflow implements WorkflowInterface
         $this->dispatcher->dispatch($event, sprintf('workflow.%s.completed.%s', $this->name, $transition->getName()));
     }
 
-    private function announce($subject, Transition $initialTransition, Marking $marking): void
+    private function announce(object $subject, Transition $initialTransition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;

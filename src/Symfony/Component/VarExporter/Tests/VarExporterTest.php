@@ -322,7 +322,7 @@ final class FinalError extends \Error
 
 final class FinalArrayIterator extends \ArrayIterator
 {
-    public function serialize()
+    public function serialize(): string
     {
         return serialize([123, parent::serialize()]);
     }

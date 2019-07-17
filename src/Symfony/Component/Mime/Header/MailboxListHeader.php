@@ -49,7 +49,7 @@ final class MailboxListHeader extends AbstractHeader
      *
      * @return (NamedAddress|Address)[]
      */
-    public function getBody()
+    public function getBody(): array
     {
         return $this->getAddresses();
     }

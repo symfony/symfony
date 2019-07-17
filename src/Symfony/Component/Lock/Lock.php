@@ -67,7 +67,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function acquire($blocking = false)
+    public function acquire($blocking = false): ?bool
     {
         try {
             if ($blocking) {
@@ -183,7 +183,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return $this->key->isExpired();
     }

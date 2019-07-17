@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
@@ -21,6 +19,7 @@ use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * AuthenticationProviderManager uses a list of AuthenticationProviderInterface
@@ -51,12 +50,9 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         $this->eraseCredentials = $eraseCredentials;
     }
 
-    /**
-     * @final since Symfony 4.3, the type-hint will be updated to the interface from symfony/contracts in 5.0
-     */
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
     {
-        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->eventDispatcher = $dispatcher;
     }
 
     /**

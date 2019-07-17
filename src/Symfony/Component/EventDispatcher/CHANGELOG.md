@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * The signature of the `EventDispatcherInterface::dispatch()` method has been changed to `dispatch($event, string $eventName = null): object`.
+ * The `Event` class has been removed in favor of `Symfony\Contracts\EventDispatcher\Event`.
+ * The `TraceableEventDispatcherInterface` has been removed.
+ * The `WrappedListener` class is now final.
+
 4.3.0
 -----
 

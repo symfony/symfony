@@ -67,7 +67,7 @@ class PhpStringTokenParser
      *
      * @return string The parsed string
      */
-    public static function parse($str)
+    public static function parse(string $str)
     {
         $bLength = 0;
         if ('b' === $str[0]) {
@@ -93,7 +93,7 @@ class PhpStringTokenParser
      *
      * @return string String with escape sequences parsed
      */
-    public static function parseEscapeSequences($str, $quote)
+    public static function parseEscapeSequences(string $str, string $quote = null)
     {
         if (null !== $quote) {
             $str = str_replace('\\'.$quote, $quote, $str);
@@ -127,7 +127,7 @@ class PhpStringTokenParser
      *
      * @return string Parsed string
      */
-    public static function parseDocString($startToken, $str)
+    public static function parseDocString(string $startToken, string $str)
     {
         // strip last newline (thanks tokenizer for sticking it into the string!)
         $str = preg_replace('~(\r\n|\n|\r)$~', '', $str);

@@ -45,7 +45,7 @@ class DebugCommandTest extends TestCase
 Built-in form types (Symfony\Component\Form\Extension\Core\Type)
 ----------------------------------------------------------------
 
- BirthdayType, DateTimeType, DateType, IntegerType, TimezoneType
+ IntegerType
 
 Service form types
 ------------------

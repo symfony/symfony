@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * The `LoggingMiddleware` class has been removed, pass a logger to `SendMessageMiddleware` instead.
+ * made `SendersLocator` require a `ContainerInterface` as 2nd argument
+
 4.4.0
 -----
 

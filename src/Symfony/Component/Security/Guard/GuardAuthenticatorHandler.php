@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Guard;
 
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -46,7 +45,7 @@ class GuardAuthenticatorHandler
     public function __construct(TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher = null, array $statelessProviderKeys = [])
     {
         $this->tokenStorage = $tokenStorage;
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        $this->dispatcher = $eventDispatcher;
         $this->statelessProviderKeys = $statelessProviderKeys;
     }
 

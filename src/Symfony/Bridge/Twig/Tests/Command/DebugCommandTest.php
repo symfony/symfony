@@ -64,32 +64,6 @@ class DebugCommandTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Loading Twig templates from the "%sResources/BarBundle/views" directory is deprecated since Symfony 4.2, use "%stemplates/bundles/BarBundle" instead.
-     */
-    public function testDeprecationForWrongBundleOverridingInLegacyPath()
-    {
-        $bundleMetadata = [
-            'TwigBundle' => 'vendor/twig-bundle/',
-            'WebProfilerBundle' => 'vendor/web-profiler-bundle/',
-        ];
-        $defaultPath = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'templates';
-        $rootDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
-
-        $tester = $this->createCommandTester([], $bundleMetadata, $defaultPath, $rootDir);
-        $ret = $tester->execute(['--filter' => 'unknown', '--format' => 'json'], ['decorated' => false]);
-
-        $expected = ['warnings' => [
-            'Path "Resources/BarBundle" not matching any bundle found',
-            'Path "templates/bundles/UnknownBundle" not matching any bundle found',
-            'Path "templates/bundles/WebProfileBundle" not matching any bundle found, did you mean "WebProfilerBundle"?',
-        ]];
-
-        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
-    }
-
-    /**
      * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Malformed namespaced template name "@foo" (expecting "@namespace/template_name").
      */

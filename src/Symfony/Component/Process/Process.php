@@ -137,14 +137,10 @@ class Process implements \IteratorAggregate
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function __construct($command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
+    public function __construct(array $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {
         if (!\function_exists('proc_open')) {
             throw new LogicException('The Process class relies on proc_open, which is not available on your PHP installation.');
-        }
-
-        if (!\is_array($command)) {
-            @trigger_error(sprintf('Passing a command as string when creating a "%s" instance is deprecated since Symfony 4.2, pass it as an array of its arguments instead, or use the "Process::fromShellCommandline()" constructor if you need features provided by the shell.', __CLASS__), E_USER_DEPRECATED);
         }
 
         $this->commandline = $command;
@@ -250,7 +246,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function mustRun(callable $callback = null, array $env = [])
+    public function mustRun(callable $callback = null, array $env = []): object
     {
         if (0 !== $this->run($callback, $env)) {
             throw new ProcessFailedException($this);
@@ -374,7 +370,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function restart(callable $callback = null, array $env = [])
+    public function restart(callable $callback = null, array $env = []): object
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
@@ -499,7 +495,7 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException In case --enable-sigchild is activated and the process can't be killed
      * @throws RuntimeException In case of failure
      */
-    public function signal($signal)
+    public function signal(int $signal)
     {
         $this->doSignal($signal, true);
 
@@ -901,7 +897,7 @@ class Process implements \IteratorAggregate
      *
      * @return int The exit-code of the process
      */
-    public function stop($timeout = 10, $signal = null)
+    public function stop(float $timeout = 10, int $signal = null)
     {
         $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
@@ -969,24 +965,6 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Sets the command line to be executed.
-     *
-     * @param string|array $commandline The command to execute
-     *
-     * @return self The current Process instance
-     *
-     * @deprecated since Symfony 4.2.
-     */
-    public function setCommandLine($commandline)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->commandline = $commandline;
-
-        return $this;
-    }
-
-    /**
      * Gets the process timeout (max. runtime).
      *
      * @return float|null The timeout in seconds or null if it's disabled
@@ -1050,13 +1028,11 @@ class Process implements \IteratorAggregate
     /**
      * Enables or disables the TTY mode.
      *
-     * @param bool $tty True to enabled and false to disable
-     *
      * @return self The current Process instance
      *
      * @throws RuntimeException In case the TTY mode is not supported
      */
-    public function setTty($tty)
+    public function setTty(bool $tty)
     {
         if ('\\' === \DIRECTORY_SEPARATOR && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
@@ -1084,13 +1060,11 @@ class Process implements \IteratorAggregate
     /**
      * Sets PTY mode.
      *
-     * @param bool $bool
-     *
      * @return self
      */
-    public function setPty($bool)
+    public function setPty(bool $bool)
     {
-        $this->pty = (bool) $bool;
+        $this->pty = $bool;
 
         return $this;
     }
@@ -1124,11 +1098,9 @@ class Process implements \IteratorAggregate
     /**
      * Sets the current working directory.
      *
-     * @param string $cwd The new working directory
-     *
      * @return self The current Process instance
      */
-    public function setWorkingDirectory($cwd)
+    public function setWorkingDirectory(string $cwd)
     {
         $this->cwd = $cwd;
 
@@ -1207,11 +1179,9 @@ class Process implements \IteratorAggregate
     /**
      * Sets whether environment variables will be inherited or not.
      *
-     * @param bool $inheritEnv
-     *
      * @return self The current Process instance
      */
-    public function inheritEnvironmentVariables($inheritEnv = true)
+    public function inheritEnvironmentVariables(bool $inheritEnv = true)
     {
         if (!$inheritEnv) {
             throw new InvalidArgumentException('Not inheriting environment variables is not supported.');
@@ -1338,7 +1308,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $blocking Whether to use a blocking read call
      */
-    protected function updateStatus($blocking)
+    protected function updateStatus(bool $blocking)
     {
         if (self::STATUS_STARTED !== $this->status) {
             return;

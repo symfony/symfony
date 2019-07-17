@@ -180,7 +180,7 @@ EOF
         })->setHidden(true)->setMaxAttempts(20);
     }
 
-    private function generateSalt()
+    private function generateSalt(): string
     {
         return base64_encode(random_bytes(30));
     }

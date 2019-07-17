@@ -136,7 +136,6 @@ class RouteTest extends TestCase
     {
         return [
            [''],
-           [[]],
            ['^$'],
            ['^'],
            ['$'],

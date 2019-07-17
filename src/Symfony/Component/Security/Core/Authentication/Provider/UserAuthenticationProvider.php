@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -89,9 +88,9 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
         }
 
         if ($token instanceof SwitchUserToken) {
-            $authenticatedToken = new SwitchUserToken($user, $token->getCredentials(), $this->providerKey, $this->getRoles($user, $token), $token->getOriginalToken());
+            $authenticatedToken = new SwitchUserToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles(), $token->getOriginalToken());
         } else {
-            $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $this->getRoles($user, $token));
+            $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
         }
 
         $authenticatedToken->setAttributes($token->getAttributes());
@@ -108,36 +107,13 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     }
 
     /**
-     * Retrieves roles from user and appends SwitchUserRole if original token contained one.
-     *
-     * @return array The user roles
-     */
-    private function getRoles(UserInterface $user, TokenInterface $token)
-    {
-        $roles = $user->getRoles();
-
-        foreach ($token->getRoles(false) as $role) {
-            if ($role instanceof SwitchUserRole) {
-                $roles[] = $role;
-
-                break;
-            }
-        }
-
-        return $roles;
-    }
-
-    /**
      * Retrieves the user from an implementation-specific location.
-     *
-     * @param string                $username The username to retrieve
-     * @param UsernamePasswordToken $token    The Token
      *
      * @return UserInterface The user
      *
      * @throws AuthenticationException if the credentials could not be validated
      */
-    abstract protected function retrieveUser($username, UsernamePasswordToken $token);
+    abstract protected function retrieveUser(string $username, UsernamePasswordToken $token);
 
     /**
      * Does additional checks on the user and token (like validating the

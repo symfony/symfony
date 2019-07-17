@@ -1509,29 +1509,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
-    {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', '2011-02-03 04:05:06', [
-            'input' => 'string',
-            'date_widget' => 'choice',
-            'time_widget' => 'choice',
-            'widget' => 'single_text',
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
-        ]);
-
-        $this->assertWidgetMatchesXpath($form->createView(), [],
-'/input
-    [@type="datetime-local"]
-    [@name="name"]
-    [@value="2011-02-03T04:05:06"]
-'
-        );
-    }
-
     public function testDateChoice()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', date('Y').'-02-03', [

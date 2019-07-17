@@ -34,7 +34,7 @@ final class NotTaggedControllerValueResolver implements ArgumentValueResolverInt
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         $controller = $request->attributes->get('_controller');
 

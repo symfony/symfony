@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Loader\ExistsLoaderInterface;
 
 /**
  * ExceptionController.
@@ -47,13 +45,11 @@ class ExceptionController
     /**
      * Renders the exception panel for the given token.
      *
-     * @param string $token The profiler token
-     *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
-    public function showAction($token)
+    public function showAction(string $token)
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -64,7 +60,7 @@ class ExceptionController
         $exception = $this->profiler->loadProfile($token)->getCollector('exception')->getException();
         $template = $this->getTemplate();
 
-        if (!$this->templateExists($template)) {
+        if (!$this->twig->getLoader()->exists($template)) {
             return new Response($this->errorRenderer->getBody($exception), 200, ['Content-Type' => 'text/html']);
         }
 
@@ -85,13 +81,11 @@ class ExceptionController
     /**
      * Renders the exception panel stylesheet for the given token.
      *
-     * @param string $token The profiler token
-     *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
-    public function cssAction($token)
+    public function cssAction(string $token)
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -101,7 +95,7 @@ class ExceptionController
 
         $template = $this->getTemplate();
 
-        if (!$this->templateExists($template, false)) {
+        if (!$this->twig->getLoader()->exists($template)) {
             return new Response($this->errorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
         }
 
@@ -111,29 +105,5 @@ class ExceptionController
     protected function getTemplate()
     {
         return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
-    }
-
-    /**
-     * @deprecated since Symfony 4.4
-     */
-    protected function templateExists($template/*, bool $triggerDeprecation = true */)
-    {
-        if (1 === \func_num_args()) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use the "exists()" method of the Twig loader instead.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        $loader = $this->twig->getLoader();
-        if ($loader instanceof ExistsLoaderInterface) {
-            return $loader->exists($template);
-        }
-
-        try {
-            $loader->getSource($template);
-
-            return true;
-        } catch (LoaderError $e) {
-        }
-
-        return false;
     }
 }

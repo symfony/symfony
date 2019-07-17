@@ -236,7 +236,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function dotize($id)
+    protected function dotize(string $id)
     {
         return hash('sha1', $id);
     }

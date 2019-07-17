@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Config\Resource;
 
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface as LegacyServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -19,7 +18,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ReflectionClassResource implements SelfCheckingResourceInterface
 {
@@ -36,7 +35,10 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         $this->excludedVendors = $excludedVendors;
     }
 
-    public function isFresh($timestamp)
+    /**
+     * {@inheritdoc}
+     */
+    public function isFresh(int $timestamp): bool
     {
         if (null === $this->hash) {
             $this->hash = $this->computeHash();
@@ -56,7 +58,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         return true;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return 'reflection.'.$this->className;
     }
@@ -166,10 +168,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             }
         }
 
-        if (interface_exists(LegacyServiceSubscriberInterface::class, false) && $class->isSubclassOf(LegacyServiceSubscriberInterface::class)) {
-            yield LegacyServiceSubscriberInterface::class;
-            yield print_r([$class->name, 'getSubscribedServices'](), true);
-        } elseif (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
+        if (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
             yield ServiceSubscriberInterface::class;
             yield print_r($class->name::getSubscribedServices(), true);
         }

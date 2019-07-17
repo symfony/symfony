@@ -23,6 +23,6 @@ class TableStyleTest extends TestCase
     public function testSetPadTypeWithInvalidType()
     {
         $style = new TableStyle();
-        $style->setPadType('TEST');
+        $style->setPadType(31);
     }
 }

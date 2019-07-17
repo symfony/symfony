@@ -13,10 +13,8 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
-use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
@@ -29,29 +27,20 @@ use Twig\TwigFilter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.2
+ * @final
  */
 class TranslationExtension extends AbstractExtension
 {
     private $translator;
     private $translationNodeVisitor;
 
-    /**
-     * @param TranslatorInterface|null $translator
-     */
-    public function __construct($translator = null, NodeVisitorInterface $translationNodeVisitor = null)
+    public function __construct(TranslatorInterface $translator = null, NodeVisitorInterface $translationNodeVisitor = null)
     {
-        if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         $this->translator = $translator;
         $this->translationNodeVisitor = $translationNodeVisitor;
     }
 
-    /**
-     * @return TranslatorInterface|null
-     */
-    public function getTranslator()
+    public function getTranslator(): ?TranslatorInterface
     {
         if (null === $this->translator) {
             if (!interface_exists(TranslatorInterface::class)) {
@@ -69,11 +58,10 @@ class TranslationExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('trans', [$this, 'trans']),
-            new TwigFilter('transchoice', [$this, 'transchoice'], ['deprecated' => '4.2', 'alternative' => 'trans" with parameter "%count%']),
         ];
     }
 
@@ -82,16 +70,11 @@ class TranslationExtension extends AbstractExtension
      *
      * @return AbstractTokenParser[]
      */
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [
             // {% trans %}Symfony is great!{% endtrans %}
             new TransTokenParser(),
-
-            // {% transchoice count %}
-            //     {0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples
-            // {% endtranschoice %}
-            new TransChoiceTokenParser(),
 
             // {% trans_default_domain "foobar" %}
             new TransDefaultDomainTokenParser(),
@@ -101,17 +84,17 @@ class TranslationExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getNodeVisitors()
+    public function getNodeVisitors(): array
     {
         return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor()];
     }
 
-    public function getTranslationNodeVisitor()
+    public function getTranslationNodeVisitor(): TranslationNodeVisitor
     {
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans($message, array $arguments = [], $domain = null, $locale = null, $count = null)
+    public function trans($message, array $arguments = [], $domain = null, $locale = null, $count = null): string
     {
         if (null !== $count) {
             $arguments['%count%'] = $count;
@@ -121,23 +104,9 @@ class TranslationExtension extends AbstractExtension
     }
 
     /**
-     * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
-     */
-    public function transchoice($message, $count, array $arguments = [], $domain = null, $locale = null)
-    {
-        $translator = $this->getTranslator();
-
-        if ($translator instanceof TranslatorInterface) {
-            return $translator->trans($message, array_merge(['%count%' => $count], $arguments), $domain, $locale);
-        }
-
-        return $translator->transChoice($message, $count, array_merge(['%count%' => $count], $arguments), $domain, $locale);
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'translator';
     }

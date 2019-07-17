@@ -245,6 +245,7 @@ FrameworkBundle
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
  * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
  * Removed support for `templating` engine in `TemplateController`, use Twig instead
+ * Removed `ResolveControllerNameSubscriber`.
 
 HttpClient
 ----------
@@ -292,6 +293,7 @@ HttpKernel
  * Removed `PostResponseEvent`, use `TerminateEvent` instead
  * Removed `TranslatorListener` in favor of `LocaleAwareListener`
  * The `DebugHandlersListener` class has been made `final`
+ * Removed `SaveSessionListener` in favor of `AbstractSessionListener` 
 
 Intl
 ----
@@ -443,7 +445,27 @@ SecurityBundle
 Serializer
 ----------
 
+ * The default value of the `CsvEncoder` "as_collection" option was changed to `true`.
+ * Individual encoders & normalizers options as constructor arguments were removed. 
+   Use the default context instead.
+ * The following method and properties:
+     - `AbstractNormalizer::$circularReferenceLimit`
+     - `AbstractNormalizer::$circularReferenceHandler`
+     - `AbstractNormalizer::$callbacks`
+     - `AbstractNormalizer::$ignoredAttributes`
+     - `AbstractNormalizer::$camelizedAttributes` 
+     - `AbstractNormalizer::setCircularReferenceLimit()`
+     - `AbstractNormalizer::setCircularReferenceHandler()` 
+     - `AbstractNormalizer::setCallbacks()`
+     - `AbstractNormalizer::setIgnoredAttributes()`
+     - `AbstractObjectNormalizer::$maxDepthHandler`
+     - `AbstractObjectNormalizer::setMaxDepthHandler()`
+     - `XmlEncoder::setRootNodeName()`
+     - `XmlEncoder::getRootNodeName()`
+
+   were removed, use the default context instead.
  * The `AbstractNormalizer::handleCircularReference()` method has two new `$format` and `$context` arguments.
+ * Removed support for instantiating a `DataUriNormalizer` with a default MIME type guesser when the `symfony/mime` component isn't installed.
 
 Translation
 -----------
@@ -486,6 +508,7 @@ Validator
  * The `symfony/intl` component is now required for using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints
  * The `egulias/email-validator` component is now required for using the `Email` constraint in strict mode
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
+ * Changed the default value of `Length::$allowEmptyString` to `false` and made it optional
 
 WebProfilerBundle
 -----------------

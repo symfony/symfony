@@ -21,8 +21,6 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  * It manages an environment made of application kernel and bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @method string getProjectDir() Gets the project dir (path of the project's composer file) - not defining it is deprecated since Symfony 4.2
  */
 interface KernelInterface extends HttpKernelInterface
 {
@@ -99,15 +97,6 @@ interface KernelInterface extends HttpKernelInterface
     public function locateResource($name, $dir = null, $first = true);
 
     /**
-     * Gets the name of the kernel.
-     *
-     * @return string The kernel name
-     *
-     * @deprecated since Symfony 4.2
-     */
-    public function getName();
-
-    /**
      * Gets the environment.
      *
      * @return string The current environment
@@ -122,13 +111,11 @@ interface KernelInterface extends HttpKernelInterface
     public function isDebug();
 
     /**
-     * Gets the application root dir (path of the project's Kernel class).
+     * Gets the project dir (path of the project's composer file).
      *
-     * @return string The Kernel root dir
-     *
-     * @deprecated since Symfony 4.2
+     * @return string
      */
-    public function getRootDir();
+    public function getProjectDir();
 
     /**
      * Gets the current container.

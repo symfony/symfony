@@ -13,15 +13,10 @@ namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
-use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
-
-class SpecialResponse extends Response
-{
-}
 
 class TestClient extends AbstractBrowser
 {
@@ -52,10 +47,6 @@ class TestClient extends AbstractBrowser
 
     protected function filterResponse($response)
     {
-        if ($response instanceof SpecialResponse) {
-            return new Response($response->getContent(), $response->getStatusCode(), $response->getHeaders());
-        }
-
         return $response;
     }
 
@@ -81,16 +72,6 @@ class AbstractBrowserTest extends TestCase
         return new TestClient($server, $history, $cookieJar);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAbstractBrowserIsAClient()
-    {
-        $browser = $this->getBrowser();
-
-        $this->assertInstanceOf(Client::class, $browser);
-    }
-
     public function testGetHistory()
     {
         $client = $this->getBrowser([], $history = new History());
@@ -112,8 +93,8 @@ class AbstractBrowserTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
+     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getRequest()".
      */
     public function testGetRequestNull()
     {
@@ -150,8 +131,8 @@ class AbstractBrowserTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
+     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getResponse()".
      */
     public function testGetResponseNull()
     {
@@ -159,20 +140,9 @@ class AbstractBrowserTest extends TestCase
         $this->assertNull($client->getResponse());
     }
 
-    public function testGetInternalResponse()
-    {
-        $client = $this->getBrowser();
-        $client->setNextResponse(new SpecialResponse('foo'));
-        $client->request('GET', 'http://example.com/');
-
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
-        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getInternalResponse());
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getResponse());
-    }
-
     /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getInternalResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
+     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getInternalResponse()".
      */
     public function testGetInternalResponseNull()
     {
@@ -199,8 +169,8 @@ class AbstractBrowserTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getCrawler()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
+     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getCrawler()".
      */
     public function testGetCrawlerNull()
     {
@@ -904,24 +874,13 @@ class AbstractBrowserTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
+     * @expectedExceptionMessage The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getInternalRequest()".
      */
     public function testInternalRequestNull()
     {
         $client = $this->getBrowser();
         $this->assertNull($client->getInternalRequest());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\BrowserKit\Tests\ClassThatInheritClient::submit()" method will have a new "array $serverParameters = []" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
-    public function testInheritedClassCallSubmitWithTwoArguments()
-    {
-        $clientChild = new ClassThatInheritClient();
-        $clientChild->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
-        $clientChild->submit($clientChild->request('GET', 'http://www.example.com/foo/foobar')->filter('input')->form());
     }
 }
 
@@ -946,8 +905,8 @@ class ClassThatInheritClient extends AbstractBrowser
         return $response;
     }
 
-    public function submit(DomCrawlerForm $form, array $values = [])
+    public function submit(DomCrawlerForm $form, array $values = [], array $serverParameters = [])
     {
-        return parent::submit($form, $values);
+        return parent::submit($form, $values, $serverParameters);
     }
 }

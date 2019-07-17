@@ -109,7 +109,7 @@ class ChildDefinition extends Definition
     /**
      * @internal
      */
-    public function setAutoconfigured($autoconfigured)
+    public function setAutoconfigured(bool $autoconfigured)
     {
         throw new BadMethodCallException('A ChildDefinition cannot be autoconfigured.');
     }

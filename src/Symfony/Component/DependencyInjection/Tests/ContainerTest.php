@@ -187,7 +187,7 @@ class ContainerTest extends TestCase
     {
         $sc = new Container();
         $sc->set('foo', new \stdClass());
-        $sc->get('foo', null);
+        $sc->get('foo');
         $sc->set('foo', null);
         $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
 

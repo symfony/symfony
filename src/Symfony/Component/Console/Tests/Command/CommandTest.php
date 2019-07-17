@@ -185,13 +185,6 @@ class CommandTest extends TestCase
         $this->assertEquals(['name1'], $command->getAliases(), '->setAliases() sets the aliases');
     }
 
-    public function testSetAliasesNull()
-    {
-        $command = new \TestCommand();
-        $this->expectException('InvalidArgumentException');
-        $command->setAliases(null);
-    }
-
     public function testGetSynopsis()
     {
         $command = new \TestCommand();

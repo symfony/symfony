@@ -14,6 +14,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Extension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\InvalidConfig\InvalidConfigExtension;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\SemiValidConfig\SemiValidConfigExtension;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\ValidConfig\Configuration;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\ValidConfig\ValidConfigExtension;
 
 class ExtensionTest extends TestCase
 {
@@ -43,6 +47,38 @@ class ExtensionTest extends TestCase
         $extension = new EnableableExtension();
 
         $extension->isConfigEnabled(new ContainerBuilder(), []);
+    }
+
+    public function testNoConfiguration()
+    {
+        $extension = new EnableableExtension();
+
+        $this->assertNull($extension->getConfiguration([], new ContainerBuilder()));
+    }
+
+    public function testValidConfiguration()
+    {
+        $extension = new ValidConfigExtension();
+
+        $this->assertInstanceOf(Configuration::class, $extension->getConfiguration([], new ContainerBuilder()));
+    }
+
+    public function testSemiValidConfiguration()
+    {
+        $extension = new SemiValidConfigExtension();
+
+        $this->assertNull($extension->getConfiguration([], new ContainerBuilder()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedExceptionMessage The extension configuration class "Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\InvalidConfig\Configuration" must implement "Symfony\Component\Config\Definition\ConfigurationInterface".
+     */
+    public function testInvalidConfiguration()
+    {
+        $extension = new InvalidConfigExtension();
+
+        $extension->getConfiguration([], new ContainerBuilder());
     }
 }
 

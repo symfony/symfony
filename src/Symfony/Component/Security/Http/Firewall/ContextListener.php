@@ -12,9 +12,8 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
@@ -25,10 +24,10 @@ use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * ContextListener manages the SecurityContext persistence through a session.
@@ -36,12 +35,10 @@ use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class ContextListener implements ListenerInterface
+class ContextListener
 {
-    use LegacyListenerTrait;
-
     private $tokenStorage;
     private $sessionKey;
     private $logger;
@@ -65,18 +62,6 @@ class ContextListener implements ListenerInterface
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
-    }
-
-    /**
-     * Enables deauthentication during refreshUser when the user has changed.
-     *
-     * @param bool $logoutOnUserChange
-     *
-     * @deprecated since Symfony 4.1
-     */
-    public function setLogoutOnUserChange($logoutOnUserChange)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**
@@ -123,7 +108,7 @@ class ContextListener implements ListenerInterface
     /**
      * Writes the security token into the session.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -155,11 +140,9 @@ class ContextListener implements ListenerInterface
     /**
      * Refreshes the user by reloading it from the user provider.
      *
-     * @return TokenInterface|null
-     *
      * @throws \RuntimeException
      */
-    protected function refreshUser(TokenInterface $token)
+    protected function refreshUser(TokenInterface $token): ?TokenInterface
     {
         $user = $token->getUser();
         if (!$user instanceof UserInterface) {
@@ -197,13 +180,6 @@ class ContextListener implements ListenerInterface
 
                     if ($token instanceof SwitchUserToken) {
                         $context['impersonator_username'] = $token->getOriginalToken()->getUsername();
-                    } else {
-                        foreach ($token->getRoles(false) as $role) {
-                            if ($role instanceof SwitchUserRole) {
-                                $context['impersonator_username'] = $role->getSource(false)->getUsername();
-                                break;
-                            }
-                        }
                     }
 
                     $this->logger->debug('User was reloaded from a user provider.', $context);

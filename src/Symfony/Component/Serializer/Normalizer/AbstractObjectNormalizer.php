@@ -92,12 +92,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private $typesCache = [];
     private $attributesCache = [];
 
-    /**
-     * @deprecated since Symfony 4.2
-     *
-     * @var callable|null
-     */
-    private $maxDepthHandler;
     private $objectClassResolver;
 
     /**
@@ -127,7 +121,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
@@ -135,7 +129,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -168,8 +162,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new InvalidArgumentException(sprintf('The "%s" given in the context is not callable.', self::MAX_DEPTH_HANDLER));
             }
         } else {
-            // already validated in constructor resp by type declaration of setMaxDepthHandler
-            $maxDepthHandler = $this->defaultContext[self::MAX_DEPTH_HANDLER] ?? $this->maxDepthHandler;
+            $maxDepthHandler = null;
         }
 
         foreach ($attributes as $attribute) {
@@ -186,7 +179,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             /**
              * @var callable|null
              */
-            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? $this->callbacks[$attribute] ?? null;
+            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? null;
             if ($callback) {
                 $attributeValue = $callback($attributeValue, $object, $attribute, $format, $context);
             }
@@ -240,7 +233,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    protected function getAttributes($object, $format = null, array $context)
+    protected function getAttributes($object, string $format = null, array $context)
     {
         $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
         $key = $class.'-'.$context['cache_key'];
@@ -281,7 +274,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    abstract protected function extractAttributes($object, $format = null, array $context = []);
+    abstract protected function extractAttributes($object, string $format = null, array $context = []);
 
     /**
      * Gets the attribute value.
@@ -293,24 +286,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return mixed
      */
-    abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = []);
-
-    /**
-     * Sets a handler function that will be called when the max depth is reached.
-     *
-     * @deprecated since Symfony 4.2
-     */
-    public function setMaxDepthHandler(?callable $handler): void
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "max_depth_handler" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->maxDepthHandler = $handler;
-    }
+    abstract protected function getAttributeValue($object, string $attribute, string $format = null, array $context = []);
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, string $format = null)
     {
         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
@@ -318,7 +299,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -561,19 +542,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * {@inheritdoc}
      *
-     * @param string|null $format
-     *
      * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute/*, ?string $format */)
+    protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
-        if (\func_num_args() >= 3) {
-            $format = func_get_arg(2);
-        } else {
-            @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', \get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-            $format = null;
-        }
-
         $context = parent::createChildContext($parentContext, $attribute, $format);
         $context['cache_key'] = $this->getCacheKey($format, $context);
 
@@ -598,8 +570,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         try {
             return md5($format.serialize([
                 'context' => $context,
-                'ignored' => $this->ignoredAttributes,
-                'camelized' => $this->camelizedAttributes,
+                'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
         } catch (\Exception $exception) {
             // The context cannot be serialized, skip the cache

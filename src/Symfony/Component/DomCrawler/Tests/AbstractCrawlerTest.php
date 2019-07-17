@@ -364,11 +364,11 @@ abstract class AbstractCrawlerTest extends TestCase
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
 
-        $this->assertEquals(['One', 'Two', 'Three'], $crawler->extract('_text'), '->extract() returns an array of extracted data from the node list');
+        $this->assertEquals(['One', 'Two', 'Three'], $crawler->extract(['_text']), '->extract() returns an array of extracted data from the node list');
         $this->assertEquals([['One', 'first'], ['Two', ''], ['Three', '']], $crawler->extract(['_text', 'class']), '->extract() returns an array of extracted data from the node list');
         $this->assertEquals([[], [], []], $crawler->extract([]), '->extract() returns empty arrays if the attribute list is empty');
 
-        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->extract('_text'), '->extract() returns an empty array if the node list is empty');
+        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->extract(['_text']), '->extract() returns an empty array if the node list is empty');
 
         $this->assertEquals([['One', 'li'], ['Two', 'li'], ['Three', 'li']], $crawler->extract(['_text', '_name']), '->extract() returns an array of extracted data from the node list');
     }
@@ -1100,62 +1100,6 @@ HTML;
         $this->createCrawler()->evaluate('//form/input[1]');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\DomCrawler\Crawler::children()" method will have a new "string $selector = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
-    public function testInheritedClassCallChildrenWithoutArgument()
-    {
-        $dom = new \DOMDocument();
-        $dom->loadHTML($this->getDoctype().'
-            <html>
-                <body>
-                    <a href="foo">Foo</a>
-                    <a href="/foo">   Fabien\'s Foo   </a>
-                    <a href="/foo">Fabien"s Foo</a>
-                    <a href="/foo">\' Fabien"s Foo</a>
-
-                    <a href="/bar"><img alt="Bar"/></a>
-                    <a href="/bar"><img alt="   Fabien\'s Bar   "/></a>
-                    <a href="/bar"><img alt="Fabien&quot;s Bar"/></a>
-                    <a href="/bar"><img alt="\' Fabien&quot;s Bar"/></a>
-
-                    <a href="?get=param">GetLink</a>
-
-                    <a href="/example">Klausi|Claudiu</a>
-
-                    <form action="foo" id="FooFormId">
-                        <input type="text" value="TextValue" name="TextName" />
-                        <input type="submit" value="FooValue" name="FooName" id="FooId" />
-                        <input type="button" value="BarValue" name="BarName" id="BarId" />
-                        <button value="ButtonValue" name="ButtonName" id="ButtonId" />
-                    </form>
-
-                    <input type="submit" value="FooBarValue" name="FooBarName" form="FooFormId" />
-                    <input type="text" value="FooTextValue" name="FooTextName" form="FooFormId" />
-
-                    <ul class="first">
-                        <li class="first">One</li>
-                        <li>Two</li>
-                        <li>Three</li>
-                    </ul>
-                    <ul>
-                        <li>One Bis</li>
-                        <li>Two Bis</li>
-                        <li>Three Bis</li>
-                    </ul>
-                    <div id="parent">
-                        <div id="child"></div>
-                        <div id="child2" xmlns:foo="http://example.com"></div>
-                    </div>
-                    <div id="sibling"><img /></div>
-                </body>
-            </html>
-        ');
-        $crawlerChild = new ClassThatInheritCrawler($dom);
-        $crawlerChild->children();
-    }
-
     public function testAddHtmlContentUnsupportedCharset()
     {
         $crawler = $this->createCrawler();
@@ -1248,13 +1192,5 @@ HTML;
         $domxpath = new \DOMXPath($dom);
 
         return $domxpath->query('//div');
-    }
-}
-
-class ClassThatInheritCrawler extends Crawler
-{
-    public function children()
-    {
-        parent::children();
     }
 }

@@ -9,16 +9,6 @@ use Symfony\Component\Workflow\Transition;
 
 class DefinitionBuilderTest extends TestCase
 {
-    /** @group legacy */
-    public function testSetInitialPlace()
-    {
-        $builder = new DefinitionBuilder(['a', 'b']);
-        $builder->setInitialPlace('b');
-        $definition = $builder->build();
-
-        $this->assertEquals(['b'], $definition->getInitialPlaces());
-    }
-
     public function testSetInitialPlaces()
     {
         $builder = new DefinitionBuilder(['a', 'b']);

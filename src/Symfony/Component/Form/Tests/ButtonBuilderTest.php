@@ -40,7 +40,8 @@ class ButtonBuilderTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The name "button[]" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").
      */
     public function testNameContainingIllegalCharacters()
     {

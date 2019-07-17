@@ -28,17 +28,8 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         self::FORMAT_KEY => 'P%yY%mM%dDT%hH%iM%sS',
     ];
 
-    /**
-     * @param array $defaultContext
-     */
-    public function __construct($defaultContext = [])
+    public function __construct(array $defaultContext = [])
     {
-        if (!\is_array($defaultContext)) {
-            @trigger_error(sprintf('The "format" parameter is deprecated since Symfony 4.2, use the "%s" key of the context instead.', self::FORMAT_KEY), E_USER_DEPRECATED);
-
-            $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
-        }
-
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
@@ -47,7 +38,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      *
      * @throws InvalidArgumentException
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof \DateInterval) {
             throw new InvalidArgumentException('The object must be an instance of "\DateInterval".');
@@ -59,7 +50,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \DateInterval;
     }
@@ -78,7 +69,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, string $format = null, array $context = [])
     {
         if (!\is_string($data)) {
             throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', \gettype($data)));
@@ -105,7 +96,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, string $format = null)
     {
         return \DateInterval::class === $type;
     }

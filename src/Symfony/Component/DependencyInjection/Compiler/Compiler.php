@@ -53,12 +53,8 @@ class Compiler
 
     /**
      * Adds a pass to the PassConfig.
-     *
-     * @param CompilerPassInterface $pass     A compiler pass
-     * @param string                $type     The type of the pass
-     * @param int                   $priority Used to sort the passes
      */
-    public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
+    public function addPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
         $this->passConfig->addPass($pass, $type, $priority);
     }

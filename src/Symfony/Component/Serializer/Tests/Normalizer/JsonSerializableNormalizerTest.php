@@ -70,23 +70,7 @@ class JsonSerializableNormalizerTest extends TestCase
      */
     public function testCircularNormalize()
     {
-        $this->doTestCircularNormalize();
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\CircularReferenceException
-     */
-    public function testLegacyCircularNormalize()
-    {
-        $this->doTestCircularNormalize(true);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\CircularReferenceException
-     */
-    private function doTestCircularNormalize(bool $legacy = false)
-    {
-        $legacy ? $this->normalizer->setCircularReferenceLimit(1) : $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
+        $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
         $this->serializer
             ->expects($this->once())

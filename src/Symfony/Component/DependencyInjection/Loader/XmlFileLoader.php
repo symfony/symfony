@@ -39,7 +39,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $type = null)
+    public function load($resource, string $type = null)
     {
         $path = $this->locator->locate($resource);
 
@@ -72,7 +72,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         if (!\is_string($resource)) {
             return false;
@@ -544,9 +544,6 @@ class XmlFileLoader extends FileLoader
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="service_locator" only accepts maps of type="service" references in "%s".', $name, $file));
                     }
                     break;
-                case 'tagged':
-                    @trigger_error(sprintf('Type "%s" of tag <%s> in "%s" is deprecated since Symfony 4.4 and will be removed in 5.0, use "tagged_iterator" instead.', $arg->getAttribute('type'), $name, $file), E_USER_DEPRECATED);
-                    // no break
                 case 'tagged_iterator':
                 case 'tagged_locator':
                     $type = $arg->getAttribute('type');

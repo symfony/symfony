@@ -12,9 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\ParentNodeDefinitionInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Exception\TreeWithoutRootNodeException;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
@@ -59,8 +59,8 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation A non-string default value of an env() parameter is deprecated since 4.3, cast "env(FLOATISH)" to string instead.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The default value of an env() parameter must be a string or null, but "double" given to "env(FLOATISH)".
      */
     public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
     {
@@ -72,8 +72,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         ]);
 
         $this->doProcess($container);
-
-        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
     /**
@@ -232,13 +230,15 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     }
 
     /**
-     * NOT LEGACY (test exception in 5.0).
-     *
-     * @group legacy
-     * @expectedDeprecation Setting path "env_extension.scalar_node_not_empty_validated" to an environment variable is deprecated since Symfony 4.3. Remove "cannotBeEmpty()", "validate()" or include a prefix/suffix value instead.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The path "env_extension.scalar_node_not_empty_validated" cannot contain an environment variable when empty values are not allowed by definition and are validated.
      */
     public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation(): void
     {
+        if (!method_exists(ParentNodeDefinitionInterface::class, 'getChildNodeDefinitions')) {
+            $this->markTestSkipped('symfony/config >=5.0 is required.');
+        }
+
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
         $container->prependExtensionConfig('env_extension', $expected = [
@@ -246,8 +246,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         ]);
 
         $this->doProcess($container);
-
-        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
     public function testPartialEnvWhichCannotBeEmptyForScalarNode(): void
@@ -274,19 +272,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
 
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation A tree builder without a root node is deprecated since Symfony 4.2 and will not be supported anymore in 5.0.
-     */
-    public function testConfigurationWithoutRootNode(): void
-    {
-        $container = new ContainerBuilder();
-        $container->registerExtension(new EnvExtension(new EnvConfigurationWithoutRootNode()));
-        $container->loadFromExtension('env_extension', ['foo' => 'bar']);
-
-        (new ValidateEnvPlaceholdersPass())->process($container);
     }
 
     public function testEmptyConfigFromMoreThanOneSource()
@@ -387,14 +372,6 @@ class EnvConfiguration implements ConfigurationInterface
     }
 }
 
-class EnvConfigurationWithoutRootNode implements ConfigurationInterface
-{
-    public function getConfigTreeBuilder()
-    {
-        return new TreeBuilder();
-    }
-}
-
 class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
@@ -439,11 +416,7 @@ class EnvExtension extends Extension
             return;
         }
 
-        try {
-            $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
-        } catch (TreeWithoutRootNodeException $e) {
-            $this->config = null;
-        }
+        $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
     }
 
     public function getConfig()

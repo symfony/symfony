@@ -16,7 +16,7 @@ use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ExceptionListener implements EventSubscriberInterface
 {
@@ -40,7 +40,7 @@ class ExceptionListener implements EventSubscriberInterface
         $this->debug = $debug;
     }
 
-    public function logKernelException(GetResponseForExceptionEvent $event)
+    public function logKernelException(ExceptionEvent $event)
     {
         $e = FlattenException::createFromThrowable($event->getException());
 
@@ -51,7 +51,7 @@ class ExceptionListener implements EventSubscriberInterface
      * @param string                   $eventName
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event)
     {
         if (null === $this->controller) {
             return;
@@ -93,7 +93,7 @@ class ExceptionListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::EXCEPTION => [
@@ -125,10 +125,8 @@ class ExceptionListener implements EventSubscriberInterface
      *
      * @param \Exception $exception The thrown exception
      * @param Request    $request   The original request
-     *
-     * @return Request The cloned request
      */
-    protected function duplicateRequest(\Exception $exception, Request $request)
+    protected function duplicateRequest(\Exception $exception, Request $request): Request
     {
         $attributes = [
             '_controller' => $this->controller,

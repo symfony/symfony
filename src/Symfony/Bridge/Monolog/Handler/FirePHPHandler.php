@@ -13,14 +13,14 @@ namespace Symfony\Bridge\Monolog\Handler;
 
 use Monolog\Handler\FirePHPHandler as BaseFirePHPHandler;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * FirePHPHandler.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {
@@ -34,7 +34,7 @@ class FirePHPHandler extends BaseFirePHPHandler
     /**
      * Adds the headers to the response once it's created.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -59,7 +59,7 @@ class FirePHPHandler extends BaseFirePHPHandler
     /**
      * {@inheritdoc}
      */
-    protected function sendHeader($header, $content)
+    protected function sendHeader($header, $content): void
     {
         if (!self::$sendHeaders) {
             return;
@@ -75,7 +75,7 @@ class FirePHPHandler extends BaseFirePHPHandler
     /**
      * Override default behavior since we check the user agent in onKernelResponse.
      */
-    protected function headersAccepted()
+    protected function headersAccepted(): bool
     {
         return true;
     }

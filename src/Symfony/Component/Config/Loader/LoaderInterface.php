@@ -21,22 +21,20 @@ interface LoaderInterface
     /**
      * Loads a resource.
      *
-     * @param mixed       $resource The resource
-     * @param string|null $type     The resource type or null if unknown
+     * @param mixed $resource The resource
      *
      * @throws \Exception If something went wrong
      */
-    public function load($resource, $type = null);
+    public function load($resource, string $type = null);
 
     /**
      * Returns whether this class supports the given resource.
      *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
+     * @param mixed $resource A resource
      *
      * @return bool True if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null);
+    public function supports($resource, string $type = null);
 
     /**
      * Gets the loader resolver.

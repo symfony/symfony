@@ -39,7 +39,7 @@ class TemplateReference implements TemplateReferenceInterface
     /**
      * {@inheritdoc}
      */
-    public function set($name, $value)
+    public function set(string $name, string $value)
     {
         if (\array_key_exists($name, $this->parameters)) {
             $this->parameters[$name] = $value;
@@ -53,7 +53,7 @@ class TemplateReference implements TemplateReferenceInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name)
     {
         if (\array_key_exists($name, $this->parameters)) {
             return $this->parameters[$name];

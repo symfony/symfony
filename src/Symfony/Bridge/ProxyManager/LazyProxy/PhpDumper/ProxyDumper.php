@@ -40,7 +40,7 @@ class ProxyDumper implements DumperInterface
     /**
      * {@inheritdoc}
      */
-    public function isProxyCandidate(Definition $definition)
+    public function isProxyCandidate(Definition $definition): bool
     {
         return ($definition->isLazy() || $definition->hasTag('proxy')) && $this->proxyGenerator->getProxifiedClass($definition);
     }
@@ -48,16 +48,12 @@ class ProxyDumper implements DumperInterface
     /**
      * {@inheritdoc}
      */
-    public function getProxyFactoryCode(Definition $definition, $id, $factoryCode = null)
+    public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode): string
     {
         $instantiation = 'return';
 
         if ($definition->isShared()) {
             $instantiation .= sprintf(' $this->%s[%s] =', $definition->isPublic() && !$definition->isPrivate() ? 'services' : 'privates', var_export($id, true));
-        }
-
-        if (null === $factoryCode) {
-            throw new \InvalidArgumentException(sprintf('Missing factory code to construct the service "%s".', $id));
         }
 
         $proxyClass = $this->getProxyClassName($definition);
@@ -82,7 +78,7 @@ EOF;
     /**
      * {@inheritdoc}
      */
-    public function getProxyCode(Definition $definition)
+    public function getProxyCode(Definition $definition): string
     {
         $code = $this->classGenerator->generate($this->generateProxyClass($definition));
 

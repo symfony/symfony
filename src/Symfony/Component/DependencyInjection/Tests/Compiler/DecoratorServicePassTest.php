@@ -169,7 +169,7 @@ class DecoratorServicePassTest extends TestCase
 
     protected function process(ContainerBuilder $container)
     {
-        $repeatedPass = new DecoratorServicePass();
-        $repeatedPass->process($container);
+        $pass = new DecoratorServicePass();
+        $pass->process($container);
     }
 }

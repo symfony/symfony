@@ -92,7 +92,7 @@ class RouteCompiler implements RouteCompilerInterface
         );
     }
 
-    private static function compilePattern(Route $route, $pattern, $isHost)
+    private static function compilePattern(Route $route, string $pattern, bool $isHost): array
     {
         $tokens = [];
         $variables = [];

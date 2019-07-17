@@ -16,11 +16,11 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.9",
         "egulias/email-validator": "^2.0",
         "psr/log": "~1.0",
-        "symfony/event-dispatcher": "^4.3",
-        "symfony/mime": "^4.3|^5.0"
+        "symfony/event-dispatcher": "^4.4|^5.0",
+        "symfony/mime": "^4.4|^5.0"
     },
     "require-dev": {
         "symfony/amazon-mailer": "^4.4|^5.0",
@@ -40,7 +40,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.4-dev"
+            "dev-master": "5.0-dev"
         }
     }
 }

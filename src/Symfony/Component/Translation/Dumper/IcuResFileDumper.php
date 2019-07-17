@@ -28,7 +28,7 @@ class IcuResFileDumper extends FileDumper
     /**
      * {@inheritdoc}
      */
-    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = [])
+    public function formatCatalogue(MessageCatalogue $messages, string $domain, array $options = [])
     {
         $data = $indexes = $resources = '';
 
@@ -82,7 +82,7 @@ class IcuResFileDumper extends FileDumper
         return $header.$root.$data;
     }
 
-    private function writePadding($data)
+    private function writePadding(string $data)
     {
         $padding = \strlen($data) % 4;
 
@@ -91,7 +91,7 @@ class IcuResFileDumper extends FileDumper
         }
     }
 
-    private function getPosition($data)
+    private function getPosition(string $data)
     {
         return (\strlen($data) + 28) / 4;
     }

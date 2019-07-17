@@ -112,7 +112,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $type = null)
+    public function load($resource, string $type = null)
     {
         $path = $this->locator->locate($resource);
 
@@ -156,7 +156,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         if (!\is_string($resource)) {
             return false;
@@ -592,14 +592,6 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The value of the "%s" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s" in "%s").', $parameter, $id, $callable, substr($callable, 1), $file));
             }
 
-            if (false !== strpos($callable, ':') && false === strpos($callable, '::')) {
-                $parts = explode(':', $callable);
-
-                @trigger_error(sprintf('Using short %s syntax for service "%s" is deprecated since Symfony 4.4, use "[\'@%s\', \'%s\']" instead.', $parameter, $id, ...$parts), E_USER_DEPRECATED);
-
-                return [$this->resolveServices('@'.$parts[0], $file), $parts[1]];
-            }
-
             return $callable;
         }
 
@@ -725,11 +717,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('"!service_locator" tag only accepts maps of "@service" references in "%s".', $file));
                 }
             }
-            if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator'], true)) {
-                if ('tagged' === $value->getTag()) {
-                    @trigger_error('"!tagged" is deprecated since Symfony 4.4 and will be removed in 5.0, use "!tagged_iterator" instead.', E_USER_DEPRECATED);
-                }
-
+            if (\in_array($value->getTag(), ['tagged_iterator', 'tagged_locator'], true)) {
                 $forLocator = 'tagged_locator' === $value->getTag();
 
                 if (\is_string($argument) && $argument) {

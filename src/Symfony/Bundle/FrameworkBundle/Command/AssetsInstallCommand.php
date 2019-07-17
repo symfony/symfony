@@ -44,13 +44,9 @@ class AssetsInstallCommand extends Command
     private $filesystem;
     private $projectDir;
 
-    public function __construct(Filesystem $filesystem, string $projectDir = null)
+    public function __construct(Filesystem $filesystem, string $projectDir)
     {
         parent::__construct();
-
-        if (null === $projectDir) {
-            @trigger_error(sprintf('Not passing the project directory to the constructor of %s is deprecated since Symfony 4.3 and will not be supported in 5.0.', __CLASS__), E_USER_DEPRECATED);
-        }
 
         $this->filesystem = $filesystem;
         $this->projectDir = $projectDir;
@@ -137,13 +133,7 @@ EOT
         $validAssetDirs = [];
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if (!method_exists($bundle, 'getPublicDir')) {
-                @trigger_error(sprintf('Not defining "getPublicDir()" method in the "%s" class is deprecated since Symfony 4.4 and will not be supported in 5.0.', \get_class($bundle)), E_USER_DEPRECATED);
-                $publicDir = 'Resources/public';
-            } else {
-                $publicDir = ltrim($bundle->getPublicDir(), '\\/');
-            }
-            if (!is_dir($originDir = $bundle->getPath().\DIRECTORY_SEPARATOR.$publicDir)) {
+            if (!is_dir($originDir = $bundle->getPath().\DIRECTORY_SEPARATOR.ltrim($bundle->getPublicDir(), '\\/'))) {
                 continue;
             }
 
@@ -268,7 +258,7 @@ EOT
         return self::METHOD_COPY;
     }
 
-    private function getPublicDirectory(ContainerInterface $container)
+    private function getPublicDirectory(ContainerInterface $container): string
     {
         $defaultPublicDir = 'public';
 

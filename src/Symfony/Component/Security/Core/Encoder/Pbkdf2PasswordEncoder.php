@@ -52,7 +52,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      *
      * @throws \LogicException when the algorithm is not supported
      */
-    public function encodePassword($raw, $salt)
+    public function encodePassword(string $raw, ?string $salt)
     {
         if ($this->isPasswordTooLong($raw)) {
             throw new BadCredentialsException('Invalid password.');
@@ -70,7 +70,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
     /**
      * {@inheritdoc}
      */
-    public function isPasswordValid($encoded, $raw, $salt)
+    public function isPasswordValid(string $encoded, string $raw, ?string $salt)
     {
         return !$this->isPasswordTooLong($raw) && $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
     }

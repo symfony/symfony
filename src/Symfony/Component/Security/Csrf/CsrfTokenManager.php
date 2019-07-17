@@ -66,7 +66,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId)
+    public function getToken(string $tokenId)
     {
         $namespacedId = $this->getNamespace().$tokenId;
         if ($this->storage->hasToken($namespacedId)) {
@@ -83,7 +83,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function refreshToken($tokenId)
+    public function refreshToken(string $tokenId)
     {
         $namespacedId = $this->getNamespace().$tokenId;
         $value = $this->generator->generateToken();
@@ -96,7 +96,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function removeToken($tokenId)
+    public function removeToken(string $tokenId)
     {
         return $this->storage->removeToken($this->getNamespace().$tokenId);
     }
@@ -114,7 +114,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
         return hash_equals($this->storage->getToken($namespacedId), $token->getValue());
     }
 
-    private function getNamespace()
+    private function getNamespace(): string
     {
         return \is_callable($ns = $this->namespace) ? $ns() : $ns;
     }

@@ -37,8 +37,6 @@ interface AdapterInterface extends CacheItemPoolInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param string $prefix
      */
-    public function clear(/*string $prefix = ''*/);
+    public function clear(string $prefix = '');
 }

@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
 use Symfony\Component\Serializer\Encoder\ContextAwareEncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -55,12 +56,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     protected $decoder;
 
-    /**
-     * @internal since Symfony 4.1
-     */
-    protected $normalizers = [];
-
-    private $cachedNormalizers;
+    private $normalizers = [];
     private $denormalizerCache = [];
     private $normalizerCache = [];
 
@@ -84,8 +80,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($normalizer instanceof NormalizerInterface || $normalizer instanceof DenormalizerInterface)) {
-                @trigger_error(sprintf('Passing normalizers ("%s") which do not implement either "%s" or "%s" has been deprecated since Symfony 4.2.', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class), E_USER_DEPRECATED);
-                // throw new \InvalidArgumentException(\sprintf('The class "%s" does not implement "%s" or "%s".', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
             }
         }
         $this->normalizers = $normalizers;
@@ -104,8 +99,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($encoder instanceof EncoderInterface || $encoder instanceof DecoderInterface)) {
-                @trigger_error(sprintf('Passing encoders ("%s") which do not implement either "%s" or "%s" has been deprecated since Symfony 4.2.', \get_class($encoder), EncoderInterface::class, DecoderInterface::class), E_USER_DEPRECATED);
-                // throw new \InvalidArgumentException(\sprintf('The class "%s" does not implement "%s" or "%s".', \get_class($normalizer), EncoderInterface::class, DecoderInterface::class));
+                throw new InvalidArgumentException(sprintf('The class "%s" neither implements "%s" nor "%s".', \get_class($encoder), EncoderInterface::class, DecoderInterface::class));
             }
         }
         $this->encoder = new ChainEncoder($realEncoders);
@@ -221,10 +215,6 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     private function getNormalizer($data, ?string $format, array $context)
     {
-        if ($this->cachedNormalizers !== $this->normalizers) {
-            $this->cachedNormalizers = $this->normalizers;
-            $this->denormalizerCache = $this->normalizerCache = [];
-        }
         $type = \is_object($data) ? \get_class($data) : 'native-'.\gettype($data);
 
         if (!isset($this->normalizerCache[$format][$type])) {
@@ -264,10 +254,6 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     private function getDenormalizer($data, string $class, ?string $format, array $context)
     {
-        if ($this->cachedNormalizers !== $this->normalizers) {
-            $this->cachedNormalizers = $this->normalizers;
-            $this->denormalizerCache = $this->normalizerCache = [];
-        }
         if (!isset($this->denormalizerCache[$format][$class])) {
             $this->denormalizerCache[$format][$class] = [];
 

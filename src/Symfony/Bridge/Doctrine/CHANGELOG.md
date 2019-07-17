@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field, throws an exception; pass `null` instead
+ * not explicitly passing an instance of `IdReader` to `DoctrineChoiceLoader` when it can optimize single id field, will not apply any optimization
+ * `DoctrineExtractor` now requires an `EntityManagerInterface` on instantiation
+
 4.4.0
 -----
 

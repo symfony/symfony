@@ -53,7 +53,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
      *
      * @throws RuntimeException When an invalid reference is found
      */
-    private function processValue($value, $rootLevel = 0, $level = 0)
+    private function processValue($value, int $rootLevel = 0, int $level = 0)
     {
         if ($value instanceof ServiceClosureArgument) {
             $value->setValues($this->processValue($value->getValues(), 1, 1));

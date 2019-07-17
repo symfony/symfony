@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class DaoAuthenticationProviderTest extends TestCase
 {
@@ -73,7 +74,7 @@ class DaoAuthenticationProviderTest extends TestCase
                      ->method('loadUserByUsername')
         ;
 
-        $user = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock();
+        $user = new TestUser();
         $token = $this->getSupportedToken();
         $token->expects($this->once())
               ->method('getUser')
@@ -83,14 +84,14 @@ class DaoAuthenticationProviderTest extends TestCase
         $provider = new DaoAuthenticationProvider($userProvider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface')->getMock(), 'key', $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Encoder\\EncoderFactoryInterface')->getMock());
         $reflection = new \ReflectionMethod($provider, 'retrieveUser');
         $reflection->setAccessible(true);
-        $result = $reflection->invoke($provider, null, $token);
+        $result = $reflection->invoke($provider, 'someUser', $token);
 
         $this->assertSame($user, $result);
     }
 
     public function testRetrieveUser()
     {
-        $user = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock();
+        $user = new TestUser();
 
         $userProvider = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface')->getMock();
         $userProvider->expects($this->once())
@@ -127,11 +128,7 @@ class DaoAuthenticationProviderTest extends TestCase
             ->willReturn('')
         ;
 
-        $method->invoke(
-            $provider,
-            $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(),
-            $token
-        );
+        $method->invoke($provider, new TestUser(), $token);
     }
 
     public function testCheckAuthenticationWhenCredentialsAre0()
@@ -154,11 +151,7 @@ class DaoAuthenticationProviderTest extends TestCase
             ->willReturn('0')
         ;
 
-        $method->invoke(
-            $provider,
-            $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(),
-            $token
-        );
+        $method->invoke($provider, new TestUser(), $token);
     }
 
     /**
@@ -182,7 +175,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(), $token);
+        $method->invoke($provider, new TestUser(), $token);
     }
 
     /**
@@ -256,7 +249,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(), $token);
+        $method->invoke($provider, new TestUser(), $token);
     }
 
     protected function getSupportedToken()
@@ -297,5 +290,32 @@ class DaoAuthenticationProviderTest extends TestCase
         ;
 
         return new DaoAuthenticationProvider($userProvider, $userChecker, 'key', $encoderFactory);
+    }
+}
+
+class TestUser implements UserInterface
+{
+    public function getRoles()
+    {
+        return [];
+    }
+
+    public function getPassword()
+    {
+        return 'secret';
+    }
+
+    public function getSalt()
+    {
+        return null;
+    }
+
+    public function getUsername()
+    {
+        return 'jane_doe';
+    }
+
+    public function eraseCredentials()
+    {
     }
 }

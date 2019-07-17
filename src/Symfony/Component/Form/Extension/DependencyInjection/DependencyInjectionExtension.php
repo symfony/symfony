@@ -58,17 +58,12 @@ class DependencyInjectionExtension implements FormExtensionInterface
             foreach ($this->typeExtensionServices[$name] as $serviceId => $extension) {
                 $extensions[] = $extension;
 
-                if (method_exists($extension, 'getExtendedTypes')) {
-                    $extendedTypes = [];
-
-                    foreach ($extension::getExtendedTypes() as $extendedType) {
-                        $extendedTypes[] = $extendedType;
-                    }
-                } else {
-                    $extendedTypes = [$extension->getExtendedType()];
+                $extendedTypes = [];
+                foreach ($extension::getExtendedTypes() as $extendedType) {
+                    $extendedTypes[] = $extendedType;
                 }
 
-                // validate the result of getExtendedTypes()/getExtendedType() to ensure it is consistent with the service definition
+                // validate the result of getExtendedTypes() to ensure it is consistent with the service definition
                 if (!\in_array($name, $extendedTypes, true)) {
                     throw new InvalidArgumentException(sprintf('The extended type specified for the service "%s" does not match the actual extended type. Expected "%s", given "%s".', $serviceId, $name, implode(', ', $extendedTypes)));
                 }

@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -25,20 +24,8 @@ class ExpressionValidator extends ConstraintValidator
 {
     private $expressionLanguage;
 
-    public function __construct(/*ExpressionLanguage */$expressionLanguage = null)
+    public function __construct(ExpressionLanguage $expressionLanguage = null)
     {
-        if (\func_num_args() > 1) {
-            @trigger_error(sprintf('The "%s" instance should be passed as "%s" first argument instead of second argument since 4.4.', ExpressionLanguage::class, __METHOD__), E_USER_DEPRECATED);
-
-            $expressionLanguage = func_get_arg(1);
-
-            if (null !== $expressionLanguage && !$expressionLanguage instanceof ExpressionLanguage) {
-                throw new \TypeError(sprintf('Argument 2 passed to %s() must be an instance of %s or null, %s given. Since 4.4, passing it as the second argument is deprecated and will trigger a deprecation. Pass it as the first argument instead.', __METHOD__, ExpressionLanguage::class, \is_object($expressionLanguage) ? \get_class($expressionLanguage) : \gettype($expressionLanguage)));
-            }
-        } elseif (null !== $expressionLanguage && !$expressionLanguage instanceof ExpressionLanguage) {
-            @trigger_error(sprintf('The "%s" first argument must be an instance of "%s" or null since 4.4. "%s" given', __METHOD__, ExpressionLanguage::class, \is_object($expressionLanguage) ? \get_class($expressionLanguage) : \gettype($expressionLanguage)), E_USER_DEPRECATED);
-        }
-
         $this->expressionLanguage = $expressionLanguage;
     }
 
@@ -66,9 +53,6 @@ class ExpressionValidator extends ConstraintValidator
     private function getExpressionLanguage()
     {
         if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
-                throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
-            }
             $this->expressionLanguage = new ExpressionLanguage();
         }
 

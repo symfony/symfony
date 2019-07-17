@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
-use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -53,12 +52,6 @@ class CachePoolClearerPassTest extends TestCase
         $container->setAlias('clearer_alias', 'clearer');
 
         $pass = new RemoveUnusedDefinitionsPass();
-        foreach ($container->getCompiler()->getPassConfig()->getRemovingPasses() as $removingPass) {
-            if ($removingPass instanceof RepeatedPass) {
-                $pass->setRepeatedPass(new RepeatedPass([$pass]));
-                break;
-            }
-        }
         foreach ([new CachePoolPass(), $pass, new CachePoolClearerPass()] as $pass) {
             $pass->process($container);
         }

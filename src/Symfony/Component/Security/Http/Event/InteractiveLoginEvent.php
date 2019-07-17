@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

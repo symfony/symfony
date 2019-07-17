@@ -21,23 +21,20 @@ use Symfony\Component\Process\Process;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.2
+ * @final
  */
 class ProcessHelper extends Helper
 {
     /**
      * Runs an external process.
      *
-     * @param OutputInterface $output    An OutputInterface instance
-     * @param array|Process   $cmd       An instance of Process or an array of the command and arguments
-     * @param string|null     $error     An error message that must be displayed if something went wrong
-     * @param callable|null   $callback  A PHP callback to run whenever there is some
-     *                                   output available on STDOUT or STDERR
-     * @param int             $verbosity The threshold for verbosity
+     * @param array|Process $cmd      An instance of Process or an array of the command and arguments
+     * @param callable|null $callback A PHP callback to run whenever there is some
+     *                                output available on STDOUT or STDERR
      *
      * @return Process The process that ran
      */
-    public function run(OutputInterface $output, $cmd, $error = null, callable $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
+    public function run(OutputInterface $output, $cmd, string $error = null, callable $callback = null, int $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): Process
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -50,8 +47,7 @@ class ProcessHelper extends Helper
         }
 
         if (!\is_array($cmd)) {
-            @trigger_error(sprintf('Passing a command as a string to "%s()" is deprecated since Symfony 4.2, pass it the command as an array of arguments instead.', __METHOD__), E_USER_DEPRECATED);
-            $cmd = [method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline($cmd) : new Process($cmd)];
+            throw new \TypeError(sprintf('The "command" argument of "%s()" must be an array or a "%s" instance, "%s" given.', __METHOD__, Process::class, \is_object($cmd) ? \get_class($cmd) : \gettype($cmd)));
         }
 
         if (\is_string($cmd[0] ?? null)) {
@@ -92,11 +88,9 @@ class ProcessHelper extends Helper
      * This is identical to run() except that an exception is thrown if the process
      * exits with a non-zero exit code.
      *
-     * @param OutputInterface $output   An OutputInterface instance
-     * @param string|Process  $cmd      An instance of Process or a command to run
-     * @param string|null     $error    An error message that must be displayed if something went wrong
-     * @param callable|null   $callback A PHP callback to run whenever there is some
-     *                                  output available on STDOUT or STDERR
+     * @param string|Process $cmd      An instance of Process or a command to run
+     * @param callable|null  $callback A PHP callback to run whenever there is some
+     *                                 output available on STDOUT or STDERR
      *
      * @return Process The process that ran
      *
@@ -104,7 +98,7 @@ class ProcessHelper extends Helper
      *
      * @see run()
      */
-    public function mustRun(OutputInterface $output, $cmd, $error = null, callable $callback = null)
+    public function mustRun(OutputInterface $output, $cmd, string $error = null, callable $callback = null): Process
     {
         $process = $this->run($output, $cmd, $error, $callback);
 
@@ -117,14 +111,8 @@ class ProcessHelper extends Helper
 
     /**
      * Wraps a Process callback to add debugging output.
-     *
-     * @param OutputInterface $output   An OutputInterface interface
-     * @param Process         $process  The Process
-     * @param callable|null   $callback A PHP callable
-     *
-     * @return callable
      */
-    public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null)
+    public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null): callable
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -149,7 +137,7 @@ class ProcessHelper extends Helper
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'process';
     }

@@ -16,11 +16,11 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.9",
         "symfony/event-dispatcher-contracts": "^1.1",
-        "symfony/http-foundation": "^3.4|^4.0|^5.0",
-        "symfony/http-kernel": "^4.3",
-        "symfony/property-access": "^3.4|^4.0|^5.0",
+        "symfony/http-foundation": "^4.4|^5.0",
+        "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/property-access": "^4.4|^5.0",
         "symfony/service-contracts": "^1.1"
     },
     "replace": {
@@ -31,17 +31,14 @@
     },
     "require-dev": {
         "psr/container": "^1.0",
-        "symfony/finder": "^3.4|^4.0|^5.0",
+        "symfony/finder": "^4.4|^5.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-icu": "~1.0",
-        "symfony/routing": "^3.4|^4.0|^5.0",
-        "symfony/validator": "^3.4|^4.0|^5.0",
-        "symfony/expression-language": "^3.4|^4.0|^5.0",
-        "symfony/ldap": "^3.4|^4.0|^5.0",
+        "symfony/routing": "^4.4|^5.0",
+        "symfony/validator": "^4.4|^5.0",
+        "symfony/expression-language": "^4.4|^5.0",
+        "symfony/ldap": "^4.4|^5.0",
         "psr/log": "~1.0"
-    },
-    "conflict": {
-        "symfony/event-dispatcher": ">=5"
     },
     "suggest": {
         "psr/container-implementation": "To instantiate the Security class",
@@ -63,7 +60,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.4-dev"
+            "dev-master": "5.0-dev"
         }
     }
 }

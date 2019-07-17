@@ -7,21 +7,10 @@
     <services>
         <defaults public="false" />
 
-        <service id=".legacy_controller_name_converter" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser">
-            <tag name="monolog.logger" channel="request" />
-            <argument type="service" id="kernel" />
-            <argument>false</argument>
-        </service>
-
-        <service id="controller_name_converter" alias=".legacy_controller_name_converter">
-            <deprecated>The "%alias_id%" service is deprecated since Symfony 4.3.</deprecated>
-        </service>
-
         <service id="controller_resolver" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver">
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="service_container" />
             <argument type="service" id="logger" on-invalid="ignore" />
-            <argument type="service" id=".legacy_controller_name_converter" />
         </service>
 
         <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" />
@@ -74,15 +63,6 @@
 
         <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener">
             <tag name="kernel.event_subscriber" />
-        </service>
-
-        <service id=".legacy_resolve_controller_name_subscriber" class="Symfony\Bundle\FrameworkBundle\EventListener\ResolveControllerNameSubscriber">
-            <argument type="service" id=".legacy_controller_name_converter" />
-            <argument>false</argument>
-            <tag name="kernel.event_subscriber" />
-        </service>
-        <service id="resolve_controller_name_subscriber" alias=".legacy_resolve_controller_name_subscriber">
-            <deprecated>The "%alias_id%" service is deprecated since Symfony 4.3.</deprecated>
         </service>
 
         <service id="disallow_search_engine_index_response_listener" class="Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener">

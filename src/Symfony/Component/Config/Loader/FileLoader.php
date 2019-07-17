@@ -38,10 +38,8 @@ abstract class FileLoader extends Loader
 
     /**
      * Sets the current directory.
-     *
-     * @param string $dir
      */
-    public function setCurrentDir($dir)
+    public function setCurrentDir(string $dir)
     {
         $this->currentDir = $dir;
     }
@@ -70,7 +68,7 @@ abstract class FileLoader extends Loader
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
      */
-    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
+    public function import($resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null)
     {
         if (\is_string($resource) && \strlen($resource) !== $i = strcspn($resource, '*?{[')) {
             $ret = [];
@@ -125,7 +123,7 @@ abstract class FileLoader extends Loader
         yield from $resource;
     }
 
-    private function doImport($resource, $type = null, bool $ignoreErrors = false, $sourceResource = null)
+    private function doImport($resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null)
     {
         try {
             $loader = $this->resolve($resource, $type);

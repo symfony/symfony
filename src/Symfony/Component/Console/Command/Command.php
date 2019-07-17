@@ -293,7 +293,7 @@ class Command
      *
      * @param bool $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    public function mergeApplicationDefinition($mergeArgs = true)
+    public function mergeApplicationDefinition(bool $mergeArgs = true)
     {
         if (null === $this->application || (true === $this->applicationDefinitionMerged && ($this->applicationDefinitionMergedWithArgs || !$mergeArgs))) {
             return;
@@ -360,16 +360,14 @@ class Command
     /**
      * Adds an argument.
      *
-     * @param string               $name        The argument name
-     * @param int|null             $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param string               $description A description text
-     * @param string|string[]|null $default     The default value (for InputArgument::OPTIONAL mode only)
+     * @param int|null             $mode    The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param string|string[]|null $default The default value (for InputArgument::OPTIONAL mode only)
      *
      * @throws InvalidArgumentException When argument mode is not valid
      *
      * @return $this
      */
-    public function addArgument($name, $mode = null, $description = '', $default = null)
+    public function addArgument(string $name, int $mode = null, string $description = '', $default = null)
     {
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
 
@@ -379,17 +377,15 @@ class Command
     /**
      * Adds an option.
      *
-     * @param string                        $name        The option name
-     * @param string|array|null             $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                      $mode        The option mode: One of the InputOption::VALUE_* constants
-     * @param string                        $description A description text
-     * @param string|string[]|int|bool|null $default     The default value (must be null for InputOption::VALUE_NONE)
+     * @param string|array|null             $shortcut The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param int|null                      $mode     The option mode: One of the InputOption::VALUE_* constants
+     * @param string|string[]|int|bool|null $default  The default value (must be null for InputOption::VALUE_NONE)
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      *
      * @return $this
      */
-    public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
+    public function addOption(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null)
     {
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
 
@@ -404,13 +400,11 @@ class Command
      *
      *     $command->setName('foo:bar');
      *
-     * @param string $name The command name
-     *
      * @return $this
      *
      * @throws InvalidArgumentException When the name is invalid
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->validateName($name);
 
@@ -427,11 +421,9 @@ class Command
      *
      * PHP 5.5+ or the proctitle PECL library is required
      *
-     * @param string $title The process title
-     *
      * @return $this
      */
-    public function setProcessTitle($title)
+    public function setProcessTitle(string $title)
     {
         $this->processTitle = $title;
 
@@ -453,9 +445,9 @@ class Command
      *
      * @return Command The current instance
      */
-    public function setHidden($hidden)
+    public function setHidden(bool $hidden)
     {
-        $this->hidden = (bool) $hidden;
+        $this->hidden = $hidden;
 
         return $this;
     }
@@ -471,11 +463,9 @@ class Command
     /**
      * Sets the description for the command.
      *
-     * @param string $description The description for the command
-     *
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
 
@@ -495,11 +485,9 @@ class Command
     /**
      * Sets the help for the command.
      *
-     * @param string $help The help for the command
-     *
      * @return $this
      */
-    public function setHelp($help)
+    public function setHelp(string $help)
     {
         $this->help = $help;
 
@@ -548,12 +536,8 @@ class Command
      *
      * @throws InvalidArgumentException When an alias is invalid
      */
-    public function setAliases($aliases)
+    public function setAliases(iterable $aliases)
     {
-        if (!\is_array($aliases) && !$aliases instanceof \Traversable) {
-            throw new InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
-        }
-
         foreach ($aliases as $alias) {
             $this->validateName($alias);
         }
@@ -580,7 +564,7 @@ class Command
      *
      * @return string The synopsis
      */
-    public function getSynopsis($short = false)
+    public function getSynopsis(bool $short = false)
     {
         $key = $short ? 'short' : 'long';
 
@@ -592,13 +576,11 @@ class Command
     }
 
     /**
-     * Add a command usage example.
-     *
-     * @param string $usage The usage, it'll be prefixed with the command name
+     * Add a command usage example, it'll be prefixed with the command name.
      *
      * @return $this
      */
-    public function addUsage($usage)
+    public function addUsage(string $usage)
     {
         if (0 !== strpos($usage, $this->name)) {
             $usage = sprintf('%s %s', $this->name, $usage);
@@ -622,14 +604,12 @@ class Command
     /**
      * Gets a helper instance by name.
      *
-     * @param string $name The helper name
-     *
      * @return mixed The helper value
      *
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined
      */
-    public function getHelper($name)
+    public function getHelper(string $name)
     {
         if (null === $this->helperSet) {
             throw new LogicException(sprintf('Cannot retrieve helper "%s" because there is no HelperSet defined. Did you forget to add your command to the application or to set the application on the command using the setApplication() method? You can also set the HelperSet directly using the setHelperSet() method.', $name));

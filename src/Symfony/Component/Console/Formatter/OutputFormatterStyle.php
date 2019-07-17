@@ -79,7 +79,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * {@inheritdoc}
      */
-    public function setForeground($color = null)
+    public function setForeground(string $color = null)
     {
         if (null === $color) {
             $this->foreground = null;
@@ -97,7 +97,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * {@inheritdoc}
      */
-    public function setBackground($color = null)
+    public function setBackground(string $color = null)
     {
         if (null === $color) {
             $this->background = null;
@@ -120,7 +120,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * {@inheritdoc}
      */
-    public function setOption($option)
+    public function setOption(string $option)
     {
         if (!isset(static::$availableOptions[$option])) {
             throw new InvalidArgumentException(sprintf('Invalid option specified: "%s". Expected one of (%s)', $option, implode(', ', array_keys(static::$availableOptions))));
@@ -134,7 +134,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * {@inheritdoc}
      */
-    public function unsetOption($option)
+    public function unsetOption(string $option)
     {
         if (!isset(static::$availableOptions[$option])) {
             throw new InvalidArgumentException(sprintf('Invalid option specified: "%s". Expected one of (%s)', $option, implode(', ', array_keys(static::$availableOptions))));
@@ -161,7 +161,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * {@inheritdoc}
      */
-    public function apply($text)
+    public function apply(string $text)
     {
         $setCodes = [];
         $unsetCodes = [];

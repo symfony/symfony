@@ -456,20 +456,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(400, $file);
     }
 
-    public function testChmodWithWrongModLeavesPreviousPermissionsUntouched()
-    {
-        $this->markAsSkippedIfChmodIsMissing();
-
-        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'file';
-        touch($dir);
-
-        $permissions = fileperms($dir);
-
-        $this->filesystem->chmod($dir, 'Wrongmode');
-
-        $this->assertSame($permissions, fileperms($dir));
-    }
-
     public function testChmodRecursive()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -1400,15 +1386,6 @@ class FilesystemTest extends FilesystemTestCase
         ];
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::isAbsolutePath()" with a null in the $file argument is deprecated since Symfony 4.4.
-     */
-    public function testIsAbsolutePathWithNull()
-    {
-        $this->assertFalse($this->filesystem->isAbsolutePath(null));
-    }
-
     public function testTempnam()
     {
         $dirname = $this->workspace;
@@ -1532,20 +1509,6 @@ class FilesystemTest extends FilesystemTestCase
         }
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::dumpFile()" with an array in the $content argument is deprecated since Symfony 4.3.
-     */
-    public function testDumpFileWithArray()
-    {
-        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
-
-        $this->filesystem->dumpFile($filename, ['bar']);
-
-        $this->assertFileExists($filename);
-        $this->assertStringEqualsFile($filename, 'bar');
-    }
-
     public function testDumpFileWithResource()
     {
         $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
@@ -1607,33 +1570,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->dumpFile($filename, 'foo');
 
         $this->filesystem->appendToFile($filename, 'bar');
-
-        $this->assertFileExists($filename);
-        $this->assertStringEqualsFile($filename, 'foobar');
-
-        // skip mode check on Windows
-        if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $this->assertFilePermissions(664, $filename);
-            umask($oldMask);
-        }
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::appendToFile()" with an array in the $content argument is deprecated since Symfony 4.3.
-     */
-    public function testAppendToFileWithArray()
-    {
-        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'bar.txt';
-
-        // skip mode check on Windows
-        if ('\\' !== \DIRECTORY_SEPARATOR) {
-            $oldMask = umask(0002);
-        }
-
-        $this->filesystem->dumpFile($filename, 'foo');
-
-        $this->filesystem->appendToFile($filename, ['bar']);
 
         $this->assertFileExists($filename);
         $this->assertStringEqualsFile($filename, 'foobar');

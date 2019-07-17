@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * throw an exception when creating a `Serializer` with normalizers which neither implement `NormalizerInterface` nor `DenormalizerInterface`
+ * throw an exception when creating a `Serializer` with encoders which neither implement `EncoderInterface` nor `DecoderInterface`
+ * changed the default value of the `CsvEncoder` "as_collection" option to `true`
+ * removed `AbstractNormalizer::$circularReferenceLimit`, `AbstractNormalizer::$circularReferenceHandler`,
+   `AbstractNormalizer::$callbacks`, `AbstractNormalizer::$ignoredAttributes`,
+   `AbstractNormalizer::$camelizedAttributes`, `AbstractNormalizer::setCircularReferenceLimit()`,
+   `AbstractNormalizer::setCircularReferenceHandler()`, `AbstractNormalizer::setCallbacks()` and
+   `AbstractNormalizer::setIgnoredAttributes()`, use the default context instead.
+ * removed `AbstractObjectNormalizer::$maxDepthHandler` and `AbstractObjectNormalizer::setMaxDepthHandler()`, 
+   use the default context instead.
+ * removed `XmlEncoder::setRootNodeName()` & `XmlEncoder::getRootNodeName()`, use the default context instead.
+ * removed individual encoders/normalizers options as constructor arguments.
+ * removed support for instantiating a `DataUriNormalizer` with a default MIME type guesser when the `symfony/mime` component isn't installed.
+
 4.3.0
 -----
 

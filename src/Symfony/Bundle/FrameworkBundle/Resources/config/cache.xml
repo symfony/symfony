@@ -11,11 +11,6 @@
             <tag name="cache.pool" clearer="cache.app_clearer" />
         </service>
 
-        <service id="cache.app.simple" class="Symfony\Component\Cache\Psr16Cache">
-            <deprecated>The "Psr\SimpleCache\CacheInterface" / "%service_id%" service is deprecated since Symfony 4.3. Use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.</deprecated>
-            <argument type="service" id="cache.app" />
-        </service>
-
         <service id="cache.app.taggable" class="Symfony\Component\Cache\Adapter\TagAwareAdapter">
             <argument type="service" id="cache.app" />
         </service>
@@ -155,7 +150,6 @@
         <service id="cache.global_clearer" parent="cache.default_clearer" public="true" />
         <service id="cache.app_clearer" alias="cache.default_clearer" public="true" />
         <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" />
-        <service id="Psr\SimpleCache\CacheInterface" alias="cache.app.simple" />
         <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="cache.app" />
         <service id="Symfony\Contracts\Cache\CacheInterface" alias="cache.app" />
         <service id="Symfony\Contracts\Cache\TagAwareCacheInterface" alias="cache.app.taggable" />

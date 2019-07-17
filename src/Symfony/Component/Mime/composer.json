@@ -16,13 +16,13 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.9",
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-mbstring": "^1.0"
     },
     "require-dev": {
         "egulias/email-validator": "^2.0",
-        "symfony/dependency-injection": "^3.4|^4.1|^5.0"
+        "symfony/dependency-injection": "^4.4|^5.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mime\\": "" },
@@ -33,7 +33,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.4-dev"
+            "dev-master": "5.0-dev"
         }
     }
 }

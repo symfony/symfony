@@ -22,22 +22,18 @@ interface CommandLoaderInterface
     /**
      * Loads a command.
      *
-     * @param string $name
-     *
      * @return Command
      *
      * @throws CommandNotFoundException
      */
-    public function get($name);
+    public function get(string $name);
 
     /**
      * Checks if a command exists.
      *
-     * @param string $name
-     *
      * @return bool
      */
-    public function has($name);
+    public function has(string $name);
 
     /**
      * @return string[] All registered command names

@@ -1,7 +1,0 @@
-imports:
-    - { resource: config.yml }
-
-security:
-    encoders:
-        Custom\Class\Argon2i\User:
-            algorithm: argon2i

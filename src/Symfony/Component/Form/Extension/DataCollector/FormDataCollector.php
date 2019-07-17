@@ -28,7 +28,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class FormDataCollector extends DataCollector implements FormDataCollectorInterface
 {
@@ -218,7 +218,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'form';
     }
@@ -226,7 +226,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
@@ -250,7 +250,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    protected function getCasters()
+    protected function getCasters(): array
     {
         return parent::getCasters() + [
             \Exception::class => function (\Exception $e, array $a, Stub $s) {

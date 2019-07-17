@@ -14,14 +14,12 @@ namespace Symfony\Component\EventDispatcher\Debug;
 use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\BrowserKit\Request;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
-use Symfony\Component\EventDispatcher\LegacyEventProxy;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Collects some data about event listeners.
@@ -30,7 +28,7 @@ use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TraceableEventDispatcher implements TraceableEventDispatcherInterface
+class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterface
 {
     protected $logger;
     protected $stopwatch;
@@ -44,7 +42,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     public function __construct(EventDispatcherInterface $dispatcher, Stopwatch $stopwatch, LoggerInterface $logger = null, RequestStack $requestStack = null)
     {
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = $dispatcher;
         $this->stopwatch = $stopwatch;
         $this->logger = $logger;
         $this->wrappedListeners = [];
@@ -55,7 +53,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function addListener($eventName, $listener, $priority = 0)
+    public function addListener(string $eventName, $listener, int $priority = 0)
     {
         $this->dispatcher->addListener($eventName, $listener, $priority);
     }
@@ -71,7 +69,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function removeListener($eventName, $listener)
+    public function removeListener(string $eventName, $listener)
     {
         if (isset($this->wrappedListeners[$eventName])) {
             foreach ($this->wrappedListeners[$eventName] as $index => $wrappedListener) {
@@ -97,7 +95,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListeners($eventName = null)
+    public function getListeners(string $eventName = null)
     {
         return $this->dispatcher->getListeners($eventName);
     }
@@ -105,7 +103,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListenerPriority($eventName, $listener)
+    public function getListenerPriority(string $eventName, $listener)
     {
         // we might have wrapped listeners for the event (if called while dispatching)
         // in that case get the priority by wrapper
@@ -123,39 +121,29 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function hasListeners($eventName = null)
+    public function hasListeners(string $eventName = null)
     {
         return $this->dispatcher->hasListeners($eventName);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param string|null $eventName
      */
-    public function dispatch($event/*, string $eventName = null*/)
+    public function dispatch($event, string $eventName = null): object
     {
+        if (!\is_object($event)) {
+            throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an object, %s given.', EventDispatcherInterface::class, \gettype($event)));
+        }
+
+        $eventName = $eventName ?? \get_class($event);
+
         if (null === $this->callStack) {
             $this->callStack = new \SplObjectStorage();
         }
 
         $currentRequestHash = $this->currentRequestHash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
-        $eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
 
-        if (\is_object($event)) {
-            $eventName = $eventName ?? \get_class($event);
-        } else {
-            @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as first argument is deprecated since Symfony 4.3, pass it second and provide the event object first instead.', EventDispatcherInterface::class), E_USER_DEPRECATED);
-            $swap = $event;
-            $event = $eventName ?? new Event();
-            $eventName = $swap;
-
-            if (!$event instanceof Event) {
-                throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an instance of %s, %s given.', EventDispatcherInterface::class, Event::class, \is_object($event) ? \get_class($event) : \gettype($event)));
-            }
-        }
-
-        if (null !== $this->logger && ($event instanceof Event || $event instanceof ContractsEvent || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
+        if (null !== $this->logger && ($event instanceof Event || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
             $this->logger->debug(sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
         }
 
@@ -187,7 +175,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      *
      * @param Request|null $request The request to get listeners for
      */
-    public function getCalledListeners(/* Request $request = null */)
+    public function getCalledListeners(Request $request = null)
     {
         if (null === $this->callStack) {
             return [];
@@ -210,7 +198,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      *
      * @param Request|null $request The request to get listeners for
      */
-    public function getNotCalledListeners(/* Request $request = null */)
+    public function getNotCalledListeners(Request $request = null)
     {
         try {
             $allListeners = $this->getListeners();
@@ -256,7 +244,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * @param Request|null $request The request to get orphaned events for
      */
-    public function getOrphanedEvents(/* Request $request = null */): array
+    public function getOrphanedEvents(Request $request = null): array
     {
         if (1 <= \func_num_args() && null !== $request = func_get_arg(0)) {
             return $this->orphanedEvents[spl_object_hash($request)] ?? [];
@@ -284,46 +272,26 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      *
      * @return mixed
      */
-    public function __call($method, $arguments)
+    public function __call(string $method, array $arguments)
     {
         return $this->dispatcher->{$method}(...$arguments);
     }
 
     /**
      * Called before dispatching the event.
-     *
-     * @param object $event
      */
-    protected function beforeDispatch(string $eventName, $event)
+    protected function beforeDispatch(string $eventName, object $event)
     {
-        $this->preDispatch($eventName, $event instanceof Event ? $event : new LegacyEventProxy($event));
     }
 
     /**
      * Called after dispatching the event.
-     *
-     * @param object $event
      */
-    protected function afterDispatch(string $eventName, $event)
-    {
-        $this->postDispatch($eventName, $event instanceof Event ? $event : new LegacyEventProxy($event));
-    }
-
-    /**
-     * @deprecated since Symfony 4.3, will be removed in 5.0, use beforeDispatch instead
-     */
-    protected function preDispatch($eventName, Event $event)
+    protected function afterDispatch(string $eventName, object $event)
     {
     }
 
-    /**
-     * @deprecated since Symfony 4.3, will be removed in 5.0, use afterDispatch instead
-     */
-    protected function postDispatch($eventName, Event $event)
-    {
-    }
-
-    private function preProcess($eventName)
+    private function preProcess(string $eventName): void
     {
         if (!$this->dispatcher->hasListeners($eventName)) {
             $this->orphanedEvents[$this->currentRequestHash][] = $eventName;
@@ -341,7 +309,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         }
     }
 
-    private function postProcess($eventName)
+    private function postProcess(string $eventName): void
     {
         unset($this->wrappedListeners[$eventName]);
         $skipped = false;

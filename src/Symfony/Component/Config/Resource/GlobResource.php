@@ -21,7 +21,7 @@ use Symfony\Component\Finder\Glob;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 {
@@ -52,7 +52,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         }
     }
 
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return $this->prefix;
     }
@@ -60,7 +60,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'glob.'.$this->prefix.$this->pattern.(int) $this->recursive;
     }
@@ -68,7 +68,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp): bool
     {
         $hash = $this->computeHash();
 
@@ -91,7 +91,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         return ['prefix', 'pattern', 'recursive', 'hash', 'forExclusion', 'excludedPrefixes'];
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         if (!file_exists($this->prefix) || (!$this->recursive && '' === $this->pattern)) {
             return;
@@ -171,7 +171,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         }
     }
 
-    private function computeHash()
+    private function computeHash(): string
     {
         $hash = hash_init('md5');
 

@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -27,21 +26,6 @@ class RegistryTest extends TestCase
     protected function tearDown()
     {
         $this->registry = null;
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\Workflow\Registry::add()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.
-     */
-    public function testAddIsDeprecated()
-    {
-        $registry = new Registry();
-
-        $registry->add($w = new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createSupportStrategy(Subject1::class));
-
-        $workflow = $registry->get(new Subject1());
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow1', $workflow->getName());
     }
 
     public function testGetWithSuccess()
@@ -108,23 +92,6 @@ class RegistryTest extends TestCase
         $this->assertCount(0, $workflows);
     }
 
-    /**
-     * @group legacy
-     */
-    private function createSupportStrategy($supportedClassName)
-    {
-        $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();
-        $strategy->expects($this->any())->method('supports')
-            ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
-                return $subject instanceof $supportedClassName;
-            });
-
-        return $strategy;
-    }
-
-    /**
-     * @group legacy
-     */
     private function createWorkflowSupportStrategy($supportedClassName)
     {
         $strategy = $this->getMockBuilder(WorkflowSupportStrategyInterface::class)->getMock();

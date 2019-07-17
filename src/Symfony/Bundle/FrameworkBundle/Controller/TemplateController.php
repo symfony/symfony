@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Templating\EngineInterface;
 use Twig\Environment;
 
 /**
@@ -25,16 +24,10 @@ use Twig\Environment;
 class TemplateController
 {
     private $twig;
-    private $templating;
 
-    public function __construct(Environment $twig = null, EngineInterface $templating = null)
+    public function __construct(Environment $twig = null)
     {
-        if (null !== $templating) {
-            @trigger_error(sprintf('Using a "%s" instance for "%s" is deprecated since version 4.4; use a \Twig\Environment instance instead.', EngineInterface::class, __CLASS__), E_USER_DEPRECATED);
-        }
-
         $this->twig = $twig;
-        $this->templating = $templating;
     }
 
     /**
@@ -47,13 +40,11 @@ class TemplateController
      */
     public function templateAction(string $template, int $maxAge = null, int $sharedAge = null, bool $private = null): Response
     {
-        if ($this->templating) {
-            $response = new Response($this->templating->render($template));
-        } elseif ($this->twig) {
-            $response = new Response($this->twig->render($template));
-        } else {
-            throw new \LogicException('You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.');
+        if (null === $this->twig) {
+            throw new \LogicException('You can not use the TemplateController if the Twig Bundle is not available.');
         }
+
+        $response = new Response($this->twig->render($template));
 
         if ($maxAge) {
             $response->setMaxAge($maxAge);

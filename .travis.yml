@@ -17,14 +17,14 @@ addons:
 
 env:
     global:
-        - MIN_PHP=7.1.3
+        - MIN_PHP=7.2.9
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
         - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
         - MESSENGER_REDIS_DSN=redis://127.0.0.1:7001/messages
 
 matrix:
     include:
-        - php: 7.1
+        - php: 7.2
         - php: 7.2
           env: deps=high
         - php: 7.3
@@ -215,7 +215,7 @@ install:
     - |
       # Install symfony/flex
       if [[ $deps = low ]]; then
-          export SYMFONY_REQUIRE='>=2.3'
+          export SYMFONY_REQUIRE='>=3.4'
       else
           export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
       fi

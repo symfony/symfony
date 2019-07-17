@@ -39,15 +39,10 @@ final class Dotenv
 
     /**
      * @var bool If `putenv()` should be used to define environment variables or not.
-     *           Beware that `putenv()` is not thread safe and this setting will default
-     *           to `false` in Symfony 5.0.
+     *           Beware that `putenv()` is not thread safe, that's why this setting defaults to false
      */
-    public function __construct(bool $usePutenv = true)
+    public function __construct(bool $usePutenv = false)
     {
-        if (!\func_num_args()) {
-            @trigger_error(sprintf('The default value of "$usePutenv" argument of "%s" will be changed from "true" to "false" in Symfony 5.0. You should define its value explicitly.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->usePutenv = $usePutenv;
     }
 
@@ -216,7 +211,7 @@ final class Dotenv
         }
     }
 
-    private function lexVarname()
+    private function lexVarname(): string
     {
         // var name + optional export
         if (!preg_match('/(export[ \t]++)?('.self::VARNAME_REGEX.')/A', $this->data, $matches, 0, $this->cursor)) {
@@ -244,7 +239,7 @@ final class Dotenv
         return $matches[2];
     }
 
-    private function lexValue()
+    private function lexValue(): string
     {
         if (preg_match('/[ \t]*+(?:#.*)?$/Am', $this->data, $matches, 0, $this->cursor)) {
             $this->moveCursor($matches[0]);
@@ -339,7 +334,7 @@ final class Dotenv
         return $v;
     }
 
-    private function lexNestedExpression()
+    private function lexNestedExpression(): string
     {
         ++$this->cursor;
         $value = '';
@@ -472,7 +467,7 @@ final class Dotenv
         $this->lineno += substr_count($text, "\n");
     }
 
-    private function createFormatException($message)
+    private function createFormatException($message): FormatException
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }

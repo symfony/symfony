@@ -128,7 +128,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      *
      * @return array The identifiers that failed to be cached or a boolean stating if caching succeeded or not
      */
-    abstract protected function doSave(array $values, ?int $lifetime, array $addTagData = [], array $removeTagData = []): array;
+    abstract protected function doSave(array $values, int $lifetime, array $addTagData = [], array $removeTagData = []): array;
 
     /**
      * Removes multiple items from the pool and their corresponding tags.

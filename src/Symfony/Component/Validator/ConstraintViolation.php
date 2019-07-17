@@ -49,17 +49,8 @@ class ConstraintViolation implements ConstraintViolationInterface
      *                                         caused the violation
      * @param mixed           $cause           The cause of the violation
      */
-    public function __construct(?string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, $code = null, Constraint $constraint = null, $cause = null)
+    public function __construct(string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, string $code = null, Constraint $constraint = null, $cause = null)
     {
-        if (null === $message) {
-            @trigger_error(sprintf('Passing a null message when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);
-            $message = '';
-        }
-
-        if (null !== $code && !\is_string($code)) {
-            @trigger_error(sprintf('Not using a string as the error code in %s() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;
         $this->parameters = $parameters;
@@ -88,13 +79,12 @@ class ConstraintViolation implements ConstraintViolationInterface
         }
 
         $propertyPath = (string) $this->propertyPath;
-        $code = (string) $this->code;
 
         if ('' !== $propertyPath && '[' !== $propertyPath[0] && '' !== $class) {
             $class .= '.';
         }
 
-        if ('' !== $code) {
+        if (null !== ($code = $this->code) && '' !== $code) {
             $code = ' (code '.$code.')';
         }
 

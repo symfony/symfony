@@ -29,11 +29,9 @@ trait TesterTrait
     /**
      * Gets the display returned by the last execution of the command or application.
      *
-     * @param bool $normalize Whether to normalize end of lines to \n or not
-     *
      * @return string The display
      */
-    public function getDisplay($normalize = false)
+    public function getDisplay(bool $normalize = false)
     {
         if (null === $this->output) {
             throw new \RuntimeException('Output not initialized, did you execute the command before requesting the display?');
@@ -57,7 +55,7 @@ trait TesterTrait
      *
      * @return string
      */
-    public function getErrorOutput($normalize = false)
+    public function getErrorOutput(bool $normalize = false)
     {
         if (!$this->captureStreamsIndependently) {
             throw new \LogicException('The error output is not available when the tester is run without "capture_stderr_separately" option set.');

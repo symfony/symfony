@@ -17,7 +17,6 @@ use Symfony\Component\Security\Core\Exception\AccountExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
 class UserAuthenticationProviderTest extends TestCase
 {
@@ -180,55 +179,11 @@ class UserAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $token->expects($this->once())
-              ->method('getRoles')
-              ->willReturn([])
-        ;
-
         $authToken = $provider->authenticate($token);
 
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $authToken);
         $this->assertSame($user, $authToken->getUser());
         $this->assertEquals(['ROLE_FOO'], $authToken->getRoleNames());
-        $this->assertEquals('foo', $authToken->getCredentials());
-        $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAuthenticateWithPreservingRoleSwitchUserRole()
-    {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $user->expects($this->once())
-             ->method('getRoles')
-             ->willReturn(['ROLE_FOO'])
-        ;
-
-        $provider = $this->getProvider();
-        $provider->expects($this->once())
-                 ->method('retrieveUser')
-                 ->willReturn($user)
-        ;
-
-        $token = $this->getSupportedToken();
-        $token->expects($this->once())
-              ->method('getCredentials')
-              ->willReturn('foo')
-        ;
-
-        $switchUserRole = new SwitchUserRole('foo', $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
-        $token->expects($this->once())
-              ->method('getRoles')
-              ->willReturn([$switchUserRole])
-        ;
-
-        $authToken = $provider->authenticate($token);
-
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $authToken);
-        $this->assertSame($user, $authToken->getUser());
-        $this->assertContains('ROLE_FOO', $authToken->getRoleNames(), '', false, false);
-        $this->assertContains($switchUserRole, $authToken->getRoles(), '', false, false);
         $this->assertEquals('foo', $authToken->getCredentials());
         $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
     }

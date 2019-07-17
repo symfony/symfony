@@ -57,7 +57,7 @@ class ServiceLocator implements ServiceProviderInterface
         }
     }
 
-    public function __invoke($id)
+    public function __invoke(string $id)
     {
         return isset($this->factories[$id]) ? $this->get($id) : null;
     }
@@ -65,7 +65,7 @@ class ServiceLocator implements ServiceProviderInterface
     /**
      * @internal
      */
-    public function withContext($externalId, Container $container)
+    public function withContext(string $externalId, Container $container)
     {
         $locator = clone $this;
         $locator->externalId = $externalId;

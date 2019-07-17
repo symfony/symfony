@@ -13,9 +13,7 @@ namespace Symfony\Component\Workflow\EventListener;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
@@ -37,10 +35,6 @@ class GuardListener
 
     public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
-        if (null !== $roleHierarchy && !method_exists($roleHierarchy, 'getReachableRoleNames')) {
-            @trigger_error(sprintf('Not implementing the getReachableRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($roleHierarchy), RoleHierarchyInterface::class), E_USER_DEPRECATED);
-        }
-
         $this->configuration = $configuration;
         $this->expressionLanguage = $expressionLanguage;
         $this->tokenStorage = $tokenStorage;
@@ -50,7 +44,7 @@ class GuardListener
         $this->validator = $validator;
     }
 
-    public function onTransition(GuardEvent $event, $eventName)
+    public function onTransition(GuardEvent $event, string $eventName)
     {
         if (!isset($this->configuration[$eventName])) {
             return;
@@ -86,30 +80,11 @@ class GuardListener
             throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow %s.', $event->getWorkflowName()));
         }
 
-        if (method_exists($token, 'getRoleNames')) {
-            $roleNames = $token->getRoleNames();
-            $roles = array_map(function (string $role) { return new Role($role, false); }, $roleNames);
-        } else {
-            @trigger_error(sprintf('Not implementing the getRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($token), TokenInterface::class), E_USER_DEPRECATED);
-
-            $roles = $token->getRoles(false);
-            $roleNames = array_map(function (Role $role) { return $role->getRole(); }, $roles);
-        }
-
-        if (null !== $this->roleHierarchy && method_exists($this->roleHierarchy, 'getReachableRoleNames')) {
-            $roleNames = $this->roleHierarchy->getReachableRoleNames($roleNames);
-            $roles = array_map(function (string $role) { return new Role($role, false); }, $roleNames);
-        } elseif (null !== $this->roleHierarchy) {
-            $roles = $this->roleHierarchy->getReachableRoles($roles);
-            $roleNames = array_map(function (Role $role) { return $role->getRole(); }, $roles);
-        }
-
         $variables = [
             'token' => $token,
             'user' => $token->getUser(),
             'subject' => $event->getSubject(),
-            'roles' => $roles,
-            'role_names' => $roleNames,
+            'role_names' => $this->roleHierarchy->getReachableRoleNames($token->getRoleNames()),
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
             // needed for the is_* expression function

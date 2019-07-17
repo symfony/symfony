@@ -299,6 +299,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         if (\defined('CURLMOPT_PUSHFUNCTION')) {
             curl_multi_setopt($this->multi->handle, CURLMOPT_PUSHFUNCTION, null);
         }
+
+        while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
+
+        foreach ($this->multi->openHandles as $ch) {
+            curl_setopt($ch, CURLOPT_VERBOSE, false);
+        }
     }
 
     private static function handlePush($parent, $pushed, array $requestHeaders, CurlClientState $multi, int $maxPendingPushes, ?LoggerInterface $logger): int

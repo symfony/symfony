@@ -155,8 +155,8 @@ class DebugClassLoader
                     include $file;
 
                     return;
-                } else {
-                    include $file;
+                } elseif (false === include $file) {
+                    return;
                 }
             } else {
                 ($this->classLoader)($class);

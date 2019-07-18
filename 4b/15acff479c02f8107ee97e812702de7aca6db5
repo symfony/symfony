@@ -1,0 +1,137 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-08T18:17:24Z
+
+@phansys, please review, and maybe test?
+
+---------------------------------------------------------------------------
+
+by phansys at 2019-07-10T00:35:29Z
+
+> @phansys, please review, and maybe test?
+
+See https://travis-ci.org/symfony/symfony/jobs/556567606.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-10T06:33:37Z
+
+Thanks for this, looks like it does not work yet. I will try to make your PoC run locally and debug this :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-10T06:33:45Z
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-10T06:44:28Z
+
+Ah wait… the way to properly test this would be do add `rm -fr vendor/symfony/phpunit-bridge -fr && cp -r src/Symfony/Bridge/PhpUnit/ vendor/symfony/phpunit-bridge` somewhere in the build script
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-10T07:08:17Z
+
+I created my own PoC, but it does not work either… will have to investigate https://travis-ci.org/symfony/symfony/jobs/556660318
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-11T06:55:28Z
+
+Ok so I have fixed most occurences of the deprecation. Some remain because of
+https://github.com/symfony/symfony/blob/2e5a8c80c6b4f906eee2c451a7e432b830775a98/src/Symfony/Component/Messenger/DependencyInjection/MessengerPass.php#L219
+
+or because of the deprecation serialization system (I have to work on that one, I can probably reuse the `originatingClass()` method).
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-11T21:11:40Z
+
+>  because of the deprecation serialization system (I have to work on that one, I can probably reuse the originatingClass() method).
+
+Actually, I don't think I should attempt to fix that one: I don't have enough information to achieve it in a robust manner: `a:4:{s:11:"deprecation";s:51:"Function ReflectionType::__toString() is deprecated";s:5:"class";s:41:"Symfony\Bridge\Twig\Tests\AppVariableTest";s:6:"method";s:14:"testGetSession";s:15:"triggering_file";s:110:"/home/travis/build/greg0ire/symfony/.phpunit/phpunit-6.5/vendor/phpunit/phpunit-mock-objects/src/Generator.php";}`
+
+The interesting part here is `trigerring_file`, but detecting `vendor/phpunit` looks fragile. Should I go for it anyway? Or should I just give up in that particular case? Please advise @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-11T21:18:40Z
+
+There are also a bunch of deprecations that don't seem to go through the bridge at all in the `Debug` component, I don't think I can do much about that…
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-15T16:05:36Z
+
+Checking for `/vendor/phpunit/` (using DIRECTORY_SEPARATOR) LGTM. That's a pragmatic choice for insulated tests.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-15T21:30:25Z
+
+Done. Here is what it looks like on my PoC: https://travis-ci.org/greg0ire/symfony/jobs/559138971
+The only occurences left are
+- when the bridge is not in use
+- when Symfony (in that case Messenger) is at fault.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-15T21:30:43Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-16T21:35:34Z
+
+I met with Nicolas, and we established that I need to take care of the deprecations not going through the bridge error handler in the Debug component. We also established I need to make a separate PR to backport this to 3.4, where the code for the bridge is very different.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-16T21:35:42Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-16T21:58:00Z
+
+Ok now we're only left with the Messenger deprecation, which should probably be fixed in another PR: https://travis-ci.org/greg0ire/symfony/jobs/559682090
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-17T22:15:02Z
+
+> thanks, let's fix the Messenger deprecation in the same PR, enough bureaucracy :)
+
+Ok! Done. Here is a proof of that claim: https://travis-ci.org/greg0ire/symfony/jobs/560211283
+
+Please review again :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-18T06:40:42Z
+
+> We also established I need to make a separate PR to backport this to 3.4, where the code for the bridge is very different.
+
+Nicolas has realized that I actually don't need to do that PR since 3.4 is tested with the version 4 of the bridge, which will contain the fix.
+
+A separate PR has been done regarding the Debug deprecations: #32592
+
+As for the Messenger deprecation, the fix should stay in this PR since there is no Messenger on 3.4.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-18T10:47:56Z
+
+Can you please rebase?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-18T13:30:51Z
+
+Done

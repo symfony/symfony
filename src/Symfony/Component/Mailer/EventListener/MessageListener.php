@@ -53,7 +53,7 @@ class MessageListener implements EventSubscriberInterface
         }
 
         $headers = $message->getHeaders();
-        foreach ($this->headers->getAll() as $name => $header) {
+        foreach ($this->headers->all() as $name => $header) {
             if (!$headers->has($name)) {
                 $headers->add($header);
             } else {

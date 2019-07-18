@@ -82,7 +82,7 @@ class SendgridTransport extends AbstractApiTransport
         // these headers can't be overwritten according to Sendgrid docs
         // see https://developers.pepipost.com/migration-api/new-subpage/email-send
         $headersToBypass = ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'];
-        foreach ($email->getHeaders()->getAll() as $name => $header) {
+        foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
                 continue;
             }

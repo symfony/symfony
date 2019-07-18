@@ -46,7 +46,7 @@ class MailgunTransport extends AbstractApiTransport
     {
         $body = new FormDataPart($this->getPayload($email, $envelope));
         $headers = [];
-        foreach ($body->getPreparedHeaders()->getAll() as $header) {
+        foreach ($body->getPreparedHeaders()->all() as $header) {
             $headers[] = $header->toString();
         }
 
@@ -97,7 +97,7 @@ class MailgunTransport extends AbstractApiTransport
         }
 
         $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'];
-        foreach ($headers->getAll() as $name => $header) {
+        foreach ($headers->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
                 continue;
             }

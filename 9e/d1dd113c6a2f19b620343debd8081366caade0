@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-10T03:42:56Z
+
+The PhpUnit bridge was affected here, hence the failures in Debug & ErrorHandler. This is solved automatically after the merge.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-11T08:48:15Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-11T08:52:34Z
+
+Don'tmiss updating the root composer.json file.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-11T12:53:14Z
+
+Done!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-11T13:58:35Z
+
+> > What about failures?
+
+> https://github.com/symfony/symfony/pull/32471#issuecomment-509895249
+> The PhpUnit bridge was affected here, hence the failures in Debug & ErrorHandler. This is solved automatically after the merge.
+
+Let's see after https://github.com/symfony/symfony/pull/32471#discussion_r302528829 what happen
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-11T15:24:23Z
+
+The problem with failed tests is related to these changes, because phpunit is still installing the old version (with Debug\DebugClassLoader).
+
+But I fixed it to make it pass after the merge, when both are together, where the ErrorHandler\DebugClassLoader wins.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-11T15:25:21Z
+
+Maybe you have another solution?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-12T23:47:40Z
+
+@nicolas-grekas I fixed the failed tests, AppVeyor's failures are unrelated, I guess, and Travis's (high) is normal.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-13T01:03:22Z
+
+What's the goal of this? It's just a renaming?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-15T21:26:21Z
+
+What do we gain from this apart from the slightly better fitting name? This will affect everyone and there is no automatic update because the Debug class is part of every front controller which is part of flex. I think some more justification would be good.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-16T06:33:16Z
+
+I see two major gains:
+- the name: "Debug" is a bad name for a piece of code that should really be loaded 100% of the time. This makes it hard to discover, understand, etc. Naming things correctly is critical.
+- big cleanup possible: not yet done in this PR, but Debug has some heavy logic from pre-PHP7 era, that a new component will allow cleaning up. Doing so in a smoother way would be too hard for the resources we have I believe.

@@ -22,6 +22,7 @@ class SentMessage
     private $original;
     private $raw;
     private $envelope;
+    private $debug = '';
 
     /**
      * @internal
@@ -46,6 +47,16 @@ class SentMessage
     public function getEnvelope(): SmtpEnvelope
     {
         return $this->envelope;
+    }
+
+    public function getDebug(): string
+    {
+        return $this->debug;
+    }
+
+    public function appendDebug(string $debug): void
+    {
+        $this->debug .= $debug;
     }
 
     public function toString(): string

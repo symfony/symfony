@@ -186,6 +186,7 @@ class AutowirePass extends AbstractRecursivePass
      * @return array The autowired arguments
      *
      * @throws AutowiringFailedException
+     * @throws \ReflectionException
      */
     private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments): array
     {
@@ -202,11 +203,11 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, true);
-            if ($parameter->hasType() === true
-                && in_array($parameter->getType()->getName(), ['string']) === true
-                && $this->container->hasParameter($parameter->name) === true
+            if (true === $parameter->hasType()
+                && true === \in_array($parameter->getType()->getName(), ['string', 'int', 'array'])
+                && true === $this->container->hasParameter($parameter->name)
             ) {
-                $type = 'string';
+                $type = 'parameter';
             }
 
             if (!$type) {
@@ -287,7 +288,7 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
-     * @return TypedReference|null|Parameter A reference to the service matching the given type, if any
+     * @return TypedReference|Parameter|null A reference to the service matching the given type, if any
      */
     private function getAutowiredReference(TypedReference $reference)
     {
@@ -298,10 +299,8 @@ class AutowirePass extends AbstractRecursivePass
             return $reference;
         }
 
-        if (in_array($type, ['string', 'int', 'array'])) {
-            if ($this->container->hasParameter($reference->getName())) {
-                return new Parameter($reference->getName());
-            }
+        if ($type === 'parameter') {
+            return new Parameter($reference->getName());
         }
 
         if (null !== $name = $reference->getName()) {

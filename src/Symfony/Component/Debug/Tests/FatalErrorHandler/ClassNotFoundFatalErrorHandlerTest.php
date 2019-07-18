@@ -17,6 +17,9 @@ use Symfony\Component\Debug\DebugClassLoader;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 
+/**
+ * @group legacy
+ */
 class ClassNotFoundFatalErrorHandlerTest extends TestCase
 {
     public static function setUpBeforeClass()
@@ -71,6 +74,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
     {
         $autoloader = new ComposerClassLoader();
         $autoloader->add('Symfony\Component\Debug\Exception\\', realpath(__DIR__.'/../../Exception'));
+        $autoloader->add('Symfony_Component_Debug_Tests_Fixtures', realpath(__DIR__.'/../../Tests/Fixtures'));
 
         $debugClassLoader = new DebugClassLoader([$autoloader, 'loadClass']);
 
@@ -101,6 +105,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
                     'message' => 'Class \'UndefinedFunctionException\' not found',
                 ],
                 "Attempted to load class \"UndefinedFunctionException\" from the global namespace.\nDid you forget a \"use\" statement for \"Symfony\Component\Debug\Exception\UndefinedFunctionException\"?",
+                [$debugClassLoader, 'loadClass'],
             ],
             [
                 [
@@ -110,6 +115,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
                     'message' => 'Class \'PEARClass\' not found',
                 ],
                 "Attempted to load class \"PEARClass\" from the global namespace.\nDid you forget a \"use\" statement for \"Symfony_Component_Debug_Tests_Fixtures_PEARClass\"?",
+                [$debugClassLoader, 'loadClass'],
             ],
             [
                 [
@@ -119,6 +125,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
                     'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
                 ],
                 "Attempted to load class \"UndefinedFunctionException\" from namespace \"Foo\Bar\".\nDid you forget a \"use\" statement for \"Symfony\Component\Debug\Exception\UndefinedFunctionException\"?",
+                [$debugClassLoader, 'loadClass'],
             ],
             [
                 [

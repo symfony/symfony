@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Debug\Exception;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', UndefinedFunctionException::class, \Symfony\Component\ErrorHandler\Exception\UndefinedFunctionException::class), E_USER_DEPRECATED);
+
 /**
  * Undefined Function Exception.
  *
  * @author Konstanton Myakshin <koc-dp@yandex.ru>
+ *
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception\UndefinedFunctionException instead.
  */
 class UndefinedFunctionException extends FatalErrorException
 {

@@ -38,8 +38,7 @@
     },
     "conflict": {
         "symfony/event-dispatcher": "<4.3",
-        "symfony/http-kernel": "<4.4",
-        "symfony/debug": "<4.4"
+        "symfony/http-kernel": "<4.4"
     },
     "suggest": {
         "enqueue/messenger-adapter": "For using the php-enqueue library as a transport."

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated `FlattenException`, use the `FlattenException` of the `ErrorRenderer` component
+ * deprecated the whole component in favor of the `ErrorHandler` component
 
 4.3.0
 -----

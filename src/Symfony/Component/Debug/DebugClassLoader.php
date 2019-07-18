@@ -13,6 +13,8 @@ namespace Symfony\Component\Debug;
 
 use PHPUnit\Framework\MockObject\Matcher\StatelessInvocation;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', DebugClassLoader::class, \Symfony\Component\ErrorHandler\DebugClassLoader::class), E_USER_DEPRECATED);
+
 /**
  * Autoloader checking if the class is really defined in the file found.
  *
@@ -24,6 +26,8 @@ use PHPUnit\Framework\MockObject\Matcher\StatelessInvocation;
  * @author Christophe Coevoet <stof@notk.org>
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Guilhem Niot <guilhem.niot@gmail.com>
+ *
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\DebugClassLoader instead.
  */
 class DebugClassLoader
 {

@@ -65,14 +65,6 @@ class FlockStore implements StoreInterface, BlockingStoreInterface
         $this->lock($key, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsWaitAndSave(): bool
-    {
-        return true;
-    }
-
     private function lock(Key $key, $blocking)
     {
         // The lock is maybe already acquired.

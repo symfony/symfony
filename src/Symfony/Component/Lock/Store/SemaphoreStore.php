@@ -113,12 +113,4 @@ class SemaphoreStore implements StoreInterface, BlockingStoreInterface
     {
         return $key->hasState(__CLASS__);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsWaitAndSave(): bool
-    {
-        return true;
-    }
 }

@@ -299,7 +299,7 @@ class AutowirePass extends AbstractRecursivePass
             return $reference;
         }
 
-        if ($type === 'parameter') {
+        if ('parameter' === $type) {
             return new Parameter($reference->getName());
         }
 

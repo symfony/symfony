@@ -71,7 +71,7 @@ final class DelayedSmtpEnvelope extends SmtpEnvelope
     {
         $recipients = [];
         foreach (['to', 'cc', 'bcc'] as $name) {
-            foreach ($headers->getAll($name) as $header) {
+            foreach ($headers->all($name) as $header) {
                 foreach ($header->getAddresses() as $address) {
                     $recipients[] = new Address($address->getAddress());
                 }

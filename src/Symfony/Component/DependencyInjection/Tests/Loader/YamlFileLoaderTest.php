@@ -829,4 +829,18 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertSame('overridden', $container->get('bar')->quz);
     }
+
+    /**
+     * When creating a tagged iterator using the array syntax, all optional parameters should be properly handled.
+     */
+    public function testDefaultValueOfTagged()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('tagged_iterator_optional.yml');
+
+        $iteratorArgument = $container->getDefinition('iterator_service')->getArgument(0);
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $iteratorArgument);
+        $this->assertNull($iteratorArgument->getIndexAttribute());
+    }
 }

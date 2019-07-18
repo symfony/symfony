@@ -1180,9 +1180,13 @@ class Process implements \IteratorAggregate
      * Sets whether environment variables will be inherited or not.
      *
      * @return self The current Process instance
+     *
+     * @deprecated since Symfony 4.4, env variables are always inherited
      */
     public function inheritEnvironmentVariables(bool $inheritEnv = true)
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, env variables are always inherited.', __METHOD__), E_USER_DEPRECATED);
+
         if (!$inheritEnv) {
             throw new InvalidArgumentException('Not inheriting environment variables is not supported.');
         }

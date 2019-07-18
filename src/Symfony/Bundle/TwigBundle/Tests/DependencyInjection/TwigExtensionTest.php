@@ -250,6 +250,7 @@ class TwigExtensionTest extends TestCase
         $container->register('foo', '%foo%')->addTag('twig.runtime');
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();
 
         $loader = $container->getDefinition('twig.runtime_loader');
@@ -286,6 +287,7 @@ class TwigExtensionTest extends TestCase
     {
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();
     }
 

@@ -8,6 +8,11 @@ CHANGELOG
  * `Process` must be instantiated with a command array, use `Process::fromShellCommandline()` when the command should be parsed by the shell
  * removed `Process::setCommandLine()`
 
+4.4.0
+-----
+
+* deprecated `Process::inheritEnvironmentVariables()`: env variables are always inherited.
+
 4.2.0
 -----
 

@@ -85,6 +85,9 @@ class PassConfig
             new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()),
             new AnalyzeServiceReferencesPass(),
             new DefinitionErrorExceptionPass(),
+        ]];
+
+        $this->afterRemovingPasses = [[
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
         ]];

@@ -364,7 +364,7 @@
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-		<target>Ennek az értéknek {{ min }} és {{ max }} között kell lennie.</target>
+                <target>Ennek az értéknek {{ min }} és {{ max }} között kell lennie.</target>
             </trans-unit>
         </body>
     </file>

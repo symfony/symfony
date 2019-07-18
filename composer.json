@@ -42,7 +42,6 @@
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",
         "symfony/dependency-injection": "self.version",
-        "symfony/debug": "self.version",
         "symfony/debug-bundle": "self.version",
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",

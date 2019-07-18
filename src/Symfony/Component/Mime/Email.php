@@ -103,7 +103,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string $addresses
+     * @param Address|NamedAddress|string ...$addresses
      *
      * @return $this
      */
@@ -113,7 +113,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string $addresses
+     * @param Address|NamedAddress|string ...$addresses
      *
      * @return $this
      */
@@ -131,7 +131,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string $addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -141,7 +141,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string $addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -159,7 +159,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string $addresses
+     * @param Address|NamedAddress|string ...$addresses
      *
      * @return $this
      */
@@ -169,7 +169,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string $addresses
+     * @param Address|NamedAddress|string ...$addresses
      *
      * @return $this
      */
@@ -187,7 +187,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string $addresses
+     * @param Address|NamedAddress|string ...$addresses
      *
      * @return $this
      */
@@ -197,7 +197,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string $addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -215,7 +215,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string $addresses
+     * @param Address|NamedAddress|string ...$addresses
      *
      * @return $this
      */
@@ -225,7 +225,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|string $addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */

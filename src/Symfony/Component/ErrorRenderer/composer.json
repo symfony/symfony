@@ -20,12 +20,10 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
-        "symfony/debug": "^4.4",
         "symfony/dependency-injection": "^4.4",
         "symfony/http-kernel": "^4.4"
     },
     "conflict": {
-        "symfony/debug": "<4.4",
         "symfony/http-kernel": "<4.4"
     },
     "autoload": {

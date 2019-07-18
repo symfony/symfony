@@ -19,6 +19,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 require_once __DIR__.'/HeaderMock.php';
 
+/**
+ * @group legacy
+ */
 class ExceptionHandlerTest extends TestCase
 {
     protected function setUp()

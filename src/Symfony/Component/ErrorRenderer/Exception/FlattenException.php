@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ErrorRenderer\Exception;
 
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;

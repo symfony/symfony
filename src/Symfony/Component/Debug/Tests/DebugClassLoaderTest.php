@@ -14,6 +14,9 @@ namespace Symfony\Component\Debug\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\DebugClassLoader;
 
+/**
+ * @group legacy
+ */
 class DebugClassLoaderTest extends TestCase
 {
     /**

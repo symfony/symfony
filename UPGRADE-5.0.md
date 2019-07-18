@@ -51,6 +51,11 @@ Console
    $processHelper->run($output, Process::fromShellCommandline('ls -l'));
    ```
 
+Debug
+-----
+
+ * Removed the component
+
 DependencyInjection
 -------------------
 

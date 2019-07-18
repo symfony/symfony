@@ -35,6 +35,7 @@ array(1) {
   [0]=>
   string(37) "Error and exception handlers do match"
 }
+%A
 object(Symfony\Component\Debug\Exception\FatalErrorException)#%d (%d) {
   ["message":protected]=>
   string(179) "Error: Class Symfony\Component\Debug\Broken contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (JsonSerializable::jsonSerialize)"

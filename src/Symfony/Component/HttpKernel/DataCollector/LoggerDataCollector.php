@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\Debug\Exception\SilencedErrorContext;
+use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;

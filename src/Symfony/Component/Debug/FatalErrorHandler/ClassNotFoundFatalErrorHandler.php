@@ -17,10 +17,14 @@ use Symfony\Component\Debug\DebugClassLoader;
 use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ClassNotFoundFatalErrorHandler::class, \Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHandler::class), E_USER_DEPRECATED);
+
 /**
  * ErrorHandler for classes that do not exist.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHandler instead.
  */
 class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
 {

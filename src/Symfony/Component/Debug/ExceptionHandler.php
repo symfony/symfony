@@ -15,6 +15,8 @@ use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ExceptionHandler::class, \Symfony\Component\ErrorHandler\ExceptionHandler::class), E_USER_DEPRECATED);
+
 /**
  * ExceptionHandler converts an exception to a Response object.
  *
@@ -28,6 +30,8 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @final since Symfony 4.3
+ *
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\ExceptionHandler instead.
  */
 class ExceptionHandler
 {

@@ -49,8 +49,8 @@ final class Dsn
             throw new InvalidArgumentException(sprintf('The "%s" mailer DSN must contain a mailer name.', $dsn));
         }
 
-        $user = urldecode($parsedDsn['user'] ?? null);
-        $password = urldecode($parsedDsn['pass'] ?? null);
+        $user = isset($parsedDsn['user']) ? urldecode($parsedDsn['user']) : null;
+        $password = isset($parsedDsn['pass']) ? urldecode($parsedDsn['pass']) : null;
         $port = $parsedDsn['port'] ?? null;
         parse_str($parsedDsn['query'] ?? '', $query);
 

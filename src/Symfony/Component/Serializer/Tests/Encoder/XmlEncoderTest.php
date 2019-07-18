@@ -306,6 +306,17 @@ XML;
         $this->assertSame($expected, $data);
     }
 
+    public function testDoesNotTypeCastStringsStartingWith0()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<document a="018"></document>
+XML;
+
+        $data = $this->encoder->decode($source, 'xml');
+        $this->assertSame('018', $data['@a']);
+    }
+
     public function testEncode()
     {
         $source = $this->getXmlSource();

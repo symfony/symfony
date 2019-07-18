@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation\Loader;
 
 /**
- * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
+ * @copyright Copyright (c) 2010, Union of RAD https://github.com/UnionOfRAD/lithium
  * @copyright Copyright (c) 2012, Clemens Tolboom
  */
 class PoFileLoader extends FileLoader
@@ -20,7 +20,7 @@ class PoFileLoader extends FileLoader
     /**
      * Parses portable object (PO) format.
      *
-     * From http://www.gnu.org/software/gettext/manual/gettext.html#PO-Files
+     * From https://www.gnu.org/software/gettext/manual/gettext.html#PO-Files
      * we should be able to parse files having:
      *
      * white-space

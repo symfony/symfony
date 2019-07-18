@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-18T17:02:24Z
+
+(tests fail)
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2019-07-18T18:25:35Z
+
+@nicolas-grekas I wrote the test apparently for Symfony 4.4+, not 4.2.
+I changed the test for 4.2, so the CI is now green (or rather: test failures unrelated).
+
+Should I send a separate PR for 4.4+, where I just rename `!tagged` to `!tagged_iterator` in the test fixture?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-18T20:03:20Z
+
+Should it be merged in 4.2 or 4.3?

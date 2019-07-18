@@ -1405,7 +1405,6 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('echo hello');
         $process->setEnv(['bad%%' => '123']);
-        $process->inheritEnvironmentVariables(true);
 
         $process->run();
 
@@ -1419,7 +1418,6 @@ class ProcessTest extends TestCase
         $_ENV['existing_var'] = 'foo';
         $process = $this->getProcess('php -r "echo getenv(\'new_test_var\');"');
         $process->setEnv(['existing_var' => 'bar', 'new_test_var' => 'foo']);
-        $process->inheritEnvironmentVariables();
 
         $process->run();
 
@@ -1581,7 +1579,6 @@ EOTXT;
         } else {
             $process = new Process($commandline, $cwd, $env, $input, $timeout);
         }
-        $process->inheritEnvironmentVariables();
 
         if (self::$process) {
             self::$process->stop(0);

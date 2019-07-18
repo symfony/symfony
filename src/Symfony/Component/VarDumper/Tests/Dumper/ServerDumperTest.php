@@ -88,7 +88,6 @@ DUMP
             'COMPONENT_ROOT' => __DIR__.'/../../',
             'VAR_DUMPER_SERVER' => self::VAR_DUMPER_SERVER,
         ]);
-        $process->inheritEnvironmentVariables(true);
 
         return $process->setTimeout(9);
     }

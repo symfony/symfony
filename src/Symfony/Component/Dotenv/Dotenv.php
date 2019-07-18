@@ -402,7 +402,12 @@ final class Dotenv
             }
 
             $process = method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline('echo '.$matches[0]) : new Process('echo '.$matches[0]);
-            $process->inheritEnvironmentVariables(true);
+
+            if (!method_exists(Process::class, 'fromShellCommandline')) {
+                // Symfony 3.4 does not inherit env vars by default:
+                $process->inheritEnvironmentVariables();
+            }
+
             $process->setEnv($this->values);
             try {
                 $process->mustRun();

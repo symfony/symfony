@@ -334,6 +334,7 @@ MonologBridge
 Process
 -------
 
+ * Removed the `Process::inheritEnvironmentVariables()` method: env variables are always inherited.
  * Removed the `Process::setCommandline()` and the `PhpProcess::setPhpBinary()` methods.
  * Commands must be defined as arrays when creating a `Process` instance.
 

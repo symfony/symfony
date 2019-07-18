@@ -118,6 +118,11 @@ MonologBridge
 --------------
 
  * The `RouteProcessor` has been marked final.
+ 
+Process
+-------
+
+ * Deprecated the `Process::inheritEnvironmentVariables()` method: env variables are always inherited.
 
 PropertyAccess
 --------------

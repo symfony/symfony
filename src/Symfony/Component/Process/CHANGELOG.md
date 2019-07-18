@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+* deprecated `Process::inheritEnvironmentVariables()`: env variables are always inherited.
+
 4.2.0
 -----
 

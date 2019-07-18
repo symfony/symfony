@@ -18,7 +18,7 @@ use Symfony\Component\Lock\Exception\LockReleasingException;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-interface PersistStoreInterface
+interface PersistingStoreInterface
 {
     /**
      * Stores the resource if it's not locked by someone else.

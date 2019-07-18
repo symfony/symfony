@@ -14,7 +14,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\PersistStoreInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -24,7 +24,7 @@ trait BlockingStoreTestTrait
     /**
      * @see AbstractStoreTest::getStore()
      *
-     * @return PersistStoreInterface
+     * @return PersistingStoreInterface
      */
     abstract protected function getStore();
 

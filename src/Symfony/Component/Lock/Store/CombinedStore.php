@@ -18,7 +18,7 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\PersistStoreInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
 
@@ -32,22 +32,22 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     use LoggerAwareTrait;
     use ExpiringStoreTrait;
 
-    /** @var PersistStoreInterface[] */
+    /** @var PersistingStoreInterface[] */
     private $stores;
     /** @var StrategyInterface */
     private $strategy;
 
     /**
-     * @param PersistStoreInterface[] $stores   The list of synchronized stores
-     * @param StrategyInterface       $strategy
+     * @param PersistingStoreInterface[] $stores   The list of synchronized stores
+     * @param StrategyInterface          $strategy
      *
      * @throws InvalidArgumentException
      */
     public function __construct(array $stores, StrategyInterface $strategy)
     {
         foreach ($stores as $store) {
-            if (!$store instanceof PersistStoreInterface) {
-                throw new InvalidArgumentException(sprintf('The store must implement "%s". Got "%s".', PersistStoreInterface::class, \get_class($store)));
+            if (!$store instanceof PersistingStoreInterface) {
+                throw new InvalidArgumentException(sprintf('The store must implement "%s". Got "%s".', PersistingStoreInterface::class, \get_class($store)));
             }
         }
 
@@ -95,6 +95,8 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since Symfony 4.4.
      */
     public function waitAndSave(Key $key)
     {
@@ -184,14 +186,6 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
             }
         }
 
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsWaitAndSave(): bool
-    {
         return false;
     }
 }

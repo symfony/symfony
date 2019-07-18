@@ -84,6 +84,8 @@ class ZookeeperStore implements StoreInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since Symfony 4.4.
      */
     public function waitAndSave(Key $key)
     {

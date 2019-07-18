@@ -146,9 +146,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $lockSetData = false;
 
     /**
-     * @var string|int|null
+     * @var string
      */
-    private $name;
+    private $name = '';
 
     /**
      * @var bool Whether the form inherits its underlying data from its parent
@@ -217,7 +217,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             return $this->propertyPath;
         }
 
-        if (null === $this->name || '' === $this->name) {
+        if ('' === $this->name) {
             return null;
         }
 

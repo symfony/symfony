@@ -12,15 +12,17 @@
 namespace Symfony\Component\Mailer;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Bridge\Amazon\Factory\SesTransportFactory;
-use Symfony\Component\Mailer\Bridge\Google\Factory\GmailTransportFactory;
-use Symfony\Component\Mailer\Bridge\Mailchimp\Factory\MandrillTransportFactory;
-use Symfony\Component\Mailer\Bridge\Mailgun\Factory\MailgunTransportFactory;
-use Symfony\Component\Mailer\Bridge\Postmark\Factory\PostmarkTransportFactory;
-use Symfony\Component\Mailer\Bridge\Sendgrid\Factory\SendgridTransportFactory;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Exception\UnsupportedHostException;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
+use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
@@ -64,12 +66,12 @@ class Transport
     {
         $dsns = preg_split('/\s++\|\|\s++/', $dsn);
         if (\count($dsns) > 1) {
-            return new Transport\FailoverTransport($this->createFromDsns($dsns));
+            return new FailoverTransport($this->createFromDsns($dsns));
         }
 
         $dsns = preg_split('/\s++&&\s++/', $dsn);
         if (\count($dsns) > 1) {
-            return new Transport\RoundRobinTransport($this->createFromDsns($dsns));
+            return new RoundRobinTransport($this->createFromDsns($dsns));
         }
 
         return $this->fromDsnObject(Dsn::fromString($dsn));

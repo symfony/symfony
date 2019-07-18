@@ -128,6 +128,9 @@ class DeprecationErrorHandler
         }
 
         $deprecation = new Deprecation($msg, debug_backtrace(), $file);
+        if ($deprecation->isMuted()) {
+            return;
+        }
         $group = 'other';
 
         if ($deprecation->originatesFromAnObject()) {

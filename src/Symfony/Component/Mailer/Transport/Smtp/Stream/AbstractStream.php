@@ -28,8 +28,16 @@ abstract class AbstractStream
     protected $in;
     protected $out;
 
-    public function write(string $bytes): void
+    private $debug = '';
+
+    public function write(string $bytes, $debug = true): void
     {
+        if ($debug) {
+            foreach (explode("\n", trim($bytes)) as $line) {
+                $this->debug .= sprintf("> %s\n", $line);
+            }
+        }
+
         $bytesToWrite = \strlen($bytes);
         $totalBytesWritten = 0;
         while ($totalBytesWritten < $bytesToWrite) {
@@ -74,7 +82,17 @@ abstract class AbstractStream
             }
         }
 
+        $this->debug .= sprintf('< %s', $line);
+
         return $line;
+    }
+
+    public function getDebug(): string
+    {
+        $debug = $this->debug;
+        $this->debug = '';
+
+        return $debug;
     }
 
     public static function replace(string $from, string $to, iterable $chunks): \Generator

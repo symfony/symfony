@@ -135,7 +135,6 @@ class SmtpTransport extends AbstractTransport
      */
     public function executeCommand(string $command, array $codes): string
     {
-        $this->getLogger()->debug(sprintf('Email transport "%s" sent command "%s"', __CLASS__, trim($command)));
         $this->stream->write($command);
         $response = $this->getFullResponse();
         $this->assertResponseCode($response, $codes);
@@ -145,18 +144,22 @@ class SmtpTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
-        $envelope = $message->getEnvelope();
-        $this->doMailFromCommand($envelope->getSender()->toString());
-        foreach ($envelope->getRecipients() as $recipient) {
-            $this->doRcptToCommand($recipient->toString());
-        }
+        try {
+            $envelope = $message->getEnvelope();
+            $this->doMailFromCommand($envelope->getSender()->toString());
+            foreach ($envelope->getRecipients() as $recipient) {
+                $this->doRcptToCommand($recipient->toString());
+            }
 
-        $this->executeCommand("DATA\r\n", [354]);
-        foreach (AbstractStream::replace("\r\n.", "\r\n..", $message->toIterable()) as $chunk) {
-            $this->stream->write($chunk);
+            $this->executeCommand("DATA\r\n", [354]);
+            foreach (AbstractStream::replace("\r\n.", "\r\n..", $message->toIterable()) as $chunk) {
+                $this->stream->write($chunk, false);
+            }
+            $this->stream->flush();
+            $this->executeCommand("\r\n.\r\n", [250]);
+        } finally {
+            $message->appendDebug($this->stream->getDebug());
         }
-        $this->stream->flush();
-        $this->executeCommand("\r\n.\r\n", [250]);
     }
 
     protected function doHeloCommand(): void
@@ -236,8 +239,6 @@ class SmtpTransport extends AbstractTransport
 
         list($code) = sscanf($response, '%3d');
         $valid = \in_array($code, $codes);
-
-        $this->getLogger()->debug(sprintf('Email transport "%s" received response "%s" (%s).', __CLASS__, trim($response), $valid ? 'ok' : 'error'));
 
         if (!$valid) {
             throw new TransportException(sprintf('Expected response code "%s" but got code "%s", with message "%s".', implode('/', $codes), $code, trim($response)), $code);

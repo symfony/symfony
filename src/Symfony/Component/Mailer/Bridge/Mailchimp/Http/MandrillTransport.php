@@ -12,11 +12,12 @@
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Http;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Kevin Verschaeve
@@ -33,7 +34,7 @@ class MandrillTransport extends AbstractHttpTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
-    protected function doSend(SentMessage $message): void
+    protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         $envelope = $message->getEnvelope();
         $response = $this->client->request('POST', self::ENDPOINT, [
@@ -48,10 +49,12 @@ class MandrillTransport extends AbstractHttpTransport
         if (200 !== $response->getStatusCode()) {
             $result = $response->toArray(false);
             if ('error' === ($result['status'] ?? false)) {
-                throw new TransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $result['code']));
+                throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $result['code']), $response);
             }
 
-            throw new TransportException(sprintf('Unable to send an email (code %s).', $result['code']));
+            throw new HttpTransportException(sprintf('Unable to send an email (code %s).', $result['code']), $response);
         }
+
+        return $response;
     }
 }

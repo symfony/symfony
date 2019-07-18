@@ -82,7 +82,7 @@ class MandrillTransport extends AbstractApiTransport
         }
 
         $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'];
-        foreach ($email->getHeaders()->getAll() as $name => $header) {
+        foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
                 continue;
             }

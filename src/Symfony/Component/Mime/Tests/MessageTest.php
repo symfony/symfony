@@ -68,7 +68,7 @@ class MessageTest extends TestCase
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $h = $message->getPreparedHeaders();
-        $this->assertCount(4, iterator_to_array($h->getAll()));
+        $this->assertCount(4, iterator_to_array($h->all()));
         $this->assertEquals(new MailboxListHeader('From', [new Address('fabien@symfony.com')]), $h->get('From'));
         $this->assertEquals(new UnstructuredHeader('MIME-Version', '1.0'), $h->get('mime-version'));
         $this->assertTrue($h->has('Message-Id'));

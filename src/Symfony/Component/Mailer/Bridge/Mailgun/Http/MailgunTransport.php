@@ -47,7 +47,7 @@ class MailgunTransport extends AbstractHttpTransport
             'message' => new DataPart($message->toString(), 'message.mime'),
         ]);
         $headers = [];
-        foreach ($body->getPreparedHeaders()->getAll() as $header) {
+        foreach ($body->getPreparedHeaders()->all() as $header) {
             $headers[] = $header->toString();
         }
         $endpoint = str_replace(['%domain%', '%region_dot%'], [urlencode($this->domain), 'us' !== ($this->region ?: 'us') ? $this->region.'.' : ''], self::ENDPOINT);

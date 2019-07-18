@@ -94,6 +94,7 @@ FrameworkBundle
  * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`.
  * The `controller_name_converter` and `resolve_controller_name_subscriber` services have been deprecated.
  * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
+ * Not tagging service route loaders with `routing.route_loader` has been deprecated.
 
 HttpClient
 ----------

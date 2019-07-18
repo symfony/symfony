@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 
 class MicroKernelTraitTest extends TestCase
@@ -38,5 +41,19 @@ class MicroKernelTraitTest extends TestCase
         $response = $kernel->handle($request);
 
         $this->assertSame('It\'s dangerous to go alone. Take this ⚔', $response->getContent());
+    }
+
+    public function testRoutingRouteLoaderTagIsAdded()
+    {
+        $frameworkExtension = $this->createMock(ExtensionInterface::class);
+        $frameworkExtension
+            ->expects($this->atLeastOnce())
+            ->method('getAlias')
+            ->willReturn('framework');
+        $container = new ContainerBuilder();
+        $container->registerExtension($frameworkExtension);
+        $kernel = new ConcreteMicroKernel('test', false);
+        $kernel->registerContainerConfiguration(new ClosureLoader($container));
+        $this->assertTrue($container->getDefinition('kernel')->hasTag('routing.route_loader'));
     }
 }

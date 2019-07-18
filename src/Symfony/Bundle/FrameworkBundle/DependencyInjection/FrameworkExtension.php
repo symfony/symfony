@@ -24,6 +24,7 @@ use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
+use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
@@ -446,6 +447,9 @@ class FrameworkExtension extends Extension
         if (!$config['disallow_search_engine_index'] ?? false) {
             $container->removeDefinition('disallow_search_engine_index_response_listener');
         }
+
+        $container->registerForAutoconfiguration(RouteLoaderInterface::class)
+            ->addTag('routing.route_loader');
     }
 
     /**

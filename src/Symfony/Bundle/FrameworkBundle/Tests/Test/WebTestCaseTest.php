@@ -15,7 +15,7 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\AbstractWebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DomCrawler\Crawler;
@@ -235,7 +235,7 @@ class WebTestCaseTest extends TestCase
         $this->getRequestTester()->assertRouteSame('articles');
     }
 
-    private function getResponseTester(Response $response): WebTestCase
+    private function getResponseTester(Response $response): AbstractWebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
         $client->expects($this->any())->method('getResponse')->willReturn($response);
@@ -243,7 +243,7 @@ class WebTestCaseTest extends TestCase
         return $this->getTester($client);
     }
 
-    private function getCrawlerTester(Crawler $crawler): WebTestCase
+    private function getCrawlerTester(Crawler $crawler): AbstractWebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
         $client->expects($this->any())->method('getCrawler')->willReturn($crawler);
@@ -251,7 +251,7 @@ class WebTestCaseTest extends TestCase
         return $this->getTester($client);
     }
 
-    private function getClientTester(): WebTestCase
+    private function getClientTester(): AbstractWebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
         $jar = new CookieJar();
@@ -261,7 +261,7 @@ class WebTestCaseTest extends TestCase
         return $this->getTester($client);
     }
 
-    private function getRequestTester(): WebTestCase
+    private function getRequestTester(): AbstractWebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
         $request = new Request();
@@ -272,9 +272,9 @@ class WebTestCaseTest extends TestCase
         return $this->getTester($client);
     }
 
-    private function getTester(KernelBrowser $client): WebTestCase
+    private function getTester(KernelBrowser $client): AbstractWebTestCase
     {
-        return new class($client) extends WebTestCase {
+        return new class($client) extends AbstractWebTestCase {
             use WebTestAssertionsTrait;
 
             public function __construct(KernelBrowser $client)

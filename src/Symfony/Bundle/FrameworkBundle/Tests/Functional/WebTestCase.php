@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\AbstractWebTestCase as BaseWebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 class WebTestCase extends BaseWebTestCase

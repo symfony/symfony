@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class WebTestCase extends KernelTestCase
+abstract class AbstractWebTestCase extends KernelTestCase
 {
     use WebTestAssertionsTrait;
 

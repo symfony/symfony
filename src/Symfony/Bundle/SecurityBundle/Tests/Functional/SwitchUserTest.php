@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 
-class SwitchUserTest extends WebTestCase
+class SwitchUserTest extends AbstractWebTestCase
 {
     /**
      * @dataProvider getTestParameters

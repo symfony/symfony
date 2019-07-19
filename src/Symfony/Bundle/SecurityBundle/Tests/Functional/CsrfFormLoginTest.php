@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-class CsrfFormLoginTest extends WebTestCase
+class CsrfFormLoginTest extends AbstractWebTestCase
 {
     /**
      * @dataProvider getConfigs

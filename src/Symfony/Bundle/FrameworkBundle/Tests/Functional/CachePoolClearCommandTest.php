@@ -18,7 +18,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @group functional
  */
-class CachePoolClearCommandTest extends WebTestCase
+class CachePoolClearCommandTest extends AbstractWebTestCase
 {
     protected function setUp()
     {

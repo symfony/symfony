@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 
-class AutowiringTypesTest extends WebTestCase
+class AutowiringTypesTest extends AbstractWebTestCase
 {
     public function testAccessDecisionManagerAutowiring()
     {

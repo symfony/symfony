@@ -35,7 +35,7 @@ use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
  * @requires extension pdo_sqlite
  * @group legacy
  */
-class SetAclCommandTest extends WebTestCase
+class SetAclCommandTest extends AbstractWebTestCase
 {
     const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
     const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';

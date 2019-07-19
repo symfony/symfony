@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-class FormLoginTest extends WebTestCase
+class FormLoginTest extends AbstractWebTestCase
 {
     /**
      * @dataProvider getConfigs

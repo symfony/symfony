@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\AbstractWebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class ClientTest extends WebTestCase
+class ClientTest extends AbstractWebTestCase
 {
     public function testRebootKernelBetweenRequests()
     {

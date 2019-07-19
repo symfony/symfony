@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Form\AbstractType;
 
 /**
  * @group legacy
@@ -213,12 +212,4 @@ class FormPassTest extends TestCase
             ['my.guesser', 'form.type_guesser'],
         ];
     }
-}
-
-class FormPassTest_Type1 extends AbstractType
-{
-}
-
-class FormPassTest_Type2 extends AbstractType
-{
 }

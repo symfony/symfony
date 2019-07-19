@@ -193,6 +193,9 @@ final class Dotenv
 
                 case self::STATE_VALUE:
                     $this->values[$name] = $this->lexValue();
+                    if ('APP_ENV' == $name && isset($_ENV['APP_ENV'])) {
+                        $this->values[$name] = $_ENV['APP_ENV'];
+                    }
                     $state = self::STATE_VARNAME;
                     break;
             }

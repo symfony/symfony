@@ -190,6 +190,20 @@ class Worker implements WorkerInterface
 
     private function shouldRetry(\Throwable $e, Envelope $envelope, RetryStrategyInterface $retryStrategy): bool
     {
+        // if ALL nested Exceptions are an instance of UnrecoverableExceptionInterface we should not retry
+        if ($e instanceof HandlerFailedException) {
+            $shouldNotRetry = true;
+            foreach ($e->getNestedExceptions() as $nestedException) {
+                if (!$nestedException instanceof UnrecoverableExceptionInterface) {
+                    $shouldNotRetry = false;
+                    break;
+                }
+            }
+            if ($shouldNotRetry) {
+                return false;
+            }
+        }
+
         if ($e instanceof UnrecoverableExceptionInterface) {
             return false;
         }

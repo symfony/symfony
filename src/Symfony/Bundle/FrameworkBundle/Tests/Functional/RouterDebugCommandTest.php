@@ -17,7 +17,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @group functional
  */
-class RouterDebugCommandTest extends WebTestCase
+class RouterDebugCommandTest extends AbstractWebTestCase
 {
     private $application;
 

@@ -10,7 +10,7 @@ use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
-class MailerTest extends WebTestCase
+class MailerTest extends AbstractWebTestCase
 {
     public function testEnvelopeListener()
     {

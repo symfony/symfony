@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by kernig at 2019-07-11T15:07:14Z
+
+@derrabus ok, i'll try to setup a testing environment for it but it will take a few days, probably.
+
+---------------------------------------------------------------------------
+
+by kernig at 2019-07-19T07:08:58Z
+
+@nicolas-grekas
+fixed the problem, can you help with travis-ci check on PHP 7.2?

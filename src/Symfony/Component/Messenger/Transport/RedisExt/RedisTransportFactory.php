@@ -25,6 +25,8 @@ class RedisTransportFactory implements TransportFactoryInterface
 {
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
+        unset($options['transport_name']);
+
         return new RedisTransport(Connection::fromDsn($dsn, $options), $serializer);
     }
 

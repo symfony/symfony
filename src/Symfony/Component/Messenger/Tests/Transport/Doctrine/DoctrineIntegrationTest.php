@@ -81,25 +81,25 @@ class DoctrineIntegrationTest extends TestCase
             'body' => '{"message": "Hi handled"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'delivered_at' => Connection::formatDateTime(new \DateTime()),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => '2019-03-15 12:00:00',
+            'delivered_at' => (new \DateTime())->format('Y-m-d H:i:s'),
         ]);
         // one available later
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi delayed"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 13:00:00')),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => '2019-03-15 13:00:00',
         ]);
         // one available
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi available"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:30:00')),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => '2019-03-15 12:30:00',
         ]);
 
         $encoded = $this->connection->get();
@@ -114,33 +114,33 @@ class DoctrineIntegrationTest extends TestCase
             'body' => '{"message": "Hi handled"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'delivered_at' => Connection::formatDateTime(new \DateTime()),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => '2019-03-15 12:00:00',
+            'delivered_at' => (new \DateTime())->format('Y-m-d H:i:s'),
         ]);
         // one available later
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi delayed"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime((new \DateTime())->modify('+1 minute')),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => ((new \DateTime())->modify('+1 minute'))->format('Y-m-d H:i:s'),
         ]);
         // one available
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi available"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:30:00')),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => '2019-03-15 12:30:00',
         ]);
         // another available
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi available"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:30:00')),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => '2019-03-15 12:30:00',
         ]);
 
         $this->assertSame(2, $this->connection->getMessageCount());
@@ -154,16 +154,16 @@ class DoctrineIntegrationTest extends TestCase
             'body' => '{"message": "Hi requeued"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'delivered_at' => Connection::formatDateTime($twoHoursAgo),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => '2019-03-15 12:00:00',
+            'delivered_at' => $twoHoursAgo->format('Y-m-d H:i:s'),
         ]);
         $this->driverConnection->insert('messenger_messages', [
             'body' => '{"message": "Hi available"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
             'queue_name' => 'default',
-            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:30:00')),
+            'created_at' => '2019-03-15 12:00:00',
+            'available_at' => '2019-03-15 12:30:00',
         ]);
 
         $next = $this->connection->get();

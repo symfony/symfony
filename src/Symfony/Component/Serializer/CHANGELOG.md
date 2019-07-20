@@ -5,7 +5,8 @@ CHANGELOG
 -----
 
  * added `AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT` context option
-   to disable throwing an `UnexpectedValueException` on a type mismatch
+   to disable throwing an `UnexpectedValueException` on a type mismatch and when an 
+   invalid datetime string is casted into a DateTime object
  * added support for serializing `DateInterval` objects
  * added getter for extra attributes in `ExtraAttributesException`
  * improved `CsvEncoder` to handle variable nested structures

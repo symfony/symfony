@@ -120,8 +120,8 @@ class Connection
             ':body' => $body,
             ':headers' => json_encode($headers),
             ':queue_name' => $this->configuration['queue_name'],
-            ':created_at' => self::formatDateTime($now),
-            ':available_at' => self::formatDateTime($availableAt),
+            ':created_at' => $this->formatDateTime($now),
+            ':available_at' => $this->formatDateTime($availableAt),
         ]);
 
         return $this->driverConnection->lastInsertId();
@@ -159,7 +159,7 @@ class Connection
             $now = new \DateTime();
             $this->executeQuery($queryBuilder->getSQL(), [
                 ':id' => $doctrineEnvelope['id'],
-                ':delivered_at' => self::formatDateTime($now),
+                ':delivered_at' => $this->formatDateTime($now),
             ]);
 
             $this->driverConnection->commit();
@@ -266,9 +266,9 @@ class Connection
             ->andWhere('m.available_at <= :now')
             ->andWhere('m.queue_name = :queue_name')
             ->setParameters([
-                ':now' => self::formatDateTime($now),
+                ':now' => $this->formatDateTime($now),
                 ':queue_name' => $this->configuration['queue_name'],
-                ':redeliver_limit' => self::formatDateTime($redeliverLimit),
+                ':redeliver_limit' => $this->formatDateTime($redeliverLimit),
             ]);
     }
 
@@ -327,9 +327,9 @@ class Connection
         return $schema;
     }
 
-    public static function formatDateTime(\DateTimeInterface $dateTime): string
+    public function formatDateTime(\DateTimeInterface $dateTime): string
     {
-        return $dateTime->format('Y-m-d\TH:i:s');
+        return $dateTime->format($this->driverConnection->getDatabasePlatform()->getDateTimeFormatString());
     }
 
     private function decodeEnvelopeHeaders(array $doctrineEnvelope): array

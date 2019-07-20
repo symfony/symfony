@@ -103,7 +103,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
             $dateTimeErrors = \DateTime::class === $class ? \DateTime::getLastErrors() : \DateTimeImmutable::getLastErrors();
 
             throw new NotNormalizableValueException(sprintf(
-                'Parsing datetime string "%s" using format "%s" resulted in %d errors:'."\n".'%s',
+                'Parsing datetime string "%s" using format "%s" resulted in %d errors:' . "\n" . '%s',
                 $data,
                 $dateTimeFormat,
                 $dateTimeErrors['error_count'],
@@ -114,6 +114,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         try {
             return \DateTime::class === $class ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
+
+            if (true === $context[AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT]) {
+                return $data;
+            }
+
             throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
         }
     }

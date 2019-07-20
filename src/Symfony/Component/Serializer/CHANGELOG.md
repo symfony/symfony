@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.4
+-----
+
+ * added a `ignore_invalid_datetimes` context option to allow invalid date strings when denormalizing without 
+   throwing an exception
+
 4.3.0
 -----
 

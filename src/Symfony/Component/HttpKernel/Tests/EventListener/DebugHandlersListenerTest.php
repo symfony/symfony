@@ -20,7 +20,6 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\ErrorHandler\ExceptionHandler;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -38,9 +37,7 @@ class DebugHandlersListenerTest extends TestCase
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $userHandler = function () {};
         $listener = new DebugHandlersListener($userHandler, $logger);
-        $xHandler = new ExceptionHandler();
         $eHandler = new ErrorHandler();
-        $eHandler->setExceptionHandler([$xHandler, 'handle']);
 
         $exception = null;
         set_error_handler([$eHandler, 'handleError']);
@@ -56,7 +53,7 @@ class DebugHandlersListenerTest extends TestCase
             throw $exception;
         }
 
-        $this->assertSame($userHandler, $xHandler->setHandler('var_dump'));
+        $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
 
         $loggers = $eHandler->setLoggers([]);
 

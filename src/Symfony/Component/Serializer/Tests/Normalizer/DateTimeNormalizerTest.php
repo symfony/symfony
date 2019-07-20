@@ -246,7 +246,7 @@ class DateTimeNormalizerTest extends TestCase
 
     public function testDenormalizeInvalidDataWithoutTypeEnforcement()
     {
-        $data = "bonjour!";
+        $data = 'bonjour!';
         $result = $this->normalizer->denormalize($data, \DateTimeInterface::class, null, [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]);
 
         $this->assertEquals($result, $data);

@@ -21,7 +21,6 @@ use Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHand
 use Symfony\Component\ErrorHandler\FatalErrorHandler\FatalErrorHandlerInterface;
 use Symfony\Component\ErrorHandler\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 use Symfony\Component\ErrorHandler\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 /**
  * A generic ErrorHandler for the PHP engine.
@@ -414,7 +413,7 @@ class ErrorHandler
         }
 
         if (false !== strpos($message, "class@anonymous\0")) {
-            $logMessage = $this->levels[$type].': '.(new FlattenException())->setMessage($message)->getMessage();
+            $logMessage = $this->parseAnonymousClass($message);
         } else {
             $logMessage = $this->levels[$type].': '.$message;
         }
@@ -539,7 +538,7 @@ class ErrorHandler
 
         if (($this->loggedErrors & $type) || $exception instanceof FatalThrowableError) {
             if (false !== strpos($message = $exception->getMessage(), "class@anonymous\0")) {
-                $message = (new FlattenException())->setMessage($message)->getMessage();
+                $message = $this->parseAnonymousClass($message);
             }
             if ($exception instanceof FatalErrorException) {
                 if ($exception instanceof FatalThrowableError) {
@@ -711,5 +710,16 @@ class ErrorHandler
         }
 
         return $lightTrace;
+    }
+
+    /**
+     * Parse the error message by removing the anonymous class notation
+     * and using the parent class instead if possible.
+     */
+    private function parseAnonymousClass(string $message): string
+    {
+        return preg_replace_callback('/class@anonymous\x00.*?\.php0x?[0-9a-fA-F]++/', static function ($m) {
+            return class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
+        }, $message);
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -241,6 +242,14 @@ class DateTimeNormalizerTest extends TestCase
     public function testDenormalizeInvalidDataThrowsException()
     {
         $this->normalizer->denormalize('invalid date', \DateTimeInterface::class);
+    }
+
+    public function testDenormalizeInvalidDataWithoutTypeEnforcement()
+    {
+        $data = "bonjour!";
+        $result = $this->normalizer->denormalize($data, \DateTimeInterface::class, null, [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]);
+
+        $this->assertEquals($result, $data);
     }
 
     /**

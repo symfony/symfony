@@ -25,6 +25,16 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     const FORMAT_KEY = 'datetime_format';
     const TIMEZONE_KEY = 'datetime_timezone';
 
+    /**
+     * While denormalizing, we try to cast strings into real DateTime instances 
+     * causing exception to be thrown if the string is not well formatted
+     * 
+     * Setting this tag to true will allow you to retrieve real instance of DateTime 
+     * if the string is well formatted but will avoid exception if the string is not
+     * well formatted.
+     */
+    public const IGNORE_INVALID_DATETIMES = "ignore_invalid_datetimes";
+
     private $defaultContext;
 
     private static $supportedTypes = [
@@ -107,7 +117,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
             $dateTimeErrors = \DateTime::class === $class ? \DateTime::getLastErrors() : \DateTimeImmutable::getLastErrors();
 
             throw new NotNormalizableValueException(sprintf(
-                'Parsing datetime string "%s" using format "%s" resulted in %d errors:'."\n".'%s',
+                'Parsing datetime string "%s" using format "%s" resulted in %d errors:' . "\n" . '%s',
                 $data,
                 $dateTimeFormat,
                 $dateTimeErrors['error_count'],
@@ -118,6 +128,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         try {
             return \DateTime::class === $class ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
+
+            if ($context[self::IGNORE_INVALID_DATETIMES] ?? false) {
+                return $data;
+            }
+
             throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
         }
     }

@@ -278,6 +278,14 @@ class DateTimeNormalizerTest extends TestCase
         $this->normalizer->denormalize('invalid date', \DateTimeInterface::class);
     }
 
+    public function testDenormalizeInvalidDateWontThrowExceptionIfIgnoreInvalidDatetimes()
+    {
+        $data = 'invalid date';
+        $result = $this->normalizer->denormalize($data, \DateTimeInterface::class, null, [DateTimeNormalizer::IGNORE_INVALID_DATETIMES => true]);
+
+        $this->assertEquals($data, $result);
+    }
+
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      * @expectedExceptionMessage The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.

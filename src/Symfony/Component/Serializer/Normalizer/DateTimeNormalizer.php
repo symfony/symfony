@@ -114,7 +114,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         try {
             return \DateTime::class === $class ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
-
             if ($context[AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT] ?? false) {
                 return $data;
             }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\SchemaConfig;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
@@ -23,7 +25,7 @@ class DoctrineTransportFactoryTest extends TestCase
     public function testSupports()
     {
         $factory = new DoctrineTransportFactory(
-            $this->getMockBuilder(RegistryInterface::class)->getMock()
+            $this->createMock(RegistryInterface::class)
         );
 
         $this->assertTrue($factory->supports('doctrine://default', []));
@@ -32,19 +34,21 @@ class DoctrineTransportFactoryTest extends TestCase
 
     public function testCreateTransport()
     {
-        $connection = $this->getMockBuilder(\Doctrine\DBAL\Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $registry = $this->getMockBuilder(RegistryInterface::class)->getMock();
+        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
+        $schemaConfig = $this->createMock(SchemaConfig::class);
+        $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
+        $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
+        $registry = $this->createMock(RegistryInterface::class);
         $registry->expects($this->once())
             ->method('getConnection')
-            ->willReturn($connection);
+            ->willReturn($driverConnection);
 
         $factory = new DoctrineTransportFactory($registry);
         $serializer = $this->createMock(SerializerInterface::class);
 
         $this->assertEquals(
-            new DoctrineTransport(new Connection(Connection::buildConfiguration('doctrine://default'), $connection), $serializer),
+            new DoctrineTransport(new Connection(Connection::buildConfiguration('doctrine://default'), $driverConnection), $serializer),
             $factory->createTransport('doctrine://default', [], $serializer)
         );
     }
@@ -55,7 +59,7 @@ class DoctrineTransportFactoryTest extends TestCase
      */
     public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
     {
-        $registry = $this->getMockBuilder(RegistryInterface::class)->getMock();
+        $registry = $this->createMock(RegistryInterface::class);
         $registry->expects($this->once())
             ->method('getConnection')
             ->willReturnCallback(function () {

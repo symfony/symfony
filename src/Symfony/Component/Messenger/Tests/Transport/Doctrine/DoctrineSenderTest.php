@@ -27,12 +27,10 @@ class DoctrineSenderTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-        $connection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'])->willReturn(15);
 
-        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new DoctrineSender($connection, $serializer);
@@ -49,12 +47,10 @@ class DoctrineSenderTest extends TestCase
         $envelope = (new Envelope(new DummyMessage('Oy')))->with(new DelayStamp(500));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-        $connection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 500);
 
-        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new DoctrineSender($connection, $serializer);

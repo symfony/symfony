@@ -281,7 +281,7 @@ class DateTimeNormalizerTest extends TestCase
     public function testDenormalizeInvalidDateWontThrowExceptionIfIgnoreInvalidDatetimes()
     {
         $data = 'invalid date';
-        $result = $this->normalizer->denormalize($data, \DateTimeInterface::class, null, [DateTimeNormalizer::IGNORE_INVALID_DATETIMES => true]);
+        $result = $this->normalizer->denormalize($data, \DateTimeInterface::class, null, [DateTimeNormalizer::DATETIME_ALLOW_INVALID => true]);
 
         $this->assertEquals($data, $result);
     }

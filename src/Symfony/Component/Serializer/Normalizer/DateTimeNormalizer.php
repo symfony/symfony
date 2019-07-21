@@ -33,7 +33,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      * if the string is well formatted but will avoid exception if the string is not
      * well formatted.
      */
-    public const IGNORE_INVALID_DATETIMES = 'ignore_invalid_datetimes';
+    public const DATETIME_ALLOW_INVALID = 'datetime_allow_invalid';
 
     private $defaultContext;
 
@@ -51,6 +51,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         $this->defaultContext = [
             self::FORMAT_KEY => \DateTime::RFC3339,
             self::TIMEZONE_KEY => null,
+            self::DATETIME_ALLOW_INVALID => false,
         ];
 
         if (!\is_array($defaultContext)) {
@@ -128,7 +129,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         try {
             return \DateTime::class === $class ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
-            if ($context[self::IGNORE_INVALID_DATETIMES] ?? false) {
+            if ($context[self::DATETIME_ALLOW_INVALID] ?? $this->defaultContext[self::DATETIME_ALLOW_INVALID]) {
                 return $data;
             }
 

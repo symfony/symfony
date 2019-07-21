@@ -104,6 +104,7 @@ EOF;
         \$context = \$this->context;
         \$request = \$this->request ?: \$this->createRequest(\$pathinfo);
         \$requestMethod = \$canonicalMethod = \$context->getMethod();
+        \$pathinfo = \$request->getPathInfo();
 
         if ('HEAD' === \$requestMethod) {
             \$canonicalMethod = 'GET';

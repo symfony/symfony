@@ -605,14 +605,6 @@ class DummyReceiver implements ReceiverInterface
     }
 }
 
-class InvalidReceiver
-{
-}
-
-class InvalidSender
-{
-}
-
 class UndefinedMessageHandler
 {
     public function __invoke(UndefinedMessage $message)

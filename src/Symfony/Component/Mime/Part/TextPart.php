@@ -146,6 +146,14 @@ class TextPart extends AbstractPart
         return $headers;
     }
 
+    /**
+     * @internal
+     */
+    public function getEncoding(): string
+    {
+        return $this->encoding;
+    }
+
     private function getEncoder(): ContentEncoderInterface
     {
         if ('8bit' === $this->encoding) {

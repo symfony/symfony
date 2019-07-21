@@ -113,9 +113,11 @@ class SendgridTransport extends AbstractApiTransport
             $headers = $attachment->getPreparedHeaders();
             $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
             $disposition = $headers->getHeaderBody('Content-Disposition');
+            // Sendgrid does not accept line breaks for base64 encoded attachments
+            $content = 'base64' === $attachment->getEncoding() ? base64_encode($attachment->getBody()) : $attachment->bodyToString();
 
             $att = [
-                'content' => $attachment->bodyToString(),
+                'content' => $content,
                 'type' => $headers->get('Content-Type')->getBody(),
                 'filename' => $filename,
                 'disposition' => $disposition,

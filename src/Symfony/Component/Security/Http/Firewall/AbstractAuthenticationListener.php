@@ -48,8 +48,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @internal since Symfony 4.3
  */
 abstract class AbstractAuthenticationListener implements ListenerInterface
 {

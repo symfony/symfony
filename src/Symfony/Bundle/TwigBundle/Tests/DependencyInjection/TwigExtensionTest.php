@@ -31,6 +31,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $container->loadFromExtension('twig', [
             'strict_variables' => false, // to be removed in 5.0 relying on default
+            'exception_controller' => null, // to be removed in 5.0 relying on default
         ]);
         $this->compileContainer($container);
 
@@ -156,6 +157,7 @@ class TwigExtensionTest extends TestCase
         $container->loadFromExtension('twig', [
             'globals' => $globals,
             'strict_variables' => false, // // to be removed in 5.0 relying on default
+            'exception_controller' => null, // to be removed in 5.0 relying on default
         ]);
         $this->compileContainer($container);
 
@@ -259,6 +261,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $container->loadFromExtension('twig', [
             'strict_variables' => false, // to be removed in 5.0 relying on default
+            'exception_controller' => null, // to be removed in 5.0 relying on default
         ]);
         $container->setAlias('test.twig.extension.debug.stopwatch', 'twig.extension.debug.stopwatch')->setPublic(true);
         $this->compileContainer($container);
@@ -289,6 +292,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $container->loadFromExtension('twig', [
             'strict_variables' => false, // to be removed in 5.0 relying on default
+            'exception_controller' => null, // to be removed in 5.0 relying on default
         ]);
         $container->setParameter('kernel.environment', 'test');
         $container->setParameter('debug.file_link_format', 'test');

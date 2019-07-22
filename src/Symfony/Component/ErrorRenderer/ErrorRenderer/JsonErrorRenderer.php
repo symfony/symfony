@@ -20,7 +20,7 @@ class JsonErrorRenderer implements ErrorRendererInterface
 {
     private $debug;
 
-    public function __construct(bool $debug = true)
+    public function __construct(bool $debug = false)
     {
         $this->debug = $debug;
     }

@@ -31,7 +31,6 @@
         <service id="error_renderer.renderer.txt" class="Symfony\Component\ErrorRenderer\ErrorRenderer\TxtErrorRenderer">
             <tag name="error_renderer.renderer" />
             <argument>%kernel.debug%</argument>
-            <argument>%kernel.charset%</argument>
         </service>
     </services>
 </container>

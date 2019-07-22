@@ -60,6 +60,9 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield [new Dsn('foo', 'sendgrid', self::USER)];
+        yield [
+            new Dsn('foo', 'sendgrid', self::USER),
+            'The "foo" scheme is not supported for mailer "sendgrid". Supported schemes are: "api", "smtp".',
+        ];
     }
 }

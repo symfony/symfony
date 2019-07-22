@@ -38,7 +38,10 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield [new Dsn('http', 'gmail', self::USER, self::PASSWORD)];
+        yield [
+            new Dsn('foo', 'gmail', self::USER, self::PASSWORD),
+            'The "foo" scheme is not supported for mailer "gmail". Supported schemes are: "smtp".',
+        ];
     }
 
     public function incompleteDsnProvider(): iterable

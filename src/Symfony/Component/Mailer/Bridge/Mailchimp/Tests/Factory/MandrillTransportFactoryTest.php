@@ -71,7 +71,10 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield [new Dsn('foo', 'mandrill', self::USER)];
+        yield [
+            new Dsn('foo', 'mandrill', self::USER),
+            'The "foo" scheme is not supported for mailer "mandrill". Supported schemes are: "api", "http", "smtp".',
+        ];
     }
 
     public function incompleteDsnProvider(): iterable

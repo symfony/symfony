@@ -41,7 +41,7 @@ final class MandrillTransportFactory extends AbstractTransportFactory
             return new Mailchimp\Smtp\MandrillTransport($user, $password, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn);
+        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp']);
     }
 
     public function supports(Dsn $dsn): bool

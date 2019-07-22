@@ -22,14 +22,20 @@ class FormBuilderTest extends TestCase
     private $factory;
     private $builder;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->dispatcher = null;
         $this->factory = null;

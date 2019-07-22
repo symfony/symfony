@@ -32,7 +32,10 @@ class JsonBundleWriterTest extends TestCase
      */
     private $filesystem;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->writer = new JsonBundleWriter();
         $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.mt_rand(1000, 9999);
@@ -41,7 +44,10 @@ class JsonBundleWriterTest extends TestCase
         $this->filesystem->mkdir($this->directory);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->filesystem->remove($this->directory);
     }

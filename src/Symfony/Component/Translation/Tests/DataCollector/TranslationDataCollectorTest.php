@@ -17,7 +17,10 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 
 class TranslationDataCollectorTest extends TestCase
 {
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         if (!class_exists('Symfony\Component\HttpKernel\DataCollector\DataCollector')) {
             $this->markTestSkipped('The "DataCollector" is not available');

@@ -24,7 +24,10 @@ class JsonBundleReaderTest extends TestCase
      */
     private $reader;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->reader = new JsonBundleReader();
     }

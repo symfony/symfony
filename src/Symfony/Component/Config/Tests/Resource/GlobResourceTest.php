@@ -16,7 +16,10 @@ use Symfony\Component\Config\Resource\GlobResource;
 
 class GlobResourceTest extends TestCase
 {
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $dir = \dirname(__DIR__).'/Fixtures';
         @rmdir($dir.'/TmpGlob');

@@ -59,7 +59,10 @@ class EntityTypeTest extends BaseTypeTest
 
     protected static $supportedFeatureSetVersion = 304;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emRegistry = $this->createRegistryMock('default', $this->em);
@@ -89,7 +92,10 @@ class EntityTypeTest extends BaseTypeTest
         }
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         parent::tearDown();
 

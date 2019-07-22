@@ -40,7 +40,10 @@ class PhpGeneratorDumperTest extends TestCase
      */
     private $largeTestTmpFilepath;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 
@@ -52,7 +55,10 @@ class PhpGeneratorDumperTest extends TestCase
         @unlink($this->largeTestTmpFilepath);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         parent::tearDown();
 

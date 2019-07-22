@@ -19,7 +19,10 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class RequestTest extends TestCase
 {
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         Request::setTrustedProxies([], -1);
         Request::setTrustedHosts([]);

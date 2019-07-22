@@ -46,7 +46,10 @@ class WebProfilerExtensionTest extends TestCase
         self::assertEquals([], $errors, $message);
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 
@@ -73,7 +76,10 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->addCompilerPass(new RegisterListenersPass());
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         parent::tearDown();
 

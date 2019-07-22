@@ -28,7 +28,10 @@ class DoctrineExtractorTest extends TestCase
      */
     private $extractor;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $config = Setup::createAnnotationMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'], true);
         $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);

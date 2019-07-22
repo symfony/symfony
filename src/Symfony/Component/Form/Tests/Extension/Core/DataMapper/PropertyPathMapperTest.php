@@ -38,7 +38,10 @@ class PropertyPathMapperTest extends TestCase
      */
     private $propertyAccessor;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->dispatcher = new EventDispatcher();
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();

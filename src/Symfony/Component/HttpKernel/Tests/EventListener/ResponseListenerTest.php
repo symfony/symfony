@@ -26,7 +26,10 @@ class ResponseListenerTest extends TestCase
 
     private $kernel;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
@@ -35,7 +38,10 @@ class ResponseListenerTest extends TestCase
         $this->kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->dispatcher = null;
         $this->kernel = null;

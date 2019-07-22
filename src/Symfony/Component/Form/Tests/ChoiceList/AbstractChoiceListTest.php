@@ -103,7 +103,10 @@ abstract class AbstractChoiceListTest extends TestCase
      */
     protected $key4;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 

@@ -69,7 +69,10 @@ class FilesystemTestCase extends TestCase
         }
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
@@ -78,7 +81,10 @@ class FilesystemTestCase extends TestCase
         $this->workspace = realpath($this->workspace);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         if (!empty($this->longPathNamesWindows)) {
             foreach ($this->longPathNamesWindows as $path) {

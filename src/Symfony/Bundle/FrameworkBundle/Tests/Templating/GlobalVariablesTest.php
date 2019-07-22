@@ -20,7 +20,10 @@ class GlobalVariablesTest extends TestCase
     private $container;
     private $globals;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->container = new Container();
         $this->globals = new GlobalVariables($this->container);

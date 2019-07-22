@@ -28,7 +28,10 @@ class MongoDbSessionHandlerTest extends TestCase
     private $storage;
     public $options;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 

@@ -31,13 +31,19 @@ abstract class AbstractEventDispatcherTest extends TestCase
 
     private $listener;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->dispatcher = $this->createEventDispatcher();
         $this->listener = new TestEventListener();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->dispatcher = null;
         $this->listener = null;

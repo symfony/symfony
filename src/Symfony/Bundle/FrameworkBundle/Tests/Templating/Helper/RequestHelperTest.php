@@ -20,7 +20,10 @@ class RequestHelperTest extends TestCase
 {
     protected $requestStack;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->requestStack = new RequestStack();
         $request = new Request();

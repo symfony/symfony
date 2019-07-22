@@ -22,12 +22,18 @@ class TableTest extends TestCase
 {
     protected $stream;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->stream = fopen('php://memory', 'r+');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         fclose($this->stream);
         $this->stream = null;

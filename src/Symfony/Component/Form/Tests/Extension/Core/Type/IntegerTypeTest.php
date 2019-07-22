@@ -17,7 +17,10 @@ class IntegerTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\IntegerType';
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         IntlTestHelper::requireIntl($this, false);
 

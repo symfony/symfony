@@ -43,7 +43,10 @@ abstract class AbstractTest extends AbstractValidatorTest
      */
     abstract protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = []);
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 

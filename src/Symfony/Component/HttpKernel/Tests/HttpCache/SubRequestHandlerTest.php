@@ -21,12 +21,18 @@ class SubRequestHandlerTest extends TestCase
 {
     private static $globalState;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         self::$globalState = $this->getGlobalState();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         Request::setTrustedProxies(self::$globalState[0], self::$globalState[1]);
     }

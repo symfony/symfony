@@ -249,7 +249,10 @@ EOTXT
         $this->assertContains('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $tester->getDisplay());
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode']);
@@ -262,7 +265,10 @@ EOTXT
         $this->passwordEncoderCommandTester = new CommandTester($passwordEncoderCommand);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->passwordEncoderCommandTester = null;
     }

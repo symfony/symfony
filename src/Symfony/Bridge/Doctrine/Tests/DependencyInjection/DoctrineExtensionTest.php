@@ -26,7 +26,10 @@ class DoctrineExtensionTest extends TestCase
      */
     private $extension;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 

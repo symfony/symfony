@@ -23,7 +23,10 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         IntlTestHelper::requireFullIntl($this, false);
 

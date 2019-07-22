@@ -19,12 +19,18 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
 {
     private $previousLocale;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->previousLocale = setlocale(LC_ALL, '0');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         setlocale(LC_ALL, $this->previousLocale);
     }

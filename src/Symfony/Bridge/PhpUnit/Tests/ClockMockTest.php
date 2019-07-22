@@ -26,7 +26,10 @@ class ClockMockTest extends TestCase
         ClockMock::register(__CLASS__);
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         ClockMock::withClockMock(1234567890.125);
     }

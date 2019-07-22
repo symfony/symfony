@@ -19,7 +19,10 @@ class NumberTypeTest extends BaseTypeTest
 
     private $defaultLocale;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 
@@ -30,7 +33,10 @@ class NumberTypeTest extends BaseTypeTest
         \Locale::setDefault('de_DE');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         parent::tearDown();
 

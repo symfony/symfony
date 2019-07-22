@@ -22,7 +22,10 @@ class PdoSessionHandlerTest extends TestCase
 {
     private $dbFile;
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         // make sure the temporary database file is deleted when it has been created (even when a test fails)
         if ($this->dbFile) {

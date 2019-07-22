@@ -115,13 +115,19 @@ YAML;
         return new CommandTester($command);
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->files = [];
         @mkdir(sys_get_temp_dir().'/framework-yml-lint-test');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

@@ -24,7 +24,10 @@ class CsvEncoderTest extends TestCase
      */
     private $encoder;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->encoder = new CsvEncoder();
     }

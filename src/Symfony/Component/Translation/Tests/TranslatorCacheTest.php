@@ -22,13 +22,19 @@ class TranslatorCacheTest extends TestCase
 {
     protected $tmpDir;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->tmpDir = sys_get_temp_dir().'/sf2_translation';
         $this->deleteTmpDir();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->deleteTmpDir();
     }

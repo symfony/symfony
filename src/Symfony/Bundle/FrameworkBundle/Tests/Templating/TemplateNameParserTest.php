@@ -20,7 +20,10 @@ class TemplateNameParserTest extends TestCase
 {
     protected $parser;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel
@@ -37,7 +40,10 @@ class TemplateNameParserTest extends TestCase
         $this->parser = new TemplateNameParser($kernel);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->parser = null;
     }

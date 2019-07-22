@@ -33,7 +33,10 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
      */
     private $renderer;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 

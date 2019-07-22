@@ -52,7 +52,10 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         ]);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->engine = null;
 

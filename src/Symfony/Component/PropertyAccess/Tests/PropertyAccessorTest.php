@@ -33,7 +33,10 @@ class PropertyAccessorTest extends TestCase
      */
     private $propertyAccessor;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->propertyAccessor = new PropertyAccessor();
     }

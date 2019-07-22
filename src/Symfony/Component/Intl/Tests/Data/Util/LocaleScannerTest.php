@@ -32,7 +32,10 @@ class LocaleScannerTest extends TestCase
      */
     private $scanner;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->directory = sys_get_temp_dir().'/LocaleScannerTest/'.mt_rand(1000, 9999);
         $this->filesystem = new Filesystem();
@@ -56,7 +59,10 @@ class LocaleScannerTest extends TestCase
         file_put_contents($this->directory.'/fr_alias.txt', 'fr_alias{"%%ALIAS"{"fr"}}');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->filesystem->remove($this->directory);
     }

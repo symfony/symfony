@@ -21,7 +21,10 @@ class ExecutableFinderTest extends TestCase
 {
     private $path;
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         if ($this->path) {
             // Restore path if it was changed.

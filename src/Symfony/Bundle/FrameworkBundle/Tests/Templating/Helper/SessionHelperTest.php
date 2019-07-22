@@ -22,7 +22,10 @@ class SessionHelperTest extends TestCase
 {
     protected $requestStack;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $request = new Request();
 
@@ -36,7 +39,10 @@ class SessionHelperTest extends TestCase
         $this->requestStack->push($request);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->requestStack = null;
     }

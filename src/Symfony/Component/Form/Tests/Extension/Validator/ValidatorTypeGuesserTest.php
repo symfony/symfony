@@ -51,7 +51,10 @@ class ValidatorTypeGuesserTest extends TestCase
      */
     private $metadataFactory;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->metadata = new ClassMetadata(self::TEST_CLASS);
         $this->metadataFactory = new FakeMetadataFactory();

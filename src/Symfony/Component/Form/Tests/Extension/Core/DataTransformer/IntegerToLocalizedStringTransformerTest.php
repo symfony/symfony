@@ -19,13 +19,19 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
 {
     private $defaultLocale;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         \Locale::setDefault($this->defaultLocale);
     }

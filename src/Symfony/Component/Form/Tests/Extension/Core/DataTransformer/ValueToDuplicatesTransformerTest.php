@@ -18,12 +18,18 @@ class ValueToDuplicatesTransformerTest extends TestCase
 {
     private $transformer;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->transformer = new ValueToDuplicatesTransformer(['a', 'b', 'c']);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->transformer = null;
     }

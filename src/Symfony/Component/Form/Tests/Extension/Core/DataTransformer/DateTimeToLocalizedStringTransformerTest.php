@@ -23,7 +23,10 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 
@@ -36,7 +39,10 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;

@@ -19,7 +19,10 @@ class ContainerParametersResourceTest extends TestCase
     /** @var ContainerParametersResource */
     private $resource;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->resource = new ContainerParametersResource(['locales' => ['fr', 'en'], 'default_locale' => 'fr']);
     }

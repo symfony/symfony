@@ -19,12 +19,18 @@ class StreamOutputTest extends TestCase
 {
     protected $stream;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->stream = fopen('php://memory', 'a', false);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->stream = null;
     }

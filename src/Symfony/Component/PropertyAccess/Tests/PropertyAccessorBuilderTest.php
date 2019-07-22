@@ -23,12 +23,18 @@ class PropertyAccessorBuilderTest extends TestCase
      */
     protected $builder;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->builder = new PropertyAccessorBuilder();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->builder = null;
     }

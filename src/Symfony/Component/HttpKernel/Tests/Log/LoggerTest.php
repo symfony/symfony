@@ -32,13 +32,19 @@ class LoggerTest extends TestCase
      */
     private $tmpFile;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->tmpFile = tempnam(sys_get_temp_dir(), 'log');
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         if (!@unlink($this->tmpFile)) {
             file_put_contents($this->tmpFile, '');

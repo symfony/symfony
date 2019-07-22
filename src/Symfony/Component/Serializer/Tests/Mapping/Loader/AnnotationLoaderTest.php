@@ -27,7 +27,10 @@ class AnnotationLoaderTest extends TestCase
      */
     private $loader;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->loader = new AnnotationLoader(new AnnotationReader());
     }

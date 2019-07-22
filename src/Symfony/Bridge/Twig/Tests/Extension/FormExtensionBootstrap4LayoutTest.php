@@ -33,7 +33,10 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
      */
     private $renderer;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 

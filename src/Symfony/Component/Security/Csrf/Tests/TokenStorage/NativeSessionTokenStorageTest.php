@@ -29,7 +29,10 @@ class NativeSessionTokenStorageTest extends TestCase
      */
     private $storage;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $_SESSION = [];
 

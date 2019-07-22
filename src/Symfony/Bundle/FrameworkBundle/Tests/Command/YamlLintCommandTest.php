@@ -183,13 +183,19 @@ EOF;
         return $application;
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         @mkdir(sys_get_temp_dir().'/yml-lint-test');
         $this->files = [];
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

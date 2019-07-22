@@ -26,7 +26,10 @@ class StoreTest extends TestCase
      */
     protected $store;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->request = Request::create('/');
         $this->response = new Response('hello world', 200, []);
@@ -36,7 +39,10 @@ class StoreTest extends TestCase
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->store = null;
         $this->request = null;

@@ -28,7 +28,10 @@ class AutowireServiceResourceTest extends TestCase
     private $class;
     private $time;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->file = realpath(sys_get_temp_dir()).'/tmp.php';
         $this->time = time();
@@ -101,7 +104,10 @@ class AutowireServiceResourceTest extends TestCase
         $this->assertFalse($resource->isFresh($this->getStaleFileTime()), '->isFresh() returns false if the class no longer exists');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         if (!file_exists($this->file)) {
             return;

@@ -27,7 +27,10 @@ class LdapClientTest extends LdapTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $ldap;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
 

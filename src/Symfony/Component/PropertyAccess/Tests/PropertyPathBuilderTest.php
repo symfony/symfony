@@ -27,7 +27,10 @@ class PropertyPathBuilderTest extends TestCase
      */
     private $builder;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->builder = new PropertyPathBuilder(new PropertyPath(self::PREFIX));
     }

@@ -28,12 +28,18 @@ class ClassMetadataTest extends TestCase
 
     protected $metadata;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->metadata = null;
     }

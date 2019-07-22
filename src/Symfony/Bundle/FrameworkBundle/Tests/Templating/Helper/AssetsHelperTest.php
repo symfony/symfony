@@ -21,7 +21,10 @@ class AssetsHelperTest extends TestCase
 {
     private $helper;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $fooPackage = new Package(new StaticVersionStrategy('42', '%s?v=%s'));
         $barPackage = new Package(new StaticVersionStrategy('22', '%s?%s'));

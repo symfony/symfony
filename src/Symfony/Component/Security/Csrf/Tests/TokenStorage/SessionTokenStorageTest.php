@@ -33,7 +33,10 @@ class SessionTokenStorageTest extends TestCase
      */
     private $storage;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->storage = new SessionTokenStorage($this->session, self::SESSION_NAMESPACE);

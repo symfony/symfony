@@ -46,7 +46,10 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         return new UserPasswordValidator($this->tokenStorage, $this->encoderFactory);
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $user = $this->createUser();
         $this->tokenStorage = $this->createTokenStorage($user);

@@ -23,7 +23,10 @@ class GuardListenerTest extends TestCase
     private $listener;
     private $configuration;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->configuration = [
             'test_is_granted' => 'is_granted("something")',
@@ -44,7 +47,10 @@ class GuardListenerTest extends TestCase
         $this->listener = new GuardListener($this->configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, null, $this->validator);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->authenticationChecker = null;
         $this->validator = null;

@@ -25,7 +25,10 @@ class PhpDocExtractorTest extends TestCase
      */
     private $extractor;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->extractor = new PhpDocExtractor();
     }

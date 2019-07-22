@@ -18,7 +18,10 @@ class ArrayToPartsTransformerTest extends TestCase
 {
     private $transformer;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->transformer = new ArrayToPartsTransformer([
             'first' => ['a', 'b', 'c'],
@@ -26,7 +29,10 @@ class ArrayToPartsTransformerTest extends TestCase
         ]);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->transformer = null;
     }

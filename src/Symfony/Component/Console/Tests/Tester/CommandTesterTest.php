@@ -27,7 +27,10 @@ class CommandTesterTest extends TestCase
     protected $command;
     protected $tester;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->command = new Command('foo');
         $this->command->addArgument('command');
@@ -38,7 +41,10 @@ class CommandTesterTest extends TestCase
         $this->tester->execute(['foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->command = null;
         $this->tester = null;

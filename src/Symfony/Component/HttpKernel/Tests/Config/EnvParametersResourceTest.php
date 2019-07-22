@@ -23,7 +23,10 @@ class EnvParametersResourceTest extends TestCase
     protected $initialEnv;
     protected $resource;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->initialEnv = [
             $this->prefix.'1' => 'foo',
@@ -37,7 +40,10 @@ class EnvParametersResourceTest extends TestCase
         $this->resource = new EnvParametersResource($this->prefix);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         foreach ($_SERVER as $key => $value) {
             if (0 === strpos($key, $this->prefix)) {

@@ -159,12 +159,18 @@ class FileBagTest extends TestCase
         return tempnam(sys_get_temp_dir().'/form_test', 'FormTest');
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         mkdir(sys_get_temp_dir().'/form_test', 0777, true);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         foreach (glob(sys_get_temp_dir().'/form_test/*') as $file) {
             unlink($file);

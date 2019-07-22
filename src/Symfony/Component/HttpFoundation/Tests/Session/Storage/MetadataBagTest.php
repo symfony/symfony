@@ -28,7 +28,10 @@ class MetadataBagTest extends TestCase
 
     protected $array = [];
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
         $this->bag = new MetadataBag();
@@ -36,7 +39,10 @@ class MetadataBagTest extends TestCase
         $this->bag->initialize($this->array);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->array = [];
         $this->bag = null;

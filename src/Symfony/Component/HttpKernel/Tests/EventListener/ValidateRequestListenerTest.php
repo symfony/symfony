@@ -21,7 +21,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ValidateRequestListenerTest extends TestCase
 {
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         Request::setTrustedProxies([], -1);
     }

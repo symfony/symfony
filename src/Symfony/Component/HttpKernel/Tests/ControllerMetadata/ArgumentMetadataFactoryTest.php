@@ -26,7 +26,10 @@ class ArgumentMetadataFactoryTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->factory = new ArgumentMetadataFactory();
     }

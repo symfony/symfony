@@ -35,7 +35,10 @@ class AbstractNormalizerTest extends TestCase
      */
     private $classMetadata;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $loader = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\Loader\LoaderChain')->setConstructorArgs([[]])->getMock();
         $this->classMetadata = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory')->setConstructorArgs([$loader])->getMock();

@@ -24,7 +24,10 @@ class OptionsResolverTest extends TestCase
      */
     private $resolver;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->resolver = new OptionsResolver();
     }

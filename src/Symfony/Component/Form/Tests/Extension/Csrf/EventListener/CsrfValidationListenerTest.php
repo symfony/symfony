@@ -27,7 +27,10 @@ class CsrfValidationListenerTest extends TestCase
     protected $tokenManager;
     protected $form;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
@@ -37,7 +40,10 @@ class CsrfValidationListenerTest extends TestCase
             ->getForm();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->dispatcher = null;
         $this->factory = null;

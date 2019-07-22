@@ -109,7 +109,10 @@ class TranslationDebugCommandTest extends TestCase
         $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
@@ -119,7 +122,10 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/templates');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->fs->remove($this->translationDir);
     }

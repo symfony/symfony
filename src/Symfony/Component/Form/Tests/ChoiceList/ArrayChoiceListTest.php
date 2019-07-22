@@ -20,7 +20,10 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
 {
     private $object;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->object = new \stdClass();
 

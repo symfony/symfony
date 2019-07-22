@@ -15,7 +15,10 @@ class DateIntervalNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->normalizer = new DateIntervalNormalizer();
     }

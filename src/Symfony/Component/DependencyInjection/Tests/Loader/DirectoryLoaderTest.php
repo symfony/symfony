@@ -32,7 +32,10 @@ class DirectoryLoaderTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $locator = new FileLocator(self::$fixturesPath);
         $this->container = new ContainerBuilder();

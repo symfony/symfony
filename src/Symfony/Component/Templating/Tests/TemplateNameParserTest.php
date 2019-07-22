@@ -19,12 +19,18 @@ class TemplateNameParserTest extends TestCase
 {
     protected $parser;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->parser = new TemplateNameParser();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->parser = null;
     }

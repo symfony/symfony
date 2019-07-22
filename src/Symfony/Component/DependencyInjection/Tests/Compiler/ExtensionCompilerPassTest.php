@@ -25,7 +25,10 @@ class ExtensionCompilerPassTest extends TestCase
     private $container;
     private $pass;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->container = new ContainerBuilder();
         $this->pass = new ExtensionCompilerPass();

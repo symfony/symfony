@@ -19,7 +19,10 @@ class MoneyTypeTest extends BaseTypeTest
 
     private $defaultLocale;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         // we test against different locales, so we need the full
         // implementation
@@ -30,7 +33,10 @@ class MoneyTypeTest extends BaseTypeTest
         $this->defaultLocale = \Locale::getDefault();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         parent::tearDown();
 

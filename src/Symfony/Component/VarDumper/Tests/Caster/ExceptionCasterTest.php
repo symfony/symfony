@@ -28,7 +28,10 @@ class ExceptionCasterTest extends TestCase
         return new \Exception(''.$msg);
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         ExceptionCaster::$srcContext = 1;
         ExceptionCaster::$traceArgs = true;

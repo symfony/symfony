@@ -17,7 +17,10 @@ class AnnotationsCacheWarmerTest extends TestCase
 {
     private $cacheDir;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->cacheDir = sys_get_temp_dir().'/'.uniqid();
         $fs = new Filesystem();
@@ -25,7 +28,10 @@ class AnnotationsCacheWarmerTest extends TestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $fs = new Filesystem();
         $fs->remove($this->cacheDir);

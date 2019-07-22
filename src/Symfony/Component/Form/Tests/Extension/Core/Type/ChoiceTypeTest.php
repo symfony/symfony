@@ -60,7 +60,10 @@ class ChoiceTypeTest extends BaseTypeTest
         ],
     ];
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         parent::setUp();
 
@@ -73,7 +76,10 @@ class ChoiceTypeTest extends BaseTypeTest
         ];
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         parent::tearDown();
 

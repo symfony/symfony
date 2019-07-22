@@ -19,12 +19,18 @@ class ConstraintViolationListTest extends TestCase
 {
     protected $list;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->list = new ConstraintViolationList();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->list = null;
     }

@@ -23,7 +23,10 @@ class WorkflowExtensionTest extends TestCase
 {
     private $extension;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $places = ['ordered', 'waiting_for_payment', 'processed'];
         $transitions = [

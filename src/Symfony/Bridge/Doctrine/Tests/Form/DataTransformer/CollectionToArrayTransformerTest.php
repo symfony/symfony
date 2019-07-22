@@ -25,7 +25,10 @@ class CollectionToArrayTransformerTest extends TestCase
      */
     private $transformer;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->transformer = new CollectionToArrayTransformer();
     }

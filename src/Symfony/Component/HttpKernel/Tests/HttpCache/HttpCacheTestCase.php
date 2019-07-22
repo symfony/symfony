@@ -35,7 +35,10 @@ class HttpCacheTestCase extends TestCase
      */
     protected $store;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->kernel = null;
 
@@ -53,7 +56,10 @@ class HttpCacheTestCase extends TestCase
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         if ($this->cache) {
             $this->cache->getStore()->cleanup();

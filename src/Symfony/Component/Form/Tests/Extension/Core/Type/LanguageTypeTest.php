@@ -19,7 +19,10 @@ class LanguageTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LanguageType';
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         IntlTestHelper::requireIntl($this, false);
 

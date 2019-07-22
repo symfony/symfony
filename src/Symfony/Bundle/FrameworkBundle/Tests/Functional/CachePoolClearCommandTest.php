@@ -20,7 +20,10 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class CachePoolClearCommandTest extends WebTestCase
 {
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         static::bootKernel(['test_case' => 'CachePoolClear', 'root_config' => 'config.yml']);
     }

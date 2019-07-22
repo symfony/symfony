@@ -233,7 +233,10 @@ class GuardAuthenticationProviderTest extends TestCase
         $provider->authenticate($token);
     }
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
         $this->userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
@@ -242,7 +245,10 @@ class GuardAuthenticationProviderTest extends TestCase
             ->getMock();
     }
 
-    protected function tearDown()
+    /**
+     * @after
+     */
+    protected function after(): void
     {
         $this->userProvider = null;
         $this->userChecker = null;

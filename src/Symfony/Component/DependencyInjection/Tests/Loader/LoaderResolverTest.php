@@ -28,7 +28,10 @@ class LoaderResolverTest extends TestCase
     /** @var LoaderResolver */
     private $resolver;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    protected function before(): void
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
 

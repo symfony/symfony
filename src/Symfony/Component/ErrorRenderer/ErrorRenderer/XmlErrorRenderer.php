@@ -21,7 +21,7 @@ class XmlErrorRenderer implements ErrorRendererInterface
     private $debug;
     private $charset;
 
-    public function __construct(bool $debug = true, string $charset = null)
+    public function __construct(bool $debug = false, string $charset = null)
     {
         $this->debug = $debug;
         $this->charset = $charset ?: (ini_get('default_charset') ?: 'UTF-8');

@@ -32,6 +32,6 @@ class JsonErrorRendererTest extends TestCase
             "trace":
 JSON;
 
-        $this->assertStringStartsWith($expected, (new JsonErrorRenderer())->render($exception));
+        $this->assertStringStartsWith($expected, (new JsonErrorRenderer(true))->render($exception));
     }
 }

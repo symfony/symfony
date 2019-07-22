@@ -638,7 +638,7 @@ class Filesystem
     public function dumpFile(string $filename, $content)
     {
         if (\is_array($content)) {
-            throw new \TypeError(sprintf('Argument 2 passed to %s() must be string or resource, %s given.', __METHOD__, $content));
+            throw new \TypeError(sprintf('Argument 2 passed to %s() must be string or resource, array given.', __METHOD__));
         }
 
         $dir = \dirname($filename);
@@ -674,7 +674,7 @@ class Filesystem
     public function appendToFile(string $filename, $content)
     {
         if (\is_array($content)) {
-            throw new \TypeError(sprintf('Argument 2 passed to %s() must be string or resource, %s given.', __METHOD__, $content));
+            throw new \TypeError(sprintf('Argument 2 passed to %s() must be string or resource, array given.', __METHOD__));
         }
 
         $dir = \dirname($filename);

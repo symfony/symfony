@@ -15,11 +15,12 @@ use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class DebugProcessor implements DebugLoggerInterface
+class DebugProcessor implements DebugLoggerInterface, ResetInterface
 {
-    private $records = array();
-    private $errorCount = array();
+    private $records = [];
+    private $errorCount = [];
     private $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
@@ -31,14 +32,14 @@ class DebugProcessor implements DebugLoggerInterface
     {
         $hash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
 
-        $this->records[$hash][] = array(
+        $this->records[$hash][] = [
             'timestamp' => $record['datetime']->getTimestamp(),
             'message' => $record['message'],
             'priority' => $record['level'],
             'priorityName' => $record['level_name'],
             'context' => $record['context'],
             'channel' => isset($record['channel']) ? $record['channel'] : '',
-        );
+        ];
 
         if (!isset($this->errorCount[$hash])) {
             $this->errorCount[$hash] = 0;
@@ -58,14 +59,14 @@ class DebugProcessor implements DebugLoggerInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogs(/* Request $request = null */)
+    public function getLogs(Request $request = null)
     {
-        if (1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) && isset($this->records[$hash = spl_object_hash($request)])) {
-            return $this->records[$hash];
+        if (null !== $request) {
+            return $this->records[spl_object_hash($request)] ?? [];
         }
 
         if (0 === \count($this->records)) {
-            return array();
+            return [];
         }
 
         return array_merge(...array_values($this->records));
@@ -74,10 +75,10 @@ class DebugProcessor implements DebugLoggerInterface
     /**
      * {@inheritdoc}
      */
-    public function countErrors(/* Request $request = null */)
+    public function countErrors(Request $request = null)
     {
-        if (1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) && isset($this->errorCount[$hash = spl_object_hash($request)])) {
-            return $this->errorCount[$hash];
+        if (null !== $request) {
+            return $this->errorCount[spl_object_hash($request)] ?? 0;
         }
 
         return array_sum($this->errorCount);
@@ -88,7 +89,15 @@ class DebugProcessor implements DebugLoggerInterface
      */
     public function clear()
     {
-        $this->records = array();
-        $this->errorCount = array();
+        $this->records = [];
+        $this->errorCount = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->clear();
     }
 }

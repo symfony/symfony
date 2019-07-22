@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.43",
     "Names": {
         "Arab": "arābu",
         "Armi": "aramiešu",
@@ -25,15 +25,15 @@
         "Guru": "pandžabu",
         "Hanb": "haņu ar bopomofo",
         "Hang": "hangils",
-        "Hani": "ķīniešu",
+        "Hani": "haņu",
         "Hans": "vienkāršotā",
         "Hant": "tradicionālā",
         "Hebr": "ivrits",
         "Hira": "hiragana",
-        "Hrkt": "katakana vai hiragana",
+        "Hrkt": "japāņu zilbju alfabēts",
         "Hung": "senungāru",
         "Ital": "vecitāļu",
-        "Jamo": "džamo",
+        "Jamo": "jamo",
         "Java": "javiešu",
         "Jpan": "japāņu",
         "Kana": "katakana",
@@ -76,7 +76,6 @@
         "Zsye": "emocijzīmes",
         "Zsym": "simboli",
         "Zxxx": "bez rakstības",
-        "Zyyy": "vispārējā",
-        "Zzzz": "nezināma rakstība"
+        "Zyyy": "vispārējā"
     }
 }

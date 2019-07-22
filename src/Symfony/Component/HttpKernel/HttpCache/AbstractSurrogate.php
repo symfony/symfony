@@ -24,16 +24,16 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 abstract class AbstractSurrogate implements SurrogateInterface
 {
     protected $contentTypes;
-    protected $phpEscapeMap = array(
-        array('<?', '<%', '<s', '<S'),
-        array('<?php echo "<?"; ?>', '<?php echo "<%"; ?>', '<?php echo "<s"; ?>', '<?php echo "<S"; ?>'),
-    );
+    protected $phpEscapeMap = [
+        ['<?', '<%', '<s', '<S'],
+        ['<?php echo "<?"; ?>', '<?php echo "<%"; ?>', '<?php echo "<s"; ?>', '<?php echo "<S"; ?>'],
+    ];
 
     /**
      * @param array $contentTypes An array of content-type that should be parsed for Surrogate information
      *                            (default: text/html, text/xml, application/xhtml+xml, and application/xml)
      */
-    public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'))
+    public function __construct(array $contentTypes = ['text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'])
     {
         $this->contentTypes = $contentTypes;
     }
@@ -90,7 +90,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
      */
     public function handle(HttpCache $cache, $uri, $alt, $ignoreErrors)
     {
-        $subRequest = Request::create($uri, Request::METHOD_GET, array(), $cache->getRequest()->cookies->all(), array(), $cache->getRequest()->server->all());
+        $subRequest = Request::create($uri, Request::METHOD_GET, [], $cache->getRequest()->cookies->all(), [], $cache->getRequest()->server->all());
 
         try {
             $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);

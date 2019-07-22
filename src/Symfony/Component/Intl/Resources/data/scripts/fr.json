@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.49.82",
     "Names": {
         "Arab": "arabe",
         "Armi": "araméen impérial",
@@ -24,11 +24,12 @@
         "Cprt": "syllabaire chypriote",
         "Cyrl": "cyrillique",
         "Cyrs": "cyrillique (variante slavonne)",
-        "Deva": "dévanâgarî",
+        "Deva": "dévanagari",
         "Dsrt": "déséret",
         "Egyd": "démotique égyptien",
         "Egyh": "hiératique égyptien",
         "Egyp": "hiéroglyphes égyptiens",
+        "Elym": "élymaïque",
         "Ethi": "éthiopique",
         "Geok": "géorgien khoutsouri",
         "Geor": "géorgien",
@@ -46,6 +47,7 @@
         "Hebr": "hébreu",
         "Hira": "hiragana",
         "Hmng": "pahawh hmong",
+        "Hmnp": "nyiakeng puachue hmong",
         "Hrkt": "katakana ou hiragana",
         "Hung": "ancien hongrois",
         "Inds": "indus",
@@ -80,11 +82,12 @@
         "Moon": "moon",
         "Mtei": "meitei mayek",
         "Mymr": "birman",
+        "Nand": "nandinagari",
         "Nkoo": "n’ko",
         "Ogam": "ogam",
         "Olck": "ol tchiki",
         "Orkh": "orkhon",
-        "Orya": "oriya",
+        "Orya": "odia",
         "Osma": "osmanais",
         "Perm": "ancien permien",
         "Phag": "phags pa",
@@ -102,7 +105,7 @@
         "Saur": "saurashtra",
         "Sgnw": "écriture des signes",
         "Shaw": "shavien",
-        "Sinh": "cinghalais",
+        "Sinh": "cingalais",
         "Sund": "sundanais",
         "Sylo": "sylotî nâgrî",
         "Syrc": "syriaque",
@@ -124,6 +127,7 @@
         "Ugar": "ougaritique",
         "Vaii": "vaï",
         "Visp": "parole visible",
+        "Wcho": "wantcho",
         "Xpeo": "cunéiforme persépolitain",
         "Xsux": "cunéiforme suméro-akkadien",
         "Yiii": "yi",
@@ -132,7 +136,6 @@
         "Zsye": "emoji",
         "Zsym": "symboles",
         "Zxxx": "non écrit",
-        "Zyyy": "commun",
-        "Zzzz": "écriture inconnue"
+        "Zyyy": "commun"
     }
 }

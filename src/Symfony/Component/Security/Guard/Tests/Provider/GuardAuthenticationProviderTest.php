@@ -35,21 +35,21 @@ class GuardAuthenticationProviderTest extends TestCase
         $authenticatorA = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticatorB = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticatorC = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
-        $authenticators = array($authenticatorA, $authenticatorB, $authenticatorC);
+        $authenticators = [$authenticatorA, $authenticatorB, $authenticatorC];
 
         // called 2 times - for authenticator A and B (stops on B because of match)
         $this->preAuthenticationToken->expects($this->exactly(2))
             ->method('getGuardProviderKey')
             // it will return the "1" index, which will match authenticatorB
-            ->will($this->returnValue('my_cool_firewall_1'));
+            ->willReturn('my_cool_firewall_1');
 
-        $enteredCredentials = array(
+        $enteredCredentials = [
             'username' => '_weaverryan_test_user',
             'password' => 'guard_auth_ftw',
-        );
+        ];
         $this->preAuthenticationToken->expects($this->atLeastOnce())
             ->method('getCredentials')
-            ->will($this->returnValue($enteredCredentials));
+            ->willReturn($enteredCredentials);
 
         // authenticators A and C are never called
         $authenticatorA->expects($this->never())
@@ -61,18 +61,18 @@ class GuardAuthenticationProviderTest extends TestCase
         $authenticatorB->expects($this->once())
             ->method('getUser')
             ->with($enteredCredentials, $this->userProvider)
-            ->will($this->returnValue($mockedUser));
+            ->willReturn($mockedUser);
         // checkCredentials is called
         $authenticatorB->expects($this->once())
             ->method('checkCredentials')
             ->with($enteredCredentials, $mockedUser)
             // authentication works!
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $authedToken = $this->getMockBuilder(TokenInterface::class)->getMock();
         $authenticatorB->expects($this->once())
             ->method('createAuthenticatedToken')
             ->with($mockedUser, $providerKey)
-            ->will($this->returnValue($authedToken));
+            ->willReturn($authedToken);
 
         // user checker should be called
         $this->userChecker->expects($this->once())
@@ -100,23 +100,23 @@ class GuardAuthenticationProviderTest extends TestCase
         $this->preAuthenticationToken->expects($this->any())
             ->method('getGuardProviderKey')
             // the 0 index, to match the only authenticator
-            ->will($this->returnValue('my_uncool_firewall_0'));
+            ->willReturn('my_uncool_firewall_0');
 
         $this->preAuthenticationToken->expects($this->atLeastOnce())
             ->method('getCredentials')
-            ->will($this->returnValue('non-null-value'));
+            ->willReturn('non-null-value');
 
         $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $authenticator->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($mockedUser));
+            ->willReturn($mockedUser);
         // checkCredentials is called
         $authenticator->expects($this->once())
             ->method('checkCredentials')
             // authentication fails :(
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
-        $provider = new GuardAuthenticationProvider(array($authenticator), $this->userProvider, $providerKey, $this->userChecker);
+        $provider = new GuardAuthenticationProvider([$authenticator], $this->userProvider, $providerKey, $this->userChecker);
         $provider->authenticate($this->preAuthenticationToken);
     }
 
@@ -130,10 +130,10 @@ class GuardAuthenticationProviderTest extends TestCase
         // create a token and mark it as NOT authenticated anymore
         // this mimics what would happen if a user "changed" between request
         $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $token = new PostAuthenticationGuardToken($mockedUser, $providerKey, array('ROLE_USER'));
+        $token = new PostAuthenticationGuardToken($mockedUser, $providerKey, ['ROLE_USER']);
         $token->setAuthenticated(false);
 
-        $provider = new GuardAuthenticationProvider(array(), $this->userProvider, $providerKey, $this->userChecker);
+        $provider = new GuardAuthenticationProvider([], $this->userProvider, $providerKey, $this->userChecker);
         $actualToken = $provider->authenticate($token);
     }
 
@@ -141,7 +141,7 @@ class GuardAuthenticationProviderTest extends TestCase
     {
         $authenticatorA = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticatorB = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
-        $authenticators = array($authenticatorA, $authenticatorB);
+        $authenticators = [$authenticatorA, $authenticatorB];
 
         $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, 'first_firewall', $this->userChecker);
@@ -162,7 +162,7 @@ class GuardAuthenticationProviderTest extends TestCase
     public function testAuthenticateFailsOnNonOriginatingToken()
     {
         $authenticatorA = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
-        $authenticators = array($authenticatorA);
+        $authenticators = [$authenticatorA];
 
         $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, 'first_firewall', $this->userChecker);

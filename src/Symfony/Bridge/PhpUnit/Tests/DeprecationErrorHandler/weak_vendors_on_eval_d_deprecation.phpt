@@ -3,7 +3,8 @@ Test DeprecationErrorHandler in weak vendors mode on eval()'d deprecation
 --FILE--
 <?php
 
-putenv('SYMFONY_DEPRECATIONS_HELPER=weak_vendors');
+$k = 'SYMFONY_DEPRECATIONS_HELPER';
+putenv($k.'='.$_SERVER[$k] = $_ENV[$k] = 'max[self]=0');
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');
@@ -19,7 +20,6 @@ eval("@trigger_error('who knows where I come from?', E_USER_DEPRECATED);");
 
 ?>
 --EXPECTF--
-
 Other deprecation notices (1)
 
   1x: who knows where I come from?

@@ -36,7 +36,7 @@ class ContainerControllerResolver extends ControllerResolver
     {
         if (1 === substr_count($controller, ':')) {
             $controller = str_replace(':', '::', $controller);
-            @trigger_error(sprintf('Referencing controllers with a single colon is deprecated since Symfony 4.1. Use %s instead.', $controller), E_USER_DEPRECATED);
+            // TODO deprecate this in 5.1
         }
 
         return parent::createController($controller);
@@ -59,7 +59,7 @@ class ContainerControllerResolver extends ControllerResolver
         $this->throwExceptionIfControllerWasRemoved($class, $e);
 
         if ($e instanceof \ArgumentCountError) {
-            throw new \InvalidArgumentException(sprintf('Controller "%s" has required constructor arguments and does not exist in the container. Did you forget to define such a service?', $class), 0, $e);
+            throw new \InvalidArgumentException(sprintf('Controller "%s" has required constructor arguments and does not exist in the container. Did you forget to define the controller as a service?', $class), 0, $e);
         }
 
         throw new \InvalidArgumentException(sprintf('Controller "%s" does neither exist as service nor as class', $class), 0, $e);

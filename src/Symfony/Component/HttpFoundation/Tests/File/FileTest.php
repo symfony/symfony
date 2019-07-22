@@ -13,8 +13,10 @@ namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
+/**
+ * @requires extension fileinfo
+ */
 class FileTest extends TestCase
 {
     protected $file;
@@ -22,50 +24,24 @@ class FileTest extends TestCase
     public function testGetMimeTypeUsesMimeTypeGuessers()
     {
         $file = new File(__DIR__.'/Fixtures/test.gif');
-        $guesser = $this->createMockGuesser($file->getPathname(), 'image/gif');
-
-        MimeTypeGuesser::getInstance()->register($guesser);
-
         $this->assertEquals('image/gif', $file->getMimeType());
     }
 
     public function testGuessExtensionWithoutGuesser()
     {
         $file = new File(__DIR__.'/Fixtures/directory/.empty');
-
         $this->assertNull($file->guessExtension());
     }
 
     public function testGuessExtensionIsBasedOnMimeType()
     {
         $file = new File(__DIR__.'/Fixtures/test');
-        $guesser = $this->createMockGuesser($file->getPathname(), 'image/gif');
-
-        MimeTypeGuesser::getInstance()->register($guesser);
-
         $this->assertEquals('gif', $file->guessExtension());
-    }
-
-    /**
-     * @requires extension fileinfo
-     */
-    public function testGuessExtensionWithReset()
-    {
-        $file = new File(__DIR__.'/Fixtures/other-file.example');
-        $guesser = $this->createMockGuesser($file->getPathname(), 'image/gif');
-        MimeTypeGuesser::getInstance()->register($guesser);
-
-        $this->assertEquals('gif', $file->guessExtension());
-
-        MimeTypeGuesser::reset();
-
-        $this->assertNull($file->guessExtension());
     }
 
     public function testConstructWhenFileNotExists()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
-
+        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
         new File(__DIR__.'/Fixtures/not_here');
     }
 
@@ -110,14 +86,14 @@ class FileTest extends TestCase
 
     public function getFilenameFixtures()
     {
-        return array(
-            array('original.gif', 'original.gif'),
-            array('..\\..\\original.gif', 'original.gif'),
-            array('../../original.gif', 'original.gif'),
-            array('файлfile.gif', 'файлfile.gif'),
-            array('..\\..\\файлfile.gif', 'файлfile.gif'),
-            array('../../файлfile.gif', 'файлfile.gif'),
-        );
+        return [
+            ['original.gif', 'original.gif'],
+            ['..\\..\\original.gif', 'original.gif'],
+            ['../../original.gif', 'original.gif'],
+            ['файлfile.gif', 'файлfile.gif'],
+            ['..\\..\\файлfile.gif', 'файлfile.gif'],
+            ['../../файлfile.gif', 'файлfile.gif'],
+        ];
     }
 
     /**
@@ -163,18 +139,5 @@ class FileTest extends TestCase
         @unlink($sourcePath);
         @unlink($targetPath);
         @rmdir($targetDir);
-    }
-
-    protected function createMockGuesser($path, $mimeType)
-    {
-        $guesser = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface')->getMock();
-        $guesser
-            ->expects($this->once())
-            ->method('guess')
-            ->with($this->equalTo($path))
-            ->will($this->returnValue($mimeType))
-        ;
-
-        return $guesser;
     }
 }

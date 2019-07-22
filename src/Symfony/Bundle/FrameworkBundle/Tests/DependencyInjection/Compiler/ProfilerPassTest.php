@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ProfilerPassTest extends TestCase
 {
@@ -32,7 +32,7 @@ class ProfilerPassTest extends TestCase
         $builder = new ContainerBuilder();
         $builder->register('profiler', 'ProfilerClass');
         $builder->register('my_collector_service')
-            ->addTag('data_collector', array('template' => 'foo'));
+            ->addTag('data_collector', ['template' => 'foo']);
 
         $profilerPass = new ProfilerPass();
         $profilerPass->process($builder);
@@ -43,12 +43,12 @@ class ProfilerPassTest extends TestCase
         $container = new ContainerBuilder();
         $profilerDefinition = $container->register('profiler', 'ProfilerClass');
         $container->register('my_collector_service')
-            ->addTag('data_collector', array('template' => 'foo', 'id' => 'my_collector'));
+            ->addTag('data_collector', ['template' => 'foo', 'id' => 'my_collector']);
 
         $profilerPass = new ProfilerPass();
         $profilerPass->process($container);
 
-        $this->assertSame(array('my_collector_service' => array('my_collector', 'foo')), $container->getParameter('data_collector.templates'));
+        $this->assertSame(['my_collector_service' => ['my_collector', 'foo']], $container->getParameter('data_collector.templates'));
 
         // grab the method calls off of the "profiler" definition
         $methodCalls = $profilerDefinition->getMethodCalls();

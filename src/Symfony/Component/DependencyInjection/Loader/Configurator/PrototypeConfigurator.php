@@ -49,7 +49,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
         $definition->setAutowired($defaults->isAutowired());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
         $definition->setBindings($defaults->getBindings());
-        $definition->setChanges(array());
+        $definition->setChanges([]);
 
         $this->loader = $loader;
         $this->resource = $resource;
@@ -75,7 +75,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
      *
      * @return $this
      */
-    final public function exclude($excludes)
+    final public function exclude($excludes): object
     {
         $this->excludes = (array) $excludes;
 

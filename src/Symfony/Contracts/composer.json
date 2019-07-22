@@ -1,0 +1,53 @@
+{
+    "name": "symfony/contracts",
+    "type": "library",
+    "description": "A set of abstractions extracted out of the Symfony components",
+    "keywords": ["abstractions", "contracts", "decoupling", "interfaces", "interoperability", "standards"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "psr/cache": "^1.0",
+        "psr/container": "^1.0"
+    },
+    "require-dev": {
+        "symfony/polyfill-intl-idn": "^1.10"
+    },
+    "replace": {
+        "symfony/cache-contracts": "self.version",
+        "symfony/event-dispatcher-contracts": "self.version",
+        "symfony/http-client-contracts": "self.version",
+        "symfony/service-contracts": "self.version",
+        "symfony/translation-contracts": "self.version"
+    },
+    "suggest": {
+        "psr/event-dispatcher": "When using the EventDispatcher contracts",
+        "symfony/cache-implementation": "",
+        "symfony/event-dispatcher-implementation": "",
+        "symfony/http-client-implementation": "",
+        "symfony/service-implementation": "",
+        "symfony/translation-implementation": ""
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Contracts\\": "" },
+        "exclude-from-classmap": [
+            "**/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.1-dev"
+        }
+    }
+}

@@ -29,7 +29,7 @@ final class PersistentToken implements PersistentTokenInterface
         if (empty($class)) {
             throw new \InvalidArgumentException('$class must not be empty.');
         }
-        if ('' === $username || null === $username) {
+        if ('' === $username) {
             throw new \InvalidArgumentException('$username must not be empty.');
         }
         if (empty($series)) {
@@ -49,7 +49,7 @@ final class PersistentToken implements PersistentTokenInterface
     /**
      * {@inheritdoc}
      */
-    public function getClass()
+    public function getClass(): string
     {
         return $this->class;
     }
@@ -57,7 +57,7 @@ final class PersistentToken implements PersistentTokenInterface
     /**
      * {@inheritdoc}
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -65,7 +65,7 @@ final class PersistentToken implements PersistentTokenInterface
     /**
      * {@inheritdoc}
      */
-    public function getSeries()
+    public function getSeries(): string
     {
         return $this->series;
     }
@@ -73,7 +73,7 @@ final class PersistentToken implements PersistentTokenInterface
     /**
      * {@inheritdoc}
      */
-    public function getTokenValue()
+    public function getTokenValue(): string
     {
         return $this->tokenValue;
     }
@@ -81,7 +81,7 @@ final class PersistentToken implements PersistentTokenInterface
     /**
      * {@inheritdoc}
      */
-    public function getLastUsed()
+    public function getLastUsed(): \DateTime
     {
         return $this->lastUsed;
     }

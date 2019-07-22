@@ -43,14 +43,13 @@ class LanguageTypeTest extends BaseTypeTest
     public function testChoiceTranslationLocaleOption()
     {
         $choices = $this->factory
-            ->create(static::TESTED_TYPE, null, array(
+            ->create(static::TESTED_TYPE, null, [
                 'choice_translation_locale' => 'uk',
-            ))
+            ])
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
         $this->assertContains(new ChoiceView('en', 'en', 'англійська'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'British English'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('en_US', 'en_US', 'англійська (США)'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('fr', 'fr', 'французька'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('my', 'my', 'бірманська'), $choices, '', false, false);
@@ -67,5 +66,10 @@ class LanguageTypeTest extends BaseTypeTest
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull($expected, $norm, '');
+    }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en')
+    {
+        parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }
 }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\BaseNode;
-use Symfony\Component\Config\Definition\Exception\TreeWithoutRootNodeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
@@ -26,13 +25,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ValidateEnvPlaceholdersPass implements CompilerPassInterface
 {
-    private static $typeFixtures = array('array' => array(), 'bool' => false, 'float' => 0.0, 'int' => 0, 'string' => '');
+    private static $typeFixtures = ['array' => [], 'bool' => false, 'float' => 0.0, 'int' => 0, 'string' => ''];
+
+    private $extensionConfig = [];
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
+        $this->extensionConfig = [];
+
         if (!class_exists(BaseNode::class) || !$extensions = $container->getExtensions()) {
             return;
         }
@@ -46,14 +49,14 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         $envTypes = $resolvingBag->getProvidedTypes();
         try {
             foreach ($resolvingBag->getEnvPlaceholders() + $resolvingBag->getUnusedEnvPlaceholders() as $env => $placeholders) {
-                $values = array();
+                $values = [];
                 if (false === $i = strpos($env, ':')) {
-                    $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : null;
+                    $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : self::$typeFixtures['string'];
                     $defaultType = null !== $default ? self::getType($default) : 'string';
                     $values[$defaultType] = $default;
                 } else {
                     $prefix = substr($env, 0, $i);
-                    foreach ($envTypes[$prefix] ?? array('string') as $type) {
+                    foreach ($envTypes[$prefix] ?? ['string'] as $type) {
                         $values[$type] = self::$typeFixtures[$type] ?? null;
                     }
                 }
@@ -65,7 +68,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
             $processor = new Processor();
 
             foreach ($extensions as $name => $extension) {
-                if (!$extension instanceof ConfigurationExtensionInterface || !$config = $container->getExtensionConfig($name)) {
+                if (!$extension instanceof ConfigurationExtensionInterface || !$config = array_filter($container->getExtensionConfig($name))) {
                     // this extension has no semantic configuration or was not called
                     continue;
                 }
@@ -76,13 +79,24 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
                     continue;
                 }
 
-                try {
-                    $processor->processConfiguration($configuration, $config);
-                } catch (TreeWithoutRootNodeException $e) {
-                }
+                $this->extensionConfig[$name] = $processor->processConfiguration($configuration, $config);
             }
         } finally {
             BaseNode::resetPlaceholders();
+        }
+
+        $resolvingBag->clearUnusedEnvPlaceholders();
+    }
+
+    /**
+     * @internal
+     */
+    public function getExtensionConfig(): array
+    {
+        try {
+            return $this->extensionConfig;
+        } finally {
+            $this->extensionConfig = [];
         }
     }
 

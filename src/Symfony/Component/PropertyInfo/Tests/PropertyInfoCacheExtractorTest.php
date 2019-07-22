@@ -61,4 +61,10 @@ class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
         parent::testGetProperties();
         parent::testGetProperties();
     }
+
+    public function testIsInitializable()
+    {
+        parent::testIsInitializable();
+        parent::testIsInitializable();
+    }
 }

@@ -21,9 +21,9 @@ class AcceptHeaderItem
     private $value;
     private $quality = 1.0;
     private $index = 0;
-    private $attributes = array();
+    private $attributes = [];
 
-    public function __construct(string $value, array $attributes = array())
+    public function __construct(string $value, array $attributes = [])
     {
         $this->value = $value;
         foreach ($attributes as $name => $value) {
@@ -49,14 +49,14 @@ class AcceptHeaderItem
     }
 
     /**
-     * Returns header  value's string representation.
+     * Returns header value's string representation.
      *
      * @return string
      */
     public function __toString()
     {
         $string = $this->value.($this->quality < 1 ? ';q='.$this->quality : '');
-        if (count($this->attributes) > 0) {
+        if (\count($this->attributes) > 0) {
             $string .= '; '.HeaderUtils::toString($this->attributes, ';');
         }
 

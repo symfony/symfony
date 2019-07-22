@@ -17,6 +17,18 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyToLocalizedStringTransformerTest extends TestCase
 {
+    private $previousLocale;
+
+    protected function setUp()
+    {
+        $this->previousLocale = setlocale(LC_ALL, '0');
+    }
+
+    protected function tearDown()
+    {
+        setlocale(LC_ALL, $this->previousLocale);
+    }
+
     public function testTransform()
     {
         // Since we test against "de_AT", we need the full implementation
@@ -33,7 +45,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('abcd');
     }
@@ -61,7 +73,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->reverseTransform(12345);
     }
@@ -73,7 +85,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
         $this->assertNull($transformer->reverseTransform(''));
     }
 
-    public function testFloatToIntConversionMismatchOnReversTransform()
+    public function testFloatToIntConversionMismatchOnReverseTransform()
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
         IntlTestHelper::requireFullIntl($this, false);
@@ -89,5 +101,17 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
         \Locale::setDefault('de_AT');
 
         $this->assertSame('10,20', $transformer->transform(1020));
+    }
+
+    public function testValidNumericValuesWithNonDotDecimalPointCharacter()
+    {
+        // calling setlocale() here is important as it changes the representation of floats when being cast to strings
+        setlocale(LC_ALL, 'de_AT.UTF-8');
+
+        $transformer = new MoneyToLocalizedStringTransformer(4, null, null, 100);
+        IntlTestHelper::requireFullIntl($this, false);
+        \Locale::setDefault('de_AT');
+
+        $this->assertSame('0,0035', $transformer->transform(12 / 34));
     }
 }

@@ -11,4 +11,5 @@
     <option key="opt1">val1</option>
     <option key="opt2">val2</option>
   </options>
+  <condition>context.getMethod() in ['GET', 'HEAD', 'POST']</condition>
 </route>

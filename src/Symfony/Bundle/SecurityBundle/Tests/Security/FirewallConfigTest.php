@@ -18,8 +18,8 @@ class FirewallConfigTest extends TestCase
 {
     public function testGetters()
     {
-        $listeners = array('logout', 'remember_me', 'anonymous');
-        $options = array(
+        $listeners = ['logout', 'remember_me', 'anonymous'];
+        $options = [
             'request_matcher' => 'foo_request_matcher',
             'security' => false,
             'stateless' => false,
@@ -29,8 +29,8 @@ class FirewallConfigTest extends TestCase
             'access_denied_url' => 'foo_access_denied_url',
             'access_denied_handler' => 'foo_access_denied_handler',
             'user_checker' => 'foo_user_checker',
-            'switch_user' => array('provider' => null, 'parameter' => '_switch_user', 'role' => 'ROLE_ALLOWED_TO_SWITCH'),
-        );
+            'switch_user' => ['provider' => null, 'parameter' => '_switch_user', 'role' => 'ROLE_ALLOWED_TO_SWITCH'],
+        ];
 
         $config = new FirewallConfig(
             'foo_firewall',

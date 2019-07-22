@@ -19,8 +19,8 @@ class UsernameNotFoundExceptionTest extends TestCase
     public function testGetMessageData()
     {
         $exception = new UsernameNotFoundException('Username could not be found.');
-        $this->assertEquals(array('{{ username }}' => null), $exception->getMessageData());
+        $this->assertEquals(['{{ username }}' => null], $exception->getMessageData());
         $exception->setUsername('username');
-        $this->assertEquals(array('{{ username }}' => 'username'), $exception->getMessageData());
+        $this->assertEquals(['{{ username }}' => 'username'], $exception->getMessageData());
     }
 }

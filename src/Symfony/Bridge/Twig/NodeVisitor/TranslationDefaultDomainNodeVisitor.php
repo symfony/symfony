@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
-use Symfony\Bridge\Twig\Node\TransNode;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
+use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
 use Twig\Node\BlockNode;
 use Twig\Node\Expression\ArrayExpression;
@@ -56,7 +56,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
                 $name = new AssignNameExpression($var, $node->getTemplateLine());
                 $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
 
-                return new SetNode(false, new Node(array($name)), new Node(array($node->getNode('expr'))), $node->getTemplateLine());
+                return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
             }
         }
 
@@ -64,7 +64,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
             return $node;
         }
 
-        if ($node instanceof FilterExpression && in_array($node->getNode('filter')->getAttribute('value'), array('trans', 'transchoice'))) {
+        if ($node instanceof FilterExpression && \in_array($node->getNode('filter')->getAttribute('value'), ['trans', 'transchoice'])) {
             $arguments = $node->getNode('arguments');
             $ind = 'trans' === $node->getNode('filter')->getAttribute('value') ? 1 : 2;
             if ($this->isNamedArguments($arguments)) {
@@ -74,7 +74,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
             } else {
                 if (!$arguments->hasNode($ind)) {
                     if (!$arguments->hasNode($ind - 1)) {
-                        $arguments->setNode($ind - 1, new ArrayExpression(array(), $node->getTemplateLine()));
+                        $arguments->setNode($ind - 1, new ArrayExpression([], $node->getTemplateLine()));
                     }
 
                     $arguments->setNode($ind, $this->scope->get('domain'));
@@ -95,7 +95,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
     protected function doLeaveNode(Node $node, Environment $env)
     {
         if ($node instanceof TransDefaultDomainNode) {
-            return false;
+            return null;
         }
 
         if ($node instanceof BlockNode || $node instanceof ModuleNode) {
@@ -119,7 +119,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
     private function isNamedArguments($arguments)
     {
         foreach ($arguments as $name => $node) {
-            if (!is_int($name)) {
+            if (!\is_int($name)) {
                 return true;
             }
         }

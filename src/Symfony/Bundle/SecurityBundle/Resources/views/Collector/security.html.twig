@@ -307,7 +307,7 @@
 
             <tbody>
                 {% for decision in collector.accessDecisionLog %}
-                    <tr>
+                    <tr class="voter_result">
                         <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
                         <td class="font-normal">
                             {{ decision.result
@@ -330,6 +330,40 @@
                             {% endif %}
                         </td>
                         <td>{{ profiler_dump(decision.seek('object')) }}</td>
+                    </tr>
+                    <tr class="voter_details">
+                        <td></td>
+                        <td colspan="3">
+                        {% if decision.voter_details is not empty %}
+                            {% set voter_details_id = 'voter-details-' ~ loop.index %}
+                            <div id="{{ voter_details_id }}" class="sf-toggle-content sf-toggle-hidden">
+                                <table>
+                                   <tbody>
+                                    {% for voter_detail in decision.voter_details %}
+                                        <tr>
+                                            <td class="font-normal">{{ profiler_dump(voter_detail['class']) }}</td>
+                                            {% if collector.voterStrategy == constant('Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager::STRATEGY_UNANIMOUS') %}
+                                            <td class="font-normal text-small">attribute {{ voter_detail['attributes'][0] }}</td>
+                                            {% endif %}
+                                            <td class="font-normal text-small">
+                                                {% if voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_GRANTED') %}
+                                                    ACCESS GRANTED
+                                                {% elseif voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_ABSTAIN') %}
+                                                    ACCESS ABSTAIN
+                                                {% elseif voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_DENIED') %}
+                                                    ACCESS DENIED
+                                                {% else %}
+                                                    unknown ({{ voter_detail['vote'] }})
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ voter_details_id }}" data-toggle-alt-content="Hide voter details">Show voter details</a>
+                        {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

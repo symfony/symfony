@@ -1,4 +1,4 @@
 Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serialization\Author:
     attributes:
-        gender:
+        eyeColor:
             groups: ['group1', 'group2']

@@ -17,7 +17,7 @@ class InputFormFieldTest extends FormFieldTestCase
 {
     public function testInitialize()
     {
-        $node = $this->createNode('input', '', array('type' => 'text', 'name' => 'name', 'value' => 'value'));
+        $node = $this->createNode('input', '', ['type' => 'text', 'name' => 'name', 'value' => 'value']);
         $field = new InputFormField($node);
 
         $this->assertEquals('value', $field->getValue(), '->initialize() sets the value of the field to the value attribute value');
@@ -30,7 +30,7 @@ class InputFormFieldTest extends FormFieldTestCase
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input');
         }
 
-        $node = $this->createNode('input', '', array('type' => 'checkbox'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox']);
         try {
             $field = new InputFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is a checkbox');
@@ -38,7 +38,7 @@ class InputFormFieldTest extends FormFieldTestCase
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is a checkbox');
         }
 
-        $node = $this->createNode('input', '', array('type' => 'file'));
+        $node = $this->createNode('input', '', ['type' => 'file']);
         try {
             $field = new InputFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is a file');

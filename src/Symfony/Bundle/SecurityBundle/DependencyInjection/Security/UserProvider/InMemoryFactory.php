@@ -28,10 +28,10 @@ class InMemoryFactory implements UserProviderFactoryInterface
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
         $defaultPassword = new Parameter('container.build_id');
-        $users = array();
+        $users = [];
 
         foreach ($config['users'] as $username => $user) {
-            $users[$username] = array('password' => null !== $user['password'] ? (string) $user['password'] : $defaultPassword, 'roles' => $user['roles']);
+            $users[$username] = ['password' => null !== $user['password'] ? (string) $user['password'] : $defaultPassword, 'roles' => $user['roles']];
         }
 
         $definition->addArgument($users);

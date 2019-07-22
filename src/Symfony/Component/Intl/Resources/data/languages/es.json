@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.49.82",
     "Names": {
         "aa": "afar",
         "ab": "abjasio",
@@ -320,7 +320,6 @@
         "ms": "malayo",
         "mt": "maltés",
         "mua": "mundang",
-        "mul": "varios idiomas",
         "mus": "creek",
         "mwl": "mirandés",
         "mwr": "marwari",
@@ -351,7 +350,7 @@
         "non": "nórdico antiguo",
         "nqo": "n’ko",
         "nr": "ndebele meridional",
-        "nso": "sesotho septentrional",
+        "nso": "sotho septentrional",
         "nus": "nuer",
         "nv": "navajo",
         "nwc": "newari clásico",
@@ -396,7 +395,6 @@
         "ro_MD": "moldavo",
         "rof": "rombo",
         "rom": "romaní",
-        "root": "raíz",
         "ru": "ruso",
         "rup": "arrumano",
         "rw": "kinyarwanda",
@@ -445,7 +443,7 @@
         "srr": "serer",
         "ss": "suazi",
         "ssy": "saho",
-        "st": "sesotho meridional",
+        "st": "sotho meridional",
         "su": "sundanés",
         "suk": "sukuma",
         "sus": "susu",
@@ -494,7 +492,6 @@
         "uga": "ugarítico",
         "uk": "ucraniano",
         "umb": "umbundu",
-        "und": "lengua desconocida",
         "ur": "urdu",
         "uz": "uzbeko",
         "vai": "vai",
@@ -531,7 +528,6 @@
         "zh_Hant": "chino tradicional",
         "zu": "zulú",
         "zun": "zuñi",
-        "zxx": "sin contenido lingüístico",
         "zza": "zazaki"
     }
 }

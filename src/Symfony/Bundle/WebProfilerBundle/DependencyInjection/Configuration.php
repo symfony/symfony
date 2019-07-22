@@ -31,10 +31,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('web_profiler');
+        $treeBuilder = new TreeBuilder('web_profiler');
 
-        $rootNode
+        $treeBuilder->getRootNode()
             ->children()
                 ->booleanNode('toolbar')->defaultFalse()->end()
                 ->booleanNode('intercept_redirects')->defaultFalse()->end()

@@ -11,19 +11,19 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
-use Symfony\Component\Console\Command\ListCommand;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -32,7 +32,7 @@ class Application extends BaseApplication
 {
     private $kernel;
     private $commandsRegistered = false;
-    private $registrationErrors = array();
+    private $registrationErrors = [];
 
     public function __construct(KernelInterface $kernel)
     {
@@ -56,21 +56,29 @@ class Application extends BaseApplication
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if ($this->kernel->getContainer()->has('services_resetter')) {
+            $this->kernel->getContainer()->get('services_resetter')->reset();
+        }
+    }
+
+    /**
      * Runs the current application.
      *
      * @return int 0 if everything went fine, or an error code
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->kernel->boot();
-
-        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
-
         $this->registerCommands();
 
         if ($this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);
         }
+
+        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
 
         return parent::doRun($input, $output);
     }
@@ -83,7 +91,7 @@ class Application extends BaseApplication
         if (!$command instanceof ListCommand) {
             if ($this->registrationErrors) {
                 $this->renderRegistrationErrors($input, $output);
-                $this->registrationErrors = array();
+                $this->registrationErrors = [];
             }
 
             return parent::doRunCommand($command, $input, $output);
@@ -93,7 +101,7 @@ class Application extends BaseApplication
 
         if ($this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);
-            $this->registrationErrors = array();
+            $this->registrationErrors = [];
         }
 
         return $returnCode;
@@ -140,7 +148,7 @@ class Application extends BaseApplication
      */
     public function getLongVersion()
     {
-        return parent::getLongVersion().sprintf(' (kernel: <comment>%s</>, env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getName(), $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
+        return parent::getLongVersion().sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
     public function add(Command $command)
@@ -179,7 +187,7 @@ class Application extends BaseApplication
         }
 
         if ($container->hasParameter('console.command.ids')) {
-            $lazyCommandIds = $container->hasParameter('console.lazy_command.ids') ? $container->getParameter('console.lazy_command.ids') : array();
+            $lazyCommandIds = $container->hasParameter('console.lazy_command.ids') ? $container->getParameter('console.lazy_command.ids') : [];
             foreach ($container->getParameter('console.command.ids') as $id) {
                 if (!isset($lazyCommandIds[$id])) {
                     try {

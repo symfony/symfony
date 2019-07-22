@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>Värdet är inte en giltig epost-adress.</target>
+                <target>Värdet är inte en giltig e-postadress.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -317,6 +317,22 @@
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Fel</target>
+            </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>Detta är inte ett giltigt UUID.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Detta värde ska vara en multipel av {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Denna BIC-koden är inte associerad med IBAN {{ iban }}.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Detta värde ska vara giltig JSON.</target>
             </trans-unit>
         </body>
     </file>

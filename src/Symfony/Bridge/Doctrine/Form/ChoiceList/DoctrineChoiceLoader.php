@@ -42,16 +42,20 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      *
      * @param ObjectManager              $manager      The object manager
      * @param string                     $class        The class name of the loaded objects
-     * @param IdReader                   $idReader     The reader for the object IDs
-     * @param null|EntityLoaderInterface $objectLoader The objects loader
+     * @param IdReader|null              $idReader     The reader for the object IDs
+     * @param EntityLoaderInterface|null $objectLoader The objects loader
      */
     public function __construct(ObjectManager $manager, string $class, IdReader $idReader = null, EntityLoaderInterface $objectLoader = null)
     {
         $classMetadata = $manager->getClassMetadata($class);
 
+        if ($idReader && !$idReader->isSingleId()) {
+            throw new \InvalidArgumentException(sprintf('The second argument `$idReader` of "%s" must be null when the query cannot be optimized because of composite id fields.', __METHOD__));
+        }
+
         $this->manager = $manager;
         $this->class = $classMetadata->getName();
-        $this->idReader = $idReader ?: new IdReader($manager, $classMetadata);
+        $this->idReader = $idReader;
         $this->objectLoader = $objectLoader;
     }
 
@@ -78,16 +82,16 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     {
         // Performance optimization
         if (empty($choices)) {
-            return array();
+            return [];
         }
 
         // Optimize performance for single-field identifiers. We already
         // know that the IDs are used as values
-        $optimize = null === $value || is_array($value) && $value[0] === $this->idReader;
+        $optimize = $this->idReader && (null === $value || \is_array($value) && $value[0] === $this->idReader);
 
         // Attention: This optimization does not check choices for existence
         if ($optimize && !$this->choiceList && $this->idReader->isSingleId()) {
-            $values = array();
+            $values = [];
 
             // Maintain order and indices of the given objects
             foreach ($choices as $i => $object) {
@@ -115,17 +119,17 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         // statements, consequently no test fails when this code is removed.
         // https://github.com/symfony/symfony/pull/8981#issuecomment-24230557
         if (empty($values)) {
-            return array();
+            return [];
         }
 
         // Optimize performance in case we have an object loader and
         // a single-field identifier
-        $optimize = null === $value || is_array($value) && $this->idReader === $value[0];
+        $optimize = $this->idReader && (null === $value || \is_array($value) && $this->idReader === $value[0]);
 
         if ($optimize && !$this->choiceList && $this->objectLoader && $this->idReader->isSingleId()) {
             $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values);
-            $objectsById = array();
-            $objects = array();
+            $objectsById = [];
+            $objects = [];
 
             // Maintain order and indices from the given $values
             // An alternative approach to the following loop is to add the

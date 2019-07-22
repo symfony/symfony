@@ -14,4 +14,5 @@
 [39;49m| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler[39;49m[39;49m           |[39;49m
 [39;49m|              | [39;49m[39;49mopt1: val1[39;49m[39;49m                                                        |[39;49m
 [39;49m|              | [39;49mopt2: val2                                                        |
+| Condition    | context.getMethod() in ['GET', 'HEAD', 'POST']                    |
 +--------------+-------------------------------------------------------------------+

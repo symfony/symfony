@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputAwareInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * An implementation of InputAwareInterface for Helpers.

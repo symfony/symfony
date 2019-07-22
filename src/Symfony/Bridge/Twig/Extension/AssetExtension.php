@@ -34,10 +34,10 @@ class AssetExtension extends AbstractExtension
      */
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('asset', array($this, 'getAssetUrl')),
-            new TwigFunction('asset_version', array($this, 'getAssetVersion')),
-        );
+        return [
+            new TwigFunction('asset', [$this, 'getAssetUrl']),
+            new TwigFunction('asset_version', [$this, 'getAssetVersion']),
+        ];
     }
 
     /**

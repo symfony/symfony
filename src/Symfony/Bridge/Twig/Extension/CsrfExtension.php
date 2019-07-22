@@ -25,8 +25,8 @@ class CsrfExtension extends AbstractExtension
      */
     public function getFunctions(): array
     {
-        return array(
-            new TwigFunction('csrf_token', array(CsrfRuntime::class, 'getCsrfToken')),
-        );
+        return [
+            new TwigFunction('csrf_token', [CsrfRuntime::class, 'getCsrfToken']),
+        ];
     }
 }

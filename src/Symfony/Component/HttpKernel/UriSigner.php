@@ -47,12 +47,13 @@ class UriSigner
         if (isset($url['query'])) {
             parse_str($url['query'], $params);
         } else {
-            $params = array();
+            $params = [];
         }
 
         $uri = $this->buildUrl($url, $params);
+        $params[$this->parameter] = $this->computeHash($uri);
 
-        return $uri.(false === strpos($uri, '?') ? '?' : '&').$this->parameter.'='.$this->computeHash($uri);
+        return $this->buildUrl($url, $params);
     }
 
     /**
@@ -68,14 +69,14 @@ class UriSigner
         if (isset($url['query'])) {
             parse_str($url['query'], $params);
         } else {
-            $params = array();
+            $params = [];
         }
 
         if (empty($params[$this->parameter])) {
             return false;
         }
 
-        $hash = urlencode($params[$this->parameter]);
+        $hash = $params[$this->parameter];
         unset($params[$this->parameter]);
 
         return $this->computeHash($this->buildUrl($url, $params)) === $hash;
@@ -83,10 +84,10 @@ class UriSigner
 
     private function computeHash($uri)
     {
-        return urlencode(base64_encode(hash_hmac('sha256', $uri, $this->secret, true)));
+        return base64_encode(hash_hmac('sha256', $uri, $this->secret, true));
     }
 
-    private function buildUrl(array $url, array $params = array())
+    private function buildUrl(array $url, array $params = [])
     {
         ksort($params, SORT_STRING);
         $url['query'] = http_build_query($params, '', '&');

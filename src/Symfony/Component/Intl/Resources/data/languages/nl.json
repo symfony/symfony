@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.49.82",
     "Names": {
         "aa": "Afar",
         "ab": "Abchazisch",
@@ -87,6 +87,7 @@
         "car": "Caribisch",
         "cay": "Cayuga",
         "cch": "Atsam",
+        "ccp": "Chakma",
         "ce": "Tsjetsjeens",
         "ceb": "Cebuano",
         "cgg": "Chiga",
@@ -355,7 +356,6 @@
         "ms": "Maleis",
         "mt": "Maltees",
         "mua": "Mundang",
-        "mul": "Meerdere talen",
         "mus": "Creek",
         "mwl": "Mirandees",
         "mwr": "Marwari",
@@ -439,7 +439,6 @@
         "ro": "Roemeens",
         "rof": "Rombo",
         "rom": "Romani",
-        "root": "Root",
         "rtm": "Rotumaans",
         "ru": "Russisch",
         "rue": "Roetheens",
@@ -553,7 +552,6 @@
         "uga": "Oegaritisch",
         "uk": "Oekraïens",
         "umb": "Umbundu",
-        "und": "onbekende taal",
         "ur": "Urdu",
         "uz": "Oezbeeks",
         "vai": "Vai",
@@ -596,7 +594,6 @@
         "zh": "Chinees",
         "zu": "Zoeloe",
         "zun": "Zuni",
-        "zxx": "geen linguïstische inhoud",
         "zza": "Zaza"
     }
 }

@@ -11,18 +11,20 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * ChannelListener switches the HTTP protocol based on the access control
  * configuration.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
-class ChannelListener implements ListenerInterface
+class ChannelListener
 {
     private $map;
     private $authenticationEntryPoint;
@@ -38,7 +40,7 @@ class ChannelListener implements ListenerInterface
     /**
      * Handles channel management.
      */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
 
@@ -46,7 +48,13 @@ class ChannelListener implements ListenerInterface
 
         if ('https' === $channel && !$request->isSecure()) {
             if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTPS.');
+                if ('https' === $request->headers->get('X-Forwarded-Proto')) {
+                    $this->logger->info('Redirecting to HTTPS. ("X-Forwarded-Proto" header is set to "https" - did you set "trusted_proxies" correctly?)');
+                } elseif (false !== strpos($request->headers->get('Forwarded'), 'proto=https')) {
+                    $this->logger->info('Redirecting to HTTPS. ("Forwarded" header is set to "proto=https" - did you set "trusted_proxies" correctly?)');
+                } else {
+                    $this->logger->info('Redirecting to HTTPS.');
+                }
             }
 
             $response = $this->authenticationEntryPoint->start($request);

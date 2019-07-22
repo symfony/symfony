@@ -33,7 +33,7 @@ class PasswordTypeTest extends BaseTypeTest
 
     public function testNotEmptyIfSubmittedAndNotAlwaysEmpty()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('always_empty' => false));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['always_empty' => false]);
         $form->submit('pAs5w0rd');
 
         $this->assertSame('pAs5w0rd', $form->createView()->vars['value']);

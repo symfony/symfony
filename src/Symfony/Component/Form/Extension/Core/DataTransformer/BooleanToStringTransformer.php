@@ -31,11 +31,11 @@ class BooleanToStringTransformer implements DataTransformerInterface
      * @param string $trueValue   The value emitted upon transform if the input is true
      * @param array  $falseValues
      */
-    public function __construct(string $trueValue, array $falseValues = array(null))
+    public function __construct(string $trueValue, array $falseValues = [null])
     {
         $this->trueValue = $trueValue;
         $this->falseValues = $falseValues;
-        if (in_array($this->trueValue, $this->falseValues, true)) {
+        if (\in_array($this->trueValue, $this->falseValues, true)) {
             throw new InvalidArgumentException('The specified "true" value is contained in the false-values');
         }
     }
@@ -55,7 +55,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
             return;
         }
 
-        if (!is_bool($value)) {
+        if (!\is_bool($value)) {
             throw new TransformationFailedException('Expected a Boolean.');
         }
 
@@ -73,11 +73,11 @@ class BooleanToStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (in_array($value, $this->falseValues, true)) {
+        if (\in_array($value, $this->falseValues, true)) {
             return false;
         }
 
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 

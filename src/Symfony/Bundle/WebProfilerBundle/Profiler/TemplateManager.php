@@ -12,13 +12,9 @@
 namespace Symfony\Bundle\WebProfilerBundle\Profiler;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Loader\ExistsLoaderInterface;
-use Twig\Loader\SourceContextLoaderInterface;
-use Twig\Template;
 
 /**
  * Profiler Templates Manager.
@@ -42,14 +38,11 @@ class TemplateManager
     /**
      * Gets the template name for a given panel.
      *
-     * @param Profile $profile
-     * @param string  $panel
-     *
      * @return mixed
      *
      * @throws NotFoundHttpException
      */
-    public function getName(Profile $profile, $panel)
+    public function getName(Profile $profile, string $panel)
     {
         $templates = $this->getNames($profile);
 
@@ -69,7 +62,8 @@ class TemplateManager
      */
     public function getNames(Profile $profile)
     {
-        $templates = array();
+        $loader = $this->twig->getLoader();
+        $templates = [];
 
         foreach ($this->templates as $arguments) {
             if (null === $arguments) {
@@ -86,7 +80,7 @@ class TemplateManager
                 $template = substr($template, 0, -10);
             }
 
-            if (!$this->templateExists($template.'.html.twig')) {
+            if (!$loader->exists($template.'.html.twig')) {
                 throw new \UnexpectedValueException(sprintf('The profiler template "%s.html.twig" for data collector "%s" does not exist.', $template, $name));
             }
 
@@ -94,27 +88,5 @@ class TemplateManager
         }
 
         return $templates;
-    }
-
-    // to be removed when the minimum required version of Twig is >= 2.0
-    protected function templateExists($template)
-    {
-        $loader = $this->twig->getLoader();
-        if ($loader instanceof ExistsLoaderInterface) {
-            return $loader->exists($template);
-        }
-
-        try {
-            if ($loader instanceof SourceContextLoaderInterface || method_exists($loader, 'getSourceContext')) {
-                $loader->getSourceContext($template);
-            } else {
-                $loader->getSource($template);
-            }
-
-            return true;
-        } catch (LoaderError $e) {
-        }
-
-        return false;
     }
 }

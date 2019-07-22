@@ -1,6 +1,47 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * made `Cookie` auto-secure and lax by default
+ * removed classes in the `MimeType` namespace, use the Symfony Mime component instead
+ * removed method `UploadedFile::getClientSize()` and the related constructor argument
+ * made `Request::getSession()` throw if the session has not been set before
+ * removed `Response::HTTP_RESERVED_FOR_WEBDAV_ADVANCED_COLLECTIONS_EXPIRED_PROPOSAL`
+ * passing a null url when instantiating a `RedirectResponse` is not allowed
+
+4.4.0
+-----
+
+ * passing arguments to `Request::isMethodSafe()` is deprecated.
+ * `ApacheRequest` is deprecated, use the `Request` class instead.
+
+4.3.0
+-----
+
+ * added PHPUnit constraints: `RequestAttributeValueSame`, `ResponseCookieValueSame`, `ResponseHasCookie`,
+   `ResponseHasHeader`, `ResponseHeaderSame`, `ResponseIsRedirected`, `ResponseIsSuccessful`, and `ResponseStatusCodeSame`
+ * deprecated `MimeTypeGuesserInterface` and `ExtensionGuesserInterface` in favor of `Symfony\Component\Mime\MimeTypesInterface`.
+ * deprecated `MimeType` and `MimeTypeExtensionGuesser` in favor of `Symfony\Component\Mime\MimeTypes`.
+ * deprecated `FileBinaryMimeTypeGuesser` in favor of `Symfony\Component\Mime\FileBinaryMimeTypeGuesser`.
+ * deprecated `FileinfoMimeTypeGuesser` in favor of `Symfony\Component\Mime\FileinfoMimeTypeGuesser`.
+ * added `UrlHelper` that allows to get an absolute URL and a relative path for a given path
+
+4.2.0
+-----
+
+ * the default value of the "$secure" and "$samesite" arguments of Cookie's constructor
+   will respectively change from "false" to "null" and from "null" to "lax" in Symfony
+   5.0, you should define their values explicitly or use "Cookie::create()" instead.
+ * added `matchPort()` in RequestMatcher
+
+4.1.3
+-----
+
+ * [BC BREAK] Support for the IIS-only `X_ORIGINAL_URL` and `X_REWRITE_URL`
+   HTTP headers has been dropped for security reasons.
+
 4.1.0
 -----
 
@@ -176,10 +217,10 @@ CHANGELOG
  * Added `FlashBag`. Flashes expire when retrieved by `get()` or `all()`. This
    implementation is ESI compatible.
  * Added `AutoExpireFlashBag` (default) to replicate Symfony 2.0.x auto expire
-   behaviour of messages auto expiring after one page page load.  Messages must
+   behavior of messages auto expiring after one page page load.  Messages must
    be retrieved by `get()` or `all()`.
  * Added `Symfony\Component\HttpFoundation\Attribute\AttributeBag` to replicate
-   attributes storage behaviour from 2.0.x (default).
+   attributes storage behavior from 2.0.x (default).
  * Added `Symfony\Component\HttpFoundation\Attribute\NamespacedAttributeBag` for
    namespace session attributes.
  * Flash API can stores messages in an array so there may be multiple messages

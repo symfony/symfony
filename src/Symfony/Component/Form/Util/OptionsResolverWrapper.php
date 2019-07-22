@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OptionsResolverWrapper extends OptionsResolver
 {
-    private $undefined = array();
+    private $undefined = [];
 
     public function setNormalizer($option, \Closure $normalizer)
     {
@@ -79,7 +79,7 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function resolve(array $options = array())
+    public function resolve(array $options = [])
     {
         throw new AccessException('Resolve options is not supported.');
     }

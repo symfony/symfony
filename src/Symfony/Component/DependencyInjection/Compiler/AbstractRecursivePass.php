@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\Reference;
@@ -32,6 +33,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
 
     private $processExpressions = false;
     private $expressionLanguage;
+    private $inExpression = false;
 
     /**
      * {@inheritdoc}
@@ -52,16 +54,24 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         $this->processExpressions = true;
     }
 
+    protected function inExpression(bool $reset = true): bool
+    {
+        $inExpression = $this->inExpression;
+        if ($reset) {
+            $this->inExpression = false;
+        }
+
+        return $inExpression;
+    }
+
     /**
      * Processes a value found in a definition tree.
      *
      * @param mixed $value
-     * @param bool  $isRoot
-     * @param bool  $inExpression
      *
      * @return mixed The processed value
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {
@@ -75,7 +85,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         } elseif ($value instanceof ArgumentInterface) {
             $value->setValues($this->processValue($value->getValues()));
         } elseif ($value instanceof Expression && $this->processExpressions) {
-            $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));
+            $this->getExpressionLanguage()->compile((string) $value, ['this' => 'container']);
         } elseif ($value instanceof Definition) {
             $value->setArguments($this->processValue($value->getArguments()));
             $value->setProperties($this->processValue($value->getProperties()));
@@ -94,17 +104,14 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @param Definition $definition
-     * @param bool       $required
-     *
      * @return \ReflectionFunctionAbstract|null
      *
      * @throws RuntimeException
      */
-    protected function getConstructor(Definition $definition, $required)
+    protected function getConstructor(Definition $definition, bool $required)
     {
-        if (is_string($factory = $definition->getFactory())) {
-            if (!function_exists($factory)) {
+        if (\is_string($factory = $definition->getFactory())) {
+            if (!\function_exists($factory)) {
                 throw new RuntimeException(sprintf('Invalid service "%s": function "%s" does not exist.', $this->currentId, $factory));
             }
             $r = new \ReflectionFunction($factory);
@@ -150,14 +157,11 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @param Definition $definition
-     * @param string     $method
-     *
      * @throws RuntimeException
      *
      * @return \ReflectionFunctionAbstract
      */
-    protected function getReflectionMethod(Definition $definition, $method)
+    protected function getReflectionMethod(Definition $definition, string $method)
     {
         if ('__construct' === $method) {
             return $this->getConstructor($definition, true);
@@ -187,16 +191,18 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists(ExpressionLanguage::class)) {
-                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+                throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
 
             $providers = $this->container->getExpressionLanguageProviders();
             $this->expressionLanguage = new ExpressionLanguage(null, $providers, function ($arg) {
                 if ('""' === substr_replace($arg, '', 1, -1)) {
                     $id = stripcslashes(substr($arg, 1, -1));
-                    $arg = $this->processValue(new Reference($id), false, true);
+                    $this->inExpression = true;
+                    $arg = $this->processValue(new Reference($id));
+                    $this->inExpression = false;
                     if (!$arg instanceof Reference) {
-                        throw new RuntimeException(sprintf('"%s::processValue()" must return a Reference when processing an expression, %s returned for service("%s").', get_class($this), is_object($arg) ? get_class($arg) : gettype($arg)));
+                        throw new RuntimeException(sprintf('"%s::processValue()" must return a Reference when processing an expression, %s returned for service("%s").', \get_class($this), \is_object($arg) ? \get_class($arg) : \gettype($arg), $id));
                     }
                     $arg = sprintf('"%s"', $arg);
                 }

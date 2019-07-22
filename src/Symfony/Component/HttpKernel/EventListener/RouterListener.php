@@ -12,31 +12,33 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yonel Ceruto <yonelceruto@gmail.com>
+ *
+ * @final
  */
 class RouterListener implements EventSubscriberInterface
 {
@@ -97,7 +99,7 @@ class RouterListener implements EventSubscriberInterface
         $this->setCurrentRequest($this->requestStack->getParentRequest());
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
 
@@ -118,12 +120,12 @@ class RouterListener implements EventSubscriberInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->info('Matched route "{route}".', array(
+                $this->logger->info('Matched route "{route}".', [
                     'route' => isset($parameters['_route']) ? $parameters['_route'] : 'n/a',
                     'route_parameters' => $parameters,
                     'request_uri' => $request->getUri(),
                     'method' => $request->getMethod(),
-                ));
+                ]);
             }
 
             $request->attributes->add($parameters);
@@ -144,7 +146,7 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event)
     {
         if (!$this->debug || !($e = $event->getException()) instanceof NotFoundHttpException) {
             return;
@@ -155,19 +157,19 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
-            KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
-            KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
-            KernelEvents::EXCEPTION => array('onKernelException', -64),
-        );
+        return [
+            KernelEvents::REQUEST => [['onKernelRequest', 32]],
+            KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
+            KernelEvents::EXCEPTION => ['onKernelException', -64],
+        ];
     }
 
-    private function createWelcomeResponse()
+    private function createWelcomeResponse(): Response
     {
         $version = Kernel::VERSION;
-        $baseDir = realpath($this->projectDir).DIRECTORY_SEPARATOR;
+        $baseDir = realpath($this->projectDir).\DIRECTORY_SEPARATOR;
         $docVersion = substr(Kernel::VERSION, 0, 3);
 
         ob_start();

@@ -19,8 +19,8 @@ namespace Symfony\Component\Config\Definition\Builder;
 class NormalizationBuilder
 {
     protected $node;
-    public $before = array();
-    public $remappings = array();
+    public $before = [];
+    public $remappings = [];
 
     public function __construct(NodeDefinition $node)
     {
@@ -30,14 +30,14 @@ class NormalizationBuilder
     /**
      * Registers a key to remap to its plural form.
      *
-     * @param string $key    The key to remap
-     * @param string $plural The plural of the key in case of irregular plural
+     * @param string      $key    The key to remap
+     * @param string|null $plural The plural of the key in case of irregular plural
      *
      * @return $this
      */
-    public function remap($key, $plural = null)
+    public function remap(string $key, string $plural = null)
     {
-        $this->remappings[] = array($key, null === $plural ? $key.'s' : $plural);
+        $this->remappings[] = [$key, null === $plural ? $key.'s' : $plural];
 
         return $this;
     }

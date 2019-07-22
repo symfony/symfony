@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 
 /**
  * Checks your services for circular references.
@@ -36,9 +36,9 @@ class CheckCircularReferencesPass implements CompilerPassInterface
     {
         $graph = $container->getCompiler()->getServiceReferenceGraph();
 
-        $this->checkedNodes = array();
+        $this->checkedNodes = [];
         foreach ($graph->getNodes() as $id => $node) {
-            $this->currentPath = array($id);
+            $this->currentPath = [$id];
 
             $this->checkOutEdges($node->getOutEdges());
         }
@@ -64,7 +64,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
                     $this->currentPath[] = $id;
 
                     if (false !== $searchKey) {
-                        throw new ServiceCircularReferenceException($id, array_slice($this->currentPath, $searchKey));
+                        throw new ServiceCircularReferenceException($id, \array_slice($this->currentPath, $searchKey));
                     }
 
                     $this->checkOutEdges($node->getOutEdges());

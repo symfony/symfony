@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class EntityStaticCarTurbo extends EntityStaticCar
 {
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('wheels', new Length(array('max' => 99)));
+        $metadata->addPropertyConstraint('wheels', new Length(['max' => 99]));
     }
 }

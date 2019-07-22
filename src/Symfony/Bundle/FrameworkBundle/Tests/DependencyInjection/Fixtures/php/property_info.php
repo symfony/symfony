@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'property_info' => array(
+$container->loadFromExtension('framework', [
+    'property_info' => [
         'enabled' => true,
-    ),
-));
+    ],
+]);

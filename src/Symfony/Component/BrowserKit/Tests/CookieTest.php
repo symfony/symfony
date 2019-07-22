@@ -29,6 +29,9 @@ class CookieTest extends TestCase
 
         $cookie = new Cookie('foo', 'bar', 0, '/', '');
         $this->assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; httponly', (string) $cookie);
+
+        $cookie = new Cookie('foo', 'bar', 2, '/', '', true, true, false, 'lax');
+        $this->assertEquals('foo=bar; expires=Thu, 01 Jan 1970 00:00:02 GMT; path=/; secure; httponly; samesite=lax', (string) $cookie);
     }
 
     /**
@@ -41,16 +44,16 @@ class CookieTest extends TestCase
 
     public function getTestsForToFromString()
     {
-        return array(
-            array('foo=bar; path=/'),
-            array('foo=bar; path=/foo'),
-            array('foo=bar; domain=google.com; path=/'),
-            array('foo=bar; domain=example.com; path=/; secure', 'https://example.com/'),
-            array('foo=bar; path=/; httponly'),
-            array('foo=bar; domain=google.com; path=/foo; secure; httponly', 'https://google.com/'),
-            array('foo=bar=baz; path=/'),
-            array('foo=bar%3Dbaz; path=/'),
-        );
+        return [
+            ['foo=bar; path=/'],
+            ['foo=bar; path=/foo'],
+            ['foo=bar; domain=google.com; path=/'],
+            ['foo=bar; domain=example.com; path=/; secure', 'https://example.com/'],
+            ['foo=bar; path=/; httponly'],
+            ['foo=bar; domain=google.com; path=/foo; secure; httponly', 'https://google.com/'],
+            ['foo=bar=baz; path=/'],
+            ['foo=bar%3Dbaz; path=/'],
+        ];
     }
 
     public function testFromStringIgnoreSecureFlag()
@@ -69,16 +72,16 @@ class CookieTest extends TestCase
 
     public function getExpireCookieStrings()
     {
-        return array(
-            array('foo=bar; expires=Fri, 31-Jul-2020 08:49:37 GMT'),
-            array('foo=bar; expires=Fri, 31 Jul 2020 08:49:37 GMT'),
-            array('foo=bar; expires=Fri, 31-07-2020 08:49:37 GMT'),
-            array('foo=bar; expires=Fri, 31-07-20 08:49:37 GMT'),
-            array('foo=bar; expires=Friday, 31-Jul-20 08:49:37 GMT'),
-            array('foo=bar; expires=Fri Jul 31 08:49:37 2020'),
-            array('foo=bar; expires=\'Fri Jul 31 08:49:37 2020\''),
-            array('foo=bar; expires=Friday July 31st 2020, 08:49:37 GMT'),
-        );
+        return [
+            ['foo=bar; expires=Fri, 31-Jul-2020 08:49:37 GMT'],
+            ['foo=bar; expires=Fri, 31 Jul 2020 08:49:37 GMT'],
+            ['foo=bar; expires=Fri, 31-07-2020 08:49:37 GMT'],
+            ['foo=bar; expires=Fri, 31-07-20 08:49:37 GMT'],
+            ['foo=bar; expires=Friday, 31-Jul-20 08:49:37 GMT'],
+            ['foo=bar; expires=Fri Jul 31 08:49:37 2020'],
+            ['foo=bar; expires=\'Fri Jul 31 08:49:37 2020\''],
+            ['foo=bar; expires=Friday July 31st 2020, 08:49:37 GMT'],
+        ];
     }
 
     public function testFromStringWithCapitalization()
@@ -100,7 +103,7 @@ class CookieTest extends TestCase
 
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         Cookie::fromString('foo');
     }
 
@@ -113,7 +116,7 @@ class CookieTest extends TestCase
 
     public function testFromStringThrowsAnExceptionIfUrlIsNotValid()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         Cookie::fromString('foo=bar', 'foobar');
     }
 
@@ -201,5 +204,14 @@ class CookieTest extends TestCase
     public function testConstructException()
     {
         $cookie = new Cookie('foo', 'bar', 'string');
+    }
+
+    public function testSameSite()
+    {
+        $cookie = new Cookie('foo', 'bar');
+        $this->assertNull($cookie->getSameSite());
+
+        $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', false, true, false, 'lax');
+        $this->assertSame('lax', $cookie->getSameSite());
     }
 }

@@ -12,17 +12,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
-
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
@@ -32,18 +27,12 @@ class ProjectServiceContainer extends Container
         }
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'test' => 'getTestService',
-        );
+        ];
 
-        $this->aliases = array();
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -58,10 +47,10 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     /**
@@ -71,13 +60,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
+        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), [('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')]);
     }
 
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
-        $name = (string) $name;
-
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
@@ -88,14 +75,12 @@ class ProjectServiceContainer extends Container
         return $this->parameters[$name];
     }
 
-    public function hasParameter($name)
+    public function hasParameter(string $name)
     {
-        $name = (string) $name;
-
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter(string $name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
@@ -113,16 +98,16 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array(
+    private $loadedDynamicParameters = [
         'foo' => false,
         'buz' => false,
-    );
-    private $dynamicParameters = array();
+    ];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *
@@ -147,9 +132,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'bar' => __DIR__,
             'baz' => (__DIR__.'/PhpDumperTest.php'),
-        );
+        ];
     }
 }

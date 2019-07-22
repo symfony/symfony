@@ -43,14 +43,14 @@ class AnnotatedRouteControllerLoader extends AnnotationClassLoader
      */
     protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
     {
-        return preg_replace(array(
+        return preg_replace([
             '/(bundle|controller)_/',
             '/action(_\d+)?$/',
             '/__/',
-        ), array(
+        ], [
             '_',
             '\\1',
             '_',
-        ), parent::getDefaultRouteName($class, $method));
+        ], parent::getDefaultRouteName($class, $method));
     }
 }

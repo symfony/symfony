@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
@@ -12,6 +12,10 @@
             >
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="event_dispatcher" on-invalid="null" />
+            <argument /> <!-- stateless firewall keys -->
+            <call method="setSessionAuthenticationStrategy">
+                <argument type="service" id="security.authentication.session_strategy" />
+            </call>
         </service>
         
         <service id="Symfony\Component\Security\Guard\GuardAuthenticatorHandler" alias="security.authentication.guard_handler" />

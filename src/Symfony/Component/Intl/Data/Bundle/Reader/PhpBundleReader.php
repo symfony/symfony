@@ -31,24 +31,16 @@ class PhpBundleReader implements BundleReaderInterface
         $fileName = $path.'/'.$locale.'.php';
 
         // prevent directory traversal attacks
-        if (dirname($fileName) !== $path) {
+        if (\dirname($fileName) !== $path) {
             throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s" does not exist.', $fileName));
         }
 
         if (!file_exists($fileName)) {
-            throw new ResourceBundleNotFoundException(sprintf(
-                'The resource bundle "%s/%s.php" does not exist.',
-                $path,
-                $locale
-            ));
+            throw new ResourceBundleNotFoundException(sprintf('The resource bundle "%s/%s.php" does not exist.', $path, $locale));
         }
 
         if (!is_file($fileName)) {
-            throw new RuntimeException(sprintf(
-                'The resource bundle "%s/%s.php" is not a file.',
-                $path,
-                $locale
-            ));
+            throw new RuntimeException(sprintf('The resource bundle "%s/%s.php" is not a file.', $path, $locale));
         }
 
         return include $fileName;

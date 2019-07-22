@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -27,19 +28,19 @@ class RepeatedTypeValidatorExtension extends AbstractTypeExtension
     {
         // Map errors to the first field
         $errorMapping = function (Options $options) {
-            return array('.' => $options['first_name']);
+            return ['.' => $options['first_name']];
         };
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'error_mapping' => $errorMapping,
-        ));
+        ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
+        return [RepeatedType::class];
     }
 }

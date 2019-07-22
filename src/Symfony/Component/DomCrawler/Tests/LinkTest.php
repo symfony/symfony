@@ -27,15 +27,25 @@ class LinkTest extends TestCase
         new Link($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
+    public function testBaseUriIsOptionalWhenLinkUrlIsAbsolute()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><a href="https://example.com/foo">foo</a></html>');
+
+        $link = new Link($dom->getElementsByTagName('a')->item(0));
+        $this->assertSame('https://example.com/foo', $link->getUri());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testConstructorWithAnInvalidCurrentUri()
+    public function testAbsoluteBaseUriIsMandatoryWhenLinkUrlIsRelative()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
 
-        new Link($dom->getElementsByTagName('a')->item(0), 'example.com');
+        $link = new Link($dom->getElementsByTagName('a')->item(0), 'example.com');
+        $link->getUri();
     }
 
     public function testGetNode()
@@ -101,61 +111,61 @@ class LinkTest extends TestCase
 
     public function getGetUriTests()
     {
-        return array(
-            array('/foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
-            array('/foo', 'http://localhost/bar/foo', 'http://localhost/foo'),
-            array('
-            /foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
-            array('/foo
-            ', 'http://localhost/bar/foo', 'http://localhost/foo'),
+        return [
+            ['/foo', 'http://localhost/bar/foo/', 'http://localhost/foo'],
+            ['/foo', 'http://localhost/bar/foo', 'http://localhost/foo'],
+            ['
+            /foo', 'http://localhost/bar/foo/', 'http://localhost/foo'],
+            ['/foo
+            ', 'http://localhost/bar/foo', 'http://localhost/foo'],
 
-            array('foo', 'http://localhost/bar/foo/', 'http://localhost/bar/foo/foo'),
-            array('foo', 'http://localhost/bar/foo', 'http://localhost/bar/foo'),
+            ['foo', 'http://localhost/bar/foo/', 'http://localhost/bar/foo/foo'],
+            ['foo', 'http://localhost/bar/foo', 'http://localhost/bar/foo'],
 
-            array('', 'http://localhost/bar/', 'http://localhost/bar/'),
-            array('#', 'http://localhost/bar/', 'http://localhost/bar/#'),
-            array('#bar', 'http://localhost/bar?a=b', 'http://localhost/bar?a=b#bar'),
-            array('#bar', 'http://localhost/bar/#foo', 'http://localhost/bar/#bar'),
-            array('?a=b', 'http://localhost/bar#foo', 'http://localhost/bar?a=b'),
-            array('?a=b', 'http://localhost/bar/', 'http://localhost/bar/?a=b'),
+            ['', 'http://localhost/bar/', 'http://localhost/bar/'],
+            ['#', 'http://localhost/bar/', 'http://localhost/bar/#'],
+            ['#bar', 'http://localhost/bar?a=b', 'http://localhost/bar?a=b#bar'],
+            ['#bar', 'http://localhost/bar/#foo', 'http://localhost/bar/#bar'],
+            ['?a=b', 'http://localhost/bar#foo', 'http://localhost/bar?a=b'],
+            ['?a=b', 'http://localhost/bar/', 'http://localhost/bar/?a=b'],
 
-            array('http://login.foo.com/foo', 'http://localhost/bar/', 'http://login.foo.com/foo'),
-            array('https://login.foo.com/foo', 'https://localhost/bar/', 'https://login.foo.com/foo'),
-            array('mailto:foo@bar.com', 'http://localhost/foo', 'mailto:foo@bar.com'),
+            ['http://login.foo.com/foo', 'http://localhost/bar/', 'http://login.foo.com/foo'],
+            ['https://login.foo.com/foo', 'https://localhost/bar/', 'https://login.foo.com/foo'],
+            ['mailto:foo@bar.com', 'http://localhost/foo', 'mailto:foo@bar.com'],
 
             // tests schema relative URL (issue #7169)
-            array('//login.foo.com/foo', 'http://localhost/bar/', 'http://login.foo.com/foo'),
-            array('//login.foo.com/foo', 'https://localhost/bar/', 'https://login.foo.com/foo'),
+            ['//login.foo.com/foo', 'http://localhost/bar/', 'http://login.foo.com/foo'],
+            ['//login.foo.com/foo', 'https://localhost/bar/', 'https://login.foo.com/foo'],
 
-            array('?foo=2', 'http://localhost?foo=1', 'http://localhost?foo=2'),
-            array('?foo=2', 'http://localhost/?foo=1', 'http://localhost/?foo=2'),
-            array('?foo=2', 'http://localhost/bar?foo=1', 'http://localhost/bar?foo=2'),
-            array('?foo=2', 'http://localhost/bar/?foo=1', 'http://localhost/bar/?foo=2'),
-            array('?bar=2', 'http://localhost?foo=1', 'http://localhost?bar=2'),
+            ['?foo=2', 'http://localhost?foo=1', 'http://localhost?foo=2'],
+            ['?foo=2', 'http://localhost/?foo=1', 'http://localhost/?foo=2'],
+            ['?foo=2', 'http://localhost/bar?foo=1', 'http://localhost/bar?foo=2'],
+            ['?foo=2', 'http://localhost/bar/?foo=1', 'http://localhost/bar/?foo=2'],
+            ['?bar=2', 'http://localhost?foo=1', 'http://localhost?bar=2'],
 
-            array('foo', 'http://login.foo.com/bar/baz?/query/string', 'http://login.foo.com/bar/foo'),
+            ['foo', 'http://login.foo.com/bar/baz?/query/string', 'http://login.foo.com/bar/foo'],
 
-            array('.', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/'),
-            array('./', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/'),
-            array('./foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/foo'),
-            array('..', 'http://localhost/foo/bar/baz', 'http://localhost/foo/'),
-            array('../', 'http://localhost/foo/bar/baz', 'http://localhost/foo/'),
-            array('../foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo/foo'),
-            array('../..', 'http://localhost/foo/bar/baz', 'http://localhost/'),
-            array('../../', 'http://localhost/foo/bar/baz', 'http://localhost/'),
-            array('../../foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo'),
-            array('../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
-            array('../bar/../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
-            array('../bar/./../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
-            array('../../', 'http://localhost/', 'http://localhost/'),
-            array('../../', 'http://localhost', 'http://localhost/'),
+            ['.', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/'],
+            ['./', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/'],
+            ['./foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/foo'],
+            ['..', 'http://localhost/foo/bar/baz', 'http://localhost/foo/'],
+            ['../', 'http://localhost/foo/bar/baz', 'http://localhost/foo/'],
+            ['../foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo/foo'],
+            ['../..', 'http://localhost/foo/bar/baz', 'http://localhost/'],
+            ['../../', 'http://localhost/foo/bar/baz', 'http://localhost/'],
+            ['../../foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo'],
+            ['../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'],
+            ['../bar/../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'],
+            ['../bar/./../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'],
+            ['../../', 'http://localhost/', 'http://localhost/'],
+            ['../../', 'http://localhost', 'http://localhost/'],
 
-            array('/foo', 'http://localhost?bar=1', 'http://localhost/foo'),
-            array('/foo', 'http://localhost#bar', 'http://localhost/foo'),
-            array('/foo', 'file:///', 'file:///foo'),
-            array('/foo', 'file:///bar/baz', 'file:///foo'),
-            array('foo', 'file:///', 'file:///foo'),
-            array('foo', 'file:///bar/baz', 'file:///bar/foo'),
-        );
+            ['/foo', 'http://localhost?bar=1', 'http://localhost/foo'],
+            ['/foo', 'http://localhost#bar', 'http://localhost/foo'],
+            ['/foo', 'file:///', 'file:///foo'],
+            ['/foo', 'file:///bar/baz', 'file:///foo'],
+            ['foo', 'file:///', 'file:///foo'],
+            ['foo', 'file:///bar/baz', 'file:///bar/foo'],
+        ];
     }
 }

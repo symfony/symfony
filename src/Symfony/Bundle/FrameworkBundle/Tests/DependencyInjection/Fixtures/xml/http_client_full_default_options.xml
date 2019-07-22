@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:framework="http://symfony.com/schema/dic/symfony"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:http-client>
+            <framework:default-options
+                    proxy="proxy.org"
+                    bindto="127.0.0.1"
+                    timeout="3.5"
+                    verify-peer="true"
+                    max-redirects="2"
+                    http-version="2.0"
+                    verify-host="true"
+                    cafile="/etc/ssl/cafile"
+                    capath="/etc/ssl"
+                    local-cert="/etc/ssl/cert.pem"
+                    local-pk="/etc/ssl/private_key.pem"
+                    passphrase="password123456"
+                    ciphers="RC4-SHA:TLS13-AES-128-GCM-SHA256"
+            >
+                <framework:header name="X-powered">PHP</framework:header>
+                <framework:resolve host="localhost">127.0.0.1</framework:resolve>
+                <framework:peer-fingerprint>
+                    <framework:pin-sha256>14s5erg62v1v8471g2revg48r7==</framework:pin-sha256>
+                    <framework:pin-sha256>jsda84hjtyd4821bgfesd215bsfg5412=</framework:pin-sha256>
+                    <framework:md5>sdhtb481248721thbr=</framework:md5>
+                </framework:peer-fingerprint>
+            </framework:default-options>
+        </framework:http-client>
+    </framework:config>
+</container>

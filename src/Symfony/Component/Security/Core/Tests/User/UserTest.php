@@ -29,10 +29,10 @@ class UserTest extends TestCase
     public function testGetRoles()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertEquals(array(), $user->getRoles());
+        $this->assertEquals([], $user->getRoles());
 
-        $user = new User('fabien', 'superpass', array('ROLE_ADMIN'));
-        $this->assertEquals(array('ROLE_ADMIN'), $user->getRoles());
+        $user = new User('fabien', 'superpass', ['ROLE_ADMIN']);
+        $this->assertEquals(['ROLE_ADMIN'], $user->getRoles());
     }
 
     public function testGetPassword()
@@ -58,7 +58,7 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isAccountNonExpired());
 
-        $user = new User('fabien', 'superpass', array(), true, false);
+        $user = new User('fabien', 'superpass', [], true, false);
         $this->assertFalse($user->isAccountNonExpired());
     }
 
@@ -67,7 +67,7 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isCredentialsNonExpired());
 
-        $user = new User('fabien', 'superpass', array(), true, true, false);
+        $user = new User('fabien', 'superpass', [], true, true, false);
         $this->assertFalse($user->isCredentialsNonExpired());
     }
 
@@ -76,7 +76,7 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isAccountNonLocked());
 
-        $user = new User('fabien', 'superpass', array(), true, true, true, false);
+        $user = new User('fabien', 'superpass', [], true, true, true, false);
         $this->assertFalse($user->isAccountNonLocked());
     }
 
@@ -85,7 +85,7 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isEnabled());
 
-        $user = new User('fabien', 'superpass', array(), false);
+        $user = new User('fabien', 'superpass', [], false);
         $this->assertFalse($user->isEnabled());
     }
 
@@ -117,16 +117,16 @@ class UserTest extends TestCase
 
     public static function isEqualToData()
     {
-        return array(
-            array(true, new User('username', 'password'), new User('username', 'password')),
-            array(true, new User('username', 'password', array('ROLE')), new User('username', 'password')),
-            array(true, new User('username', 'password', array('ROLE')), new User('username', 'password', array('NO ROLE'))),
-            array(false, new User('diff', 'diff'), new User('username', 'password')),
-            array(false, new User('diff', 'diff', array(), false), new User('username', 'password')),
-            array(false, new User('diff', 'diff', array(), false, false), new User('username', 'password')),
-            array(false, new User('diff', 'diff', array(), false, false, false), new User('username', 'password')),
-            array(false, new User('diff', 'diff', array(), false, false, false, false), new User('username', 'password')),
-        );
+        return [
+            [true, new User('username', 'password'), new User('username', 'password')],
+            [true, new User('username', 'password', ['ROLE']), new User('username', 'password')],
+            [true, new User('username', 'password', ['ROLE']), new User('username', 'password', ['NO ROLE'])],
+            [false, new User('diff', 'diff'), new User('username', 'password')],
+            [false, new User('diff', 'diff', [], false), new User('username', 'password')],
+            [false, new User('diff', 'diff', [], false, false), new User('username', 'password')],
+            [false, new User('diff', 'diff', [], false, false, false), new User('username', 'password')],
+            [false, new User('diff', 'diff', [], false, false, false, false), new User('username', 'password')],
+        ];
     }
 
     public function testIsEqualToWithDifferentUser()

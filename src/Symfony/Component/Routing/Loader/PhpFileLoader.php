@@ -33,10 +33,10 @@ class PhpFileLoader extends FileLoader
      *
      * @return RouteCollection A RouteCollection instance
      */
-    public function load($file, $type = null)
+    public function load($file, string $type = null)
     {
         $path = $this->locator->locate($file);
-        $this->setCurrentDir(dirname($path));
+        $this->setCurrentDir(\dirname($path));
 
         // the closure forbids access to the private scope in the included file
         $loader = $this;
@@ -48,7 +48,7 @@ class PhpFileLoader extends FileLoader
 
         if (\is_object($result) && \is_callable($result)) {
             $collection = new RouteCollection();
-            $result(new RoutingConfigurator($collection, $this, $path, $file), $this);
+            $result(new RoutingConfigurator($collection, $this, $path, $file));
         } else {
             $collection = $result;
         }
@@ -61,9 +61,9 @@ class PhpFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'php' === $type);
+        return \is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'php' === $type);
     }
 }
 

@@ -12,34 +12,23 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 {
     private $parameters;
-    private $targetDirs = array();
-
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'baz' => 'getBazService',
             'foo1' => 'getFoo1Service',
-        );
+        ];
 
-        $this->aliases = array();
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -54,12 +43,12 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
             'foo3' => true,
-        );
+        ];
     }
 
     /**
@@ -74,13 +63,13 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $instance->foo1 = ($this->services['foo1'] ?? null);
         $instance->foo2 = null;
         $instance->foo3 = ($this->privates['foo3'] ?? null);
-        $instance->closures = array(0 => function () {
+        $instance->closures = [0 => function () {
             return ($this->services['foo1'] ?? null);
         }, 1 => function () {
             return null;
         }, 2 => function () {
             return ($this->privates['foo3'] ?? null);
-        });
+        }];
         $instance->iter = new RewindableGenerator(function () {
             if (isset($this->services['foo1'])) {
                 yield 'foo1' => ($this->services['foo1'] ?? null);
@@ -107,7 +96,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
     {
         $this->services['baz'] = $instance = new \stdClass();
 
-        $instance->foo3 = ($this->privates['foo3'] ?? $this->privates['foo3'] = new \stdClass());
+        $instance->foo3 = ($this->privates['foo3'] ?? ($this->privates['foo3'] = new \stdClass()));
 
         return $instance;
     }

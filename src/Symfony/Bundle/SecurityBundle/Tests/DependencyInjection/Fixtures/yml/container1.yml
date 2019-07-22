@@ -16,8 +16,12 @@ security:
             iterations: 5
             key_length: 30
         JMS\FooBundle\Entity\User6:
-            algorithm: bcrypt
+            algorithm: native
+            time_cost: 8
+            memory_cost: 100
             cost: 15
+        JMS\FooBundle\Entity\User7:
+            algorithm: auto
 
     providers:
         default:
@@ -70,18 +74,13 @@ security:
             http_basic: ~
             user_checker: app.user_checker
 
-        simple_auth:
-            provider: default
-            anonymous: ~
-            simple_form: { authenticator: simple_authenticator }
-
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
         ROLE_REMOTE:      ROLE_USER,ROLE_ADMIN
 
     access_control:
-        - { path: /blog/524, role: ROLE_USER, requires_channel: https, methods: [get, POST]}
+        - { path: /blog/524, role: ROLE_USER, requires_channel: https, methods: [get, POST], port: 8000}
         -
             path: /blog/.*
             role: IS_AUTHENTICATED_ANONYMOUSLY

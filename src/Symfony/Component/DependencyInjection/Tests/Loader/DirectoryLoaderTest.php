@@ -12,13 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
+use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class DirectoryLoaderTest extends TestCase
 {
@@ -37,25 +37,25 @@ class DirectoryLoaderTest extends TestCase
         $locator = new FileLocator(self::$fixturesPath);
         $this->container = new ContainerBuilder();
         $this->loader = new DirectoryLoader($this->container, $locator);
-        $resolver = new LoaderResolver(array(
+        $resolver = new LoaderResolver([
             new PhpFileLoader($this->container, $locator),
             new IniFileLoader($this->container, $locator),
             new YamlFileLoader($this->container, $locator),
             $this->loader,
-        ));
+        ]);
         $this->loader->setResolver($resolver);
     }
 
     public function testDirectoryCanBeLoadedRecursively()
     {
         $this->loader->load('directory/');
-        $this->assertEquals(array('ini' => 'ini', 'yaml' => 'yaml', 'php' => 'php'), $this->container->getParameterBag()->all(), '->load() takes a single directory');
+        $this->assertEquals(['ini' => 'ini', 'yaml' => 'yaml', 'php' => 'php'], $this->container->getParameterBag()->all(), '->load() takes a single directory');
     }
 
     public function testImports()
     {
         $this->loader->resolve('directory/import/import.yml')->load('directory/import/import.yml');
-        $this->assertEquals(array('ini' => 'ini', 'yaml' => 'yaml'), $this->container->getParameterBag()->all(), '->load() takes a single file that imports a directory');
+        $this->assertEquals(['ini' => 'ini', 'yaml' => 'yaml'], $this->container->getParameterBag()->all(), '->load() takes a single file that imports a directory');
     }
 
     /**

@@ -26,26 +26,26 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 abstract class AbstractFactory implements SecurityFactoryInterface
 {
-    protected $options = array(
+    protected $options = [
         'check_path' => '/login_check',
         'use_forward' => false,
         'require_previous_session' => false,
-    );
+    ];
 
-    protected $defaultSuccessHandlerOptions = array(
+    protected $defaultSuccessHandlerOptions = [
         'always_use_default_target_path' => false,
         'default_target_path' => '/',
         'login_path' => '/login',
         'target_path_parameter' => '_target_path',
         'use_referer' => false,
-    );
+    ];
 
-    protected $defaultFailureHandlerOptions = array(
+    protected $defaultFailureHandlerOptions = [
         'failure_path' => null,
         'failure_forward' => false,
         'login_path' => '/login',
         'failure_path_parameter' => '_failure_path',
-    );
+    ];
 
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
     {
@@ -59,14 +59,14 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         if ($this->isRememberMeAware($config)) {
             $container
                 ->getDefinition($listenerId)
-                ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProviderId))
+                ->addTag('security.remember_me_aware', ['id' => $id, 'provider' => $userProviderId])
             ;
         }
 
         // create entry point if applicable (optional)
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPointId);
 
-        return array($authProviderId, $listenerId, $entryPointId);
+        return [$authProviderId, $listenerId, $entryPointId];
     }
 
     public function addConfiguration(NodeDefinition $node)
@@ -81,7 +81,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         ;
 
         foreach (array_merge($this->options, $this->defaultSuccessHandlerOptions, $this->defaultFailureHandlerOptions) as $name => $default) {
-            if (is_bool($default)) {
+            if (\is_bool($default)) {
                 $builder->booleanNode($name)->defaultValue($default);
             } else {
                 $builder->scalarNode($name)->defaultValue($default);
@@ -178,8 +178,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             $successHandler->replaceArgument(2, $id);
         } else {
             $successHandler = $container->setDefinition($successHandlerId, new ChildDefinition('security.authentication.success_handler'));
-            $successHandler->addMethodCall('setOptions', array($options));
-            $successHandler->addMethodCall('setProviderKey', array($id));
+            $successHandler->addMethodCall('setOptions', [$options]);
+            $successHandler->addMethodCall('setProviderKey', [$id]);
         }
 
         return $successHandlerId;
@@ -196,7 +196,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             $failureHandler->replaceArgument(1, $options);
         } else {
             $failureHandler = $container->setDefinition($id, new ChildDefinition('security.authentication.failure_handler'));
-            $failureHandler->addMethodCall('setOptions', array($options));
+            $failureHandler->addMethodCall('setOptions', [$options]);
         }
 
         return $id;

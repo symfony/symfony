@@ -19,11 +19,10 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the 'dump' tag.
  *
  * Dump variables with:
- * <pre>
- *  {% dump %}
- *  {% dump foo %}
- *  {% dump foo, bar %}
- * </pre>
+ *
+ *     {% dump %}
+ *     {% dump foo %}
+ *     {% dump foo, bar %}
  *
  * @author Julien Galenski <julien.galenski@gmail.com>
  */

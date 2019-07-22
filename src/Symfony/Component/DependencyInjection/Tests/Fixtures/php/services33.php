@@ -12,33 +12,22 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
-
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'Bar\\Foo' => 'getFooService',
             'Foo\\Foo' => 'getFoo2Service',
-        );
+        ];
 
-        $this->aliases = array();
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -53,10 +42,10 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     /**
@@ -66,7 +55,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        return $this->services['Bar\Foo'] = new \Bar\Foo();
+        return $this->services['Bar\\Foo'] = new \Bar\Foo();
     }
 
     /**
@@ -76,6 +65,6 @@ class ProjectServiceContainer extends Container
      */
     protected function getFoo2Service()
     {
-        return $this->services['Foo\Foo'] = new \Foo\Foo();
+        return $this->services['Foo\\Foo'] = new \Foo\Foo();
     }
 }

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -22,7 +22,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface KernelInterface extends HttpKernelInterface, \Serializable
+interface KernelInterface extends HttpKernelInterface
 {
     /**
      * Returns an array of bundles to register.
@@ -97,13 +97,6 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function locateResource($name, $dir = null, $first = true);
 
     /**
-     * Gets the name of the kernel.
-     *
-     * @return string The kernel name
-     */
-    public function getName();
-
-    /**
      * Gets the environment.
      *
      * @return string The current environment
@@ -118,16 +111,16 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function isDebug();
 
     /**
-     * Gets the application root dir (path of the project's Kernel class).
+     * Gets the project dir (path of the project's composer file).
      *
-     * @return string The Kernel root dir
+     * @return string
      */
-    public function getRootDir();
+    public function getProjectDir();
 
     /**
      * Gets the current container.
      *
-     * @return ContainerInterface A ContainerInterface instance
+     * @return ContainerInterface|null A ContainerInterface instance or null when the Kernel is shutdown
      */
     public function getContainer();
 

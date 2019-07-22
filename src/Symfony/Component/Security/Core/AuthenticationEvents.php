@@ -17,7 +17,7 @@ final class AuthenticationEvents
      * The AUTHENTICATION_SUCCESS event occurs after a user is authenticated
      * by one provider.
      *
-     * @Event("Symfony\Component\Security\Core\Event\AuthenticationEvent")
+     * @Event("Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent")
      */
     const AUTHENTICATION_SUCCESS = 'security.authentication.success';
 

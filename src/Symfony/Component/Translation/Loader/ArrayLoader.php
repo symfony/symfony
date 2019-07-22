@@ -23,9 +23,9 @@ class ArrayLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $locale, $domain = 'messages')
+    public function load($resource, string $locale, string $domain = 'messages')
     {
-        $this->flatten($resource);
+        $resource = $this->flatten($resource);
         $catalogue = new MessageCatalogue($locale);
         $catalogue->add($resource, $domain);
 
@@ -36,31 +36,23 @@ class ArrayLoader implements LoaderInterface
      * Flattens an nested array of translations.
      *
      * The scheme used is:
-     *   'key' => array('key2' => array('key3' => 'value'))
+     *   'key' => ['key2' => ['key3' => 'value']]
      * Becomes:
      *   'key.key2.key3' => 'value'
-     *
-     * This function takes an array by reference and will modify it
-     *
-     * @param array  &$messages The array that will be flattened
-     * @param array  $subnode   Current subnode being parsed, used internally for recursive calls
-     * @param string $path      Current path being parsed, used internally for recursive calls
      */
-    private function flatten(array &$messages, array $subnode = null, $path = null)
+    private function flatten(array $messages): array
     {
-        if (null === $subnode) {
-            $subnode = &$messages;
-        }
-        foreach ($subnode as $key => $value) {
-            if (is_array($value)) {
-                $nodePath = $path ? $path.'.'.$key : $key;
-                $this->flatten($messages, $value, $nodePath);
-                if (null === $path) {
-                    unset($messages[$key]);
+        $result = [];
+        foreach ($messages as $key => $value) {
+            if (\is_array($value)) {
+                foreach ($this->flatten($value) as $k => $v) {
+                    $result[$key.'.'.$k] = $v;
                 }
-            } elseif (null !== $path) {
-                $messages[$path.'.'.$key] = $value;
+            } else {
+                $result[$key] = $value;
             }
         }
+
+        return $result;
     }
 }

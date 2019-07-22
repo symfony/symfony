@@ -23,8 +23,8 @@ class SplCasterTest extends TestCase
 
     public function getCastFileInfoTests()
     {
-        return array(
-            array(__FILE__, <<<'EOTXT'
+        return [
+            [__FILE__, <<<'EOTXT'
 SplFileInfo {
 %Apath: "%sCaster"
   filename: "SplCasterTest.php"
@@ -35,7 +35,7 @@ SplFileInfo {
   aTime: %s-%s-%d %d:%d:%d
   mTime: %s-%s-%d %d:%d:%d
   cTime: %s-%s-%d %d:%d:%d
-  inode: %d
+  inode: %i
   size: %d
   perms: 0%d
   owner: %d
@@ -49,8 +49,8 @@ SplFileInfo {
   link: false
 %A}
 EOTXT
-            ),
-            array('https://google.com/about', <<<'EOTXT'
+            ],
+            ['https://google.com/about', <<<'EOTXT'
 SplFileInfo {
 %Apath: "https://google.com"
   filename: "about"
@@ -60,8 +60,8 @@ SplFileInfo {
   realPath: false
 %A}
 EOTXT
-            ),
-        );
+            ],
+        ];
     }
 
     /** @dataProvider getCastFileInfoTests */
@@ -85,7 +85,7 @@ SplFileObject {
   aTime: %s-%s-%d %d:%d:%d
   mTime: %s-%s-%d %d:%d:%d
   cTime: %s-%s-%d %d:%d:%d
-  inode: %d
+  inode: %i
   size: %d
   perms: 0%d
   owner: %d
@@ -105,7 +105,7 @@ SplFileObject {
   maxLineLen: 0
   fstat: array:26 [
     "dev" => %d
-    "ino" => %d
+    "ino" => %i
     "nlink" => %d
     "rdev" => 0
     "blksize" => %i
@@ -137,12 +137,12 @@ EOTXT;
 
     public function provideCastSplDoublyLinkedList()
     {
-        return array(
-            array(\SplDoublyLinkedList::IT_MODE_FIFO, 'IT_MODE_FIFO | IT_MODE_KEEP'),
-            array(\SplDoublyLinkedList::IT_MODE_LIFO, 'IT_MODE_LIFO | IT_MODE_KEEP'),
-            array(\SplDoublyLinkedList::IT_MODE_FIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_FIFO | IT_MODE_DELETE'),
-            array(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_LIFO | IT_MODE_DELETE'),
-        );
+        return [
+            [\SplDoublyLinkedList::IT_MODE_FIFO, 'IT_MODE_FIFO | IT_MODE_KEEP'],
+            [\SplDoublyLinkedList::IT_MODE_LIFO, 'IT_MODE_LIFO | IT_MODE_KEEP'],
+            [\SplDoublyLinkedList::IT_MODE_FIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_FIFO | IT_MODE_DELETE'],
+            [\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_LIFO | IT_MODE_DELETE'],
+        ];
     }
 
     public function testCastObjectStorageIsntModified()
@@ -163,4 +163,45 @@ EOTXT;
 
         $this->assertDumpMatchesFormat('%ADateTime%A', $var);
     }
+
+    public function testCastArrayObject()
+    {
+        $var = new \ArrayObject([123]);
+        $var->foo = 234;
+
+        $expected = <<<EOTXT
+ArrayObject {
+  +"foo": 234
+  flag::STD_PROP_LIST: false
+  flag::ARRAY_AS_PROPS: false
+  iteratorClass: "ArrayIterator"
+  storage: array:1 [
+    0 => 123
+  ]
+}
+EOTXT;
+        $this->assertDumpEquals($expected, $var);
+    }
+
+    public function testArrayIterator()
+    {
+        $var = new MyArrayIterator([234]);
+
+        $expected = <<<EOTXT
+Symfony\Component\VarDumper\Tests\Caster\MyArrayIterator {
+  -foo: 123
+  flag::STD_PROP_LIST: false
+  flag::ARRAY_AS_PROPS: false
+  storage: array:1 [
+    0 => 234
+  ]
+}
+EOTXT;
+        $this->assertDumpEquals($expected, $var);
+    }
+}
+
+class MyArrayIterator extends \ArrayIterator
+{
+    private $foo = 123;
 }

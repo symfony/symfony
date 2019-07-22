@@ -12,8 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
  * @author Guilhem N <egetick@gmail.com>
@@ -23,7 +23,7 @@ class PassConfigTest extends TestCase
     public function testPassOrdering()
     {
         $config = new PassConfig();
-        $config->setBeforeOptimizationPasses(array());
+        $config->setBeforeOptimizationPasses([]);
 
         $pass1 = $this->getMockBuilder(CompilerPassInterface::class)->getMock();
         $config->addPass($pass1, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
@@ -39,11 +39,11 @@ class PassConfigTest extends TestCase
     public function testPassOrderingWithoutPasses()
     {
         $config = new PassConfig();
-        $config->setBeforeOptimizationPasses(array());
-        $config->setAfterRemovingPasses(array());
-        $config->setBeforeRemovingPasses(array());
-        $config->setOptimizationPasses(array());
-        $config->setRemovingPasses(array());
+        $config->setBeforeOptimizationPasses([]);
+        $config->setAfterRemovingPasses([]);
+        $config->setBeforeRemovingPasses([]);
+        $config->setOptimizationPasses([]);
+        $config->setRemovingPasses([]);
 
         $this->assertEmpty($config->getBeforeOptimizationPasses());
         $this->assertEmpty($config->getAfterRemovingPasses());

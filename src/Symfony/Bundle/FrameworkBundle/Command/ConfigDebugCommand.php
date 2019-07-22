@@ -11,12 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Yaml;
 
@@ -37,10 +37,10 @@ class ConfigDebugCommand extends AbstractConfigCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
-            ))
+            ])
             ->setDescription('Dumps the current configuration for an extension')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the current configuration for an
@@ -80,22 +80,26 @@ EOF
         $container = $this->compileContainer();
 
         $extensionAlias = $extension->getAlias();
-        $configs = $container->getExtensionConfig($extensionAlias);
-        $configuration = $extension->getConfiguration($configs, $container);
+        $extensionConfig = [];
+        foreach ($container->getCompilerPassConfig()->getPasses() as $pass) {
+            if ($pass instanceof ValidateEnvPlaceholdersPass) {
+                $extensionConfig = $pass->getExtensionConfig();
+                break;
+            }
+        }
 
-        $this->validateConfiguration($extension, $configuration);
+        if (!isset($extensionConfig[$extensionAlias])) {
+            throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
+        }
 
-        $configs = $container->resolveEnvPlaceholders($container->getParameterBag()->resolveValue($configs));
-
-        $processor = new Processor();
-        $config = $container->resolveEnvPlaceholders($container->getParameterBag()->resolveValue($processor->processConfiguration($configuration, $configs)));
+        $config = $container->resolveEnvPlaceholders($extensionConfig[$extensionAlias]);
 
         if (null === $path = $input->getArgument('path')) {
             $io->title(
                 sprintf('Current configuration for %s', ($name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name)))
             );
 
-            $io->writeln(Yaml::dump(array($extensionAlias => $config), 10));
+            $io->writeln(Yaml::dump([$extensionAlias => $config], 10));
 
             return;
         }
@@ -138,7 +142,7 @@ EOF
         $steps = explode('.', $path);
 
         foreach ($steps as $step) {
-            if (!array_key_exists($step, $config)) {
+            if (!\array_key_exists($step, $config)) {
                 throw new LogicException(sprintf('Unable to find configuration for "%s.%s"', $alias, $path));
             }
 

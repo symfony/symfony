@@ -31,7 +31,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function processAutoLoginCookie(array $cookieParts, Request $request)
     {
-        if (4 !== count($cookieParts)) {
+        if (4 !== \count($cookieParts)) {
             throw new AuthenticationException('The cookie is invalid.');
         }
 
@@ -50,7 +50,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_class($user)));
+            throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', \get_class($user)));
         }
 
         if (true !== hash_equals($this->generateCookieHash($class, $username, $expires, $user->getPassword()), $hash)) {
@@ -71,7 +71,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     {
         $user = $token->getUser();
         $expires = time() + $this->options['lifetime'];
-        $value = $this->generateCookieValue(get_class($user), $user->getUsername(), $expires, $user->getPassword());
+        $value = $this->generateCookieValue(\get_class($user), $user->getUsername(), $expires, $user->getPassword());
 
         $response->headers->setCookie(
             new Cookie(
@@ -80,8 +80,10 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
                 $expires,
                 $this->options['path'],
                 $this->options['domain'],
-                $this->options['secure'],
-                $this->options['httponly']
+                $this->options['secure'] ?? $request->isSecure(),
+                $this->options['httponly'],
+                false,
+                $this->options['samesite'] ?? null
             )
         );
     }
@@ -100,12 +102,12 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     {
         // $username is encoded because it might contain COOKIE_DELIMITER,
         // we assume other values don't
-        return $this->encodeCookie(array(
+        return $this->encodeCookie([
             $class,
             base64_encode($username),
             $expires,
             $this->generateCookieHash($class, $username, $expires, $password),
-        ));
+        ]);
     }
 
     /**
@@ -120,6 +122,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {
-        return hash_hmac('sha256', $class.$username.$expires.$password, $this->getSecret());
+        return hash_hmac('sha256', $class.self::COOKIE_DELIMITER.$username.self::COOKIE_DELIMITER.$expires.self::COOKIE_DELIMITER.$password, $this->getSecret());
     }
 }

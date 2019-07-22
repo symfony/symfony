@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Log\Logger;
 
 /**
  * Registers the default logger if necessary.

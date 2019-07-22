@@ -19,9 +19,9 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
  */
 class TraceableAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testPrune' => 'TraceableAdapter just proxies',
-    );
+    ];
 
     public function createCachePool($defaultLifetime = 0)
     {
@@ -37,7 +37,7 @@ class TraceableAdapterTest extends AdapterTestCase
 
         $call = $calls[0];
         $this->assertSame('getItem', $call->name);
-        $this->assertSame(array('k' => false), $call->result);
+        $this->assertSame(['k' => false], $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(1, $call->misses);
         $this->assertNotEmpty($call->start);
@@ -61,7 +61,7 @@ class TraceableAdapterTest extends AdapterTestCase
     public function testGetItemsMissTrace()
     {
         $pool = $this->createCachePool();
-        $arg = array('k0', 'k1');
+        $arg = ['k0', 'k1'];
         $items = $pool->getItems($arg);
         foreach ($items as $item) {
         }
@@ -70,7 +70,7 @@ class TraceableAdapterTest extends AdapterTestCase
 
         $call = $calls[0];
         $this->assertSame('getItems', $call->name);
-        $this->assertSame(array('k0' => false, 'k1' => false), $call->result);
+        $this->assertSame(['k0' => false, 'k1' => false], $call->result);
         $this->assertSame(2, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
@@ -85,7 +85,7 @@ class TraceableAdapterTest extends AdapterTestCase
 
         $call = $calls[0];
         $this->assertSame('hasItem', $call->name);
-        $this->assertSame(array('k' => false), $call->result);
+        $this->assertSame(['k' => false], $call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
@@ -101,7 +101,7 @@ class TraceableAdapterTest extends AdapterTestCase
 
         $call = $calls[2];
         $this->assertSame('hasItem', $call->name);
-        $this->assertSame(array('k' => true), $call->result);
+        $this->assertSame(['k' => true], $call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
@@ -115,7 +115,7 @@ class TraceableAdapterTest extends AdapterTestCase
 
         $call = $calls[0];
         $this->assertSame('deleteItem', $call->name);
-        $this->assertSame(array('k' => true), $call->result);
+        $this->assertSame(['k' => true], $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
@@ -125,14 +125,14 @@ class TraceableAdapterTest extends AdapterTestCase
     public function testDeleteItemsTrace()
     {
         $pool = $this->createCachePool();
-        $arg = array('k0', 'k1');
+        $arg = ['k0', 'k1'];
         $pool->deleteItems($arg);
         $calls = $pool->getCalls();
         $this->assertCount(1, $calls);
 
         $call = $calls[0];
         $this->assertSame('deleteItems', $call->name);
-        $this->assertSame(array('keys' => $arg, 'result' => true), $call->result);
+        $this->assertSame(['keys' => $arg, 'result' => true], $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
@@ -149,7 +149,7 @@ class TraceableAdapterTest extends AdapterTestCase
 
         $call = $calls[1];
         $this->assertSame('save', $call->name);
-        $this->assertSame(array('k' => true), $call->result);
+        $this->assertSame(['k' => true], $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
@@ -166,7 +166,7 @@ class TraceableAdapterTest extends AdapterTestCase
 
         $call = $calls[1];
         $this->assertSame('saveDeferred', $call->name);
-        $this->assertSame(array('k' => true), $call->result);
+        $this->assertSame(['k' => true], $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);

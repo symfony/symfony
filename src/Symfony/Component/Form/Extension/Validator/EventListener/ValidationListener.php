@@ -12,11 +12,11 @@
 namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -32,7 +32,7 @@ class ValidationListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::POST_SUBMIT => 'validateForm');
+        return [FormEvents::POST_SUBMIT => 'validateForm'];
     }
 
     public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
@@ -51,7 +51,7 @@ class ValidationListener implements EventSubscriberInterface
         $form = $event->getForm();
 
         if ($form->isRoot()) {
-            // Validate the form in group "Default"
+            // Form groups are validated internally (FormValidator). Here we don't set groups as they are retrieved into the validator.
             foreach ($this->validator->validate($form) as $violation) {
                 // Allow the "invalid" constraint to be put onto
                 // non-synchronized forms

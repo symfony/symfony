@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.49.82",
     "Names": {
         "ADP": [
             "ADP",
@@ -16,6 +16,10 @@
         "AFN": [
             "AFN",
             "Afghani Afghanistan"
+        ],
+        "ALK": [
+            "ALK",
+            "ALK"
         ],
         "ALL": [
             "ALL",
@@ -261,6 +265,10 @@
             "CNH",
             "Nhân dân tệ (hải ngoại)"
         ],
+        "CNX": [
+            "CNX",
+            "CNX"
+        ],
         "CNY": [
             "CN¥",
             "Nhân dân tệ"
@@ -481,6 +489,10 @@
             "ILP",
             "Pao Ixraen"
         ],
+        "ILR": [
+            "ILR",
+            "ILR"
+        ],
         "ILS": [
             "₪",
             "Sheqel Israel mới"
@@ -496,6 +508,10 @@
         "IRR": [
             "IRR",
             "Rial Iran"
+        ],
+        "ISJ": [
+            "ISJ",
+            "ISJ"
         ],
         "ISK": [
             "ISK",
@@ -684,6 +700,10 @@
         "MUR": [
             "MUR",
             "Rupee Mauritius"
+        ],
+        "MVP": [
+            "MVP",
+            "MVP"
         ],
         "MVR": [
             "MVR",
@@ -1013,6 +1033,10 @@
             "UYU",
             "Peso Uruguay"
         ],
+        "UYW": [
+            "UYW",
+            "UYW"
+        ],
         "UZS": [
             "UZS",
             "Som Uzbekistan"
@@ -1023,6 +1047,10 @@
         ],
         "VEF": [
             "VEF",
+            "Bolívar Venezuela (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "Bolívar Venezuela"
         ],
         "VND": [

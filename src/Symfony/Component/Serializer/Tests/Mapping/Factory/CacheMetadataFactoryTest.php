@@ -14,8 +14,8 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Factory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
 /**
@@ -31,7 +31,7 @@ class CacheMetadataFactoryTest extends TestCase
         $decorated
             ->expects($this->once())
             ->method('getMetadataFor')
-            ->will($this->returnValue($metadata))
+            ->willReturn($metadata)
         ;
 
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
@@ -47,7 +47,7 @@ class CacheMetadataFactoryTest extends TestCase
         $decorated
             ->expects($this->once())
             ->method('hasMetadataFor')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());

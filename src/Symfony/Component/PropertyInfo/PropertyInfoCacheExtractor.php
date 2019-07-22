@@ -20,11 +20,11 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @final
  */
-class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
+class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
 {
     private $propertyInfoExtractor;
     private $cacheItemPool;
-    private $arrayCache = array();
+    private $arrayCache = [];
 
     public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, CacheItemPoolInterface $cacheItemPool)
     {
@@ -35,49 +35,57 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = array())
+    public function isReadable(string $class, string $property, array $context = [])
     {
-        return $this->extract('isReadable', array($class, $property, $context));
+        return $this->extract('isReadable', [$class, $property, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = array())
+    public function isWritable(string $class, string $property, array $context = [])
     {
-        return $this->extract('isWritable', array($class, $property, $context));
+        return $this->extract('isWritable', [$class, $property, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = array())
+    public function getShortDescription(string $class, string $property, array $context = [])
     {
-        return $this->extract('getShortDescription', array($class, $property, $context));
+        return $this->extract('getShortDescription', [$class, $property, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = array())
+    public function getLongDescription(string $class, string $property, array $context = [])
     {
-        return $this->extract('getLongDescription', array($class, $property, $context));
+        return $this->extract('getLongDescription', [$class, $property, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = array())
+    public function getProperties(string $class, array $context = [])
     {
-        return $this->extract('getProperties', array($class, $context));
+        return $this->extract('getProperties', [$class, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = array())
+    public function getTypes(string $class, string $property, array $context = [])
     {
-        return $this->extract('getTypes', array($class, $property, $context));
+        return $this->extract('getTypes', [$class, $property, $context]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = []): ?bool
+    {
+        return $this->extract('isInitializable', [$class, $property, $context]);
     }
 
     /**
@@ -91,13 +99,13 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
             $serializedArguments = serialize($arguments);
         } catch (\Exception $exception) {
             // If arguments are not serializable, skip the cache
-            return call_user_func_array(array($this->propertyInfoExtractor, $method), $arguments);
+            return $this->propertyInfoExtractor->{$method}(...$arguments);
         }
 
         // Calling rawurlencode escapes special characters not allowed in PSR-6's keys
         $key = rawurlencode($method.'.'.$serializedArguments);
 
-        if (array_key_exists($key, $this->arrayCache)) {
+        if (\array_key_exists($key, $this->arrayCache)) {
             return $this->arrayCache[$key];
         }
 
@@ -107,7 +115,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
             return $this->arrayCache[$key] = $item->get();
         }
 
-        $value = call_user_func_array(array($this->propertyInfoExtractor, $method), $arguments);
+        $value = $this->propertyInfoExtractor->{$method}(...$arguments);
         $item->set($value);
         $this->cacheItemPool->save($item);
 

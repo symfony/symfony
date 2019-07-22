@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -33,8 +34,8 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
     public function process(ContainerBuilder $container)
     {
         // First collect all alias targets that need to be replaced
-        $seenAliasTargets = array();
-        $replacements = array();
+        $seenAliasTargets = [];
+        $replacements = [];
         foreach ($container->getAliases() as $definitionId => $target) {
             $targetId = (string) $target;
             // Special case: leave this target alone
@@ -53,8 +54,12 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
             $seenAliasTargets[$targetId] = true;
             try {
                 $definition = $container->getDefinition($targetId);
-            } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException(sprintf('Unable to replace alias "%s" with actual definition "%s".', $definitionId, $targetId), null, $e);
+            } catch (ServiceNotFoundException $e) {
+                if ('' !== $e->getId() && '@' === $e->getId()[0]) {
+                    throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, [substr($e->getId(), 1)]);
+                }
+
+                throw $e;
             }
             if ($definition->isPublic()) {
                 continue;
@@ -69,13 +74,13 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
         $this->replacements = $replacements;
 
         parent::process($container);
-        $this->replacements = array();
+        $this->replacements = [];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof Reference && isset($this->replacements[$referenceId = (string) $value])) {
             // Perform the replacement

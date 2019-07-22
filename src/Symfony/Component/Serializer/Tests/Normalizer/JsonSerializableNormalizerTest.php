@@ -34,8 +34,13 @@ class JsonSerializableNormalizerTest extends TestCase
 
     protected function setUp()
     {
+        $this->createNormalizer();
+    }
+
+    private function createNormalizer(array $defaultContext = [])
+    {
         $this->serializer = $this->getMockBuilder(JsonSerializerNormalizer::class)->getMock();
-        $this->normalizer = new JsonSerializableNormalizer();
+        $this->normalizer = new JsonSerializableNormalizer(null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -50,11 +55,11 @@ class JsonSerializableNormalizerTest extends TestCase
         $this->serializer
             ->expects($this->once())
             ->method('normalize')
-            ->will($this->returnCallback(function ($data) {
-                $this->assertArraySubset(array('foo' => 'a', 'bar' => 'b', 'baz' => 'c'), $data);
+            ->willReturnCallback(function ($data) {
+                $this->assertArraySubset(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $data);
 
                 return 'string_object';
-            }))
+            })
         ;
 
         $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
@@ -65,16 +70,16 @@ class JsonSerializableNormalizerTest extends TestCase
      */
     public function testCircularNormalize()
     {
-        $this->normalizer->setCircularReferenceLimit(1);
+        $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
         $this->serializer
             ->expects($this->once())
             ->method('normalize')
-            ->will($this->returnCallback(function ($data, $format, $context) {
+            ->willReturnCallback(function ($data, $format, $context) {
                 $this->normalizer->normalize($data['qux'], $format, $context);
 
                 return 'string_object';
-            }))
+            })
         ;
 
         $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));

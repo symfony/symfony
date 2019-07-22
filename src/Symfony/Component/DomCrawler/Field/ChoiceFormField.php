@@ -45,7 +45,7 @@ class ChoiceFormField extends FormField
     public function hasValue()
     {
         // don't send a value for unchecked checkboxes
-        if (in_array($this->type, array('checkbox', 'radio')) && null === $this->value) {
+        if (\in_array($this->type, ['checkbox', 'radio']) && null === $this->value) {
             return false;
         }
 
@@ -75,7 +75,7 @@ class ChoiceFormField extends FormField
     /**
      * Sets the value of the field.
      *
-     * @param string $value The value of the field
+     * @param string|array $value The value of the field
      */
     public function select($value)
     {
@@ -126,7 +126,7 @@ class ChoiceFormField extends FormField
             // check
             $this->value = $this->options[0]['value'];
         } else {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 if (!$this->multiple) {
                     throw new \InvalidArgumentException(sprintf('The value for "%s" cannot be an array.', $this->name));
                 }
@@ -144,7 +144,7 @@ class ChoiceFormField extends FormField
                 $value = (array) $value;
             }
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $this->value = $value;
             } else {
                 parent::setValue($value);
@@ -211,7 +211,7 @@ class ChoiceFormField extends FormField
         }
 
         $this->value = null;
-        $this->options = array();
+        $this->options = [];
         $this->multiple = false;
 
         if ('input' == $this->node->nodeName) {
@@ -226,7 +226,7 @@ class ChoiceFormField extends FormField
             $this->type = 'select';
             if ($this->node->hasAttribute('multiple')) {
                 $this->multiple = true;
-                $this->value = array();
+                $this->value = [];
                 $this->name = str_replace('[]', '', $this->name);
             }
 
@@ -257,7 +257,7 @@ class ChoiceFormField extends FormField
      */
     private function buildOptionValue(\DOMElement $node): array
     {
-        $option = array();
+        $option = [];
 
         $defaultDefaultValue = 'select' === $this->node->nodeName ? '' : 'on';
         $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : $defaultDefaultValue;
@@ -270,12 +270,9 @@ class ChoiceFormField extends FormField
     /**
      * Checks whether given value is in the existing options.
      *
-     * @param string $optionValue
-     * @param array  $options
-     *
      * @return bool
      */
-    public function containsOption($optionValue, $options)
+    public function containsOption(string $optionValue, array $options)
     {
         if ($this->validationDisabled) {
             return true;
@@ -297,7 +294,7 @@ class ChoiceFormField extends FormField
      */
     public function availableOptionValues()
     {
-        $values = array();
+        $values = [];
 
         foreach ($this->options as $option) {
             $values[] = $option['value'];

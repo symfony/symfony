@@ -2,8 +2,8 @@
 
 $container->setParameter('env(REDIS_URL)', 'redis://paas.com');
 
-$container->loadFromExtension('framework', array(
-    'cache' => array(
+$container->loadFromExtension('framework', [
+    'cache' => [
         'default_redis_provider' => '%env(REDIS_URL)%',
-    ),
-));
+    ],
+]);

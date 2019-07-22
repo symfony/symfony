@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.42",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Kaukazo Albanijos",
@@ -92,7 +92,6 @@
         "Merc": "Merojitų rankraštinis",
         "Mero": "meroitik",
         "Mlym": "malajalių",
-        "Modi": "Modi",
         "Mong": "mongolų",
         "Moon": "mūn",
         "Mroo": "Mro",
@@ -166,7 +165,6 @@
         "Zsye": "jaustukai",
         "Zsym": "simbolių",
         "Zxxx": "neparašyta",
-        "Zyyy": "bendri",
-        "Zzzz": "nežinomi rašmenys"
+        "Zyyy": "bendri"
     }
 }

@@ -35,7 +35,7 @@ class Package implements PackageInterface
     /**
      * {@inheritdoc}
      */
-    public function getVersion($path)
+    public function getVersion(string $path)
     {
         return $this->versionStrategy->getVersion($path);
     }
@@ -43,7 +43,7 @@ class Package implements PackageInterface
     /**
      * {@inheritdoc}
      */
-    public function getUrl($path)
+    public function getUrl(string $path)
     {
         if ($this->isAbsoluteUrl($path)) {
             return $path;
@@ -68,7 +68,7 @@ class Package implements PackageInterface
         return $this->versionStrategy;
     }
 
-    protected function isAbsoluteUrl($url)
+    protected function isAbsoluteUrl(string $url)
     {
         return false !== strpos($url, '://') || '//' === substr($url, 0, 2);
     }

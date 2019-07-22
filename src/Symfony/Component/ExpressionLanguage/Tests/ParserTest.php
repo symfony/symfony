@@ -12,9 +12,9 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ExpressionLanguage\Parser;
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Node;
+use Symfony\Component\ExpressionLanguage\Parser;
 
 class ParserTest extends TestCase
 {
@@ -25,7 +25,7 @@ class ParserTest extends TestCase
     public function testParseWithInvalidName()
     {
         $lexer = new Lexer();
-        $parser = new Parser(array());
+        $parser = new Parser([]);
         $parser->parse($lexer->tokenize('foo'));
     }
 
@@ -36,17 +36,17 @@ class ParserTest extends TestCase
     public function testParseWithZeroInNames()
     {
         $lexer = new Lexer();
-        $parser = new Parser(array());
-        $parser->parse($lexer->tokenize('foo'), array(0));
+        $parser = new Parser([]);
+        $parser->parse($lexer->tokenize('foo'), [0]);
     }
 
     /**
      * @dataProvider getParseData
      */
-    public function testParse($node, $expression, $names = array())
+    public function testParse($node, $expression, $names = [])
     {
         $lexer = new Lexer();
-        $parser = new Parser(array());
+        $parser = new Parser([]);
         $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
@@ -57,63 +57,63 @@ class ParserTest extends TestCase
         $arguments->addElement(new Node\ConstantNode(2));
         $arguments->addElement(new Node\ConstantNode(true));
 
-        return array(
-            array(
+        return [
+            [
                 new Node\NameNode('a'),
                 'a',
-                array('a'),
-            ),
-            array(
+                ['a'],
+            ],
+            [
                 new Node\ConstantNode('a'),
                 '"a"',
-            ),
-            array(
+            ],
+            [
                 new Node\ConstantNode(3),
                 '3',
-            ),
-            array(
+            ],
+            [
                 new Node\ConstantNode(false),
                 'false',
-            ),
-            array(
+            ],
+            [
                 new Node\ConstantNode(true),
                 'true',
-            ),
-            array(
+            ],
+            [
                 new Node\ConstantNode(null),
                 'null',
-            ),
-            array(
+            ],
+            [
                 new Node\UnaryNode('-', new Node\ConstantNode(3)),
                 '-3',
-            ),
-            array(
+            ],
+            [
                 new Node\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(3)),
                 '3 - 3',
-            ),
-            array(
+            ],
+            [
                 new Node\BinaryNode('*',
                     new Node\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(3)),
                     new Node\ConstantNode(2)
                 ),
                 '(3 - 3) * 2',
-            ),
-            array(
+            ],
+            [
                 new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar', true), new Node\ArgumentsNode(), Node\GetAttrNode::PROPERTY_CALL),
                 'foo.bar',
-                array('foo'),
-            ),
-            array(
+                ['foo'],
+            ],
+            [
                 new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar', true), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
                 'foo.bar()',
-                array('foo'),
-            ),
-            array(
+                ['foo'],
+            ],
+            [
                 new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('not', true), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
                 'foo.not()',
-                array('foo'),
-            ),
-            array(
+                ['foo'],
+            ],
+            [
                 new Node\GetAttrNode(
                     new Node\NameNode('foo'),
                     new Node\ConstantNode('bar', true),
@@ -121,24 +121,24 @@ class ParserTest extends TestCase
                     Node\GetAttrNode::METHOD_CALL
                 ),
                 'foo.bar("arg1", 2, true)',
-                array('foo'),
-            ),
-            array(
+                ['foo'],
+            ],
+            [
                 new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode(3), new Node\ArgumentsNode(), Node\GetAttrNode::ARRAY_CALL),
                 'foo[3]',
-                array('foo'),
-            ),
-            array(
+                ['foo'],
+            ],
+            [
                 new Node\ConditionalNode(new Node\ConstantNode(true), new Node\ConstantNode(true), new Node\ConstantNode(false)),
                 'true ? true : false',
-            ),
-            array(
+            ],
+            [
                 new Node\BinaryNode('matches', new Node\ConstantNode('foo'), new Node\ConstantNode('/foo/')),
                 '"foo" matches "/foo/"',
-            ),
+            ],
 
             // chained calls
-            array(
+            [
                 $this->createGetAttrNode(
                     $this->createGetAttrNode(
                         $this->createGetAttrNode(
@@ -147,15 +147,15 @@ class ParserTest extends TestCase
                         'baz', Node\GetAttrNode::PROPERTY_CALL),
                     '3', Node\GetAttrNode::ARRAY_CALL),
                 'foo.bar().foo().baz[3]',
-                array('foo'),
-            ),
+                ['foo'],
+            ],
 
-            array(
+            [
                 new Node\NameNode('foo'),
                 'bar',
-                array('foo' => 'bar'),
-            ),
-        );
+                ['foo' => 'bar'],
+            ],
+        ];
     }
 
     private function createGetAttrNode($node, $item, $type)
@@ -167,33 +167,33 @@ class ParserTest extends TestCase
      * @dataProvider getInvalidPostfixData
      * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
      */
-    public function testParseWithInvalidPostfixData($expr, $names = array())
+    public function testParseWithInvalidPostfixData($expr, $names = [])
     {
         $lexer = new Lexer();
-        $parser = new Parser(array());
+        $parser = new Parser([]);
         $parser->parse($lexer->tokenize($expr), $names);
     }
 
     public function getInvalidPostfixData()
     {
-        return array(
-            array(
+        return [
+            [
                 'foo."#"',
-                array('foo'),
-            ),
-            array(
+                ['foo'],
+            ],
+            [
                 'foo."bar"',
-                array('foo'),
-            ),
-            array(
+                ['foo'],
+            ],
+            [
                 'foo.**',
-                array('foo'),
-            ),
-            array(
+                ['foo'],
+            ],
+            [
                 'foo.123',
-                array('foo'),
-            ),
-        );
+                ['foo'],
+            ],
+        ];
     }
 
     /**
@@ -203,8 +203,8 @@ class ParserTest extends TestCase
     public function testNameProposal()
     {
         $lexer = new Lexer();
-        $parser = new Parser(array());
+        $parser = new Parser([]);
 
-        $parser->parse($lexer->tokenize('foo > bar'), array('foo', 'baz'));
+        $parser->parse($lexer->tokenize('foo > bar'), ['foo', 'baz']);
     }
 }

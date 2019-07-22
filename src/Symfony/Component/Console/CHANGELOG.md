@@ -1,6 +1,44 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed `TableStyle::setCrossingChar()` method in favor of `TableStyle::setDefaultCrossingChar()`
+ * removed `TableStyle::setHorizontalBorderChar()` method in favor of `TableStyle::setDefaultCrossingChars()`
+ * removed `TableStyle::getHorizontalBorderChar()` method in favor of `TableStyle::getBorderChars()`
+ * removed `TableStyle::setVerticalBorderChar()` method in favor of `TableStyle::setVerticalBorderChars()`
+ * removed `TableStyle::getVerticalBorderChar()` method in favor of `TableStyle::getBorderChars()`
+ * `ProcessHelper::run()` accepts only `array|Symfony\Component\Process\Process` for its `command` argument
+ * `Application::setDispatcher` accepts only `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` 
+    for its `dispatcher` argument
+
+4.4.0
+-----
+
+ * added `Question::setTrimmable` default to true to allow the answer to be trimmed
+ * added method `preventRedrawFasterThan()` and `forceRedrawSlowerThan()` on `ProgressBar`
+ * `Application` implements `ResetInterface`
+
+4.3.0
+-----
+
+ * added support for hyperlinks
+ * added `ProgressBar::iterate()` method that simplify updating the progress bar when iterating
+ * added `Question::setAutocompleterCallback()` to provide a callback function
+   that dynamically generates suggestions as the user types
+
+4.2.0
+-----
+
+ * allowed passing commands as `[$process, 'ENV_VAR' => 'value']` to
+   `ProcessHelper::run()` to pass environment variables
+ * deprecated passing a command as a string to `ProcessHelper::run()`,
+   pass it the command as an array of its arguments instead
+ * made the `ProcessHelper` class final
+ * added `WrappableOutputFormatterInterface::formatAndWrap()` (implemented in `OutputFormatter`)
+ * added `capture_stderr_separately` option to `CommandTester::execute()`
+
 4.1.0
 -----
 
@@ -13,7 +51,7 @@ CHANGELOG
 
  * `OutputFormatter` throws an exception when unknown options are used
  * removed `QuestionHelper::setInputStream()/getInputStream()`
- * removed `Application::getTerminalWidth()/getTerminalHeight()` and 
+ * removed `Application::getTerminalWidth()/getTerminalHeight()` and
   `Application::setTerminalDimensions()/getTerminalDimensions()`
 * removed `ConsoleExceptionEvent`
 * removed `ConsoleEvents::EXCEPTION`
@@ -39,7 +77,7 @@ CHANGELOG
   with value optional explicitly passed empty
 * added console.error event to catch exceptions thrown by other listeners
 * deprecated console.exception event in favor of console.error
-* added ability to handle `CommandNotFoundException` through the 
+* added ability to handle `CommandNotFoundException` through the
  `console.error` event
 * deprecated default validation in `SymfonyQuestionHelper::ask`
 
@@ -55,7 +93,7 @@ CHANGELOG
 -----
 
  * added truncate method to FormatterHelper
- * added setColumnWidth(s) method to Table 
+ * added setColumnWidth(s) method to Table
 
 2.8.3
 -----

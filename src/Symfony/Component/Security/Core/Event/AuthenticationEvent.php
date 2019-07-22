@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Event;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This is a general purpose authentication event.

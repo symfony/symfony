@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -23,28 +24,23 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractorTest extends TestCase
 {
-    /**
-     * @var DoctrineExtractor
-     */
-    private $extractor;
-
-    protected function setUp()
+    private function createExtractor()
     {
-        $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'), true);
-        $entityManager = EntityManager::create(array('driver' => 'pdo_sqlite'), $config);
+        $config = Setup::createAnnotationMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'], true);
+        $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);
 
         if (!DBALType::hasType('foo')) {
             DBALType::addType('foo', 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineFooType');
             $entityManager->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('custom_foo', 'foo');
         }
 
-        $this->extractor = new DoctrineExtractor($entityManager->getMetadataFactory());
+        return new DoctrineExtractor($entityManager);
     }
 
     public function testGetProperties()
     {
         $this->assertEquals(
-             array(
+             [
                 'id',
                 'guid',
                 'time',
@@ -62,23 +58,23 @@ class DoctrineExtractorTest extends TestCase
                 'bar',
                 'indexedBar',
                 'indexedFoo',
-            ),
-            $this->extractor->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy')
+            ],
+            $this->createExtractor()->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy')
         );
     }
 
-    public function testGetPropertiesWithEmbedded()
+    public function testTestGetPropertiesWithEmbedded()
     {
         if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
             $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
         $this->assertEquals(
-            array(
+            [
                 'id',
                 'embedded',
-            ),
-            $this->extractor->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
+            ],
+            $this->createExtractor()->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
         );
     }
 
@@ -87,7 +83,7 @@ class DoctrineExtractorTest extends TestCase
      */
     public function testExtract($property, array $type = null)
     {
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy', $property, array()));
+        $this->assertEquals($type, $this->createExtractor()->getTypes('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy', $property, []));
     }
 
     public function testExtractWithEmbedded()
@@ -96,16 +92,16 @@ class DoctrineExtractorTest extends TestCase
             $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
-        $expectedTypes = array(new Type(
+        $expectedTypes = [new Type(
             Type::BUILTIN_TYPE_OBJECT,
             false,
             'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEmbeddable'
-        ));
+        )];
 
-        $actualTypes = $this->extractor->getTypes(
+        $actualTypes = $this->createExtractor()->getTypes(
             'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded',
             'embedded',
-            array()
+            []
         );
 
         $this->assertEquals($expectedTypes, $actualTypes);
@@ -113,56 +109,65 @@ class DoctrineExtractorTest extends TestCase
 
     public function typesProvider()
     {
-        return array(
-            array('id', array(new Type(Type::BUILTIN_TYPE_INT))),
-            array('guid', array(new Type(Type::BUILTIN_TYPE_STRING))),
-            array('bigint', array(new Type(Type::BUILTIN_TYPE_STRING))),
-            array('time', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))),
-            array('timeImmutable', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))),
-            array('dateInterval', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateInterval'))),
-            array('float', array(new Type(Type::BUILTIN_TYPE_FLOAT))),
-            array('decimal', array(new Type(Type::BUILTIN_TYPE_STRING))),
-            array('bool', array(new Type(Type::BUILTIN_TYPE_BOOL))),
-            array('binary', array(new Type(Type::BUILTIN_TYPE_RESOURCE))),
-            array('json', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true))),
-            array('foo', array(new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation'))),
-            array('bar', array(new Type(
+        return [
+            ['id', [new Type(Type::BUILTIN_TYPE_INT)]],
+            ['guid', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['bigint', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['time', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
+            ['timeImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
+            ['dateInterval', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateInterval')]],
+            ['float', [new Type(Type::BUILTIN_TYPE_FLOAT)]],
+            ['decimal', [new Type(Type::BUILTIN_TYPE_STRING)]],
+            ['bool', [new Type(Type::BUILTIN_TYPE_BOOL)]],
+            ['binary', [new Type(Type::BUILTIN_TYPE_RESOURCE)]],
+            ['json', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
+            ['foo', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')]],
+            ['bar', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
                 false,
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type(Type::BUILTIN_TYPE_INT),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
-            ))),
-            array('indexedBar', array(new Type(
+            )]],
+            ['indexedBar', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
                 false,
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type(Type::BUILTIN_TYPE_STRING),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
-            ))),
-            array('indexedFoo', array(new Type(
+            )]],
+            ['indexedFoo', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
                 false,
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type(Type::BUILTIN_TYPE_STRING),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
-            ))),
-            array('simpleArray', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
-            array('customFoo', null),
-            array('notMapped', null),
-        );
+            )]],
+            ['simpleArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))]],
+            ['customFoo', null],
+            ['notMapped', null],
+        ];
     }
 
     public function testGetPropertiesCatchException()
     {
-        $this->assertNull($this->extractor->getProperties('Not\Exist'));
+        $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
     }
 
     public function testGetTypesCatchException()
     {
-        $this->assertNull($this->extractor->getTypes('Not\Exist', 'baz'));
+        $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
+    }
+
+    public function testGeneratedValueNotWritable()
+    {
+        $extractor = $this->createExtractor();
+        $this->assertFalse($extractor->isWritable(DoctrineGeneratedValue::class, 'id'));
+        $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'id'));
+        $this->assertNull($extractor->isWritable(DoctrineGeneratedValue::class, 'foo'));
+        $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
     }
 }

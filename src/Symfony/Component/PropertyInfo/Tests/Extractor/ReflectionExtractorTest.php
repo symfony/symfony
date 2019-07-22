@@ -14,6 +14,11 @@ namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -34,14 +39,22 @@ class ReflectionExtractorTest extends TestCase
     public function testGetProperties()
     {
         $this->assertSame(
-            array(
+            [
                 'bal',
                 'parent',
                 'collection',
+                'nestedCollection',
+                'mixedCollection',
                 'B',
                 'Guid',
-                'array',
+                'g',
+                'h',
+                'i',
+                'j',
                 'emptyVar',
+                'iteratorCollection',
+                'iteratorCollectionWithKey',
+                'nestedIterators',
                 'foo',
                 'foo2',
                 'foo3',
@@ -58,8 +71,7 @@ class ReflectionExtractorTest extends TestCase
                 'd',
                 'e',
                 'f',
-                'g',
-            ),
+            ],
             $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
 
@@ -68,17 +80,25 @@ class ReflectionExtractorTest extends TestCase
 
     public function testGetPropertiesWithCustomPrefixes()
     {
-        $customExtractor = new ReflectionExtractor(array('add', 'remove'), array('is', 'can'));
+        $customExtractor = new ReflectionExtractor(['add', 'remove'], ['is', 'can']);
 
         $this->assertSame(
-            array(
+            [
                 'bal',
                 'parent',
                 'collection',
+                'nestedCollection',
+                'mixedCollection',
                 'B',
                 'Guid',
-                'array',
+                'g',
+                'h',
+                'i',
+                'j',
                 'emptyVar',
+                'iteratorCollection',
+                'iteratorCollectionWithKey',
+                'nestedIterators',
                 'foo',
                 'foo2',
                 'foo3',
@@ -89,50 +109,40 @@ class ReflectionExtractorTest extends TestCase
                 'd',
                 'e',
                 'f',
-            ),
+            ],
             $customExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
     }
 
     public function testGetPropertiesWithNoPrefixes()
     {
-        $noPrefixExtractor = new ReflectionExtractor(array(), array(), array());
+        $noPrefixExtractor = new ReflectionExtractor([], [], []);
 
         $this->assertSame(
-            array(
+            [
                 'bal',
                 'parent',
                 'collection',
+                'nestedCollection',
+                'mixedCollection',
                 'B',
                 'Guid',
-                'array',
+                'g',
+                'h',
+                'i',
+                'j',
                 'emptyVar',
+                'iteratorCollection',
+                'iteratorCollectionWithKey',
+                'nestedIterators',
                 'foo',
                 'foo2',
                 'foo3',
                 'foo4',
                 'foo5',
                 'files',
-            ),
+            ],
             $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
-        );
-    }
-
-    public function testGetPropertiesPhp71()
-    {
-        $noPrefixExtractor = new ReflectionExtractor();
-
-        $this->assertSame(
-            array(
-                'string',
-                'stringOrNull',
-                'foo',
-                'buz',
-                'bar',
-                'baz',
-                'intWithAccessor',
-            ),
-            $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy')
         );
     }
 
@@ -141,24 +151,24 @@ class ReflectionExtractorTest extends TestCase
      */
     public function testExtractors($property, array $type = null)
     {
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, array()));
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, []));
     }
 
     public function typesProvider()
     {
-        return array(
-            array('a', null),
-            array('b', array(new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy'))),
-            array('c', array(new Type(Type::BUILTIN_TYPE_BOOL))),
-            array('d', array(new Type(Type::BUILTIN_TYPE_BOOL))),
-            array('e', null),
-            array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')))),
-            array('donotexist', null),
-            array('staticGetter', null),
-            array('staticSetter', null),
-            array('self', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy'))),
-            array('realParent', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy'))),
-        );
+        return [
+            ['a', null],
+            ['b', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')]],
+            ['c', [new Type(Type::BUILTIN_TYPE_BOOL)]],
+            ['d', [new Type(Type::BUILTIN_TYPE_BOOL)]],
+            ['e', null],
+            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))]],
+            ['donotexist', null],
+            ['staticGetter', null],
+            ['staticSetter', null],
+            ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')]],
+            ['realParent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')]],
+        ];
     }
 
     /**
@@ -166,19 +176,19 @@ class ReflectionExtractorTest extends TestCase
      */
     public function testExtractPhp7Type($property, array $type = null)
     {
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy', $property, array()));
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy', $property, []));
     }
 
     public function php7TypesProvider()
     {
-        return array(
-            array('foo', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true))),
-            array('bar', array(new Type(Type::BUILTIN_TYPE_INT))),
-            array('baz', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
-            array('buz', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy'))),
-            array('biz', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'stdClass'))),
-            array('donotexist', null),
-        );
+        return [
+            ['foo', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
+            ['bar', [new Type(Type::BUILTIN_TYPE_INT)]],
+            ['baz', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))]],
+            ['buz', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy')]],
+            ['biz', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'stdClass')]],
+            ['donotexist', null],
+        ];
     }
 
     /**
@@ -186,31 +196,37 @@ class ReflectionExtractorTest extends TestCase
      */
     public function testExtractPhp71Type($property, array $type = null)
     {
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy', $property, array()));
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy', $property, []));
     }
 
     public function php71TypesProvider()
     {
-        return array(
-            array('foo', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true))),
-            array('buz', array(new Type(Type::BUILTIN_TYPE_NULL))),
-            array('bar', array(new Type(Type::BUILTIN_TYPE_INT, true))),
-            array('baz', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
-            array('donotexist', null),
-            array('string', array(new Type(Type::BUILTIN_TYPE_STRING, false))),
-            array('stringOrNull', array(new Type(Type::BUILTIN_TYPE_STRING, true))),
-            array('intPrivate', array(new Type(Type::BUILTIN_TYPE_INT, false))),
-            array('intWithAccessor', array(new Type(Type::BUILTIN_TYPE_INT, false))),
-        );
+        return [
+            ['foo', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)]],
+            ['buz', [new Type(Type::BUILTIN_TYPE_NULL)]],
+            ['bar', [new Type(Type::BUILTIN_TYPE_INT, true)]],
+            ['baz', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))]],
+            ['donotexist', null],
+        ];
     }
 
-    public function testExtractPhp71TypeWithParentConstructor()
+    /**
+     * @dataProvider defaultValueProvider
+     */
+    public function testExtractWithDefaultValue($property, $type)
     {
-        $property = 'string';
-        $type = array(new Type(Type::BUILTIN_TYPE_STRING, false));
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyChild', $property, array()));
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyChild2', $property, array()));
-        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyChild3', $property, array()));
+        $this->assertEquals($type, $this->extractor->getTypes(DefaultValue::class, $property, []));
+    }
+
+    public function defaultValueProvider()
+    {
+        return [
+            ['defaultInt', [new Type(Type::BUILTIN_TYPE_INT, false)]],
+            ['defaultFloat', [new Type(Type::BUILTIN_TYPE_FLOAT, false)]],
+            ['defaultString', [new Type(Type::BUILTIN_TYPE_STRING, false)]],
+            ['defaultArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false)]],
+            ['defaultNull', null],
+        ];
     }
 
     /**
@@ -220,29 +236,27 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            $this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, array())
+            $this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, [])
         );
     }
 
     public function getReadableProperties()
     {
-        return array(
-            array('bar', false),
-            array('baz', false),
-            array('parent', true),
-            array('a', true),
-            array('b', false),
-            array('c', true),
-            array('d', true),
-            array('e', false),
-            array('f', false),
-            array('g', true),
-            array('Id', true),
-            array('id', true),
-            array('Guid', true),
-            array('guid', false),
-            array('guid', false),
-        );
+        return [
+            ['bar', false],
+            ['baz', false],
+            ['parent', true],
+            ['a', true],
+            ['b', false],
+            ['c', true],
+            ['d', true],
+            ['e', false],
+            ['f', false],
+            ['Id', true],
+            ['id', true],
+            ['Guid', true],
+            ['guid', false],
+        ];
     }
 
     /**
@@ -252,33 +266,98 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            $this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, array())
+            $this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, [])
         );
     }
 
     public function getWritableProperties()
     {
-        return array(
-            array('bar', false),
-            array('baz', false),
-            array('parent', true),
-            array('a', false),
-            array('b', true),
-            array('c', false),
-            array('d', false),
-            array('e', true),
-            array('f', true),
-            array('g', false),
-            array('Id', false),
-            array('Guid', true),
-            array('guid', false),
-        );
+        return [
+            ['bar', false],
+            ['baz', false],
+            ['parent', true],
+            ['a', false],
+            ['b', true],
+            ['c', false],
+            ['d', false],
+            ['e', true],
+            ['f', true],
+            ['Id', false],
+            ['Guid', true],
+            ['guid', false],
+        ];
     }
 
     public function testSingularize()
     {
         $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'analyses'));
         $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'feet'));
-        $this->assertEquals(array('analyses', 'feet'), $this->extractor->getProperties(AdderRemoverDummy::class));
+        $this->assertEquals(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class));
+    }
+
+    public function testPrivatePropertyExtractor()
+    {
+        $privateExtractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PRIVATE | ReflectionExtractor::ALLOW_PROTECTED);
+        $properties = $privateExtractor->getProperties(Dummy::class);
+
+        $this->assertContains('bar', $properties);
+        $this->assertContains('baz', $properties);
+
+        $this->assertTrue($privateExtractor->isReadable(Dummy::class, 'bar'));
+        $this->assertTrue($privateExtractor->isReadable(Dummy::class, 'baz'));
+
+        $protectedExtractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED);
+        $properties = $protectedExtractor->getProperties(Dummy::class);
+
+        $this->assertNotContains('bar', $properties);
+        $this->assertContains('baz', $properties);
+
+        $this->assertFalse($protectedExtractor->isReadable(Dummy::class, 'bar'));
+        $this->assertTrue($protectedExtractor->isReadable(Dummy::class, 'baz'));
+    }
+
+    /**
+     * @dataProvider getInitializableProperties
+     */
+    public function testIsInitializable(string $class, string $property, bool $expected)
+    {
+        $this->assertSame($expected, $this->extractor->isInitializable($class, $property));
+    }
+
+    public function getInitializableProperties(): array
+    {
+        return [
+            [Php71Dummy::class, 'string', true],
+            [Php71Dummy::class, 'intPrivate', true],
+            [Php71Dummy::class, 'notExist', false],
+            [Php71DummyExtended2::class, 'intWithAccessor', true],
+            [Php71DummyExtended2::class, 'intPrivate', false],
+            [NotInstantiable::class, 'foo', false],
+        ];
+    }
+
+    /**
+     * @dataProvider constructorTypesProvider
+     */
+    public function testExtractTypeConstructor(string $class, string $property, array $type = null)
+    {
+        /* Check that constructor extractions works by default, and if passed in via context.
+           Check that null is returned if constructor extraction is disabled */
+        $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
+        $this->assertEquals($type, $this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => true]));
+        $this->assertNull($this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => false]));
+    }
+
+    public function constructorTypesProvider(): array
+    {
+        return [
+            // php71 dummy has following constructor: __construct(string $string, int $intPrivate)
+            [Php71Dummy::class, 'string', [new Type(Type::BUILTIN_TYPE_STRING, false)]],
+            [Php71Dummy::class, 'intPrivate', [new Type(Type::BUILTIN_TYPE_INT, false)]],
+            // Php71DummyExtended2 adds int $intWithAccessor
+            [Php71DummyExtended2::class, 'intWithAccessor', [new Type(Type::BUILTIN_TYPE_INT, false)]],
+            [Php71DummyExtended2::class, 'intPrivate', [new Type(Type::BUILTIN_TYPE_INT, false)]],
+            [DefaultValue::class, 'foo', null],
+        ];
     }
 }

@@ -9,6 +9,6 @@ return new class() {
     {
         $s = $c->services();
         $s->set(BarService::class)
-            ->args(array(inline('FooClass')));
+            ->args([inline('FooClass')]);
     }
 };

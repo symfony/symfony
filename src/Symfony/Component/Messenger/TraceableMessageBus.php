@@ -17,7 +17,7 @@ namespace Symfony\Component\Messenger;
 class TraceableMessageBus implements MessageBusInterface
 {
     private $decoratedBus;
-    private $dispatchedMessages = array();
+    private $dispatchedMessages = [];
 
     public function __construct(MessageBusInterface $decoratedBus)
     {
@@ -27,35 +27,24 @@ class TraceableMessageBus implements MessageBusInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message)
+    public function dispatch($message, array $stamps = []): Envelope
     {
-        $caller = $this->getCaller();
-        $callTime = microtime(true);
-        $messageToTrace = $message instanceof Envelope ? $message->getMessage() : $message;
-        $envelopeItems = $message instanceof Envelope ? array_values($message->all()) : null;
+        $envelope = Envelope::wrap($message, $stamps);
+        $context = [
+            'stamps' => array_values($envelope->all()),
+            'message' => $envelope->getMessage(),
+            'caller' => $this->getCaller(),
+            'callTime' => microtime(true),
+        ];
 
         try {
-            $result = $this->decoratedBus->dispatch($message);
-
-            $this->dispatchedMessages[] = array(
-                'envelopeItems' => $envelopeItems,
-                'message' => $messageToTrace,
-                'result' => $result,
-                'callTime' => $callTime,
-                'caller' => $caller,
-            );
-
-            return $result;
+            return $this->decoratedBus->dispatch($message, $stamps);
         } catch (\Throwable $e) {
-            $this->dispatchedMessages[] = array(
-                'envelopeItems' => $envelopeItems,
-                'message' => $messageToTrace,
-                'exception' => $e,
-                'callTime' => $callTime,
-                'caller' => $caller,
-            );
+            $context['exception'] = $e;
 
             throw $e;
+        } finally {
+            $this->dispatchedMessages[] = $context;
         }
     }
 
@@ -66,7 +55,7 @@ class TraceableMessageBus implements MessageBusInterface
 
     public function reset()
     {
-        $this->dispatchedMessages = array();
+        $this->dispatchedMessages = [];
     }
 
     private function getCaller(): array
@@ -85,10 +74,7 @@ class TraceableMessageBus implements MessageBusInterface
                 $line = $trace[$i]['line'];
 
                 while (++$i < 8) {
-                    if (isset($trace[$i]['function'], $trace[$i]['file']) && empty($trace[$i]['class']) && 0 !== strpos(
-                            $trace[$i]['function'],
-                            'call_user_func'
-                        )) {
+                    if (isset($trace[$i]['function'], $trace[$i]['file']) && empty($trace[$i]['class']) && 0 !== strpos($trace[$i]['function'], 'call_user_func')) {
                         $file = $trace[$i]['file'];
                         $line = $trace[$i]['line'];
 

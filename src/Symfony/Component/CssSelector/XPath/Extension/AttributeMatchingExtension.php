@@ -31,16 +31,16 @@ class AttributeMatchingExtension extends AbstractExtension
      */
     public function getAttributeMatchingTranslators()
     {
-        return array(
-            'exists' => array($this, 'translateExists'),
-            '=' => array($this, 'translateEquals'),
-            '~=' => array($this, 'translateIncludes'),
-            '|=' => array($this, 'translateDashMatch'),
-            '^=' => array($this, 'translatePrefixMatch'),
-            '$=' => array($this, 'translateSuffixMatch'),
-            '*=' => array($this, 'translateSubstringMatch'),
-            '!=' => array($this, 'translateDifferent'),
-        );
+        return [
+            'exists' => [$this, 'translateExists'],
+            '=' => [$this, 'translateEquals'],
+            '~=' => [$this, 'translateIncludes'],
+            '|=' => [$this, 'translateDashMatch'],
+            '^=' => [$this, 'translatePrefixMatch'],
+            '$=' => [$this, 'translateSuffixMatch'],
+            '*=' => [$this, 'translateSubstringMatch'],
+            '!=' => [$this, 'translateDifferent'],
+        ];
     }
 
     public function translateExists(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
@@ -86,7 +86,7 @@ class AttributeMatchingExtension extends AbstractExtension
         return $xpath->addCondition($value ? sprintf(
             '%1$s and substring(%1$s, string-length(%1$s)-%2$s) = %3$s',
             $attribute,
-            strlen($value) - 1,
+            \strlen($value) - 1,
             Translator::getXpathLiteral($value)
         ) : '0');
     }

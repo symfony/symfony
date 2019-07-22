@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.48.42",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhaz",
@@ -81,6 +81,7 @@
         "car": "Karib",
         "cay": "Cayuga",
         "cch": "Atsam",
+        "ccp": "Chakma",
         "ce": "Chechen",
         "ceb": "Cebuano",
         "cgg": "Kiga",
@@ -151,6 +152,8 @@
         "fo": "Faroe",
         "fon": "Fon",
         "fr": "Prancis",
+        "fr_CA": "Perancis (Kanada)",
+        "fr_CH": "Perancis (Swiss)",
         "frc": "Prancis Cajun",
         "frm": "Prancis Abad Pertengahan",
         "fro": "Prancis Kuno",
@@ -326,7 +329,6 @@
         "ms": "Melayu",
         "mt": "Malta",
         "mua": "Mundang",
-        "mul": "Beberapa Bahasa",
         "mus": "Bahasa Muskogee",
         "mwl": "Miranda",
         "mwr": "Marwari",
@@ -400,7 +402,6 @@
         "ro_MD": "Moldavia",
         "rof": "Rombo",
         "rom": "Romani",
-        "root": "Root",
         "rtm": "Rotuma",
         "ru": "Rusia",
         "rup": "Aromania",
@@ -506,7 +507,6 @@
         "uga": "Ugarit",
         "uk": "Ukraina",
         "umb": "Umbundu",
-        "und": "Bahasa Tidak Dikenal",
         "ur": "Urdu",
         "uz": "Uzbek",
         "vai": "Vai",
@@ -543,7 +543,6 @@
         "zh_Hant": "Tionghoa (Aksara Tradisional)",
         "zu": "Zulu",
         "zun": "Zuni",
-        "zxx": "Tidak ada konten linguistik",
         "zza": "Zaza"
     }
 }

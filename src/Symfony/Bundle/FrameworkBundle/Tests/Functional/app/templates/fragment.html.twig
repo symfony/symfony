@@ -1,0 +1,7 @@
+{{ render(controller('Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Bundle\\TestBundle\\Controller\\FragmentController::inlinedAction', {'options': {'bar': bar, 'eleven': 11}})) }}
+--
+{{ render(controller('Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Bundle\\TestBundle\\Controller\\FragmentController::customformatAction', {'_format': 'html'})) }}
+--
+{{ render(controller('Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Bundle\\TestBundle\\Controller\\FragmentController::customlocaleAction', {'_locale': 'es'})) }}
+--
+{{ app.request.setLocale('fr') }}{{ render(controller('Symfony\\Bundle\\FrameworkBundle\\Tests\\Functional\\Bundle\\TestBundle\\Controller\\FragmentController::forwardlocaleAction')) -}}

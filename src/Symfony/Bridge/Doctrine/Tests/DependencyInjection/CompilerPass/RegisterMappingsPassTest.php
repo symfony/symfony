@@ -4,8 +4,8 @@ namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterMappingsPass;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterMappingsPassTest extends TestCase
 {
@@ -16,17 +16,17 @@ class RegisterMappingsPassTest extends TestCase
     public function testNoDriverParmeterException()
     {
         $container = $this->createBuilder();
-        $this->process($container, array(
+        $this->process($container, [
             'manager.param.one',
             'manager.param.two',
-        ));
+        ]);
     }
 
     private function process(ContainerBuilder $container, array $managerParamNames)
     {
         $pass = new ConcreteMappingsPass(
             new Definition('\stdClass'),
-            array(),
+            [],
             $managerParamNames,
             'some.%s.metadata_driver'
         );

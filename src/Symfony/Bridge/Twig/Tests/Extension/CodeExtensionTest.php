@@ -23,6 +23,11 @@ class CodeExtensionTest extends TestCase
         $this->assertEquals($expected, $this->getExtension()->formatFile(__FILE__, 25));
     }
 
+    public function testFileRelative()
+    {
+        $this->assertEquals('file.txt', $this->getExtension()->getFileRelative(\DIRECTORY_SEPARATOR.'project'.\DIRECTORY_SEPARATOR.'file.txt'));
+    }
+
     /**
      * @dataProvider getClassNameProvider
      */
@@ -41,20 +46,20 @@ class CodeExtensionTest extends TestCase
 
     public function getClassNameProvider()
     {
-        return array(
-            array('F\Q\N\Foo', '<abbr title="F\Q\N\Foo">Foo</abbr>'),
-            array('Bare', '<abbr title="Bare">Bare</abbr>'),
-        );
+        return [
+            ['F\Q\N\Foo', '<abbr title="F\Q\N\Foo">Foo</abbr>'],
+            ['Bare', '<abbr title="Bare">Bare</abbr>'],
+        ];
     }
 
     public function getMethodNameProvider()
     {
-        return array(
-            array('F\Q\N\Foo::Method', '<abbr title="F\Q\N\Foo">Foo</abbr>::Method()'),
-            array('Bare::Method', '<abbr title="Bare">Bare</abbr>::Method()'),
-            array('Closure', '<abbr title="Closure">Closure</abbr>'),
-            array('Method', '<abbr title="Method">Method</abbr>()'),
-        );
+        return [
+            ['F\Q\N\Foo::Method', '<abbr title="F\Q\N\Foo">Foo</abbr>::Method()'],
+            ['Bare::Method', '<abbr title="Bare">Bare</abbr>::Method()'],
+            ['Closure', '<abbr title="Closure">Closure</abbr>'],
+            ['Method', '<abbr title="Method">Method</abbr>()'],
+        ];
     }
 
     public function testGetName()
@@ -64,6 +69,6 @@ class CodeExtensionTest extends TestCase
 
     protected function getExtension()
     {
-        return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), '/root', 'UTF-8');
+        return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), \DIRECTORY_SEPARATOR.'project', 'UTF-8');
     }
 }

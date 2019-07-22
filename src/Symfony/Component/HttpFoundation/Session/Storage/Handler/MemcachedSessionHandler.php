@@ -45,14 +45,12 @@ class MemcachedSessionHandler extends AbstractSessionHandler
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */
-    public function __construct(\Memcached $memcached, array $options = array())
+    public function __construct(\Memcached $memcached, array $options = [])
     {
         $this->memcached = $memcached;
 
-        if ($diff = array_diff(array_keys($options), array('prefix', 'expiretime'))) {
-            throw new \InvalidArgumentException(sprintf(
-                'The following options are not supported "%s"', implode(', ', $diff)
-            ));
+        if ($diff = array_diff(array_keys($options), ['prefix', 'expiretime'])) {
+            throw new \InvalidArgumentException(sprintf('The following options are not supported "%s"', implode(', ', $diff)));
         }
 
         $this->ttl = isset($options['expiretime']) ? (int) $options['expiretime'] : 86400;
@@ -64,7 +62,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
      */
     public function close()
     {
-        return true;
+        return $this->memcached->quit();
     }
 
     /**

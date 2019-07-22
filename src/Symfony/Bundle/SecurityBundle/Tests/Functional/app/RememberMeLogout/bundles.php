@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
 
-return array(
+return [
     new FrameworkBundle(),
     new SecurityBundle(),
-);
+];

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -36,11 +36,11 @@ class AddValidatorInitializersPass implements CompilerPassInterface
             return;
         }
 
-        $initializers = array();
+        $initializers = [];
         foreach ($container->findTaggedServiceIds($this->initializerTag, true) as $id => $attributes) {
             $initializers[] = new Reference($id);
         }
 
-        $container->getDefinition($this->builderService)->addMethodCall('addObjectInitializers', array($initializers));
+        $container->getDefinition($this->builderService)->addMethodCall('addObjectInitializers', [$initializers]);
     }
 }

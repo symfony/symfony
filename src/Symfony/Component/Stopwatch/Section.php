@@ -21,10 +21,10 @@ class Section
     /**
      * @var StopwatchEvent[]
      */
-    private $events = array();
+    private $events = [];
 
     /**
-     * @var null|float
+     * @var float|null
      */
     private $origin;
 
@@ -41,7 +41,7 @@ class Section
     /**
      * @var Section[]
      */
-    private $children = array();
+    private $children = [];
 
     /**
      * @param float|null $origin        Set the origin of the events in this section, use null to set their origin to their start time
@@ -78,7 +78,7 @@ class Section
      */
     public function open($id)
     {
-        if (null === $session = $this->get($id)) {
+        if (null === $id || null === $session = $this->get($id)) {
             $session = $this->children[] = new self(microtime(true) * 1000, $this->morePrecision);
         }
 

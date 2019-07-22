@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 class FragmentHandler
 {
     private $debug;
-    private $renderers = array();
+    private $renderers = [];
     private $requestStack;
 
     /**
@@ -37,7 +37,7 @@ class FragmentHandler
      * @param FragmentRendererInterface[] $renderers    An array of FragmentRendererInterface instances
      * @param bool                        $debug        Whether the debug mode is enabled or not
      */
-    public function __construct(RequestStack $requestStack, array $renderers = array(), bool $debug = false)
+    public function __construct(RequestStack $requestStack, array $renderers = [], bool $debug = false)
     {
         $this->requestStack = $requestStack;
         foreach ($renderers as $renderer) {
@@ -70,7 +70,7 @@ class FragmentHandler
      * @throws \InvalidArgumentException when the renderer does not exist
      * @throws \LogicException           when no master request is being handled
      */
-    public function render($uri, $renderer = 'inline', array $options = array())
+    public function render($uri, $renderer = 'inline', array $options = [])
     {
         if (!isset($options['ignore_errors'])) {
             $options['ignore_errors'] = !$this->debug;

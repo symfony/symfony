@@ -45,23 +45,23 @@ class StopwatchPeriodTest extends TestCase
 
     public function provideTimeValues()
     {
-        yield array(0, false, 0);
-        yield array(0, true, 0.0);
-        yield array(0.0, false, 0);
-        yield array(0.0, true, 0.0);
-        yield array(2.71, false, 2);
-        yield array(2.71, true, 2.71);
+        yield [0, false, 0];
+        yield [0, true, 0.0];
+        yield [0.0, false, 0];
+        yield [0.0, true, 0.0];
+        yield [2.71, false, 2];
+        yield [2.71, true, 2.71];
     }
 
     public function provideDurationValues()
     {
-        yield array(0, 0, false, 0);
-        yield array(0, 0, true, 0.0);
-        yield array(0.0, 0.0, false, 0);
-        yield array(0.0, 0.0, true, 0.0);
-        yield array(2, 3.14, false, 1);
-        yield array(2, 3.14, true, 1.14);
-        yield array(2.71, 3.14, false, 1);
-        yield array(2.71, 3.14, true, 0.43);
+        yield [0, 0, false, 0];
+        yield [0, 0, true, 0.0];
+        yield [0.0, 0.0, false, 0];
+        yield [0.0, 0.0, true, 0.0];
+        yield [2, 3.14, false, 1];
+        yield [2, 3.14, true, 1.14];
+        yield [2.71, 3.14, false, 1];
+        yield [2.71, 3.14, true, 0.43];
     }
 }

@@ -71,7 +71,7 @@ class Esi extends AbstractSurrogate
         }
 
         $parts = explode(';', $type);
-        if (!in_array($parts[0], $this->contentTypes)) {
+        if (!\in_array($parts[0], $this->contentTypes)) {
             return $response;
         }
 
@@ -85,7 +85,7 @@ class Esi extends AbstractSurrogate
 
         $i = 1;
         while (isset($chunks[$i])) {
-            $options = array();
+            $options = [];
             preg_match_all('/(src|onerror|alt)="([^"]*?)"/', $chunks[$i], $matches, PREG_SET_ORDER);
             foreach ($matches as $set) {
                 $options[$set[1]] = $set[2];

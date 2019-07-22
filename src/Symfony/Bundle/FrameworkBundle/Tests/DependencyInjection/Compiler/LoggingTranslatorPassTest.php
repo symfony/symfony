@@ -30,17 +30,17 @@ class LoggingTranslatorPassTest extends TestCase
         $container->setAlias('translator', 'translator.default');
         $translationWarmerDefinition = $container->register('translation.warmer')
             ->addArgument(new Reference('translator'))
-            ->addTag('container.service_subscriber', array('id' => 'translator'))
-            ->addTag('container.service_subscriber', array('id' => 'foo'));
+            ->addTag('container.service_subscriber', ['id' => 'translator'])
+            ->addTag('container.service_subscriber', ['id' => 'foo']);
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
 
         $this->assertEquals(
-            array('container.service_subscriber' => array(
-                array('id' => 'foo'),
-                array('key' => 'translator', 'id' => 'translator.logging.inner'),
-            )),
+            ['container.service_subscriber' => [
+                ['id' => 'foo'],
+                ['key' => 'translator', 'id' => 'translator.logging.inner'],
+            ]],
             $translationWarmerDefinition->getTags()
         );
     }
@@ -51,8 +51,8 @@ class LoggingTranslatorPassTest extends TestCase
         $container->register('identity_translator');
         $container->setAlias('translator', 'identity_translator');
 
-        $definitionsBefore = count($container->getDefinitions());
-        $aliasesBefore = count($container->getAliases());
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
@@ -68,8 +68,8 @@ class LoggingTranslatorPassTest extends TestCase
         $container->register('monolog.logger');
         $container->setAlias('logger', 'monolog.logger');
 
-        $definitionsBefore = count($container->getDefinitions());
-        $aliasesBefore = count($container->getAliases());
+        $definitionsBefore = \count($container->getDefinitions());
+        $aliasesBefore = \count($container->getAliases());
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);

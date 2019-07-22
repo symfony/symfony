@@ -12,4 +12,12 @@ class DefaultValueController
     public function action($default = 'value')
     {
     }
+
+    /**
+     * @Route("/hello/{name<\w+>}", name="hello_without_default")
+     * @Route("/hello/{name<\w+>?Symfony}", name="hello_with_default")
+     */
+    public function hello(string $name = 'World')
+    {
+    }
 }

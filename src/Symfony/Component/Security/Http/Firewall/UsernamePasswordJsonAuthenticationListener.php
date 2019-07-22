@@ -12,11 +12,10 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -33,14 +32,18 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * UsernamePasswordJsonAuthenticationListener is a stateless implementation of
  * an authentication via a JSON document composed of a username and a password.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final
  */
-class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
+class UsernamePasswordJsonAuthenticationListener
 {
     private $tokenStorage;
     private $authenticationManager;
@@ -52,8 +55,9 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     private $logger;
     private $eventDispatcher;
     private $propertyAccessor;
+    private $sessionStrategy;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, HttpUtils $httpUtils, string $providerKey, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, HttpUtils $httpUtils, string $providerKey, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
@@ -63,14 +67,11 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $this->failureHandler = $failureHandler;
         $this->logger = $logger;
         $this->eventDispatcher = $eventDispatcher;
-        $this->options = array_merge(array('username_path' => 'username', 'password_path' => 'password'), $options);
+        $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
         if (false === strpos($request->getRequestFormat(), 'json')
@@ -102,15 +103,15 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
                 throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);
             }
 
-            if (!is_string($username)) {
+            if (!\is_string($username)) {
                 throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
             }
 
-            if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
+            if (\strlen($username) > Security::MAX_USERNAME_LENGTH) {
                 throw new BadCredentialsException('Invalid username.');
             }
 
-            if (!is_string($password)) {
+            if (!\is_string($password)) {
                 throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
             }
 
@@ -136,16 +137,16 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     private function onSuccess(Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
-            $this->logger->info('User has been authenticated successfully.', array('username' => $token->getUsername()));
+            $this->logger->info('User has been authenticated successfully.', ['username' => $token->getUsername()]);
         }
 
-        $this->migrateSession($request);
+        $this->migrateSession($request, $token);
 
         $this->tokenStorage->setToken($token);
 
         if (null !== $this->eventDispatcher) {
             $loginEvent = new InteractiveLoginEvent($request, $token);
-            $this->eventDispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+            $this->eventDispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
         }
 
         if (!$this->successHandler) {
@@ -164,7 +165,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     private function onFailure(Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
-            $this->logger->info('Authentication request failed.', array('exception' => $failed));
+            $this->logger->info('Authentication request failed.', ['exception' => $failed]);
         }
 
         $token = $this->tokenStorage->getToken();
@@ -173,7 +174,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         }
 
         if (!$this->failureHandler) {
-            return new JsonResponse(array('error' => $failed->getMessageKey()), 401);
+            return new JsonResponse(['error' => $failed->getMessageKey()], 401);
         }
 
         $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
@@ -185,11 +186,22 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         return $response;
     }
 
-    private function migrateSession(Request $request)
+    /**
+     * Call this method if your authentication token is stored to a session.
+     *
+     * @final
+     */
+    public function setSessionAuthenticationStrategy(SessionAuthenticationStrategyInterface $sessionStrategy)
     {
-        if (!$request->hasSession() || !$request->hasPreviousSession()) {
+        $this->sessionStrategy = $sessionStrategy;
+    }
+
+    private function migrateSession(Request $request, TokenInterface $token)
+    {
+        if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
         }
-        $request->getSession()->migrate(true);
+
+        $this->sessionStrategy->onAuthentication($request, $token);
     }
 }

@@ -12,9 +12,9 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
  * RequestMatcherInterface is the interface that all request matcher classes must implement.

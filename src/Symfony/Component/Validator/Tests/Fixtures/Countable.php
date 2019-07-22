@@ -22,6 +22,6 @@ class Countable implements \Countable
 
     public function count()
     {
-        return count($this->content);
+        return \count($this->content);
     }
 }

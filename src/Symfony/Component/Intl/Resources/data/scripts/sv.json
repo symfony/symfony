@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.48.90",
     "Names": {
         "Adlm": "adlamiska",
         "Afak": "afakiska",
@@ -38,10 +38,12 @@
         "Egyh": "hieratiska",
         "Egyp": "egyptiska hieroglyfer",
         "Elba": "elbasiska",
+        "Elym": "elymaiska",
         "Ethi": "etiopiska",
         "Geok": "kutsuri",
         "Geor": "georgiska",
         "Glag": "glagolitiska",
+        "Gong": "gunjalgondiska",
         "Gonm": "masaram-gondi",
         "Goth": "gotiska",
         "Gran": "gammaltamilska",
@@ -59,6 +61,7 @@
         "Hira": "hiragana",
         "Hluw": "hittitiska hieroglyfer",
         "Hmng": "pahaw mong",
+        "Hmnp": "nyiakeng puachue hmong",
         "Hrkt": "katakana\/hiragana",
         "Hung": "fornungerska",
         "Inds": "indus",
@@ -105,6 +108,7 @@
         "Mtei": "meitei-mayek",
         "Mult": "multaniska",
         "Mymr": "burmesiska",
+        "Nand": "nandinagari",
         "Narb": "fornnordarabiska",
         "Nbat": "nabateiska",
         "Newa": "newariska",
@@ -128,6 +132,7 @@
         "Plrd": "pollardtecken",
         "Prti": "tidig parthianska",
         "Rjng": "rejang",
+        "Rohg": "hanifiska",
         "Roro": "rongo-rongo",
         "Runr": "runor",
         "Samr": "samaritiska",
@@ -140,6 +145,8 @@
         "Sidd": "siddhamska",
         "Sind": "sindhiska",
         "Sinh": "singalesiska",
+        "Sogd": "sogdiska",
+        "Sogo": "gammalsogdiska",
         "Sora": "sora sompeng",
         "Soyo": "soyombo",
         "Sund": "sundanesiska",
@@ -167,6 +174,7 @@
         "Vaii": "vaj",
         "Visp": "synligt tal",
         "Wara": "varang kshiti",
+        "Wcho": "wancho",
         "Wole": "woleai",
         "Xpeo": "fornpersiska",
         "Xsux": "sumero-akkadisk kilskrift",
@@ -177,7 +185,6 @@
         "Zsye": "emoji",
         "Zsym": "symboler",
         "Zxxx": "oskrivet språk",
-        "Zyyy": "gemensamma",
-        "Zzzz": "okänt skriftsystem"
+        "Zyyy": "gemensamma"
     }
 }

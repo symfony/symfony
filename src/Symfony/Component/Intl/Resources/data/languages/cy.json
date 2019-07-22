@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.49.82",
     "Names": {
         "aa": "Affareg",
         "ab": "Abchaseg",
@@ -76,6 +76,7 @@
         "cad": "Cado",
         "car": "Caribeg",
         "cch": "Atsameg",
+        "ccp": "Tsiacma",
         "ce": "Tsietsieneg",
         "ceb": "Cebuano",
         "cgg": "Tsiga",
@@ -309,7 +310,6 @@
         "ms": "Maleieg",
         "mt": "Malteg",
         "mua": "Mundang",
-        "mul": "Mwy nag un iaith",
         "mus": "Creek",
         "mwl": "Mirandeg",
         "mwr": "Marwari",
@@ -389,7 +389,6 @@
         "ro_MD": "Moldofeg",
         "rof": "Rombo",
         "rom": "Romani",
-        "root": "Y Gwraidd",
         "rtm": "Rotumaneg",
         "ru": "Rwseg",
         "rup": "Aromaneg",
@@ -496,7 +495,6 @@
         "uga": "Wgariteg",
         "uk": "Wcreineg",
         "umb": "Umbundu",
-        "und": "Iaith anhysbys",
         "ur": "Wrdw",
         "uz": "Wsbeceg",
         "vai": "Faieg",
@@ -532,7 +530,6 @@
         "zh_Hant": "Tsieineeg Traddodiadol",
         "zu": "Swlw",
         "zun": "Swni",
-        "zxx": "Dim cynnwys ieithyddol",
         "zza": "Sasäeg"
     }
 }

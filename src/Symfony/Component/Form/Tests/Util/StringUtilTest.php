@@ -35,45 +35,45 @@ class StringUtilTest extends TestCase
 
         // Convert UCS-2BE to UTF-8
         $symbol = mb_convert_encoding($binary, 'UTF-8', 'UCS-2BE');
-        $symbol = $symbol."ab\ncd".$symbol;
+        $symbol .= "ab\ncd".$symbol;
 
         $this->assertSame("ab\ncd", StringUtil::trim($symbol));
     }
 
     public function spaceProvider()
     {
-        return array(
+        return [
             // separators
-            array('0020'),
-            array('00A0'),
-            array('1680'),
-//            array('180E'),
-            array('2000'),
-            array('2001'),
-            array('2002'),
-            array('2003'),
-            array('2004'),
-            array('2005'),
-            array('2006'),
-            array('2007'),
-            array('2008'),
-            array('2009'),
-            array('200A'),
-            array('2028'),
-            array('2029'),
-            array('202F'),
-            array('205F'),
-            array('3000'),
+            ['0020'],
+            ['00A0'],
+            ['1680'],
+//            ['180E'],
+            ['2000'],
+            ['2001'],
+            ['2002'],
+            ['2003'],
+            ['2004'],
+            ['2005'],
+            ['2006'],
+            ['2007'],
+            ['2008'],
+            ['2009'],
+            ['200A'],
+            ['2028'],
+            ['2029'],
+            ['202F'],
+            ['205F'],
+            ['3000'],
             // controls
-            array('0009'),
-            array('000A'),
-            array('000B'),
-            array('000C'),
-            array('000D'),
-            array('0085'),
+            ['0009'],
+            ['000A'],
+            ['000B'],
+            ['000C'],
+            ['000D'],
+            ['0085'],
             // zero width space
-//            array('200B'),
-        );
+//            ['200B'],
+        ];
     }
 
     /**
@@ -88,18 +88,18 @@ class StringUtilTest extends TestCase
 
     public function fqcnToBlockPrefixProvider()
     {
-        return array(
-            array('TYPE', 'type'),
-            array('\Type', 'type'),
-            array('\UserType', 'user'),
-            array('UserType', 'user'),
-            array('Vendor\Name\Space\Type', 'type'),
-            array('Vendor\Name\Space\UserForm', 'user_form'),
-            array('Vendor\Name\Space\UserType', 'user'),
-            array('Vendor\Name\Space\usertype', 'user'),
-            array('Symfony\Component\Form\Form', 'form'),
-            array('Vendor\Name\Space\BarTypeBazType', 'bar_type_baz'),
-            array('FooBarBazType', 'foo_bar_baz'),
-        );
+        return [
+            ['TYPE', 'type'],
+            ['\Type', 'type'],
+            ['\UserType', 'user'],
+            ['UserType', 'user'],
+            ['Vendor\Name\Space\Type', 'type'],
+            ['Vendor\Name\Space\UserForm', 'user_form'],
+            ['Vendor\Name\Space\UserType', 'user'],
+            ['Vendor\Name\Space\usertype', 'user'],
+            ['Symfony\Component\Form\Form', 'form'],
+            ['Vendor\Name\Space\BarTypeBazType', 'bar_type_baz'],
+            ['FooBarBazType', 'foo_bar_baz'],
+        ];
     }
 }

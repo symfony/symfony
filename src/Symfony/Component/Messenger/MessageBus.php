@@ -11,67 +11,72 @@
 
 namespace Symfony\Component\Messenger;
 
-use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Matthias Noback <matthiasnoback@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class MessageBus implements MessageBusInterface
 {
-    private $middlewareHandlers;
-
-    /**
-     * @var MiddlewareInterface[]|null
-     */
-    private $indexedMiddlewareHandlers;
+    private $middlewareAggregate;
 
     /**
      * @param MiddlewareInterface[]|iterable $middlewareHandlers
      */
-    public function __construct(iterable $middlewareHandlers = array())
+    public function __construct(iterable $middlewareHandlers = [])
     {
-        $this->middlewareHandlers = $middlewareHandlers;
+        if ($middlewareHandlers instanceof \IteratorAggregate) {
+            $this->middlewareAggregate = $middlewareHandlers;
+        } elseif (\is_array($middlewareHandlers)) {
+            $this->middlewareAggregate = new \ArrayObject($middlewareHandlers);
+        } else {
+            // $this->middlewareAggregate should be an instance of IteratorAggregate.
+            // When $middlewareHandlers is an Iterator, we wrap it to ensure it is lazy-loaded and can be rewound.
+            $this->middlewareAggregate = new class($middlewareHandlers) implements \IteratorAggregate {
+                private $middlewareHandlers;
+                private $cachedIterator;
+
+                public function __construct($middlewareHandlers)
+                {
+                    $this->middlewareHandlers = $middlewareHandlers;
+                }
+
+                public function getIterator()
+                {
+                    if (null === $this->cachedIterator) {
+                        $this->cachedIterator = new \ArrayObject(iterator_to_array($this->middlewareHandlers, false));
+                    }
+
+                    return $this->cachedIterator;
+                }
+            };
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function dispatch($message)
+    public function dispatch($message, array $stamps = []): Envelope
     {
         if (!\is_object($message)) {
-            throw new InvalidArgumentException(sprintf('Invalid type for message argument. Expected object, but got "%s".', \gettype($message)));
+            throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object, but got %s.', __METHOD__, \gettype($message)));
         }
+        $envelope = Envelope::wrap($message, $stamps);
+        $middlewareIterator = $this->middlewareAggregate->getIterator();
 
-        return \call_user_func($this->callableForNextMiddleware(0, Envelope::wrap($message)), $message);
-    }
-
-    private function callableForNextMiddleware(int $index, Envelope $currentEnvelope): callable
-    {
-        if (null === $this->indexedMiddlewareHandlers) {
-            $this->indexedMiddlewareHandlers = \is_array($this->middlewareHandlers) ? array_values($this->middlewareHandlers) : iterator_to_array($this->middlewareHandlers, false);
+        while ($middlewareIterator instanceof \IteratorAggregate) {
+            $middlewareIterator = $middlewareIterator->getIterator();
         }
+        $middlewareIterator->rewind();
 
-        if (!isset($this->indexedMiddlewareHandlers[$index])) {
-            return function () {};
+        if (!$middlewareIterator->valid()) {
+            return $envelope;
         }
+        $stack = new StackMiddleware($middlewareIterator);
 
-        $middleware = $this->indexedMiddlewareHandlers[$index];
-
-        return function ($message) use ($middleware, $index, $currentEnvelope) {
-            if ($message instanceof Envelope) {
-                $currentEnvelope = $message;
-            } else {
-                $message = $currentEnvelope->withMessage($message);
-            }
-
-            if (!$middleware instanceof EnvelopeAwareInterface) {
-                // Do not provide the envelope if the middleware cannot read it:
-                $message = $message->getMessage();
-            }
-
-            return $middleware->handle($message, $this->callableForNextMiddleware($index + 1, $currentEnvelope));
-        };
+        return $middlewareIterator->current()->handle($envelope, $stack);
     }
 }

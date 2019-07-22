@@ -12,34 +12,23 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
-
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'test' => 'getTestService',
-        );
+        ];
 
-        $this->aliases = array();
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -54,10 +43,10 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     /**
@@ -67,13 +56,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(array('only dot' => '.', 'concatenation as value' => '.\'\'.', 'concatenation from the start value' => '\'\'.', '.' => 'dot as a key', '.\'\'.' => 'concatenation as a key', '\'\'.' => 'concatenation from the start key', 'optimize concatenation' => 'string1-string2', 'optimize concatenation with empty string' => 'string1string2', 'optimize concatenation from the start' => 'start', 'optimize concatenation at the end' => 'end', 'new line' => 'string with '."\n".'new line'));
+        return $this->services['test'] = new \stdClass(['only dot' => '.', 'concatenation as value' => '.\'\'.', 'concatenation from the start value' => '\'\'.', '.' => 'dot as a key', '.\'\'.' => 'concatenation as a key', '\'\'.' => 'concatenation from the start key', 'optimize concatenation' => 'string1-string2', 'optimize concatenation with empty string' => 'string1string2', 'optimize concatenation from the start' => 'start', 'optimize concatenation at the end' => 'end', 'new line' => 'string with '."\n".'new line']);
     }
 
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
-        $name = (string) $name;
-
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
@@ -84,14 +71,12 @@ class ProjectServiceContainer extends Container
         return $this->parameters[$name];
     }
 
-    public function hasParameter($name)
+    public function hasParameter(string $name)
     {
-        $name = (string) $name;
-
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter(string $name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
@@ -109,13 +94,13 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array();
-    private $dynamicParameters = array();
+    private $loadedDynamicParameters = [];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *
@@ -133,9 +118,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'empty_value' => '',
             'some_string' => '-',
-        );
+        ];
     }
 }

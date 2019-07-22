@@ -17,23 +17,28 @@ use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SecurityDataCollectorTest extends TestCase
 {
     public function testCollectWhenSecurityIsDisabled()
     {
         $collector = new SecurityDataCollector();
-        $collector->collect($this->getRequest(), $this->getResponse());
+        $collector->collect(new Request(), new Response());
 
         $this->assertSame('security', $collector->getName());
         $this->assertFalse($collector->isEnabled());
@@ -53,7 +58,7 @@ class SecurityDataCollectorTest extends TestCase
     {
         $tokenStorage = new TokenStorage();
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
-        $collector->collect($this->getRequest(), $this->getResponse());
+        $collector->collect(new Request(), new Response());
 
         $this->assertTrue($collector->isEnabled());
         $this->assertFalse($collector->isAuthenticated());
@@ -75,7 +80,7 @@ class SecurityDataCollectorTest extends TestCase
         $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $roles));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
-        $collector->collect($this->getRequest(), $this->getResponse());
+        $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
         $this->assertTrue($collector->isEnabled());
@@ -90,37 +95,32 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('hhamon', $collector->getUser());
     }
 
-    public function testCollectImpersonatedToken()
+    public function testCollectSwitchUserToken()
     {
-        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', array('ROLE_ADMIN'));
-
-        $userRoles = array(
-            'ROLE_USER',
-            new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $adminToken),
-        );
+        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', ['ROLE_ADMIN']);
 
         $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $userRoles));
+        $tokenStorage->setToken(new SwitchUserToken('hhamon', 'P4$$w0rD', 'provider', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $adminToken));
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
-        $collector->collect($this->getRequest(), $this->getResponse());
+        $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
         $this->assertTrue($collector->isEnabled());
         $this->assertTrue($collector->isAuthenticated());
         $this->assertTrue($collector->isImpersonated());
         $this->assertSame('yceruto', $collector->getImpersonatorUser());
-        $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
+        $this->assertSame(SwitchUserToken::class, $collector->getTokenClass()->getValue());
         $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame(array('ROLE_USER', 'ROLE_PREVIOUS_ADMIN'), $collector->getRoles()->getValue(true));
-        $this->assertSame(array(), $collector->getInheritedRoles()->getValue(true));
+        $this->assertSame(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $collector->getRoles()->getValue(true));
+        $this->assertSame([], $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
     }
 
     public function testGetFirewall()
     {
         $firewallConfig = new FirewallConfig('dummy', 'security.request_matcher.dummy', 'security.user_checker.dummy');
-        $request = $this->getRequest();
+        $request = new Request();
 
         $firewallMap = $this
             ->getMockBuilder(FirewallMap::class)
@@ -133,7 +133,7 @@ class SecurityDataCollectorTest extends TestCase
             ->willReturn($firewallConfig);
 
         $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
-        $collector->collect($request, $this->getResponse());
+        $collector->collect($request, new Response());
         $collector->lateCollect();
         $collected = $collector->getFirewall();
 
@@ -153,8 +153,8 @@ class SecurityDataCollectorTest extends TestCase
 
     public function testGetFirewallReturnsNull()
     {
-        $request = $this->getRequest();
-        $response = $this->getResponse();
+        $request = new Request();
+        $response = new Response();
 
         // Don't inject any firewall map
         $collector = new SecurityDataCollector();
@@ -187,14 +187,12 @@ class SecurityDataCollectorTest extends TestCase
      */
     public function testGetListeners()
     {
-        $request = $this->getRequest();
-        $event = new GetResponseEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
-        $event->setResponse($response = $this->getResponse());
-        $listener = $this->getMockBuilder(ListenerInterface::class)->getMock();
-        $listener
-            ->expects($this->once())
-            ->method('handle')
-            ->with($event);
+        $request = new Request();
+        $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event->setResponse($response = new Response());
+        $listener = function ($e) use ($event, &$listenerCalled) {
+            $listenerCalled += $e === $event;
+        };
         $firewallMap = $this
             ->getMockBuilder(FirewallMap::class)
             ->disableOriginalConstructor()
@@ -208,7 +206,7 @@ class SecurityDataCollectorTest extends TestCase
             ->expects($this->once())
             ->method('getListeners')
             ->with($request)
-            ->willReturn(array(array($listener), null, null));
+            ->willReturn([[$listener], null, null]);
 
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
         $firewall->onKernelRequest($event);
@@ -218,63 +216,168 @@ class SecurityDataCollectorTest extends TestCase
 
         $this->assertNotEmpty($collected = $collector->getListeners()[0]);
         $collector->lateCollect();
-        $this->addToAssertionCount(1);
+        $this->assertSame(1, $listenerCalled);
+    }
+
+    public function providerCollectDecisionLog(): \Generator
+    {
+        $voter1 = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+        $voter2 = $this->getMockBuilder(VoterInterface::class)->getMockForAbstractClass();
+
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
+        $decoratedVoter1 = new TraceableVoter($voter1, $eventDispatcher);
+        $decoratedVoter2 = new TraceableVoter($voter2, $eventDispatcher);
+
+        yield [
+            AccessDecisionManager::STRATEGY_AFFIRMATIVE,
+            [[
+                'attributes' => ['view'],
+                'object' => new \stdClass(),
+                'result' => true,
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                ],
+            ]],
+            [$decoratedVoter1, $decoratedVoter1],
+            [\get_class($voter1), \get_class($voter2)],
+            [[
+                'attributes' => ['view'],
+                'object' => new \stdClass(),
+                'result' => true,
+                'voter_details' => [
+                    ['class' => \get_class($voter1), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['class' => \get_class($voter2), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                ],
+            ]],
+        ];
+
+        yield [
+            AccessDecisionManager::STRATEGY_UNANIMOUS,
+            [
+                [
+                    'attributes' => ['view', 'edit'],
+                    'object' => new \stdClass(),
+                    'result' => false,
+                    'voterDetails' => [
+                        ['voter' => $voter1, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['voter' => $voter1, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['voter' => $voter2, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['voter' => $voter2, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ],
+                ],
+                [
+                    'attributes' => ['update'],
+                    'object' => new \stdClass(),
+                    'result' => true,
+                    'voterDetails' => [
+                        ['voter' => $voter1, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['voter' => $voter2, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ],
+                ],
+            ],
+            [$decoratedVoter1, $decoratedVoter1],
+            [\get_class($voter1), \get_class($voter2)],
+            [
+                [
+                    'attributes' => ['view', 'edit'],
+                    'object' => new \stdClass(),
+                    'result' => false,
+                    'voter_details' => [
+                        ['class' => \get_class($voter1), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['class' => \get_class($voter1), 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['class' => \get_class($voter2), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['class' => \get_class($voter2), 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ],
+                ],
+                [
+                    'attributes' => ['update'],
+                    'object' => new \stdClass(),
+                    'result' => true,
+                    'voter_details' => [
+                        ['class' => \get_class($voter1), 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['class' => \get_class($voter2), 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Test the returned data when AccessDecisionManager is a TraceableAccessDecisionManager.
+     *
+     * @param string $strategy             strategy returned by the AccessDecisionManager
+     * @param array  $voters               voters returned by AccessDecisionManager
+     * @param array  $decisionLog          log of the votes and final decisions from AccessDecisionManager
+     * @param array  $expectedVoterClasses expected voter classes returned by the collector
+     * @param array  $expectedDecisionLog  expected decision log returned by the collector
+     *
+     * @dataProvider providerCollectDecisionLog
+     */
+    public function testCollectDecisionLog(string $strategy, array $decisionLog, array $voters, array $expectedVoterClasses, array $expectedDecisionLog): void
+    {
+        $accessDecisionManager = $this
+            ->getMockBuilder(TraceableAccessDecisionManager::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getStrategy', 'getVoters', 'getDecisionLog'])
+            ->getMock();
+
+        $accessDecisionManager
+            ->expects($this->any())
+            ->method('getStrategy')
+            ->willReturn($strategy);
+
+        $accessDecisionManager
+            ->expects($this->any())
+            ->method('getVoters')
+            ->willReturn($voters);
+
+        $accessDecisionManager
+            ->expects($this->any())
+            ->method('getDecisionLog')
+            ->willReturn($decisionLog);
+
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager);
+        $dataCollector->collect(new Request(), new Response());
+
+        $this->assertEquals($dataCollector->getAccessDecisionLog(), $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
+
+        $this->assertSame(
+            array_map(function ($classStub) { return (string) $classStub; }, $dataCollector->getVoters()),
+            $expectedVoterClasses,
+            'Wrong value returned by getVoters'
+        );
+        $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
     public function provideRoles()
     {
-        return array(
+        return [
             // Basic roles
-            array(
-                array('ROLE_USER'),
-                array('ROLE_USER'),
-                array(),
-            ),
-            array(
-                array(new Role('ROLE_USER')),
-                array('ROLE_USER'),
-                array(),
-            ),
+            [
+                ['ROLE_USER'],
+                ['ROLE_USER'],
+                [],
+            ],
             // Inherited roles
-            array(
-                array('ROLE_ADMIN'),
-                array('ROLE_ADMIN'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-            array(
-                array(new Role('ROLE_ADMIN')),
-                array('ROLE_ADMIN'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-            array(
-                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
-                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-        );
+            [
+                ['ROLE_ADMIN'],
+                ['ROLE_ADMIN'],
+                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            ],
+            [
+                ['ROLE_ADMIN', 'ROLE_OPERATOR'],
+                ['ROLE_ADMIN', 'ROLE_OPERATOR'],
+                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            ],
+        ];
     }
 
     private function getRoleHierarchy()
     {
-        return new RoleHierarchy(array(
-            'ROLE_ADMIN' => array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_OPERATOR' => array('ROLE_USER'),
-        ));
-    }
-
-    private function getRequest()
-    {
-        return $this
-            ->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    private function getResponse()
-    {
-        return $this
-            ->getMockBuilder('Symfony\Component\HttpFoundation\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return new RoleHierarchy([
+            'ROLE_ADMIN' => ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            'ROLE_OPERATOR' => ['ROLE_USER'],
+        ]);
     }
 }

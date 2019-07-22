@@ -44,29 +44,27 @@ class ServerDumperTest extends TestCase
 
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');
-        $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper, array(
+        $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper, [
             'foo_provider' => new class() implements ContextProviderInterface {
                 public function getContext(): ?array
                 {
-                    return array('foo');
+                    return ['foo'];
                 }
             },
-        ));
+        ]);
 
         $dumped = null;
         $process = $this->getServerProcess();
-        $process->start(function ($type, $buffer) use ($process, &$dumped) {
+        $process->start(function ($type, $buffer) use ($process, &$dumped, $dumper, $data) {
             if (Process::ERR === $type) {
                 $process->stop();
                 $this->fail();
+            } elseif ("READY\n" === $buffer) {
+                $dumper->dump($data);
             } else {
                 $dumped .= $buffer;
             }
         });
-
-        sleep(3);
-
-        $dumper->dump($data);
 
         $process->wait();
 
@@ -74,7 +72,7 @@ class ServerDumperTest extends TestCase
         $this->assertStringMatchesFormat(<<<'DUMP'
 (3) "foo"
 [
-  "timestamp" => %d
+  "timestamp" => %d.%d
   "foo_provider" => [
     (3) "foo"
   ]
@@ -86,11 +84,10 @@ DUMP
 
     private function getServerProcess(): Process
     {
-        $process = new PhpProcess(file_get_contents(__DIR__.'/../Fixtures/dump_server.php'), null, array(
+        $process = new PhpProcess(file_get_contents(__DIR__.'/../Fixtures/dump_server.php'), null, [
             'COMPONENT_ROOT' => __DIR__.'/../../',
             'VAR_DUMPER_SERVER' => self::VAR_DUMPER_SERVER,
-        ));
-        $process->inheritEnvironmentVariables(true);
+        ]);
 
         return $process->setTimeout(9);
     }

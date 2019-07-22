@@ -12,27 +12,22 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class Symfony_DI_PhpDumper_Errored_Definition extends Container
 {
     private $parameters;
-    private $targetDirs = array();
-
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = $this->privates = array();
-        $this->syntheticIds = array(
+        $this->services = $this->privates = [];
+        $this->syntheticIds = [
             'request' => true,
-        );
-        $this->methodMap = array(
+        ];
+        $this->methodMap = [
             'BAR' => 'getBARService',
             'BAR2' => 'getBAR2Service',
             'bar' => 'getBar3Service',
@@ -56,18 +51,12 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             'runtime_error' => 'getRuntimeErrorService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
-        );
-        $this->aliases = array(
+        ];
+        $this->aliases = [
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
             'decorated' => 'decorator_service_with_name',
-        );
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
+        ];
     }
 
     public function compile()
@@ -82,7 +71,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'configurator_service' => true,
@@ -94,7 +83,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
             'inlined' => true,
             'new_factory' => true,
             'tagged_iterator_foo' => true,
-        );
+        ];
     }
 
     /**
@@ -217,11 +206,11 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
      *
      * @return \stdClass
      *
-     * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.
+     * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     protected function getDeprecatedServiceService()
     {
-        @trigger_error('The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
+        @trigger_error('The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.', E_USER_DEPRECATED);
 
         return $this->services['deprecated_service'] = new \stdClass();
     }
@@ -255,11 +244,11 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
     {
         $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
 
-        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
+        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, ['bar' => 'foo is bar', 'foobar' => 'bar'], true, $this);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
-        $instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
+        $instance->qux = ['bar' => 'foo is bar', 'foobar' => 'bar'];
         $instance->setBar(($this->services['bar'] ?? $this->getBar3Service()));
         $instance->initialize();
         sc_configure($instance);
@@ -301,7 +290,6 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
         $a = new \Bar();
-
         $a->pub = 'pub';
         $a->setBaz(($this->services['baz'] ?? $this->getBazService()));
 
@@ -403,7 +391,7 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
     {
         return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
             yield 0 => ($this->services['foo'] ?? $this->getFooService());
-            yield 1 => ($this->privates['tagged_iterator_foo'] ?? $this->privates['tagged_iterator_foo'] = new \Bar());
+            yield 1 => ($this->privates['tagged_iterator_foo'] ?? ($this->privates['tagged_iterator_foo'] = new \Bar()));
         }, 2));
     }
 
@@ -412,19 +400,17 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
      *
      * @return \SimpleFactoryClass
      *
-     * @deprecated The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.
+     * @deprecated The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     protected function getFactorySimpleService()
     {
-        @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
+        @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.', E_USER_DEPRECATED);
 
         return new \SimpleFactoryClass('foo');
     }
 
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
-        $name = (string) $name;
-
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
@@ -435,14 +421,12 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
         return $this->parameters[$name];
     }
 
-    public function hasParameter($name)
+    public function hasParameter(string $name)
     {
-        $name = (string) $name;
-
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter(string $name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
@@ -460,13 +444,13 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array();
-    private $dynamicParameters = array();
+    private $loadedDynamicParameters = [];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
      *
-     * @param string The name of the dynamic parameter to load
+     * @param string $name The name of the dynamic parameter to load
      *
      * @return mixed The value of the dynamic parameter
      *
@@ -484,12 +468,12 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'baz_class' => 'BazClass',
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
             'foo_bar' => 'foo_bar',
-        );
+        ];
     }
 
     protected function throw($message)

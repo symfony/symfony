@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.49.82",
     "Names": {
         "aa": "Afar",
         "ab": "Abkażjan",
@@ -298,7 +298,6 @@
         "ms": "Malay",
         "mt": "Malti",
         "mua": "Mundang",
-        "mul": "Lingwi Diversi",
         "mus": "Kriek",
         "mwl": "Mirandiż",
         "mwr": "Marwari",
@@ -372,7 +371,6 @@
         "ro_MD": "Moldovan",
         "rof": "Rombo",
         "rom": "Romanesk",
-        "root": "Root",
         "ru": "Russu",
         "rup": "Aromanjan",
         "rw": "Kinjarwanda",
@@ -466,7 +464,6 @@
         "uga": "Ugaritiku",
         "uk": "Ukren",
         "umb": "Umbundu",
-        "und": "Lingwa Mhix Magħrufa",
         "ur": "Urdu",
         "uz": "Uzbek",
         "vai": "Vai",
@@ -500,7 +497,6 @@
         "zh_Hant": "Ċiniż Tradizzjonali",
         "zu": "Zulu",
         "zun": "Zuni",
-        "zxx": "Bla kontenut lingwistiku",
         "zza": "Zaza"
     }
 }

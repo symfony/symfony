@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.47.82",
     "Names": {
         "aa": "Afar",
         "ab": "Abchazysk",
@@ -309,7 +309,6 @@
         "ms": "Maleis",
         "mt": "Maltees",
         "mua": "Mundang",
-        "mul": "Meardere talen",
         "mus": "Creek",
         "mwl": "Mirandees",
         "mwr": "Marwari",
@@ -379,7 +378,6 @@
         "ro_MD": "Moldavysk",
         "rof": "Rombo",
         "rom": "Romani",
-        "root": "Root",
         "ru": "Russysk",
         "rup": "Aromaniaansk",
         "rw": "Kinyarwanda",
@@ -476,7 +474,6 @@
         "uga": "Oegaritysk",
         "uk": "Oekraïens",
         "umb": "Umbundu",
-        "und": "Onbekende taal",
         "ur": "Urdu",
         "uz": "Oezbeeks",
         "vai": "Vai",
@@ -511,7 +508,6 @@
         "zh_Hant": "Tradisjoneel Sineesk",
         "zu": "Zulu",
         "zun": "Zuni",
-        "zxx": "Gjin linguïstyske ynhâld",
         "zza": "Zaza"
     }
 }

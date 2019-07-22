@@ -22,7 +22,7 @@ class UnanimousStrategyTest extends TestCase
     /** @var UnanimousStrategy */
     private $strategy;
 
-    public function setup()
+    protected function setUp()
     {
         $this->strategy = new UnanimousStrategy();
     }
@@ -30,45 +30,45 @@ class UnanimousStrategyTest extends TestCase
     public function provideMetResults()
     {
         // success, failure, total, isMet
-        yield array(3, 0, 3, true);
-        yield array(2, 1, 3, false);
-        yield array(2, 0, 3, false);
-        yield array(1, 2, 3, false);
-        yield array(1, 1, 3, false);
-        yield array(1, 0, 3, false);
-        yield array(0, 3, 3, false);
-        yield array(0, 2, 3, false);
-        yield array(0, 1, 3, false);
-        yield array(0, 0, 3, false);
+        yield [3, 0, 3, true];
+        yield [2, 1, 3, false];
+        yield [2, 0, 3, false];
+        yield [1, 2, 3, false];
+        yield [1, 1, 3, false];
+        yield [1, 0, 3, false];
+        yield [0, 3, 3, false];
+        yield [0, 2, 3, false];
+        yield [0, 1, 3, false];
+        yield [0, 0, 3, false];
 
-        yield array(2, 0, 2, true);
-        yield array(1, 1, 2, false);
-        yield array(1, 0, 2, false);
-        yield array(0, 2, 2, false);
-        yield array(0, 1, 2, false);
-        yield array(0, 0, 2, false);
+        yield [2, 0, 2, true];
+        yield [1, 1, 2, false];
+        yield [1, 0, 2, false];
+        yield [0, 2, 2, false];
+        yield [0, 1, 2, false];
+        yield [0, 0, 2, false];
     }
 
     public function provideIndeterminate()
     {
         // success, failure, total, canBeMet
-        yield array(3, 0, 3, true);
-        yield array(2, 1, 3, false);
-        yield array(2, 0, 3, true);
-        yield array(1, 2, 3, false);
-        yield array(1, 1, 3, false);
-        yield array(1, 0, 3, true);
-        yield array(0, 3, 3, false);
-        yield array(0, 2, 3, false);
-        yield array(0, 1, 3, false);
-        yield array(0, 0, 3, true);
+        yield [3, 0, 3, true];
+        yield [2, 1, 3, false];
+        yield [2, 0, 3, true];
+        yield [1, 2, 3, false];
+        yield [1, 1, 3, false];
+        yield [1, 0, 3, true];
+        yield [0, 3, 3, false];
+        yield [0, 2, 3, false];
+        yield [0, 1, 3, false];
+        yield [0, 0, 3, true];
 
-        yield array(2, 0, 2, true);
-        yield array(1, 1, 2, false);
-        yield array(1, 0, 2, true);
-        yield array(0, 2, 2, false);
-        yield array(0, 1, 2, false);
-        yield array(0, 0, 2, true);
+        yield [2, 0, 2, true];
+        yield [1, 1, 2, false];
+        yield [1, 0, 2, true];
+        yield [0, 2, 2, false];
+        yield [0, 1, 2, false];
+        yield [0, 0, 2, true];
     }
 
     /**

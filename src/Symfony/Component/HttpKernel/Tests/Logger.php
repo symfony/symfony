@@ -29,59 +29,59 @@ class Logger implements LoggerInterface
 
     public function clear()
     {
-        $this->logs = array(
-            'emergency' => array(),
-            'alert' => array(),
-            'critical' => array(),
-            'error' => array(),
-            'warning' => array(),
-            'notice' => array(),
-            'info' => array(),
-            'debug' => array(),
-        );
+        $this->logs = [
+            'emergency' => [],
+            'alert' => [],
+            'critical' => [],
+            'error' => [],
+            'warning' => [],
+            'notice' => [],
+            'info' => [],
+            'debug' => [],
+        ];
     }
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         $this->logs[$level][] = $message;
     }
 
-    public function emergency($message, array $context = array())
+    public function emergency($message, array $context = [])
     {
         $this->log('emergency', $message, $context);
     }
 
-    public function alert($message, array $context = array())
+    public function alert($message, array $context = [])
     {
         $this->log('alert', $message, $context);
     }
 
-    public function critical($message, array $context = array())
+    public function critical($message, array $context = [])
     {
         $this->log('critical', $message, $context);
     }
 
-    public function error($message, array $context = array())
+    public function error($message, array $context = [])
     {
         $this->log('error', $message, $context);
     }
 
-    public function warning($message, array $context = array())
+    public function warning($message, array $context = [])
     {
         $this->log('warning', $message, $context);
     }
 
-    public function notice($message, array $context = array())
+    public function notice($message, array $context = [])
     {
         $this->log('notice', $message, $context);
     }
 
-    public function info($message, array $context = array())
+    public function info($message, array $context = [])
     {
         $this->log('info', $message, $context);
     }
 
-    public function debug($message, array $context = array())
+    public function debug($message, array $context = [])
     {
         $this->log('debug', $message, $context);
     }

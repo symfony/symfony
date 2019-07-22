@@ -13,9 +13,9 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -32,16 +32,16 @@ class LoginController implements ContainerAwareInterface
             $error = $request->getSession()->get(Security::AUTHENTICATION_ERROR);
         }
 
-        return new Response($this->container->get('twig')->render('@FormLogin/Login/login.html.twig', array(
+        return new Response($this->container->get('twig')->render('@FormLogin/Login/login.html.twig', [
             // last username entered by the user
             'last_username' => $request->getSession()->get(Security::LAST_USERNAME),
             'error' => $error,
-        )));
+        ]));
     }
 
     public function afterLoginAction(UserInterface $user)
     {
-        return new Response($this->container->get('twig')->render('@FormLogin/Login/after_login.html.twig', array('user' => $user)));
+        return new Response($this->container->get('twig')->render('@FormLogin/Login/after_login.html.twig', ['user' => $user]));
     }
 
     public function loginCheckAction()

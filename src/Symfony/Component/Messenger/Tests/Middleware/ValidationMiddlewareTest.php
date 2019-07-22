@@ -11,19 +11,20 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
+use Symfony\Component\Messenger\Stamp\ValidationStamp;
+use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ValidationMiddlewareTest extends TestCase
+class ValidationMiddlewareTest extends MiddlewareTestCase
 {
     public function testValidateAndNextMiddleware()
     {
         $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
@@ -32,23 +33,14 @@ class ValidationMiddlewareTest extends TestCase
             ->with($message)
             ->willReturn($this->createMock(ConstraintViolationListInterface::class))
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($message)
-            ->willReturn('Hello')
-        ;
 
-        $result = (new ValidationMiddleware($validator))->handle($message, $next);
-
-        $this->assertSame('Hello', $result);
+        (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());
     }
 
-    public function testValidateWithConfigurationAndNextMiddleware()
+    public function testValidateWithStampAndNextMiddleware()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'))->with(new ValidationConfiguration($groups = array('Default', 'Extra')));
-
+        $message = new DummyMessage('Hey');
+        $envelope = (new Envelope($message))->with(new ValidationStamp($groups = ['Default', 'Extra']));
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
             ->expects($this->once())
@@ -56,17 +48,8 @@ class ValidationMiddlewareTest extends TestCase
             ->with($message, null, $groups)
             ->willReturn($this->createMock(ConstraintViolationListInterface::class))
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
-            ->expects($this->once())
-            ->method('__invoke')
-            ->with($envelope)
-            ->willReturn('Hello')
-        ;
 
-        $result = (new ValidationMiddleware($validator))->handle($envelope, $next);
-
-        $this->assertSame('Hello', $result);
+        (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());
     }
 
     /**
@@ -76,6 +59,7 @@ class ValidationMiddlewareTest extends TestCase
     public function testValidationFailedException()
     {
         $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
 
         $violationList = $this->createMock(ConstraintViolationListInterface::class);
         $violationList
@@ -90,12 +74,7 @@ class ValidationMiddlewareTest extends TestCase
             ->with($message)
             ->willReturn($violationList)
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next
-            ->expects($this->never())
-            ->method('__invoke')
-        ;
 
-        (new ValidationMiddleware($validator))->handle($message, $next);
+        (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock(false));
     }
 }

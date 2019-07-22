@@ -12,33 +12,24 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
-
-    /**
-     * @internal but protected for BC on cache:clear
-     */
-    protected $privates = array();
+    private $targetDirs = [];
+    private $getService;
 
     public function __construct()
     {
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->getService = \Closure::fromCallable([$this, 'getService']);
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => 'getTestServiceSubscriberService',
             'foo_service' => 'getFooServiceService',
-        );
+        ];
 
-        $this->aliases = array();
-    }
-
-    public function reset()
-    {
-        $this->privates = array();
-        parent::reset();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -53,13 +44,13 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
-            '.service_locator.ljJrY4L' => true,
-            '.service_locator.ljJrY4L.foo_service' => true,
+        return [
+            '.service_locator.nZQiwdg' => true,
+            '.service_locator.nZQiwdg.foo_service' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
-        );
+        ];
     }
 
     /**
@@ -69,7 +60,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestServiceSubscriberService()
     {
-        return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber();
+        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber();
     }
 
     /**
@@ -79,14 +70,26 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooServiceService()
     {
-        return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber((new \Symfony\Component\DependencyInjection\ServiceLocator(array('Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => function (): ?\Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition {
-            return ($this->privates['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] ?? $this->privates['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition());
-        }, 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => function (): \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber {
-            return ($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] ?? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber());
-        }, 'bar' => function (): \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition {
-            return ($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] ?? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber());
-        }, 'baz' => function (): ?\Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition {
-            return ($this->privates['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] ?? $this->privates['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition());
-        })))->withContext('foo_service', $this));
+        return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber((new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($this->getService, [
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => ['privates', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition', 'getCustomDefinitionService', false],
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => ['services', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber', 'getTestServiceSubscriberService', false],
+            'bar' => ['services', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber', 'getTestServiceSubscriberService', false],
+            'baz' => ['privates', 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition', 'getCustomDefinitionService', false],
+        ], [
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition',
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber',
+            'bar' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition',
+            'baz' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition',
+        ]))->withContext('foo_service', $this));
+    }
+
+    /**
+     * Gets the private 'Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition
+     */
+    protected function getCustomDefinitionService()
+    {
+        return $this->privates['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition();
     }
 }

@@ -1,0 +1,6 @@
+some_route:
+    path: /
+
+some_utf8_route:
+    path: /utf8
+    utf8: true

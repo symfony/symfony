@@ -37,12 +37,12 @@ class WorkflowDumpCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
                 new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Labels a graph'),
                 new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format [dot|puml]', 'dot'),
-            ))
+            ])
             ->setDescription('Dump a workflow')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the graphical representation of a
@@ -89,13 +89,13 @@ EOF
             $marking->mark($place);
         }
 
-        $options = array(
+        $options = [
             'name' => $serviceId,
             'nofooter' => true,
-            'graph' => array(
+            'graph' => [
                 'label' => $input->getOption('label'),
-            ),
-        );
+            ],
+        ];
         $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));
     }
 }

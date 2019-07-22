@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.49.82",
     "Names": {
         "aa": "afar",
         "ab": "abxaz",
@@ -72,7 +72,7 @@
         "de_CH": "yuqori nemis (Shveytsariya)",
         "dgr": "dogrib",
         "dje": "zarma",
-        "dsb": "quyi sorbcha",
+        "dsb": "quyi sorb",
         "dua": "duala",
         "dv": "divexi",
         "dyo": "diola-fogni",
@@ -239,7 +239,6 @@
         "ms": "malay",
         "mt": "maltiy",
         "mua": "mundang",
-        "mul": "bir nechta til",
         "mus": "krik",
         "mwl": "miranda",
         "my": "birman",
@@ -296,7 +295,6 @@
         "ro": "rumincha",
         "ro_MD": "moldovan",
         "rof": "rombo",
-        "root": "tub aholi tili",
         "ru": "ruscha",
         "rup": "arumin",
         "rw": "kinyaruanda",
@@ -305,13 +303,13 @@
         "sad": "sandave",
         "sah": "saxa",
         "saq": "samburu",
-        "sat": "santal",
+        "sat": "santali",
         "sba": "ngambay",
         "sbp": "sangu",
         "sc": "sardin",
         "scn": "sitsiliya",
         "sco": "shotland",
-        "sd": "sindxi",
+        "sd": "sindhi",
         "sdh": "janubiy kurd",
         "se": "shimoliy saam",
         "seh": "sena",
@@ -371,7 +369,6 @@
         "ug": "uyg‘ur",
         "uk": "ukrain",
         "umb": "umbundu",
-        "und": "noma’lum til",
         "ur": "urdu",
         "uz": "o‘zbek",
         "vai": "vai",
@@ -400,7 +397,6 @@
         "zh_Hant": "xitoy (an’anaviy)",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "til tarkibi yo‘q",
         "zza": "zaza"
     }
 }

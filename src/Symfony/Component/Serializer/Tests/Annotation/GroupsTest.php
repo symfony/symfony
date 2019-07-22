@@ -24,7 +24,7 @@ class GroupsTest extends TestCase
      */
     public function testEmptyGroupsParameter()
     {
-        new Groups(array('value' => array()));
+        new Groups(['value' => []]);
     }
 
     /**
@@ -32,7 +32,7 @@ class GroupsTest extends TestCase
      */
     public function testNotAnArrayGroupsParameter()
     {
-        new Groups(array('value' => 12));
+        new Groups(['value' => 12]);
     }
 
     /**
@@ -40,20 +40,20 @@ class GroupsTest extends TestCase
      */
     public function testInvalidGroupsParameter()
     {
-        new Groups(array('value' => array('a', 1, new \stdClass())));
+        new Groups(['value' => ['a', 1, new \stdClass()]]);
     }
 
     public function testGroupsParameters()
     {
-        $validData = array('a', 'b');
+        $validData = ['a', 'b'];
 
-        $groups = new Groups(array('value' => $validData));
+        $groups = new Groups(['value' => $validData]);
         $this->assertEquals($validData, $groups->getGroups());
     }
 
     public function testSingleGroup()
     {
-        $groups = new Groups(array('value' => 'a'));
-        $this->assertEquals(array('a'), $groups->getGroups());
+        $groups = new Groups(['value' => 'a']);
+        $this->assertEquals(['a'], $groups->getGroups());
     }
 }

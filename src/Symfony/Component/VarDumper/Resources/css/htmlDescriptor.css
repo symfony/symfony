@@ -22,14 +22,6 @@ a {
 a:hover {
     text-decoration: underline;
 }
-code {
-    color: #cc2255;
-    background-color: #f7f7f9;
-    border: 1px solid #e1e1e8;
-    border-radius: 3px;
-    margin-right: 5px;
-    padding: 0 3px;
-}
 .text-small {
     font-size: 12px !important;
 }
@@ -60,6 +52,12 @@ article > header > .row > h2 {
 article > header > .row > h2 > code {
     white-space: nowrap;
     user-select: none;
+    color: #cc2255;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    border-radius: 3px;
+    margin-right: 5px;
+    padding: 0 3px;
 }
 article > header > .row > time.col {
     flex: 0;
@@ -104,7 +102,7 @@ pre.sf-dump {
     margin-bottom: 0;
 }
 .hidden {
-    display: none; !important
+    display: none !important;
 }
 .dumped-tag > .sf-dump {
     display: inline-block;
@@ -129,3 +127,4 @@ pre.sf-dump {
 .dumped-tag > .sf-dump .sf-dump-ref { color: #6E6E6E; }
 .dumped-tag > .sf-dump .sf-dump-ellipsis { color: #CC7832; max-width: 100em; }
 .dumped-tag > .sf-dump .sf-dump-ellipsis-path { max-width: 5em; }
+.dumped-tag > .sf-dump .sf-dump-ns { user-select: none; }

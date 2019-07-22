@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -24,20 +25,35 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 class ConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
+    const INSTANCE = 'instance';
+    const STATUS = 'status';
+    const TITLE = 'title';
+    const TYPE = 'type';
+
+    private $defaultContext;
+    private $nameConverter;
+
+    public function __construct($defaultContext = [], NameConverterInterface $nameConverter = null)
+    {
+        $this->defaultContext = $defaultContext;
+        $this->nameConverter = $nameConverter;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
-        $violations = array();
-        $messages = array();
+        $violations = [];
+        $messages = [];
         foreach ($object as $violation) {
-            $propertyPath = $violation->getPropertyPath();
+            $propertyPath = $this->nameConverter ? $this->nameConverter->normalize($violation->getPropertyPath(), null, $format, $context) : $violation->getPropertyPath();
 
-            $violationEntry = array(
+            $violationEntry = [
                 'propertyPath' => $propertyPath,
                 'title' => $violation->getMessage(),
-            );
+                'parameters' => $violation->getParameters(),
+            ];
             if (null !== $code = $violation->getCode()) {
                 $violationEntry['type'] = sprintf('urn:uuid:%s', $code);
             }
@@ -48,21 +64,21 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             $messages[] = $prefix.$violation->getMessage();
         }
 
-        $result = array(
-            'type' => $context['type'] ?? 'https://symfony.com/errors/validation',
-            'title' => $context['title'] ?? 'Validation Failed',
-        );
-        if (isset($context['status'])) {
-            $result['status'] = $context['status'];
+        $result = [
+            'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE] ?? 'https://symfony.com/errors/validation',
+            'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE] ?? 'Validation Failed',
+        ];
+        if (null !== $status = ($context[self::STATUS] ?? $this->defaultContext[self::STATUS] ?? null)) {
+            $result['status'] = $status;
         }
         if ($messages) {
             $result['detail'] = implode("\n", $messages);
         }
-        if (isset($context['instance'])) {
-            $result['instance'] = $context['instance'];
+        if (null !== $instance = ($context[self::INSTANCE] ?? $this->defaultContext[self::INSTANCE] ?? null)) {
+            $result['instance'] = $instance;
         }
 
-        return $result + array('violations' => $violations);
+        return $result + ['violations' => $violations];
     }
 
     /**

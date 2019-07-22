@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -26,10 +27,10 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpressionIsEvaluatedWithNullValue()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'false',
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate(null, $constraint);
 
@@ -41,10 +42,10 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpressionIsEvaluatedWithEmptyStringValue()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'false',
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate('', $constraint);
 
@@ -70,10 +71,10 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testFailingExpressionAtObjectLevel()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'this.data == 1',
             'message' => 'myMessage',
-        ));
+        ]);
 
         $object = new Entity();
         $object->data = '2';
@@ -104,10 +105,10 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testFailingExpressionAtObjectLevelWithToString()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'this.data == 1',
             'message' => 'myMessage',
-        ));
+        ]);
 
         $object = new ToString();
         $object->data = '2';
@@ -140,10 +141,10 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testFailingExpressionAtPropertyLevel()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'value == this.data',
             'message' => 'myMessage',
-        ));
+        ]);
 
         $object = new Entity();
         $object->data = '1';
@@ -182,10 +183,10 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testFailingExpressionAtNestedPropertyLevel()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'value == this.data',
             'message' => 'myMessage',
-        ));
+        ]);
 
         $object = new Entity();
         $object->data = '1';
@@ -229,10 +230,10 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
      */
     public function testFailingExpressionAtPropertyLevelWithoutRoot()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'value == "1"',
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->setRoot('2');
         $this->setPropertyPath('');
@@ -249,22 +250,22 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpressionLanguageUsage()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'false',
-        ));
+        ]);
 
-        $expressionLanguage = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ExpressionLanguage')->getMock();
+        $expressionLanguage = $this->getMockBuilder(ExpressionLanguage::class)->getMock();
 
         $used = false;
 
         $expressionLanguage->method('evaluate')
-            ->will($this->returnCallback(function () use (&$used) {
+            ->willReturnCallback(function () use (&$used) {
                 $used = true;
 
                 return true;
-            }));
+            });
 
-        $validator = new ExpressionValidator(null, $expressionLanguage);
+        $validator = new ExpressionValidator($expressionLanguage);
         $validator->initialize($this->createContext());
         $validator->validate(null, $constraint);
 
@@ -273,12 +274,12 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testPassingCustomValues()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'value + custom == 2',
-            'values' => array(
+            'values' => [
                 'custom' => 1,
-            ),
-        ));
+            ],
+        ]);
 
         $this->validator->validate(1, $constraint);
 

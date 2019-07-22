@@ -12,15 +12,18 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\FormEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\FormEvent;
 
 class FixUrlProtocolListenerTest extends TestCase
 {
     public function testFixHttpUrl()
     {
         $data = 'www.symfony.com';
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
         $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
@@ -32,7 +35,7 @@ class FixUrlProtocolListenerTest extends TestCase
     public function testSkipKnownUrl()
     {
         $data = 'http://www.symfony.com';
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
         $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
@@ -43,13 +46,13 @@ class FixUrlProtocolListenerTest extends TestCase
 
     public function provideUrlsWithSupportedProtocols()
     {
-        return array(
-            array('ftp://www.symfony.com'),
-            array('chrome-extension://foo'),
-            array('h323://foo'),
-            array('iris.beep://foo'),
-            array('foo+bar://foo'),
-        );
+        return [
+            ['ftp://www.symfony.com'],
+            ['chrome-extension://foo'],
+            ['h323://foo'],
+            ['iris.beep://foo'],
+            ['foo+bar://foo'],
+        ];
     }
 
     /**
@@ -57,7 +60,7 @@ class FixUrlProtocolListenerTest extends TestCase
      */
     public function testSkipOtherProtocol($url)
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
         $event = new FormEvent($form, $url);
 
         $filter = new FixUrlProtocolListener('http');

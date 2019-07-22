@@ -13,8 +13,8 @@ namespace Symfony\Component\Security\Csrf;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
-use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
@@ -31,7 +31,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     private $namespace;
 
     /**
-     * @param null|string|RequestStack|callable $namespace
+     * @param string|RequestStack|callable|null $namespace
      *                                                     * null: generates a namespace using $_SERVER['HTTPS']
      *                                                     * string: uses the given string
      *                                                     * RequestStack: generates a namespace using the current master request
@@ -56,17 +56,17 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
 
                 return $superGlobalNamespaceGenerator();
             };
-        } elseif (is_callable($namespace) || is_string($namespace)) {
+        } elseif (\is_callable($namespace) || \is_string($namespace)) {
             $this->namespace = $namespace;
         } else {
-            throw new InvalidArgumentException(sprintf('$namespace must be a string, a callable returning a string, null or an instance of "RequestStack". "%s" given.', gettype($namespace)));
+            throw new InvalidArgumentException(sprintf('$namespace must be a string, a callable returning a string, null or an instance of "RequestStack". "%s" given.', \gettype($namespace)));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId)
+    public function getToken(string $tokenId)
     {
         $namespacedId = $this->getNamespace().$tokenId;
         if ($this->storage->hasToken($namespacedId)) {
@@ -83,7 +83,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function refreshToken($tokenId)
+    public function refreshToken(string $tokenId)
     {
         $namespacedId = $this->getNamespace().$tokenId;
         $value = $this->generator->generateToken();
@@ -96,7 +96,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function removeToken($tokenId)
+    public function removeToken(string $tokenId)
     {
         return $this->storage->removeToken($this->getNamespace().$tokenId);
     }
@@ -114,8 +114,8 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
         return hash_equals($this->storage->getToken($namespacedId), $token->getValue());
     }
 
-    private function getNamespace()
+    private function getNamespace(): string
     {
-        return is_callable($ns = $this->namespace) ? $ns() : $ns;
+        return \is_callable($ns = $this->namespace) ? $ns() : $ns;
     }
 }

@@ -14,13 +14,13 @@ namespace Symfony\Bridge\Doctrine\Security\User;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Wrapper around a Doctrine ObjectManager.
  *
- * Provides easy to use provisioning for Doctrine entity users.
+ * Provides provisioning for Doctrine entity users.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -44,14 +44,14 @@ class EntityUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername(string $username)
     {
         $repository = $this->getRepository();
         if (null !== $this->property) {
-            $user = $repository->findOneBy(array($this->property => $username));
+            $user = $repository->findOneBy([$this->property => $username]);
         } else {
             if (!$repository instanceof UserLoaderInterface) {
-                throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, get_class($repository)));
+                throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, \get_class($repository)));
             }
 
             $user = $repository->loadUserByUsername($username);
@@ -71,7 +71,7 @@ class EntityUserProvider implements UserProviderInterface
     {
         $class = $this->getClass();
         if (!$user instanceof $class) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
         $repository = $this->getRepository();
@@ -102,7 +102,7 @@ class EntityUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class)
     {
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
     }

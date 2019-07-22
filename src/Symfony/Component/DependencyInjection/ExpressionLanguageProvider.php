@@ -33,7 +33,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 
     public function getFunctions()
     {
-        return array(
+        return [
             new ExpressionFunction('service', $this->serviceCompiler ?: function ($arg) {
                 return sprintf('$this->get(%s)', $arg);
             }, function (array $variables, $value) {
@@ -45,6 +45,6 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             }, function (array $variables, $value) {
                 return $variables['container']->getParameter($value);
             }),
-        );
+        ];
     }
 }

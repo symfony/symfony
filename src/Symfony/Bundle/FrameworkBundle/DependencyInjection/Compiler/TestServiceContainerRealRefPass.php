@@ -32,7 +32,7 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
 
         foreach ($privateServices as $id => $argument) {
             if (isset($definitions[$target = (string) $argument->getValues()[0]])) {
-                $argument->setValues(array(new Reference($target)));
+                $argument->setValues([new Reference($target)]);
             } else {
                 unset($privateServices[$id]);
             }

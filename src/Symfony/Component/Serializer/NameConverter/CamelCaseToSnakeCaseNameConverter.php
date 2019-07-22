@@ -22,7 +22,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     private $lowerCamelCase;
 
     /**
-     * @param null|array $attributes     The list of attributes to rename or null for all attributes
+     * @param array|null $attributes     The list of attributes to rename or null for all attributes
      * @param bool       $lowerCamelCase Use lowerCamelCase style
      */
     public function __construct(array $attributes = null, bool $lowerCamelCase = true)
@@ -34,7 +34,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($propertyName)
+    public function normalize(string $propertyName)
     {
         if (null === $this->attributes || \in_array($propertyName, $this->attributes)) {
             return strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)));
@@ -46,7 +46,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($propertyName)
+    public function denormalize(string $propertyName)
     {
         $camelCasedName = preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
             return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);

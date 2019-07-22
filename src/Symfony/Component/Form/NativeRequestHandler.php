@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
- * A request handler using PHP's super globals $_GET, $_POST and $_SERVER.
+ * A request handler using PHP super globals $_GET, $_POST and $_SERVER.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -26,13 +26,13 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * The allowed keys of the $_FILES array.
      */
-    private static $fileKeys = array(
+    private static $fileKeys = [
         'error',
         'name',
         'size',
         'tmp_name',
         'type',
-    );
+    ];
 
     public function __construct(ServerParams $params = null)
     {
@@ -41,6 +41,8 @@ class NativeRequestHandler implements RequestHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws Exception\UnexpectedTypeException If the $request is not null
      */
     public function handleRequest(FormInterface $form, $request = null)
     {
@@ -78,15 +80,15 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $form->submit(null, false);
 
                 $form->addError(new FormError(
-                    call_user_func($form->getConfig()->getOption('upload_max_size_message')),
+                    $form->getConfig()->getOption('upload_max_size_message')(),
                     null,
-                    array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
+                    ['{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()]
                 ));
 
                 return;
             }
 
-            $fixedFiles = array();
+            $fixedFiles = [];
             foreach ($_FILES as $fileKey => $file) {
                 $fixedFiles[$fileKey] = self::stripEmptyFiles(self::fixPhpFilesArray($file));
             }
@@ -94,16 +96,16 @@ class NativeRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $params = $_POST;
                 $files = $fixedFiles;
-            } elseif (array_key_exists($name, $_POST) || array_key_exists($name, $fixedFiles)) {
-                $default = $form->getConfig()->getCompound() ? array() : null;
-                $params = array_key_exists($name, $_POST) ? $_POST[$name] : $default;
-                $files = array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
+            } elseif (\array_key_exists($name, $_POST) || \array_key_exists($name, $fixedFiles)) {
+                $default = $form->getConfig()->getCompound() ? [] : null;
+                $params = \array_key_exists($name, $_POST) ? $_POST[$name] : $default;
+                $files = \array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
             } else {
                 // Don't submit the form if it is not present in the request
                 return;
             }
 
-            if (is_array($params) && is_array($files)) {
+            if (\is_array($params) && \is_array($files)) {
                 $data = array_replace_recursive($params, $files);
             } else {
                 $data = $params ?: $files;
@@ -111,8 +113,12 @@ class NativeRequestHandler implements RequestHandlerInterface
         }
 
         // Don't auto-submit the form unless at least one field is present.
-        if ('' === $name && count(array_intersect_key($data, $form->all())) <= 0) {
+        if ('' === $name && \count(array_intersect_key($data, $form->all())) <= 0) {
             return;
+        }
+
+        if (\is_array($data) && \array_key_exists('_method', $data) && $method === $data['_method'] && !$form->has('_method')) {
+            unset($data['_method']);
         }
 
         $form->submit($data, 'PATCH' !== $method);
@@ -126,7 +132,31 @@ class NativeRequestHandler implements RequestHandlerInterface
         // POST data will always be strings or arrays of strings. Thus, we can be sure
         // that the submitted data is a file upload if the "error" value is an integer
         // (this value must have been injected by PHP itself).
-        return is_array($data) && isset($data['error']) && is_int($data['error']);
+        return \is_array($data) && isset($data['error']) && \is_int($data['error']);
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getUploadFileError($data)
+    {
+        if (!\is_array($data)) {
+            return null;
+        }
+
+        if (!isset($data['error'])) {
+            return null;
+        }
+
+        if (!\is_int($data['error'])) {
+            return null;
+        }
+
+        if (UPLOAD_ERR_OK === $data['error']) {
+            return null;
+        }
+
+        return $data['error'];
     }
 
     /**
@@ -166,14 +196,14 @@ class NativeRequestHandler implements RequestHandlerInterface
      */
     private static function fixPhpFilesArray($data)
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return $data;
         }
 
         $keys = array_keys($data);
         sort($keys);
 
-        if (self::$fileKeys !== $keys || !isset($data['name']) || !is_array($data['name'])) {
+        if (self::$fileKeys !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 
@@ -183,13 +213,13 @@ class NativeRequestHandler implements RequestHandlerInterface
         }
 
         foreach ($data['name'] as $key => $name) {
-            $files[$key] = self::fixPhpFilesArray(array(
+            $files[$key] = self::fixPhpFilesArray([
                 'error' => $data['error'][$key],
                 'name' => $name,
                 'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
                 'size' => $data['size'][$key],
-            ));
+            ]);
         }
 
         return $files;
@@ -204,7 +234,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      */
     private static function stripEmptyFiles($data)
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return $data;
         }
 
@@ -213,7 +243,7 @@ class NativeRequestHandler implements RequestHandlerInterface
 
         if (self::$fileKeys === $keys) {
             if (UPLOAD_ERR_NO_FILE === $data['error']) {
-                return;
+                return null;
             }
 
             return $data;

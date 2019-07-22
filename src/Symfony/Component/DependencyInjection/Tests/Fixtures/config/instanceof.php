@@ -9,8 +9,8 @@ return function (ContainerConfigurator $c) {
     $s = $c->services();
     $s->instanceof(Prototype\Foo::class)
         ->property('p', 0)
-        ->call('setFoo', array(ref('foo')))
-        ->tag('tag', array('k' => 'v'))
+        ->call('setFoo', [ref('foo')])
+        ->tag('tag', ['k' => 'v'])
         ->share(false)
         ->lazy()
         ->configurator('c')

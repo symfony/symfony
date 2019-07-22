@@ -49,7 +49,7 @@ class ChainUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername(string $username)
     {
         foreach ($this->providers as $provider) {
             try {
@@ -87,14 +87,14 @@ class ChainUserProvider implements UserProviderInterface
             $e->setUsername($user->getUsername());
             throw $e;
         } else {
-            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', \get_class($user)));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class)
     {
         foreach ($this->providers as $provider) {
             if ($provider->supportsClass($class)) {

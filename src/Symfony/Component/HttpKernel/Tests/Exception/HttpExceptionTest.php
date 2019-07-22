@@ -9,22 +9,22 @@ class HttpExceptionTest extends TestCase
 {
     public function headerDataProvider()
     {
-        return array(
-            array(array('X-Test' => 'Test')),
-            array(array('X-Test' => 1)),
-            array(
-                array(
-                    array('X-Test' => 'Test'),
-                    array('X-Test-2' => 'Test-2'),
-                ),
-            ),
-        );
+        return [
+            [['X-Test' => 'Test']],
+            [['X-Test' => 1]],
+            [
+                [
+                    ['X-Test' => 'Test'],
+                    ['X-Test-2' => 'Test-2'],
+                ],
+            ],
+        ];
     }
 
     public function testHeadersDefault()
     {
         $exception = $this->createException();
-        $this->assertSame(array(), $exception->getHeaders());
+        $this->assertSame([], $exception->getHeaders());
     }
 
     /**
@@ -46,8 +46,16 @@ class HttpExceptionTest extends TestCase
         $this->assertSame($headers, $exception->getHeaders());
     }
 
-    protected function createException()
+    public function testThrowableIsAllowedForPrevious()
     {
-        return new HttpException(200);
+        $previous = new class('Error of PHP 7+') extends \Error {
+        };
+        $exception = $this->createException(null, $previous);
+        $this->assertSame($previous, $exception->getPrevious());
+    }
+
+    protected function createException(string $message = null, \Throwable $previous = null, ?int $code = 0, array $headers = [])
+    {
+        return new HttpException(200, $message, $previous, $headers, $code);
     }
 }

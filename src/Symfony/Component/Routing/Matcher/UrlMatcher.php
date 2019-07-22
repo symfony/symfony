@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -32,19 +32,20 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     const REQUIREMENT_MISMATCH = 1;
     const ROUTE_MATCH = 2;
 
+    /** @var RequestContext */
     protected $context;
 
     /**
      * Collects HTTP methods that would be allowed for the request.
      */
-    protected $allow = array();
+    protected $allow = [];
 
     /**
      * Collects URI schemes that would be allowed for the request.
      *
      * @internal
      */
-    protected $allowSchemes = array();
+    protected $allowSchemes = [];
 
     protected $routes;
     protected $request;
@@ -53,7 +54,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    protected $expressionLanguageProviders = array();
+    protected $expressionLanguageProviders = [];
 
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
@@ -80,19 +81,19 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function match($pathinfo)
+    public function match(string $pathinfo)
     {
-        $this->allow = $this->allowSchemes = array();
+        $this->allow = $this->allowSchemes = [];
 
-        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
+        if ($ret = $this->matchCollection(rawurldecode($pathinfo) ?: '/', $this->routes)) {
             return $ret;
         }
 
-        if ('/' === $pathinfo && !$this->allow) {
+        if ('/' === $pathinfo && !$this->allow && !$this->allowSchemes) {
             throw new NoConfigurationException();
         }
 
-        throw 0 < count($this->allow)
+        throw 0 < \count($this->allow)
             ? new MethodNotAllowedException(array_unique($this->allow))
             : new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
     }
@@ -130,19 +131,43 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
+        // HEAD and GET are equivalent as per RFC
+        if ('HEAD' === $method = $this->context->getMethod()) {
+            $method = 'GET';
+        }
+        $supportsTrailingSlash = 'GET' === $method && $this instanceof RedirectableUrlMatcherInterface;
+        $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
+
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();
+            $staticPrefix = rtrim($compiledRoute->getStaticPrefix(), '/');
+            $requiredMethods = $route->getMethods();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
-            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($pathinfo, $compiledRoute->getStaticPrefix())) {
+            if ('' !== $staticPrefix && 0 !== strpos($trimmedPathinfo, $staticPrefix)) {
+                continue;
+            }
+            $regex = $compiledRoute->getRegex();
+
+            $pos = strrpos($regex, '$');
+            $hasTrailingSlash = '/' === $regex[$pos - 1];
+            $regex = substr_replace($regex, '/?$', $pos - $hasTrailingSlash, 1 + $hasTrailingSlash);
+
+            if (!preg_match($regex, $pathinfo, $matches)) {
                 continue;
             }
 
-            if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
-                continue;
+            $hasTrailingVar = $trimmedPathinfo !== $pathinfo && preg_match('#\{\w+\}/?$#', $route->getPath());
+
+            if ($hasTrailingVar && ($hasTrailingSlash || (null === $m = $matches[\count($compiledRoute->getPathVariables())] ?? null) || '/' !== ($m[-1] ?? '/')) && preg_match($regex, $trimmedPathinfo, $m)) {
+                if ($hasTrailingSlash) {
+                    $matches = $m;
+                } else {
+                    $hasTrailingVar = false;
+                }
             }
 
-            $hostMatches = array();
+            $hostMatches = [];
             if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
                 continue;
             }
@@ -153,30 +178,27 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            $hasRequiredScheme = !$route->getSchemes() || $route->hasScheme($this->context->getScheme());
-            if ($requiredMethods = $route->getMethods()) {
-                // HEAD and GET are equivalent as per RFC
-                if ('HEAD' === $method = $this->context->getMethod()) {
-                    $method = 'GET';
+            if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
+                    return $this->allow = $this->allowSchemes = [];
                 }
-
-                if (!in_array($method, $requiredMethods)) {
-                    if ($hasRequiredScheme) {
-                        $this->allow = array_merge($this->allow, $requiredMethods);
-                    }
-
-                    continue;
-                }
-            }
-
-            if (!$hasRequiredScheme) {
-                $this->allowSchemes = array_merge($this->allowSchemes, $route->getSchemes());
-
                 continue;
             }
 
-            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, isset($status[1]) ? $status[1] : array()));
+            if ($route->getSchemes() && !$route->hasScheme($this->context->getScheme())) {
+                $this->allowSchemes = array_merge($this->allowSchemes, $route->getSchemes());
+                continue;
+            }
+
+            if ($requiredMethods && !\in_array($method, $requiredMethods)) {
+                $this->allow = array_merge($this->allow, $requiredMethods);
+                continue;
+            }
+
+            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, isset($status[1]) ? $status[1] : []));
         }
+
+        return [];
     }
 
     /**
@@ -216,11 +238,11 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function handleRouteRequirements($pathinfo, $name, Route $route)
     {
         // expression condition
-        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), array('context' => $this->context, 'request' => $this->request ?: $this->createRequest($pathinfo)))) {
-            return array(self::REQUIREMENT_MISMATCH, null);
+        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), ['context' => $this->context, 'request' => $this->request ?: $this->createRequest($pathinfo)])) {
+            return [self::REQUIREMENT_MISMATCH, null];
         }
 
-        return array(self::REQUIREMENT_MATCH, null);
+        return [self::REQUIREMENT_MATCH, null];
     }
 
     /**
@@ -246,7 +268,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
-                throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+                throw new \LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
         }
@@ -263,9 +285,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             return null;
         }
 
-        return Request::create($this->context->getScheme().'://'.$this->context->getHost().$this->context->getBaseUrl().$pathinfo, $this->context->getMethod(), $this->context->getParameters(), array(), array(), array(
+        return Request::create($this->context->getScheme().'://'.$this->context->getHost().$this->context->getBaseUrl().$pathinfo, $this->context->getMethod(), $this->context->getParameters(), [], [], [
             'SCRIPT_FILENAME' => $this->context->getBaseUrl(),
             'SCRIPT_NAME' => $this->context->getBaseUrl(),
-        ));
+        ]);
     }
 }

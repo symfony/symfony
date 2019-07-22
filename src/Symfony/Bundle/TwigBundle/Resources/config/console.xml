@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
@@ -10,6 +10,9 @@
         <service id="twig.command.debug" class="Symfony\Bridge\Twig\Command\DebugCommand">
             <argument type="service" id="twig" />
             <argument>%kernel.project_dir%</argument>
+            <argument>%kernel.bundles_metadata%</argument>
+            <argument>%twig.default_path%</argument>
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <tag name="console.command" command="debug:twig" />
         </service>
 

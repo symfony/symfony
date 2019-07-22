@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Translation\TranslatorBagInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
@@ -47,7 +47,7 @@ class LoggingTranslatorPass implements CompilerPassInterface
                         $warmer->addTag('container.service_subscriber', $v);
                     }
                 }
-                $warmer->addTag('container.service_subscriber', array('key' => 'translator', 'id' => 'translator.logging.inner'));
+                $warmer->addTag('container.service_subscriber', ['key' => 'translator', 'id' => 'translator.logging.inner']);
             }
         }
     }

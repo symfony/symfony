@@ -20,7 +20,7 @@ class DirectoryResourceTest extends TestCase
 
     protected function setUp()
     {
-        $this->directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
+        $this->directory = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
             mkdir($this->directory);
         }
@@ -178,6 +178,6 @@ class DirectoryResourceTest extends TestCase
         $resourceA = new DirectoryResource($this->directory, '/.xml$/');
         $resourceB = new DirectoryResource($this->directory, '/.yaml$/');
 
-        $this->assertCount(2, array_unique(array($resourceA, $resourceB)));
+        $this->assertCount(2, array_unique([$resourceA, $resourceB]));
     }
 }

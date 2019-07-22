@@ -81,20 +81,20 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @return bool
      */
-    public function hasPropertyMetadata($property);
+    public function hasPropertyMetadata(string $property);
 
     /**
      * Returns all metadata instances for the given named property.
      *
-     * If your implementation does not support properties, simply throw an
-     * exception in this method (for example a <tt>BadMethodCallException</tt>).
+     * If your implementation does not support properties, throw an exception
+     * in this method (for example a <tt>BadMethodCallException</tt>).
      *
      * @param string $property The property name
      *
      * @return PropertyMetadataInterface[] A list of metadata instances. Empty if
      *                                     no metadata exists for the property.
      */
-    public function getPropertyMetadata($property);
+    public function getPropertyMetadata(string $property);
 
     /**
      * Returns the name of the backing PHP class.

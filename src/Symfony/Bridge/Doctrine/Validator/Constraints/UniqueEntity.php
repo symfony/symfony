@@ -30,17 +30,17 @@ class UniqueEntity extends Constraint
     public $em = null;
     public $entityClass = null;
     public $repositoryMethod = 'findBy';
-    public $fields = array();
+    public $fields = [];
     public $errorPath = null;
     public $ignoreNull = true;
 
-    protected static $errorNames = array(
+    protected static $errorNames = [
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
-    );
+    ];
 
     public function getRequiredOptions()
     {
-        return array('fields');
+        return ['fields'];
     }
 
     /**

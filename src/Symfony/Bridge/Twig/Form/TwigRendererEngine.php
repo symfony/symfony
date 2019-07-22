@@ -40,7 +40,7 @@ class TwigRendererEngine extends AbstractRendererEngine
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $resource, $blockName, array $variables = array())
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
@@ -98,7 +98,7 @@ class TwigRendererEngine extends AbstractRendererEngine
 
         // Check each theme whether it contains the searched block
         if (isset($this->themes[$cacheKey])) {
-            for ($i = count($this->themes[$cacheKey]) - 1; $i >= 0; --$i) {
+            for ($i = \count($this->themes[$cacheKey]) - 1; $i >= 0; --$i) {
                 $this->loadResourcesFromTheme($cacheKey, $this->themes[$cacheKey][$i]);
                 // CONTINUE LOADING (see doc comment)
             }
@@ -107,7 +107,7 @@ class TwigRendererEngine extends AbstractRendererEngine
         // Check the default themes once we reach the root view without success
         if (!$view->parent) {
             if (!isset($this->useDefaultThemes[$cacheKey]) || $this->useDefaultThemes[$cacheKey]) {
-                for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
+                for ($i = \count($this->defaultThemes) - 1; $i >= 0; --$i) {
                     $this->loadResourcesFromTheme($cacheKey, $this->defaultThemes[$i]);
                     // CONTINUE LOADING (see doc comment)
                 }
@@ -169,7 +169,7 @@ class TwigRendererEngine extends AbstractRendererEngine
         // theme is a reference and we don't want to change it.
         $currentTheme = $theme;
 
-        $context = $this->environment->mergeGlobals(array());
+        $context = $this->environment->mergeGlobals([]);
 
         // The do loop takes care of template inheritance.
         // Add blocks from all templates in the inheritance tree, but avoid

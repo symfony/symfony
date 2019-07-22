@@ -26,15 +26,15 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('a', 'stdClass')->addTag('foo');
-        $container->register('b', 'stdClass')->addTag('foo', array('priority' => 20));
-        $container->register('c', 'stdClass')->addTag('foo', array('priority' => 10));
+        $container->register('b', 'stdClass')->addTag('foo', ['priority' => 20]);
+        $container->register('c', 'stdClass')->addTag('foo', ['priority' => 10]);
         $container->register('d', 'stdClass')->setProperty('foos', new TaggedIteratorArgument('foo'));
 
         (new ResolveTaggedIteratorArgumentPass())->process($container);
 
         $properties = $container->getDefinition('d')->getProperties();
         $expected = new TaggedIteratorArgument('foo');
-        $expected->setValues(array(new Reference('b'), new Reference('c'), new Reference('a')));
+        $expected->setValues([new Reference('b'), new Reference('c'), new Reference('a')]);
         $this->assertEquals($expected, $properties['foos']);
     }
 }

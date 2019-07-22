@@ -20,8 +20,8 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class PreloadedExtension implements FormExtensionInterface
 {
-    private $types = array();
-    private $typeExtensions = array();
+    private $types = [];
+    private $typeExtensions = [];
     private $typeGuesser;
 
     /**
@@ -37,7 +37,7 @@ class PreloadedExtension implements FormExtensionInterface
         $this->typeGuesser = $typeGuesser;
 
         foreach ($types as $type) {
-            $this->types[get_class($type)] = $type;
+            $this->types[\get_class($type)] = $type;
         }
     }
 
@@ -68,7 +68,7 @@ class PreloadedExtension implements FormExtensionInterface
     {
         return isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]
-            : array();
+            : [];
     }
 
     /**

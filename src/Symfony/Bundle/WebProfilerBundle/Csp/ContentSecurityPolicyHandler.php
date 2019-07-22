@@ -44,23 +44,23 @@ class ContentSecurityPolicyHandler
     public function getNonces(Request $request, Response $response)
     {
         if ($request->headers->has('X-SymfonyProfiler-Script-Nonce') && $request->headers->has('X-SymfonyProfiler-Style-Nonce')) {
-            return array(
+            return [
                 'csp_script_nonce' => $request->headers->get('X-SymfonyProfiler-Script-Nonce'),
                 'csp_style_nonce' => $request->headers->get('X-SymfonyProfiler-Style-Nonce'),
-            );
+            ];
         }
 
         if ($response->headers->has('X-SymfonyProfiler-Script-Nonce') && $response->headers->has('X-SymfonyProfiler-Style-Nonce')) {
-            return array(
+            return [
                 'csp_script_nonce' => $response->headers->get('X-SymfonyProfiler-Script-Nonce'),
                 'csp_style_nonce' => $response->headers->get('X-SymfonyProfiler-Style-Nonce'),
-            );
+            ];
         }
 
-        $nonces = array(
+        $nonces = [
             'csp_script_nonce' => $this->generateNonce(),
             'csp_style_nonce' => $this->generateNonce(),
-        );
+        ];
 
         $response->headers->set('X-SymfonyProfiler-Script-Nonce', $nonces['csp_script_nonce']);
         $response->headers->set('X-SymfonyProfiler-Style-Nonce', $nonces['csp_style_nonce']);
@@ -88,7 +88,7 @@ class ContentSecurityPolicyHandler
         if ($this->cspDisabled) {
             $this->removeCspHeaders($response);
 
-            return array();
+            return [];
         }
 
         $nonces = $this->getNonces($request, $response);
@@ -116,19 +116,19 @@ class ContentSecurityPolicyHandler
      *
      * @return array
      */
-    private function updateCspHeaders(Response $response, array $nonces = array())
+    private function updateCspHeaders(Response $response, array $nonces = [])
     {
-        $nonces = array_replace(array(
+        $nonces = array_replace([
             'csp_script_nonce' => $this->generateNonce(),
             'csp_style_nonce' => $this->generateNonce(),
-        ), $nonces);
+        ], $nonces);
 
         $ruleIsSet = false;
 
         $headers = $this->getCspHeaders($response);
 
         foreach ($headers as $header => $directives) {
-            foreach (array('script-src' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce') as $type => $tokenName) {
+            foreach (['script-src' => 'csp_script_nonce', 'style-src' => 'csp_style_nonce'] as $type => $tokenName) {
                 if ($this->authorizesInline($directives, $type)) {
                     continue;
                 }
@@ -141,7 +141,7 @@ class ContentSecurityPolicyHandler
                     }
                 }
                 $ruleIsSet = true;
-                if (!in_array('\'unsafe-inline\'', $headers[$header][$type], true)) {
+                if (!\in_array('\'unsafe-inline\'', $headers[$header][$type], true)) {
                     $headers[$header][$type][] = '\'unsafe-inline\'';
                 }
                 $headers[$header][$type][] = sprintf('\'nonce-%s\'', $nonces[$tokenName]);
@@ -190,13 +190,13 @@ class ContentSecurityPolicyHandler
      *
      * @return array The directive set
      */
-    private function parseDirectives($header)
+    private function parseDirectives(string $header)
     {
-        $directives = array();
+        $directives = [];
 
         foreach (explode(';', $header) as $directive) {
             $parts = explode(' ', trim($directive));
-            if (count($parts) < 1) {
+            if (\count($parts) < 1) {
                 continue;
             }
             $name = array_shift($parts);
@@ -214,7 +214,7 @@ class ContentSecurityPolicyHandler
      *
      * @return bool
      */
-    private function authorizesInline(array $directivesSet, $type)
+    private function authorizesInline(array $directivesSet, string $type)
     {
         if (isset($directivesSet[$type])) {
             $directives = $directivesSet[$type];
@@ -224,7 +224,7 @@ class ContentSecurityPolicyHandler
             return false;
         }
 
-        return in_array('\'unsafe-inline\'', $directives, true) && !$this->hasHashOrNonce($directives);
+        return \in_array('\'unsafe-inline\'', $directives, true) && !$this->hasHashOrNonce($directives);
     }
 
     private function hasHashOrNonce(array $directives)
@@ -236,7 +236,7 @@ class ContentSecurityPolicyHandler
             if ('\'nonce-' === substr($directive, 0, 7)) {
                 return true;
             }
-            if (in_array(substr($directive, 0, 8), array('\'sha256-', '\'sha384-', '\'sha512-'), true)) {
+            if (\in_array(substr($directive, 0, 8), ['\'sha256-', '\'sha384-', '\'sha512-'], true)) {
                 return true;
             }
         }
@@ -252,7 +252,7 @@ class ContentSecurityPolicyHandler
      */
     private function getCspHeaders(Response $response)
     {
-        $headers = array();
+        $headers = [];
 
         if ($response->headers->has('Content-Security-Policy')) {
             $headers['Content-Security-Policy'] = $this->parseDirectives($response->headers->get('Content-Security-Policy'));

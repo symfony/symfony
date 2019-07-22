@@ -16,10 +16,12 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.9",
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "doctrine/dbal": "~2.4",
+        "mongodb/mongodb": "~1.1",
         "predis/predis": "~1.0"
     },
     "autoload": {
@@ -31,7 +33,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     }
 }

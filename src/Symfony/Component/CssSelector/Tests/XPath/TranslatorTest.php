@@ -12,8 +12,12 @@
 namespace Symfony\Component\CssSelector\Tests\XPath;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\CssSelector\Node\ElementNode;
+use Symfony\Component\CssSelector\Node\FunctionNode;
+use Symfony\Component\CssSelector\Parser\Parser;
 use Symfony\Component\CssSelector\XPath\Extension\HtmlExtension;
 use Symfony\Component\CssSelector\XPath\Translator;
+use Symfony\Component\CssSelector\XPath\XPathExpr;
 
 class TranslatorTest extends TestCase
 {
@@ -31,15 +35,82 @@ class TranslatorTest extends TestCase
         $this->assertEquals($xpath, $translator->cssToXPath($css, ''));
     }
 
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
+    public function testCssToXPathPseudoElement()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $translator->cssToXPath('e::first-line');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
+    public function testGetExtensionNotExistsExtension()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $translator->getExtension('fake');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
+    public function testAddCombinationNotExistsExtension()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $parser = new Parser();
+        $xpath = $parser->parse('*')[0];
+        $combinedXpath = $parser->parse('*')[0];
+        $translator->addCombination('fake', $xpath, $combinedXpath);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
+    public function testAddFunctionNotExistsFunction()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $xpath = new XPathExpr();
+        $function = new FunctionNode(new ElementNode(), 'fake');
+        $translator->addFunction($xpath, $function);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
+    public function testAddPseudoClassNotExistsClass()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $xpath = new XPathExpr();
+        $translator->addPseudoClass($xpath, 'fake');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
+    public function testAddAttributeMatchingClassNotExistsClass()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $xpath = new XPathExpr();
+        $translator->addAttributeMatching($xpath, '', '', '');
+    }
+
     /** @dataProvider getXmlLangTestData */
     public function testXmlLang($css, array $elementsId)
     {
         $translator = new Translator();
         $document = new \SimpleXMLElement(file_get_contents(__DIR__.'/Fixtures/lang.xml'));
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(count($elementsId), $elements);
+        $this->assertCount(\count($elementsId), $elements);
         foreach ($elements as $element) {
-            $this->assertTrue(in_array($element->attributes()->id, $elementsId));
+            $this->assertTrue(\in_array($element->attributes()->id, $elementsId));
         }
     }
 
@@ -54,10 +125,10 @@ class TranslatorTest extends TestCase
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
-        $this->assertCount(count($elementsId), $elementsId);
+        $this->assertCount(\count($elementsId), $elementsId);
         foreach ($elements as $element) {
             if (null !== $element->attributes()->id) {
-                $this->assertTrue(in_array($element->attributes()->id, $elementsId));
+                $this->assertTrue(\in_array($element->attributes()->id, $elementsId));
             }
         }
         libxml_clear_errors();
@@ -80,248 +151,248 @@ class TranslatorTest extends TestCase
 
     public function getXpathLiteralTestData()
     {
-        return array(
-            array('foo', "'foo'"),
-            array("foo's bar", '"foo\'s bar"'),
-            array("foo's \"middle\" bar", 'concat(\'foo\', "\'", \'s "middle" bar\')'),
-            array("foo's 'middle' \"bar\"", 'concat(\'foo\', "\'", \'s \', "\'", \'middle\', "\'", \' "bar"\')'),
-        );
+        return [
+            ['foo', "'foo'"],
+            ["foo's bar", '"foo\'s bar"'],
+            ["foo's \"middle\" bar", 'concat(\'foo\', "\'", \'s "middle" bar\')'],
+            ["foo's 'middle' \"bar\"", 'concat(\'foo\', "\'", \'s \', "\'", \'middle\', "\'", \' "bar"\')'],
+        ];
     }
 
     public function getCssToXPathTestData()
     {
-        return array(
-            array('*', '*'),
-            array('e', 'e'),
-            array('*|e', 'e'),
-            array('e|f', 'e:f'),
-            array('e[foo]', 'e[@foo]'),
-            array('e[foo|bar]', 'e[@foo:bar]'),
-            array('e[foo="bar"]', "e[@foo = 'bar']"),
-            array('e[foo~="bar"]', "e[@foo and contains(concat(' ', normalize-space(@foo), ' '), ' bar ')]"),
-            array('e[foo^="bar"]', "e[@foo and starts-with(@foo, 'bar')]"),
-            array('e[foo$="bar"]', "e[@foo and substring(@foo, string-length(@foo)-2) = 'bar']"),
-            array('e[foo*="bar"]', "e[@foo and contains(@foo, 'bar')]"),
-            array('e[foo!="bar"]', "e[not(@foo) or @foo != 'bar']"),
-            array('e[foo!="bar"][foo!="baz"]', "e[(not(@foo) or @foo != 'bar') and (not(@foo) or @foo != 'baz')]"),
-            array('e[hreflang|="en"]', "e[@hreflang and (@hreflang = 'en' or starts-with(@hreflang, 'en-'))]"),
-            array('e:nth-child(1)', "*/*[(name() = 'e') and (position() = 1)]"),
-            array('e:nth-last-child(1)', "*/*[(name() = 'e') and (position() = last() - 0)]"),
-            array('e:nth-last-child(2n+2)', "*/*[(name() = 'e') and (last() - position() - 1 >= 0 and (last() - position() - 1) mod 2 = 0)]"),
-            array('e:nth-of-type(1)', '*/e[position() = 1]'),
-            array('e:nth-last-of-type(1)', '*/e[position() = last() - 0]'),
-            array('div e:nth-last-of-type(1) .aclass', "div/descendant-or-self::*/e[position() = last() - 0]/descendant-or-self::*/*[@class and contains(concat(' ', normalize-space(@class), ' '), ' aclass ')]"),
-            array('e:first-child', "*/*[(name() = 'e') and (position() = 1)]"),
-            array('e:last-child', "*/*[(name() = 'e') and (position() = last())]"),
-            array('e:first-of-type', '*/e[position() = 1]'),
-            array('e:last-of-type', '*/e[position() = last()]'),
-            array('e:only-child', "*/*[(name() = 'e') and (last() = 1)]"),
-            array('e:only-of-type', 'e[last() = 1]'),
-            array('e:empty', 'e[not(*) and not(string-length())]'),
-            array('e:EmPTY', 'e[not(*) and not(string-length())]'),
-            array('e:root', 'e[not(parent::*)]'),
-            array('e:hover', 'e[0]'),
-            array('e:contains("foo")', "e[contains(string(.), 'foo')]"),
-            array('e:ConTains(foo)', "e[contains(string(.), 'foo')]"),
-            array('e.warning', "e[@class and contains(concat(' ', normalize-space(@class), ' '), ' warning ')]"),
-            array('e#myid', "e[@id = 'myid']"),
-            array('e:not(:nth-child(odd))', 'e[not(position() - 1 >= 0 and (position() - 1) mod 2 = 0)]'),
-            array('e:nOT(*)', 'e[0]'),
-            array('e f', 'e/descendant-or-self::*/f'),
-            array('e > f', 'e/f'),
-            array('e + f', "e/following-sibling::*[(name() = 'f') and (position() = 1)]"),
-            array('e ~ f', 'e/following-sibling::f'),
-            array('div#container p', "div[@id = 'container']/descendant-or-self::*/p"),
-        );
+        return [
+            ['*', '*'],
+            ['e', 'e'],
+            ['*|e', 'e'],
+            ['e|f', 'e:f'],
+            ['e[foo]', 'e[@foo]'],
+            ['e[foo|bar]', 'e[@foo:bar]'],
+            ['e[foo="bar"]', "e[@foo = 'bar']"],
+            ['e[foo~="bar"]', "e[@foo and contains(concat(' ', normalize-space(@foo), ' '), ' bar ')]"],
+            ['e[foo^="bar"]', "e[@foo and starts-with(@foo, 'bar')]"],
+            ['e[foo$="bar"]', "e[@foo and substring(@foo, string-length(@foo)-2) = 'bar']"],
+            ['e[foo*="bar"]', "e[@foo and contains(@foo, 'bar')]"],
+            ['e[foo!="bar"]', "e[not(@foo) or @foo != 'bar']"],
+            ['e[foo!="bar"][foo!="baz"]', "e[(not(@foo) or @foo != 'bar') and (not(@foo) or @foo != 'baz')]"],
+            ['e[hreflang|="en"]', "e[@hreflang and (@hreflang = 'en' or starts-with(@hreflang, 'en-'))]"],
+            ['e:nth-child(1)', "*/*[(name() = 'e') and (position() = 1)]"],
+            ['e:nth-last-child(1)', "*/*[(name() = 'e') and (position() = last() - 0)]"],
+            ['e:nth-last-child(2n+2)', "*/*[(name() = 'e') and (last() - position() - 1 >= 0 and (last() - position() - 1) mod 2 = 0)]"],
+            ['e:nth-of-type(1)', '*/e[position() = 1]'],
+            ['e:nth-last-of-type(1)', '*/e[position() = last() - 0]'],
+            ['div e:nth-last-of-type(1) .aclass', "div/descendant-or-self::*/e[position() = last() - 0]/descendant-or-self::*/*[@class and contains(concat(' ', normalize-space(@class), ' '), ' aclass ')]"],
+            ['e:first-child', "*/*[(name() = 'e') and (position() = 1)]"],
+            ['e:last-child', "*/*[(name() = 'e') and (position() = last())]"],
+            ['e:first-of-type', '*/e[position() = 1]'],
+            ['e:last-of-type', '*/e[position() = last()]'],
+            ['e:only-child', "*/*[(name() = 'e') and (last() = 1)]"],
+            ['e:only-of-type', 'e[last() = 1]'],
+            ['e:empty', 'e[not(*) and not(string-length())]'],
+            ['e:EmPTY', 'e[not(*) and not(string-length())]'],
+            ['e:root', 'e[not(parent::*)]'],
+            ['e:hover', 'e[0]'],
+            ['e:contains("foo")', "e[contains(string(.), 'foo')]"],
+            ['e:ConTains(foo)', "e[contains(string(.), 'foo')]"],
+            ['e.warning', "e[@class and contains(concat(' ', normalize-space(@class), ' '), ' warning ')]"],
+            ['e#myid', "e[@id = 'myid']"],
+            ['e:not(:nth-child(odd))', 'e[not(position() - 1 >= 0 and (position() - 1) mod 2 = 0)]'],
+            ['e:nOT(*)', 'e[0]'],
+            ['e f', 'e/descendant-or-self::*/f'],
+            ['e > f', 'e/f'],
+            ['e + f', "e/following-sibling::*[(name() = 'f') and (position() = 1)]"],
+            ['e ~ f', 'e/following-sibling::f'],
+            ['div#container p', "div[@id = 'container']/descendant-or-self::*/p"],
+        ];
     }
 
     public function getXmlLangTestData()
     {
-        return array(
-            array(':lang("EN")', array('first', 'second', 'third', 'fourth')),
-            array(':lang("en-us")', array('second', 'fourth')),
-            array(':lang(en-nz)', array('third')),
-            array(':lang(fr)', array('fifth')),
-            array(':lang(ru)', array('sixth')),
-            array(":lang('ZH')", array('eighth')),
-            array(':lang(de) :lang(zh)', array('eighth')),
-            array(':lang(en), :lang(zh)', array('first', 'second', 'third', 'fourth', 'eighth')),
-            array(':lang(es)', array()),
-        );
+        return [
+            [':lang("EN")', ['first', 'second', 'third', 'fourth']],
+            [':lang("en-us")', ['second', 'fourth']],
+            [':lang(en-nz)', ['third']],
+            [':lang(fr)', ['fifth']],
+            [':lang(ru)', ['sixth']],
+            [":lang('ZH')", ['eighth']],
+            [':lang(de) :lang(zh)', ['eighth']],
+            [':lang(en), :lang(zh)', ['first', 'second', 'third', 'fourth', 'eighth']],
+            [':lang(es)', []],
+        ];
     }
 
     public function getHtmlIdsTestData()
     {
-        return array(
-            array('div', array('outer-div', 'li-div', 'foobar-div')),
-            array('DIV', array('outer-div', 'li-div', 'foobar-div')),  // case-insensitive in HTML
-            array('div div', array('li-div')),
-            array('div, div div', array('outer-div', 'li-div', 'foobar-div')),
-            array('a[name]', array('name-anchor')),
-            array('a[NAme]', array('name-anchor')), // case-insensitive in HTML:
-            array('a[rel]', array('tag-anchor', 'nofollow-anchor')),
-            array('a[rel="tag"]', array('tag-anchor')),
-            array('a[href*="localhost"]', array('tag-anchor')),
-            array('a[href*=""]', array()),
-            array('a[href^="http"]', array('tag-anchor', 'nofollow-anchor')),
-            array('a[href^="http:"]', array('tag-anchor')),
-            array('a[href^=""]', array()),
-            array('a[href$="org"]', array('nofollow-anchor')),
-            array('a[href$=""]', array()),
-            array('div[foobar~="bc"]', array('foobar-div')),
-            array('div[foobar~="cde"]', array('foobar-div')),
-            array('[foobar~="ab bc"]', array('foobar-div')),
-            array('[foobar~=""]', array()),
-            array('[foobar~=" \t"]', array()),
-            array('div[foobar~="cd"]', array()),
-            array('*[lang|="En"]', array('second-li')),
-            array('[lang|="En-us"]', array('second-li')),
+        return [
+            ['div', ['outer-div', 'li-div', 'foobar-div']],
+            ['DIV', ['outer-div', 'li-div', 'foobar-div']],  // case-insensitive in HTML
+            ['div div', ['li-div']],
+            ['div, div div', ['outer-div', 'li-div', 'foobar-div']],
+            ['a[name]', ['name-anchor']],
+            ['a[NAme]', ['name-anchor']], // case-insensitive in HTML:
+            ['a[rel]', ['tag-anchor', 'nofollow-anchor']],
+            ['a[rel="tag"]', ['tag-anchor']],
+            ['a[href*="localhost"]', ['tag-anchor']],
+            ['a[href*=""]', []],
+            ['a[href^="http"]', ['tag-anchor', 'nofollow-anchor']],
+            ['a[href^="http:"]', ['tag-anchor']],
+            ['a[href^=""]', []],
+            ['a[href$="org"]', ['nofollow-anchor']],
+            ['a[href$=""]', []],
+            ['div[foobar~="bc"]', ['foobar-div']],
+            ['div[foobar~="cde"]', ['foobar-div']],
+            ['[foobar~="ab bc"]', ['foobar-div']],
+            ['[foobar~=""]', []],
+            ['[foobar~=" \t"]', []],
+            ['div[foobar~="cd"]', []],
+            ['*[lang|="En"]', ['second-li']],
+            ['[lang|="En-us"]', ['second-li']],
             // Attribute values are case sensitive
-            array('*[lang|="en"]', array()),
-            array('[lang|="en-US"]', array()),
-            array('*[lang|="e"]', array()),
+            ['*[lang|="en"]', []],
+            ['[lang|="en-US"]', []],
+            ['*[lang|="e"]', []],
             // ... :lang() is not.
-            array(':lang("EN")', array('second-li', 'li-div')),
-            array('*:lang(en-US)', array('second-li', 'li-div')),
-            array(':lang("e")', array()),
-            array('li:nth-child(3)', array('third-li')),
-            array('li:nth-child(10)', array()),
-            array('li:nth-child(2n)', array('second-li', 'fourth-li', 'sixth-li')),
-            array('li:nth-child(even)', array('second-li', 'fourth-li', 'sixth-li')),
-            array('li:nth-child(2n+0)', array('second-li', 'fourth-li', 'sixth-li')),
-            array('li:nth-child(+2n+1)', array('first-li', 'third-li', 'fifth-li', 'seventh-li')),
-            array('li:nth-child(odd)', array('first-li', 'third-li', 'fifth-li', 'seventh-li')),
-            array('li:nth-child(2n+4)', array('fourth-li', 'sixth-li')),
-            array('li:nth-child(3n+1)', array('first-li', 'fourth-li', 'seventh-li')),
-            array('li:nth-child(n)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
-            array('li:nth-child(n-1)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
-            array('li:nth-child(n+1)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
-            array('li:nth-child(n+3)', array('third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
-            array('li:nth-child(-n)', array()),
-            array('li:nth-child(-n-1)', array()),
-            array('li:nth-child(-n+1)', array('first-li')),
-            array('li:nth-child(-n+3)', array('first-li', 'second-li', 'third-li')),
-            array('li:nth-last-child(0)', array()),
-            array('li:nth-last-child(2n)', array('second-li', 'fourth-li', 'sixth-li')),
-            array('li:nth-last-child(even)', array('second-li', 'fourth-li', 'sixth-li')),
-            array('li:nth-last-child(2n+2)', array('second-li', 'fourth-li', 'sixth-li')),
-            array('li:nth-last-child(n)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
-            array('li:nth-last-child(n-1)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
-            array('li:nth-last-child(n-3)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
-            array('li:nth-last-child(n+1)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
-            array('li:nth-last-child(n+3)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li')),
-            array('li:nth-last-child(-n)', array()),
-            array('li:nth-last-child(-n-1)', array()),
-            array('li:nth-last-child(-n+1)', array('seventh-li')),
-            array('li:nth-last-child(-n+3)', array('fifth-li', 'sixth-li', 'seventh-li')),
-            array('ol:first-of-type', array('first-ol')),
-            array('ol:nth-child(1)', array('first-ol')),
-            array('ol:nth-of-type(2)', array('second-ol')),
-            array('ol:nth-last-of-type(1)', array('second-ol')),
-            array('span:only-child', array('foobar-span')),
-            array('li div:only-child', array('li-div')),
-            array('div *:only-child', array('li-div', 'foobar-span')),
-            array('p:only-of-type', array('paragraph')),
-            array('a:empty', array('name-anchor')),
-            array('a:EMpty', array('name-anchor')),
-            array('li:empty', array('third-li', 'fourth-li', 'fifth-li', 'sixth-li')),
-            array(':root', array('html')),
-            array('html:root', array('html')),
-            array('li:root', array()),
-            array('* :root', array()),
-            array('*:contains("link")', array('html', 'outer-div', 'tag-anchor', 'nofollow-anchor')),
-            array(':CONtains("link")', array('html', 'outer-div', 'tag-anchor', 'nofollow-anchor')),
-            array('*:contains("LInk")', array()),  // case sensitive
-            array('*:contains("e")', array('html', 'nil', 'outer-div', 'first-ol', 'first-li', 'paragraph', 'p-em')),
-            array('*:contains("E")', array()),  // case-sensitive
-            array('.a', array('first-ol')),
-            array('.b', array('first-ol')),
-            array('*.a', array('first-ol')),
-            array('ol.a', array('first-ol')),
-            array('.c', array('first-ol', 'third-li', 'fourth-li')),
-            array('*.c', array('first-ol', 'third-li', 'fourth-li')),
-            array('ol *.c', array('third-li', 'fourth-li')),
-            array('ol li.c', array('third-li', 'fourth-li')),
-            array('li ~ li.c', array('third-li', 'fourth-li')),
-            array('ol > li.c', array('third-li', 'fourth-li')),
-            array('#first-li', array('first-li')),
-            array('li#first-li', array('first-li')),
-            array('*#first-li', array('first-li')),
-            array('li div', array('li-div')),
-            array('li > div', array('li-div')),
-            array('div div', array('li-div')),
-            array('div > div', array()),
-            array('div>.c', array('first-ol')),
-            array('div > .c', array('first-ol')),
-            array('div + div', array('foobar-div')),
-            array('a ~ a', array('tag-anchor', 'nofollow-anchor')),
-            array('a[rel="tag"] ~ a', array('nofollow-anchor')),
-            array('ol#first-ol li:last-child', array('seventh-li')),
-            array('ol#first-ol *:last-child', array('li-div', 'seventh-li')),
-            array('#outer-div:first-child', array('outer-div')),
-            array('#outer-div :first-child', array('name-anchor', 'first-li', 'li-div', 'p-b', 'checkbox-fieldset-disabled', 'area-href')),
-            array('a[href]', array('tag-anchor', 'nofollow-anchor')),
-            array(':not(*)', array()),
-            array('a:not([href])', array('name-anchor')),
-            array('ol :Not(li[class])', array('first-li', 'second-li', 'li-div', 'fifth-li', 'sixth-li', 'seventh-li')),
+            [':lang("EN")', ['second-li', 'li-div']],
+            ['*:lang(en-US)', ['second-li', 'li-div']],
+            [':lang("e")', []],
+            ['li:nth-child(3)', ['third-li']],
+            ['li:nth-child(10)', []],
+            ['li:nth-child(2n)', ['second-li', 'fourth-li', 'sixth-li']],
+            ['li:nth-child(even)', ['second-li', 'fourth-li', 'sixth-li']],
+            ['li:nth-child(2n+0)', ['second-li', 'fourth-li', 'sixth-li']],
+            ['li:nth-child(+2n+1)', ['first-li', 'third-li', 'fifth-li', 'seventh-li']],
+            ['li:nth-child(odd)', ['first-li', 'third-li', 'fifth-li', 'seventh-li']],
+            ['li:nth-child(2n+4)', ['fourth-li', 'sixth-li']],
+            ['li:nth-child(3n+1)', ['first-li', 'fourth-li', 'seventh-li']],
+            ['li:nth-child(n)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:nth-child(n-1)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:nth-child(n+1)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:nth-child(n+3)', ['third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:nth-child(-n)', []],
+            ['li:nth-child(-n-1)', []],
+            ['li:nth-child(-n+1)', ['first-li']],
+            ['li:nth-child(-n+3)', ['first-li', 'second-li', 'third-li']],
+            ['li:nth-last-child(0)', []],
+            ['li:nth-last-child(2n)', ['second-li', 'fourth-li', 'sixth-li']],
+            ['li:nth-last-child(even)', ['second-li', 'fourth-li', 'sixth-li']],
+            ['li:nth-last-child(2n+2)', ['second-li', 'fourth-li', 'sixth-li']],
+            ['li:nth-last-child(n)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:nth-last-child(n-1)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:nth-last-child(n-3)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:nth-last-child(n+1)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:nth-last-child(n+3)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li']],
+            ['li:nth-last-child(-n)', []],
+            ['li:nth-last-child(-n-1)', []],
+            ['li:nth-last-child(-n+1)', ['seventh-li']],
+            ['li:nth-last-child(-n+3)', ['fifth-li', 'sixth-li', 'seventh-li']],
+            ['ol:first-of-type', ['first-ol']],
+            ['ol:nth-child(1)', ['first-ol']],
+            ['ol:nth-of-type(2)', ['second-ol']],
+            ['ol:nth-last-of-type(1)', ['second-ol']],
+            ['span:only-child', ['foobar-span']],
+            ['li div:only-child', ['li-div']],
+            ['div *:only-child', ['li-div', 'foobar-span']],
+            ['p:only-of-type', ['paragraph']],
+            ['a:empty', ['name-anchor']],
+            ['a:EMpty', ['name-anchor']],
+            ['li:empty', ['third-li', 'fourth-li', 'fifth-li', 'sixth-li']],
+            [':root', ['html']],
+            ['html:root', ['html']],
+            ['li:root', []],
+            ['* :root', []],
+            ['*:contains("link")', ['html', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
+            [':CONtains("link")', ['html', 'outer-div', 'tag-anchor', 'nofollow-anchor']],
+            ['*:contains("LInk")', []],  // case sensitive
+            ['*:contains("e")', ['html', 'nil', 'outer-div', 'first-ol', 'first-li', 'paragraph', 'p-em']],
+            ['*:contains("E")', []],  // case-sensitive
+            ['.a', ['first-ol']],
+            ['.b', ['first-ol']],
+            ['*.a', ['first-ol']],
+            ['ol.a', ['first-ol']],
+            ['.c', ['first-ol', 'third-li', 'fourth-li']],
+            ['*.c', ['first-ol', 'third-li', 'fourth-li']],
+            ['ol *.c', ['third-li', 'fourth-li']],
+            ['ol li.c', ['third-li', 'fourth-li']],
+            ['li ~ li.c', ['third-li', 'fourth-li']],
+            ['ol > li.c', ['third-li', 'fourth-li']],
+            ['#first-li', ['first-li']],
+            ['li#first-li', ['first-li']],
+            ['*#first-li', ['first-li']],
+            ['li div', ['li-div']],
+            ['li > div', ['li-div']],
+            ['div div', ['li-div']],
+            ['div > div', []],
+            ['div>.c', ['first-ol']],
+            ['div > .c', ['first-ol']],
+            ['div + div', ['foobar-div']],
+            ['a ~ a', ['tag-anchor', 'nofollow-anchor']],
+            ['a[rel="tag"] ~ a', ['nofollow-anchor']],
+            ['ol#first-ol li:last-child', ['seventh-li']],
+            ['ol#first-ol *:last-child', ['li-div', 'seventh-li']],
+            ['#outer-div:first-child', ['outer-div']],
+            ['#outer-div :first-child', ['name-anchor', 'first-li', 'li-div', 'p-b', 'checkbox-fieldset-disabled', 'area-href']],
+            ['a[href]', ['tag-anchor', 'nofollow-anchor']],
+            [':not(*)', []],
+            ['a:not([href])', ['name-anchor']],
+            ['ol :Not(li[class])', ['first-li', 'second-li', 'li-div', 'fifth-li', 'sixth-li', 'seventh-li']],
             // HTML-specific
-            array(':link', array('link-href', 'tag-anchor', 'nofollow-anchor', 'area-href')),
-            array(':visited', array()),
-            array(':enabled', array('link-href', 'tag-anchor', 'nofollow-anchor', 'checkbox-unchecked', 'text-checked', 'checkbox-checked', 'area-href')),
-            array(':disabled', array('checkbox-disabled', 'checkbox-disabled-checked', 'fieldset', 'checkbox-fieldset-disabled')),
-            array(':checked', array('checkbox-checked', 'checkbox-disabled-checked')),
-        );
+            [':link', ['link-href', 'tag-anchor', 'nofollow-anchor', 'area-href']],
+            [':visited', []],
+            [':enabled', ['link-href', 'tag-anchor', 'nofollow-anchor', 'checkbox-unchecked', 'text-checked', 'checkbox-checked', 'area-href']],
+            [':disabled', ['checkbox-disabled', 'checkbox-disabled-checked', 'fieldset', 'checkbox-fieldset-disabled']],
+            [':checked', ['checkbox-checked', 'checkbox-disabled-checked']],
+        ];
     }
 
     public function getHtmlShakespearTestData()
     {
-        return array(
-            array('*', 246),
-            array('div:contains(CELIA)', 26),
-            array('div:only-child', 22), // ?
-            array('div:nth-child(even)', 106),
-            array('div:nth-child(2n)', 106),
-            array('div:nth-child(odd)', 137),
-            array('div:nth-child(2n+1)', 137),
-            array('div:nth-child(n)', 243),
-            array('div:last-child', 53),
-            array('div:first-child', 51),
-            array('div > div', 242),
-            array('div + div', 190),
-            array('div ~ div', 190),
-            array('body', 1),
-            array('body div', 243),
-            array('div', 243),
-            array('div div', 242),
-            array('div div div', 241),
-            array('div, div, div', 243),
-            array('div, a, span', 243),
-            array('.dialog', 51),
-            array('div.dialog', 51),
-            array('div .dialog', 51),
-            array('div.character, div.dialog', 99),
-            array('div.direction.dialog', 0),
-            array('div.dialog.direction', 0),
-            array('div.dialog.scene', 1),
-            array('div.scene.scene', 1),
-            array('div.scene .scene', 0),
-            array('div.direction .dialog ', 0),
-            array('div .dialog .direction', 4),
-            array('div.dialog .dialog .direction', 4),
-            array('#speech5', 1),
-            array('div#speech5', 1),
-            array('div #speech5', 1),
-            array('div.scene div.dialog', 49),
-            array('div#scene1 div.dialog div', 142),
-            array('#scene1 #speech1', 1),
-            array('div[class]', 103),
-            array('div[class=dialog]', 50),
-            array('div[class^=dia]', 51),
-            array('div[class$=log]', 50),
-            array('div[class*=sce]', 1),
-            array('div[class|=dialog]', 50), // ? Seems right
-            array('div[class!=madeup]', 243), // ? Seems right
-            array('div[class~=dialog]', 51), // ? Seems right
-        );
+        return [
+            ['*', 246],
+            ['div:contains(CELIA)', 26],
+            ['div:only-child', 22], // ?
+            ['div:nth-child(even)', 106],
+            ['div:nth-child(2n)', 106],
+            ['div:nth-child(odd)', 137],
+            ['div:nth-child(2n+1)', 137],
+            ['div:nth-child(n)', 243],
+            ['div:last-child', 53],
+            ['div:first-child', 51],
+            ['div > div', 242],
+            ['div + div', 190],
+            ['div ~ div', 190],
+            ['body', 1],
+            ['body div', 243],
+            ['div', 243],
+            ['div div', 242],
+            ['div div div', 241],
+            ['div, div, div', 243],
+            ['div, a, span', 243],
+            ['.dialog', 51],
+            ['div.dialog', 51],
+            ['div .dialog', 51],
+            ['div.character, div.dialog', 99],
+            ['div.direction.dialog', 0],
+            ['div.dialog.direction', 0],
+            ['div.dialog.scene', 1],
+            ['div.scene.scene', 1],
+            ['div.scene .scene', 0],
+            ['div.direction .dialog ', 0],
+            ['div .dialog .direction', 4],
+            ['div.dialog .dialog .direction', 4],
+            ['#speech5', 1],
+            ['div#speech5', 1],
+            ['div #speech5', 1],
+            ['div.scene div.dialog', 49],
+            ['div#scene1 div.dialog div', 142],
+            ['#scene1 #speech1', 1],
+            ['div[class]', 103],
+            ['div[class=dialog]', 50],
+            ['div[class^=dia]', 51],
+            ['div[class$=log]', 50],
+            ['div[class*=sce]', 1],
+            ['div[class|=dialog]', 50], // ? Seems right
+            ['div[class!=madeup]', 243], // ? Seems right
+            ['div[class~=dialog]', 51], // ? Seems right
+        ];
     }
 }

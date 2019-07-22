@@ -13,16 +13,16 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\Processor;
 
 class FinalizationTest extends TestCase
 {
     public function testUnsetKeyWithDeepHierarchy()
     {
-        $tb = new TreeBuilder();
+        $tb = new TreeBuilder('config', 'array');
         $tree = $tb
-            ->root('config', 'array')
+            ->getRootNode()
                 ->children()
                     ->node('level1', 'array')
                         ->canBeUnset()
@@ -42,27 +42,27 @@ class FinalizationTest extends TestCase
             ->buildTree()
         ;
 
-        $a = array(
-            'level1' => array(
-                'level2' => array(
+        $a = [
+            'level1' => [
+                'level2' => [
                     'somevalue' => 'foo',
                     'anothervalue' => 'bar',
-                ),
+                ],
                 'level1_scalar' => 'foo',
-            ),
-        );
+            ],
+        ];
 
-        $b = array(
-            'level1' => array(
+        $b = [
+            'level1' => [
                 'level2' => false,
-            ),
-        );
+            ],
+        ];
 
-        $this->assertEquals(array(
-            'level1' => array(
+        $this->assertEquals([
+            'level1' => [
                 'level1_scalar' => 'foo',
-            ),
-        ), $this->process($tree, array($a, $b)));
+            ],
+        ], $this->process($tree, [$a, $b]));
     }
 
     protected function process(NodeInterface $tree, array $configs)

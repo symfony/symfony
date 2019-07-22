@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.40",
+    "Version": "2.1.48.42",
     "Names": {
         "aa": "afar",
         "ab": "abcaso",
@@ -30,7 +30,7 @@
         "aro": "araona",
         "arp": "arapaho",
         "arq": "arabo algerino",
-        "ars": "arabo, najd",
+        "ars": "arabo najd",
         "arw": "aruaco",
         "ary": "arabo marocchino",
         "arz": "arabo egiziano",
@@ -88,6 +88,7 @@
         "car": "caribico",
         "cay": "cayuga",
         "cch": "atsam",
+        "ccp": "chakma",
         "ce": "ceceno",
         "ceb": "cebuano",
         "cgg": "chiga",
@@ -297,7 +298,7 @@
         "kut": "kutenai",
         "kv": "komi",
         "kw": "cornico",
-        "ky": "chirghiso",
+        "ky": "kirghiso",
         "la": "latino",
         "lad": "giudeo-spagnolo",
         "lag": "langi",
@@ -363,7 +364,6 @@
         "ms": "malese",
         "mt": "maltese",
         "mua": "mundang",
-        "mul": "multilingua",
         "mus": "creek",
         "mwl": "mirandese",
         "mwr": "marwari",
@@ -409,7 +409,7 @@
         "oc": "occitano",
         "oj": "ojibwa",
         "om": "oromo",
-        "or": "oriya",
+        "or": "odia",
         "os": "ossetico",
         "osa": "osage",
         "ota": "turco ottomano",
@@ -450,7 +450,6 @@
         "ro_MD": "moldavo",
         "rof": "rombo",
         "rom": "romani",
-        "root": "root",
         "rtm": "rotumano",
         "ru": "russo",
         "rue": "ruteno",
@@ -565,7 +564,6 @@
         "uga": "ugaritico",
         "uk": "ucraino",
         "umb": "mbundu",
-        "und": "lingua imprecisata",
         "ur": "urdu",
         "uz": "uzbeco",
         "vai": "vai",
@@ -609,7 +607,6 @@
         "zh_Hant": "cinese tradizionale",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "nessun contenuto linguistico",
         "zza": "zaza"
     }
 }

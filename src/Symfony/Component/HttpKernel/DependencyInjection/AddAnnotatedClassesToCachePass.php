@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Composer\Autoload\ClassLoader;
-use Symfony\Component\Debug\DebugClassLoader;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -55,11 +55,11 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
      * @param array $patterns The class patterns to expand
      * @param array $classes  The existing classes to match against the patterns
      *
-     * @return array A list of classes derivated from the patterns
+     * @return array A list of classes derived from the patterns
      */
     private function expandClasses(array $patterns, array $classes)
     {
-        $expanded = array();
+        $expanded = [];
 
         // Explicit classes declared in the patterns are returned directly
         foreach ($patterns as $key => $pattern) {
@@ -85,10 +85,10 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
     private function getClassesInComposerClassMaps()
     {
-        $classes = array();
+        $classes = [];
 
         foreach (spl_autoload_functions() as $function) {
-            if (!is_array($function)) {
+            if (!\is_array($function)) {
                 continue;
             }
 
@@ -96,7 +96,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
                 $function = $function[0]->getClassLoader();
             }
 
-            if (is_array($function) && $function[0] instanceof ClassLoader) {
+            if (\is_array($function) && $function[0] instanceof ClassLoader) {
                 $classes += array_filter($function[0]->getClassMap());
             }
         }
@@ -106,14 +106,14 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
     private function patternsToRegexps($patterns)
     {
-        $regexps = array();
+        $regexps = [];
 
         foreach ($patterns as $pattern) {
             // Escape user input
             $regex = preg_quote(ltrim($pattern, '\\'));
 
             // Wildcards * and **
-            $regex = strtr($regex, array('\\*\\*' => '.*?', '\\*' => '[^\\\\]*?'));
+            $regex = strtr($regex, ['\\*\\*' => '.*?', '\\*' => '[^\\\\]*?']);
 
             // If this class does not end by a slash, anchor the end
             if ('\\' !== substr($regex, -1)) {

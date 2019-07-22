@@ -12,8 +12,8 @@
 namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\Loader\IniFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Loader\IniFileLoader;
 
 class IniFileLoaderTest extends TestCase
 {
@@ -23,9 +23,9 @@ class IniFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/resources.ini';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(array('foo' => 'bar'), $catalogue->all('domain1'));
+        $this->assertEquals(['foo' => 'bar'], $catalogue->all('domain1'));
         $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     public function testLoadDoesNothingIfEmpty()
@@ -34,9 +34,9 @@ class IniFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/empty.ini';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(array(), $catalogue->all('domain1'));
+        $this->assertEquals([], $catalogue->all('domain1'));
         $this->assertEquals('en', $catalogue->getLocale());
-        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
     /**

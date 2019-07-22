@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Process\Pipes;
 
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\Process;
 
 /**
  * WindowsPipes implementation uses temporary files as handles.
@@ -26,12 +26,13 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 class WindowsPipes extends AbstractPipes
 {
-    private $files = array();
-    private $fileHandles = array();
-    private $readBytes = array(
+    private $files = [];
+    private $fileHandles = [];
+    private $lockHandles = [];
+    private $readBytes = [
         Process::STDOUT => 0,
         Process::STDERR => 0,
-    );
+    ];
     private $haveReadSupport;
 
     public function __construct($input, bool $haveReadSupport)
@@ -43,35 +44,37 @@ class WindowsPipes extends AbstractPipes
             // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
             //
             // @see https://bugs.php.net/bug.php?id=51800
-            $pipes = array(
+            $pipes = [
                 Process::STDOUT => Process::OUT,
                 Process::STDERR => Process::ERR,
-            );
-            $tmpCheck = false;
+            ];
             $tmpDir = sys_get_temp_dir();
             $lastError = 'unknown reason';
             set_error_handler(function ($type, $msg) use (&$lastError) { $lastError = $msg; });
             for ($i = 0;; ++$i) {
                 foreach ($pipes as $pipe => $name) {
                     $file = sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
-                    if (file_exists($file) && !unlink($file)) {
-                        continue 2;
-                    }
-                    $h = fopen($file, 'xb');
-                    if (!$h) {
-                        $error = $lastError;
-                        if ($tmpCheck || $tmpCheck = unlink(tempnam(false, 'sf_check_'))) {
-                            continue;
-                        }
+
+                    if (!$h = fopen($file.'.lock', 'w')) {
                         restore_error_handler();
-                        throw new RuntimeException(sprintf('A temporary file could not be opened to write the process output: %s', $error));
+                        throw new RuntimeException(sprintf('A temporary file could not be opened to write the process output: %s', $lastError));
                     }
-                    if (!$h || !$this->fileHandles[$pipe] = fopen($file, 'rb')) {
+                    if (!flock($h, LOCK_EX | LOCK_NB)) {
                         continue 2;
                     }
-                    if (isset($this->files[$pipe])) {
-                        unlink($this->files[$pipe]);
+                    if (isset($this->lockHandles[$pipe])) {
+                        flock($this->lockHandles[$pipe], LOCK_UN);
+                        fclose($this->lockHandles[$pipe]);
                     }
+                    $this->lockHandles[$pipe] = $h;
+
+                    if (!fclose(fopen($file, 'w')) || !$h = fopen($file, 'r')) {
+                        flock($this->lockHandles[$pipe], LOCK_UN);
+                        fclose($this->lockHandles[$pipe]);
+                        unset($this->lockHandles[$pipe]);
+                        continue 2;
+                    }
+                    $this->fileHandles[$pipe] = $h;
                     $this->files[$pipe] = $file;
                 }
                 break;
@@ -85,7 +88,6 @@ class WindowsPipes extends AbstractPipes
     public function __destruct()
     {
         $this->close();
-        $this->removeFiles();
     }
 
     /**
@@ -96,21 +98,21 @@ class WindowsPipes extends AbstractPipes
         if (!$this->haveReadSupport) {
             $nullstream = fopen('NUL', 'c');
 
-            return array(
-                array('pipe', 'r'),
+            return [
+                ['pipe', 'r'],
                 $nullstream,
                 $nullstream,
-            );
+            ];
         }
 
         // We're not using pipe on Windows platform as it hangs (https://bugs.php.net/bug.php?id=51800)
         // We're not using file handles as it can produce corrupted output https://bugs.php.net/bug.php?id=65650
         // So we redirect output within the commandline and pass the nul device to the process
-        return array(
-            array('pipe', 'r'),
-            array('file', 'NUL', 'w'),
-            array('file', 'NUL', 'w'),
-        );
+        return [
+            ['pipe', 'r'],
+            ['file', 'NUL', 'w'],
+            ['file', 'NUL', 'w'],
+        ];
     }
 
     /**
@@ -124,11 +126,11 @@ class WindowsPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function readAndWrite($blocking, $close = false)
+    public function readAndWrite(bool $blocking, bool $close = false)
     {
         $this->unblock();
         $w = $this->write();
-        $read = $r = $e = array();
+        $read = $r = $e = [];
 
         if ($blocking) {
             if ($w) {
@@ -141,12 +143,15 @@ class WindowsPipes extends AbstractPipes
             $data = stream_get_contents($fileHandle, -1, $this->readBytes[$type]);
 
             if (isset($data[0])) {
-                $this->readBytes[$type] += strlen($data);
+                $this->readBytes[$type] += \strlen($data);
                 $read[$type] = $data;
             }
             if ($close) {
+                ftruncate($fileHandle, 0);
                 fclose($fileHandle);
-                unset($this->fileHandles[$type]);
+                flock($this->lockHandles[$type], LOCK_UN);
+                fclose($this->lockHandles[$type]);
+                unset($this->fileHandles[$type], $this->lockHandles[$type]);
             }
         }
 
@@ -175,22 +180,12 @@ class WindowsPipes extends AbstractPipes
     public function close()
     {
         parent::close();
-        foreach ($this->fileHandles as $handle) {
+        foreach ($this->fileHandles as $type => $handle) {
+            ftruncate($handle, 0);
             fclose($handle);
+            flock($this->lockHandles[$type], LOCK_UN);
+            fclose($this->lockHandles[$type]);
         }
-        $this->fileHandles = array();
-    }
-
-    /**
-     * Removes temporary files.
-     */
-    private function removeFiles()
-    {
-        foreach ($this->files as $filename) {
-            if (file_exists($filename)) {
-                @unlink($filename);
-            }
-        }
-        $this->files = array();
+        $this->fileHandles = $this->lockHandles = [];
     }
 }

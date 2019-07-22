@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Added PHPUnit constraints: `BrowserCookieValueSame` and `BrowserHasCookie`
+ * Added `HttpBrowser`, an implementation of a browser with the HttpClient component
+ * Renamed `Client` to `AbstractBrowser`
+ * Marked `Response` final.
+ * Deprecated `Response::buildHeader()`
+ * Deprecated `Response::getStatus()`, use `Response::getStatusCode()` instead
+
+4.2.0
+-----
+
+ * The method `Client::submit()` will have a new `$serverParameters` argument 
+   in version 5.0, not defining it is deprecated
+ * Added ability to read the "samesite" attribute of cookies using `Cookie::getSameSite()`
+
 3.4.0
 -----
 

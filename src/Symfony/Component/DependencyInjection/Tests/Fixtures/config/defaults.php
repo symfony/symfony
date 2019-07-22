@@ -12,10 +12,10 @@ return function (ContainerConfigurator $c) {
         ->private()
         ->autoconfigure()
         ->autowire()
-        ->tag('t', array('a' => 'b'))
+        ->tag('t', ['a' => 'b'])
         ->bind(Foo::class, ref('bar'))
         ->private();
 
-    $s->set(Foo::class)->args(array(ref('bar')))->public();
+    $s->set(Foo::class)->args([ref('bar')])->public();
     $s->set('bar', Foo::class)->call('setFoo')->autoconfigure(false);
 };

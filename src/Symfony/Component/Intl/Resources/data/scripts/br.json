@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.86",
     "Names": {
         "Adlm": "adlam",
         "Arab": "arabek",
@@ -33,6 +33,7 @@
         "Hira": "hiragana",
         "Hluw": "hieroglifoù Anatolia",
         "Hrkt": "silabennaouegoù japanek",
+        "Hung": "henhungarek",
         "Ital": "henitalek",
         "Jamo": "jamo",
         "Java": "javanek",
@@ -44,13 +45,19 @@
         "Laoo": "laosek",
         "Latg": "latin gouezelek",
         "Latn": "latin",
+        "Lyci": "likiek",
+        "Lydi": "lidiek",
+        "Mani": "manikeek",
         "Maya": "hieroglifoù mayaek",
         "Mlym": "malayalam",
         "Mong": "mongolek",
         "Mymr": "myanmar",
+        "Narb": "henarabek an Norzh",
         "Ogam": "ogam",
         "Orya": "oriya",
         "Runr": "runek",
+        "Samr": "samaritek",
+        "Sarb": "henarabek ar Su",
         "Sinh": "singhalek",
         "Sund": "sundanek",
         "Syrc": "siriek",
@@ -66,11 +73,11 @@
         "Ugar": "ougaritek",
         "Vaii": "vai",
         "Xpeo": "persek kozh",
+        "Xsux": "gennheñvel",
         "Zmth": "notadur jedoniel",
         "Zsye": "fromlunioù",
         "Zsym": "arouezioù",
         "Zxxx": "anskrivet",
-        "Zyyy": "boutin",
-        "Zzzz": "skritur dianav"
+        "Zyyy": "boutin"
     }
 }

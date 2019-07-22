@@ -1,13 +1,22 @@
 {
-    "Version": "2.1.38.69",
+    "Version": "2.1.48.45",
     "Names": {
         "BJ": "Binin",
         "BM": "Bemuda",
-        "CN": "Chaina",
+        "BR": "Mba Brazil",
+        "CN": "Mba China",
+        "DE": "Mba Germany",
+        "FR": "Mba France",
+        "GB": "Mba United Kingdom",
         "HT": "Hati",
+        "IN": "Mba India",
+        "IT": "Mba Italy",
+        "JP": "Mba Japan",
         "KM": "Comorosu",
         "LY": "Libyia",
         "MV": "Maldivesa",
-        "NG": "Naịjịrịa"
+        "NG": "Naịjịrịa",
+        "RU": "Mba Russia",
+        "US": "Mba United States"
     }
 }

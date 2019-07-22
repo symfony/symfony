@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Validates that a value is a valid IP address.
@@ -46,7 +47,7 @@ class Ip extends Constraint
 
     const INVALID_IP_ERROR = 'b1b427ae-9f6f-41b0-aa9b-84511fbb3c5b';
 
-    protected static $versions = array(
+    protected static $versions = [
         self::V4,
         self::V6,
         self::ALL,
@@ -62,15 +63,17 @@ class Ip extends Constraint
         self::V4_ONLY_PUBLIC,
         self::V6_ONLY_PUBLIC,
         self::ALL_ONLY_PUBLIC,
-    );
+    ];
 
-    protected static $errorNames = array(
+    protected static $errorNames = [
         self::INVALID_IP_ERROR => 'INVALID_IP_ERROR',
-    );
+    ];
 
     public $version = self::V4;
 
     public $message = 'This is not a valid IP address.';
+
+    public $normalizer;
 
     /**
      * {@inheritdoc}
@@ -79,8 +82,12 @@ class Ip extends Constraint
     {
         parent::__construct($options);
 
-        if (!in_array($this->version, self::$versions)) {
+        if (!\in_array($this->version, self::$versions)) {
             throw new ConstraintDefinitionException(sprintf('The option "version" must be one of "%s"', implode('", "', self::$versions)));
+        }
+
+        if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
+            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', \is_object($this->normalizer) ? \get_class($this->normalizer) : \gettype($this->normalizer)));
         }
     }
 }

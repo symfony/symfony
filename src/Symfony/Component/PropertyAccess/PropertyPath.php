@@ -32,7 +32,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @var array
      */
-    private $elements = array();
+    private $elements = [];
 
     /**
      * The number of elements in the property path.
@@ -47,7 +47,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @var array
      */
-    private $isIndex = array();
+    private $isIndex = [];
 
     /**
      * String representation of the path.
@@ -76,13 +76,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             return;
         }
-        if (!is_string($propertyPath)) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path constructor needs a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPath". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
+        if (!\is_string($propertyPath)) {
+            throw new InvalidArgumentException(sprintf('The property path constructor needs a string or an instance of "Symfony\Component\PropertyAccess\PropertyPath". Got: "%s"', \is_object($propertyPath) ? \get_class($propertyPath) : \gettype($propertyPath)));
         }
 
         if ('' === $propertyPath) {
@@ -107,21 +102,16 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             $this->elements[] = $element;
 
-            $position += strlen($matches[1]);
+            $position += \strlen($matches[1]);
             $remaining = $matches[4];
             $pattern = '/^(\.([^\.|\[]++)|\[([^\]]++)\])(.*)/';
         }
 
         if ('' !== $remaining) {
-            throw new InvalidPropertyPathException(sprintf(
-                'Could not parse property path "%s". Unexpected token "%s" at position %d',
-                $propertyPath,
-                $remaining[0],
-                $position
-            ));
+            throw new InvalidPropertyPathException(sprintf('Could not parse property path "%s". Unexpected token "%s" at position %d', $propertyPath, $remaining[0], $position));
         }
 
-        $this->length = count($this->elements);
+        $this->length = \count($this->elements);
     }
 
     /**
@@ -180,7 +170,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getElement($index)
+    public function getElement(int $index)
     {
         if (!isset($this->elements[$index])) {
             throw new OutOfBoundsException(sprintf('The index %s is not within the property path', $index));
@@ -192,7 +182,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function isProperty($index)
+    public function isProperty(int $index)
     {
         if (!isset($this->isIndex[$index])) {
             throw new OutOfBoundsException(sprintf('The index %s is not within the property path', $index));
@@ -204,7 +194,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function isIndex($index)
+    public function isIndex(int $index)
     {
         if (!isset($this->isIndex[$index])) {
             throw new OutOfBoundsException(sprintf('The index %s is not within the property path', $index));

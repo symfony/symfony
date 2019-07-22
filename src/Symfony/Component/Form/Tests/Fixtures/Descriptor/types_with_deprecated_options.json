@@ -1,0 +1,6 @@
+{
+    "builtin_form_types": [],
+    "service_form_types": [
+        "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\FooType"
+    ]
+}

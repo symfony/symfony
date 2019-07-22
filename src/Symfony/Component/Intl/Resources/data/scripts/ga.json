@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.49.82",
     "Names": {
         "Adlm": "Adlm",
         "Aghb": "Albánach Cugasach",
@@ -156,7 +156,6 @@
         "Zsye": "Emoji",
         "Zsym": "Siombailí",
         "Zxxx": "Gan Scríobh",
-        "Zyyy": "Coitianta",
-        "Zzzz": "Script Anaithnid"
+        "Zyyy": "Coitianta"
     }
 }

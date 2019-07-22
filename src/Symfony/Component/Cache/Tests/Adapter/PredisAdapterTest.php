@@ -19,35 +19,29 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
     public static function setupBeforeClass()
     {
         parent::setupBeforeClass();
-        self::$redis = new \Predis\Client(array('host' => getenv('REDIS_HOST')));
+        self::$redis = new \Predis\Client(['host' => getenv('REDIS_HOST')]);
     }
 
     public function testCreateConnection()
     {
         $redisHost = getenv('REDIS_HOST');
 
-        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/1', array('class' => \Predis\Client::class, 'timeout' => 3));
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/1', ['class' => \Predis\Client::class, 'timeout' => 3]);
         $this->assertInstanceOf(\Predis\Client::class, $redis);
 
         $connection = $redis->getConnection();
         $this->assertInstanceOf(StreamConnection::class, $connection);
 
-        $params = array(
+        $params = [
             'scheme' => 'tcp',
-            'host' => $redisHost,
-            'path' => '',
-            'dbindex' => '1',
+            'host' => 'localhost',
             'port' => 6379,
-            'class' => 'Predis\Client',
-            'timeout' => 3,
             'persistent' => 0,
-            'persistent_id' => null,
-            'read_timeout' => 0,
-            'retry_interval' => 0,
-            'lazy' => false,
+            'timeout' => 3,
+            'read_write_timeout' => 0,
+            'tcp_nodelay' => true,
             'database' => '1',
-            'password' => null,
-        );
+        ];
         $this->assertSame($params, $connection->getParameters()->toArray());
     }
 }

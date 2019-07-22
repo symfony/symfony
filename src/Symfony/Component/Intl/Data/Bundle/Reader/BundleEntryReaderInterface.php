@@ -35,7 +35,7 @@ interface BundleEntryReaderInterface extends BundleReaderInterface
      *
      * Then the value can be read by calling:
      *
-     *     $reader->readEntry('...', 'en', array('TopLevel', 'NestedLevel', 'Entry'));
+     *     $reader->readEntry('...', 'en', ['TopLevel', 'NestedLevel', 'Entry']);
      *
      * @param string   $path     The path to the resource bundle
      * @param string   $locale   The locale to read

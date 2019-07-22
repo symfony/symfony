@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.48.42",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -356,7 +356,6 @@
         "ms": "malayisk",
         "mt": "maltesisk",
         "mua": "mundang",
-        "mul": "flere språk",
         "mus": "creek",
         "mwl": "mirandesisk",
         "mwr": "marwari",
@@ -442,7 +441,6 @@
         "ro_MD": "moldovsk",
         "rof": "rombo",
         "rom": "romani",
-        "root": "rot",
         "rtm": "rotumansk",
         "ru": "russisk",
         "rue": "rusinsk",
@@ -557,7 +555,6 @@
         "uga": "ugaritisk",
         "uk": "ukrainsk",
         "umb": "umbundu",
-        "und": "ukjent språk",
         "ur": "urdu",
         "uz": "usbekisk",
         "vai": "vai",
@@ -602,7 +599,6 @@
         "zh_Hant": "tradisjonell kinesisk",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "uten språklig innhold",
         "zza": "zazaisk"
     }
 }

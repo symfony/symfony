@@ -57,7 +57,7 @@ interface ResolvedFormTypeInterface
      *
      * @return FormBuilderInterface The created form builder
      */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = array());
+    public function createBuilder(FormFactoryInterface $factory, $name, array $options = []);
 
     /**
      * Creates a new form view for a form of this type.

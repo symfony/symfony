@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -28,7 +28,7 @@ class RuntimeLoaderPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('twig.runtime_loader');
-        $mapping = array();
+        $mapping = [];
         foreach ($container->findTaggedServiceIds('twig.runtime', true) as $id => $attributes) {
             $def = $container->getDefinition($id);
             $mapping[$def->getClass()] = new Reference($id);

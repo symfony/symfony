@@ -15,8 +15,8 @@ use PHPUnit\Framework\BaseTestListener;
 use PHPUnit\Framework\Test;
 
 /**
- * CoverageListener adds `@covers <className>` on each test suite when possible
- * to make the code coverage more accurate.
+ * CoverageListener adds `@covers <className>` on each test when possible to
+ * make the code coverage more accurate.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *

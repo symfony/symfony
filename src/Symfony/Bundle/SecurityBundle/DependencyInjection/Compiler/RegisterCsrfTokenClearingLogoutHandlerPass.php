@@ -37,6 +37,6 @@ class RegisterCsrfTokenClearingLogoutHandlerPass implements CompilerPassInterfac
             ->addArgument(new Reference('security.csrf.token_storage'))
             ->setPublic(false);
 
-        $container->findDefinition('security.logout_listener')->addMethodCall('addHandler', array(new Reference('security.logout.handler.csrf_token_clearing')));
+        $container->findDefinition('security.logout_listener')->addMethodCall('addHandler', [new Reference('security.logout.handler.csrf_token_clearing')]);
     }
 }

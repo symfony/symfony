@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.69",
+    "Version": "2.1.48.4",
     "Names": {
         "Arab": "arába",
         "Cyrl": "kyrillalaš",
@@ -11,7 +11,6 @@
         "Hira": "hiragana",
         "Kana": "katakana",
         "Latn": "láhtenaš",
-        "Zxxx": "orrut chállojuvvot",
-        "Zzzz": "dovdameahttun chállin"
+        "Zxxx": "orrut chállojuvvot"
     }
 }

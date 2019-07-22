@@ -1,4 +1,3 @@
-
 Symfony\Component\Form\Tests\Console\Descriptor\FooType (empty_data)
 ====================================================================
 
@@ -8,15 +7,13 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (empty_data)
   Default          Value: null          %s 
                                         %s 
                    Closure(s): [        %s 
-                     Closure {          %s 
-                       parameters: 1    %s 
-                       file: "%s%eExtension%eCore%eType%eFormType.php"                     
-                       line: "%s to %s" %s 
+                     Closure%s{%A
+                       file: "%s%eExtension%eCore%eType%eFormType.php"%w
+                       line: %s 
                      },                 %s 
-                     Closure {          %s 
-                       parameters: 2    %s 
-                       file: "%s%eTests%eConsole%eDescriptor%eAbstractDescriptorTest.php"  
-                       line: "%s to %s" %s 
+                     Closure%s{%A
+                       file: "%s%eTests%eConsole%eDescriptor%eAbstractDescriptorTest.php"%w
+                       line: %s 
                      }                  %s 
                    ]                    %s 
  ---------------- ----------------------%s 
@@ -24,6 +21,6 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (empty_data)
  ---------------- ----------------------%s 
   Allowed values   -                    %s 
  ---------------- ----------------------%s 
-  Normalizer       -                    %s 
+  Normalizers      -                    %s
  ---------------- ----------------------%s 
 

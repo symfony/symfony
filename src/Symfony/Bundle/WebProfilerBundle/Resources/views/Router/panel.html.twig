@@ -5,13 +5,6 @@
         <span class="value">{{ request.route ?: '(none)' }}</span>
         <span class="label">Matched route</span>
     </div>
-
-    {% if request.route %}
-        <div class="metric">
-            <span class="value">{{ traces|length }}</span>
-            <span class="label">Tested routes before match</span>
-        </div>
-    {% endif %}
 </div>
 
 {% if request.route %}

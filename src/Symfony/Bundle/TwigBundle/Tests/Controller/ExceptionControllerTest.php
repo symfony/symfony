@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
-use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Bundle\TwigBundle\Tests\TestCase;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -22,11 +22,11 @@ class ExceptionControllerTest extends TestCase
 {
     public function testShowActionCanBeForcedToShowErrorPage()
     {
-        $twig = $this->createTwigEnv(array('@Twig/Exception/error404.html.twig' => '<html>not found</html>'));
+        $twig = $this->createTwigEnv(['@Twig/Exception/error404.html.twig' => '<html>not found</html>']);
 
         $request = $this->createRequest('html');
         $request->attributes->set('showException', false);
-        $exception = FlattenException::create(new \Exception(), 404);
+        $exception = FlattenException::createFromThrowable(new \Exception(), 404);
         $controller = new ExceptionController($twig, /* "showException" defaults to --> */ true);
 
         $response = $controller->showAction($request, $exception, null);
@@ -37,10 +37,10 @@ class ExceptionControllerTest extends TestCase
 
     public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
     {
-        $twig = $this->createTwigEnv(array('@Twig/Exception/error.html.twig' => '<html></html>'));
+        $twig = $this->createTwigEnv(['@Twig/Exception/error.html.twig' => '<html></html>']);
 
         $request = $this->createRequest('txt');
-        $exception = FlattenException::create(new \Exception());
+        $exception = FlattenException::createFromThrowable(new \Exception());
         $controller = new ExceptionController($twig, false);
 
         $controller->showAction($request, $exception);
@@ -50,11 +50,11 @@ class ExceptionControllerTest extends TestCase
 
     public function testFallbackToHtmlWithFullExceptionIfNoTemplateForRequestedFormatAndExceptionsShouldBeShown()
     {
-        $twig = $this->createTwigEnv(array('@Twig/Exception/exception_full.html.twig' => '<html></html>'));
+        $twig = $this->createTwigEnv(['@Twig/Exception/exception_full.html.twig' => '<html></html>']);
 
         $request = $this->createRequest('txt');
         $request->attributes->set('showException', true);
-        $exception = FlattenException::create(new \Exception());
+        $exception = FlattenException::createFromThrowable(new \Exception());
         $controller = new ExceptionController($twig, false);
 
         $controller->showAction($request, $exception);
@@ -64,10 +64,10 @@ class ExceptionControllerTest extends TestCase
 
     public function testResponseHasRequestedMimeType()
     {
-        $twig = $this->createTwigEnv(array('@Twig/Exception/error.json.twig' => '{}'));
+        $twig = $this->createTwigEnv(['@Twig/Exception/error.json.twig' => '{}']);
 
         $request = $this->createRequest('json');
-        $exception = FlattenException::create(new \Exception());
+        $exception = FlattenException::createFromThrowable(new \Exception());
         $controller = new ExceptionController($twig, false);
 
         $response = $controller->showAction($request, $exception);

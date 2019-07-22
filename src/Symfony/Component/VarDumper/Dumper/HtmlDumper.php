@@ -23,6 +23,41 @@ class HtmlDumper extends CliDumper
 {
     public static $defaultOutput = 'php://output';
 
+    protected static $themes = [
+        'dark' => [
+            'default' => 'background-color:#18171B; color:#FF8400; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:99999; word-break: break-all',
+            'num' => 'font-weight:bold; color:#1299DA',
+            'const' => 'font-weight:bold',
+            'str' => 'font-weight:bold; color:#56DB3A',
+            'note' => 'color:#1299DA',
+            'ref' => 'color:#A0A0A0',
+            'public' => 'color:#FFFFFF',
+            'protected' => 'color:#FFFFFF',
+            'private' => 'color:#FFFFFF',
+            'meta' => 'color:#B729D9',
+            'key' => 'color:#56DB3A',
+            'index' => 'color:#1299DA',
+            'ellipsis' => 'color:#FF8400',
+            'ns' => 'user-select:none;',
+        ],
+        'light' => [
+            'default' => 'background:none; color:#CC7832; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:99999; word-break: break-all',
+            'num' => 'font-weight:bold; color:#1299DA',
+            'const' => 'font-weight:bold',
+            'str' => 'font-weight:bold; color:#629755;',
+            'note' => 'color:#6897BB',
+            'ref' => 'color:#6E6E6E',
+            'public' => 'color:#262626',
+            'protected' => 'color:#262626',
+            'private' => 'color:#262626',
+            'meta' => 'color:#B729D9',
+            'key' => 'color:#789339',
+            'index' => 'color:#1299DA',
+            'ellipsis' => 'color:#CC7832',
+            'ns' => 'user-select:none;',
+        ],
+    ];
+
     protected $dumpHeader;
     protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s">';
     protected $dumpSuffix = '</pre><script>Sfdump(%s)</script>';
@@ -30,28 +65,14 @@ class HtmlDumper extends CliDumper
     protected $colors = true;
     protected $headerIsDumped = false;
     protected $lastDepth = -1;
-    protected $styles = array(
-        'default' => 'background-color:#18171B; color:#FF8400; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:99999; word-break: break-all',
-        'num' => 'font-weight:bold; color:#1299DA',
-        'const' => 'font-weight:bold',
-        'str' => 'font-weight:bold; color:#56DB3A',
-        'note' => 'color:#1299DA',
-        'ref' => 'color:#A0A0A0',
-        'public' => 'color:#FFFFFF',
-        'protected' => 'color:#FFFFFF',
-        'private' => 'color:#FFFFFF',
-        'meta' => 'color:#B729D9',
-        'key' => 'color:#56DB3A',
-        'index' => 'color:#1299DA',
-        'ellipsis' => 'color:#FF8400',
-    );
+    protected $styles;
 
-    private $displayOptions = array(
+    private $displayOptions = [
         'maxDepth' => 1,
         'maxStringLength' => 160,
         'fileLinkFormat' => null,
-    );
-    private $extraDisplayOptions = array();
+    ];
+    private $extraDisplayOptions = [];
 
     /**
      * {@inheritdoc}
@@ -61,6 +82,7 @@ class HtmlDumper extends CliDumper
         AbstractDumper::__construct($output, $charset, $flags);
         $this->dumpId = 'sf-dump-'.mt_rand();
         $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->styles = static::$themes['dark'] ?? self::$themes['dark'];
     }
 
     /**
@@ -70,6 +92,15 @@ class HtmlDumper extends CliDumper
     {
         $this->headerIsDumped = false;
         $this->styles = $styles + $this->styles;
+    }
+
+    public function setTheme(string $themeName)
+    {
+        if (!isset(static::$themes[$themeName])) {
+            throw new \InvalidArgumentException(sprintf('Theme "%s" does not exist in class "%s".', $themeName, static::class));
+        }
+
+        $this->setStyles(static::$themes[$themeName]);
     }
 
     /**
@@ -108,7 +139,7 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function dump(Data $data, $output = null, array $extraDisplayOptions = array())
+    public function dump(Data $data, $output = null, array $extraDisplayOptions = [])
     {
         $this->extraDisplayOptions = $extraDisplayOptions;
         $result = parent::dump($data, $output);
@@ -283,13 +314,17 @@ return function (root, x) {
     }
 
     function a(e, f) {
-        addEventListener(root, e, function (e) {
+        addEventListener(root, e, function (e, n) {
             if ('A' == e.target.tagName) {
                 f(e.target, e);
             } else if ('A' == e.target.parentNode.tagName) {
                 f(e.target.parentNode, e);
-            } else if (e.target.nextElementSibling && 'A' == e.target.nextElementSibling.tagName) {
-                f(e.target.nextElementSibling, e, true);
+            } else if ((n = e.target.nextElementSibling) && 'A' == n.tagName) {
+                if (!/\bsf-dump-toggle\b/.test(n.className)) {
+                    n = n.nextElementSibling;
+                }
+
+                f(n, e, true);
             }
         });
     };
@@ -469,10 +504,18 @@ return function (root, x) {
 
         function showCurrent(state)
         {
-            var currentNode = state.current();
+            var currentNode = state.current(), currentRect, searchRect;
             if (currentNode) {
                 reveal(currentNode);
                 highlight(root, currentNode, state.nodes);
+                if ('scrollIntoView' in currentNode) {
+                    currentNode.scrollIntoView(true);
+                    currentRect = currentNode.getBoundingClientRect();
+                    searchRect = search.getBoundingClientRect();
+                    if (currentRect.top < (searchRect.top + searchRect.height)) {
+                        window.scrollBy(0, -(searchRect.top + searchRect.height + 5));
+                    }
+                }
             }
             counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' of ' + state.count();
         }
@@ -483,14 +526,10 @@ return function (root, x) {
             <input type="text" class="sf-dump-search-input">
             <span class="sf-dump-search-count">0 of 0<\/span>
             <button type="button" class="sf-dump-search-input-previous" tabindex="-1">
-                <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1683 1331l-166 165q-19 19-45 19t-45-19l-531-531-531 531q-19 19-45 19t-45-19l-166-165q-19-19-19-45.5t19-45.5l742-741q19-19 45-19t45 19l742 741q19 19 19 45.5t-19 45.5z"\/>
-                <\/svg>
+                <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1683 1331l-166 165q-19 19-45 19t-45-19L896 965l-531 531q-19 19-45 19t-45-19l-166-165q-19-19-19-45.5t19-45.5l742-741q19-19 45-19t45 19l742 741q19 19 19 45.5t-19 45.5z"\/><\/svg>
             <\/button>
             <button type="button" class="sf-dump-search-input-next" tabindex="-1">
-                <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1683 808l-742 741q-19 19-45 19t-45-19l-742-741q-19-19-19-45.5t19-45.5l166-165q19-19 45-19t45 19l531 531 531-531q19-19 45-19t45 19l166 165q19 19 19 45.5t-19 45.5z"\/>
-                <\/svg>
+                <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1683 808l-742 741q-19 19-45 19t-45-19L109 808q-19-19-19-45.5t19-45.5l166-165q19-19 45-19t45 19l531 531 531-531q19-19 45-19t45 19l166 165q19 19 19 45.5t-19 45.5z"\/><\/svg>
             <\/button>
         ';
         root.insertBefore(search, root.firstChild);
@@ -549,6 +588,15 @@ return function (root, x) {
             var isSearchActive = !/\bsf-dump-search-hidden\b/.test(search.className);
             if ((114 === e.keyCode && !isSearchActive) || (isCtrlKey(e) && 70 === e.keyCode)) {
                 /* F3 or CMD/CTRL + F */
+                if (70 === e.keyCode && document.activeElement === searchInput) {
+                   /*
+                    * If CMD/CTRL + F is hit while having focus on search input,
+                    * the user probably meant to trigger browser search instead.
+                    * Let the browser execute its behavior:
+                    */
+                    return;
+                }
+    
                 e.preventDefault();
                 search.className = search.className.replace(/\bsf-dump-search-hidden\b/, '');
                 searchInput.focus();
@@ -607,6 +655,7 @@ pre.sf-dump {
     display: block;
     white-space: pre;
     padding: 5px;
+    overflow: initial !important;
 }
 pre.sf-dump:after {
    content: "";
@@ -675,14 +724,16 @@ pre.sf-dump code {
     border-radius: 3px;
 }
 pre.sf-dump .sf-dump-search-hidden {
-    display: none;
+    display: none !important;
 }
 pre.sf-dump .sf-dump-search-wrapper {
-    float: right;
     font-size: 0;
     white-space: nowrap;
-    max-width: 100%;
-    text-align: right;
+    margin-bottom: 5px;
+    display: flex;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 5px;
 }
 pre.sf-dump .sf-dump-search-wrapper > * {
     vertical-align: top;
@@ -699,10 +750,11 @@ pre.sf-dump .sf-dump-search-wrapper > input.sf-dump-search-input {
     height: 21px;
     font-size: 12px;
     border-right: none;
-    width: 140px;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
     color: #000;
+    min-width: 15px;
+    width: 100%;
 }
 pre.sf-dump .sf-dump-search-wrapper > .sf-dump-search-input-next,
 pre.sf-dump .sf-dump-search-wrapper > .sf-dump-search-input-previous {
@@ -785,7 +837,7 @@ EOHTML
     /**
      * {@inheritdoc}
      */
-    protected function style($style, $value, $attr = array())
+    protected function style($style, $value, $attr = [])
     {
         if ('' === $value) {
             return '';
@@ -809,7 +861,13 @@ EOHTML
         } elseif ('str' === $style && 1 < $attr['length']) {
             $style .= sprintf(' title="%d%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
         } elseif ('note' === $style && false !== $c = strrpos($v, '\\')) {
-            return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $v, $style, substr($v, $c + 1));
+            if (isset($attr['file']) && $link = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
+                $link = sprintf('<a href="%s" rel="noopener noreferrer">^</a>', esc($this->utf8Encode($link)));
+            } else {
+                $link = '';
+            }
+
+            return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>%s', $v, $style, substr($v, $c + 1), $link);
         } elseif ('protected' === $style) {
             $style .= ' title="Protected property"';
         } elseif ('meta' === $style && isset($attr['title'])) {
@@ -826,10 +884,10 @@ EOHTML
             }
             $label = esc(substr($value, -$attr['ellipsis']));
             $style = str_replace(' title="', " title=\"$v\n", $style);
-            $v = sprintf('<span class=%s>%s</span>', $class, substr($v, 0, -strlen($label)));
+            $v = sprintf('<span class=%s>%s</span>', $class, substr($v, 0, -\strlen($label)));
 
             if (!empty($attr['ellipsis-tail'])) {
-                $tail = strlen(esc(substr($value, -$attr['ellipsis'], $attr['ellipsis-tail'])));
+                $tail = \strlen(esc(substr($value, -$attr['ellipsis'], $attr['ellipsis-tail'])));
                 $v .= sprintf('<span class=sf-dump-ellipsis>%s</span>%s', substr($label, 0, $tail), substr($label, $tail));
             } else {
                 $v .= $label;
@@ -837,10 +895,22 @@ EOHTML
         }
 
         $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
-            $s = '<span class=sf-dump-default>';
+            $s = $b = '<span class="sf-dump-default';
             $c = $c[$i = 0];
+            if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
+                $s .= ' sf-dump-ns';
+            }
+            $s .= '">';
             do {
-                $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', ord($c[$i]));
+                if (("\r" === $c[$i] || "\n" === $c[$i]) !== $ns) {
+                    $s .= '</span>'.$b;
+                    if ($ns = !$ns) {
+                        $s .= ' sf-dump-ns';
+                    }
+                    $s .= '">';
+                }
+
+                $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', \ord($c[$i]));
             } while (isset($c[++$i]));
 
             return $s.'</span>';
@@ -873,7 +943,7 @@ EOHTML
         }
 
         if (-1 === $depth) {
-            $args = array('"'.$this->dumpId.'"');
+            $args = ['"'.$this->dumpId.'"'];
             if ($this->extraDisplayOptions) {
                 $args[] = json_encode($this->extraDisplayOptions, JSON_FORCE_OBJECT);
             }
@@ -895,7 +965,7 @@ EOHTML
         $options = $this->extraDisplayOptions + $this->displayOptions;
 
         if ($fmt = $options['fileLinkFormat']) {
-            return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
+            return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);
         }
 
         return false;

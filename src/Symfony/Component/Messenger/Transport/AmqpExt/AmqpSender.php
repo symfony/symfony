@@ -12,8 +12,11 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\SenderInterface;
-use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
+use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * Symfony Messenger sender to send messages to AMQP brokers using PHP's AMQP extension.
@@ -22,22 +25,54 @@ use Symfony\Component\Messenger\Transport\Serialization\EncoderInterface;
  */
 class AmqpSender implements SenderInterface
 {
-    private $encoder;
+    private $serializer;
     private $connection;
 
-    public function __construct(EncoderInterface $encoder, Connection $connection)
+    public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
-        $this->encoder = $encoder;
         $this->connection = $connection;
+        $this->serializer = $serializer ?? new PhpSerializer();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function send(Envelope $envelope)
+    public function send(Envelope $envelope): Envelope
     {
-        $encodedMessage = $this->encoder->encode($envelope);
+        $encodedMessage = $this->serializer->encode($envelope);
 
-        $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
+        /** @var DelayStamp|null $delayStamp */
+        $delayStamp = $envelope->last(DelayStamp::class);
+        $delay = 0;
+        if (null !== $delayStamp) {
+            $delay = $delayStamp->getDelay();
+        }
+
+        $amqpStamp = $envelope->last(AmqpStamp::class);
+        if (isset($encodedMessage['headers']['Content-Type'])) {
+            $contentType = $encodedMessage['headers']['Content-Type'];
+            unset($encodedMessage['headers']['Content-Type']);
+
+            $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
+
+            if (!isset($attributes['content_type'])) {
+                $attributes['content_type'] = $contentType;
+
+                $amqpStamp = new AmqpStamp($amqpStamp ? $amqpStamp->getRoutingKey() : null, $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM, $attributes);
+            }
+        }
+
+        try {
+            $this->connection->publish(
+                $encodedMessage['body'],
+                $encodedMessage['headers'] ?? [],
+                $delay,
+                $amqpStamp
+            );
+        } catch (\AMQPException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        return $envelope;
     }
 }

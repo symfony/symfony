@@ -1,5 +1,5 @@
 <tr>
-    <?php $widgetAttr = empty($help) ? array() : array('attr' => array('aria-describedby' => $id.'_help')); ?>
+    <?php $widgetAttr = empty($help) ? [] : ['attr' => ['aria-describedby' => $id.'_help']]; ?>
     <td>
         <?php echo $view['form']->label($form); ?>
     </td>

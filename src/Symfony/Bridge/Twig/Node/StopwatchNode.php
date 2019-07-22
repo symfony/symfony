@@ -24,7 +24,7 @@ class StopwatchNode extends Node
 {
     public function __construct(Node $name, Node $body, AssignNameExpression $var, int $lineno = 0, string $tag = null)
     {
-        parent::__construct(array('body' => $body, 'name' => $name, 'var' => $var), array(), $lineno, $tag);
+        parent::__construct(['body' => $body, 'name' => $name, 'var' => $var], [], $lineno, $tag);
     }
 
     public function compile(Compiler $compiler)

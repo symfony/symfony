@@ -23,12 +23,13 @@ use Symfony\Component\Yaml\Parser;
 class YamlEncoder implements EncoderInterface, DecoderInterface
 {
     const FORMAT = 'yaml';
+    private const ALTERNATIVE_FORMAT = 'yml';
 
     private $dumper;
     private $parser;
-    private $defaultContext = array('yaml_inline' => 0, 'yaml_indent' => 0, 'yaml_flags' => 0);
+    private $defaultContext = ['yaml_inline' => 0, 'yaml_indent' => 0, 'yaml_flags' => 0];
 
-    public function __construct(Dumper $dumper = null, Parser $parser = null, array $defaultContext = array())
+    public function __construct(Dumper $dumper = null, Parser $parser = null, array $defaultContext = [])
     {
         if (!class_exists(Dumper::class)) {
             throw new RuntimeException('The YamlEncoder class requires the "Yaml" component. Install "symfony/yaml" to use it.');
@@ -42,7 +43,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, string $format, array $context = [])
     {
         $context = array_merge($this->defaultContext, $context);
 
@@ -52,15 +53,15 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format)
+    public function supportsEncoding(string $format)
     {
-        return self::FORMAT === $format;
+        return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = array())
+    public function decode(string $data, string $format, array $context = [])
     {
         $context = array_merge($this->defaultContext, $context);
 
@@ -70,8 +71,8 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format)
+    public function supportsDecoding(string $format)
     {
-        return self::FORMAT === $format;
+        return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }
 }

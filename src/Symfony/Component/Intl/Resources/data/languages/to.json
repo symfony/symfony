@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.39",
+    "Version": "2.1.47.82",
     "Names": {
         "aa": "lea fakaʻafāla",
         "ab": "lea fakaʻapakasia",
@@ -365,7 +365,6 @@
         "ms": "lea fakamalei",
         "mt": "lea fakamalita",
         "mua": "lea fakamunitangi",
-        "mul": "lea tuifio",
         "mus": "lea fakakileki",
         "mwl": "lea fakamilanitēsi",
         "mwr": "lea fakamaliwali",
@@ -453,7 +452,6 @@
         "ro_MD": "lea fakamolitāvia",
         "rof": "lea fakalomipō",
         "rom": "lea fakalomani",
-        "root": "lea fakaʻilonga-tefito",
         "rtm": "lea fakalotuma",
         "ru": "lea fakalūsia",
         "rue": "lea fakalusini",
@@ -568,7 +566,6 @@
         "uga": "lea fakaʻūkaliti",
         "uk": "lea fakaʻūkalaʻine",
         "umb": "lea fakaʻumipūnitu",
-        "und": "lea taʻeʻiloa",
         "ur": "lea fakaʻūtū",
         "uz": "lea fakaʻusipeki",
         "vai": "lea fakavai",
@@ -613,7 +610,6 @@
         "zh_Hant": "lea fakasiaina-tukufakaholo",
         "zu": "lea fakasulu",
         "zun": "lea fakasuni",
-        "zxx": "ʻikai ha lea",
         "zza": "lea fakasāsā"
     }
 }

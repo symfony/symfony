@@ -18,15 +18,17 @@ namespace Symfony\Component\Config\Resource;
  * The resource must be a fully-qualified class name.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
-class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializable
+class ClassExistenceResource implements SelfCheckingResourceInterface
 {
     private $resource;
     private $exists;
 
     private static $autoloadLevel = 0;
     private static $autoloadedClass;
-    private static $existsCache = array();
+    private static $existsCache = [];
 
     /**
      * @param string    $resource The fully-qualified class name
@@ -41,7 +43,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->resource;
     }
@@ -49,7 +51,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     /**
      * @return string The file path to the resource
      */
-    public function getResource()
+    public function getResource(): string
     {
         return $this->resource;
     }
@@ -59,7 +61,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
      *
      * @throws \ReflectionException when a parent class/interface/trait is not found
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp): bool
     {
         $loaded = class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
 
@@ -95,39 +97,33 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
-    public function serialize()
+    public function __sleep(): array
     {
         if (null === $this->exists) {
             $this->isFresh(0);
         }
 
-        return serialize(array($this->resource, $this->exists));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        list($this->resource, $this->exists) = unserialize($serialized);
+        return ['resource', 'exists'];
     }
 
     /**
      * @throws \ReflectionException When $class is not found and is required
+     *
+     * @internal
      */
-    private static function throwOnRequiredClass($class)
+    public static function throwOnRequiredClass($class)
     {
         if (self::$autoloadedClass === $class) {
             return;
         }
         $e = new \ReflectionException("Class $class not found");
         $trace = $e->getTrace();
-        $autoloadFrame = array(
+        $autoloadFrame = [
             'function' => 'spl_autoload_call',
-            'args' => array($class),
-        );
+            'args' => [$class],
+        ];
         $i = 1 + array_search($autoloadFrame, $trace, true);
 
         if (isset($trace[$i]['function']) && !isset($trace[$i]['class'])) {
@@ -149,11 +145,11 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
                     return;
             }
 
-            $props = array(
+            $props = [
                 'file' => $trace[$i]['file'],
                 'line' => $trace[$i]['line'],
-                'trace' => array_slice($trace, 1 + $i),
-            );
+                'trace' => \array_slice($trace, 1 + $i),
+            ];
 
             foreach ($props as $p => $v) {
                 $r = new \ReflectionProperty('Exception', $p);

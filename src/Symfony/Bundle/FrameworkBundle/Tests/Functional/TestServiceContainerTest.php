@@ -22,7 +22,7 @@ class TestServiceContainerTest extends WebTestCase
 {
     public function testThatPrivateServicesAreUnavailableIfTestConfigIsDisabled()
     {
-        static::bootKernel(array('test_case' => 'TestServiceContainer', 'root_config' => 'test_disabled.yml', 'environment' => 'test_disabled'));
+        static::bootKernel(['test_case' => 'TestServiceContainer', 'root_config' => 'test_disabled.yml', 'environment' => 'test_disabled']);
 
         $this->assertInstanceOf(ContainerInterface::class, static::$container);
         $this->assertNotInstanceOf(TestContainer::class, static::$container);
@@ -35,7 +35,7 @@ class TestServiceContainerTest extends WebTestCase
 
     public function testThatPrivateServicesAreAvailableIfTestConfigIsEnabled()
     {
-        static::bootKernel(array('test_case' => 'TestServiceContainer'));
+        static::bootKernel(['test_case' => 'TestServiceContainer']);
 
         $this->assertInstanceOf(TestContainer::class, static::$container);
         $this->assertTrue(static::$container->has(PublicService::class));

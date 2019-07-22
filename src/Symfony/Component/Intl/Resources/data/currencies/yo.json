@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.17",
     "Names": {
         "AED": [
             "AED",
@@ -20,6 +20,10 @@
         "BIF": [
             "BIF",
             "Faransi ti Orílẹ́ède Bùùrúndì"
+        ],
+        "BRL": [
+            "R$",
+            "Owó ti Orílẹ̀-èdè Brazil"
         ],
         "BWP": [
             "BWP",
@@ -67,11 +71,11 @@
         ],
         "EUR": [
             "€",
-            "Uro"
+            "owó Yúrò"
         ],
         "GBP": [
             "£",
-            "Pọọn ti Orílẹ́ède Bírítísì"
+            "Pọ́n-ùn ti Orilẹ̀-èdè Gẹ̀ẹ́sì"
         ],
         "GHC": [
             "GHC",
@@ -147,7 +151,11 @@
         ],
         "NGN": [
             "₦",
-            "Naira ti Orílẹ́ède Nàìjíríà"
+            "Náìrà ti Orílẹ̀-èdè Nàìjíríà"
+        ],
+        "RUB": [
+            "₽",
+            "Owó ruble ti ilẹ̀ Rọ́ṣíà"
         ],
         "RWF": [
             "RWF",
@@ -206,8 +214,8 @@
             "Siile ti Orílẹ́ède Uganda"
         ],
         "USD": [
-            "US$",
-            "Dọla ti Orílẹ́ède Amerika"
+            "$",
+            "Dọ́là"
         ],
         "XAF": [
             "FCFA",

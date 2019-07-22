@@ -18,7 +18,7 @@ class FormLoginTest extends WebTestCase
      */
     public function testFormLogin($config)
     {
-        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -37,7 +37,7 @@ class FormLoginTest extends WebTestCase
      */
     public function testFormLogout($config)
     {
-        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -70,7 +70,7 @@ class FormLoginTest extends WebTestCase
      */
     public function testFormLoginWithCustomTargetPath($config)
     {
-        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -90,7 +90,7 @@ class FormLoginTest extends WebTestCase
      */
     public function testFormLoginRedirectsToProtectedResourceAfterLogin($config)
     {
-        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config]);
 
         $client->request('GET', '/protected_resource');
         $this->assertRedirect($client->getResponse(), '/login');
@@ -108,9 +108,9 @@ class FormLoginTest extends WebTestCase
 
     public function getConfigs()
     {
-        return array(
-            array('config.yml'),
-            array('routes_as_path.yml'),
-        );
+        return [
+            ['config.yml'],
+            ['routes_as_path.yml'],
+        ];
     }
 }

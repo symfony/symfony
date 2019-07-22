@@ -38,11 +38,11 @@ abstract class IntlGlobals
     /**
      * All known error codes.
      */
-    private static $errorCodes = array(
+    private static $errorCodes = [
         self::U_ZERO_ERROR => 'U_ZERO_ERROR',
         self::U_ILLEGAL_ARGUMENT_ERROR => 'U_ILLEGAL_ARGUMENT_ERROR',
         self::U_PARSE_ERROR => 'U_PARSE_ERROR',
-    );
+    ];
 
     /**
      * The error code of the last operation.
@@ -100,11 +100,7 @@ abstract class IntlGlobals
      */
     public static function getErrorName($code)
     {
-        if (isset(self::$errorCodes[$code])) {
-            return self::$errorCodes[$code];
-        }
-
-        return '[BOGUS UErrorCode]';
+        return self::$errorCodes[$code] ?? '[BOGUS UErrorCode]';
     }
 
     /**

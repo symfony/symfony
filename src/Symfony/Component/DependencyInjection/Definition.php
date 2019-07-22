@@ -28,12 +28,12 @@ class Definition
     private $shared = true;
     private $deprecated = false;
     private $deprecationTemplate;
-    private $properties = array();
-    private $calls = array();
-    private $instanceof = array();
+    private $properties = [];
+    private $calls = [];
+    private $instanceof = [];
     private $autoconfigured = false;
     private $configurator;
-    private $tags = array();
+    private $tags = [];
     private $public = true;
     private $private = true;
     private $synthetic = false;
@@ -41,13 +41,13 @@ class Definition
     private $lazy = false;
     private $decoratedService;
     private $autowired = false;
-    private $changes = array();
-    private $bindings = array();
-    private $errors = array();
+    private $changes = [];
+    private $bindings = [];
+    private $errors = [];
 
-    protected $arguments = array();
+    protected $arguments = [];
 
-    private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
+    private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.';
 
     /**
      * @internal
@@ -56,11 +56,7 @@ class Definition
      */
     public $innerServiceId;
 
-    /**
-     * @param string|null $class     The service class
-     * @param array       $arguments An array of arguments to pass to the service constructor
-     */
-    public function __construct($class = null, array $arguments = array())
+    public function __construct(string $class = null, array $arguments = [])
     {
         if (null !== $class) {
             $this->setClass($class);
@@ -95,7 +91,7 @@ class Definition
     /**
      * Sets a factory.
      *
-     * @param string|array $factory A PHP function or an array containing a class/Reference and a method to call
+     * @param string|array|Reference $factory A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -103,8 +99,10 @@ class Definition
     {
         $this->changes['factory'] = true;
 
-        if (is_string($factory) && false !== strpos($factory, '::')) {
+        if (\is_string($factory) && false !== strpos($factory, '::')) {
             $factory = explode('::', $factory, 2);
+        } elseif ($factory instanceof Reference) {
+            $factory = [$factory, '__invoke'];
         }
 
         $this->factory = $factory;
@@ -115,7 +113,7 @@ class Definition
     /**
      * Gets the factory.
      *
-     * @return string|array The PHP function or an array containing a class/Reference and a method to call
+     * @return string|array|null The PHP function or an array containing a class/Reference and a method to call
      */
     public function getFactory()
     {
@@ -125,15 +123,15 @@ class Definition
     /**
      * Sets the service that this service is decorating.
      *
-     * @param null|string $id        The decorated service id, use null to remove decoration
-     * @param null|string $renamedId The new decorated service id
+     * @param string|null $id        The decorated service id, use null to remove decoration
+     * @param string|null $renamedId The new decorated service id
      * @param int         $priority  The priority of decoration
      *
      * @return $this
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    public function setDecoratedService($id, $renamedId = null, $priority = 0)
+    public function setDecoratedService(?string $id, ?string $renamedId = null, int $priority = 0)
     {
         if ($renamedId && $id === $renamedId) {
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
@@ -144,7 +142,7 @@ class Definition
         if (null === $id) {
             $this->decoratedService = null;
         } else {
-            $this->decoratedService = array($id, $renamedId, (int) $priority);
+            $this->decoratedService = [$id, $renamedId, (int) $priority];
         }
 
         return $this;
@@ -153,7 +151,7 @@ class Definition
     /**
      * Gets the service that this service is decorating.
      *
-     * @return null|array An array composed of the decorated service id, the new id for it and the priority of decoration, null if no service is decorated
+     * @return array|null An array composed of the decorated service id, the new id for it and the priority of decoration, null if no service is decorated
      */
     public function getDecoratedService()
     {
@@ -163,11 +161,9 @@ class Definition
     /**
      * Sets the service class.
      *
-     * @param string $class The service class
-     *
      * @return $this
      */
-    public function setClass($class)
+    public function setClass(?string $class)
     {
         $this->changes['class'] = true;
 
@@ -223,12 +219,11 @@ class Definition
     /**
      * Sets a specific property.
      *
-     * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return $this
      */
-    public function setProperty($name, $value)
+    public function setProperty(string $name, $value)
     {
         $this->properties[$name] = $value;
 
@@ -261,15 +256,15 @@ class Definition
      */
     public function replaceArgument($index, $argument)
     {
-        if (0 === count($this->arguments)) {
+        if (0 === \count($this->arguments)) {
             throw new OutOfBoundsException('Cannot replace arguments if none have been configured yet.');
         }
 
-        if (is_int($index) && ($index < 0 || $index > count($this->arguments) - 1)) {
-            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
+        if (\is_int($index) && ($index < 0 || $index > \count($this->arguments) - 1)) {
+            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, \count($this->arguments) - 1));
         }
 
-        if (!array_key_exists($index, $this->arguments)) {
+        if (!\array_key_exists($index, $this->arguments)) {
             throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
         }
 
@@ -314,7 +309,7 @@ class Definition
      */
     public function getArgument($index)
     {
-        if (!array_key_exists($index, $this->arguments)) {
+        if (!\array_key_exists($index, $this->arguments)) {
             throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
         }
 
@@ -326,11 +321,11 @@ class Definition
      *
      * @return $this
      */
-    public function setMethodCalls(array $calls = array())
+    public function setMethodCalls(array $calls = [])
     {
-        $this->calls = array();
+        $this->calls = [];
         foreach ($calls as $call) {
-            $this->addMethodCall($call[0], $call[1]);
+            $this->addMethodCall($call[0], $call[1], $call[2] ?? false);
         }
 
         return $this;
@@ -339,19 +334,20 @@ class Definition
     /**
      * Adds a method to call after service initialization.
      *
-     * @param string $method    The method name to call
-     * @param array  $arguments An array of arguments to pass to the method call
+     * @param string $method       The method name to call
+     * @param array  $arguments    An array of arguments to pass to the method call
+     * @param bool   $returnsClone Whether the call returns the service instance or not
      *
      * @return $this
      *
      * @throws InvalidArgumentException on empty $method param
      */
-    public function addMethodCall($method, array $arguments = array())
+    public function addMethodCall(string $method, array $arguments = [], bool $returnsClone = false)
     {
         if (empty($method)) {
             throw new InvalidArgumentException('Method name cannot be empty.');
         }
-        $this->calls[] = array($method, $arguments);
+        $this->calls[] = 2 < \func_num_args() && func_get_arg(2) ? [$method, $arguments, true] : [$method, $arguments];
 
         return $this;
     }
@@ -359,11 +355,9 @@ class Definition
     /**
      * Removes a method to call after service initialization.
      *
-     * @param string $method The method name to remove
-     *
      * @return $this
      */
-    public function removeMethodCall($method)
+    public function removeMethodCall(string $method)
     {
         foreach ($this->calls as $i => $call) {
             if ($call[0] === $method) {
@@ -378,11 +372,9 @@ class Definition
     /**
      * Check if the current definition has a given method to call after service initialization.
      *
-     * @param string $method The method name to search for
-     *
      * @return bool
      */
-    public function hasMethodCall($method)
+    public function hasMethodCall(string $method)
     {
         foreach ($this->calls as $call) {
             if ($call[0] === $method) {
@@ -406,7 +398,7 @@ class Definition
     /**
      * Sets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
      *
-     * @param $instanceof ChildDefinition[]
+     * @param ChildDefinition[] $instanceof
      *
      * @return $this
      */
@@ -434,7 +426,7 @@ class Definition
      *
      * @return $this
      */
-    public function setAutoconfigured($autoconfigured)
+    public function setAutoconfigured(bool $autoconfigured)
     {
         $this->changes['autoconfigured'] = true;
 
@@ -476,24 +468,19 @@ class Definition
     /**
      * Gets a tag by name.
      *
-     * @param string $name The tag name
-     *
      * @return array An array of attributes
      */
-    public function getTag($name)
+    public function getTag(string $name)
     {
-        return isset($this->tags[$name]) ? $this->tags[$name] : array();
+        return isset($this->tags[$name]) ? $this->tags[$name] : [];
     }
 
     /**
      * Adds a tag for this definition.
      *
-     * @param string $name       The tag name
-     * @param array  $attributes An array of attributes
-     *
      * @return $this
      */
-    public function addTag($name, array $attributes = array())
+    public function addTag(string $name, array $attributes = [])
     {
         $this->tags[$name][] = $attributes;
 
@@ -503,11 +490,9 @@ class Definition
     /**
      * Whether this definition has a tag with the given name.
      *
-     * @param string $name
-     *
      * @return bool
      */
-    public function hasTag($name)
+    public function hasTag(string $name)
     {
         return isset($this->tags[$name]);
     }
@@ -515,11 +500,9 @@ class Definition
     /**
      * Clears all tags for a given name.
      *
-     * @param string $name The tag name
-     *
      * @return $this
      */
-    public function clearTag($name)
+    public function clearTag(string $name)
     {
         unset($this->tags[$name]);
 
@@ -533,7 +516,7 @@ class Definition
      */
     public function clearTags()
     {
-        $this->tags = array();
+        $this->tags = [];
 
         return $this;
     }
@@ -541,11 +524,9 @@ class Definition
     /**
      * Sets a file to require before creating the service.
      *
-     * @param string $file A full pathname to include
-     *
      * @return $this
      */
-    public function setFile($file)
+    public function setFile(?string $file)
     {
         $this->changes['file'] = true;
 
@@ -567,15 +548,13 @@ class Definition
     /**
      * Sets if the service must be shared or not.
      *
-     * @param bool $shared Whether the service must be shared or not
-     *
      * @return $this
      */
-    public function setShared($shared)
+    public function setShared(bool $shared)
     {
         $this->changes['shared'] = true;
 
-        $this->shared = (bool) $shared;
+        $this->shared = $shared;
 
         return $this;
     }
@@ -593,15 +572,13 @@ class Definition
     /**
      * Sets the visibility of this service.
      *
-     * @param bool $boolean
-     *
      * @return $this
      */
-    public function setPublic($boolean)
+    public function setPublic(bool $boolean)
     {
         $this->changes['public'] = true;
 
-        $this->public = (bool) $boolean;
+        $this->public = $boolean;
         $this->private = false;
 
         return $this;
@@ -625,13 +602,11 @@ class Definition
      * but triggers a deprecation notice when accessed from the container,
      * so that the service can be made really private in 4.0.
      *
-     * @param bool $boolean
-     *
      * @return $this
      */
-    public function setPrivate($boolean)
+    public function setPrivate(bool $boolean)
     {
-        $this->private = (bool) $boolean;
+        $this->private = $boolean;
 
         return $this;
     }
@@ -649,15 +624,13 @@ class Definition
     /**
      * Sets the lazy flag of this service.
      *
-     * @param bool $lazy
-     *
      * @return $this
      */
-    public function setLazy($lazy)
+    public function setLazy(bool $lazy)
     {
         $this->changes['lazy'] = true;
 
-        $this->lazy = (bool) $lazy;
+        $this->lazy = $lazy;
 
         return $this;
     }
@@ -676,13 +649,11 @@ class Definition
      * Sets whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @param bool $boolean
-     *
      * @return $this
      */
-    public function setSynthetic($boolean)
+    public function setSynthetic(bool $boolean)
     {
-        $this->synthetic = (bool) $boolean;
+        $this->synthetic = $boolean;
 
         return $this;
     }
@@ -702,13 +673,11 @@ class Definition
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @param bool $boolean
-     *
      * @return $this
      */
-    public function setAbstract($boolean)
+    public function setAbstract(bool $boolean)
     {
-        $this->abstract = (bool) $boolean;
+        $this->abstract = $boolean;
 
         return $this;
     }
@@ -728,14 +697,13 @@ class Definition
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
      *
-     * @param bool   $status
      * @param string $template Template message to use if the definition is deprecated
      *
      * @return $this
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated($status = true, $template = null)
+    public function setDeprecated(bool $status = true, string $template = null)
     {
         if (null !== $template) {
             if (preg_match('#[\r\n]|\*/#', $template)) {
@@ -751,7 +719,7 @@ class Definition
 
         $this->changes['deprecated'] = true;
 
-        $this->deprecated = (bool) $status;
+        $this->deprecated = $status;
 
         return $this;
     }
@@ -774,7 +742,7 @@ class Definition
      *
      * @return string
      */
-    public function getDeprecationMessage($id)
+    public function getDeprecationMessage(string $id)
     {
         return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
     }
@@ -782,7 +750,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param string|array $configurator A PHP callable
+     * @param string|array|Reference $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -790,8 +758,10 @@ class Definition
     {
         $this->changes['configurator'] = true;
 
-        if (is_string($configurator) && false !== strpos($configurator, '::')) {
+        if (\is_string($configurator) && false !== strpos($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
+        } elseif ($configurator instanceof Reference) {
+            $configurator = [$configurator, '__invoke'];
         }
 
         $this->configurator = $configurator;
@@ -822,15 +792,13 @@ class Definition
     /**
      * Enables/disables autowiring.
      *
-     * @param bool $autowired
-     *
      * @return $this
      */
-    public function setAutowired($autowired)
+    public function setAutowired(bool $autowired)
     {
         $this->changes['autowired'] = true;
 
-        $this->autowired = (bool) $autowired;
+        $this->autowired = $autowired;
 
         return $this;
     }
@@ -876,13 +844,17 @@ class Definition
     /**
      * Add an error that occurred when building this Definition.
      *
-     * @param string $error
+     * @param string|\Closure|self $error
      *
      * @return $this
      */
     public function addError($error)
     {
-        $this->errors[] = $error;
+        if ($error instanceof self) {
+            $this->errors = array_merge($this->errors, $error->errors);
+        } else {
+            $this->errors[] = $error;
+        }
 
         return $this;
     }
@@ -894,6 +866,19 @@ class Definition
      */
     public function getErrors()
     {
+        foreach ($this->errors as $i => $error) {
+            if ($error instanceof \Closure) {
+                $this->errors[$i] = (string) $error();
+            } elseif (!\is_string($error)) {
+                $this->errors[$i] = (string) $error;
+            }
+        }
+
         return $this->errors;
+    }
+
+    public function hasErrors(): bool
+    {
+        return (bool) $this->errors;
     }
 }

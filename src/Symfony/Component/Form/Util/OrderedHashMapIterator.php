@@ -56,8 +56,6 @@ class OrderedHashMapIterator implements \Iterator
     private $current;
 
     /**
-     * Creates a new iterator.
-     *
      * @param array $elements       The elements of the map, indexed by their
      *                              keys
      * @param array $orderedKeys    The keys of the map in the order in which
@@ -73,7 +71,7 @@ class OrderedHashMapIterator implements \Iterator
         $this->elements = &$elements;
         $this->orderedKeys = &$orderedKeys;
         $this->managedCursors = &$managedCursors;
-        $this->cursorId = count($managedCursors);
+        $this->cursorId = \count($managedCursors);
 
         $this->managedCursors[$this->cursorId] = &$this->cursor;
     }
@@ -84,7 +82,7 @@ class OrderedHashMapIterator implements \Iterator
      */
     public function __destruct()
     {
-        // Use array_splice() instead of isset() to prevent holes in the
+        // Use array_splice() instead of unset() to prevent holes in the
         // array indices, which would break the initialization of $cursorId
         array_splice($this->managedCursors, $this->cursorId, 1);
     }
@@ -122,7 +120,7 @@ class OrderedHashMapIterator implements \Iterator
             return null;
         }
 
-        $array = array($this->key => null);
+        $array = [$this->key => null];
 
         return key($array);
     }

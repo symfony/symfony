@@ -3,7 +3,9 @@ Test DeprecationErrorHandler in default mode
 --FILE--
 <?php
 
-putenv('SYMFONY_DEPRECATIONS_HELPER');
+$k = 'SYMFONY_DEPRECATIONS_HELPER';
+unset($_SERVER[$k], $_ENV[$k]);
+putenv($k);
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');
@@ -73,16 +75,14 @@ Unsilenced deprecation notices (3)
   1x: unsilenced bar deprecation
     1x in FooTestCase::testNonLegacyBar
 
-Remaining deprecation notices (1)
+Legacy deprecation notices (1)
+
+Other deprecation notices (2)
+
+  1x: root deprecation
 
   1x: silenced bar deprecation
     1x in FooTestCase::testNonLegacyBar
-
-Legacy deprecation notices (1)
-
-Other deprecation notices (1)
-
-  1x: root deprecation
 
 Shutdown-time deprecations:
 

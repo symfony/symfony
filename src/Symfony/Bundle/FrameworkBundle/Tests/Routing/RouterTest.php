@@ -27,7 +27,7 @@ class RouterTest extends TestCase
      */
     public function testConstructThrowsOnNonSymfonyNorPsr11Container()
     {
-        new Router($this->getMockBuilder(ContainerInterface::class)->getMock(), 'foo');
+        new Router($this->createMock(ContainerInterface::class), 'foo');
     }
 
     public function testGenerateWithServiceParam()
@@ -36,24 +36,24 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             ' /{_locale}',
-            array(
+            [
                 '_locale' => '%locale%',
-            ),
-            array(
+            ],
+            [
                 '_locale' => 'en|es',
-            ), array(), '', array(), array(), '"%foo%" == "bar"'
+            ], [], '', [], [], '"%foo%" == "bar"'
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
-        $parameters = $this->getParameterBag(array(
+        $parameters = $this->getParameterBag([
             'locale' => 'es',
             'foo' => 'bar',
-        ));
+        ]);
 
-        $router = new Router($sc, 'foo', array(), null, $parameters);
+        $router = new Router($sc, 'foo', [], null, $parameters);
 
-        $this->assertSame('/en', $router->generate('foo', array('_locale' => 'en')));
-        $this->assertSame('/', $router->generate('foo', array('_locale' => 'es')));
+        $this->assertSame('/en', $router->generate('foo', ['_locale' => 'en']));
+        $this->assertSame('/', $router->generate('foo', ['_locale' => 'es']));
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
@@ -63,12 +63,12 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             ' /{_locale}',
-            array(
+            [
                 '_locale' => '%locale%',
-            ),
-            array(
+            ],
+            [
                 '_locale' => 'en|es',
-            ), array(), '', array(), array(), '"%foo%" == "bar"'
+            ], [], '', [], [], '"%foo%" == "bar"'
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -77,9 +77,35 @@ class RouterTest extends TestCase
 
         $router = new Router($sc, 'foo');
 
-        $this->assertSame('/en', $router->generate('foo', array('_locale' => 'en')));
-        $this->assertSame('/', $router->generate('foo', array('_locale' => 'es')));
+        $this->assertSame('/en', $router->generate('foo', ['_locale' => 'en']));
+        $this->assertSame('/', $router->generate('foo', ['_locale' => 'es']));
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
+    }
+
+    public function testGenerateWithDefaultLocale()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('');
+
+        $name = 'testFoo';
+
+        foreach (['hr' => '/test-hr', 'en' => '/test-en'] as $locale => $path) {
+            $localizedRoute = clone $route;
+            $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setDefault('_canonical_route', $name);
+            $localizedRoute->setPath($path);
+            $routes->add($name.'.'.$locale, $localizedRoute);
+        }
+
+        $sc = $this->getServiceContainer($routes);
+
+        $router = new Router($sc, '', [], null, null, null, 'hr');
+
+        $this->assertSame('/test-hr', $router->generate($name));
+
+        $this->assertSame('/test-en', $router->generate($name, ['_locale' => 'en']));
+        $this->assertSame('/test-hr', $router->generate($name, ['_locale' => 'hr']));
     }
 
     public function testDefaultsPlaceholders()
@@ -88,37 +114,37 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             '/foo',
-            array(
+            [
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-                'boo' => array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
-                'bee' => array('bee', 'bee'),
-            ),
-            array(
-            )
+                'boo' => ['%parameter%', '%%escaped_parameter%%', ['%bee_parameter%', 'bee']],
+                'bee' => ['bee', 'bee'],
+            ],
+            [
+            ]
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
 
-        $parameters = $this->getParameterBag(array(
+        $parameters = $this->getParameterBag([
             'parameter.foo' => 'foo',
             'parameter.bar' => 'bar',
             'parameter' => 'boo',
             'bee_parameter' => 'foo_bee',
-        ));
+        ]);
 
-        $router = new Router($sc, 'foo', array(), null, $parameters);
+        $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
-                'boo' => array('boo', '%escaped_parameter%', array('foo_bee', 'bee')),
-                'bee' => array('bee', 'bee'),
-            ),
+                'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
+                'bee' => ['bee', 'bee'],
+            ],
             $route->getDefaults()
         );
     }
@@ -129,15 +155,15 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             '/foo',
-            array(
+            [
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-                'boo' => array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
-                'bee' => array('bee', 'bee'),
-            ),
-            array(
-            )
+                'boo' => ['%parameter%', '%%escaped_parameter%%', ['%bee_parameter%', 'bee']],
+                'bee' => ['bee', 'bee'],
+            ],
+            [
+            ]
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -151,13 +177,13 @@ class RouterTest extends TestCase
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
-                'boo' => array('boo', '%escaped_parameter%', array('foo_bee', 'bee')),
-                'bee' => array('bee', 'bee'),
-            ),
+                'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
+                'bee' => ['bee', 'bee'],
+            ],
             $route->getDefaults()
         );
     }
@@ -168,31 +194,31 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             '/foo',
-            array(
-            ),
-            array(
+            [
+            ],
+            [
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-            )
+            ]
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
-        $parameters = $this->getParameterBag(array(
+        $parameters = $this->getParameterBag([
             'parameter.foo' => 'foo',
             'parameter.bar' => 'bar',
-        ));
+        ]);
 
-        $router = new Router($sc, 'foo', array(), null, $parameters);
+        $router = new Router($sc, 'foo', [], null, $parameters);
 
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
-            ),
+            ],
             $route->getRequirements()
         );
     }
@@ -203,13 +229,13 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             '/foo',
-            array(
-            ),
-            array(
+            [
+            ],
+            [
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-            )
+            ]
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -220,11 +246,11 @@ class RouterTest extends TestCase
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
-            ),
+            ],
             $route->getRequirements()
         );
     }
@@ -236,9 +262,9 @@ class RouterTest extends TestCase
         $routes->add('foo', new Route('/before/%parameter.foo%/after/%%escaped%%'));
 
         $sc = $this->getPsr11ServiceContainer($routes);
-        $parameters = $this->getParameterBag(array('parameter.foo' => 'foo'));
+        $parameters = $this->getParameterBag(['parameter.foo' => 'foo']);
 
-        $router = new Router($sc, 'foo', array(), null, $parameters);
+        $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
@@ -275,7 +301,7 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route('/%env(FOO)%'));
 
-        $router = new Router($this->getPsr11ServiceContainer($routes), 'foo', array(), null, $this->getParameterBag());
+        $router = new Router($this->getPsr11ServiceContainer($routes), 'foo', [], null, $this->getParameterBag());
         $router->getRouteCollection();
     }
 
@@ -303,9 +329,9 @@ class RouterTest extends TestCase
         $routes->add('foo', $route);
 
         $sc = $this->getPsr11ServiceContainer($routes);
-        $parameters = $this->getParameterBag(array('parameter.foo' => 'foo'));
+        $parameters = $this->getParameterBag(['parameter.foo' => 'foo']);
 
-        $router = new Router($sc, 'foo', array(), null, $parameters);
+        $router = new Router($sc, 'foo', [], null, $parameters);
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
@@ -362,9 +388,9 @@ class RouterTest extends TestCase
         $routes->add('foo', new Route('/%object%'));
 
         $sc = $this->getPsr11ServiceContainer($routes);
-        $parameters = $this->getParameterBag(array('object' => new \stdClass()));
+        $parameters = $this->getParameterBag(['object' => new \stdClass()]);
 
-        $router = new Router($sc, 'foo', array(), null, $parameters);
+        $router = new Router($sc, 'foo', [], null, $parameters);
         $router->getRouteCollection()->get('foo');
     }
 
@@ -391,11 +417,11 @@ class RouterTest extends TestCase
     public function testDefaultValuesAsNonStrings($value)
     {
         $routes = new RouteCollection();
-        $routes->add('foo', new Route('foo', array('foo' => $value), array('foo' => '\d+')));
+        $routes->add('foo', new Route('foo', ['foo' => $value], ['foo' => '\d+']));
 
         $sc = $this->getPsr11ServiceContainer($routes);
 
-        $router = new Router($sc, 'foo', array(), null, $this->getParameterBag());
+        $router = new Router($sc, 'foo', [], null, $this->getParameterBag());
 
         $route = $router->getRouteCollection()->get('foo');
 
@@ -408,7 +434,7 @@ class RouterTest extends TestCase
     public function testDefaultValuesAsNonStringsWithSfContainer($value)
     {
         $routes = new RouteCollection();
-        $routes->add('foo', new Route('foo', array('foo' => $value), array('foo' => '\d+')));
+        $routes->add('foo', new Route('foo', ['foo' => $value], ['foo' => '\d+']));
 
         $sc = $this->getServiceContainer($routes);
 
@@ -425,9 +451,9 @@ class RouterTest extends TestCase
         $routeCollection->add('foo', new Route('/%locale%'));
 
         $sc = $this->getPsr11ServiceContainer($routeCollection);
-        $parameters = $this->getParameterBag(array('locale' => 'en'));
+        $parameters = $this->getParameterBag(['locale' => 'en']);
 
-        $router = new Router($sc, 'foo', array(), null, $parameters);
+        $router = new Router($sc, 'foo', [], null, $parameters);
 
         $router->getRouteCollection();
     }
@@ -444,12 +470,30 @@ class RouterTest extends TestCase
 
         $routeCollection = $router->getRouteCollection();
 
-        $this->assertEquals(array(new ContainerParametersResource(array('locale' => 'en'))), $routeCollection->getResources());
+        $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
+    }
+
+    public function testBooleanContainerParametersWithinRouteCondition()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('foo');
+        $route->setCondition('%parameter.true% or %parameter.false%');
+
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag(['parameter.true' => true, 'parameter.false' => false]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertSame('1 or 0', $route->getCondition());
     }
 
     public function getNonStringValues()
     {
-        return array(array(null), array(false), array(true), array(new \stdClass()), array(array('foo', 'bar')), array(array(array())));
+        return [[null], [false], [true], [new \stdClass()], [['foo', 'bar']], [[[]]]];
     }
 
     /**
@@ -462,15 +506,15 @@ class RouterTest extends TestCase
         $loader
             ->expects($this->any())
             ->method('load')
-            ->will($this->returnValue($routes))
+            ->willReturn($routes)
         ;
 
-        $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(array('get'))->getMock();
+        $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(['get'])->getMock();
 
         $sc
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($loader))
+            ->willReturn($loader)
         ;
 
         return $sc;
@@ -483,7 +527,7 @@ class RouterTest extends TestCase
         $loader
             ->expects($this->any())
             ->method('load')
-            ->will($this->returnValue($routes))
+            ->willReturn($routes)
         ;
 
         $sc = $this->getMockBuilder(ContainerInterface::class)->getMock();
@@ -491,21 +535,21 @@ class RouterTest extends TestCase
         $sc
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($loader))
+            ->willReturn($loader)
         ;
 
         return $sc;
     }
 
-    private function getParameterBag(array $params = array()): ContainerInterface
+    private function getParameterBag(array $params = []): ContainerInterface
     {
         $bag = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $bag
             ->expects($this->any())
             ->method('get')
-            ->will($this->returnCallback(function ($key) use ($params) {
+            ->willReturnCallback(function ($key) use ($params) {
                 return isset($params[$key]) ? $params[$key] : null;
-            }))
+            })
         ;
 
         return $bag;

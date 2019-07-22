@@ -56,9 +56,9 @@ interface FormTypeExtensionInterface
     public function configureOptions(OptionsResolver $resolver);
 
     /**
-     * Returns the name of the type being extended.
+     * Gets the extended types.
      *
-     * @return string The name of the type being extended
+     * @return string[]
      */
-    public function getExtendedType();
+    public static function getExtendedTypes(): iterable;
 }

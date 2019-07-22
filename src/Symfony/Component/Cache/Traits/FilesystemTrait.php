@@ -23,6 +23,8 @@ trait FilesystemTrait
 {
     use FilesystemCommonTrait;
 
+    private $marshaller;
+
     /**
      * @return bool
      */
@@ -52,7 +54,7 @@ trait FilesystemTrait
      */
     protected function doFetch(array $ids)
     {
-        $values = array();
+        $values = [];
         $now = time();
 
         foreach ($ids as $id) {
@@ -68,7 +70,7 @@ trait FilesystemTrait
                 $value = stream_get_contents($h);
                 fclose($h);
                 if ($i === $id) {
-                    $values[$id] = parent::unserialize($value);
+                    $values[$id] = $this->marshaller->unmarshall($value);
                 }
             }
         }
@@ -79,29 +81,44 @@ trait FilesystemTrait
     /**
      * {@inheritdoc}
      */
-    protected function doHave($id)
+    protected function doHave(string $id)
     {
         $file = $this->getFile($id);
 
-        return file_exists($file) && (@filemtime($file) > time() || $this->doFetch(array($id)));
+        return file_exists($file) && (@filemtime($file) > time() || $this->doFetch([$id]));
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
-        $ok = true;
         $expiresAt = $lifetime ? (time() + $lifetime) : 0;
+        $values = $this->marshaller->marshall($values, $failed);
 
         foreach ($values as $id => $value) {
-            $ok = $this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".serialize($value), $expiresAt) && $ok;
+            if (!$this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".$value, $expiresAt)) {
+                $failed[] = $id;
+            }
         }
 
-        if (!$ok && !is_writable($this->directory)) {
+        if ($failed && !is_writable($this->directory)) {
             throw new CacheException(sprintf('Cache directory is not writable (%s)', $this->directory));
         }
 
-        return $ok;
+        return $failed;
+    }
+
+    private function getFileKey(string $file): string
+    {
+        if (!$h = @fopen($file, 'rb')) {
+            return '';
+        }
+
+        fgets($h); // expiry
+        $encodedKey = fgets($h);
+        fclose($h);
+
+        return rawurldecode(rtrim($encodedKey));
     }
 }

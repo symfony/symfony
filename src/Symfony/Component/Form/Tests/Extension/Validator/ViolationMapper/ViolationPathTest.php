@@ -21,67 +21,67 @@ class ViolationPathTest extends TestCase
 {
     public function providePaths()
     {
-        return array(
-            array('children[address]', array(
-                array('address', true, true),
-            )),
-            array('children[address].children[street]', array(
-                array('address', true, true),
-                array('street', true, true),
-            )),
-            array('children[address][street]', array(
-                array('address', true, true),
-                array('street', true, true),
-            ), 'children[address].children[street]'),
-            array('children[address].data', array(
-                array('address', true, true),
-            ), 'children[address]'),
-            array('children[address].data.street', array(
-                array('address', true, true),
-                array('street', false, false),
-            )),
-            array('children[address].data[street]', array(
-                array('address', true, true),
-                array('street', false, true),
-            )),
-            array('children[address].children[street].data.name', array(
-                array('address', true, true),
-                array('street', true, true),
-                array('name', false, false),
-            )),
-            array('children[address].children[street].data[name]', array(
-                array('address', true, true),
-                array('street', true, true),
-                array('name', false, true),
-            )),
-            array('data.address', array(
-                array('address', false, false),
-            )),
-            array('data[address]', array(
-                array('address', false, true),
-            )),
-            array('data.address.street', array(
-                array('address', false, false),
-                array('street', false, false),
-            )),
-            array('data[address].street', array(
-                array('address', false, true),
-                array('street', false, false),
-            )),
-            array('data.address[street]', array(
-                array('address', false, false),
-                array('street', false, true),
-            )),
-            array('data[address][street]', array(
-                array('address', false, true),
-                array('street', false, true),
-            )),
+        return [
+            ['children[address]', [
+                ['address', true, true],
+            ]],
+            ['children[address].children[street]', [
+                ['address', true, true],
+                ['street', true, true],
+            ]],
+            ['children[address][street]', [
+                ['address', true, true],
+                ['street', true, true],
+            ], 'children[address].children[street]'],
+            ['children[address].data', [
+                ['address', true, true],
+            ], 'children[address]'],
+            ['children[address].data.street', [
+                ['address', true, true],
+                ['street', false, false],
+            ]],
+            ['children[address].data[street]', [
+                ['address', true, true],
+                ['street', false, true],
+            ]],
+            ['children[address].children[street].data.name', [
+                ['address', true, true],
+                ['street', true, true],
+                ['name', false, false],
+            ]],
+            ['children[address].children[street].data[name]', [
+                ['address', true, true],
+                ['street', true, true],
+                ['name', false, true],
+            ]],
+            ['data.address', [
+                ['address', false, false],
+            ]],
+            ['data[address]', [
+                ['address', false, true],
+            ]],
+            ['data.address.street', [
+                ['address', false, false],
+                ['street', false, false],
+            ]],
+            ['data[address].street', [
+                ['address', false, true],
+                ['street', false, false],
+            ]],
+            ['data.address[street]', [
+                ['address', false, false],
+                ['street', false, true],
+            ]],
+            ['data[address][street]', [
+                ['address', false, true],
+                ['street', false, true],
+            ]],
             // A few invalid examples
-            array('data', array(), ''),
-            array('children', array(), ''),
-            array('children.address', array(), ''),
-            array('children.address[street]', array(), ''),
-        );
+            ['data', [], ''],
+            ['children', [], ''],
+            ['children.address', [], ''],
+            ['children.address[street]', [], ''],
+        ];
     }
 
     /**
@@ -96,8 +96,8 @@ class ViolationPathTest extends TestCase
         $path = new ViolationPath($string);
 
         $this->assertSame($slicedPath, $path->__toString());
-        $this->assertCount(count($entries), $path->getElements());
-        $this->assertSame(count($entries), $path->getLength());
+        $this->assertCount(\count($entries), $path->getElements());
+        $this->assertSame(\count($entries), $path->getLength());
 
         foreach ($entries as $index => $entry) {
             $this->assertEquals($entry[0], $path->getElement($index));
@@ -109,17 +109,17 @@ class ViolationPathTest extends TestCase
 
     public function provideParents()
     {
-        return array(
-            array('children[address]', null),
-            array('children[address].children[street]', 'children[address]'),
-            array('children[address].data.street', 'children[address]'),
-            array('children[address].data[street]', 'children[address]'),
-            array('data.address', null),
-            array('data.address.street', 'data.address'),
-            array('data.address[street]', 'data.address'),
-            array('data[address].street', 'data[address]'),
-            array('data[address][street]', 'data[address]'),
-        );
+        return [
+            ['children[address]', null],
+            ['children[address].children[street]', 'children[address]'],
+            ['children[address].data.street', 'children[address]'],
+            ['children[address].data[street]', 'children[address]'],
+            ['data.address', null],
+            ['data.address.street', 'data.address'],
+            ['data.address[street]', 'data.address'],
+            ['data[address].street', 'data[address]'],
+            ['data[address][street]', 'data[address]'],
+        ];
     }
 
     /**

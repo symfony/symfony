@@ -6,7 +6,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\EventListener\AuditTrailListener;
-use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
+use Symfony\Component\Workflow\Tests\Subject;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
 use Symfony\Component\Workflow\Workflow;
 
@@ -18,23 +19,22 @@ class AuditTrailListenerTest extends TestCase
     {
         $definition = $this->createSimpleWorkflowDefinition();
 
-        $object = new \stdClass();
-        $object->marking = null;
+        $object = new Subject();
 
         $logger = new Logger();
 
         $ed = new EventDispatcher();
         $ed->addSubscriber(new AuditTrailListener($logger));
 
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $ed);
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $ed);
 
         $workflow->apply($object, 't1');
 
-        $expected = array(
-            'Leaving "a" for subject of class "stdClass" in workflow "unnamed".',
-            'Transition "t1" for subject of class "stdClass" in workflow "unnamed".',
-            'Entering "b" for subject of class "stdClass" in workflow "unnamed".',
-        );
+        $expected = [
+            'Leaving "a" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
+            'Transition "t1" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
+            'Entering "b" for subject of class "Symfony\Component\Workflow\Tests\Subject" in workflow "unnamed".',
+        ];
 
         $this->assertSame($expected, $logger->logs);
     }
@@ -42,9 +42,9 @@ class AuditTrailListenerTest extends TestCase
 
 class Logger extends AbstractLogger
 {
-    public $logs = array();
+    public $logs = [];
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         $this->logs[] = $message;
     }

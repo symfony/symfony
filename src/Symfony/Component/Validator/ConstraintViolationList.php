@@ -21,14 +21,14 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * @var ConstraintViolationInterface[]
      */
-    private $violations = array();
+    private $violations = [];
 
     /**
      * Creates a new constraint violation list.
      *
      * @param ConstraintViolationInterface[] $violations The constraint violations to add to the list
      */
-    public function __construct(array $violations = array())
+    public function __construct(array $violations = [])
     {
         foreach ($violations as $violation) {
             $this->add($violation);
@@ -72,7 +72,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function get($offset)
+    public function get(int $offset)
     {
         if (!isset($this->violations[$offset])) {
             throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
@@ -84,7 +84,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function has($offset)
+    public function has(int $offset)
     {
         return isset($this->violations[$offset]);
     }
@@ -92,7 +92,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function set($offset, ConstraintViolationInterface $violation)
+    public function set(int $offset, ConstraintViolationInterface $violation)
     {
         $this->violations[$offset] = $violation;
     }
@@ -100,7 +100,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function remove($offset)
+    public function remove(int $offset)
     {
         unset($this->violations[$offset]);
     }
@@ -120,7 +120,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      */
     public function count()
     {
-        return count($this->violations);
+        return \count($this->violations);
     }
 
     /**
@@ -169,9 +169,9 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     public function findByCodes($codes)
     {
         $codes = (array) $codes;
-        $violations = array();
+        $violations = [];
         foreach ($this as $violation) {
-            if (in_array($violation->getCode(), $codes, true)) {
+            if (\in_array($violation->getCode(), $codes, true)) {
                 $violations[] = $violation;
             }
         }

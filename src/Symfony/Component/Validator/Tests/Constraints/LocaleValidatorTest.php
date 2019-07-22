@@ -22,124 +22,49 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         return new LocaleValidator();
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "canonicalize" option with value "false" is deprecated since Symfony 4.1, set it to "true" instead.
-     *
-     * @dataProvider getValidLocales
-     */
-    public function testLegacyNullIsValid()
+    public function testNullIsValid()
     {
         $this->validator->validate(null, new Locale());
 
         $this->assertNoViolation();
     }
 
-    public function testNullIsValid()
-    {
-        $this->validator->validate(null, new Locale(array('canonicalize' => true)));
-
-        $this->assertNoViolation();
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "canonicalize" option with value "false" is deprecated since Symfony 4.1, set it to "true" instead.
-     *
-     * @dataProvider getValidLocales
-     */
-    public function testLegacyEmptyStringIsValid()
+    public function testEmptyStringIsValid()
     {
         $this->validator->validate('', new Locale());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
-    {
-        $this->validator->validate('', new Locale(array('canonicalize' => true)));
-
-        $this->assertNoViolation();
-    }
-
     /**
-     * @group legacy
-     * @expectedDeprecation The "canonicalize" option with value "false" is deprecated since Symfony 4.1, set it to "true" instead.
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
      */
-    public function testLegacyExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType()
     {
         $this->validator->validate(new \stdClass(), new Locale());
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
-    public function testExpectsStringCompatibleType()
-    {
-        $this->validator->validate(new \stdClass(), new Locale(array('canonicalize' => true)));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "canonicalize" option with value "false" is deprecated since Symfony 4.1, set it to "true" instead.
-     *
      * @dataProvider getValidLocales
      */
-    public function testLegacyValidLocales(string $locale)
+    public function testValidLocales($locale)
     {
         $this->validator->validate($locale, new Locale());
 
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidLocales
-     */
-    public function testValidLocales($locale, array $options)
-    {
-        $this->validator->validate($locale, new Locale($options));
-
-        $this->assertNoViolation();
-    }
-
     public function getValidLocales()
     {
-        return array(
-            array('en', array('canonicalize' => true)),
-            array('en_US', array('canonicalize' => true)),
-            array('pt', array('canonicalize' => true)),
-            array('pt_PT', array('canonicalize' => true)),
-            array('zh_Hans', array('canonicalize' => true)),
-            array('fil_PH', array('canonicalize' => true)),
-        );
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "canonicalize" option with value "false" is deprecated since Symfony 4.1, set it to "true" instead.
-     * @dataProvider getLegacyInvalidLocales
-     */
-    public function testLegacyInvalidLocales(string $locale)
-    {
-        $constraint = new Locale(array(
-            'message' => 'myMessage',
-        ));
-
-        $this->validator->validate($locale, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$locale.'"')
-            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
-            ->assertRaised();
-    }
-
-    public function getLegacyInvalidLocales()
-    {
-        return array(
-            array('EN'),
-            array('foobar'),
-        );
+        return [
+            ['en'],
+            ['en_US'],
+            ['pt'],
+            ['pt_PT'],
+            ['zh_Hans'],
+            ['tl_PH'],
+            ['fil_PH'], // alias for "tl_PH"
+        ];
     }
 
     /**
@@ -147,10 +72,9 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidLocales($locale)
     {
-        $constraint = new Locale(array(
+        $constraint = new Locale([
             'message' => 'myMessage',
-            'canonicalize' => true,
-        ));
+        ]);
 
         $this->validator->validate($locale, $constraint);
 
@@ -162,29 +86,10 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidLocales()
     {
-        return array(
-            array('baz'),
-            array('foobar'),
-        );
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "canonicalize" option with value "false" is deprecated since Symfony 4.1, set it to "true" instead.
-     * @dataProvider getUncanonicalizedLocales
-     */
-    public function testInvalidLocalesWithoutCanonicalization(string $locale)
-    {
-        $constraint = new Locale(array(
-            'message' => 'myMessage',
-        ));
-
-        $this->validator->validate($locale, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$locale.'"')
-            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
-            ->assertRaised();
+        return [
+            ['baz'],
+            ['foobar'],
+        ];
     }
 
     /**
@@ -192,10 +97,9 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidLocalesWithCanonicalization(string $locale)
     {
-        $constraint = new Locale(array(
+        $constraint = new Locale([
             'message' => 'myMessage',
-            'canonicalize' => true,
-        ));
+        ]);
 
         $this->validator->validate($locale, $constraint);
 
@@ -204,10 +108,10 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
 
     public function getUncanonicalizedLocales(): iterable
     {
-        return array(
-            array('en-US'),
-            array('es-AR'),
-            array('fr_FR.utf8'),
-        );
+        return [
+            ['en-US'],
+            ['es-AR'],
+            ['fr_FR.utf8'],
+        ];
     }
 }

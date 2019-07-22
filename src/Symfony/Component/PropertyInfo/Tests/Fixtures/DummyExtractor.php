@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -20,12 +21,12 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DummyExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
+class DummyExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = array())
+    public function getShortDescription($class, $property, array $context = [])
     {
         return 'short';
     }
@@ -33,7 +34,7 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = array())
+    public function getLongDescription($class, $property, array $context = [])
     {
         return 'long';
     }
@@ -41,15 +42,15 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = array())
+    public function getTypes($class, $property, array $context = [])
     {
-        return array(new Type(Type::BUILTIN_TYPE_INT));
+        return [new Type(Type::BUILTIN_TYPE_INT)];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = array())
+    public function isReadable($class, $property, array $context = [])
     {
         return true;
     }
@@ -57,7 +58,7 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = array())
+    public function isWritable($class, $property, array $context = [])
     {
         return true;
     }
@@ -65,8 +66,16 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = array())
+    public function getProperties($class, array $context = [])
     {
-        return array('a', 'b');
+        return ['a', 'b'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = []): ?bool
+    {
+        return true;
     }
 }

@@ -31,7 +31,7 @@ class ChoiceListView
      * @param ChoiceGroupView[]|ChoiceView[] $choices          The choice views
      * @param ChoiceGroupView[]|ChoiceView[] $preferredChoices the preferred choice views
      */
-    public function __construct(array $choices = array(), array $preferredChoices = array())
+    public function __construct(array $choices = [], array $preferredChoices = [])
     {
         $this->choices = $choices;
         $this->preferredChoices = $preferredChoices;

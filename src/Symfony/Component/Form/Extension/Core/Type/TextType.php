@@ -35,9 +35,9 @@ class TextType extends AbstractType implements DataTransformerInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'compound' => false,
-        ));
+        ]);
     }
 
     /**

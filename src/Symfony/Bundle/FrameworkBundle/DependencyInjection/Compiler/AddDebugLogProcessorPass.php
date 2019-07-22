@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class AddDebugLogProcessorPass implements CompilerPassInterface
@@ -30,6 +30,14 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('monolog.logger_prototype');
-        $definition->addMethodCall('pushProcessor', array(new Reference('debug.log_processor')));
+        $definition->setConfigurator([__CLASS__, 'configureLogger']);
+        $definition->addMethodCall('pushProcessor', [new Reference('debug.log_processor')]);
+    }
+
+    public static function configureLogger($logger)
+    {
+        if (method_exists($logger, 'removeDebugLogger') && \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+            $logger->removeDebugLogger();
+        }
     }
 }

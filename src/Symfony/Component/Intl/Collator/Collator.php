@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Intl\Collator;
 
-use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
+use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Locale\Locale;
 
@@ -108,11 +108,11 @@ class Collator
      */
     public function asort(&$array, $sortFlag = self::SORT_REGULAR)
     {
-        $intlToPlainFlagMap = array(
+        $intlToPlainFlagMap = [
             self::SORT_REGULAR => \SORT_REGULAR,
             self::SORT_NUMERIC => \SORT_NUMERIC,
             self::SORT_STRING => \SORT_STRING,
-        );
+        ];
 
         $plainSortFlag = isset($intlToPlainFlagMap[$sortFlag]) ? $intlToPlainFlagMap[$sortFlag] : self::SORT_REGULAR;
 

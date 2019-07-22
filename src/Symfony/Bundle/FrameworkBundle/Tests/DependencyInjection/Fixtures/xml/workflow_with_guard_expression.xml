@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:framework="http://symfony.com/schema/dic/symfony"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:workflow name="article" type="workflow">
+            <framework:initial-marking>draft</framework:initial-marking>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:place>draft</framework:place>
+            <framework:place>wait_for_journalist</framework:place>
+            <framework:place>approved_by_journalist</framework:place>
+            <framework:place>wait_for_spellchecker</framework:place>
+            <framework:place>approved_by_spellchecker</framework:place>
+            <framework:place>published</framework:place>
+            <framework:transition name="request_review">
+                <framework:from>draft</framework:from>
+                <framework:to>wait_for_journalist</framework:to>
+                <framework:to>wait_for_spellchecker</framework:to>
+            </framework:transition>
+            <framework:transition name="journalist_approval">
+                <framework:from>wait_for_journalist</framework:from>
+                <framework:to>approved_by_journalist</framework:to>
+            </framework:transition>
+            <framework:transition name="spellchecker_approval">
+                <framework:from>wait_for_spellchecker</framework:from>
+                <framework:to>approved_by_spellchecker</framework:to>
+            </framework:transition>
+            <framework:transition name="publish">
+                <framework:from>approved_by_journalist</framework:from>
+                <framework:from>approved_by_spellchecker</framework:from>
+                <framework:to>published</framework:to>
+                <framework:guard>!!true</framework:guard>
+            </framework:transition>
+            <framework:transition name="publish">
+                <framework:from>draft</framework:from>
+                <framework:to>published</framework:to>
+                <framework:guard>!!false</framework:guard>
+            </framework:transition>
+        </framework:workflow>
+    </framework:config>
+</container>

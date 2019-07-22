@@ -1,0 +1,23 @@
+open
+validateId
+read
+doRead: 
+read
+destroy
+close
+open
+validateId
+read
+doRead: 
+read
+
+write
+doWrite: foo|s:3:"bar";
+close
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: max-age=0, private, must-revalidate
+    [2] => Set-Cookie: sid=random_session_id; path=/; secure; HttpOnly; SameSite=lax
+)
+shutdown

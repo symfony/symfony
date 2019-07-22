@@ -6,8 +6,8 @@ use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 
 /**
  * @group tty
@@ -18,10 +18,10 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
     {
         $questionHelper = new SymfonyQuestionHelper();
 
-        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $helperSet = new HelperSet([new FormatterHelper()]);
         $questionHelper->setHelperSet($helperSet);
 
-        $heroes = array('Superman', 'Batman', 'Spiderman');
+        $heroes = ['Superman', 'Batman', 'Spiderman'];
 
         $inputStream = $this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n");
 
@@ -55,23 +55,35 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
 
-        $this->assertEquals(array('Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals(array('Superman', 'Spiderman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals(array('Superman', 'Spiderman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(['Batman'], $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(['Superman', 'Spiderman'], $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(['Superman', 'Spiderman'], $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '0,1');
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
 
-        $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
+        $this->assertEquals(['Superman', 'Batman'], $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
         $this->assertOutputContains('What is your favorite superhero? [Superman, Batman]', $output);
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, ' 0 , 1 ');
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
 
-        $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
+        $this->assertEquals(['Superman', 'Batman'], $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
         $this->assertOutputContains('What is your favorite superhero? [Superman, Batman]', $output);
+    }
+
+    public function testAskChoiceWithChoiceValueAsDefault()
+    {
+        $questionHelper = new SymfonyQuestionHelper();
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $questionHelper->setHelperSet($helperSet);
+        $question = new ChoiceQuestion('What is your favorite superhero?', ['Superman', 'Batman', 'Spiderman'], 'Batman');
+        $question->setMaxAttempts(1);
+
+        $this->assertSame('Batman', $questionHelper->ask($this->createStreamableInputInterfaceMock($this->getInputStream("Batman\n")), $output = $this->createOutputInterface(), $question));
+        $this->assertOutputContains('What is your favorite superhero? [Batman]', $output);
     }
 
     public function testAskReturnsNullIfValidatorAllowsIt()
@@ -112,7 +124,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
     /**
      * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
-     * @expectedExceptionMessage Aborted
+     * @expectedExceptionMessage Aborted.
      */
     public function testAskThrowsExceptionOnMissingInput()
     {
@@ -142,7 +154,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $mock = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $mock->expects($this->any())
             ->method('isInteractive')
-            ->will($this->returnValue($interactive));
+            ->willReturn($interactive);
 
         return $mock;
     }

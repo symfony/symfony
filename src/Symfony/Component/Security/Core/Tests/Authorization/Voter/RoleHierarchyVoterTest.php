@@ -20,28 +20,28 @@ class RoleHierarchyVoterTest extends RoleVoterTest
     /**
      * @dataProvider getVoteTests
      */
-    public function testVote($roles, $attributes, $expected)
+    public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
     {
-        $voter = new RoleHierarchyVoter(new RoleHierarchy(array('ROLE_FOO' => array('ROLE_FOOBAR'))));
+        $voter = new RoleHierarchyVoter(new RoleHierarchy(['ROLE_FOO' => ['ROLE_FOOBAR']]));
 
-        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
+        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
     public function getVoteTests()
     {
-        return array_merge(parent::getVoteTests(), array(
-            array(array('ROLE_FOO'), array('ROLE_FOOBAR'), VoterInterface::ACCESS_GRANTED),
-        ));
+        return array_merge(parent::getVoteTests(), [
+            [['ROLE_FOO'], ['ROLE_FOOBAR'], VoterInterface::ACCESS_GRANTED],
+        ]);
     }
 
     /**
      * @dataProvider getVoteWithEmptyHierarchyTests
      */
-    public function testVoteWithEmptyHierarchy($roles, $attributes, $expected)
+    public function testVoteWithEmptyHierarchyUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
     {
-        $voter = new RoleHierarchyVoter(new RoleHierarchy(array()));
+        $voter = new RoleHierarchyVoter(new RoleHierarchy([]));
 
-        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
+        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
     }
 
     public function getVoteWithEmptyHierarchyTests()

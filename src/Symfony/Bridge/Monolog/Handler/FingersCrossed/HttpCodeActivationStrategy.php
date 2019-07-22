@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\Monolog\Handler\FingersCrossed;
 
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Activation strategy that ignores certain HTTP codes.
@@ -31,10 +31,10 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
     public function __construct(RequestStack $requestStack, array $exclusions, $actionLevel)
     {
         foreach ($exclusions as $exclusion) {
-            if (!array_key_exists('code', $exclusion)) {
+            if (!\array_key_exists('code', $exclusion)) {
                 throw new \LogicException(sprintf('An exclusion must have a "code" key'));
             }
-            if (!array_key_exists('urls', $exclusion)) {
+            if (!\array_key_exists('urls', $exclusion)) {
                 throw new \LogicException(sprintf('An exclusion must have a "urls" key'));
             }
         }
@@ -45,7 +45,7 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
         $this->exclusions = $exclusions;
     }
 
-    public function isHandlerActivated(array $record)
+    public function isHandlerActivated(array $record): bool
     {
         $isActivated = parent::isHandlerActivated($record);
 
@@ -60,8 +60,7 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
                     continue;
                 }
 
-                $urlBlacklist = null;
-                if (count($exclusion['urls'])) {
+                if (\count($exclusion['urls'])) {
                     return !preg_match('{('.implode('|', $exclusion['urls']).')}i', $request->getPathInfo());
                 }
 

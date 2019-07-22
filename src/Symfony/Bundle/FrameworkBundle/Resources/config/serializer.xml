@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
         <parameter key="serializer.mapping.cache.file">%kernel.cache_dir%/serialization.php</parameter>
@@ -32,6 +32,8 @@
 
         <!-- Normalizer -->
         <service id="serializer.normalizer.constraint_violation_list" class="Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer">
+            <argument type="collection" />
+            <argument type="service" id="serializer.name_converter.metadata_aware" />
             <!-- Run before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-915" />
         </service>
@@ -42,6 +44,7 @@
         </service>
 
         <service id="serializer.normalizer.data_uri" class="Symfony\Component\Serializer\Normalizer\DataUriNormalizer">
+            <argument type="service" id="mime_types" on-invalid="null" />
             <!-- Run before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-920" />
         </service>
@@ -58,10 +61,12 @@
 
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
-            <argument>null</argument> <!-- name converter -->
+            <argument type="service" id="serializer.name_converter.metadata_aware" />
             <argument type="service" id="serializer.property_accessor" />
             <argument type="service" id="property_info" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
+            <argument>null</argument>
+            <argument type="collection" />
 
             <!-- Run after all custom normalizers -->
             <tag name="serializer.normalizer" priority="-1000" />
@@ -90,14 +95,18 @@
         <service id="serializer.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer">
             <argument type="collection" /><!-- Loaders injected by the extension -->
             <argument>%serializer.mapping.cache.file%</argument>
-            <argument type="service" id="cache.serializer" />
             <tag name="kernel.cache_warmer" />
         </service>
 
-        <service id="serializer.mapping.cache.symfony" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
+        <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">
             <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
             <argument>%serializer.mapping.cache.file%</argument>
             <argument type="service" id="cache.serializer" />
+        </service>
+
+        <service id="serializer.mapping.cache_class_metadata_factory" decorates="serializer.mapping.class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory">
+            <argument type="service" id="serializer.mapping.cache_class_metadata_factory.inner" />
+            <argument type="service" id="serializer.mapping.cache.symfony" />
         </service>
 
         <!-- Encoders -->
@@ -119,6 +128,10 @@
 
         <!-- Name converter -->
         <service id="serializer.name_converter.camel_case_to_snake_case" class="Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter" />
+
+        <service id="serializer.name_converter.metadata_aware" class="Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter" >
+            <argument type="service" id="serializer.mapping.class_metadata_factory"/>
+        </service>
 
         <!-- PropertyInfo extractor -->
         <service id="property_info.serializer_extractor" class="Symfony\Component\PropertyInfo\Extractor\SerializerExtractor">

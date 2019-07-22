@@ -52,7 +52,7 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
                 $id = (string) $resolverReference;
                 $container->register("debug.$id", TraceableValueResolver::class)
                     ->setDecoratedService($id)
-                    ->setArguments(array(new Reference("debug.$id.inner"), new Reference($this->traceableResolverStopwatch)));
+                    ->setArguments([new Reference("debug.$id.inner"), new Reference($this->traceableResolverStopwatch)]);
             }
         }
 

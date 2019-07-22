@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Normalizer\NormalizableInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizableInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizableInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class Dummy implements NormalizableInterface, DenormalizableInterface
 {
@@ -23,17 +23,17 @@ class Dummy implements NormalizableInterface, DenormalizableInterface
     public $baz;
     public $qux;
 
-    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = [])
     {
-        return array(
+        return [
             'foo' => $this->foo,
             'bar' => $this->bar,
             'baz' => $this->baz,
             'qux' => $this->qux,
-        );
+        ];
     }
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = [])
     {
         $this->foo = $data['foo'];
         $this->bar = $data['bar'];

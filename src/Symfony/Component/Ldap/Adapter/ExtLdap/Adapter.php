@@ -23,9 +23,9 @@ class Adapter implements AdapterInterface
     private $connection;
     private $entryManager;
 
-    public function __construct(array $config = array())
+    public function __construct(array $config = [])
     {
-        if (!extension_loaded('ldap')) {
+        if (!\extension_loaded('ldap')) {
             throw new LdapException('The LDAP PHP extension is not enabled.');
         }
 
@@ -59,7 +59,7 @@ class Adapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function createQuery($dn, $query, array $options = array())
+    public function createQuery(string $dn, string $query, array $options = [])
     {
         return new Query($this->getConnection(), $dn, $query, $options);
     }
@@ -67,7 +67,7 @@ class Adapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function escape($subject, $ignore = '', $flags = 0)
+    public function escape(string $subject, string $ignore = '', int $flags = 0)
     {
         $value = ldap_escape($subject, $ignore, $flags);
 
@@ -76,7 +76,7 @@ class Adapter implements AdapterInterface
             if (!empty($value) && ' ' === $value[0]) {
                 $value = '\\20'.substr($value, 1);
             }
-            if (!empty($value) && ' ' === $value[strlen($value) - 1]) {
+            if (!empty($value) && ' ' === $value[\strlen($value) - 1]) {
                 $value = substr($value, 0, -1).'\\20';
             }
             $value = str_replace("\r", '\0d', $value);

@@ -2,7 +2,7 @@
 
 <serializer xmlns="http://symfony.com/schema/dic/serializer-mapping"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://symfony.com/schema/dic/serializer-mapping http://symfony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd">
+                    xsi:schemaLocation="http://symfony.com/schema/dic/serializer-mapping https://symfony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd">
 
     <class name="Symfony\Component\Serializer\Tests\Fixtures\GroupDummy">
         <attribute name="foo">
@@ -18,6 +18,11 @@
     <class name="Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy">
         <attribute name="foo" max-depth="2" />
         <attribute name="bar" max-depth="3" />
+    </class>
+
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy">
+        <attribute name="foo" serialized-name="baz" />
+        <attribute name="bar" serialized-name="qux" />
     </class>
 
     <class name="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy">

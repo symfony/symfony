@@ -12,9 +12,9 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
 
 class TwigLoaderPassTest extends TestCase
 {
@@ -72,9 +72,9 @@ class TwigLoaderPassTest extends TestCase
     {
         $this->builder->setDefinition('twig.loader.chain', $this->chainLoader);
         $this->builder->register('test_loader_1')
-            ->addTag('twig.loader', array('priority' => 100));
+            ->addTag('twig.loader', ['priority' => 100]);
         $this->builder->register('test_loader_2')
-            ->addTag('twig.loader', array('priority' => 200));
+            ->addTag('twig.loader', ['priority' => 200]);
 
         $this->pass->process($this->builder);
 

@@ -24,11 +24,13 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
 {
     const FORMAT_KEY = 'dateinterval_format';
 
-    private $format;
+    private $defaultContext = [
+        self::FORMAT_KEY => 'P%yY%mM%dDT%hH%iM%sS',
+    ];
 
-    public function __construct(string $format = 'P%yY%mM%dDT%hH%iM%sS')
+    public function __construct(array $defaultContext = [])
     {
-        $this->format = $format;
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -36,21 +38,19 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      *
      * @throws InvalidArgumentException
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof \DateInterval) {
             throw new InvalidArgumentException('The object must be an instance of "\DateInterval".');
         }
 
-        $dateIntervalFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
-
-        return $object->format($dateIntervalFormat);
+        return $object->format($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \DateInterval;
     }
@@ -69,17 +69,17 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, string $format = null, array $context = [])
     {
-        if (!is_string($data)) {
-            throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', gettype($data)));
+        if (!\is_string($data)) {
+            throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', \gettype($data)));
         }
 
         if (!$this->isISO8601($data)) {
             throw new UnexpectedValueException('Expected a valid ISO 8601 interval string.');
         }
 
-        $dateIntervalFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
+        $dateIntervalFormat = $context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY];
 
         $valuePattern = '/^'.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?P<$1>\d+)$2', $dateIntervalFormat).'$/';
         if (!preg_match($valuePattern, $data)) {
@@ -96,7 +96,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, string $format = null)
     {
         return \DateInterval::class === $type;
     }

@@ -23,36 +23,36 @@ class FunctionNode extends Node
     public function __construct(string $name, Node $arguments)
     {
         parent::__construct(
-            array('arguments' => $arguments),
-            array('name' => $name)
+            ['arguments' => $arguments],
+            ['name' => $name]
         );
     }
 
     public function compile(Compiler $compiler)
     {
-        $arguments = array();
+        $arguments = [];
         foreach ($this->nodes['arguments']->nodes as $node) {
             $arguments[] = $compiler->subcompile($node);
         }
 
         $function = $compiler->getFunction($this->attributes['name']);
 
-        $compiler->raw(call_user_func_array($function['compiler'], $arguments));
+        $compiler->raw($function['compiler'](...$arguments));
     }
 
     public function evaluate($functions, $values)
     {
-        $arguments = array($values);
+        $arguments = [$values];
         foreach ($this->nodes['arguments']->nodes as $node) {
             $arguments[] = $node->evaluate($functions, $values);
         }
 
-        return call_user_func_array($functions[$this->attributes['name']]['evaluator'], $arguments);
+        return $functions[$this->attributes['name']]['evaluator'](...$arguments);
     }
 
     public function toArray()
     {
-        $array = array();
+        $array = [];
         $array[] = $this->attributes['name'];
 
         foreach ($this->nodes['arguments']->nodes as $node) {

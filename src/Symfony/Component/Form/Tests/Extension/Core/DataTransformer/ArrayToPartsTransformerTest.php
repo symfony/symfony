@@ -20,10 +20,10 @@ class ArrayToPartsTransformerTest extends TestCase
 
     protected function setUp()
     {
-        $this->transformer = new ArrayToPartsTransformer(array(
-            'first' => array('a', 'b', 'c'),
-            'second' => array('d', 'e', 'f'),
-        ));
+        $this->transformer = new ArrayToPartsTransformer([
+            'first' => ['a', 'b', 'c'],
+            'second' => ['d', 'e', 'f'],
+        ]);
     }
 
     protected function tearDown()
@@ -33,37 +33,37 @@ class ArrayToPartsTransformerTest extends TestCase
 
     public function testTransform()
     {
-        $input = array(
+        $input = [
             'a' => '1',
             'b' => '2',
             'c' => '3',
             'd' => '4',
             'e' => '5',
             'f' => '6',
-        );
+        ];
 
-        $output = array(
-            'first' => array(
+        $output = [
+            'first' => [
                 'a' => '1',
                 'b' => '2',
                 'c' => '3',
-            ),
-            'second' => array(
+            ],
+            'second' => [
                 'd' => '4',
                 'e' => '5',
                 'f' => '6',
-            ),
-        );
+            ],
+        ];
 
         $this->assertSame($output, $this->transformer->transform($input));
     }
 
     public function testTransformEmpty()
     {
-        $output = array(
+        $output = [
             'first' => null,
             'second' => null,
-        );
+        ];
 
         $this->assertSame($output, $this->transformer->transform(null));
     }
@@ -78,47 +78,47 @@ class ArrayToPartsTransformerTest extends TestCase
 
     public function testReverseTransform()
     {
-        $input = array(
-            'first' => array(
+        $input = [
+            'first' => [
                 'a' => '1',
                 'b' => '2',
                 'c' => '3',
-            ),
-            'second' => array(
+            ],
+            'second' => [
                 'd' => '4',
                 'e' => '5',
                 'f' => '6',
-            ),
-        );
+            ],
+        ];
 
-        $output = array(
+        $output = [
             'a' => '1',
             'b' => '2',
             'c' => '3',
             'd' => '4',
             'e' => '5',
             'f' => '6',
-        );
+        ];
 
         $this->assertSame($output, $this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyEmpty()
     {
-        $input = array(
+        $input = [
             'first' => '',
             'second' => '',
-        );
+        ];
 
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyNull()
     {
-        $input = array(
+        $input = [
             'first' => null,
             'second' => null,
-        );
+        ];
 
         $this->assertNull($this->transformer->reverseTransform($input));
     }
@@ -128,14 +128,14 @@ class ArrayToPartsTransformerTest extends TestCase
      */
     public function testReverseTransformPartiallyNull()
     {
-        $input = array(
-            'first' => array(
+        $input = [
+            'first' => [
                 'a' => '1',
                 'b' => '2',
                 'c' => '3',
-            ),
+            ],
             'second' => null,
-        );
+        ];
 
         $this->transformer->reverseTransform($input);
     }

@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * REMOTE_USER authentication listener.
@@ -44,6 +44,6 @@ class RemoteUserAuthenticationListener extends AbstractPreAuthenticatedListener
             throw new BadCredentialsException(sprintf('User key was not found: %s', $this->userKey));
         }
 
-        return array($request->server->get($this->userKey), null);
+        return [$request->server->get($this->userKey), null];
     }
 }

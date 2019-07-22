@@ -25,10 +25,11 @@ class Question
     private $attempts;
     private $hidden = false;
     private $hiddenFallback = true;
-    private $autocompleterValues;
+    private $autocompleterCallback;
     private $validator;
     private $default;
     private $normalizer;
+    private $trimmable = true;
 
     /**
      * @param string $question The question to ask to the user
@@ -81,7 +82,7 @@ class Question
      */
     public function setHidden($hidden)
     {
-        if ($this->autocompleterValues) {
+        if ($this->autocompleterCallback) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
@@ -117,17 +118,19 @@ class Question
     /**
      * Gets values for the autocompleter.
      *
-     * @return null|iterable
+     * @return iterable|null
      */
     public function getAutocompleterValues()
     {
-        return $this->autocompleterValues;
+        $callback = $this->getAutocompleterCallback();
+
+        return $callback ? $callback('') : null;
     }
 
     /**
      * Sets values for the autocompleter.
      *
-     * @param null|iterable $values
+     * @param iterable|null $values
      *
      * @return $this
      *
@@ -136,19 +139,48 @@ class Question
      */
     public function setAutocompleterValues($values)
     {
-        if (is_array($values)) {
+        if (\is_array($values)) {
             $values = $this->isAssoc($values) ? array_merge(array_keys($values), array_values($values)) : array_values($values);
+
+            $callback = static function () use ($values) {
+                return $values;
+            };
+        } elseif ($values instanceof \Traversable) {
+            $valueCache = null;
+            $callback = static function () use ($values, &$valueCache) {
+                return $valueCache ?? $valueCache = iterator_to_array($values, false);
+            };
+        } elseif (null === $values) {
+            $callback = null;
+        } else {
+            throw new InvalidArgumentException('Autocompleter values can be either an array, "null" or a "Traversable" object.');
         }
 
-        if (null !== $values && !is_array($values) && !$values instanceof \Traversable) {
-            throw new InvalidArgumentException('Autocompleter values can be either an array, `null` or a `Traversable` object.');
-        }
+        return $this->setAutocompleterCallback($callback);
+    }
 
-        if ($this->hidden) {
+    /**
+     * Gets the callback function used for the autocompleter.
+     */
+    public function getAutocompleterCallback(): ?callable
+    {
+        return $this->autocompleterCallback;
+    }
+
+    /**
+     * Sets the callback function used for the autocompleter.
+     *
+     * The callback is passed the user input as argument and should return an iterable of corresponding suggestions.
+     *
+     * @return $this
+     */
+    public function setAutocompleterCallback(callable $callback = null): self
+    {
+        if ($this->hidden && null !== $callback) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
-        $this->autocompleterValues = $values;
+        $this->autocompleterCallback = $callback;
 
         return $this;
     }
@@ -156,7 +188,7 @@ class Question
     /**
      * Sets a validator for the question.
      *
-     * @param null|callable $validator
+     * @param callable|null $validator
      *
      * @return $this
      */
@@ -170,7 +202,7 @@ class Question
     /**
      * Gets the validator for the question.
      *
-     * @return null|callable
+     * @return callable|null
      */
     public function getValidator()
     {
@@ -182,7 +214,7 @@ class Question
      *
      * Null means an unlimited number of attempts.
      *
-     * @param null|int $attempts
+     * @param int|null $attempts
      *
      * @return $this
      *
@@ -204,7 +236,7 @@ class Question
      *
      * Null means an unlimited number of attempts.
      *
-     * @return null|int
+     * @return int|null
      */
     public function getMaxAttempts()
     {
@@ -241,6 +273,21 @@ class Question
 
     protected function isAssoc($array)
     {
-        return (bool) count(array_filter(array_keys($array), 'is_string'));
+        return (bool) \count(array_filter(array_keys($array), 'is_string'));
+    }
+
+    public function isTrimmable(): bool
+    {
+        return $this->trimmable;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTrimmable(bool $trimmable): self
+    {
+        $this->trimmable = $trimmable;
+
+        return $this;
     }
 }

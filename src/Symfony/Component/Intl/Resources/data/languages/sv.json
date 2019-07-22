@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.48.90",
     "Names": {
         "aa": "afar",
         "ab": "abchaziska",
@@ -88,6 +88,7 @@
         "car": "karibiska",
         "cay": "cayuga",
         "cch": "atsam",
+        "ccp": "chakma",
         "ce": "tjetjenska",
         "ceb": "cebuano",
         "cgg": "chiga",
@@ -367,7 +368,6 @@
         "ms": "malajiska",
         "mt": "maltesiska",
         "mua": "mundang",
-        "mul": "flera språk",
         "mus": "muskogee",
         "mwl": "mirandesiska",
         "mwr": "marwari",
@@ -376,7 +376,7 @@
         "mye": "myene",
         "myv": "erjya",
         "mzn": "mazanderani",
-        "na": "nauriska",
+        "na": "nauruanska",
         "nan": "min nan",
         "nap": "napolitanska",
         "naq": "nama",
@@ -455,7 +455,6 @@
         "ro_MD": "moldaviska",
         "rof": "rombo",
         "rom": "romani",
-        "root": "rot",
         "rtm": "rotumänska",
         "ru": "ryska",
         "rue": "rusyn",
@@ -570,7 +569,6 @@
         "uga": "ugaritiska",
         "uk": "ukrainska",
         "umb": "umbundu",
-        "und": "obestämt språk",
         "ur": "urdu",
         "uz": "uzbekiska",
         "vai": "vaj",
@@ -615,7 +613,6 @@
         "zh_Hant": "traditionell kinesiska",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "inget språkligt innehåll",
         "zza": "zazaiska"
     }
 }

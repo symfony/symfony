@@ -12,16 +12,16 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class AbstractRememberMeServicesTest extends TestCase
 {
     public function testGetRememberMeParameter()
     {
-        $service = $this->getService(null, array('remember_me_parameter' => 'foo'));
+        $service = $this->getService(null, ['remember_me_parameter' => 'foo']);
 
         $this->assertEquals('foo', $service->getRememberMeParameter());
     }
@@ -34,7 +34,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
     public function testAutoLoginReturnsNullWhenNoCookie()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
 
         $this->assertNull($service->autoLogin(new Request()));
     }
@@ -44,14 +44,14 @@ class AbstractRememberMeServicesTest extends TestCase
      */
     public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
         $request->cookies->set('foo', 'foo');
 
         $service
             ->expects($this->once())
             ->method('processAutoLoginCookie')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
 
         $service->autoLogin($request);
@@ -59,7 +59,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
     public function testAutoLogin()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
         $request->cookies->set('foo', 'foo');
 
@@ -67,13 +67,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getRoles')
-            ->will($this->returnValue(array()))
+            ->willReturn([])
         ;
 
         $service
             ->expects($this->once())
             ->method('processAutoLoginCookie')
-            ->will($this->returnValue($user))
+            ->willReturn($user)
         ;
 
         $returnedToken = $service->autoLogin($request);
@@ -105,15 +105,15 @@ class AbstractRememberMeServicesTest extends TestCase
 
     public function provideOptionsForLogout()
     {
-        return array(
-            array(array('name' => 'foo', 'path' => '/', 'domain' => null, 'secure' => false, 'httponly' => true)),
-            array(array('name' => 'foo', 'path' => '/bar', 'domain' => 'baz.com', 'secure' => true, 'httponly' => false)),
-        );
+        return [
+            [['name' => 'foo', 'path' => '/', 'domain' => null, 'secure' => false, 'httponly' => true]],
+            [['name' => 'foo', 'path' => '/bar', 'domain' => 'baz.com', 'secure' => true, 'httponly' => false]],
+        ];
     }
 
     public function testLoginFail()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
 
         $service->loginFail($request);
@@ -123,7 +123,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
     public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainUserInterfaceImplementation()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
@@ -131,7 +131,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue('foo'))
+            ->willReturn('foo')
         ;
 
         $service
@@ -146,7 +146,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
     public function testLoginSuccessIsNotProcessedWhenRememberMeIsNotRequested()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
@@ -154,13 +154,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($account))
+            ->willReturn($account)
         ;
 
         $service
             ->expects($this->never())
             ->method('onLoginSuccess')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
 
         $this->assertFalse($request->request->has('foo'));
@@ -170,7 +170,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
     public function testLoginSuccessWhenRememberMeAlwaysIsTrue()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
@@ -178,13 +178,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($account))
+            ->willReturn($account)
         ;
 
         $service
             ->expects($this->once())
             ->method('onLoginSuccess')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
 
         $service->loginSuccess($request, $response, $token);
@@ -195,23 +195,23 @@ class AbstractRememberMeServicesTest extends TestCase
      */
     public function testLoginSuccessWhenRememberMeParameterWithPathIsPositive($value)
     {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo[bar]', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo[bar]', 'path' => null, 'domain' => null]);
 
         $request = new Request();
-        $request->request->set('foo', array('bar' => $value));
+        $request->request->set('foo', ['bar' => $value]);
         $response = new Response();
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($account))
+            ->willReturn($account)
         ;
 
         $service
             ->expects($this->once())
             ->method('onLoginSuccess')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $service->loginSuccess($request, $response, $token);
@@ -222,7 +222,7 @@ class AbstractRememberMeServicesTest extends TestCase
      */
     public function testLoginSuccessWhenRememberMeParameterIsPositive($value)
     {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null]);
 
         $request = new Request();
         $request->request->set('foo', $value);
@@ -232,13 +232,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($account))
+            ->willReturn($account)
         ;
 
         $service
             ->expects($this->once())
             ->method('onLoginSuccess')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $service->loginSuccess($request, $response, $token);
@@ -246,24 +246,24 @@ class AbstractRememberMeServicesTest extends TestCase
 
     public function getPositiveRememberMeParameterValues()
     {
-        return array(
-            array('true'),
-            array('1'),
-            array('on'),
-            array('yes'),
-            array(true),
-        );
+        return [
+            ['true'],
+            ['1'],
+            ['on'],
+            ['yes'],
+            [true],
+        ];
     }
 
     public function testEncodeCookieAndDecodeCookieAreInvertible()
     {
-        $cookieParts = array('aa', 'bb', 'cc');
+        $cookieParts = ['aa', 'bb', 'cc'];
         $service = $this->getService();
 
-        $encoded = $this->callProtected($service, 'encodeCookie', array($cookieParts));
+        $encoded = $this->callProtected($service, 'encodeCookie', [$cookieParts]);
         $this->assertInternalType('string', $encoded);
 
-        $decoded = $this->callProtected($service, 'decodeCookie', array($encoded));
+        $decoded = $this->callProtected($service, 'decodeCookie', [$encoded]);
         $this->assertSame($cookieParts, $decoded);
     }
 
@@ -273,21 +273,21 @@ class AbstractRememberMeServicesTest extends TestCase
      */
     public function testThereShouldBeNoCookieDelimiterInCookieParts()
     {
-        $cookieParts = array('aa', 'b'.AbstractRememberMeServices::COOKIE_DELIMITER.'b', 'cc');
+        $cookieParts = ['aa', 'b'.AbstractRememberMeServices::COOKIE_DELIMITER.'b', 'cc'];
         $service = $this->getService();
 
-        $this->callProtected($service, 'encodeCookie', array($cookieParts));
+        $this->callProtected($service, 'encodeCookie', [$cookieParts]);
     }
 
-    protected function getService($userProvider = null, $options = array(), $logger = null)
+    protected function getService($userProvider = null, $options = [], $logger = null)
     {
         if (null === $userProvider) {
             $userProvider = $this->getProvider();
         }
 
-        return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', array(
-            array($userProvider), 'foosecret', 'fookey', $options, $logger,
-        ));
+        return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', [
+            [$userProvider], 'foosecret', 'fookey', $options, $logger,
+        ]);
     }
 
     protected function getProvider()
@@ -296,7 +296,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $provider
             ->expects($this->any())
             ->method('supportsClass')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         return $provider;
@@ -304,7 +304,7 @@ class AbstractRememberMeServicesTest extends TestCase
 
     private function callProtected($object, $method, array $args)
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new \ReflectionClass(\get_class($object));
         $reflectionMethod = $reflection->getMethod($method);
         $reflectionMethod->setAccessible(true);
 

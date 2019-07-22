@@ -19,7 +19,7 @@ class Entry
     private $dn;
     private $attributes;
 
-    public function __construct(string $dn, array $attributes = array())
+    public function __construct(string $dn, array $attributes = [])
     {
         $this->dn = $dn;
         $this->attributes = $attributes;
@@ -38,11 +38,11 @@ class Entry
     /**
      * Returns whether an attribute exists.
      *
-     * @param $name string The name of the attribute
+     * @param string $name The name of the attribute
      *
      * @return bool
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name)
     {
         return isset($this->attributes[$name]);
     }
@@ -53,11 +53,11 @@ class Entry
      * As LDAP can return multiple values for a single attribute,
      * this value is returned as an array.
      *
-     * @param $name string The name of the attribute
+     * @param string $name The name of the attribute
      *
-     * @return null|array
+     * @return array|null
      */
-    public function getAttribute($name)
+    public function getAttribute(string $name)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
     }
@@ -78,7 +78,7 @@ class Entry
      * @param string $name
      * @param array  $value
      */
-    public function setAttribute($name, array $value)
+    public function setAttribute(string $name, array $value)
     {
         $this->attributes[$name] = $value;
     }
@@ -88,7 +88,7 @@ class Entry
      *
      * @param string $name
      */
-    public function removeAttribute($name)
+    public function removeAttribute(string $name)
     {
         unset($this->attributes[$name]);
     }

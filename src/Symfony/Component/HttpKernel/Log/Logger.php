@@ -22,7 +22,7 @@ use Psr\Log\LogLevel;
  */
 class Logger extends AbstractLogger
 {
-    private static $levels = array(
+    private static $levels = [
         LogLevel::DEBUG => 0,
         LogLevel::INFO => 1,
         LogLevel::NOTICE => 2,
@@ -31,7 +31,7 @@ class Logger extends AbstractLogger
         LogLevel::CRITICAL => 5,
         LogLevel::ALERT => 6,
         LogLevel::EMERGENCY => 7,
-    );
+    ];
 
     private $minLevelIndex;
     private $formatter;
@@ -40,7 +40,7 @@ class Logger extends AbstractLogger
     public function __construct(string $minLevel = null, $output = 'php://stderr', callable $formatter = null)
     {
         if (null === $minLevel) {
-            $minLevel = LogLevel::WARNING;
+            $minLevel = 'php://stdout' === $output || 'php://stderr' === $output ? LogLevel::CRITICAL : LogLevel::WARNING;
 
             if (isset($_ENV['SHELL_VERBOSITY']) || isset($_SERVER['SHELL_VERBOSITY'])) {
                 switch ((int) (isset($_ENV['SHELL_VERBOSITY']) ? $_ENV['SHELL_VERBOSITY'] : $_SERVER['SHELL_VERBOSITY'])) {
@@ -57,8 +57,8 @@ class Logger extends AbstractLogger
         }
 
         $this->minLevelIndex = self::$levels[$minLevel];
-        $this->formatter = $formatter ?: array($this, 'format');
-        if (false === $this->handle = is_resource($output) ? $output : @fopen($output, 'a')) {
+        $this->formatter = $formatter ?: [$this, 'format'];
+        if (false === $this->handle = \is_resource($output) ? $output : @fopen($output, 'a')) {
             throw new InvalidArgumentException(sprintf('Unable to open "%s".', $output));
         }
     }
@@ -66,7 +66,7 @@ class Logger extends AbstractLogger
     /**
      * {@inheritdoc}
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         if (!isset(self::$levels[$level])) {
             throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $level));
@@ -83,7 +83,7 @@ class Logger extends AbstractLogger
     private function format(string $level, string $message, array $context): string
     {
         if (false !== strpos($message, '{')) {
-            $replacements = array();
+            $replacements = [];
             foreach ($context as $key => $val) {
                 if (null === $val || is_scalar($val) || (\is_object($val) && method_exists($val, '__toString'))) {
                     $replacements["{{$key}}"] = $val;

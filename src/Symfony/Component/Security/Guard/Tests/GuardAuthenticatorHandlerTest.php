@@ -14,11 +14,15 @@ namespace Symfony\Component\Security\Guard\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class GuardAuthenticatorHandlerTest extends TestCase
 {
@@ -26,6 +30,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
     private $dispatcher;
     private $token;
     private $request;
+    private $sessionStrategy;
     private $guardAuthenticator;
 
     public function testAuthenticateWithToken()
@@ -39,7 +44,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->equalTo(SecurityEvents::INTERACTIVE_LOGIN), $this->equalTo($loginEvent))
+            ->with($this->equalTo($loginEvent), $this->equalTo(SecurityEvents::INTERACTIVE_LOGIN))
         ;
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
@@ -53,7 +58,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator->expects($this->once())
             ->method('onAuthenticationSuccess')
             ->with($this->request, $this->token, $providerKey)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationSuccess($this->token, $this->request, $this->guardAuthenticator, $providerKey);
@@ -72,7 +77,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $authException)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, 'firewall_provider_key');
@@ -89,7 +94,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->getMock();
         $token->expects($this->any())
             ->method('getProviderKey')
-            ->will($this->returnValue($tokenProviderKey));
+            ->willReturn($tokenProviderKey);
 
         $this->tokenStorage->expects($this->never())
             ->method('setToken')
@@ -100,7 +105,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $authException)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, $actualProviderKey);
@@ -109,21 +114,59 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     public function getTokenClearingTests()
     {
-        $tests = array();
+        $tests = [];
         // correct token class and matching firewall => clear the token
-        $tests[] = array('Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'the_firewall_key');
-        $tests[] = array('Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'different_key');
-        $tests[] = array('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', 'the_firewall_key', 'the_firewall_key');
+        $tests[] = ['Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'the_firewall_key'];
+        $tests[] = ['Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'different_key'];
+        $tests[] = ['Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', 'the_firewall_key', 'the_firewall_key'];
 
         return $tests;
     }
 
+    public function testNoFailureIfSessionStrategyNotPassed()
+    {
+        $this->configurePreviousSession();
+
+        $this->tokenStorage->expects($this->once())
+            ->method('setToken')
+            ->with($this->token);
+
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
+        $handler->authenticateWithToken($this->token, $this->request);
+    }
+
+    public function testSessionStrategyIsCalled()
+    {
+        $this->configurePreviousSession();
+
+        $this->sessionStrategy->expects($this->once())
+            ->method('onAuthentication')
+            ->with($this->request, $this->token);
+
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
+        $handler->setSessionAuthenticationStrategy($this->sessionStrategy);
+        $handler->authenticateWithToken($this->token, $this->request);
+    }
+
+    public function testSessionStrategyIsNotCalledWhenStateless()
+    {
+        $this->configurePreviousSession();
+
+        $this->sessionStrategy->expects($this->never())
+            ->method('onAuthentication');
+
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher, ['some_provider_key']);
+        $handler->setSessionAuthenticationStrategy($this->sessionStrategy);
+        $handler->authenticateWithToken($this->token, $this->request, 'some_provider_key');
+    }
+
     protected function setUp()
     {
-        $this->tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
-        $this->request = new Request(array(), array(), array(), array(), array(), array());
+        $this->tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $this->token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $this->request = new Request([], [], [], [], [], []);
+        $this->sessionStrategy = $this->getMockBuilder(SessionAuthenticationStrategyInterface::class)->getMock();
         $this->guardAuthenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
     }
 
@@ -134,5 +177,15 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->token = null;
         $this->request = null;
         $this->guardAuthenticator = null;
+    }
+
+    private function configurePreviousSession()
+    {
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session->expects($this->any())
+            ->method('getName')
+            ->willReturn('test_session_name');
+        $this->request->setSession($session);
+        $this->request->cookies->set('test_session_name', 'session_cookie_val');
     }
 }

@@ -21,13 +21,13 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createArgumentMetadata($controller)
+    public function createArgumentMetadata($controller): array
     {
-        $arguments = array();
+        $arguments = [];
 
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             $reflection = new \ReflectionMethod($controller[0], $controller[1]);
-        } elseif (is_object($controller) && !$controller instanceof \Closure) {
+        } elseif (\is_object($controller) && !$controller instanceof \Closure) {
             $reflection = (new \ReflectionObject($controller))->getMethod('__invoke');
         } else {
             $reflection = new \ReflectionFunction($controller);
@@ -42,30 +42,24 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 
     /**
      * Returns an associated type to the given parameter if available.
-     *
-     * @param \ReflectionParameter $parameter
-     *
-     * @return null|string
      */
-    private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function)
+    private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function): ?string
     {
         if (!$type = $parameter->getType()) {
-            return;
+            return null;
         }
         $name = $type->getName();
-        $lcName = strtolower($name);
 
-        if ('self' !== $lcName && 'parent' !== $lcName) {
-            return $name;
+        if ($function instanceof \ReflectionMethod) {
+            $lcName = strtolower($name);
+            switch ($lcName) {
+                case 'self':
+                    return $function->getDeclaringClass()->name;
+                case 'parent':
+                    return ($parent = $function->getDeclaringClass()->getParentClass()) ? $parent->name : null;
+            }
         }
-        if (!$function instanceof \ReflectionMethod) {
-            return;
-        }
-        if ('self' === $lcName) {
-            return $function->getDeclaringClass()->name;
-        }
-        if ($parent = $function->getDeclaringClass()->getParentClass()) {
-            return $parent->name;
-        }
+
+        return $name;
     }
 }

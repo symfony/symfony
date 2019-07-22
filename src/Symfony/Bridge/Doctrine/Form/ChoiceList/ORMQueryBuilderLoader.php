@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Loads entities using a {@link QueryBuilder} instance.
@@ -64,7 +64,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         // Guess type
         $entity = current($qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
-        if (in_array($metadata->getTypeOfField($identifier), array('integer', 'bigint', 'smallint'))) {
+        if (\in_array($metadata->getTypeOfField($identifier), ['integer', 'bigint', 'smallint'])) {
             $parameterType = Connection::PARAM_INT_ARRAY;
 
             // Filter out non-integer values (e.g. ""). If we don't, some
@@ -72,7 +72,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
             $values = array_values(array_filter($values, function ($v) {
                 return (string) $v === (string) (int) $v || ctype_digit($v);
             }));
-        } elseif (in_array($metadata->getTypeOfField($identifier), array('uuid', 'guid'))) {
+        } elseif (\in_array($metadata->getTypeOfField($identifier), ['uuid', 'guid'])) {
             $parameterType = Connection::PARAM_STR_ARRAY;
 
             // Like above, but we just filter out empty strings.
@@ -83,7 +83,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
             $parameterType = Connection::PARAM_STR_ARRAY;
         }
         if (!$values) {
-            return array();
+            return [];
         }
 
         return $qb->andWhere($where)

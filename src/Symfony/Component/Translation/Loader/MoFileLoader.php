@@ -71,7 +71,7 @@ class MoFileLoader extends FileLoader
         // offsetHashes
         $this->readLong($stream, $isBigEndian);
 
-        $messages = array();
+        $messages = [];
 
         for ($i = 0; $i < $count; ++$i) {
             $pluralId = null;
@@ -108,20 +108,15 @@ class MoFileLoader extends FileLoader
                 $translated = explode("\000", $translated);
             }
 
-            $ids = array('singular' => $singularId, 'plural' => $pluralId);
+            $ids = ['singular' => $singularId, 'plural' => $pluralId];
             $item = compact('ids', 'translated');
 
-            if (is_array($item['translated'])) {
-                $messages[$item['ids']['singular']] = stripcslashes($item['translated'][0]);
+            if (!empty($item['ids']['singular'])) {
+                $id = $item['ids']['singular'];
                 if (isset($item['ids']['plural'])) {
-                    $plurals = array();
-                    foreach ($item['translated'] as $plural => $translated) {
-                        $plurals[] = sprintf('{%d} %s', $plural, $translated);
-                    }
-                    $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
+                    $id .= '|'.$item['ids']['plural'];
                 }
-            } elseif (!empty($item['ids']['singular'])) {
-                $messages[$item['ids']['singular']] = stripcslashes($item['translated']);
+                $messages[$id] = stripcslashes(implode('|', (array) $item['translated']));
             }
         }
 

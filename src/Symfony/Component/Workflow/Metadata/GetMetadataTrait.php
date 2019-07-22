@@ -43,6 +43,6 @@ trait GetMetadataTrait
             return $metadataBag[$key] ?? null;
         }
 
-        throw new InvalidArgumentException(sprintf('Could not find a MetadataBag for the subject of type "%s".', is_object($subject) ? get_class($subject) : gettype($subject)));
+        throw new InvalidArgumentException(sprintf('Could not find a MetadataBag for the subject of type "%s".', \is_object($subject) ? \get_class($subject) : \gettype($subject)));
     }
 }

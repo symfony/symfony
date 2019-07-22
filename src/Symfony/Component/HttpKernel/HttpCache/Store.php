@@ -38,7 +38,7 @@ class Store implements StoreInterface
             throw new \RuntimeException(sprintf('Unable to create the store directory (%s).', $this->root));
         }
         $this->keyCache = new \SplObjectStorage();
-        $this->locks = array();
+        $this->locks = [];
     }
 
     /**
@@ -52,7 +52,7 @@ class Store implements StoreInterface
             fclose($lock);
         }
 
-        $this->locks = array();
+        $this->locks = [];
     }
 
     /**
@@ -66,7 +66,7 @@ class Store implements StoreInterface
 
         if (!isset($this->locks[$key])) {
             $path = $this->getPath($key);
-            if (!file_exists(dirname($path)) && false === @mkdir(dirname($path), 0777, true) && !is_dir(dirname($path))) {
+            if (!file_exists(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
                 return $path;
             }
             $h = fopen($path, 'cb');
@@ -185,16 +185,16 @@ class Store implements StoreInterface
             $response->headers->set('X-Content-Digest', $digest);
 
             if (!$response->headers->has('Transfer-Encoding')) {
-                $response->headers->set('Content-Length', strlen($response->getContent()));
+                $response->headers->set('Content-Length', \strlen($response->getContent()));
             }
         }
 
         // read existing cache entries, remove non-varying, and add this one to the list
-        $entries = array();
+        $entries = [];
         $vary = $response->headers->get('vary');
         foreach ($this->getMetadata($key) as $entry) {
             if (!isset($entry[1]['vary'][0])) {
-                $entry[1]['vary'] = array('');
+                $entry[1]['vary'] = [''];
             }
 
             if ($entry[1]['vary'][0] != $vary || !$this->requestsMatch($vary, $entry[0], $storedEnv)) {
@@ -205,7 +205,7 @@ class Store implements StoreInterface
         $headers = $this->persistResponse($response);
         unset($headers['age']);
 
-        array_unshift($entries, array($storedEnv, $headers));
+        array_unshift($entries, [$storedEnv, $headers]);
 
         if (false === $this->save($key, serialize($entries))) {
             throw new \RuntimeException('Unable to store the metadata.');
@@ -234,13 +234,13 @@ class Store implements StoreInterface
         $modified = false;
         $key = $this->getCacheKey($request);
 
-        $entries = array();
+        $entries = [];
         foreach ($this->getMetadata($key) as $entry) {
             $response = $this->restoreResponse($entry[1]);
             if ($response->isFresh()) {
                 $response->expire();
                 $modified = true;
-                $entries[] = array($entry[0], $this->persistResponse($response));
+                $entries[] = [$entry[0], $this->persistResponse($response)];
             } else {
                 $entries[] = $entry;
             }
@@ -291,7 +291,7 @@ class Store implements StoreInterface
     private function getMetadata($key)
     {
         if (!$entries = $this->load($key)) {
-            return array();
+            return [];
         }
 
         return unserialize($entries);
@@ -373,17 +373,17 @@ class Store implements StoreInterface
             @ftruncate($fp, 0);
             @fseek($fp, 0);
             $len = @fwrite($fp, $data);
-            if (strlen($data) !== $len) {
+            if (\strlen($data) !== $len) {
                 @ftruncate($fp, 0);
 
                 return false;
             }
         } else {
-            if (!file_exists(dirname($path)) && false === @mkdir(dirname($path), 0777, true) && !is_dir(dirname($path))) {
+            if (!file_exists(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
                 return false;
             }
 
-            $tmpFile = tempnam(dirname($path), basename($path));
+            $tmpFile = tempnam(\dirname($path), basename($path));
             if (false === $fp = @fopen($tmpFile, 'wb')) {
                 @unlink($tmpFile);
 
@@ -410,7 +410,7 @@ class Store implements StoreInterface
 
     public function getPath($key)
     {
-        return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
+        return $this->root.\DIRECTORY_SEPARATOR.substr($key, 0, 2).\DIRECTORY_SEPARATOR.substr($key, 2, 2).\DIRECTORY_SEPARATOR.substr($key, 4, 2).\DIRECTORY_SEPARATOR.substr($key, 6);
     }
 
     /**
@@ -462,7 +462,7 @@ class Store implements StoreInterface
     private function persistResponse(Response $response)
     {
         $headers = $response->headers->all();
-        $headers['X-Status'] = array($response->getStatusCode());
+        $headers['X-Status'] = [$response->getStatusCode()];
 
         return $headers;
     }
@@ -481,7 +481,7 @@ class Store implements StoreInterface
         unset($headers['X-Status']);
 
         if (null !== $body) {
-            $headers['X-Body-File'] = array($body);
+            $headers['X-Body-File'] = [$body];
         }
 
         return new Response($body, $status, $headers);

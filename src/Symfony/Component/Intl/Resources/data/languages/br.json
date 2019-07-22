@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.86",
     "Names": {
         "aa": "afar",
         "ab": "abkhazeg",
@@ -319,7 +319,6 @@
         "ms": "malayseg",
         "mt": "malteg",
         "mua": "moundangeg",
-        "mul": "yezhoù lies",
         "mus": "muskogi",
         "mwl": "mirandeg",
         "my": "birmaneg",
@@ -400,7 +399,6 @@
         "ro_MD": "moldoveg",
         "rof": "rombo",
         "rom": "romanieg",
-        "root": "gwrizienn",
         "ru": "rusianeg",
         "rup": "aroumaneg",
         "rw": "kinyarwanda",
@@ -498,7 +496,6 @@
         "uga": "ougariteg",
         "uk": "ukraineg",
         "umb": "umbundu",
-        "und": "yezh dianav",
         "ur": "ourdou",
         "uz": "ouzbekeg",
         "vai": "vai",
@@ -540,7 +537,6 @@
         "zh_Hant": "sinaeg hengounel",
         "zu": "zouloueg",
         "zun": "zuni",
-        "zxx": "diyezh",
         "zza": "zazakeg"
     }
 }

@@ -15,8 +15,10 @@ namespace Symfony\Component\Config\Resource;
  * DirectoryResource represents a resources stored in a subdirectory tree.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
-class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
+class DirectoryResource implements SelfCheckingResourceInterface
 {
     private $resource;
     private $pattern;
@@ -40,25 +42,23 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return md5(serialize(array($this->resource, $this->pattern)));
+        return md5(serialize([$this->resource, $this->pattern]));
     }
 
     /**
      * @return string The file path to the resource
      */
-    public function getResource()
+    public function getResource(): string
     {
         return $this->resource;
     }
 
     /**
      * Returns the pattern to restrict monitored files.
-     *
-     * @return string|null
      */
-    public function getPattern()
+    public function getPattern(): ?string
     {
         return $this->pattern;
     }
@@ -66,7 +66,7 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp): bool
     {
         if (!is_dir($this->resource)) {
             return false;
@@ -102,15 +102,5 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
         }
 
         return true;
-    }
-
-    public function serialize()
-    {
-        return serialize(array($this->resource, $this->pattern));
-    }
-
-    public function unserialize($serialized)
-    {
-        list($this->resource, $this->pattern) = unserialize($serialized);
     }
 }

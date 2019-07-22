@@ -13,11 +13,11 @@ namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -34,7 +34,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describe(OutputInterface $output, $object, array $options = array())
+    public function describe(OutputInterface $output, $object, array $options = [])
     {
         $this->output = $output;
 
@@ -55,17 +55,14 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeApplication($object, $options);
                 break;
             default:
-                throw new InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
+                throw new InvalidArgumentException(sprintf('Object of type "%s" is not describable.', \get_class($object)));
         }
     }
 
     /**
      * Writes content to output.
-     *
-     * @param string $content
-     * @param bool   $decorated
      */
-    protected function write($content, $decorated = false)
+    protected function write(string $content, bool $decorated = false)
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
@@ -75,33 +72,33 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string|mixed
      */
-    abstract protected function describeInputArgument(InputArgument $argument, array $options = array());
+    abstract protected function describeInputArgument(InputArgument $argument, array $options = []);
 
     /**
      * Describes an InputOption instance.
      *
      * @return string|mixed
      */
-    abstract protected function describeInputOption(InputOption $option, array $options = array());
+    abstract protected function describeInputOption(InputOption $option, array $options = []);
 
     /**
      * Describes an InputDefinition instance.
      *
      * @return string|mixed
      */
-    abstract protected function describeInputDefinition(InputDefinition $definition, array $options = array());
+    abstract protected function describeInputDefinition(InputDefinition $definition, array $options = []);
 
     /**
      * Describes a Command instance.
      *
      * @return string|mixed
      */
-    abstract protected function describeCommand(Command $command, array $options = array());
+    abstract protected function describeCommand(Command $command, array $options = []);
 
     /**
      * Describes an Application instance.
      *
      * @return string|mixed
      */
-    abstract protected function describeApplication(Application $application, array $options = array());
+    abstract protected function describeApplication(Application $application, array $options = []);
 }

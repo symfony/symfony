@@ -17,11 +17,9 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
-use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * @group time-sensitive
@@ -31,13 +29,11 @@ class TraceableFirewallListenerTest extends TestCase
     public function testOnKernelRequestRecordsListeners()
     {
         $request = new Request();
-        $event = new GetResponseEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
         $event->setResponse($response = new Response());
-        $listener = $this->getMockBuilder(ListenerInterface::class)->getMock();
-        $listener
-            ->expects($this->once())
-            ->method('handle')
-            ->with($event);
+        $listener = function ($e) use ($event, &$listenerCalled) {
+            $listenerCalled += $e === $event;
+        };
         $firewallMap = $this
             ->getMockBuilder(FirewallMap::class)
             ->disableOriginalConstructor()
@@ -51,15 +47,14 @@ class TraceableFirewallListenerTest extends TestCase
             ->expects($this->once())
             ->method('getListeners')
             ->with($request)
-            ->willReturn(array(array($listener), null, null));
+            ->willReturn([[$listener], null, null]);
 
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
+        $firewall->configureLogoutUrlGenerator($event);
         $firewall->onKernelRequest($event);
 
         $listeners = $firewall->getWrappedListeners();
         $this->assertCount(1, $listeners);
-        $this->assertSame($response, $listeners[0]['response']);
-        $this->assertInstanceOf(ClassStub::class, $listeners[0]['stub']);
-        $this->assertSame(get_class($listener), (string) $listeners[0]['stub']);
+        $this->assertSame($listener, $listeners[0]['stub']);
     }
 }

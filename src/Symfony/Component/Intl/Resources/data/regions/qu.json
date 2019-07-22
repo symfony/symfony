@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.72",
+    "Version": "2.1.49.82",
     "Names": {
         "AD": "Andorra",
         "AF": "Afganistán",
@@ -67,6 +67,7 @@
         "GW": "Guinea-Bisáu",
         "GY": "Guyana",
         "HK": "Hong Kong (RAE)",
+        "HM": "Islas Heard y McDonald",
         "HN": "Honduras",
         "HR": "Croacia",
         "HT": "Haití",
@@ -104,7 +105,7 @@
         "MF": "San Martín",
         "MG": "Madagascar",
         "MH": "Islas Marshall",
-        "MK": "ERY Macedonia",
+        "MK": "Macedonia del Norte",
         "ML": "Malí",
         "MM": "Myanmar",
         "MO": "Macao RAE",

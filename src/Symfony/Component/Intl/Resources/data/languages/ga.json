@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.49.82",
     "Names": {
         "aa": "Afáiris",
         "ab": "Abcáisis",
@@ -52,6 +52,7 @@
         "bug": "Buiginis",
         "byn": "byn",
         "ca": "Catalóinis",
+        "ccp": "ccp",
         "ce": "Seisnis",
         "ceb": "Seabúáinis",
         "cgg": "cgg",
@@ -269,7 +270,6 @@
         "ms": "Malaeis",
         "mt": "Máltais",
         "mua": "mua",
-        "mul": "Ilteangacha",
         "mus": "mus",
         "mwl": "Mioraindéis",
         "mwr": "Marmhairis",
@@ -333,7 +333,6 @@
         "ro_MD": "Moldáivis",
         "rof": "rof",
         "rom": "Romainis",
-        "root": "root",
         "ru": "Rúisis",
         "rup": "Arómáinis",
         "rw": "Ciniaruaindis",
@@ -415,7 +414,6 @@
         "ug": "Uigiúiris",
         "uk": "Úcráinis",
         "umb": "umb",
-        "und": "Teanga Anaithnid",
         "ur": "Urdúis",
         "uz": "Úisbéiceastáinis",
         "vai": "vai",
@@ -447,7 +445,6 @@
         "zh_Hant": "Sínis Thraidisiúnta",
         "zu": "Súlúis",
         "zun": "Zúinis",
-        "zxx": "Gan ábhar teangeolaíoch",
         "zza": "zza"
     }
 }

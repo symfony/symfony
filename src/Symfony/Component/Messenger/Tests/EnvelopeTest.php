@@ -12,10 +12,11 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\EnvelopeAwareInterface;
-use Symfony\Component\Messenger\Middleware\Configuration\ValidationConfiguration;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 /**
@@ -25,58 +26,105 @@ class EnvelopeTest extends TestCase
 {
     public function testConstruct()
     {
-        $envelope = new Envelope($dummy = new DummyMessage('dummy'), array(
-            $receivedConfig = new ReceivedMessage(),
-        ));
+        $receivedStamp = new ReceivedStamp('transport');
+        $envelope = new Envelope($dummy = new DummyMessage('dummy'), [$receivedStamp]);
 
         $this->assertSame($dummy, $envelope->getMessage());
-        $this->assertArrayHasKey(ReceivedMessage::class, $configs = $envelope->all());
-        $this->assertSame($receivedConfig, $configs[ReceivedMessage::class]);
-    }
-
-    public function testWrap()
-    {
-        $first = Envelope::wrap($dummy = new DummyMessage('dummy'));
-
-        $this->assertInstanceOf(Envelope::class, $first);
-        $this->assertSame($dummy, $first->getMessage());
-
-        $envelope = Envelope::wrap($first);
-        $this->assertSame($first, $envelope);
+        $this->assertArrayHasKey(ReceivedStamp::class, $stamps = $envelope->all());
+        $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class][0]);
     }
 
     public function testWithReturnsNewInstance()
     {
-        $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'));
+        $envelope = new Envelope(new DummyMessage('dummy'));
 
-        $this->assertNotSame($envelope, $envelope->with(new ReceivedMessage()));
+        $this->assertNotSame($envelope, $envelope->with(new ReceivedStamp('transport')));
     }
 
-    public function testGet()
+    public function testWithoutAll()
     {
-        $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'))
-            ->with($config = new ReceivedMessage())
-        ;
+        $envelope = new Envelope(new DummyMessage('dummy'), [new ReceivedStamp('transport1'), new ReceivedStamp('transport2'), new DelayStamp(5000)]);
 
-        $this->assertSame($config, $envelope->get(ReceivedMessage::class));
-        $this->assertNull($envelope->get(ValidationConfiguration::class));
+        $envelope = $envelope->withoutAll(ReceivedStamp::class);
+
+        $this->assertEmpty($envelope->all(ReceivedStamp::class));
+        $this->assertCount(1, $envelope->all(DelayStamp::class));
+    }
+
+    public function testWithoutStampsOfType()
+    {
+        $envelope = new Envelope(new DummyMessage('dummy'), [
+            new ReceivedStamp('transport1'),
+            new DummyExtendsFooBarStamp(),
+            new DummyImplementsFooBarStamp(),
+        ]);
+
+        $envelope2 = $envelope->withoutStampsOfType(DummyNothingImplementsMeStampInterface::class);
+        $this->assertEquals($envelope, $envelope2);
+
+        $envelope3 = $envelope2->withoutStampsOfType(ReceivedStamp::class);
+        $this->assertEmpty($envelope3->all(ReceivedStamp::class));
+
+        $envelope4 = $envelope3->withoutStampsOfType(DummyImplementsFooBarStamp::class);
+        $this->assertEmpty($envelope4->all(DummyImplementsFooBarStamp::class));
+        $this->assertEmpty($envelope4->all(DummyExtendsFooBarStamp::class));
+
+        $envelope5 = $envelope3->withoutStampsOfType(DummyFooBarStampInterface::class);
+        $this->assertEmpty($envelope5->all());
+    }
+
+    public function testLast()
+    {
+        $receivedStamp = new ReceivedStamp('transport');
+        $envelope = new Envelope($dummy = new DummyMessage('dummy'), [$receivedStamp]);
+
+        $this->assertSame($receivedStamp, $envelope->last(ReceivedStamp::class));
+        $this->assertNull($envelope->last(ValidationStamp::class));
     }
 
     public function testAll()
     {
-        $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'))
-            ->with($receivedConfig = new ReceivedMessage())
-            ->with($validationConfig = new ValidationConfiguration(array('foo')))
+        $envelope = (new Envelope($dummy = new DummyMessage('dummy')))
+            ->with($receivedStamp = new ReceivedStamp('transport'))
+            ->with($validationStamp = new ValidationStamp(['foo']))
         ;
 
-        $configs = $envelope->all();
-        $this->assertArrayHasKey(ReceivedMessage::class, $configs);
-        $this->assertSame($receivedConfig, $configs[ReceivedMessage::class]);
-        $this->assertArrayHasKey(ValidationConfiguration::class, $configs);
-        $this->assertSame($validationConfig, $configs[ValidationConfiguration::class]);
+        $stamps = $envelope->all();
+        $this->assertArrayHasKey(ReceivedStamp::class, $stamps);
+        $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class][0]);
+        $this->assertArrayHasKey(ValidationStamp::class, $stamps);
+        $this->assertSame($validationStamp, $stamps[ValidationStamp::class][0]);
+    }
+
+    public function testWrapWithMessage()
+    {
+        $message = new \stdClass();
+        $stamp = new ReceivedStamp('transport');
+        $envelope = Envelope::wrap($message, [$stamp]);
+
+        $this->assertSame($message, $envelope->getMessage());
+        $this->assertSame([ReceivedStamp::class => [$stamp]], $envelope->all());
+    }
+
+    public function testWrapWithEnvelope()
+    {
+        $envelope = new Envelope(new \stdClass(), [new DelayStamp(5)]);
+        $envelope = Envelope::wrap($envelope, [new ReceivedStamp('transport')]);
+
+        $this->assertCount(1, $envelope->all(DelayStamp::class));
+        $this->assertCount(1, $envelope->all(ReceivedStamp::class));
     }
 }
 
-class FooConfigurationConsumer implements EnvelopeAwareInterface
+interface DummyFooBarStampInterface extends StampInterface
+{
+}
+interface DummyNothingImplementsMeStampInterface extends StampInterface
+{
+}
+class DummyImplementsFooBarStamp implements DummyFooBarStampInterface
+{
+}
+class DummyExtendsFooBarStamp extends DummyImplementsFooBarStamp
 {
 }

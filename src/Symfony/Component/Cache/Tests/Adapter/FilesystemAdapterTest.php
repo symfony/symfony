@@ -34,7 +34,7 @@ class FilesystemAdapterTest extends AdapterTestCase
         if (!file_exists($dir)) {
             return;
         }
-        if (!$dir || 0 !== strpos(dirname($dir), sys_get_temp_dir())) {
+        if (!$dir || 0 !== strpos(\dirname($dir), sys_get_temp_dir())) {
             throw new \Exception(__METHOD__."() operates only on subdirs of system's temp dir");
         }
         $children = new \RecursiveIteratorIterator(

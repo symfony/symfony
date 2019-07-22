@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
@@ -13,12 +13,17 @@
             <tag name="monolog.logger" channel="console" />
         </service>
 
+        <service id="console.suggest_missing_package_subscriber" class="Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
         <service id="console.command.about" class="Symfony\Bundle\FrameworkBundle\Command\AboutCommand">
             <tag name="console.command" command="about" />
         </service>
 
         <service id="console.command.assets_install" class="Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand">
             <argument type="service" id="filesystem" />
+            <argument>%kernel.project_dir%</argument>
             <tag name="console.command" command="assets:install" />
         </service>
 
@@ -43,6 +48,11 @@
             <tag name="console.command" command="cache:pool:delete" />
         </service>
 
+        <service id="console.command.cache_pool_list" class="Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand">
+            <argument /> <!-- Pool names -->
+            <tag name="console.command" command="cache:pool:list" />
+        </service>
+
         <service id="console.command.cache_warmup" class="Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand">
             <argument type="service" id="cache_warmer" />
             <tag name="console.command" command="cache:warmup" />
@@ -61,6 +71,8 @@
         </service>
 
         <service id="console.command.debug_autowiring" class="Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand">
+            <argument>null</argument>
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null"/>
             <tag name="console.command" command="debug:autowiring" />
         </service>
 
@@ -70,12 +82,25 @@
         </service>
 
         <service id="console.command.messenger_consume_messages" class="Symfony\Component\Messenger\Command\ConsumeMessagesCommand">
-            <argument type="service" id="message_bus" />
+            <argument type="service" id="messenger.routable_message_bus" />
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
-            <argument>null</argument> <!-- Default receiver name -->
+            <argument type="collection" /> <!-- Receiver names -->
+            <argument type="service" id="messenger.retry_strategy_locator" />
+            <argument type="service" id="event_dispatcher" />
+            <call method="setCachePoolForRestartSignal">
+                <argument type="service" id="cache.messenger.restart_workers_signal" />
+            </call>
 
-            <tag name="console.command" command="messenger:consume-messages" />
+            <tag name="console.command" command="messenger:consume" />
+            <tag name="monolog.logger" channel="messenger" />
+        </service>
+
+        <service id="console.command.messenger_setup_transports" class="Symfony\Component\Messenger\Command\SetupTransportsCommand">
+            <argument type="service" id="messenger.receiver_locator" />
+            <argument type="collection" /> <!-- Receiver names -->
+
+            <tag name="console.command" command="messenger:setup-transports" />
         </service>
 
         <service id="console.command.messenger_debug" class="Symfony\Component\Messenger\Command\DebugCommand">
@@ -83,8 +108,39 @@
             <tag name="console.command" command="debug:messenger" />
         </service>
 
+        <service id="console.command.messenger_stop_workers" class="Symfony\Component\Messenger\Command\StopWorkersCommand">
+            <argument type="service" id="cache.messenger.restart_workers_signal" />
+            <tag name="console.command" command="messenger:stop-workers" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_retry" class="Symfony\Component\Messenger\Command\FailedMessagesRetryCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+            <argument type="service" id="messenger.routable_message_bus" />
+            <argument type="service" id="event_dispatcher" />
+            <argument /> <!-- Retry strategy -->
+            <argument type="service" id="logger" />
+
+            <tag name="console.command" command="messenger:failed:retry" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_show" class="Symfony\Component\Messenger\Command\FailedMessagesShowCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+
+            <tag name="console.command" command="messenger:failed:show" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_remove" class="Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+
+            <tag name="console.command" command="messenger:failed:remove" />
+        </service>
+
         <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
             <argument type="service" id="router" />
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <tag name="console.command" command="debug:router" />
         </service>
 
@@ -99,6 +155,8 @@
             <argument type="service" id="translation.extractor" />
             <argument>%translator.default_path%</argument>
             <argument /> <!-- %twig.default_path% -->
+            <argument type="collection" /> <!-- Translator paths -->
+            <argument type="collection" /> <!-- Twig paths -->
             <tag name="console.command" command="debug:translation" />
         </service>
 
@@ -109,6 +167,8 @@
             <argument>%kernel.default_locale%</argument>
             <argument>%translator.default_path%</argument>
             <argument /> <!-- %twig.default_path% -->
+            <argument type="collection" /> <!-- Translator paths -->
+            <argument type="collection" /> <!-- Twig paths -->
             <tag name="console.command" command="translation:update" />
         </service>
 
@@ -130,6 +190,7 @@
             <argument type="collection" /> <!-- All services form types are stored here by FormPass -->
             <argument type="collection" /> <!-- All type extensions are stored here by FormPass -->
             <argument type="collection" /> <!-- All type guessers are stored here by FormPass -->
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <tag name="console.command" command="debug:form" />
         </service>
     </services>

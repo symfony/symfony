@@ -4,7 +4,10 @@ imports:
 framework:
     secret: '%secret%'
     default_locale: '%env(LOCALE)%'
+    session:
+        cookie_httponly: '%env(bool:COOKIE_HTTPONLY)%'
 
 parameters:
     env(LOCALE): en
+    env(COOKIE_HTTPONLY): '1'
     secret: test

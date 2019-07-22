@@ -3,22 +3,20 @@
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:framework="http://symfony.com/schema/dic/symfony"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
-                        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
-        <framework:workflow name="article" type="workflow" initial-place="draft">
-            <framework:marking-store type="multiple_state">
-                <framework:argument>a</framework:argument>
-                <framework:argument>a</framework:argument>
-            </framework:marking-store>
+        <framework:workflow name="article" type="workflow">
+            <framework:initial-marking>draft</framework:initial-marking>
+            <framework:marking-store type="method" property="state" />
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
-            <framework:place name="draft"></framework:place>
-            <framework:place name="wait_for_journalist"></framework:place>
-            <framework:place name="approved_by_journalist"></framework:place>
-            <framework:place name="wait_for_spellchecker"></framework:place>
-            <framework:place name="approved_by_spellchecker"></framework:place>
-            <framework:place name="published"></framework:place>
+            <framework:place name="draft" />
+            <framework:place name="wait_for_journalist" />
+            <framework:place name="approved_by_journalist" />
+            <framework:place name="wait_for_spellchecker" />
+            <framework:place name="approved_by_spellchecker" />
+            <framework:place name="published" />
             <framework:transition name="request_review">
                 <framework:from>draft</framework:from>
                 <framework:to>wait_for_journalist</framework:to>
@@ -29,18 +27,18 @@
                 <framework:to>approved_by_journalist</framework:to>
             </framework:transition>
             <framework:transition name="spellchecker_approval">
-                <framework:from>wait_for_spellcheker</framework:from>
-                <framework:to>approved_by_spellchker</framework:to>
+                <framework:from>wait_for_spellchecker</framework:from>
+                <framework:to>approved_by_spellchecker</framework:to>
             </framework:transition>
             <framework:transition name="publish">
                 <framework:from>approved_by_journalist</framework:from>
-                <framework:from>approved_by_spellchker</framework:from>
+                <framework:from>approved_by_spellchecker</framework:from>
                 <framework:to>published</framework:to>
             </framework:transition>
         </framework:workflow>
 
-        <framework:workflow name="pull_request" initial-place="start">
-            <framework:marking-store type="single_state"/>
+        <framework:workflow name="pull_request">
+            <framework:initial-marking>start</framework:initial-marking>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place name="start">
                 <framework:metadata>

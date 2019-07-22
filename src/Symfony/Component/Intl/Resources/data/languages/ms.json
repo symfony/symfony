@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.49.2",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazia",
@@ -67,6 +67,7 @@
         "byv": "Medumba",
         "ca": "Catalonia",
         "cay": "Cayuga",
+        "ccp": "Chakma",
         "ce": "Chechen",
         "ceb": "Cebuano",
         "cgg": "Chiga",
@@ -275,7 +276,6 @@
         "ms": "Melayu",
         "mt": "Malta",
         "mua": "Mundang",
-        "mul": "Pelbagai Bahasa",
         "mus": "Creek",
         "mwl": "Mirandese",
         "my": "Burma",
@@ -334,7 +334,6 @@
         "ro": "Romania",
         "ro_MD": "Moldavia",
         "rof": "Rombo",
-        "root": "Root",
         "ru": "Rusia",
         "rup": "Aromanian",
         "rw": "Kinyarwanda",
@@ -414,7 +413,6 @@
         "ug": "Uyghur",
         "uk": "Ukraine",
         "umb": "Umbundu",
-        "und": "Bahasa Tidak Diketahui",
         "ur": "Urdu",
         "uz": "Uzbekistan",
         "vai": "Vai",
@@ -443,7 +441,6 @@
         "zh_Hant": "Cina Tradisional",
         "zu": "Zulu",
         "zun": "Zuni",
-        "zxx": "Tiada kandungan linguistik",
         "zza": "Zaza"
     }
 }

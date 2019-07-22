@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.15",
+    "Version": "2.1.48.44",
     "Names": {
         "aa": "afarština",
         "ab": "abcházština",
@@ -26,11 +26,11 @@
         "ar": "arabština",
         "ar_001": "arabština (moderní standardní)",
         "arc": "aramejština",
-        "arn": "mapudungunština",
+        "arn": "mapudungun",
         "aro": "araonština",
         "arp": "arapažština",
         "arq": "arabština (alžírská)",
-        "ars": "arabština (nadžd)",
+        "ars": "arabština (Nadžd)",
         "arw": "arawacké jazyky",
         "ary": "arabština (marocká)",
         "arz": "arabština (egyptská)",
@@ -88,6 +88,7 @@
         "car": "karibština",
         "cay": "kajugština",
         "cch": "atsam",
+        "ccp": "čakma",
         "ce": "čečenština",
         "ceb": "cebuánština",
         "cgg": "kiga",
@@ -360,7 +361,6 @@
         "ms": "malajština",
         "mt": "maltština",
         "mua": "mundang",
-        "mul": "více jazyků",
         "mus": "kríkština",
         "mwl": "mirandština",
         "mwr": "márvárština",
@@ -447,7 +447,6 @@
         "ro_MD": "moldavština",
         "rof": "rombo",
         "rom": "romština",
-        "root": "kořen",
         "rtm": "rotumanština",
         "ru": "ruština",
         "rue": "rusínština",
@@ -562,7 +561,6 @@
         "uga": "ugaritština",
         "uk": "ukrajinština",
         "umb": "umbundu",
-        "und": "neznámý jazyk",
         "ur": "urdština",
         "uz": "uzbečtina",
         "vai": "vai",
@@ -606,7 +604,6 @@
         "zh_Hans": "čínština (zjednodušená)",
         "zu": "zuluština",
         "zun": "zunijština",
-        "zxx": "žádný jazykový obsah",
         "zza": "zaza"
     }
 }

@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * IcuResFileLoader loads translations from a resource bundle.
@@ -26,7 +26,7 @@ class IcuResFileLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $locale, $domain = 'messages')
+    public function load($resource, string $locale, string $domain = 'messages')
     {
         if (!stream_is_local($resource)) {
             throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
@@ -75,7 +75,7 @@ class IcuResFileLoader implements LoaderInterface
      *
      * @return array the flattened ResourceBundle
      */
-    protected function flatten(\ResourceBundle $rb, array &$messages = array(), $path = null)
+    protected function flatten(\ResourceBundle $rb, array &$messages = [], string $path = null)
     {
         foreach ($rb as $key => $value) {
             $nodePath = $path ? $path.'.'.$key : $key;

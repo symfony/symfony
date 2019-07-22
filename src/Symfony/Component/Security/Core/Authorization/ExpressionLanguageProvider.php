@@ -23,7 +23,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
     public function getFunctions()
     {
-        return array(
+        return [
             new ExpressionFunction('is_anonymous', function () {
                 return '$trust_resolver->isAnonymous($token)';
             }, function (array $variables) {
@@ -53,16 +53,6 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             }, function (array $variables) {
                 return $variables['trust_resolver']->isRememberMe($variables['token']);
             }),
-
-            new ExpressionFunction('has_role', function ($role) {
-                @trigger_error('Using the "has_role()" function in security expressions is deprecated since Symfony 4.2, use "is_granted()" instead.', E_USER_DEPRECATED);
-
-                return sprintf('in_array(%s, $roles)', $role);
-            }, function (array $variables, $role) {
-                @trigger_error('Using the "has_role()" function in security expressions is deprecated since Symfony 4.2, use "is_granted()" instead.', E_USER_DEPRECATED);
-
-                return in_array($role, $variables['roles']);
-            }),
-        );
+        ];
     }
 }

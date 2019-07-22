@@ -12,34 +12,28 @@
 namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceTypeExtension extends AbstractTypeExtension
 {
-    private $extendedType;
-
-    public function __construct($extendedType = ChoiceType::class)
-    {
-        $this->extendedType = $extendedType;
-    }
+    public static $extendedType;
 
     /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('choices', array(
+        $resolver->setDefault('choices', [
             'A' => 'a',
             'B' => 'b',
-        ));
+        ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return $this->extendedType;
+        return [self::$extendedType];
     }
 }

@@ -9,6 +9,7 @@ skinparam state {
     BorderColor #3887C6
     BorderColor<<marked>> Black
     FontColor<<marked>> White
+    BackgroundColor<<DeepSkyBlue>> DeepSkyBlue
 }
 skinparam agent {
     BackgroundColor #ffffff
@@ -16,11 +17,12 @@ skinparam agent {
 }
 state "a" <<initial>>
 state "b"
-state "c"
+state "c" <<DeepSkyBlue>> as c
+c : My custom place description
 agent "t1"
 agent "t2"
-"a" --> "t1"
-"t1" --> "b"
-"b" --> "t2"
-"t2" --> "c"
+"a" -[#Purple]-> "t1": "<font color=Grey>My custom transition label 2</font>"
+"t1" -[#Purple]-> "b": "<font color=Grey>My custom transition label 2</font>"
+"b" -[#Pink]-> "t2"
+"t2" -[#Pink]-> "c"
 @enduml

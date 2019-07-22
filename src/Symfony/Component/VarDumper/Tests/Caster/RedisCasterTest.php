@@ -49,11 +49,15 @@ Redis {%A
   host: "127.0.0.1"
   port: 6379
   auth: null
+  mode: ATOMIC
   dbNum: 0
   timeout: 0.0
+  lastError: null
   persistentId: null
   options: {
+    TCP_KEEPALIVE: 0
     READ_TIMEOUT: 0.0
+    COMPRESSION: NONE
     SERIALIZER: NONE
     PREFIX: null
     SCAN: NORETRY

@@ -12,7 +12,10 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\AbstractConnection;
+use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
+use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,6 +25,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Connection extends AbstractConnection
 {
+    private const LDAP_INVALID_CREDENTIALS = '0x31';
+    private const LDAP_TIMEOUT = '0x55';
+    private const LDAP_ALREADY_EXISTS = '0x44';
+
     /** @var bool */
     private $bound = false;
 
@@ -44,14 +51,23 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function bind($dn = null, $password = null)
+    public function bind(string $dn = null, string $password = null)
     {
         if (!$this->connection) {
             $this->connect();
         }
 
         if (false === @ldap_bind($this->connection, $dn, $password)) {
-            throw new ConnectionException(ldap_error($this->connection));
+            $error = ldap_error($this->connection);
+            switch (ldap_errno($this->connection)) {
+                case self::LDAP_INVALID_CREDENTIALS:
+                    throw new InvalidCredentialsException($error);
+                case self::LDAP_TIMEOUT:
+                    throw new ConnectionTimeoutException($error);
+                case self::LDAP_ALREADY_EXISTS:
+                    throw new AlreadyExistsException($error);
+            }
+            throw new ConnectionException($error);
         }
 
         $this->bound = true;
@@ -69,14 +85,14 @@ class Connection extends AbstractConnection
         return $this->connection;
     }
 
-    public function setOption($name, $value)
+    public function setOption(string $name, $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
             throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
         }
     }
 
-    public function getOption($name)
+    public function getOption(string $name)
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
             throw new LdapException(sprintf('Could not retrieve value for option "%s".', $name));
@@ -93,31 +109,17 @@ class Connection extends AbstractConnection
         $resolver->setAllowedTypes('debug', 'bool');
         $resolver->setDefault('referrals', false);
         $resolver->setAllowedTypes('referrals', 'bool');
+        $resolver->setDefault('options', function (OptionsResolver $options, Options $parent) {
+            $options->setDefined(array_map('strtolower', array_keys((new \ReflectionClass(ConnectionOptions::class))->getConstants())));
 
-        $resolver->setNormalizer('options', function (Options $options, $value) {
-            if (true === $options['debug']) {
-                $value['debug_level'] = 7;
+            if (true === $parent['debug']) {
+                $options->setDefault('debug_level', 7);
             }
 
-            if (!isset($value['protocol_version'])) {
-                $value['protocol_version'] = $options['version'];
-            }
-
-            if (!isset($value['referrals'])) {
-                $value['referrals'] = $options['referrals'];
-            }
-
-            return $value;
-        });
-
-        $resolver->setAllowedValues('options', function (array $values) {
-            foreach ($values as $name => $value) {
-                if (!ConnectionOptions::isOption($name)) {
-                    return false;
-                }
-            }
-
-            return true;
+            $options->setDefaults([
+                'protocol_version' => $parent['version'],
+                'referrals' => $parent['referrals'],
+            ]);
         });
     }
 
@@ -137,15 +139,15 @@ class Connection extends AbstractConnection
             throw new LdapException(sprintf('Could not connect to Ldap server: %s.', ldap_error($this->connection)));
         }
 
-        if ('tls' === $this->config['encryption'] && false === ldap_start_tls($this->connection)) {
+        if ('tls' === $this->config['encryption'] && false === @ldap_start_tls($this->connection)) {
             throw new LdapException(sprintf('Could not initiate TLS connection: %s.', ldap_error($this->connection)));
         }
     }
 
     private function disconnect()
     {
-        if ($this->connection && is_resource($this->connection)) {
-            ldap_close($this->connection);
+        if ($this->connection && \is_resource($this->connection)) {
+            ldap_unbind($this->connection);
         }
 
         $this->connection = null;

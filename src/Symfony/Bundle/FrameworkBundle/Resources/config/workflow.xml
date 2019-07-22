@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
@@ -20,8 +20,7 @@
             <argument /> <!-- name -->
         </service>
 
-        <service id="workflow.marking_store.multiple_state" class="Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore" abstract="true" />
-        <service id="workflow.marking_store.single_state" class="Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore" abstract="true" />
+        <service id="workflow.marking_store.method" class="Symfony\Component\Workflow\MarkingStore\MethodMarkingStore" abstract="true" />
 
         <service id="workflow.registry" class="Symfony\Component\Workflow\Registry" />
         <service id="Symfony\Component\Workflow\Registry" alias="workflow.registry" />

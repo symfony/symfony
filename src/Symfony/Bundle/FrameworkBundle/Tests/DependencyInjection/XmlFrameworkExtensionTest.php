@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Config\FileLocator;
 
 class XmlFrameworkExtensionTest extends FrameworkExtensionTest
 {
@@ -30,6 +30,6 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testMessengerMiddlewareFactoryErroneousFormat()
     {
-        $this->markTestSkipped('XML configuration will not allow eeroneous format.');
+        $this->markTestSkipped('XML configuration will not allow erroneous format.');
     }
 }

@@ -21,7 +21,7 @@ class FileLocatorTest extends TestCase
      */
     public function testIsAbsolutePath($path)
     {
-        $loader = new FileLocator(array());
+        $loader = new FileLocator([]);
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('isAbsolutePath');
         $m->setAccessible(true);
@@ -31,14 +31,14 @@ class FileLocatorTest extends TestCase
 
     public function getIsAbsolutePathTests()
     {
-        return array(
-            array('/foo.xml'),
-            array('c:\\\\foo.xml'),
-            array('c:/foo.xml'),
-            array('\\server\\foo.xml'),
-            array('https://server/foo.xml'),
-            array('phar://server/foo.xml'),
-        );
+        return [
+            ['/foo.xml'],
+            ['c:\\\\foo.xml'],
+            ['c:/foo.xml'],
+            ['\\server\\foo.xml'],
+            ['https://server/foo.xml'],
+            ['phar://server/foo.xml'],
+        ];
     }
 
     public function testLocate()
@@ -46,33 +46,33 @@ class FileLocatorTest extends TestCase
         $loader = new FileLocator(__DIR__.'/Fixtures');
 
         $this->assertEquals(
-            __DIR__.DIRECTORY_SEPARATOR.'FileLocatorTest.php',
+            __DIR__.\DIRECTORY_SEPARATOR.'FileLocatorTest.php',
             $loader->locate('FileLocatorTest.php', __DIR__),
             '->locate() returns the absolute filename if the file exists in the given path'
         );
 
         $this->assertEquals(
-            __DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml',
+            __DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml',
             $loader->locate('foo.xml', __DIR__),
             '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
         );
 
         $this->assertEquals(
-            __DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml',
-            $loader->locate(__DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', __DIR__),
+            __DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml',
+            $loader->locate(__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__),
             '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
         );
 
-        $loader = new FileLocator(array(__DIR__.'/Fixtures', __DIR__.'/Fixtures/Again'));
+        $loader = new FileLocator([__DIR__.'/Fixtures', __DIR__.'/Fixtures/Again']);
 
         $this->assertEquals(
-            array(__DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.DIRECTORY_SEPARATOR.'foo.xml'),
+            [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
             $loader->locate('foo.xml', __DIR__, false),
             '->locate() returns an array of absolute filenames'
         );
 
         $this->assertEquals(
-            array(__DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.DIRECTORY_SEPARATOR.'foo.xml'),
+            [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
             $loader->locate('foo.xml', __DIR__.'/Fixtures', false),
             '->locate() returns an array of absolute filenames'
         );
@@ -80,7 +80,7 @@ class FileLocatorTest extends TestCase
         $loader = new FileLocator(__DIR__.'/Fixtures/Again');
 
         $this->assertEquals(
-            array(__DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.DIRECTORY_SEPARATOR.'foo.xml'),
+            [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
             $loader->locate('foo.xml', __DIR__.'/Fixtures', false),
             '->locate() returns an array of absolute filenames'
         );
@@ -92,7 +92,7 @@ class FileLocatorTest extends TestCase
      */
     public function testLocateThrowsAnExceptionIfTheFileDoesNotExists()
     {
-        $loader = new FileLocator(array(__DIR__.'/Fixtures'));
+        $loader = new FileLocator([__DIR__.'/Fixtures']);
 
         $loader->locate('foobar.xml', __DIR__);
     }
@@ -102,7 +102,7 @@ class FileLocatorTest extends TestCase
      */
     public function testLocateThrowsAnExceptionIfTheFileDoesNotExistsInAbsolutePath()
     {
-        $loader = new FileLocator(array(__DIR__.'/Fixtures'));
+        $loader = new FileLocator([__DIR__.'/Fixtures']);
 
         $loader->locate(__DIR__.'/Fixtures/foobar.xml', __DIR__);
     }
@@ -113,8 +113,8 @@ class FileLocatorTest extends TestCase
      */
     public function testLocateEmpty()
     {
-        $loader = new FileLocator(array(__DIR__.'/Fixtures'));
+        $loader = new FileLocator([__DIR__.'/Fixtures']);
 
-        $loader->locate(null, __DIR__);
+        $loader->locate('', __DIR__);
     }
 }

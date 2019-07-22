@@ -29,4 +29,8 @@ class TestClassSetValue
     {
         $this->value = $value;
     }
+
+    private function setFoo()
+    {
+    }
 }

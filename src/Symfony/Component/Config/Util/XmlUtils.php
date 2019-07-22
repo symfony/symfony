@@ -44,10 +44,10 @@ class XmlUtils
      * @throws InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
      * @throws \RuntimeException   When DOM extension is missing
      */
-    public static function parse($content, $schemaOrCallable = null)
+    public static function parse(string $content, $schemaOrCallable = null)
     {
-        if (!extension_loaded('dom')) {
-            throw new \RuntimeException('Extension DOM is required.');
+        if (!\extension_loaded('dom')) {
+            throw new \LogicException('Extension DOM is required.');
         }
 
         $internalErrors = libxml_use_internal_errors(true);
@@ -56,7 +56,7 @@ class XmlUtils
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->loadXML($content, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+        if (!$dom->loadXML($content, LIBXML_NONET | (\defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
             throw new XmlParsingException(implode("\n", static::getXmlErrors($internalErrors)));
@@ -78,13 +78,13 @@ class XmlUtils
             libxml_clear_errors();
 
             $e = null;
-            if (is_callable($schemaOrCallable)) {
+            if (\is_callable($schemaOrCallable)) {
                 try {
-                    $valid = call_user_func($schemaOrCallable, $dom, $internalErrors);
+                    $valid = $schemaOrCallable($dom, $internalErrors);
                 } catch (\Exception $e) {
                     $valid = false;
                 }
-            } elseif (!is_array($schemaOrCallable) && is_file((string) $schemaOrCallable)) {
+            } elseif (!\is_array($schemaOrCallable) && is_file((string) $schemaOrCallable)) {
                 $schemaSource = file_get_contents((string) $schemaOrCallable);
                 $valid = @$dom->schemaValidateSource($schemaSource);
             } else {
@@ -120,7 +120,7 @@ class XmlUtils
      * @throws XmlParsingException       When XML parsing returns any errors
      * @throws \RuntimeException         When DOM extension is missing
      */
-    public static function loadFile($file, $schemaOrCallable = null)
+    public static function loadFile(string $file, $schemaOrCallable = null)
     {
         $content = @file_get_contents($file);
         if ('' === trim($content)) {
@@ -154,13 +154,13 @@ class XmlUtils
      *
      * @return array A PHP array
      */
-    public static function convertDomElementToArray(\DOMElement $element, $checkPrefix = true)
+    public static function convertDomElementToArray(\DOMElement $element, bool $checkPrefix = true)
     {
         $prefix = (string) $element->prefix;
         $empty = true;
-        $config = array();
+        $config = [];
         foreach ($element->attributes as $name => $node) {
-            if ($checkPrefix && !in_array((string) $node->prefix, array('', $prefix), true)) {
+            if ($checkPrefix && !\in_array((string) $node->prefix, ['', $prefix], true)) {
                 continue;
             }
             $config[$name] = static::phpize($node->value);
@@ -181,8 +181,8 @@ class XmlUtils
 
                 $key = $node->localName;
                 if (isset($config[$key])) {
-                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
-                        $config[$key] = array($config[$key]);
+                    if (!\is_array($config[$key]) || !\is_int(key($config[$key]))) {
+                        $config[$key] = [$config[$key]];
                     }
                     $config[$key][] = $value;
                 } else {
@@ -195,7 +195,7 @@ class XmlUtils
 
         if (false !== $nodeValue) {
             $value = static::phpize($nodeValue);
-            if (count($config)) {
+            if (\count($config)) {
                 $config['value'] = $value;
             } else {
                 $config = $value;
@@ -240,7 +240,7 @@ class XmlUtils
                 return '0x' === $value[0].$value[1] ? hexdec($value) : (float) $value;
             case preg_match('/^0x[0-9a-f]++$/i', $value):
                 return hexdec($value);
-            case preg_match('/^(-|\+)?[0-9]+(\.[0-9]+)?$/', $value):
+            case preg_match('/^[+-]?[0-9]+(\.[0-9]+)?$/', $value):
                 return (float) $value;
             default:
                 return $value;
@@ -249,7 +249,7 @@ class XmlUtils
 
     protected static function getXmlErrors($internalErrors)
     {
-        $errors = array();
+        $errors = [];
         foreach (libxml_get_errors() as $error) {
             $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
                 LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',

@@ -20,17 +20,9 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
+class RemoveUnusedDefinitionsPass extends AbstractRecursivePass
 {
-    private $connectedIds = array();
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
-    {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-    }
+    private $connectedIds = [];
 
     /**
      * Processes the ContainerBuilder to remove unused definitions.
@@ -40,7 +32,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
         try {
             $this->enableExpressionProcessing();
             $this->container = $container;
-            $connectedIds = array();
+            $connectedIds = [];
             $aliases = $container->getAliases();
 
             foreach ($aliases as $id => $alias) {
@@ -58,9 +50,9 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
 
             while ($this->connectedIds) {
                 $ids = $this->connectedIds;
-                $this->connectedIds = array();
+                $this->connectedIds = [];
                 foreach ($ids as $id) {
-                    if (!isset($connectedIds[$id]) && $container->has($id)) {
+                    if (!isset($connectedIds[$id]) && $container->hasDefinition($id)) {
                         $connectedIds[$id] = true;
                         $this->processValue($container->getDefinition($id));
                     }
@@ -70,23 +62,23 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
             foreach ($container->getDefinitions() as $id => $definition) {
                 if (!isset($connectedIds[$id])) {
                     $container->removeDefinition($id);
-                    $container->resolveEnvPlaceholders(serialize($definition));
+                    $container->resolveEnvPlaceholders(!$definition->hasErrors() ? serialize($definition) : $definition);
                     $container->log($this, sprintf('Removed service "%s"; reason: unused.', $id));
                 }
             }
         } finally {
             $this->container = null;
-            $this->connectedIds = array();
+            $this->connectedIds = [];
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         if (!$value instanceof Reference) {
-            return parent::processValue($value);
+            return parent::processValue($value, $isRoot);
         }
 
         if (ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior()) {

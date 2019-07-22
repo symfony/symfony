@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\MemcachedStore;
 
 /**
@@ -56,5 +57,14 @@ class MemcachedStoreTest extends AbstractStoreTest
     public function testAbortAfterExpiration()
     {
         $this->markTestSkipped('Memcached expects a TTL greater than 1 sec. Simulating a slow network is too hard');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Lock\Exception\InvalidTtlException
+     */
+    public function testInvalidTtl()
+    {
+        $store = $this->getStore();
+        $store->putOffExpiration(new Key('toto'), 0.1);
     }
 }

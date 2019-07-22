@@ -44,7 +44,7 @@ interface PipesInterface
      *
      * @return string[] An array of read data indexed by their fd
      */
-    public function readAndWrite($blocking, $close = false);
+    public function readAndWrite(bool $blocking, bool $close = false);
 
     /**
      * Returns if the current state has open file handles or pipes.

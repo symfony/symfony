@@ -13,14 +13,14 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\ErrorHandler\ErrorHandler;
+use Symfony\Component\ErrorHandler\ExceptionHandler;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -40,11 +40,11 @@ class DebugHandlersListenerTest extends TestCase
         $listener = new DebugHandlersListener($userHandler, $logger);
         $xHandler = new ExceptionHandler();
         $eHandler = new ErrorHandler();
-        $eHandler->setExceptionHandler(array($xHandler, 'handle'));
+        $eHandler->setExceptionHandler([$xHandler, 'handle']);
 
         $exception = null;
-        set_error_handler(array($eHandler, 'handleError'));
-        set_exception_handler(array($eHandler, 'handleException'));
+        set_error_handler([$eHandler, 'handleError']);
+        set_exception_handler([$eHandler, 'handleException']);
         try {
             $listener->configure();
         } catch (\Exception $exception) {
@@ -58,10 +58,10 @@ class DebugHandlersListenerTest extends TestCase
 
         $this->assertSame($userHandler, $xHandler->setHandler('var_dump'));
 
-        $loggers = $eHandler->setLoggers(array());
+        $loggers = $eHandler->setLoggers([]);
 
         $this->assertArrayHasKey(E_DEPRECATED, $loggers);
-        $this->assertSame(array($logger, LogLevel::INFO), $loggers[E_DEPRECATED]);
+        $this->assertSame([$logger, LogLevel::INFO], $loggers[E_DEPRECATED]);
     }
 
     public function testConfigureForHttpKernelWithNoTerminateWithException()
@@ -75,7 +75,7 @@ class DebugHandlersListenerTest extends TestCase
         );
 
         $exception = null;
-        $h = set_exception_handler(array($eHandler, 'handleException'));
+        $h = set_exception_handler([$eHandler, 'handleException']);
         try {
             $listener->configure($event);
         } catch (\Exception $exception) {
@@ -94,25 +94,26 @@ class DebugHandlersListenerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $listener = new DebugHandlersListener(null);
         $app = $this->getMockBuilder('Symfony\Component\Console\Application')->getMock();
-        $app->expects($this->once())->method('getHelperSet')->will($this->returnValue(new HelperSet()));
+        $app->expects($this->once())->method('getHelperSet')->willReturn(new HelperSet());
         $command = new Command(__FUNCTION__);
         $command->setApplication($app);
         $event = new ConsoleEvent($command, new ArgvInput(), new ConsoleOutput());
 
         $dispatcher->addSubscriber($listener);
 
-        $xListeners = array(
-            KernelEvents::REQUEST => array(array($listener, 'configure')),
-            ConsoleEvents::COMMAND => array(array($listener, 'configure')),
-        );
+        $xListeners = [
+            KernelEvents::REQUEST => [[$listener, 'configure']],
+            ConsoleEvents::COMMAND => [[$listener, 'configure']],
+            KernelEvents::EXCEPTION => [[$listener, 'onKernelException']],
+        ];
         $this->assertSame($xListeners, $dispatcher->getListeners());
 
         $exception = null;
         $eHandler = new ErrorHandler();
-        set_error_handler(array($eHandler, 'handleError'));
-        set_exception_handler(array($eHandler, 'handleException'));
+        set_error_handler([$eHandler, 'handleError']);
+        set_exception_handler([$eHandler, 'handleException']);
         try {
-            $dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+            $dispatcher->dispatch($event, ConsoleEvents::COMMAND);
         } catch (\Exception $exception) {
         }
         restore_exception_handler();
@@ -139,7 +140,7 @@ class DebugHandlersListenerTest extends TestCase
         $eHandler->setExceptionHandler('var_dump');
 
         $exception = null;
-        set_exception_handler(array($eHandler, 'handleException'));
+        set_exception_handler([$eHandler, 'handleException']);
         try {
             $listener->configure();
         } catch (\Exception $exception) {

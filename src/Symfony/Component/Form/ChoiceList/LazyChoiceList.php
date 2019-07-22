@@ -32,9 +32,9 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * The callable creating string values for each choice.
      *
-     * If null, choices are simply cast to strings.
+     * If null, choices are cast to strings.
      *
-     * @var null|callable
+     * @var callable|null
      */
     private $value;
 
@@ -46,7 +46,7 @@ class LazyChoiceList implements ChoiceListInterface
      * argument.
      *
      * @param ChoiceLoaderInterface $loader The choice loader
-     * @param null|callable         $value  The callable generating the choice values
+     * @param callable|null         $value  The callable generating the choice values
      */
     public function __construct(ChoiceLoaderInterface $loader, callable $value = null)
     {

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.48.42",
     "Names": {
         "ADP": [
             "ADP",
@@ -637,10 +637,6 @@
             "MAF",
             "marokkanske franc"
         ],
-        "MCF": [
-            "MCF",
-            "MCF"
-        ],
         "MDC": [
             "MDC",
             "moldovske cupon"
@@ -1043,6 +1039,10 @@
         ],
         "VEF": [
             "VEF",
+            "venezuelanske bolivar (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "venezuelanske bolivar"
         ],
         "VND": [

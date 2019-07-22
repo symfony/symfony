@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * using `putenv()` is disabled by default
+
+4.3.0
+-----
+
+ * deprecated use of `putenv()` by default. This feature will be opted-in with a constructor argument to `Dotenv`
+
+4.2.0
+-----
+
+ * added `Dotenv::overload()` and `$overrideExistingVars` as optional parameter of `Dotenv::populate()`
+ * added `Dotenv::loadEnv()` to load a .env file and its corresponding .env.local, .env.$env and .env.$env.local files if they exist
+
 3.3.0
 -----
 

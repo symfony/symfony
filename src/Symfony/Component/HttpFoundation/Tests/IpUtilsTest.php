@@ -26,20 +26,20 @@ class IpUtilsTest extends TestCase
 
     public function getIpv4Data()
     {
-        return array(
-            array(true, '192.168.1.1', '192.168.1.1'),
-            array(true, '192.168.1.1', '192.168.1.1/1'),
-            array(true, '192.168.1.1', '192.168.1.0/24'),
-            array(false, '192.168.1.1', '1.2.3.4/1'),
-            array(false, '192.168.1.1', '192.168.1.1/33'), // invalid subnet
-            array(true, '192.168.1.1', array('1.2.3.4/1', '192.168.1.0/24')),
-            array(true, '192.168.1.1', array('192.168.1.0/24', '1.2.3.4/1')),
-            array(false, '192.168.1.1', array('1.2.3.4/1', '4.3.2.1/1')),
-            array(true, '1.2.3.4', '0.0.0.0/0'),
-            array(true, '1.2.3.4', '192.168.1.0/0'),
-            array(false, '1.2.3.4', '256.256.256/0'), // invalid CIDR notation
-            array(false, 'an_invalid_ip', '192.168.1.0/24'),
-        );
+        return [
+            [true, '192.168.1.1', '192.168.1.1'],
+            [true, '192.168.1.1', '192.168.1.1/1'],
+            [true, '192.168.1.1', '192.168.1.0/24'],
+            [false, '192.168.1.1', '1.2.3.4/1'],
+            [false, '192.168.1.1', '192.168.1.1/33'], // invalid subnet
+            [true, '192.168.1.1', ['1.2.3.4/1', '192.168.1.0/24']],
+            [true, '192.168.1.1', ['192.168.1.0/24', '1.2.3.4/1']],
+            [false, '192.168.1.1', ['1.2.3.4/1', '4.3.2.1/1']],
+            [true, '1.2.3.4', '0.0.0.0/0'],
+            [true, '1.2.3.4', '192.168.1.0/0'],
+            [false, '1.2.3.4', '256.256.256/0'], // invalid CIDR notation
+            [false, 'an_invalid_ip', '192.168.1.0/24'],
+        ];
     }
 
     /**
@@ -47,7 +47,7 @@ class IpUtilsTest extends TestCase
      */
     public function testIpv6($matches, $remoteAddr, $cidr)
     {
-        if (!defined('AF_INET6')) {
+        if (!\defined('AF_INET6')) {
             $this->markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
         }
 
@@ -56,20 +56,20 @@ class IpUtilsTest extends TestCase
 
     public function getIpv6Data()
     {
-        return array(
-            array(true, '2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
-            array(false, '2a00:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
-            array(false, '2a01:198:603:0:396e:4789:8e99:890f', '::1'),
-            array(true, '0:0:0:0:0:0:0:1', '::1'),
-            array(false, '0:0:603:0:396e:4789:8e99:0001', '::1'),
-            array(true, '0:0:603:0:396e:4789:8e99:0001', '::/0'),
-            array(true, '0:0:603:0:396e:4789:8e99:0001', '2a01:198:603:0::/0'),
-            array(true, '2a01:198:603:0:396e:4789:8e99:890f', array('::1', '2a01:198:603:0::/65')),
-            array(true, '2a01:198:603:0:396e:4789:8e99:890f', array('2a01:198:603:0::/65', '::1')),
-            array(false, '2a01:198:603:0:396e:4789:8e99:890f', array('::1', '1a01:198:603:0::/65')),
-            array(false, '}__test|O:21:&quot;JDatabaseDriverMysqli&quot;:3:{s:2', '::1'),
-            array(false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'),
-        );
+        return [
+            [true, '2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'],
+            [false, '2a00:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'],
+            [false, '2a01:198:603:0:396e:4789:8e99:890f', '::1'],
+            [true, '0:0:0:0:0:0:0:1', '::1'],
+            [false, '0:0:603:0:396e:4789:8e99:0001', '::1'],
+            [true, '0:0:603:0:396e:4789:8e99:0001', '::/0'],
+            [true, '0:0:603:0:396e:4789:8e99:0001', '2a01:198:603:0::/0'],
+            [true, '2a01:198:603:0:396e:4789:8e99:890f', ['::1', '2a01:198:603:0::/65']],
+            [true, '2a01:198:603:0:396e:4789:8e99:890f', ['2a01:198:603:0::/65', '::1']],
+            [false, '2a01:198:603:0:396e:4789:8e99:890f', ['::1', '1a01:198:603:0::/65']],
+            [false, '}__test|O:21:&quot;JDatabaseDriverMysqli&quot;:3:{s:2', '::1'],
+            [false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'],
+        ];
     }
 
     /**
@@ -78,7 +78,7 @@ class IpUtilsTest extends TestCase
      */
     public function testAnIpv6WithOptionDisabledIpv6()
     {
-        if (defined('AF_INET6')) {
+        if (\defined('AF_INET6')) {
             $this->markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
         }
 
@@ -95,10 +95,10 @@ class IpUtilsTest extends TestCase
 
     public function invalidIpAddressData()
     {
-        return array(
-            'invalid proxy wildcard' => array('192.168.20.13', '*'),
-            'invalid proxy missing netmask' => array('192.168.20.13', '0.0.0.0'),
-            'invalid request IP with invalid proxy wildcard' => array('0.0.0.0', '*'),
-        );
+        return [
+            'invalid proxy wildcard' => ['192.168.20.13', '*'],
+            'invalid proxy missing netmask' => ['192.168.20.13', '0.0.0.0'],
+            'invalid request IP with invalid proxy wildcard' => ['0.0.0.0', '*'],
+        ];
     }
 }

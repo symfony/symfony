@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.17",
     "Names": {
         "AED": [
             "AED",
@@ -603,6 +603,10 @@
         ],
         "VEF": [
             "VEF",
+            "i-Venezuelan Bolívar (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "i-Venezuelan Bolívar"
         ],
         "VND": [

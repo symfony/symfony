@@ -30,7 +30,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
     private $stderr;
-    private $consoleSectionOutputs = array();
+    private $consoleSectionOutputs = [];
 
     /**
      * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
@@ -60,7 +60,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setDecorated($decorated)
+    public function setDecorated(bool $decorated)
     {
         parent::setDecorated($decorated);
         $this->stderr->setDecorated($decorated);
@@ -78,7 +78,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setVerbosity($level)
+    public function setVerbosity(int $level)
     {
         parent::setVerbosity($level);
         $this->stderr->setVerbosity($level);
@@ -130,11 +130,11 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function isRunningOS400()
     {
-        $checks = array(
-            function_exists('php_uname') ? php_uname('s') : '',
+        $checks = [
+            \function_exists('php_uname') ? php_uname('s') : '',
             getenv('OSTYPE'),
             PHP_OS,
-        );
+        ];
 
         return false !== stripos(implode(';', $checks), 'OS400');
     }

@@ -36,7 +36,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         parent::__construct($inputTimezone, $outputTimezone);
 
         if (null === $fields) {
-            $fields = array('year', 'month', 'day', 'hour', 'minute', 'second');
+            $fields = ['year', 'month', 'day', 'hour', 'minute', 'second'];
         }
 
         $this->fields = $fields;
@@ -55,14 +55,14 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     public function transform($dateTime)
     {
         if (null === $dateTime) {
-            return array_intersect_key(array(
+            return array_intersect_key([
                 'year' => '',
                 'month' => '',
                 'day' => '',
                 'hour' => '',
                 'minute' => '',
                 'second' => '',
-            ), array_flip($this->fields));
+            ], array_flip($this->fields));
         }
 
         if (!$dateTime instanceof \DateTimeInterface) {
@@ -77,14 +77,14 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
         }
 
-        $result = array_intersect_key(array(
+        $result = array_intersect_key([
             'year' => $dateTime->format('Y'),
             'month' => $dateTime->format('m'),
             'day' => $dateTime->format('d'),
             'hour' => $dateTime->format('H'),
             'minute' => $dateTime->format('i'),
             'second' => $dateTime->format('s'),
-        ), array_flip($this->fields));
+        ], array_flip($this->fields));
 
         if (!$this->pad) {
             foreach ($result as &$entry) {
@@ -114,7 +114,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             return;
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -122,7 +122,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             return;
         }
 
-        $emptyFields = array();
+        $emptyFields = [];
 
         foreach ($this->fields as $field) {
             if (!isset($value[$field])) {
@@ -130,10 +130,8 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             }
         }
 
-        if (count($emptyFields) > 0) {
-            throw new TransformationFailedException(
-                sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)
-            ));
+        if (\count($emptyFields) > 0) {
+            throw new TransformationFailedException(sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)));
         }
 
         if (isset($value['month']) && !ctype_digit((string) $value['month'])) {

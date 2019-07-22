@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 
 /**
  * Provides integration with the HttpKernel component.
@@ -38,7 +38,7 @@ class HttpKernelRuntime
      *
      * @see FragmentHandler::render()
      */
-    public function renderFragment($uri, $options = array())
+    public function renderFragment($uri, $options = [])
     {
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
@@ -57,7 +57,7 @@ class HttpKernelRuntime
      *
      * @see FragmentHandler::render()
      */
-    public function renderFragmentStrategy($strategy, $uri, $options = array())
+    public function renderFragmentStrategy($strategy, $uri, $options = [])
     {
         return $this->handler->render($uri, $strategy, $options);
     }

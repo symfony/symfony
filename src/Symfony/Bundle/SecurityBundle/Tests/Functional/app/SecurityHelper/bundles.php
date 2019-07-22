@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Bundle\TwigBundle\TwigBundle;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 
-return array(
+return [
     new FrameworkBundle(),
     new SecurityBundle(),
     new TwigBundle(),
-);
+];

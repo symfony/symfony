@@ -34,10 +34,10 @@ class LogoutUrlExtension extends AbstractExtension
      */
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('logout_url', array($this, 'getLogoutUrl')),
-            new TwigFunction('logout_path', array($this, 'getLogoutPath')),
-        );
+        return [
+            new TwigFunction('logout_url', [$this, 'getLogoutUrl']),
+            new TwigFunction('logout_path', [$this, 'getLogoutPath']),
+        ];
     }
 
     /**

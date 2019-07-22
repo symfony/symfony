@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.45",
     "Names": {
         "AED": [
             "AED",
@@ -21,6 +21,10 @@
             "BIF",
             "Kuɗin Burundi"
         ],
+        "BRL": [
+            "R$",
+            "Ril Kudin Birazil"
+        ],
         "BWP": [
             "BWP",
             "Kuɗin Baswana"
@@ -39,7 +43,7 @@
         ],
         "CNY": [
             "CN¥",
-            "Kuɗin Caina\/Sin"
+            "Yuwan kasar Sin"
         ],
         "CVE": [
             "CVE",
@@ -71,7 +75,7 @@
         ],
         "GBP": [
             "£",
-            "Fam kin Ingila"
+            "Fam na Ingila"
         ],
         "GHC": [
             "GHC",
@@ -90,8 +94,8 @@
             "Kuɗin Indiya"
         ],
         "JPY": [
-            "JP¥",
-            "Kuɗin Japan"
+            "¥",
+            "Yen kasar Japan"
         ],
         "KES": [
             "KES",
@@ -149,6 +153,10 @@
             "₦",
             "Naira"
         ],
+        "RUB": [
+            "RUB",
+            "Ruble kasar Rasha"
+        ],
         "RWF": [
             "RWF",
             "Kuɗin Ruwanda"
@@ -202,8 +210,8 @@
             "Sule Yuganda"
         ],
         "USD": [
-            "US$",
-            "Dalar Amurka"
+            "$",
+            "Dalar Amirka"
         ],
         "XAF": [
             "FCFA",

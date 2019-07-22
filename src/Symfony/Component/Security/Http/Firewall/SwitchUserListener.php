@@ -11,32 +11,33 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * SwitchUserListener allows a user to impersonate another one temporarily
  * (like the Unix su command).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
-class SwitchUserListener implements ListenerInterface
+class SwitchUserListener
 {
     const EXIT_VALUE = '_exit';
 
@@ -74,13 +75,17 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws \LogicException if switching to a user failed
      */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
         $username = $request->get($this->usernameParameter) ?: $request->headers->get($this->usernameParameter);
 
         if (!$username) {
             return;
+        }
+
+        if (null === $this->tokenStorage->getToken()) {
+            throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
 
         if (self::EXIT_VALUE === $username) {
@@ -113,12 +118,12 @@ class SwitchUserListener implements ListenerInterface
      * @throws \LogicException
      * @throws AccessDeniedException
      */
-    private function attemptSwitchUser(Request $request, $username)
+    private function attemptSwitchUser(Request $request, $username): ?TokenInterface
     {
         $token = $this->tokenStorage->getToken();
         $originalToken = $this->getOriginalToken($token);
 
-        if (false !== $originalToken) {
+        if (null !== $originalToken) {
             if ($token->getUsername() === $username) {
                 return $token;
             }
@@ -128,7 +133,7 @@ class SwitchUserListener implements ListenerInterface
 
         $user = $this->provider->loadUserByUsername($username);
 
-        if (false === $this->accessDecisionManager->decide($token, array($this->role), $user)) {
+        if (false === $this->accessDecisionManager->decide($token, [$this->role], $user)) {
             $exception = new AccessDeniedException();
             $exception->setAttributes($this->role);
 
@@ -136,19 +141,18 @@ class SwitchUserListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info('Attempting to switch to user.', array('username' => $username));
+            $this->logger->info('Attempting to switch to user.', ['username' => $username]);
         }
 
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
-        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->tokenStorage->getToken());
 
-        $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
+        $token = new SwitchUserToken($user, $user->getPassword(), $this->providerKey, $roles, $token);
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser(), $token);
-            $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
+            $this->dispatcher->dispatch($switchEvent, SecurityEvents::SWITCH_USER);
             // use the token from the event in case any listeners have replaced it.
             $token = $switchEvent->getToken();
         }
@@ -163,35 +167,28 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws AuthenticationCredentialsNotFoundException
      */
-    private function attemptExitUser(Request $request)
+    private function attemptExitUser(Request $request): TokenInterface
     {
-        if (null === ($currentToken = $this->tokenStorage->getToken()) || false === $original = $this->getOriginalToken($currentToken)) {
+        if (null === ($currentToken = $this->tokenStorage->getToken()) || null === $original = $this->getOriginalToken($currentToken)) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
 
         if (null !== $this->dispatcher && $original->getUser() instanceof UserInterface) {
             $user = $this->provider->refreshUser($original->getUser());
             $switchEvent = new SwitchUserEvent($request, $user, $original);
-            $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
+            $this->dispatcher->dispatch($switchEvent, SecurityEvents::SWITCH_USER);
             $original = $switchEvent->getToken();
         }
 
         return $original;
     }
 
-    /**
-     * Gets the original Token from a switched one.
-     *
-     * @return TokenInterface|false The original TokenInterface instance, false if the current TokenInterface is not switched
-     */
-    private function getOriginalToken(TokenInterface $token)
+    private function getOriginalToken(TokenInterface $token): ?TokenInterface
     {
-        foreach ($token->getRoles() as $role) {
-            if ($role instanceof SwitchUserRole) {
-                return $role->getSource();
-            }
+        if ($token instanceof SwitchUserToken) {
+            return $token->getOriginalToken();
         }
 
-        return false;
+        return null;
     }
 }

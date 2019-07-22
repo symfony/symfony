@@ -19,12 +19,12 @@ class UpdateOperation
     private $values;
     private $attribute;
 
-    private $validOperationTypes = array(
+    private $validOperationTypes = [
         LDAP_MODIFY_BATCH_ADD,
         LDAP_MODIFY_BATCH_REMOVE,
         LDAP_MODIFY_BATCH_REMOVE_ALL,
         LDAP_MODIFY_BATCH_REPLACE,
-    );
+    ];
 
     /**
      * @param int    $operationType An LDAP_MODIFY_BATCH_* constant
@@ -34,11 +34,11 @@ class UpdateOperation
      */
     public function __construct(int $operationType, string $attribute, ?array $values)
     {
-        if (!in_array($operationType, $this->validOperationTypes, true)) {
+        if (!\in_array($operationType, $this->validOperationTypes, true)) {
             throw new UpdateOperationException(sprintf('"%s" is not a valid modification type.', $operationType));
         }
         if (LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {
-            throw new UpdateOperationException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', gettype($values)));
+            throw new UpdateOperationException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', \gettype($values)));
         }
 
         $this->operationType = $operationType;
@@ -48,10 +48,10 @@ class UpdateOperation
 
     public function toArray(): array
     {
-        return array(
+        return [
             'attrib' => $this->attribute,
             'modtype' => $this->operationType,
             'values' => $this->values,
-        );
+        ];
     }
 }

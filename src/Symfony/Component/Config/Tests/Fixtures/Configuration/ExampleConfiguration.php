@@ -18,10 +18,9 @@ class ExampleConfiguration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('acme_root');
+        $treeBuilder = new TreeBuilder('acme_root');
 
-        $rootNode
+        $treeBuilder->getRootNode()
             ->fixXmlConfig('parameter')
             ->fixXmlConfig('connection')
             ->fixXmlConfig('cms_page')
@@ -32,14 +31,14 @@ class ExampleConfiguration implements ConfigurationInterface
                 ->scalarNode('scalar_true')->defaultTrue()->end()
                 ->scalarNode('scalar_false')->defaultFalse()->end()
                 ->scalarNode('scalar_default')->defaultValue('default')->end()
-                ->scalarNode('scalar_array_empty')->defaultValue(array())->end()
-                ->scalarNode('scalar_array_defaults')->defaultValue(array('elem1', 'elem2'))->end()
+                ->scalarNode('scalar_array_empty')->defaultValue([])->end()
+                ->scalarNode('scalar_array_defaults')->defaultValue(['elem1', 'elem2'])->end()
                 ->scalarNode('scalar_required')->isRequired()->end()
                 ->scalarNode('scalar_deprecated')->setDeprecated()->end()
                 ->scalarNode('scalar_deprecated_with_message')->setDeprecated('Deprecation custom message for "%node%" at "%path%"')->end()
                 ->scalarNode('node_with_a_looong_name')->end()
-                ->enumNode('enum_with_default')->values(array('this', 'that'))->defaultValue('this')->end()
-                ->enumNode('enum')->values(array('this', 'that'))->end()
+                ->enumNode('enum_with_default')->values(['this', 'that'])->defaultValue('this')->end()
+                ->enumNode('enum')->values(['this', 'that'])->end()
                 ->arrayNode('array')
                     ->info('some info')
                     ->canBeUnset()

@@ -14,8 +14,8 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBun
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
@@ -65,9 +65,9 @@ class UserLoginType extends AbstractType
                 $event->getForm()->addError(new FormError($error->getMessage()));
             }
 
-            $event->setData(array_replace((array) $event->getData(), array(
+            $event->setData(array_replace((array) $event->getData(), [
                 'username' => $request->getSession()->get(Security::LAST_USERNAME),
-            )));
+            ]));
         });
     }
 
@@ -80,8 +80,8 @@ class UserLoginType extends AbstractType
          * listener in order for the CSRF token to validate successfully.
          */
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'csrf_token_id' => 'authenticate',
-        ));
+        ]);
     }
 }

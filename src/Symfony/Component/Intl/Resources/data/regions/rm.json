@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.4",
     "Names": {
         "AD": "Andorra",
         "AE": "Emirats Arabs Unids",
@@ -33,6 +33,7 @@
         "BR": "Brasilia",
         "BS": "Bahamas",
         "BT": "Bhutan",
+        "BV": "Insla Bouvet",
         "BW": "Botswana",
         "BY": "Bielorussia",
         "BZ": "Belize",
@@ -93,6 +94,7 @@
         "GW": "Guinea-Bissau",
         "GY": "Guyana",
         "HK": "Regiun d’administraziun speziala da Hongkong, China",
+        "HM": "Inslas da Heard e da McDonald",
         "HN": "Honduras",
         "HR": "Croazia",
         "HT": "Haiti",

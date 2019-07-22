@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\CacheProvider;
 
 class ArrayCache extends CacheProvider
 {
-    private $data = array();
+    private $data = [];
 
     protected function doFetch($id)
     {
@@ -21,12 +21,12 @@ class ArrayCache extends CacheProvider
 
         $expiry = $this->data[$id][1];
 
-        return !$expiry || time() <= $expiry || !$this->doDelete($id);
+        return !$expiry || microtime(true) < $expiry || !$this->doDelete($id);
     }
 
     protected function doSave($id, $data, $lifeTime = 0)
     {
-        $this->data[$id] = array($data, $lifeTime ? time() + $lifeTime : false);
+        $this->data[$id] = [$data, $lifeTime ? microtime(true) + $lifeTime : false];
 
         return true;
     }
@@ -40,7 +40,7 @@ class ArrayCache extends CacheProvider
 
     protected function doFlush()
     {
-        $this->data = array();
+        $this->data = [];
 
         return true;
     }

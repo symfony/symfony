@@ -18,23 +18,23 @@ class WhitespaceHandlerTest extends AbstractHandlerTest
 {
     public function getHandleValueTestData()
     {
-        return array(
-            array(' ', new Token(Token::TYPE_WHITESPACE, ' ', 0), ''),
-            array("\n", new Token(Token::TYPE_WHITESPACE, "\n", 0), ''),
-            array("\t", new Token(Token::TYPE_WHITESPACE, "\t", 0), ''),
+        return [
+            [' ', new Token(Token::TYPE_WHITESPACE, ' ', 0), ''],
+            ["\n", new Token(Token::TYPE_WHITESPACE, "\n", 0), ''],
+            ["\t", new Token(Token::TYPE_WHITESPACE, "\t", 0), ''],
 
-            array(' foo', new Token(Token::TYPE_WHITESPACE, ' ', 0), 'foo'),
-            array(' .foo', new Token(Token::TYPE_WHITESPACE, ' ', 0), '.foo'),
-        );
+            [' foo', new Token(Token::TYPE_WHITESPACE, ' ', 0), 'foo'],
+            [' .foo', new Token(Token::TYPE_WHITESPACE, ' ', 0), '.foo'],
+        ];
     }
 
     public function getDontHandleValueTestData()
     {
-        return array(
-            array('>'),
-            array('1'),
-            array('a'),
-        );
+        return [
+            ['>'],
+            ['1'],
+            ['a'],
+        ];
     }
 
     protected function generateHandler()

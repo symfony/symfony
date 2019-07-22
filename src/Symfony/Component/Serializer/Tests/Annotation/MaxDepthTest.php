@@ -25,17 +25,17 @@ class MaxDepthTest extends TestCase
      */
     public function testNotSetMaxDepthParameter()
     {
-        new MaxDepth(array());
+        new MaxDepth([]);
     }
 
     public function provideInvalidValues()
     {
-        return array(
-            array(''),
-            array('foo'),
-            array('1'),
-            array(0),
-        );
+        return [
+            [''],
+            ['foo'],
+            ['1'],
+            [0],
+        ];
     }
 
     /**
@@ -46,12 +46,12 @@ class MaxDepthTest extends TestCase
      */
     public function testNotAnIntMaxDepthParameter($value)
     {
-        new MaxDepth(array('value' => $value));
+        new MaxDepth(['value' => $value]);
     }
 
     public function testMaxDepthParameters()
     {
-        $maxDepth = new MaxDepth(array('value' => 3));
+        $maxDepth = new MaxDepth(['value' => 3]);
         $this->assertEquals(3, $maxDepth->getMaxDepth());
     }
 }

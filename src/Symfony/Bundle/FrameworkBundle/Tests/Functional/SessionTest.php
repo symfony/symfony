@@ -20,7 +20,7 @@ class SessionTest extends WebTestCase
      */
     public function testWelcome($config, $insulate)
     {
-        $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client->insulate();
         }
@@ -53,7 +53,7 @@ class SessionTest extends WebTestCase
      */
     public function testFlash($config, $insulate)
     {
-        $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client->insulate();
         }
@@ -71,20 +71,22 @@ class SessionTest extends WebTestCase
 
     /**
      * See if two separate insulated clients can run without
-     * polluting eachother's session data.
+     * polluting each other's session data.
      *
      * @dataProvider getConfigs
      */
     public function testTwoClients($config, $insulate)
     {
         // start first client
-        $client1 = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        $client1 = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client1->insulate();
         }
 
+        $this->ensureKernelShutdown();
+
         // start second client
-        $client2 = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        $client2 = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
             $client2->insulate();
         }
@@ -126,12 +128,28 @@ class SessionTest extends WebTestCase
         $this->assertContains('Welcome back client2, nice to meet you.', $crawler2->text());
     }
 
+    /**
+     * @dataProvider getConfigs
+     */
+    public function testCorrectCacheControlHeadersForCacheableAction($config, $insulate)
+    {
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        if ($insulate) {
+            $client->insulate();
+        }
+
+        $client->request('GET', '/cacheable');
+
+        $response = $client->getResponse();
+        $this->assertSame('public, s-maxage=100', $response->headers->get('cache-control'));
+    }
+
     public function getConfigs()
     {
-        return array(
+        return [
             // configfile, insulate
-            array('config.yml', true),
-            array('config.yml', false),
-        );
+            ['config.yml', true],
+            ['config.yml', false],
+        ];
     }
 }

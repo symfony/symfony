@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.17",
     "Names": {
         "Arab": "isi-Arabic",
         "Armn": "isi-Armenian",
@@ -43,7 +43,6 @@
         "Zsye": "i-Emoji",
         "Zsym": "amasimbuli",
         "Zxxx": "okungabhaliwe",
-        "Zyyy": "jwayelekile",
-        "Zzzz": "iskripthi esingaziwa"
+        "Zyyy": "jwayelekile"
     }
 }

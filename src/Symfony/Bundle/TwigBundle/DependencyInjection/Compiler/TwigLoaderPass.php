@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Adds services tagged twig.loader as Twig loaders.
@@ -29,7 +29,7 @@ class TwigLoaderPass implements CompilerPassInterface
             return;
         }
 
-        $prioritizedLoaders = array();
+        $prioritizedLoaders = [];
         $found = 0;
 
         foreach ($container->findTaggedServiceIds('twig.loader', true) as $id => $attributes) {
@@ -50,7 +50,7 @@ class TwigLoaderPass implements CompilerPassInterface
 
             foreach ($prioritizedLoaders as $loaders) {
                 foreach ($loaders as $loader) {
-                    $chainLoader->addMethodCall('addLoader', array(new Reference($loader)));
+                    $chainLoader->addMethodCall('addLoader', [new Reference($loader)]);
                 }
             }
 

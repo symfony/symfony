@@ -13,11 +13,12 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\HttpCache\SubRequestHandler;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Implements the inline rendering strategy where the Request is rendered by the current HTTP kernel.
@@ -42,7 +43,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
      *
      *  * alt: an alternative URI to render in case of an error
      */
-    public function render($uri, Request $request, array $options = array())
+    public function render($uri, Request $request, array $options = [])
     {
         $reference = null;
         if ($uri instanceof ControllerReference) {
@@ -53,10 +54,10 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             // want that as we want to preserve objects (so we manually set Request attributes
             // below instead)
             $attributes = $reference->attributes;
-            $reference->attributes = array();
+            $reference->attributes = [];
 
             // The request format and locale might have been overridden by the user
-            foreach (array('_format', '_locale') as $key) {
+            foreach (['_format', '_locale'] as $key) {
                 if (isset($attributes[$key])) {
                     $reference->attributes[$key] = $attributes[$key];
                 }
@@ -76,14 +77,14 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
 
         $level = ob_get_level();
         try {
-            return $this->kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
+            return SubRequestHandler::handle($this->kernel, $subRequest, HttpKernelInterface::SUB_REQUEST, false);
         } catch (\Exception $e) {
             // we dispatch the exception event to trigger the logging
-            // the response that comes back is simply ignored
+            // the response that comes back is ignored
             if (isset($options['ignore_errors']) && $options['ignore_errors'] && $this->dispatcher) {
-                $event = new GetResponseForExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
+                $event = new ExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
 
-                $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+                $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
             }
 
             // let's clean up the output buffers that were created by the sub-request
@@ -109,19 +110,10 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $cookies = $request->cookies->all();
         $server = $request->server->all();
 
-        if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
-            $currentXForwardedFor = $request->headers->get('X_FORWARDED_FOR', '');
-
-            $server['HTTP_X_FORWARDED_FOR'] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();
-        }
-
-        $trustedProxies = Request::getTrustedProxies();
-        $server['REMOTE_ADDR'] = $trustedProxies ? reset($trustedProxies) : '127.0.0.1';
-
         unset($server['HTTP_IF_MODIFIED_SINCE']);
         unset($server['HTTP_IF_NONE_MATCH']);
 
-        $subRequest = Request::create($uri, 'get', array(), $cookies, array(), $server);
+        $subRequest = Request::create($uri, 'get', [], $cookies, [], $server);
         if ($request->headers->has('Surrogate-Capability')) {
             $subRequest->headers->set('Surrogate-Capability', $request->headers->get('Surrogate-Capability'));
         }
@@ -132,6 +124,13 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             $setSession = \Closure::bind(function ($subRequest, $request) { $subRequest->session = $request->session; }, null, Request::class);
         }
         $setSession($subRequest, $request);
+
+        if ($request->get('_format')) {
+            $subRequest->attributes->set('_format', $request->get('_format'));
+        }
+        if ($request->getDefaultLocale() !== $request->getLocale()) {
+            $subRequest->setLocale($request->getLocale());
+        }
 
         return $subRequest;
     }

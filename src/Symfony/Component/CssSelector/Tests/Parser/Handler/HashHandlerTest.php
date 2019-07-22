@@ -13,31 +13,31 @@ namespace Symfony\Component\CssSelector\Tests\Parser\Handler;
 
 use Symfony\Component\CssSelector\Parser\Handler\HashHandler;
 use Symfony\Component\CssSelector\Parser\Token;
-use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
+use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 
 class HashHandlerTest extends AbstractHandlerTest
 {
     public function getHandleValueTestData()
     {
-        return array(
-            array('#id', new Token(Token::TYPE_HASH, 'id', 0), ''),
-            array('#123', new Token(Token::TYPE_HASH, '123', 0), ''),
+        return [
+            ['#id', new Token(Token::TYPE_HASH, 'id', 0), ''],
+            ['#123', new Token(Token::TYPE_HASH, '123', 0), ''],
 
-            array('#id.class', new Token(Token::TYPE_HASH, 'id', 0), '.class'),
-            array('#id element', new Token(Token::TYPE_HASH, 'id', 0), ' element'),
-        );
+            ['#id.class', new Token(Token::TYPE_HASH, 'id', 0), '.class'],
+            ['#id element', new Token(Token::TYPE_HASH, 'id', 0), ' element'],
+        ];
     }
 
     public function getDontHandleValueTestData()
     {
-        return array(
-            array('id'),
-            array('123'),
-            array('<'),
-            array('<'),
-            array('#'),
-        );
+        return [
+            ['id'],
+            ['123'],
+            ['<'],
+            ['<'],
+            ['#'],
+        ];
     }
 
     protected function generateHandler()

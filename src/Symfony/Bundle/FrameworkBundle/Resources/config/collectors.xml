@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
@@ -28,6 +28,7 @@
         <service id="data_collector.events" class="Symfony\Component\HttpKernel\DataCollector\EventDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/events.html.twig" id="events" priority="290" />
             <argument type="service" id="debug.event_dispatcher" on-invalid="ignore" />
+            <argument type="service" id="request_stack" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.logger" class="Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector">

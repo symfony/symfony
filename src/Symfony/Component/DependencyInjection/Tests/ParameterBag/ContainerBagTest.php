@@ -26,15 +26,15 @@ class ContainerBagTest extends TestCase
     /** @var ContainerBag */
     private $containerBag;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->parameterBag = new ParameterBag(array('foo' => 'value'));
+        $this->parameterBag = new ParameterBag(['foo' => 'value']);
         $this->containerBag = new ContainerBag(new Container($this->parameterBag));
     }
 
     public function testGetAllParameters()
     {
-        $this->assertSame(array('foo' => 'value'), $this->containerBag->all());
+        $this->assertSame(['foo' => 'value'], $this->containerBag->all());
     }
 
     public function testHasAParameter()

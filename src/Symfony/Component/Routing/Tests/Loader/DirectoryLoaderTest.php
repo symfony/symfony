@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\Loader\AnnotationFileLoader;
-use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\RouteCollection;
 
 class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
@@ -30,11 +30,11 @@ class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $locator = new FileLocator();
         $this->reader = $this->getReader();
         $this->loader = new DirectoryLoader($locator);
-        $resolver = new LoaderResolver(array(
+        $resolver = new LoaderResolver([
             new YamlFileLoader($locator),
             new AnnotationFileLoader($locator, $this->getClassLoader($this->reader)),
             $this->loader,
-        ));
+        ]);
         $this->loader->setResolver($resolver);
     }
 

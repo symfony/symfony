@@ -58,7 +58,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         $authenticatorIds = $config['authenticators'];
-        $authenticatorReferences = array();
+        $authenticatorReferences = [];
         foreach ($authenticatorIds as $authenticatorId) {
             $authenticatorReferences[] = new Reference($authenticatorId);
         }
@@ -87,9 +87,9 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         // this is always injected - then the listener decides if it should be used
         $container
             ->getDefinition($listenerId)
-            ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProvider));
+            ->addTag('security.remember_me_aware', ['id' => $id, 'provider' => $userProvider]);
 
-        return array($providerId, $listenerId, $entryPointId);
+        return [$providerId, $listenerId, $entryPointId];
     }
 
     private function determineEntryPoint($defaultEntryPointId, array $config)
@@ -97,10 +97,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         if ($defaultEntryPointId) {
             // explode if they've configured the entry_point, but there is already one
             if ($config['entry_point']) {
-                throw new \LogicException(sprintf(
-                    'The guard authentication provider cannot use the "%s" entry_point because another entry point is already configured by another provider! Either remove the other provider or move the entry_point configuration as a root key under your firewall (i.e. at the same level as "guard").',
-                    $config['entry_point']
-                ));
+                throw new \LogicException(sprintf('The guard authentication provider cannot use the "%s" entry_point because another entry point is already configured by another provider! Either remove the other provider or move the entry_point configuration as a root key under your firewall (i.e. at the same level as "guard").', $config['entry_point']));
             }
 
             return $defaultEntryPointId;
@@ -112,15 +109,12 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         }
 
         $authenticatorIds = $config['authenticators'];
-        if (1 == count($authenticatorIds)) {
+        if (1 == \count($authenticatorIds)) {
             // if there is only one authenticator, use that as the entry point
             return array_shift($authenticatorIds);
         }
 
         // we have multiple entry points - we must ask them to configure one
-        throw new \LogicException(sprintf(
-            'Because you have multiple guard configurators, you need to set the "guard.entry_point" key to one of your configurators (%s)',
-            implode(', ', $authenticatorIds)
-        ));
+        throw new \LogicException(sprintf('Because you have multiple guard authenticators, you need to set the "guard.entry_point" key to one of your authenticators (%s)', implode(', ', $authenticatorIds)));
     }
 }

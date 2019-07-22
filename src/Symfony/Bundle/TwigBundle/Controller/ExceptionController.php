@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
-use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
@@ -61,14 +61,14 @@ class ExceptionController
 
         return new Response($this->twig->render(
             (string) $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
-            array(
+            [
                 'status_code' => $code,
                 'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
                 'exception' => $exception,
                 'logger' => $logger,
                 'currentContent' => $currentContent,
-            )
-        ), 200, array('Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html'));
+            ]
+        ), 200, ['Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html']);
     }
 
     /**

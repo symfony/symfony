@@ -1,8 +1,9 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'property_access' => array(
+$container->loadFromExtension('framework', [
+    'property_access' => [
         'magic_call' => true,
         'throw_exception_on_invalid_index' => true,
-    ),
-));
+        'throw_exception_on_invalid_property_path' => false,
+    ],
+]);

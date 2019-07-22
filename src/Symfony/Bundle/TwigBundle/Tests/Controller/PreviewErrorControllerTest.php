@@ -13,9 +13,9 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Controller\PreviewErrorController;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
-use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class PreviewErrorControllerTest extends TestCase
@@ -44,7 +44,7 @@ class PreviewErrorControllerTest extends TestCase
                 }),
                 $this->equalTo(HttpKernelInterface::SUB_REQUEST)
             )
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $controller = new PreviewErrorController($kernel, $logicalControllerName);
 

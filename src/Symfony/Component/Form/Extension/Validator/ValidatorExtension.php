@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Validator;
 
-use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -49,10 +49,10 @@ class ValidatorExtension extends AbstractExtension
 
     protected function loadTypeExtensions()
     {
-        return array(
+        return [
             new Type\FormTypeValidatorExtension($this->validator),
             new Type\RepeatedTypeValidatorExtension(),
             new Type\SubmitTypeValidatorExtension(),
-        );
+        ];
     }
 }

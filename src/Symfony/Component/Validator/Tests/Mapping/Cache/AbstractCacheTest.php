@@ -26,12 +26,12 @@ abstract class AbstractCacheTest extends TestCase
     {
         $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getClassName'))
+            ->setMethods(['getClassName'])
             ->getMock();
 
         $meta->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue('Foo\\Bar'));
+            ->willReturn('Foo\\Bar');
 
         $this->cache->write($meta);
 
@@ -46,12 +46,12 @@ abstract class AbstractCacheTest extends TestCase
     {
         $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getClassName'))
+            ->setMethods(['getClassName'])
             ->getMock();
 
         $meta->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue('Foo\\Bar'));
+            ->willReturn('Foo\\Bar');
 
         $this->assertFalse($this->cache->has('Foo\\Bar'), 'has() returns false when there is no entry');
 
@@ -63,12 +63,12 @@ abstract class AbstractCacheTest extends TestCase
     {
         $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getClassName'))
+            ->setMethods(['getClassName'])
             ->getMock();
 
         $meta->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue('Foo\\Bar'));
+            ->willReturn('Foo\\Bar');
 
         $this->assertFalse($this->cache->read('Foo\\Bar'), 'read() returns false when there is no entry');
 

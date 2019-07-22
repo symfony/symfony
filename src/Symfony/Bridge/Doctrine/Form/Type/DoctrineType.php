@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
@@ -24,8 +25,9 @@ use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Service\ResetInterface;
 
-abstract class DoctrineType extends AbstractType
+abstract class DoctrineType extends AbstractType implements ResetInterface
 {
     /**
      * @var ManagerRegistry
@@ -35,12 +37,12 @@ abstract class DoctrineType extends AbstractType
     /**
      * @var IdReader[]
      */
-    private $idReaders = array();
+    private $idReaders = [];
 
     /**
      * @var DoctrineChoiceLoader[]
      */
-    private $choiceLoaders = array();
+    private $choiceLoaders = [];
 
     /**
      * Creates the label for a choice.
@@ -106,7 +108,7 @@ abstract class DoctrineType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['multiple']) {
+        if ($options['multiple'] && interface_exists(Collection::class)) {
             $builder
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(new CollectionToArrayTransformer(), true)
@@ -126,11 +128,11 @@ abstract class DoctrineType extends AbstractType
                 // also if concrete Type can return important QueryBuilder parts to generate
                 // hash key we go for it as well
                 if (!$options['query_builder'] || false !== ($qbParts = $this->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
-                    $hash = CachingFactoryDecorator::generateHash(array(
+                    $hash = CachingFactoryDecorator::generateHash([
                         $options['em'],
                         $options['class'],
                         $qbParts,
-                    ));
+                    ]);
 
                     if (isset($this->choiceLoaders[$hash])) {
                         return $this->choiceLoaders[$hash];
@@ -148,7 +150,8 @@ abstract class DoctrineType extends AbstractType
                     $options['em'],
                     $options['class'],
                     $options['id_reader'],
-                    $entityLoader
+                    $entityLoader,
+                    false
                 );
 
                 if (null !== $hash) {
@@ -160,14 +163,11 @@ abstract class DoctrineType extends AbstractType
         };
 
         $choiceName = function (Options $options) {
-            /** @var IdReader $idReader */
-            $idReader = $options['id_reader'];
-
             // If the object has a single-column, numeric ID, use that ID as
             // field name. We can only use numeric IDs as names, as we cannot
             // guarantee that a non-numeric ID contains a valid form name
-            if ($idReader->isIntId()) {
-                return array(__CLASS__, 'createChoiceName');
+            if ($options['id_reader'] instanceof IdReader && $options['id_reader']->isIntId()) {
+                return [__CLASS__, 'createChoiceName'];
             }
 
             // Otherwise, an incrementing integer is used as name automatically
@@ -178,12 +178,9 @@ abstract class DoctrineType extends AbstractType
         // are indexed by an incrementing integer.
         // Use the ID/incrementing integer as choice value.
         $choiceValue = function (Options $options) {
-            /** @var IdReader $idReader */
-            $idReader = $options['id_reader'];
-
             // If the entity has a single-column ID, use that ID as value
-            if ($idReader->isSingleId()) {
-                return array($idReader, 'getIdValue');
+            if ($options['id_reader'] instanceof IdReader && $options['id_reader']->isSingleId()) {
+                return [$options['id_reader'], 'getIdValue'];
             }
 
             // Otherwise, an incrementing integer is used as value automatically
@@ -202,11 +199,7 @@ abstract class DoctrineType extends AbstractType
             $em = $this->registry->getManagerForClass($options['class']);
 
             if (null === $em) {
-                throw new RuntimeException(sprintf(
-                    'Class "%s" seems not to be a managed Doctrine entity. '.
-                    'Did you forget to map it?',
-                    $options['class']
-                ));
+                throw new RuntimeException(sprintf('Class "%s" seems not to be a managed Doctrine entity. Did you forget to map it?', $options['class']));
             }
 
             return $em;
@@ -215,8 +208,8 @@ abstract class DoctrineType extends AbstractType
         // Invoke the query builder closure so that we can cache choice lists
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
-            if (is_callable($queryBuilder)) {
-                $queryBuilder = call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
+            if (\is_callable($queryBuilder)) {
+                $queryBuilder = $queryBuilder($options['em']->getRepository($options['class']));
             }
 
             return $queryBuilder;
@@ -225,10 +218,10 @@ abstract class DoctrineType extends AbstractType
         // Set the "id_reader" option via the normalizer. This option is not
         // supposed to be set by the user.
         $idReaderNormalizer = function (Options $options) {
-            $hash = CachingFactoryDecorator::generateHash(array(
+            $hash = CachingFactoryDecorator::generateHash([
                 $options['em'],
                 $options['class'],
-            ));
+            ]);
 
             // The ID reader is a utility that is needed to read the object IDs
             // when generating the field values. The callback generating the
@@ -241,28 +234,32 @@ abstract class DoctrineType extends AbstractType
                 $this->idReaders[$hash] = new IdReader($options['em'], $classMetadata);
             }
 
-            return $this->idReaders[$hash];
+            if ($this->idReaders[$hash]->isSingleId()) {
+                return $this->idReaders[$hash];
+            }
+
+            return null;
         };
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'em' => null,
             'query_builder' => null,
             'choices' => null,
             'choice_loader' => $choiceLoader,
-            'choice_label' => array(__CLASS__, 'createChoiceLabel'),
+            'choice_label' => [__CLASS__, 'createChoiceLabel'],
             'choice_name' => $choiceName,
             'choice_value' => $choiceValue,
             'id_reader' => null, // internal
             'choice_translation_domain' => false,
-        ));
+        ]);
 
-        $resolver->setRequired(array('class'));
+        $resolver->setRequired(['class']);
 
         $resolver->setNormalizer('em', $emNormalizer);
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
         $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
-        $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
+        $resolver->setAllowedTypes('em', ['null', 'string', 'Doctrine\Common\Persistence\ObjectManager']);
     }
 
     /**
@@ -283,6 +280,6 @@ abstract class DoctrineType extends AbstractType
 
     public function reset()
     {
-        $this->choiceLoaders = array();
+        $this->choiceLoaders = [];
     }
 }

@@ -12,25 +12,26 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
 
 class TokenBasedRememberMeServicesTest extends TestCase
 {
     public function testAutoLoginReturnsNullWhenNoCookie()
     {
-        $service = $this->getService(null, array('name' => 'foo'));
+        $service = $this->getService(null, ['name' => 'foo']);
 
         $this->assertNull($service->autoLogin(new Request()));
     }
 
     public function testAutoLoginThrowsExceptionOnInvalidCookie()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
+        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo']);
         $request = new Request();
         $request->request->set('foo', 'true');
         $request->cookies->set('foo', 'foo');
@@ -42,14 +43,14 @@ class TokenBasedRememberMeServicesTest extends TestCase
     public function testAutoLoginThrowsExceptionOnNonExistentUser()
     {
         $userProvider = $this->getProvider();
-        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
+        $service = $this->getService($userProvider, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600]);
         $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() + 3600, 'foopass'));
 
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->will($this->throwException(new UsernameNotFoundException('user not found')))
+            ->willThrowException(new UsernameNotFoundException('user not found'))
         ;
 
         $this->assertNull($service->autoLogin($request));
@@ -59,7 +60,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
     public function testAutoLoginDoesNotAcceptCookieWithInvalidHash()
     {
         $userProvider = $this->getProvider();
-        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
+        $service = $this->getService($userProvider, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600]);
         $request = new Request();
         $request->cookies->set('foo', base64_encode('class:'.base64_encode('foouser').':123456789:fooHash'));
 
@@ -67,14 +68,14 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
 
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo('foouser'))
-            ->will($this->returnValue($user))
+            ->willReturn($user)
         ;
 
         $this->assertNull($service->autoLogin($request));
@@ -84,7 +85,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
     public function testAutoLoginDoesNotAcceptAnExpiredCookie()
     {
         $userProvider = $this->getProvider();
-        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
+        $service = $this->getService($userProvider, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600]);
         $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() - 1, 'foopass'));
 
@@ -92,14 +93,14 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
 
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo('foouser'))
-            ->will($this->returnValue($user))
+            ->willReturn($user)
         ;
 
         $this->assertNull($service->autoLogin($request));
@@ -117,12 +118,12 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getRoles')
-            ->will($this->returnValue(array('ROLE_FOO')))
+            ->willReturn(['ROLE_FOO'])
         ;
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
 
         $userProvider = $this->getProvider();
@@ -130,10 +131,10 @@ class TokenBasedRememberMeServicesTest extends TestCase
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo($username))
-            ->will($this->returnValue($user))
+            ->willReturn($user)
         ;
 
-        $service = $this->getService($userProvider, array('name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600));
+        $service = $this->getService($userProvider, ['name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600]);
         $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', $username, time() + 3600, 'foopass'));
 
@@ -146,15 +147,15 @@ class TokenBasedRememberMeServicesTest extends TestCase
 
     public function provideUsernamesForAutoLogin()
     {
-        return array(
-            array('foouser', 'Simple username'),
-            array('foo'.TokenBasedRememberMeServices::COOKIE_DELIMITER.'user', 'Username might contain the delimiter'),
-        );
+        return [
+            ['foouser', 'Simple username'],
+            ['foo'.TokenBasedRememberMeServices::COOKIE_DELIMITER.'user', 'Username might contain the delimiter'],
+        ];
     }
 
     public function testLogout()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => false));
+        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => false]);
         $request = new Request();
         $response = new Response();
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
@@ -171,7 +172,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
 
     public function testLoginFail()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo'));
+        $service = $this->getService(null, ['name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo']);
         $request = new Request();
 
         $service->loginFail($request);
@@ -184,14 +185,14 @@ class TokenBasedRememberMeServicesTest extends TestCase
 
     public function testLoginSuccessIgnoresTokensWhichDoNotContainAnUserInterfaceImplementation()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
+        $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue('foo'))
+            ->willReturn('foo')
         ;
 
         $cookies = $response->headers->getCookies();
@@ -205,7 +206,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
 
     public function testLoginSuccess()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'lifetime' => 3600, 'always_remember_me' => true));
+        $service = $this->getService(null, ['name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'samesite' => Cookie::SAMESITE_STRICT, 'lifetime' => 3600, 'always_remember_me' => true]);
         $request = new Request();
         $response = new Response();
 
@@ -214,17 +215,17 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
         $user
             ->expects($this->once())
             ->method('getUsername')
-            ->will($this->returnValue('foouser'))
+            ->willReturn('foouser')
         ;
         $token
             ->expects($this->atLeastOnce())
             ->method('getUser')
-            ->will($this->returnValue($user))
+            ->willReturn($user)
         ;
 
         $cookies = $response->headers->getCookies();
@@ -240,6 +241,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($cookie->getExpiresTime() > time() + 3590 && $cookie->getExpiresTime() < time() + 3610);
         $this->assertEquals('myfoodomain.foo', $cookie->getDomain());
         $this->assertEquals('/foo/path', $cookie->getPath());
+        $this->assertSame(Cookie::SAMESITE_STRICT, $cookie->getSameSite());
     }
 
     protected function getCookie($class, $username, $expires, $password)
@@ -260,13 +262,13 @@ class TokenBasedRememberMeServicesTest extends TestCase
         return $r->invoke($service, $parts);
     }
 
-    protected function getService($userProvider = null, $options = array(), $logger = null)
+    protected function getService($userProvider = null, $options = [], $logger = null)
     {
         if (null === $userProvider) {
             $userProvider = $this->getProvider();
         }
 
-        $service = new TokenBasedRememberMeServices(array($userProvider), 'foosecret', 'fookey', $options, $logger);
+        $service = new TokenBasedRememberMeServices([$userProvider], 'foosecret', 'fookey', $options, $logger);
 
         return $service;
     }
@@ -277,7 +279,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $provider
             ->expects($this->any())
             ->method('supportsClass')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         return $provider;

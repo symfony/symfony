@@ -39,7 +39,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
 
     /**
      * @param callable|resource|string|null $output  A line dumper callable, an opened stream or an output path, defaults to static::$defaultOutput
-     * @param string                        $charset The default character encoding to use for non-UTF8 strings
+     * @param string|null                   $charset The default character encoding to use for non-UTF8 strings
      * @param int                           $flags   A bit field of static::DUMP_* constants to fine tune dumps representation
      */
     public function __construct($output = null, string $charset = null, int $flags = 0)
@@ -49,7 +49,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
         $this->decimalPoint = localeconv();
         $this->decimalPoint = $this->decimalPoint['decimal_point'];
         $this->setOutput($output ?: static::$defaultOutput);
-        if (!$output && is_string(static::$defaultOutput)) {
+        if (!$output && \is_string(static::$defaultOutput)) {
             static::$defaultOutput = $this->outputStream;
         }
     }
@@ -65,15 +65,15 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     {
         $prev = null !== $this->outputStream ? $this->outputStream : $this->lineDumper;
 
-        if (is_callable($output)) {
+        if (\is_callable($output)) {
             $this->outputStream = null;
             $this->lineDumper = $output;
         } else {
-            if (is_string($output)) {
+            if (\is_string($output)) {
                 $output = fopen($output, 'wb');
             }
             $this->outputStream = $output;
-            $this->lineDumper = array($this, 'echoLine');
+            $this->lineDumper = [$this, 'echoLine'];
         }
 
         return $prev;
@@ -164,7 +164,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      */
     protected function dumpLine($depth)
     {
-        call_user_func($this->lineDumper, $this->line, $depth, $this->indentPad);
+        ($this->lineDumper)($this->line, $depth, $this->indentPad);
         $this->line = '';
     }
 
@@ -195,7 +195,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
             return $s;
         }
 
-        if (!function_exists('iconv')) {
+        if (!\function_exists('iconv')) {
             throw new \RuntimeException('Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist. You should install ext-iconv or symfony/polyfill-iconv.');
         }
 

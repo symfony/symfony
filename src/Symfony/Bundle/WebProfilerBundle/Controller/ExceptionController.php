@@ -11,14 +11,12 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\Debug\ExceptionHandler;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Loader\ExistsLoaderInterface;
 
 /**
  * ExceptionController.
@@ -30,26 +28,28 @@ class ExceptionController
     protected $twig;
     protected $debug;
     protected $profiler;
-    private $fileLinkFormat;
+    private $errorRenderer;
 
-    public function __construct(Profiler $profiler = null, Environment $twig, bool $debug, FileLinkFormatter $fileLinkFormat = null)
+    public function __construct(Profiler $profiler = null, Environment $twig, bool $debug, FileLinkFormatter $fileLinkFormat = null, HtmlErrorRenderer $errorRenderer = null)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->debug = $debug;
-        $this->fileLinkFormat = $fileLinkFormat;
+        $this->errorRenderer = $errorRenderer;
+
+        if (null === $errorRenderer) {
+            $this->errorRenderer = new HtmlErrorRenderer($debug, $this->twig->getCharset(), $fileLinkFormat);
+        }
     }
 
     /**
      * Renders the exception panel for the given token.
      *
-     * @param string $token The profiler token
-     *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
-    public function showAction($token)
+    public function showAction(string $token)
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -61,35 +61,31 @@ class ExceptionController
         $template = $this->getTemplate();
 
         if (!$this->twig->getLoader()->exists($template)) {
-            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
-
-            return new Response($handler->getContent($exception), 200, array('Content-Type' => 'text/html'));
+            return new Response($this->errorRenderer->getBody($exception), 200, ['Content-Type' => 'text/html']);
         }
 
         $code = $exception->getStatusCode();
 
         return new Response($this->twig->render(
             $template,
-            array(
+            [
                 'status_code' => $code,
                 'status_text' => Response::$statusTexts[$code],
                 'exception' => $exception,
                 'logger' => null,
                 'currentContent' => '',
-            )
-        ), 200, array('Content-Type' => 'text/html'));
+            ]
+        ), 200, ['Content-Type' => 'text/html']);
     }
 
     /**
      * Renders the exception panel stylesheet for the given token.
      *
-     * @param string $token The profiler token
-     *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
-    public function cssAction($token)
+    public function cssAction(string $token)
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -97,38 +93,17 @@ class ExceptionController
 
         $this->profiler->disable();
 
-        $exception = $this->profiler->loadProfile($token)->getCollector('exception')->getException();
         $template = $this->getTemplate();
 
-        if (!$this->templateExists($template)) {
-            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
-
-            return new Response($handler->getStylesheet($exception), 200, array('Content-Type' => 'text/css'));
+        if (!$this->twig->getLoader()->exists($template)) {
+            return new Response($this->errorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
         }
 
-        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, array('Content-Type' => 'text/css'));
+        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, ['Content-Type' => 'text/css']);
     }
 
     protected function getTemplate()
     {
         return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
-    }
-
-    // to be removed when the minimum required version of Twig is >= 2.0
-    protected function templateExists($template)
-    {
-        $loader = $this->twig->getLoader();
-        if ($loader instanceof ExistsLoaderInterface) {
-            return $loader->exists($template);
-        }
-
-        try {
-            $loader->getSource($template);
-
-            return true;
-        } catch (LoaderError $e) {
-        }
-
-        return false;
     }
 }

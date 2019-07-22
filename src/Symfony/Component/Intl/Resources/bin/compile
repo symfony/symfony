@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+[[ $1 == force ]] && docker pull jakzal/php-intl
+[[ ! -d /tmp/symfony/icu ]] && mkdir -p /tmp/symfony/icu
+
+docker run \
+    -it --rm --name symfony-intl \
+    -u $(id -u):$(id -g) \
+    -v /tmp/symfony/icu:/tmp \
+    -v $(pwd):/symfony \
+    -w /symfony \
+    jakzal/php-intl:latest \
+    php src/Symfony/Component/Intl/Resources/bin/update-data.php

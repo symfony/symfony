@@ -11,9 +11,15 @@
 
 namespace Symfony\Component\Cache\Exception;
 
-use Psr\Cache\InvalidArgumentException as Psr6CacheInterface;
-use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInterface;
+use Psr\Cache\CacheException as Psr6CacheInterface;
+use Psr\SimpleCache\CacheException as SimpleCacheInterface;
 
-class LogicException extends \LogicException implements Psr6CacheInterface, SimpleCacheInterface
-{
+if (interface_exists(SimpleCacheInterface::class)) {
+    class LogicException extends \LogicException implements Psr6CacheInterface, SimpleCacheInterface
+    {
+    }
+} else {
+    class LogicException extends \LogicException implements Psr6CacheInterface
+    {
+    }
 }

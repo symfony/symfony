@@ -31,6 +31,21 @@ secured-by-one-ip:
 secured-by-two-ips:
     path:     /secured-by-two-ips
 
+secured-by-one-real-ip:
+    path:     /secured-by-one-real-ip
+
+secured-by-one-real-ip-with-mask:
+    path:     /secured-by-one-real-ip-with-mask
+
+secured-by-one-real-ipv6:
+    path:     /secured-by-one-real-ipv6
+
+secured-by-one-env-placeholder:
+    path:     /secured-by-one-env-placeholder
+
+secured-by-one-env-placeholder-and-one-real-ip:
+    path:     /secured-by-one-env-placeholder-and-one-real-ip
+
 form_logout:
     path:     /logout_path
 

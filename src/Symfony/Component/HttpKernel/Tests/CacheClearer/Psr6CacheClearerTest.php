@@ -12,8 +12,8 @@
 namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 class Psr6CacheClearerTest extends TestCase
 {
@@ -24,7 +24,7 @@ class Psr6CacheClearerTest extends TestCase
             ->expects($this->once())
             ->method('clear');
 
-        (new Psr6CacheClearer(array('pool' => $pool)))->clear('');
+        (new Psr6CacheClearer(['pool' => $pool]))->clear('');
     }
 
     public function testClearPool()
@@ -34,7 +34,7 @@ class Psr6CacheClearerTest extends TestCase
             ->expects($this->once())
             ->method('clear');
 
-        (new Psr6CacheClearer(array('pool' => $pool)))->clearPool('pool');
+        (new Psr6CacheClearer(['pool' => $pool]))->clearPool('pool');
     }
 
     /**

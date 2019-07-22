@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\TransformationFailedException;
-
 class CallbackTransformer implements DataTransformerInterface
 {
     private $transform;
@@ -30,33 +27,18 @@ class CallbackTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a value from the original representation to a transformed representation.
-     *
-     * @param mixed $data The value in the original representation
-     *
-     * @return mixed The value in the transformed representation
-     *
-     * @throws UnexpectedTypeException       when the argument is not of the expected type
-     * @throws TransformationFailedException when the transformation fails
+     * {@inheritdoc}
      */
     public function transform($data)
     {
-        return call_user_func($this->transform, $data);
+        return ($this->transform)($data);
     }
 
     /**
-     * Transforms a value from the transformed representation to its original
-     * representation.
-     *
-     * @param mixed $data The value in the transformed representation
-     *
-     * @return mixed The value in the original representation
-     *
-     * @throws UnexpectedTypeException       when the argument is not of the expected type
-     * @throws TransformationFailedException when the transformation fails
+     * {@inheritdoc}
      */
     public function reverseTransform($data)
     {
-        return call_user_func($this->reverseTransform, $data);
+        return ($this->reverseTransform)($data);
     }
 }

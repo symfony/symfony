@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added different protocols to be allowed as asset base_urls
+
 3.4.0
 -----
 

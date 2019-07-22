@@ -32,7 +32,7 @@ class ParametersConfigurator extends AbstractConfigurator
      *
      * @return $this
      */
-    final public function set(string $name, $value)
+    final public function set(string $name, $value): object
     {
         $this->container->setParameter($name, static::processValue($value, true));
 
@@ -44,7 +44,7 @@ class ParametersConfigurator extends AbstractConfigurator
      *
      * @return $this
      */
-    final public function __invoke(string $name, $value)
+    final public function __invoke(string $name, $value): object
     {
         return $this->set($name, $value);
     }

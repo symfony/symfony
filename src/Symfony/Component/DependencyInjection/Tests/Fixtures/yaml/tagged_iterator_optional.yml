@@ -1,0 +1,4 @@
+services:
+    iterator_service:
+        class: FooClass
+        arguments: [!tagged_iterator {tag: test.tag}]

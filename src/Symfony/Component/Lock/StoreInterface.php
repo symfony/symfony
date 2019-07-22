@@ -18,16 +18,11 @@ use Symfony\Component\Lock\Exception\NotSupportedException;
  * StoreInterface defines an interface to manipulate a lock store.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
+ * @deprecated since Symfony 4.4, use PersistingStoreInterface and BlockingStoreInterface instead
  */
-interface StoreInterface
+interface StoreInterface extends PersistingStoreInterface
 {
-    /**
-     * Stores the resource if it's not locked by someone else.
-     *
-     * @throws LockConflictedException
-     */
-    public function save(Key $key);
-
     /**
      * Waits until a key becomes free, then stores the resource.
      *
@@ -37,28 +32,4 @@ interface StoreInterface
      * @throws NotSupportedException
      */
     public function waitAndSave(Key $key);
-
-    /**
-     * Extends the ttl of a resource.
-     *
-     * If the store does not support this feature it should throw a NotSupportedException.
-     *
-     * @param float $ttl amount of second to keep the lock in the store
-     *
-     * @throws LockConflictedException
-     * @throws NotSupportedException
-     */
-    public function putOffExpiration(Key $key, $ttl);
-
-    /**
-     * Removes a resource from the storage.
-     */
-    public function delete(Key $key);
-
-    /**
-     * Returns whether or not the resource exists in the storage.
-     *
-     * @return bool
-     */
-    public function exists(Key $key);
 }

@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 /**
  * AnonymousAuthenticationProvider validates AnonymousToken instances.

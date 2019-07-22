@@ -2,8 +2,8 @@
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:framework="http://symfony.com/schema/dic/symfony"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
-        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
         <framework:cache>
@@ -12,6 +12,11 @@
             <framework:pool name="cache.baz" adapter="cache.adapter.filesystem" default-lifetime="7" />
             <framework:pool name="cache.foobar" adapter="cache.adapter.psr6" default-lifetime="10" provider="app.cache_pool" />
             <framework:pool name="cache.def" default-lifetime="11" />
+            <framework:pool name="cache.chain" default-lifetime="12">
+                <framework:adapter name="cache.adapter.array" />
+                <framework:adapter name="cache.adapter.filesystem" />
+                <framework:adapter name="cache.adapter.redis" provider="redis://foo" />
+            </framework:pool>
         </framework:cache>
     </framework:config>
 </container>

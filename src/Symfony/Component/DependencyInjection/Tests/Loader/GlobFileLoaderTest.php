@@ -12,10 +12,10 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
-use Symfony\Component\Config\FileLocator;
 
 class GlobFileLoaderTest extends TestCase
 {

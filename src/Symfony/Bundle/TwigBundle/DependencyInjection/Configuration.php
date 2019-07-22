@@ -29,8 +29,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('twig');
+        $treeBuilder = new TreeBuilder('twig');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
@@ -54,11 +54,11 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('form_themes')
                     ->addDefaultChildrenIfNoneSet()
                     ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
-                    ->example(array('MyBundle::form.html.twig'))
+                    ->example(['@My/form.html.twig'])
                     ->validate()
-                        ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
+                        ->ifTrue(function ($v) { return !\in_array('form_div_layout.html.twig', $v); })
                         ->then(function ($v) {
-                            return array_merge(array('form_div_layout.html.twig'), $v);
+                            return array_merge(['form_div_layout.html.twig'], $v);
                         })
                     ->end()
                 ->end()
@@ -74,37 +74,37 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('globals')
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('key')
-                    ->example(array('foo' => '"@bar"', 'pi' => 3.14))
+                    ->example(['foo' => '"@bar"', 'pi' => 3.14])
                     ->prototype('array')
                         ->normalizeKeys(false)
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return is_string($v) && 0 === strpos($v, '@'); })
+                            ->ifTrue(function ($v) { return \is_string($v) && 0 === strpos($v, '@'); })
                             ->then(function ($v) {
                                 if (0 === strpos($v, '@@')) {
                                     return substr($v, 1);
                                 }
 
-                                return array('id' => substr($v, 1), 'type' => 'service');
+                                return ['id' => substr($v, 1), 'type' => 'service'];
                             })
                         ->end()
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                if (is_array($v)) {
+                                if (\is_array($v)) {
                                     $keys = array_keys($v);
                                     sort($keys);
 
-                                    return $keys !== array('id', 'type') && $keys !== array('value');
+                                    return $keys !== ['id', 'type'] && $keys !== ['value'];
                                 }
 
                                 return true;
                             })
-                            ->then(function ($v) { return array('value' => $v); })
+                            ->then(function ($v) { return ['value' => $v]; })
                         ->end()
                         ->children()
                             ->scalarNode('id')->end()
                             ->scalarNode('type')
                                 ->validate()
-                                    ->ifNotInArray(array('service'))
+                                    ->ifNotInArray(['service'])
                                     ->thenInvalid('The %s type is not supported')
                                 ->end()
                             ->end()
@@ -128,13 +128,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
-                ->booleanNode('strict_variables')
-                    ->defaultValue(function () {
-                        @trigger_error('Relying on the default value ("false") of the "twig.strict_variables" configuration option is deprecated since Symfony 4.1. You should use "%kernel.debug%" explicitly instead, which will be the new default in 5.0.', E_USER_DEPRECATED);
-
-                        return false;
-                    })
-                ->end()
+                ->booleanNode('strict_variables')->defaultValue('%kernel.debug%')->end()
                 ->scalarNode('auto_reload')->end()
                 ->integerNode('optimizations')->min(-1)->end()
                 ->scalarNode('default_path')
@@ -147,9 +141,9 @@ class Configuration implements ConfigurationInterface
                     ->beforeNormalization()
                         ->always()
                         ->then(function ($paths) {
-                            $normalized = array();
+                            $normalized = [];
                             foreach ($paths as $path => $namespace) {
-                                if (is_array($namespace)) {
+                                if (\is_array($namespace)) {
                                     // xml
                                     $path = $namespace['value'];
                                     $namespace = $namespace['namespace'];

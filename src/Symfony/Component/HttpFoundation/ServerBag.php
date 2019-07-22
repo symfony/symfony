@@ -27,8 +27,8 @@ class ServerBag extends ParameterBag
      */
     public function getHeaders()
     {
-        $headers = array();
-        $contentHeaders = array('CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true);
+        $headers = [];
+        $contentHeaders = ['CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true];
         foreach ($this->parameters as $key => $value) {
             if (0 === strpos($key, 'HTTP_')) {
                 $headers[substr($key, 5)] = $value;
@@ -68,7 +68,7 @@ class ServerBag extends ParameterBag
                 if (0 === stripos($authorizationHeader, 'basic ')) {
                     // Decode AUTHORIZATION header into PHP_AUTH_USER and PHP_AUTH_PW when authorization header is basic
                     $exploded = explode(':', base64_decode(substr($authorizationHeader, 6)), 2);
-                    if (2 == count($exploded)) {
+                    if (2 == \count($exploded)) {
                         list($headers['PHP_AUTH_USER'], $headers['PHP_AUTH_PW']) = $exploded;
                     }
                 } elseif (empty($this->parameters['PHP_AUTH_DIGEST']) && (0 === stripos($authorizationHeader, 'digest '))) {

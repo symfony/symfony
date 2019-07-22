@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.49.82",
     "Names": {
         "aa": "Afar",
         "ab": "Abchasesch",
@@ -362,7 +362,6 @@
         "ms": "Malaiesch",
         "mt": "Maltesesch",
         "mua": "Mundang",
-        "mul": "Méisproocheg",
         "mus": "Muskogee-Sprooch",
         "mwl": "Mirandesesch",
         "mwr": "Marwari",
@@ -448,7 +447,6 @@
         "ro_MD": "Moldawesch",
         "rof": "Rombo",
         "rom": "Romani",
-        "root": "Root",
         "rtm": "Rotumanesch",
         "ru": "Russesch",
         "rue": "Russinesch",
@@ -562,7 +560,6 @@
         "uga": "Ugaritesch",
         "uk": "Ukrainesch",
         "umb": "Mbundu-Sprooch",
-        "und": "Onbestëmmt Sprooch",
         "ur": "Urdu",
         "uz": "Usbekesch",
         "vai": "Vai-Sprooch",
@@ -606,7 +603,6 @@
         "zh_Hant": "Chinesesch (traditionell)",
         "zu": "Zulu",
         "zun": "Zuni-Sprooch",
-        "zxx": "Keng Sproochinhalter",
         "zza": "Zaza"
     }
 }

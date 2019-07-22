@@ -16,14 +16,12 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 interface DefinitionValidatorInterface
 {
     /**
-     * @param Definition $definition
-     * @param string     $name
-     *
      * @throws InvalidDefinitionException on invalid definition
      */
-    public function validate(Definition $definition, $name);
+    public function validate(Definition $definition, string $name);
 }

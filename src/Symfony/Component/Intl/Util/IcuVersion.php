@@ -91,7 +91,7 @@ class IcuVersion
     {
         $version = preg_replace('/^(\d)\.(\d)/', '$1$2', $version);
 
-        if (1 === strlen($version)) {
+        if (1 === \strlen($version)) {
             $version .= '0';
         }
 

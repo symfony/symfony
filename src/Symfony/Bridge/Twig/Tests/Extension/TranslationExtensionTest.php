@@ -13,8 +13,8 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader as TwigArrayLoader;
 
@@ -22,7 +22,7 @@ class TranslationExtensionTest extends TestCase
 {
     public function testEscaping()
     {
-        $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(array('value' => 12, 'msg' => 'approx.'));
+        $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(['value' => 12, 'msg' => 'approx.']);
 
         $this->assertEquals('Percent: 12% (approx.)', $output);
     }
@@ -30,12 +30,12 @@ class TranslationExtensionTest extends TestCase
     /**
      * @dataProvider getTransTests
      */
-    public function testTrans($template, $expected, array $variables = array())
+    public function testTrans($template, $expected, array $variables = [])
     {
         if ($expected != $this->getTemplate($template)->render($variables)) {
             echo $template."\n";
-            $loader = new TwigArrayLoader(array('index' => $template));
-            $twig = new Environment($loader, array('debug' => true, 'cache' => false));
+            $loader = new TwigArrayLoader(['index' => $template]);
+            $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
             $twig->addExtension(new TranslationExtension(new Translator('en')));
 
             echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSourceContext('index'))))."\n\n";
@@ -63,78 +63,69 @@ class TranslationExtensionTest extends TestCase
         $output = $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
     }
 
-    /**
-     * @expectedException        \Twig\Error\SyntaxError
-     * @expectedExceptionMessage A message inside a transchoice tag must be a simple text in "index" at line 2.
-     */
-    public function testTransChoiceComplexBody()
-    {
-        $output = $this->getTemplate("{% transchoice count %}\n{{ 1 + 2 }}{% endtranschoice %}")->render();
-    }
-
     public function getTransTests()
     {
-        return array(
+        return [
             // trans tag
-            array('{% trans %}Hello{% endtrans %}', 'Hello'),
-            array('{% trans %}%name%{% endtrans %}', 'Symfony', array('name' => 'Symfony')),
+            ['{% trans %}Hello{% endtrans %}', 'Hello'],
+            ['{% trans %}%name%{% endtrans %}', 'Symfony', ['name' => 'Symfony']],
 
-            array('{% trans from elsewhere %}Hello{% endtrans %}', 'Hello'),
+            ['{% trans from elsewhere %}Hello{% endtrans %}', 'Hello'],
 
-            array('{% trans %}Hello %name%{% endtrans %}', 'Hello Symfony', array('name' => 'Symfony')),
-            array('{% trans with { \'%name%\': \'Symfony\' } %}Hello %name%{% endtrans %}', 'Hello Symfony'),
-            array('{% set vars = { \'%name%\': \'Symfony\' } %}{% trans with vars %}Hello %name%{% endtrans %}', 'Hello Symfony'),
+            ['{% trans %}Hello %name%{% endtrans %}', 'Hello Symfony', ['name' => 'Symfony']],
+            ['{% trans with { \'%name%\': \'Symfony\' } %}Hello %name%{% endtrans %}', 'Hello Symfony'],
+            ['{% set vars = { \'%name%\': \'Symfony\' } %}{% trans with vars %}Hello %name%{% endtrans %}', 'Hello Symfony'],
 
-            array('{% trans into "fr"%}Hello{% endtrans %}', 'Hello'),
+            ['{% trans into "fr"%}Hello{% endtrans %}', 'Hello'],
 
-            // transchoice
-            array(
-                '{% transchoice count from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
+            // trans with count
+            [
+                '{% trans from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtrans %}',
                 'There is no apples',
-                array('count' => 0),
-            ),
-            array(
-                '{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
+                ['count' => 0],
+            ],
+            [
+                '{% trans %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtrans %}',
                 'There is 5 apples',
-                array('count' => 5),
-            ),
-            array(
-                '{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
+                ['count' => 5],
+            ],
+            [
+                '{% trans %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtrans %}',
                 'There is 5 apples (Symfony)',
-                array('count' => 5, 'name' => 'Symfony'),
-            ),
-            array(
-                '{% transchoice count with { \'%name%\': \'Symfony\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
+                ['count' => 5, 'name' => 'Symfony'],
+            ],
+            [
+                '{% trans with { \'%name%\': \'Symfony\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtrans %}',
                 'There is 5 apples (Symfony)',
-                array('count' => 5),
-            ),
-            array(
-                '{% transchoice count into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
+                ['count' => 5],
+            ],
+            [
+                '{% trans into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtrans %}',
                 'There is no apples',
-                array('count' => 0),
-            ),
-            array(
-                '{% transchoice 5 into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
+                ['count' => 0],
+            ],
+            [
+                '{% trans count 5 into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtrans %}',
                 'There is 5 apples',
-            ),
+            ],
 
             // trans filter
-            array('{{ "Hello"|trans }}', 'Hello'),
-            array('{{ name|trans }}', 'Symfony', array('name' => 'Symfony')),
-            array('{{ hello|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', array('hello' => 'Hello %name%')),
-            array('{% set vars = { \'%name%\': \'Symfony\' } %}{{ hello|trans(vars) }}', 'Hello Symfony', array('hello' => 'Hello %name%')),
-            array('{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'),
+            ['{{ "Hello"|trans }}', 'Hello'],
+            ['{{ name|trans }}', 'Symfony', ['name' => 'Symfony']],
+            ['{{ hello|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{% set vars = { \'%name%\': \'Symfony\' } %}{{ hello|trans(vars) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'],
 
-            // transchoice filter
-            array('{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|transchoice(count) }}', 'There is 5 apples', array('count' => 5)),
-            array('{{ text|transchoice(5, {\'%name%\': \'Symfony\'}) }}', 'There is 5 apples (Symfony)', array('text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)')),
-            array('{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|transchoice(count, {}, "messages", "fr") }}', 'There is 5 apples', array('count' => 5)),
-        );
+            // trans filter with count
+            ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans(count=count) }}', 'There is 5 apples', ['count' => 5]],
+            ['{{ text|trans(count=5, arguments={\'%name%\': \'Symfony\'}) }}', 'There is 5 apples (Symfony)', ['text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)']],
+            ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans({}, "messages", "fr", count) }}', 'There is 5 apples', ['count' => 5]],
+        ];
     }
 
     public function testDefaultTranslationDomain()
     {
-        $templates = array(
+        $templates = [
             'index' => '
                 {%- extends "base" %}
 
@@ -145,59 +136,59 @@ class TranslationExtensionTest extends TestCase
                     {%- trans from "custom" %}foo{% endtrans %}
                     {{- "foo"|trans }}
                     {{- "foo"|trans({}, "custom") }}
-                    {{- "foo"|transchoice(1) }}
-                    {{- "foo"|transchoice(1, {}, "custom") }}
+                    {{- "foo"|trans(count=1) }}
+                    {{- "foo"|trans({"%count%":1}, "custom") }}
                 {% endblock %}
             ',
 
             'base' => '
                 {%- block content "" %}
             ',
-        );
+        ];
 
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
-        $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
-        $translator->addResource('array', array('foo' => 'foo (foo)'), 'en', 'foo');
+        $translator->addResource('array', ['foo' => 'foo (messages)'], 'en');
+        $translator->addResource('array', ['foo' => 'foo (custom)'], 'en', 'custom');
+        $translator->addResource('array', ['foo' => 'foo (foo)'], 'en', 'foo');
 
         $template = $this->getTemplate($templates, $translator);
 
-        $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render(array())));
+        $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render([])));
     }
 
     public function testDefaultTranslationDomainWithNamedArguments()
     {
-        $templates = array(
+        $templates = [
             'index' => '
                 {%- trans_default_domain "foo" %}
 
                 {%- block content %}
                     {{- "foo"|trans(arguments = {}, domain = "custom") }}
-                    {{- "foo"|transchoice(count = 1) }}
-                    {{- "foo"|transchoice(count = 1, arguments = {}, domain = "custom") }}
+                    {{- "foo"|trans(count = 1) }}
+                    {{- "foo"|trans(count = 1, arguments = {}, domain = "custom") }}
                     {{- "foo"|trans({}, domain = "custom") }}
                     {{- "foo"|trans({}, "custom", locale = "fr") }}
-                    {{- "foo"|transchoice(1, arguments = {}, domain = "custom") }}
-                    {{- "foo"|transchoice(1, {}, "custom", locale = "fr") }}
+                    {{- "foo"|trans(arguments = {"%count%":1}, domain = "custom") }}
+                    {{- "foo"|trans({"%count%":1}, "custom", locale = "fr") }}
                 {% endblock %}
             ',
 
             'base' => '
                 {%- block content "" %}
             ',
-        );
+        ];
 
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
-        $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
-        $translator->addResource('array', array('foo' => 'foo (foo)'), 'en', 'foo');
-        $translator->addResource('array', array('foo' => 'foo (fr)'), 'fr', 'custom');
+        $translator->addResource('array', ['foo' => 'foo (messages)'], 'en');
+        $translator->addResource('array', ['foo' => 'foo (custom)'], 'en', 'custom');
+        $translator->addResource('array', ['foo' => 'foo (foo)'], 'en', 'foo');
+        $translator->addResource('array', ['foo' => 'foo (fr)'], 'fr', 'custom');
 
         $template = $this->getTemplate($templates, $translator);
 
-        $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render(array())));
+        $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render([])));
     }
 
     protected function getTemplate($template, $translator = null)
@@ -206,12 +197,12 @@ class TranslationExtensionTest extends TestCase
             $translator = new Translator('en');
         }
 
-        if (is_array($template)) {
+        if (\is_array($template)) {
             $loader = new TwigArrayLoader($template);
         } else {
-            $loader = new TwigArrayLoader(array('index' => $template));
+            $loader = new TwigArrayLoader(['index' => $template]);
         }
-        $twig = new Environment($loader, array('debug' => true, 'cache' => false));
+        $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new TranslationExtension($translator));
 
         return $twig->loadTemplate('index');

@@ -11,38 +11,43 @@
 
 namespace Symfony\Component\Translation\Formatter;
 
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class MessageFormatter implements MessageFormatterInterface, ChoiceMessageFormatterInterface
+class MessageFormatter implements MessageFormatterInterface, IntlFormatterInterface
 {
-    private $selector;
+    private $translator;
+    private $intlFormatter;
 
     /**
-     * @param MessageSelector|null $selector The message selector for pluralization
+     * @param TranslatorInterface|null $translator An identity translator to use as selector for pluralization
      */
-    public function __construct(MessageSelector $selector = null)
+    public function __construct(TranslatorInterface $translator = null, IntlFormatterInterface $intlFormatter = null)
     {
-        $this->selector = $selector ?: new MessageSelector();
+        $this->translator = $translator ?? new IdentityTranslator();
+        $this->intlFormatter = $intlFormatter ?? new IntlFormatter();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function format($message, $locale, array $parameters = array())
+    public function format(string $message, string $locale, array $parameters = [])
     {
+        if ($this->translator instanceof TranslatorInterface) {
+            return $this->translator->trans($message, $parameters, null, $locale);
+        }
+
         return strtr($message, $parameters);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function choiceFormat($message, $number, $locale, array $parameters = array())
+    public function formatIntl(string $message, string $locale, array $parameters = []): string
     {
-        $parameters = array_merge(array('%count%' => $number), $parameters);
-
-        return $this->format($this->selector->choose($message, (int) $number, $locale), $locale, $parameters);
+        return $this->intlFormatter->formatIntl($message, $locale, $parameters);
     }
 }

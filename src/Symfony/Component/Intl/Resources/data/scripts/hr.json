@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.42",
     "Names": {
         "Afak": "afaka pismo",
         "Arab": "arapsko pismo",
@@ -159,7 +159,6 @@
         "Zsye": "emotikoni",
         "Zsym": "simboli",
         "Zxxx": "jezik bez pismenosti",
-        "Zyyy": "zajedničko pismo",
-        "Zzzz": "nepoznato pismo"
+        "Zyyy": "zajedničko pismo"
     }
 }

@@ -30,13 +30,13 @@ class SpecificityTest extends TestCase
 
     public function getValueTestData()
     {
-        return array(
-            array(new Specificity(0, 0, 0), 0),
-            array(new Specificity(0, 0, 2), 2),
-            array(new Specificity(0, 3, 0), 30),
-            array(new Specificity(4, 0, 0), 400),
-            array(new Specificity(4, 3, 2), 432),
-        );
+        return [
+            [new Specificity(0, 0, 0), 0],
+            [new Specificity(0, 0, 2), 2],
+            [new Specificity(0, 3, 0), 30],
+            [new Specificity(4, 0, 0), 400],
+            [new Specificity(4, 3, 2), 432],
+        ];
     }
 
     /** @dataProvider getCompareTestData */
@@ -47,17 +47,17 @@ class SpecificityTest extends TestCase
 
     public function getCompareTestData()
     {
-        return array(
-            array(new Specificity(0, 0, 0), new Specificity(0, 0, 0), 0),
-            array(new Specificity(0, 0, 1), new Specificity(0, 0, 1), 0),
-            array(new Specificity(0, 0, 2), new Specificity(0, 0, 1), 1),
-            array(new Specificity(0, 0, 2), new Specificity(0, 0, 3), -1),
-            array(new Specificity(0, 4, 0), new Specificity(0, 4, 0), 0),
-            array(new Specificity(0, 6, 0), new Specificity(0, 5, 11), 1),
-            array(new Specificity(0, 7, 0), new Specificity(0, 8, 0), -1),
-            array(new Specificity(9, 0, 0), new Specificity(9, 0, 0), 0),
-            array(new Specificity(11, 0, 0), new Specificity(10, 11, 0), 1),
-            array(new Specificity(12, 11, 0), new Specificity(13, 0, 0), -1),
-        );
+        return [
+            [new Specificity(0, 0, 0), new Specificity(0, 0, 0), 0],
+            [new Specificity(0, 0, 1), new Specificity(0, 0, 1), 0],
+            [new Specificity(0, 0, 2), new Specificity(0, 0, 1), 1],
+            [new Specificity(0, 0, 2), new Specificity(0, 0, 3), -1],
+            [new Specificity(0, 4, 0), new Specificity(0, 4, 0), 0],
+            [new Specificity(0, 6, 0), new Specificity(0, 5, 11), 1],
+            [new Specificity(0, 7, 0), new Specificity(0, 8, 0), -1],
+            [new Specificity(9, 0, 0), new Specificity(9, 0, 0), 0],
+            [new Specificity(11, 0, 0), new Specificity(10, 11, 0), 1],
+            [new Specificity(12, 11, 0), new Specificity(13, 0, 0), -1],
+        ];
     }
 }

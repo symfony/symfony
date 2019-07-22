@@ -18,7 +18,7 @@ class ProfilerTest extends WebTestCase
      */
     public function testProfilerIsDisabled($insulate)
     {
-        $client = $this->createClient(array('test_case' => 'Profiler', 'root_config' => 'config.yml'));
+        $client = $this->createClient(['test_case' => 'Profiler', 'root_config' => 'config.yml']);
         if ($insulate) {
             $client->insulate();
         }
@@ -28,9 +28,9 @@ class ProfilerTest extends WebTestCase
 
         // enable the profiler for the next request
         $client->enableProfiler();
-        $crawler = $client->request('GET', '/profiler');
-        $profile = $client->getProfile();
-        $this->assertInternalType('object', $profile);
+        $this->assertFalse($client->getProfile());
+        $client->request('GET', '/profiler');
+        $this->assertInternalType('object', $client->getProfile());
 
         $client->request('GET', '/profiler');
         $this->assertFalse($client->getProfile());
@@ -38,9 +38,9 @@ class ProfilerTest extends WebTestCase
 
     public function getConfigs()
     {
-        return array(
-            array(false),
-            array(true),
-        );
+        return [
+            [false],
+            [true],
+        ];
     }
 }

@@ -18,29 +18,29 @@ namespace Symfony\Component\Workflow;
  */
 class Marking
 {
-    private $places = array();
+    private $places = [];
 
     /**
      * @param int[] $representation Keys are the place name and values should be 1
      */
-    public function __construct(array $representation = array())
+    public function __construct(array $representation = [])
     {
         foreach ($representation as $place => $nbToken) {
             $this->mark($place);
         }
     }
 
-    public function mark($place)
+    public function mark(string $place)
     {
         $this->places[$place] = 1;
     }
 
-    public function unmark($place)
+    public function unmark(string $place)
     {
         unset($this->places[$place]);
     }
 
-    public function has($place)
+    public function has(string $place)
     {
         return isset($this->places[$place]);
     }

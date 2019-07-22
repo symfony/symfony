@@ -52,7 +52,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * @var \ReflectionMethod[]|\ReflectionProperty[]
      */
-    private $reflMember = array();
+    private $reflMember = [];
 
     /**
      * @param string $class    The name of the class this member is defined on
@@ -71,11 +71,8 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      */
     public function addConstraint(Constraint $constraint)
     {
-        if (!in_array(Constraint::PROPERTY_CONSTRAINT, (array) $constraint->getTargets())) {
-            throw new ConstraintDefinitionException(sprintf(
-                'The constraint %s cannot be put on properties or getters',
-                get_class($constraint)
-            ));
+        if (!\in_array(Constraint::PROPERTY_CONSTRAINT, (array) $constraint->getTargets())) {
+            throw new ConstraintDefinitionException(sprintf('The constraint %s cannot be put on properties or getters', \get_class($constraint)));
         }
 
         parent::addConstraint($constraint);
@@ -88,11 +85,11 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      */
     public function __sleep()
     {
-        return array_merge(parent::__sleep(), array(
+        return array_merge(parent::__sleep(), [
             'class',
             'name',
             'property',
-        ));
+        ]);
     }
 
     /**
@@ -166,7 +163,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      */
     public function getReflectionMember($objectOrClassName)
     {
-        $className = is_string($objectOrClassName) ? $objectOrClassName : get_class($objectOrClassName);
+        $className = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
         if (!isset($this->reflMember[$className])) {
             $this->reflMember[$className] = $this->newReflectionMember($objectOrClassName);
         }

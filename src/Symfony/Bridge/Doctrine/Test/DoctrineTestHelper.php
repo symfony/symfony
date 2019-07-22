@@ -13,9 +13,12 @@ namespace Symfony\Bridge\Doctrine\Test;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
+use Doctrine\Common\Persistence\Mapping\Driver\SymfonyFileLocator;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,7 +37,7 @@ class DoctrineTestHelper
      */
     public static function createTestEntityManager(Configuration $config = null)
     {
-        if (!extension_loaded('pdo_sqlite')) {
+        if (!\extension_loaded('pdo_sqlite')) {
             TestCase::markTestSkipped('Extension pdo_sqlite is required.');
         }
 
@@ -42,10 +45,10 @@ class DoctrineTestHelper
             $config = self::createTestConfiguration();
         }
 
-        $params = array(
+        $params = [
             'driver' => 'pdo_sqlite',
             'memory' => true,
-        );
+        ];
 
         return EntityManager::create($params, $config);
     }
@@ -56,13 +59,35 @@ class DoctrineTestHelper
     public static function createTestConfiguration()
     {
         $config = new Configuration();
-        $config->setEntityNamespaces(array('SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'));
+        $config->setEntityNamespaces(['SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures']);
         $config->setAutoGenerateProxyClasses(true);
-        $config->setProxyDir(\sys_get_temp_dir());
+        $config->setProxyDir(sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
         $config->setQueryCacheImpl(new ArrayCache());
         $config->setMetadataCacheImpl(new ArrayCache());
+
+        return $config;
+    }
+
+    /**
+     * @return Configuration
+     */
+    public static function createTestConfigurationWithXmlLoader()
+    {
+        $config = static::createTestConfiguration();
+
+        $driverChain = new MappingDriverChain();
+        $driverChain->addDriver(
+            new XmlDriver(
+                new SymfonyFileLocator(
+                    [__DIR__.'/../Tests/Resources/orm' => 'Symfony\\Bridge\\Doctrine\\Tests\\Fixtures'], '.orm.xml'
+                )
+            ),
+            'Symfony\\Bridge\\Doctrine\\Tests\\Fixtures'
+        );
+
+        $config->setMetadataDriverImpl($driverChain);
 
         return $config;
     }

@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Ova vrijednost treba biti jedna od ponuđenih.</target>
+                <target>Ova vrijednost nije valjan izbor.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Ovo polje nije očekivalo.</target>
+                <target>Ovo polje nije očekivano.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>Ova vrijednost nije ispravan datum-vrijeme.</target>
+                <target>Ova vrijednost nije ispravnog datum-vrijeme formata.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
@@ -88,11 +88,11 @@
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
-                <target>Ova vrijednost ne smije biti prazna.</target>
+                <target>Ova vrijednost ne bi trebala biti prazna.</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>Ova vrijednost ne smije biti null.</target>
+                <target>Ova vrijednost ne bi trebala biti null.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
@@ -148,7 +148,7 @@
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Ova vrijednost nije ispravna zemlja.</target>
+                <target>Ova vrijednost nije ispravna država.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>U php.ini datoteci nije konfiguriran privremeni folder.</target>
+                <target>U php.ini datoteci nije konfiguriran privremeni direktorij.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -220,7 +220,7 @@
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>Neispravan broj kartice ili tip kartice nije podržan.</target>
+                <target>Tip kartice nije podržan ili je broj kartice neispravan.</target>
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
@@ -248,35 +248,35 @@
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>Ova vrijednost bi trebala biti jednaka {{ compared_value }}.</target>
+                <target>Ova vrijednost treba biti jednaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
-                <target>Ova vrijednost bi trebala biti veća od {{ compared_value }}.</target>
+                <target>Ova vrijednost treba biti veća od {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>Ova vrijednost bi trebala biti veća ili jednaka od {{ compared_value }}.</target>
+                <target>Ova vrijednost treba biti veća od ili jednaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Ova vrijednost bi trebala biti {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Ova vrijednost treba biti {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
-                <target>Ova vrijednost bi trebala biti manja od {{ compared_value }}.</target>
+                <target>Ova vrijednost treba biti manja od {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>Ova vrijednost bi trebala biti manja ili jednaka {{ compared_value }}.</target>
+                <target>Ova vrijednost treba biti manja od ili jednaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>Ova vrijednost ne bi trebala biti {{ compared_value }}.</target>
+                <target>Ova vrijednost treba biti različita od {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Ova vrijednost ne bi trebala biti {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Ova vrijednost treba biti različita od {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
@@ -304,11 +304,11 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>Poslužitelj nije mogao biti razriješen.</target>
+                <target>Poslužitelj ne može biti pronađen.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>Znakovne oznake vrijednosti ne odgovaraju očekivanom {{ charset }} skupu.</target>
+                <target>Ova vrijednost ne odgovara očekivanom {{ charset }} znakovnom skupu.</target>
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
@@ -317,6 +317,50 @@
             <trans-unit id="82">
                 <source>Error</source>
                 <target>Greška</target>
+            </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>Ovo nije validan UUID.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Ova vrijednost treba biti višekratnik od {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Poslovni identifikacijski broj (BIC) nije povezan sa IBAN brojem {{ iban }}.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Ova vrijednost treba biti validan JSON.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ova kolekcija treba sadržavati samo unikatne elemente.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Ova vrijednost treba biti pozitivna.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Ova vrijednost treba biti pozitivna ili jednaka nuli.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Ova vrijednost treba biti negativna.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Ova vrijednost treba biti negativna ili jednaka nuli.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Ova vrijednost nije validna vremenska zona.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Ova lozinka je procurila u nekom od sigurnosnih propusta, te je potrebno koristiti drugu lozinku.</target>
             </trans-unit>
         </body>
     </file>

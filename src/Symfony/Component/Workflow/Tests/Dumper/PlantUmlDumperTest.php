@@ -25,7 +25,7 @@ class PlantUmlDumperTest extends TestCase
     public function testDumpWorkflowWithoutMarking($definition, $marking, $expectedFileName, $title)
     {
         $dumper = new PlantUmlDumper(PlantUmlDumper::WORKFLOW_TRANSITION);
-        $dump = $dumper->dump($definition, $marking, array('title' => $title));
+        $dump = $dumper->dump($definition, $marking, ['title' => $title]);
         // handle windows, and avoid to create more fixtures
         $dump = str_replace(PHP_EOL, "\n", $dump.PHP_EOL);
         $file = $this->getFixturePath($expectedFileName, PlantUmlDumper::WORKFLOW_TRANSITION);
@@ -34,12 +34,12 @@ class PlantUmlDumperTest extends TestCase
 
     public function provideWorkflowDefinitionWithoutMarking()
     {
-        yield array($this->createSimpleWorkflowDefinition(), null, 'simple-workflow-nomarking', 'SimpleDiagram');
-        yield array($this->createComplexWorkflowDefinition(), null, 'complex-workflow-nomarking', 'ComplexDiagram');
-        $marking = new Marking(array('b' => 1));
-        yield array($this->createSimpleWorkflowDefinition(), $marking, 'simple-workflow-marking', 'SimpleDiagram');
-        $marking = new Marking(array('c' => 1, 'e' => 1));
-        yield array($this->createComplexWorkflowDefinition(), $marking, 'complex-workflow-marking', 'ComplexDiagram');
+        yield [$this->createSimpleWorkflowDefinition(), null, 'simple-workflow-nomarking', 'SimpleDiagram'];
+        yield [$this->createComplexWorkflowDefinition(), null, 'complex-workflow-nomarking', 'ComplexDiagram'];
+        $marking = new Marking(['b' => 1]);
+        yield [$this->createSimpleWorkflowDefinition(), $marking, 'simple-workflow-marking', 'SimpleDiagram'];
+        $marking = new Marking(['c' => 1, 'e' => 1]);
+        yield [$this->createComplexWorkflowDefinition(), $marking, 'complex-workflow-marking', 'ComplexDiagram'];
     }
 
     /**
@@ -48,7 +48,7 @@ class PlantUmlDumperTest extends TestCase
     public function testDumpStateMachineWithoutMarking($definition, $marking, $expectedFileName, $title)
     {
         $dumper = new PlantUmlDumper(PlantUmlDumper::STATEMACHINE_TRANSITION);
-        $dump = $dumper->dump($definition, $marking, array('title' => $title));
+        $dump = $dumper->dump($definition, $marking, ['title' => $title]);
         // handle windows, and avoid to create more fixtures
         $dump = str_replace(PHP_EOL, "\n", $dump.PHP_EOL);
         $file = $this->getFixturePath($expectedFileName, PlantUmlDumper::STATEMACHINE_TRANSITION);
@@ -57,9 +57,9 @@ class PlantUmlDumperTest extends TestCase
 
     public function provideStateMachineDefinitionWithoutMarking()
     {
-        yield array($this->createComplexStateMachineDefinition(), null, 'complex-state-machine-nomarking', 'SimpleDiagram');
-        $marking = new Marking(array('c' => 1, 'e' => 1));
-        yield array($this->createComplexStateMachineDefinition(), $marking, 'complex-state-machine-marking', 'SimpleDiagram');
+        yield [$this->createComplexStateMachineDefinition(), null, 'complex-state-machine-nomarking', 'SimpleDiagram'];
+        $marking = new Marking(['c' => 1, 'e' => 1]);
+        yield [$this->createComplexStateMachineDefinition(), $marking, 'complex-state-machine-marking', 'SimpleDiagram'];
     }
 
     private function getFixturePath($name, $transitionType)

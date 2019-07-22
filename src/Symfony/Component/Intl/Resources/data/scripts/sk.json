@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.42",
     "Names": {
         "Arab": "arabské",
         "Armn": "arménske",
@@ -52,7 +52,6 @@
         "Zsye": "emodži",
         "Zsym": "symboly",
         "Zxxx": "bez zápisu",
-        "Zyyy": "všeobecné",
-        "Zzzz": "neznáme písmo"
+        "Zyyy": "všeobecné"
     }
 }

@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -27,8 +27,10 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  * LogoutListener logout users.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
  */
-class LogoutListener implements ListenerInterface
+class LogoutListener
 {
     private $tokenStorage;
     private $options;
@@ -44,18 +46,18 @@ class LogoutListener implements ListenerInterface
      * @param array                          $options          An array of options to process a logout attempt
      * @param CsrfTokenManagerInterface|null $csrfTokenManager A CsrfTokenManagerInterface instance
      */
-    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = array(), CsrfTokenManagerInterface $csrfTokenManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = [], CsrfTokenManagerInterface $csrfTokenManager = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;
-        $this->options = array_merge(array(
+        $this->options = array_merge([
             'csrf_parameter' => '_csrf_token',
             'csrf_token_id' => 'logout',
             'logout_path' => '/logout',
-        ), $options);
+        ], $options);
         $this->successHandler = $successHandler;
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->handlers = array();
+        $this->handlers = [];
     }
 
     public function addHandler(LogoutHandlerInterface $handler)
@@ -72,7 +74,7 @@ class LogoutListener implements ListenerInterface
      * @throws LogoutException   if the CSRF token is invalid
      * @throws \RuntimeException if the LogoutSuccessHandlerInterface instance does not return a response
      */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
 
@@ -111,10 +113,8 @@ class LogoutListener implements ListenerInterface
      * The default implementation only processed requests to a specific path,
      * but a subclass could change this to logout requests where
      * certain parameters is present.
-     *
-     * @return bool
      */
-    protected function requiresLogout(Request $request)
+    protected function requiresLogout(Request $request): bool
     {
         return isset($this->options['logout_path']) && $this->httpUtils->checkRequestPath($request, $this->options['logout_path']);
     }

@@ -32,14 +32,14 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
         // Make sure that validation groups end up as null, closure or array
         $validationGroupsNormalizer = function (Options $options, $groups) {
             if (false === $groups) {
-                return array();
+                return [];
             }
 
             if (empty($groups)) {
                 return;
             }
 
-            if (is_callable($groups)) {
+            if (\is_callable($groups)) {
                 return $groups;
             }
 
@@ -50,9 +50,9 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
             return (array) $groups;
         };
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'validation_groups' => null,
-        ));
+        ]);
 
         $resolver->setNormalizer('validation_groups', $validationGroupsNormalizer);
     }

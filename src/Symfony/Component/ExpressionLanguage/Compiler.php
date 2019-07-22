@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\ExpressionLanguage;
 
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * Compiles a node to PHP code.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Compiler
+class Compiler implements ResetInterface
 {
     private $source;
     private $functions;
@@ -76,11 +78,9 @@ class Compiler
     /**
      * Adds a raw string to the compiled code.
      *
-     * @param string $string The string
-     *
      * @return $this
      */
-    public function raw($string)
+    public function raw(string $string)
     {
         $this->source .= $string;
 
@@ -90,11 +90,9 @@ class Compiler
     /**
      * Adds a quoted string to the compiled code.
      *
-     * @param string $value The string
-     *
      * @return $this
      */
-    public function string($value)
+    public function string(string $value)
     {
         $this->source .= sprintf('"%s"', addcslashes($value, "\0\t\"\$\\"));
 
@@ -110,7 +108,7 @@ class Compiler
      */
     public function repr($value)
     {
-        if (is_int($value) || is_float($value)) {
+        if (\is_int($value) || \is_float($value)) {
             if (false !== $locale = setlocale(LC_NUMERIC, 0)) {
                 setlocale(LC_NUMERIC, 'C');
             }
@@ -122,10 +120,10 @@ class Compiler
             }
         } elseif (null === $value) {
             $this->raw('null');
-        } elseif (is_bool($value)) {
+        } elseif (\is_bool($value)) {
             $this->raw($value ? 'true' : 'false');
-        } elseif (is_array($value)) {
-            $this->raw('array(');
+        } elseif (\is_array($value)) {
+            $this->raw('[');
             $first = true;
             foreach ($value as $key => $value) {
                 if (!$first) {
@@ -136,7 +134,7 @@ class Compiler
                 $this->raw(' => ');
                 $this->repr($value);
             }
-            $this->raw(')');
+            $this->raw(']');
         } else {
             $this->string($value);
         }

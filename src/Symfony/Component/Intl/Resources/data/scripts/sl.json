@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.42",
     "Names": {
         "Arab": "arabski",
         "Armi": "imperialno-aramejski",
@@ -122,7 +122,6 @@
         "Zsye": "čustvenček",
         "Zsym": "simboli",
         "Zxxx": "nenapisano",
-        "Zyyy": "splošno",
-        "Zzzz": "neznan ali neveljaven zapis"
+        "Zyyy": "splošno"
     }
 }

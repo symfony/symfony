@@ -68,4 +68,9 @@ interface BundleInterface extends ContainerAwareInterface
      * @return string The Bundle absolute path
      */
     public function getPath();
+
+    /**
+     * Returns relative path to the public assets directory.
+     */
+    public function getPublicDir(): string;
 }

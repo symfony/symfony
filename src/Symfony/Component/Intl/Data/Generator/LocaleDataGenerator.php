@@ -12,223 +12,176 @@
 namespace Symfony\Component\Intl\Data\Generator;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
-use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
-use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
+use Symfony\Component\Intl\Data\Bundle\Compiler\BundleCompilerInterface;
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 use Symfony\Component\Intl\Exception\MissingResourceException;
-use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
-use Symfony\Component\Intl\Locale;
 
 /**
  * The rule for compiling the locale bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Roland Franssen <franssen.roland@gmail.com>
  *
  * @internal
  */
-class LocaleDataGenerator
+class LocaleDataGenerator extends AbstractDataGenerator
 {
-    private $dirName;
-    private $languageDataProvider;
-    private $scriptDataProvider;
-    private $regionDataProvider;
+    use FallbackTrait;
 
-    public function __construct(string $dirName, LanguageDataProvider $languageDataProvider, ScriptDataProvider $scriptDataProvider, RegionDataProvider $regionDataProvider)
+    private $locales = [];
+    private $localeAliases = [];
+    private $localeParents = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function scanLocales(LocaleScanner $scanner, $sourceDir)
     {
-        $this->dirName = $dirName;
-        $this->languageDataProvider = $languageDataProvider;
-        $this->scriptDataProvider = $scriptDataProvider;
-        $this->regionDataProvider = $regionDataProvider;
+        $this->locales = $scanner->scanLocales($sourceDir.'/locales');
+        $this->localeAliases = $scanner->scanAliases($sourceDir.'/locales');
+        $this->localeParents = $scanner->scanParents($sourceDir.'/locales');
+
+        return $this->locales;
     }
 
-    public function generateData(GeneratorConfig $config)
+    /**
+     * {@inheritdoc}
+     */
+    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir)
     {
         $filesystem = new Filesystem();
-        $localeScanner = new LocaleScanner();
+        $filesystem->mkdir([
+            $tempDir.'/lang',
+            $tempDir.'/region',
+        ]);
+        $compiler->compile($sourceDir.'/lang', $tempDir.'/lang');
+        $compiler->compile($sourceDir.'/region', $tempDir.'/region');
+    }
 
-        $writers = $config->getBundleWriters();
+    /**
+     * {@inheritdoc}
+     */
+    protected function preGenerate()
+    {
+        // Write parents locale file for the Translation component
+        file_put_contents(
+            __DIR__.'/../../../Translation/Resources/data/parents.json',
+            json_encode($this->localeParents, \JSON_PRETTY_PRINT).\PHP_EOL
+        );
+    }
 
-        // Prepare filesystem directories
-        foreach ($writers as $targetDir => $writer) {
-            $filesystem->remove($targetDir.'/'.$this->dirName);
-            $filesystem->mkdir($targetDir.'/'.$this->dirName);
+    /**
+     * {@inheritdoc}
+     */
+    protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale)
+    {
+        // Don't generate aliases, as they are resolved during runtime
+        // Unless an alias is needed as fallback for de-duplication purposes
+        if (isset($this->localeAliases[$displayLocale]) && !$this->generatingFallback) {
+            return;
         }
-
-        $locales = $localeScanner->scanLocales($config->getSourceDir().'/locales');
-        $aliases = $localeScanner->scanAliases($config->getSourceDir().'/locales');
-
-        // Flip to facilitate lookup
-        $flippedLocales = array_flip($locales);
-
-        // Don't generate names for aliases (names will be generated for the
-        // locale they are duplicating)
-        $displayLocales = array_diff_key($flippedLocales, $aliases);
-
-        ksort($displayLocales);
-
-        // Generate a list of (existing) locale fallbacks
-        $fallbackMapping = $this->generateFallbackMapping($displayLocales, $aliases);
-
-        $localeNames = array();
 
         // Generate locale names for all locales that have translations in
         // at least the language or the region bundle
-        foreach ($displayLocales as $displayLocale => $_) {
-            $localeNames[$displayLocale] = array();
-
-            foreach ($locales as $locale) {
-                try {
-                    // Generate a locale name in the language of each display locale
-                    // Each locale name has the form: "Language (Script, Region, Variant1, ...)
-                    // Script, Region and Variants are optional. If none of them is
-                    // available, the braces are not printed.
-                    if (null !== ($name = $this->generateLocaleName($locale, $displayLocale))) {
-                        $localeNames[$displayLocale][$locale] = $name;
-                    }
-                } catch (MissingResourceException $e) {
-                } catch (ResourceBundleNotFoundException $e) {
-                }
-            }
-        }
-
-        // Process again to de-duplicate locales and their fallback locales
-        // Only keep the differences
-        foreach ($displayLocales as $displayLocale => $_) {
-            $fallback = $displayLocale;
-
-            while (isset($fallbackMapping[$fallback])) {
-                $fallback = $fallbackMapping[$fallback];
-                $localeNames[$displayLocale] = array_diff(
-                    $localeNames[$displayLocale],
-                    $localeNames[$fallback]
-                );
-            }
-
-            // If no names remain to be saved for the current locale, skip it
-            if (0 === count($localeNames[$displayLocale])) {
+        $displayFormat = $reader->readEntry($tempDir.'/lang', $displayLocale, ['localeDisplayPattern']);
+        $pattern = $displayFormat['pattern'] ?? '{0} ({1})';
+        $separator = $displayFormat['separator'] ?? '{0}, {1}';
+        $localeNames = [];
+        foreach ($this->locales as $locale) {
+            // Ensure a normalized list of pure locales
+            if (\Locale::getAllVariants($locale)) {
                 continue;
             }
 
-            foreach ($writers as $targetDir => $writer) {
-                $writer->write($targetDir.'/'.$this->dirName, $displayLocale, array(
-                    'Names' => $localeNames[$displayLocale],
-                ));
+            try {
+                // Generate a locale name in the language of each display locale
+                // Each locale name has the form: "Language (Script, Region, Variant1, ...)
+                // Script, Region and Variants are optional. If none of them is
+                // available, the braces are not printed.
+                $localeNames[$locale] = $this->generateLocaleName($reader, $tempDir, $locale, $displayLocale, $pattern, $separator);
+            } catch (MissingResourceException $e) {
+                // Silently ignore incomplete locale names
+                // In this case one should configure at least one fallback locale that is complete (e.g. English) during
+                // runtime. Alternatively a translation for the missing resource can be proposed upstream.
             }
         }
 
-        // Generate aliases, needed to enable proper fallback from alias to its
-        // target
-        foreach ($aliases as $alias => $aliasOf) {
-            foreach ($writers as $targetDir => $writer) {
-                $writer->write($targetDir.'/'.$this->dirName, $alias, array(
-                    '%%ALIAS' => $aliasOf,
-                ));
-            }
+        $data = [
+            'Names' => $localeNames,
+        ];
+
+        // Don't de-duplicate a fallback locale
+        // Ensures the display locale can be de-duplicated on itself
+        if ($this->generatingFallback) {
+            return $data;
         }
 
-        // Create root file which maps locale codes to locale codes, for fallback
-        foreach ($writers as $targetDir => $writer) {
-            $writer->write($targetDir.'/'.$this->dirName, 'meta', array(
-                'Locales' => $locales,
-                'Aliases' => $aliases,
-            ));
+        // Process again to de-duplicate locale and its fallback locales
+        // Only keep the differences
+        $fallbackData = $this->generateFallbackData($reader, $tempDir, $displayLocale);
+        if (isset($fallbackData['Names'])) {
+            $data['Names'] = array_diff($data['Names'], $fallbackData['Names']);
         }
+        if (!$data['Names']) {
+            return;
+        }
+
+        return $data;
     }
 
-    private function generateLocaleName($locale, $displayLocale)
+    /**
+     * {@inheritdoc}
+     */
+    protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir)
     {
-        $name = null;
+    }
 
-        $lang = \Locale::getPrimaryLanguage($locale);
-        $script = \Locale::getScript($locale);
-        $region = \Locale::getRegion($locale);
-        $variants = \Locale::getAllVariants($locale);
+    /**
+     * {@inheritdoc}
+     */
+    protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
+    {
+        return [
+            'Locales' => $this->locales,
+            'Aliases' => $this->localeAliases,
+        ];
+    }
 
-        // Currently the only available variant is POSIX, which we don't want
-        // to include in the list
-        if (count($variants) > 0) {
-            return;
-        }
-
-        // Some languages are translated together with their region,
-        // i.e. "en_GB" is translated as "British English"
-        // we don't include these languages though because they mess up
-        // the name sorting
-        // $name = $this->langBundle->getLanguageName($displayLocale, $lang, $region);
-
-        // Some languages are simply not translated
-        // Example: "az" (Azerbaijani) has no translation in "af" (Afrikaans)
-        if (null === ($name = $this->languageDataProvider->getName($lang, $displayLocale))) {
-            return;
-        }
-
-        // "as" (Assamese) has no "Variants" block
-        //if (!$langBundle->get('Variants')) {
-        //    continue;
-        //}
-
-        $extras = array();
+    /**
+     * @return string
+     */
+    private function generateLocaleName(BundleEntryReaderInterface $reader, $tempDir, $locale, $displayLocale, $pattern, $separator)
+    {
+        // Apply generic notation using square brackets as described per http://cldr.unicode.org/translation/language-names
+        $name = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/lang', $displayLocale, ['Languages', \Locale::getPrimaryLanguage($locale)]));
+        $extras = [];
 
         // Discover the name of the script part of the locale
         // i.e. in zh_Hans_MO, "Hans" is the script
-        if ($script) {
-            // Some scripts are not translated into every language
-            if (null === ($scriptName = $this->scriptDataProvider->getName($script, $displayLocale))) {
-                return;
-            }
-
-            $extras[] = $scriptName;
+        if ($script = \Locale::getScript($locale)) {
+            $extras[] = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/lang', $displayLocale, ['Scripts', $script]));
         }
 
         // Discover the name of the region part of the locale
         // i.e. in de_AT, "AT" is the region
-        if ($region) {
-            // Some regions are not translated into every language
-            if (null === ($regionName = $this->regionDataProvider->getName($region, $displayLocale))) {
-                return;
+        if ($region = \Locale::getRegion($locale)) {
+            if (!RegionDataGenerator::isValidCountryCode($region)) {
+                throw new MissingResourceException('Skipping "'.$locale.'" due an invalid country.');
             }
 
-            $extras[] = $regionName;
+            $extras[] = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/region', $displayLocale, ['Countries', $region]));
         }
 
-        if (count($extras) > 0) {
-            // Remove any existing extras
-            // For example, in German, zh_Hans is "Chinesisch (vereinfacht)".
-            // The latter is the script part which is already included in the
-            // extras and will be appended again with the other extras.
-            if (preg_match('/^(.+)\s+\([^\)]+\)$/', $name, $matches)) {
-                $name = $matches[1];
+        if ($extras) {
+            $extra = array_shift($extras);
+            foreach ($extras as $part) {
+                $extra = str_replace(['{0}', '{1}'], [$extra,  $part], $separator);
             }
 
-            $name .= ' ('.implode(', ', $extras).')';
+            $name = str_replace(['{0}', '{1}'], [$name,  $extra], $pattern);
         }
 
         return $name;
-    }
-
-    private function generateFallbackMapping(array $displayLocales, array $aliases)
-    {
-        $mapping = array();
-
-        foreach ($displayLocales as $displayLocale => $_) {
-            $mapping[$displayLocale] = null;
-            $fallback = $displayLocale;
-
-            // Recursively search for a fallback locale until one is found
-            while (null !== ($fallback = Locale::getFallback($fallback))) {
-                // Currently, no locale has an alias as fallback locale.
-                // If this starts to be the case, we need to add code here.
-                assert(!isset($aliases[$fallback]));
-
-                // Check whether the fallback exists
-                if (isset($displayLocales[$fallback])) {
-                    $mapping[$displayLocale] = $fallback;
-                    break;
-                }
-            }
-        }
-
-        return $mapping;
     }
 }

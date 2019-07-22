@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Uses the session domain to restrict allowed redirection targets.
@@ -26,15 +26,23 @@ class AddSessionDomainConstraintPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasParameter('session.storage.options')) {
+        if (!$container->hasParameter('session.storage.options') || !$container->has('security.http_utils')) {
             return;
         }
 
         $sessionOptions = $container->getParameter('session.storage.options');
         $domainRegexp = empty($sessionOptions['cookie_domain']) ? '%s' : sprintf('(?:%%s|(?:.+\.)?%s)', preg_quote(trim($sessionOptions['cookie_domain'], '.')));
-        $domainRegexp = (empty($sessionOptions['cookie_secure']) ? 'https?://' : 'https://').$domainRegexp;
 
-        // if the service doesn't exist, an exception must be thrown - ignoring would put security at risk
-        $container->findDefinition('security.http_utils')->addArgument(sprintf('{^%s$}i', $domainRegexp));
+        if ('auto' === ($sessionOptions['cookie_secure'] ?? null)) {
+            $secureDomainRegexp = sprintf('{^https://%s$}i', $domainRegexp);
+            $domainRegexp = 'https?://'.$domainRegexp;
+        } else {
+            $secureDomainRegexp = null;
+            $domainRegexp = (empty($sessionOptions['cookie_secure']) ? 'https?://' : 'https://').$domainRegexp;
+        }
+
+        $container->findDefinition('security.http_utils')
+            ->addArgument(sprintf('{^%s$}i', $domainRegexp))
+            ->addArgument($secureDomainRegexp);
     }
 }

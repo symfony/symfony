@@ -21,19 +21,17 @@ class Lexer
     /**
      * Tokenizes an expression.
      *
-     * @param string $expression The expression to tokenize
-     *
      * @return TokenStream A token stream instance
      *
      * @throws SyntaxError
      */
-    public function tokenize($expression)
+    public function tokenize(string $expression)
     {
-        $expression = str_replace(array("\r", "\n", "\t", "\v", "\f"), ' ', $expression);
+        $expression = str_replace(["\r", "\n", "\t", "\v", "\f"], ' ', $expression);
         $cursor = 0;
-        $tokens = array();
-        $brackets = array();
-        $end = strlen($expression);
+        $tokens = [];
+        $brackets = [];
+        $end = \strlen($expression);
 
         while ($cursor < $end) {
             if (' ' == $expression[$cursor]) {
@@ -49,10 +47,10 @@ class Lexer
                     $number = (int) $match[0]; // integers lower than the maximum
                 }
                 $tokens[] = new Token(Token::NUMBER_TYPE, $number, $cursor + 1);
-                $cursor += strlen($match[0]);
+                $cursor += \strlen($match[0]);
             } elseif (false !== strpos('([{', $expression[$cursor])) {
                 // opening bracket
-                $brackets[] = array($expression[$cursor], $cursor);
+                $brackets[] = [$expression[$cursor], $cursor];
 
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
                 ++$cursor;
@@ -72,11 +70,11 @@ class Lexer
             } elseif (preg_match('/"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'/As', $expression, $match, 0, $cursor)) {
                 // strings
                 $tokens[] = new Token(Token::STRING_TYPE, stripcslashes(substr($match[0], 1, -1)), $cursor + 1);
-                $cursor += strlen($match[0]);
+                $cursor += \strlen($match[0]);
             } elseif (preg_match('/not in(?=[\s(])|\!\=\=|not(?=[\s(])|and(?=[\s(])|\=\=\=|\>\=|or(?=[\s(])|\<\=|\*\*|\.\.|in(?=[\s(])|&&|\|\||matches|\=\=|\!\=|\*|~|%|\/|\>|\||\!|\^|&|\+|\<|\-/A', $expression, $match, 0, $cursor)) {
                 // operators
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
-                $cursor += strlen($match[0]);
+                $cursor += \strlen($match[0]);
             } elseif (false !== strpos('.,?:', $expression[$cursor])) {
                 // punctuation
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
@@ -84,7 +82,7 @@ class Lexer
             } elseif (preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $expression, $match, 0, $cursor)) {
                 // names
                 $tokens[] = new Token(Token::NAME_TYPE, $match[0], $cursor + 1);
-                $cursor += strlen($match[0]);
+                $cursor += \strlen($match[0]);
             } else {
                 // unlexable
                 throw new SyntaxError(sprintf('Unexpected character "%s"', $expression[$cursor]), $cursor, $expression);

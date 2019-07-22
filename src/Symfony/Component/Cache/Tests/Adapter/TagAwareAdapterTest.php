@@ -14,12 +14,15 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
 
 /**
  * @group time-sensitive
  */
 class TagAwareAdapterTest extends AdapterTestCase
 {
+    use TagAwareTestTrait;
+
     public function createCachePool($defaultLifetime = 0)
     {
         return new TagAwareAdapter(new FilesystemAdapter('', $defaultLifetime));
@@ -31,53 +34,9 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @expectedException \Psr\Cache\InvalidArgumentException
+     * Test feature specific to TagAwareAdapter as it implicit needs to save deferred when also saving expiry info.
      */
-    public function testInvalidTag()
-    {
-        $pool = $this->createCachePool();
-        $item = $pool->getItem('foo');
-        $item->tag(':');
-    }
-
-    public function testInvalidateTags()
-    {
-        $pool = $this->createCachePool();
-
-        $i0 = $pool->getItem('i0');
-        $i1 = $pool->getItem('i1');
-        $i2 = $pool->getItem('i2');
-        $i3 = $pool->getItem('i3');
-        $foo = $pool->getItem('foo');
-
-        $pool->save($i0->tag('bar'));
-        $pool->save($i1->tag('foo'));
-        $pool->save($i2->tag('foo')->tag('bar'));
-        $pool->save($i3->tag('foo')->tag('baz'));
-        $pool->save($foo);
-
-        $pool->invalidateTags(array('bar'));
-
-        $this->assertFalse($pool->getItem('i0')->isHit());
-        $this->assertTrue($pool->getItem('i1')->isHit());
-        $this->assertFalse($pool->getItem('i2')->isHit());
-        $this->assertTrue($pool->getItem('i3')->isHit());
-        $this->assertTrue($pool->getItem('foo')->isHit());
-
-        $pool->invalidateTags(array('foo'));
-
-        $this->assertFalse($pool->getItem('i1')->isHit());
-        $this->assertFalse($pool->getItem('i3')->isHit());
-        $this->assertTrue($pool->getItem('foo')->isHit());
-
-        $anotherPoolInstance = $this->createCachePool();
-
-        $this->assertFalse($anotherPoolInstance->getItem('i1')->isHit());
-        $this->assertFalse($anotherPoolInstance->getItem('i3')->isHit());
-        $this->assertTrue($anotherPoolInstance->getItem('foo')->isHit());
-    }
-
-    public function testInvalidateCommits()
+    public function testInvalidateCommitsSeperatePools()
     {
         $pool1 = $this->createCachePool();
 
@@ -85,68 +44,12 @@ class TagAwareAdapterTest extends AdapterTestCase
         $foo->tag('tag');
 
         $pool1->saveDeferred($foo->set('foo'));
-        $pool1->invalidateTags(array('tag'));
+        $pool1->invalidateTags(['tag']);
 
         $pool2 = $this->createCachePool();
         $foo = $pool2->getItem('foo');
 
         $this->assertTrue($foo->isHit());
-    }
-
-    public function testTagsAreCleanedOnSave()
-    {
-        $pool = $this->createCachePool();
-
-        $i = $pool->getItem('k');
-        $pool->save($i->tag('foo'));
-
-        $i = $pool->getItem('k');
-        $pool->save($i->tag('bar'));
-
-        $pool->invalidateTags(array('foo'));
-        $this->assertTrue($pool->getItem('k')->isHit());
-    }
-
-    public function testTagsAreCleanedOnDelete()
-    {
-        $pool = $this->createCachePool();
-
-        $i = $pool->getItem('k');
-        $pool->save($i->tag('foo'));
-        $pool->deleteItem('k');
-
-        $pool->save($pool->getItem('k'));
-        $pool->invalidateTags(array('foo'));
-
-        $this->assertTrue($pool->getItem('k')->isHit());
-    }
-
-    public function testTagItemExpiry()
-    {
-        $pool = $this->createCachePool(10);
-
-        $item = $pool->getItem('foo');
-        $item->tag(array('baz'));
-        $item->expiresAfter(100);
-
-        $pool->save($item);
-        $pool->invalidateTags(array('baz'));
-        $this->assertFalse($pool->getItem('foo')->isHit());
-
-        sleep(20);
-
-        $this->assertFalse($pool->getItem('foo')->isHit());
-    }
-
-    public function testGetPreviousTags()
-    {
-        $pool = $this->createCachePool();
-
-        $i = $pool->getItem('k');
-        $pool->save($i->tag('foo'));
-
-        $i = $pool->getItem('k');
-        $this->assertSame(array('foo' => 'foo'), $i->getPreviousTags());
     }
 
     public function testPrune()
@@ -173,7 +76,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pruneable
             ->expects($this->atLeastOnce())
             ->method('prune')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         return $pruneable;
     }
@@ -190,7 +93,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pruneable
             ->expects($this->atLeastOnce())
             ->method('prune')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         return $pruneable;
     }

@@ -29,7 +29,7 @@ final class FirewallConfig
     private $listeners;
     private $switchUser;
 
-    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $listeners = array(), $switchUser = null)
+    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $listeners = [], $switchUser = null)
     {
         $this->name = $name;
         $this->userChecker = $userChecker;
@@ -66,7 +66,7 @@ final class FirewallConfig
 
     public function allowsAnonymous(): bool
     {
-        return in_array('anonymous', $this->listeners, true);
+        return \in_array('anonymous', $this->listeners, true);
     }
 
     public function isStateless(): bool

@@ -20,11 +20,11 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  * Usage:
  *
- * $output = new StreamOutput(fopen('php://stdout', 'w'));
+ *     $output = new StreamOutput(fopen('php://stdout', 'w'));
  *
  * As `StreamOutput` can use any stream, you can also use a file:
  *
- * $output = new StreamOutput(fopen('/path/to/output.log', 'a', false));
+ *     $output = new StreamOutput(fopen('/path/to/output.log', 'a', false));
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -42,7 +42,7 @@ class StreamOutput extends Output
      */
     public function __construct($stream, int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = null, OutputFormatterInterface $formatter = null)
     {
-        if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
+        if (!\is_resource($stream) || 'stream' !== get_resource_type($stream)) {
             throw new InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
         }
 
@@ -68,9 +68,13 @@ class StreamOutput extends Output
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($message, $newline)
+    protected function doWrite(string $message, bool $newline)
     {
-        if (false === @fwrite($this->stream, $message) || ($newline && (false === @fwrite($this->stream, PHP_EOL)))) {
+        if ($newline) {
+            $message .= PHP_EOL;
+        }
+
+        if (false === @fwrite($this->stream, $message)) {
             // should never happen
             throw new RuntimeException('Unable to write output.');
         }
@@ -93,19 +97,23 @@ class StreamOutput extends Output
      */
     protected function hasColorSupport()
     {
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return (function_exists('sapi_windows_vt100_support')
+        if ('Hyper' === getenv('TERM_PROGRAM')) {
+            return true;
+        }
+
+        if (\DIRECTORY_SEPARATOR === '\\') {
+            return (\function_exists('sapi_windows_vt100_support')
                 && @sapi_windows_vt100_support($this->stream))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');
         }
 
-        if (function_exists('stream_isatty')) {
+        if (\function_exists('stream_isatty')) {
             return @stream_isatty($this->stream);
         }
 
-        if (function_exists('posix_isatty')) {
+        if (\function_exists('posix_isatty')) {
             return @posix_isatty($this->stream);
         }
 

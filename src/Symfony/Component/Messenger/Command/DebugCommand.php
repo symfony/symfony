@@ -22,8 +22,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * A console command to debug Messenger information.
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
- *
- * @experimental in 4.1
  */
 class DebugCommand extends Command
 {
@@ -44,7 +42,7 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of %s)', implode(', ', array_keys($this->mapping))), null)
+            ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of %s)', implode(', ', array_keys($this->mapping))))
             ->setDescription('Lists messages you can dispatch using the message buses')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all messages that can be
@@ -74,27 +72,43 @@ EOF
             if (!isset($mapping[$bus])) {
                 throw new RuntimeException(sprintf('Bus "%s" does not exist. Known buses are %s.', $bus, implode(', ', array_keys($this->mapping))));
             }
-            $mapping = array($bus => $mapping[$bus]);
+            $mapping = [$bus => $mapping[$bus]];
         }
 
         foreach ($mapping as $bus => $handlersByMessage) {
             $io->section($bus);
 
-            $tableRows = array();
+            $tableRows = [];
             foreach ($handlersByMessage as $message => $handlers) {
-                $tableRows[] = array(sprintf('<fg=cyan>%s</fg=cyan>', $message));
+                $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $message)];
                 foreach ($handlers as $handler) {
-                    $tableRows[] = array(sprintf('    handled by <info>%s</>', $handler));
+                    $tableRows[] = [
+                        sprintf('    handled by <info>%s</>', $handler[0]).$this->formatConditions($handler[1]),
+                    ];
                 }
             }
 
             if ($tableRows) {
                 $io->text('The following messages can be dispatched:');
                 $io->newLine();
-                $io->table(array(), $tableRows);
+                $io->table([], $tableRows);
             } else {
                 $io->warning(sprintf('No handled message found in bus "%s".', $bus));
             }
         }
+    }
+
+    private function formatConditions(array $options): string
+    {
+        if (!$options) {
+            return '';
+        }
+
+        $optionsMapping = [];
+        foreach ($options as $key => $value) {
+            $optionsMapping[] = ' '.$key.'='.$value;
+        }
+
+        return ' (when'.implode(', ', $optionsMapping).')';
     }
 }

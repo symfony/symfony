@@ -1,14 +1,20 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'messenger' => array(
-        'routing' => array(
-            'Symfony\Component\Messenger\Tests\Fixtures\DummyMessage' => array('amqp', 'audit'),
-            'Symfony\Component\Messenger\Tests\Fixtures\SecondMessage' => array(
-                'senders' => array('amqp', 'audit'),
-                'send_and_handle' => true,
-            ),
+$container->loadFromExtension('framework', [
+    'serializer' => true,
+    'messenger' => [
+        'serializer' => [
+            'default_serializer' => 'messenger.transport.symfony_serializer',
+        ],
+        'routing' => [
+            'Symfony\Component\Messenger\Tests\Fixtures\DummyMessage' => ['amqp', 'audit'],
+            'Symfony\Component\Messenger\Tests\Fixtures\SecondMessage' => [
+                'senders' => ['amqp', 'audit'],
+            ],
             '*' => 'amqp',
-        ),
-    ),
-));
+        ],
+        'transports' => [
+            'amqp' => 'amqp://localhost/%2f/messages',
+        ],
+    ],
+]);

@@ -318,6 +318,54 @@
                 <source>Error</source>
                 <target>Hiba</target>
             </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>Érvénytelen egyedi azonosító (UUID).</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Ennek az értéknek oszthatónak kell lennie a következővel: {{ compared_value }}</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Ez a Bankazonosító kód (BIC) nem kapcsolódik az IBAN kódhoz ({{ iban }}).</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Ez az érték érvényes JSON kell, hogy legyen.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This value should be positive.</source>
+                <target>Ennek az értéknek pozitívnak kell lennie.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be either positive or zero.</source>
+                <target>Ennek az értéknek pozitívnak vagy nullának kell lennie.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be negative.</source>
+                <target>Ennek az értéknek negatívnak kell lennie.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be either negative or zero.</source>
+                <target>Ennek az értéknek negatívnak vagy nullának kell lennie.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ez a gyűjtemény csak egyedi elemeket tartalmazhat.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Ez az érték nem egy érvényes időzóna.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Ez a jelszó korábban egy adatvédelmi incidens során illetéktelenek kezébe került, így nem használható. Kérjük, használjon másik jelszót.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Ennek az értéknek {{ min }} és {{ max }} között kell lennie.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

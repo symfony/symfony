@@ -12,12 +12,12 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
@@ -32,22 +32,96 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     use ObjectToPopulateTrait;
     use SerializerAwareTrait;
 
-    const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
-    const OBJECT_TO_POPULATE = 'object_to_populate';
-    const GROUPS = 'groups';
-    const ATTRIBUTES = 'attributes';
-    const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
-    const DEFAULT_CONSTRUCTOR_ARGUMENTS = 'default_constructor_arguments';
+    /* constants to configure the context */
 
     /**
-     * @var int
+     * How many loops of circular reference to allow while normalizing.
+     *
+     * The default value of 1 means that when we encounter the same object a
+     * second time, we consider that a circular reference.
+     *
+     * You can raise this value for special cases, e.g. in combination with the
+     * max depth setting of the object normalizer.
      */
-    protected $circularReferenceLimit = 1;
+    public const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
 
     /**
-     * @var callable
+     * Instead of creating a new instance of an object, update the specified object.
+     *
+     * If you have a nested structure, child objects will be overwritten with
+     * new instances unless you set DEEP_OBJECT_TO_POPULATE to true.
      */
-    protected $circularReferenceHandler;
+    public const OBJECT_TO_POPULATE = 'object_to_populate';
+
+    /**
+     * Only (de)normalize attributes that are in the specified groups.
+     */
+    public const GROUPS = 'groups';
+
+    /**
+     * Limit (de)normalize to the specified names.
+     *
+     * For nested structures, this list needs to reflect the object tree.
+     */
+    public const ATTRIBUTES = 'attributes';
+
+    /**
+     * If ATTRIBUTES are specified, and the source has fields that are not part of that list,
+     * either ignore those attributes (true) or throw an ExtraAttributesException (false).
+     */
+    public const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
+
+    /**
+     * Hashmap of default values for constructor arguments.
+     *
+     * The names need to match the parameter names in the constructor arguments.
+     */
+    public const DEFAULT_CONSTRUCTOR_ARGUMENTS = 'default_constructor_arguments';
+
+    /**
+     * Hashmap of field name => callable to normalize this field.
+     *
+     * The callable is called if the field is encountered with the arguments:
+     *
+     * - mixed  $attributeValue value of this field
+     * - object $object         the whole object being normalized
+     * - string $attributeName  name of the attribute being normalized
+     * - string $format         the requested format
+     * - array  $context        the serialization context
+     */
+    public const CALLBACKS = 'callbacks';
+
+    /**
+     * Handler to call when a circular reference has been detected.
+     *
+     * If you specify no handler, a CircularReferenceException is thrown.
+     *
+     * The method will be called with ($object, $format, $context) and its
+     * return value is returned as the result of the normalize call.
+     */
+    public const CIRCULAR_REFERENCE_HANDLER = 'circular_reference_handler';
+
+    /**
+     * Skip the specified attributes when normalizing an object tree.
+     *
+     * This list is applied to each element of nested structures.
+     *
+     * Note: The behaviour for nested structures is different from ATTRIBUTES
+     * for historical reason. Aligning the behaviour would be a BC break.
+     */
+    public const IGNORED_ATTRIBUTES = 'ignored_attributes';
+
+    /**
+     * @internal
+     */
+    protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
+
+    protected $defaultContext = [
+        self::ALLOW_EXTRA_ATTRIBUTES => true,
+        self::CIRCULAR_REFERENCE_HANDLER => null,
+        self::CIRCULAR_REFERENCE_LIMIT => 1,
+        self::IGNORED_ATTRIBUTES => [],
+    ];
 
     /**
      * @var ClassMetadataFactoryInterface|null
@@ -60,91 +134,29 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected $nameConverter;
 
     /**
-     * @var array
-     */
-    protected $callbacks = array();
-
-    /**
-     * @var array
-     */
-    protected $ignoredAttributes = array();
-
-    /**
-     * @var array
-     */
-    protected $camelizedAttributes = array();
-
-    /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
-    }
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
-    /**
-     * Set circular reference limit.
-     *
-     * @param int $circularReferenceLimit Limit of iterations for the same object
-     *
-     * @return self
-     */
-    public function setCircularReferenceLimit($circularReferenceLimit)
-    {
-        $this->circularReferenceLimit = $circularReferenceLimit;
+        if (isset($this->defaultContext[self::CALLBACKS])) {
+            if (!\is_array($this->defaultContext[self::CALLBACKS])) {
+                throw new InvalidArgumentException(sprintf('The "%s" default context option must be an array of callables.', self::CALLBACKS));
+            }
 
-        return $this;
-    }
-
-    /**
-     * Set circular reference handler.
-     *
-     * @param callable $circularReferenceHandler
-     *
-     * @return self
-     */
-    public function setCircularReferenceHandler(callable $circularReferenceHandler)
-    {
-        $this->circularReferenceHandler = $circularReferenceHandler;
-
-        return $this;
-    }
-
-    /**
-     * Set normalization callbacks.
-     *
-     * @param callable[] $callbacks Help normalize the result
-     *
-     * @return self
-     *
-     * @throws InvalidArgumentException if a non-callable callback is set
-     */
-    public function setCallbacks(array $callbacks)
-    {
-        foreach ($callbacks as $attribute => $callback) {
-            if (!\is_callable($callback)) {
-                throw new InvalidArgumentException(sprintf(
-                    'The given callback for attribute "%s" is not callable.',
-                    $attribute
-                ));
+            foreach ($this->defaultContext[self::CALLBACKS] as $attribute => $callback) {
+                if (!\is_callable($callback)) {
+                    throw new InvalidArgumentException(sprintf('Invalid callback found for attribute "%s" in the "%s" default context option.', $attribute, self::CALLBACKS));
+                }
             }
         }
-        $this->callbacks = $callbacks;
 
-        return $this;
-    }
-
-    /**
-     * Set ignored attributes for normalization and denormalization.
-     *
-     * @return self
-     */
-    public function setIgnoredAttributes(array $ignoredAttributes)
-    {
-        $this->ignoredAttributes = $ignoredAttributes;
-
-        return $this;
+        if (isset($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER]) && !\is_callable($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
+            throw new InvalidArgumentException(sprintf('Invalid callback found in the "%s" default context option.', self::CIRCULAR_REFERENCE_HANDLER));
+        }
     }
 
     /**
@@ -169,16 +181,17 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     {
         $objectHash = spl_object_hash($object);
 
-        if (isset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash])) {
-            if ($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] >= $this->circularReferenceLimit) {
-                unset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash]);
+        $circularReferenceLimit = $context[self::CIRCULAR_REFERENCE_LIMIT] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_LIMIT];
+        if (isset($context[self::CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash])) {
+            if ($context[self::CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash] >= $circularReferenceLimit) {
+                unset($context[self::CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash]);
 
                 return true;
             }
 
-            ++$context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash];
+            ++$context[self::CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash];
         } else {
-            $context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] = 1;
+            $context[self::CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash] = 1;
         }
 
         return false;
@@ -190,19 +203,20 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * If a circular reference handler is set, it will be called. Otherwise, a
      * {@class CircularReferenceException} will be thrown.
      *
-     * @param object $object
+     * @final
      *
      * @return mixed
      *
      * @throws CircularReferenceException
      */
-    protected function handleCircularReference($object)
+    protected function handleCircularReference(object $object, string $format = null, array $context = [])
     {
-        if ($this->circularReferenceHandler) {
-            return \call_user_func($this->circularReferenceHandler, $object);
+        $circularReferenceHandler = $context[self::CIRCULAR_REFERENCE_HANDLER] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER];
+        if ($circularReferenceHandler) {
+            return $circularReferenceHandler($object, $format, $context);
         }
 
-        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $this->circularReferenceLimit));
+        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $context[self::CIRCULAR_REFERENCE_LIMIT] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_LIMIT]));
     }
 
     /**
@@ -212,22 +226,28 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @param array         $context
      * @param bool          $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
+     * @throws LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
+     *
      * @return string[]|AttributeMetadataInterface[]|bool
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
+        $allowExtraAttributes = $context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES];
         if (!$this->classMetadataFactory) {
+            if (!$allowExtraAttributes) {
+                throw new LogicException(sprintf('A class metadata factory must be provided in the constructor when setting "%s" to false.', self::ALLOW_EXTRA_ATTRIBUTES));
+            }
+
             return false;
         }
 
-        $groups = false;
-        if (isset($context[static::GROUPS]) && \is_array($context[static::GROUPS])) {
-            $groups = $context[static::GROUPS];
-        } elseif (!isset($context[static::ALLOW_EXTRA_ATTRIBUTES]) || $context[static::ALLOW_EXTRA_ATTRIBUTES]) {
+        $tmpGroups = $context[self::GROUPS] ?? $this->defaultContext[self::GROUPS] ?? null;
+        $groups = (\is_array($tmpGroups) || is_scalar($tmpGroups)) ? (array) $tmpGroups : false;
+        if (false === $groups && $allowExtraAttributes) {
             return false;
         }
 
-        $allowedAttributes = array();
+        $allowedAttributes = [];
         foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
             $name = $attributeMetadata->getName();
 
@@ -252,19 +272,21 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return bool
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
     {
-        if (in_array($attribute, $this->ignoredAttributes)) {
+        $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
+        if (\in_array($attribute, $ignoredAttributes)) {
             return false;
         }
 
-        if (isset($context[self::ATTRIBUTES][$attribute])) {
+        $attributes = $context[self::ATTRIBUTES] ?? $this->defaultContext[self::ATTRIBUTES] ?? null;
+        if (isset($attributes[$attribute])) {
             // Nested attributes
             return true;
         }
 
-        if (isset($context[self::ATTRIBUTES]) && is_array($context[self::ATTRIBUTES])) {
-            return in_array($attribute, $context[self::ATTRIBUTES], true);
+        if (\is_array($attributes)) {
+            return \in_array($attribute, $attributes, true);
         }
 
         return true;
@@ -322,32 +344,44 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
-        if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
-            unset($context[static::OBJECT_TO_POPULATE]);
+        if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
+            unset($context[self::OBJECT_TO_POPULATE]);
 
             return $object;
         }
+        // clean up even if no match
+        unset($context[static::OBJECT_TO_POPULATE]);
 
         $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
         if ($constructor) {
+            if (true !== $constructor->isPublic()) {
+                return $reflectionClass->newInstanceWithoutConstructor();
+            }
+
             $constructorParameters = $constructor->getParameters();
 
-            $params = array();
+            $params = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
-                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
+                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
 
                 $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
                 if ($constructorParameter->isVariadic()) {
-                    if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
+                    if ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
                         if (!\is_array($data[$paramName])) {
                             throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
                         }
 
-                        $params = array_merge($params, $data[$paramName]);
+                        $variadicParameters = [];
+                        foreach ($data[$paramName] as $parameterData) {
+                            $variadicParameters[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                        }
+
+                        $params = array_merge($params, $variadicParameters);
+                        unset($data[$key]);
                     }
-                } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
+                } elseif ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
                     $parameterData = $data[$key];
                     if (null === $parameterData && $constructorParameter->allowsNull()) {
                         $params[] = null;
@@ -355,38 +389,18 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         unset($data[$key]);
                         continue;
                     }
-                    try {
-                        if (null !== $constructorParameter->getClass()) {
-                            if (!$this->serializer instanceof DenormalizerInterface) {
-                                throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $constructorParameter->getClass(), static::class));
-                            }
-                            $parameterClass = $constructorParameter->getClass()->getName();
-                            $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $paramName));
-                        }
-                    } catch (\ReflectionException $e) {
-                        throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
-                    } catch (MissingConstructorArgumentsException $e) {
-                        if (!$constructorParameter->getType()->allowsNull()) {
-                            throw $e;
-                        }
-                        $parameterData = null;
-                    }
 
                     // Don't run set for a parameter passed to the constructor
-                    $params[] = $parameterData;
+                    $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
                     unset($data[$key]);
-                } elseif (isset($context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key])) {
+                } elseif (\array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
                     $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
+                } elseif (\array_key_exists($key, $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
+                    $params[] = $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
-                    throw new MissingConstructorArgumentsException(
-                        sprintf(
-                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
-                            $class,
-                            $constructorParameter->name
-                        )
-                    );
+                    throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
                 }
             }
 
@@ -401,14 +415,34 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     }
 
     /**
-     * @param array  $parentContext
-     * @param string $attribute
-     *
-     * @return array
-     *
      * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute)
+    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, $parameterName, $parameterData, array $context, $format = null)
+    {
+        try {
+            if (null !== $parameter->getClass()) {
+                if (!$this->serializer instanceof DenormalizerInterface) {
+                    throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $parameter->getClass(), self::class));
+                }
+                $parameterClass = $parameter->getClass()->getName();
+                $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $parameterName, $format));
+            }
+        } catch (\ReflectionException $e) {
+            throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $parameterName), 0, $e);
+        } catch (MissingConstructorArgumentsException $e) {
+            if (!$parameter->getType()->allowsNull()) {
+                throw $e;
+            }
+            $parameterData = null;
+        }
+
+        return $parameterData;
+    }
+
+    /**
+     * @internal
+     */
+    protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RepeatedType extends AbstractType
@@ -32,10 +32,10 @@ class RepeatedType extends AbstractType
         }
 
         $builder
-            ->addViewTransformer(new ValueToDuplicatesTransformer(array(
+            ->addViewTransformer(new ValueToDuplicatesTransformer([
                 $options['first_name'],
                 $options['second_name'],
-            )))
+            ]))
             ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
             ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
         ;
@@ -46,15 +46,15 @@ class RepeatedType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'type' => __NAMESPACE__.'\TextType',
-            'options' => array(),
-            'first_options' => array(),
-            'second_options' => array(),
+            'options' => [],
+            'first_options' => [],
+            'second_options' => [],
             'first_name' => 'first',
             'second_name' => 'second',
             'error_bubbling' => false,
-        ));
+        ]);
 
         $resolver->setAllowedTypes('options', 'array');
         $resolver->setAllowedTypes('first_options', 'array');

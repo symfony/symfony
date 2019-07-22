@@ -62,7 +62,7 @@ class Token
         return self::TYPE_FILE_END === $this->type;
     }
 
-    public function isDelimiter(array $values = array()): bool
+    public function isDelimiter(array $values = []): bool
     {
         if (self::TYPE_DELIMITER !== $this->type) {
             return false;
@@ -72,7 +72,7 @@ class Token
             return true;
         }
 
-        return in_array($this->value, $values);
+        return \in_array($this->value, $values);
     }
 
     public function isWhitespace(): bool

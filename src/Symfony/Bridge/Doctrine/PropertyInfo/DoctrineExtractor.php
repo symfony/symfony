@@ -11,11 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\PropertyInfo;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -25,26 +27,23 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface
+class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
+    private $entityManager;
     private $classMetadataFactory;
 
-    public function __construct(ClassMetadataFactory $classMetadataFactory)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->classMetadataFactory = $classMetadataFactory;
+        $this->entityManager = $entityManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = array())
+    public function getProperties($class, array $context = [])
     {
-        try {
-            $metadata = $this->classMetadataFactory->getMetadataFor($class);
-        } catch (MappingException $exception) {
-            return;
-        } catch (OrmMappingException $exception) {
-            return;
+        if (null === $metadata = $this->getMetadata($class)) {
+            return null;
         }
 
         $properties = array_merge($metadata->getFieldNames(), $metadata->getAssociationNames());
@@ -63,14 +62,10 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = array())
+    public function getTypes($class, $property, array $context = [])
     {
-        try {
-            $metadata = $this->classMetadataFactory->getMetadataFor($class);
-        } catch (MappingException $exception) {
-            return;
-        } catch (OrmMappingException $exception) {
-            return;
+        if (null === $metadata = $this->getMetadata($class)) {
+            return null;
         }
 
         if ($metadata->hasAssociation($property)) {
@@ -85,7 +80,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     $nullable = false;
                 }
 
-                return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class));
+                return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class)];
             }
 
             $collectionKeyType = Type::BUILTIN_TYPE_INT;
@@ -96,7 +91,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 if (isset($associationMapping['indexBy'])) {
                     $indexProperty = $associationMapping['indexBy'];
                     /** @var ClassMetadataInfo $subMetadata */
-                    $subMetadata = $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
+                    $subMetadata = $this->entityManager ? $this->entityManager->getClassMetadata($associationMapping['targetEntity']) : $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
                     $typeOfField = $subMetadata->getTypeOfField($indexProperty);
 
                     if (null === $typeOfField) {
@@ -104,7 +99,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
                         /** @var ClassMetadataInfo $subMetadata */
                         $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($indexProperty);
-                        $subMetadata = $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
+                        $subMetadata = $this->entityManager ? $this->entityManager->getClassMetadata($associationMapping['targetEntity']) : $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
                         $typeOfField = $subMetadata->getTypeOfField($indexProperty);
                     }
 
@@ -112,18 +107,18 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 }
             }
 
-            return array(new Type(
+            return [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
                 false,
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type($collectionKeyType),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
-            ));
+            )];
         }
 
         if ($metadata instanceof ClassMetadataInfo && class_exists('Doctrine\ORM\Mapping\Embedded') && isset($metadata->embeddedClasses[$property])) {
-            return array(new Type(Type::BUILTIN_TYPE_OBJECT, false, $metadata->embeddedClasses[$property]['class']));
+            return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $metadata->embeddedClasses[$property]['class'])];
         }
 
         if ($metadata->hasField($property)) {
@@ -136,31 +131,64 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 case DBALType::DATETIMETZ:
                 case 'vardatetime':
                 case DBALType::TIME:
-                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime'));
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
 
                 case 'date_immutable':
                 case 'datetime_immutable':
                 case 'datetimetz_immutable':
                 case 'time_immutable':
-                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable'));
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
 
                 case 'dateinterval':
-                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval'));
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
 
                 case DBALType::TARRAY:
-                    return array(new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true));
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
                 case DBALType::SIMPLE_ARRAY:
-                    return array(new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)));
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
 
                 case DBALType::JSON_ARRAY:
-                    return array(new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true));
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
                 default:
                     $builtinType = $this->getPhpType($typeOfField);
 
-                    return $builtinType ? array(new Type($builtinType, $nullable)) : null;
+                    return $builtinType ? [new Type($builtinType, $nullable)] : null;
             }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isReadable($class, $property, array $context = [])
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isWritable($class, $property, array $context = [])
+    {
+        if (
+            null === ($metadata = $this->getMetadata($class))
+            || ClassMetadata::GENERATOR_TYPE_NONE === $metadata->generatorType
+            || !\in_array($property, $metadata->getIdentifierFieldNames(), true)
+        ) {
+            return null;
+        }
+
+        return false;
+    }
+
+    private function getMetadata(string $class): ?ClassMetadata
+    {
+        try {
+            return $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
+        } catch (MappingException | OrmMappingException $exception) {
+            return null;
         }
     }
 

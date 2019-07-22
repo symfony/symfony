@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
@@ -42,10 +42,10 @@ final class CachePoolDeleteCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('pool', InputArgument::REQUIRED, 'The cache pool from which to delete an item'),
                 new InputArgument('key', InputArgument::REQUIRED, 'The cache key to delete from the pool'),
-            ))
+            ])
             ->setDescription('Deletes an item from a cache pool')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> deletes an item from a given cache pool.

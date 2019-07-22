@@ -12,17 +12,14 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
-use Symfony\Component\Cache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
-use Symfony\Component\Cache\Traits\GetTrait;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
  */
 class NullAdapter implements AdapterInterface, CacheInterface
 {
-    use GetTrait;
-
     private $createCacheItem;
 
     public function __construct()
@@ -43,6 +40,16 @@ class NullAdapter implements AdapterInterface, CacheInterface
     /**
      * {@inheritdoc}
      */
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
+    {
+        $save = true;
+
+        return $callback(($this->createCacheItem)($key), $save);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getItem($key)
     {
         $f = $this->createCacheItem;
@@ -53,7 +60,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         return $this->generateItems($keys);
     }
@@ -69,7 +76,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(string $prefix = '')
     {
         return true;
     }
@@ -112,6 +119,14 @@ class NullAdapter implements AdapterInterface, CacheInterface
     public function commit()
     {
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(string $key): bool
+    {
+        return $this->deleteItem($key);
     }
 
     private function generateItems(array $keys)

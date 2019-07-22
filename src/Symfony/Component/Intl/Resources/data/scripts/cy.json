@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.49.82",
     "Names": {
         "Arab": "Arabaidd",
         "Armn": "Armenaidd",
@@ -44,7 +44,6 @@
         "Zsye": "Emoji",
         "Zsym": "Symbolau",
         "Zxxx": "Anysgrifenedig",
-        "Zyyy": "Cyffredin",
-        "Zzzz": "Sgript anhysbys"
+        "Zyyy": "Cyffredin"
     }
 }

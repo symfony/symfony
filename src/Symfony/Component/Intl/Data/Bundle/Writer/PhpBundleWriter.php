@@ -43,9 +43,11 @@ TEMPLATE;
         });
 
         $data = var_export($data, true);
-        $data = preg_replace('/array \(/', 'array(', $data);
-        $data = preg_replace('/\n {1,10}array\(/', 'array(', $data);
+        $data = preg_replace('/array \(/', '[', $data);
+        $data = preg_replace('/\n {1,10}\[/', '[', $data);
         $data = preg_replace('/  /', '    ', $data);
+        $data = preg_replace('/\),$/m', '],', $data);
+        $data = preg_replace('/\)$/', ']', $data);
         $data = sprintf($template, $data);
 
         file_put_contents($path.'/'.$locale.'.php', $data);

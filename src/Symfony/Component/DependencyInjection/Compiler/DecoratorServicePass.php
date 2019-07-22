@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Overwrites a service but keeps the overridden one.
@@ -32,8 +32,9 @@ class DecoratorServicePass implements CompilerPassInterface
             if (!$decorated = $definition->getDecoratedService()) {
                 continue;
             }
-            $definitions->insert(array($id, $definition), array($decorated[2], --$order));
+            $definitions->insert([$id, $definition], [$decorated[2], --$order]);
         }
+        $decoratingDefinitions = [];
 
         foreach ($definitions as list($id, $definition)) {
             list($inner, $renamedId) = $definition->getDecoratedService();
@@ -54,12 +55,18 @@ class DecoratorServicePass implements CompilerPassInterface
                 $container->setAlias($renamedId, new Alias((string) $alias, false));
             } else {
                 $decoratedDefinition = $container->getDefinition($inner);
-                $definition->setTags(array_merge($decoratedDefinition->getTags(), $definition->getTags()));
                 $public = $decoratedDefinition->isPublic();
                 $private = $decoratedDefinition->isPrivate();
                 $decoratedDefinition->setPublic(false);
-                $decoratedDefinition->setTags(array());
                 $container->setDefinition($renamedId, $decoratedDefinition);
+                $decoratingDefinitions[$inner] = $decoratedDefinition;
+            }
+
+            if (isset($decoratingDefinitions[$inner])) {
+                $decoratingDefinition = $decoratingDefinitions[$inner];
+                $definition->setTags(array_merge($decoratingDefinition->getTags(), $definition->getTags()));
+                $decoratingDefinition->setTags([]);
+                $decoratingDefinitions[$inner] = $definition;
             }
 
             $container->setAlias($inner, $id)->setPublic($public)->setPrivate($private);

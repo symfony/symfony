@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.69",
+    "Version": "2.1.49.33",
     "Names": {
         "aa": "afara",
         "ab": "abĥaza",
@@ -139,7 +139,6 @@
         "tw": "tw",
         "ug": "ujgura",
         "uk": "ukraina",
-        "und": "nekonata lingvo",
         "ur": "urduo",
         "uz": "uzbeka",
         "vi": "vjetnama",
@@ -152,7 +151,6 @@
         "zh": "ĉina",
         "zh_Hans": "ĉina simpligita",
         "zh_Hant": "ĉina tradicia",
-        "zu": "zulua",
-        "zxx": "nelingvaĵo"
+        "zu": "zulua"
     }
 }

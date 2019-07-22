@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -29,12 +30,12 @@ class DateTimeValidator extends DateValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\DateTime');
         }
 
-        if (null === $value || '' === $value || $value instanceof \DateTimeInterface) {
+        if (null === $value || '' === $value) {
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+            throw new UnexpectedValueException($value, 'string');
         }
 
         $value = (string) $value;

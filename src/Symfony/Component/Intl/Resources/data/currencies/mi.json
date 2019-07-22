@@ -1,0 +1,129 @@
+{
+    "Version": "2.1.49.82",
+    "Names": {
+        "ANG": [
+            "ANG",
+            "ANG"
+        ],
+        "ARS": [
+            "ARS",
+            "ARS"
+        ],
+        "AWG": [
+            "AWG",
+            "AWG"
+        ],
+        "BBD": [
+            "BBD",
+            "BBD"
+        ],
+        "BMD": [
+            "BMD",
+            "BMD"
+        ],
+        "BRL": [
+            "R$",
+            "Real Parahi"
+        ],
+        "BSD": [
+            "BSD",
+            "BSD"
+        ],
+        "BZD": [
+            "BZD",
+            "BZD"
+        ],
+        "CAD": [
+            "CA$",
+            "CAD"
+        ],
+        "CNY": [
+            "CN¥",
+            "Yuan Haina"
+        ],
+        "CRC": [
+            "CRC",
+            "CRC"
+        ],
+        "CUC": [
+            "CUC",
+            "CUC"
+        ],
+        "CUP": [
+            "CUP",
+            "CUP"
+        ],
+        "DOP": [
+            "DOP",
+            "DOP"
+        ],
+        "EUR": [
+            "€",
+            "Euro"
+        ],
+        "GBP": [
+            "£",
+            "Pāuna Piritene"
+        ],
+        "GTQ": [
+            "GTQ",
+            "GTQ"
+        ],
+        "HNL": [
+            "HNL",
+            "HNL"
+        ],
+        "HTG": [
+            "HTG",
+            "HTG"
+        ],
+        "INR": [
+            "₹",
+            "Rupee Iniana"
+        ],
+        "JMD": [
+            "JMD",
+            "JMD"
+        ],
+        "JPY": [
+            "¥",
+            "Yen Hapanihi"
+        ],
+        "KYD": [
+            "KYD",
+            "KYD"
+        ],
+        "MXN": [
+            "MX$",
+            "MXN"
+        ],
+        "NIO": [
+            "NIO",
+            "NIO"
+        ],
+        "NZD": [
+            "$",
+            "Tāra o Aotearoa"
+        ],
+        "PAB": [
+            "PAB",
+            "PAB"
+        ],
+        "RUB": [
+            "RUB",
+            "Rūpera Ruhiana"
+        ],
+        "TTD": [
+            "TTD",
+            "TTD"
+        ],
+        "USD": [
+            "US$",
+            "Tāra US"
+        ],
+        "XCD": [
+            "EC$",
+            "XCD"
+        ]
+    }
+}

@@ -3,15 +3,12 @@
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:framework="http://symfony.com/schema/dic/symfony"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
-                        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
-        <framework:workflow name="article" type="workflow" initial-place="draft">
-            <framework:marking-store type="multiple_state">
-                <framework:argument>a</framework:argument>
-                <framework:argument>a</framework:argument>
-            </framework:marking-store>
+        <framework:workflow name="article" type="workflow">
+            <framework:initial-marking>draft</framework:initial-marking>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place name="draft" />
             <framework:place name="wait_for_journalist" />

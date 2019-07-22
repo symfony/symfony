@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -21,9 +21,9 @@ class RouterCacheWarmerTest extends TestCase
 {
     public function testWarmUpWithWarmebleInterface()
     {
-        $containerMock = $this->getMockBuilder(ContainerInterface::class)->setMethods(array('get', 'has'))->getMock();
+        $containerMock = $this->getMockBuilder(ContainerInterface::class)->setMethods(['get', 'has'])->getMock();
 
-        $routerMock = $this->getMockBuilder(testRouterInterfaceWithWarmebleInterface::class)->setMethods(array('match', 'generate', 'getContext', 'setContext', 'getRouteCollection', 'warmUp'))->getMock();
+        $routerMock = $this->getMockBuilder(testRouterInterfaceWithWarmebleInterface::class)->setMethods(['match', 'generate', 'getContext', 'setContext', 'getRouteCollection', 'warmUp'])->getMock();
         $containerMock->expects($this->any())->method('get')->with('router')->willReturn($routerMock);
         $routerCacheWarmer = new RouterCacheWarmer($containerMock);
 
@@ -32,17 +32,15 @@ class RouterCacheWarmerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @expectedDeprecation Passing a Symfony\Component\Routing\RouterInterface without implementing Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface is deprecated since Symfony 4.1.
-     * @group legacy
-     */
     public function testWarmUpWithoutWarmebleInterface()
     {
-        $containerMock = $this->getMockBuilder(ContainerInterface::class)->setMethods(array('get', 'has'))->getMock();
+        $containerMock = $this->getMockBuilder(ContainerInterface::class)->setMethods(['get', 'has'])->getMock();
 
-        $routerMock = $this->getMockBuilder(testRouterInterfaceWithoutWarmebleInterface::class)->setMethods(array('match', 'generate', 'getContext', 'setContext', 'getRouteCollection'))->getMock();
+        $routerMock = $this->getMockBuilder(testRouterInterfaceWithoutWarmebleInterface::class)->setMethods(['match', 'generate', 'getContext', 'setContext', 'getRouteCollection'])->getMock();
         $containerMock->expects($this->any())->method('get')->with('router')->willReturn($routerMock);
         $routerCacheWarmer = new RouterCacheWarmer($containerMock);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('cannot be warmed up because it does not implement Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface');
         $routerCacheWarmer->warmUp('/tmp');
     }
 }

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -37,7 +37,7 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
             return;
         }
 
-        $validators = array();
+        $validators = [];
         foreach ($container->findTaggedServiceIds($this->constraintValidatorTag, true) as $id => $attributes) {
             $definition = $container->getDefinition($id);
 

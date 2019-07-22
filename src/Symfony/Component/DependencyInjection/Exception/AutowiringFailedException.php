@@ -17,12 +17,52 @@ namespace Symfony\Component\DependencyInjection\Exception;
 class AutowiringFailedException extends RuntimeException
 {
     private $serviceId;
+    private $messageCallback;
 
-    public function __construct(string $serviceId, string $message = '', int $code = 0, \Exception $previous = null)
+    public function __construct(string $serviceId, $message = '', int $code = 0, \Exception $previous = null)
     {
         $this->serviceId = $serviceId;
 
-        parent::__construct($message, $code, $previous);
+        if ($message instanceof \Closure && \function_exists('xdebug_is_enabled') && xdebug_is_enabled()) {
+            $message = $message();
+        }
+
+        if (!$message instanceof \Closure) {
+            parent::__construct($message, $code, $previous);
+
+            return;
+        }
+
+        $this->messageCallback = $message;
+        parent::__construct('', $code, $previous);
+
+        $this->message = new class($this->message, $this->messageCallback) {
+            private $message;
+            private $messageCallback;
+
+            public function __construct(&$message, &$messageCallback)
+            {
+                $this->message = &$message;
+                $this->messageCallback = &$messageCallback;
+            }
+
+            public function __toString(): string
+            {
+                $messageCallback = $this->messageCallback;
+                $this->messageCallback = null;
+
+                try {
+                    return $this->message = $messageCallback();
+                } catch (\Throwable $e) {
+                    return $this->message = $e->getMessage();
+                }
+            }
+        };
+    }
+
+    public function getMessageCallback(): ?\Closure
+    {
+        return $this->messageCallback;
     }
 
     public function getServiceId()

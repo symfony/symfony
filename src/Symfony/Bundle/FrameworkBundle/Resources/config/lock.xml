@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
@@ -26,7 +26,7 @@
 
         <service id="lock.strategy.majority" class="Symfony\Component\Lock\Strategy\ConsensusStrategy" />
 
-        <service id="lock.factory.abstract" class="Symfony\Component\Lock\Factory" abstract="true">
+        <service id="lock.factory.abstract" class="Symfony\Component\Lock\LockFactory" abstract="true">
             <tag name="monolog.logger" channel="lock" />
             <argument /> <!-- Store -->
             <call method="setLogger">

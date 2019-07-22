@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:http-client max-host-connections="4">
+            <framework:default-options>
+                <framework:header name="foo">bar</framework:header>
+            </framework:default-options>
+            <framework:scoped-client name="foo" base-uri="http://example.com">
+                <framework:header name="bar">baz</framework:header>
+            </framework:scoped-client>
+        </framework:http-client>
+    </framework:config>
+</container>

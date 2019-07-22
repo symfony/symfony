@@ -17,7 +17,7 @@ namespace Symfony\Component\HttpFoundation;
  * A StreamedResponse uses a callback for its content.
  *
  * The callback should use the standard PHP functions like echo
- * to stream the response back to the client. The flush() method
+ * to stream the response back to the client. The flush() function
  * can also be used if needed.
  *
  * @see flush()
@@ -35,7 +35,7 @@ class StreamedResponse extends Response
      * @param int           $status   The response status code
      * @param array         $headers  An array of response headers
      */
-    public function __construct(callable $callback = null, int $status = 200, array $headers = array())
+    public function __construct(callable $callback = null, int $status = 200, array $headers = [])
     {
         parent::__construct(null, $status, $headers);
 
@@ -55,7 +55,7 @@ class StreamedResponse extends Response
      *
      * @return static
      */
-    public static function create($callback = null, $status = 200, $headers = array())
+    public static function create($callback = null, $status = 200, $headers = [])
     {
         return new static($callback, $status, $headers);
     }
@@ -111,7 +111,7 @@ class StreamedResponse extends Response
             throw new \LogicException('The Response callback must not be null.');
         }
 
-        call_user_func($this->callback);
+        ($this->callback)();
 
         return $this;
     }
@@ -128,6 +128,8 @@ class StreamedResponse extends Response
         if (null !== $content) {
             throw new \LogicException('The content cannot be set on a StreamedResponse instance.');
         }
+
+        $this->streamed = true;
 
         return $this;
     }

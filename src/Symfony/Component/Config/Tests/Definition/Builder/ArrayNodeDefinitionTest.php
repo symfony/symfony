@@ -13,9 +13,11 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use Symfony\Component\Config\Definition\Processor;
 
 class ArrayNodeDefinitionTest extends TestCase
 {
@@ -43,20 +45,20 @@ class ArrayNodeDefinitionTest extends TestCase
     {
         $node = new ArrayNodeDefinition('root');
 
-        call_user_func_array(array($node, $method), $args);
+        $node->{$method}(...$args);
 
         $node->getNode();
     }
 
     public function providePrototypeNodeSpecificCalls()
     {
-        return array(
-            array('defaultValue', array(array())),
-            array('addDefaultChildrenIfNoneSet', array()),
-            array('requiresAtLeastOneElement', array()),
-            array('cannotBeEmpty', array()),
-            array('useAttributeAsKey', array('foo')),
-        );
+        return [
+            ['defaultValue', [[]]],
+            ['addDefaultChildrenIfNoneSet', []],
+            ['requiresAtLeastOneElement', []],
+            ['cannotBeEmpty', []],
+            ['useAttributeAsKey', ['foo']],
+        ];
     }
 
     /**
@@ -79,7 +81,7 @@ class ArrayNodeDefinitionTest extends TestCase
     {
         $node = new ArrayNodeDefinition('root');
         $node
-            ->defaultValue(array())
+            ->defaultValue([])
             ->addDefaultChildrenIfNoneSet('foo')
             ->prototype('array')
         ;
@@ -94,7 +96,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->prototype('array')
         ;
         $tree = $node->getNode();
-        $this->assertEquals(array(array()), $tree->getDefaultValue());
+        $this->assertEquals([[]], $tree->getDefaultValue());
     }
 
     /**
@@ -134,14 +136,14 @@ class ArrayNodeDefinitionTest extends TestCase
 
     public function providePrototypedArrayNodeDefaults()
     {
-        return array(
-            array(null, true, false, array(array())),
-            array(2, true, false, array(array(), array())),
-            array('2', false, true, array('2' => array())),
-            array('foo', false, true, array('foo' => array())),
-            array(array('foo'), false, true, array('foo' => array())),
-            array(array('foo', 'bar'), false, true, array('foo' => array(), 'bar' => array())),
-        );
+        return [
+            [null, true, false, [[]]],
+            [2, true, false, [[], []]],
+            ['2', false, true, ['2' => []]],
+            ['foo', false, true, ['foo' => []]],
+            [['foo'], false, true, ['foo' => []]],
+            [['foo', 'bar'], false, true, ['foo' => [], 'bar' => []]],
+        ];
     }
 
     public function testNestedPrototypedArrayNodes()
@@ -167,7 +169,7 @@ class ArrayNodeDefinitionTest extends TestCase
                 ->scalarNode('foo')->defaultValue('bar')->end()
         ;
 
-        $this->assertEquals(array('enabled' => false, 'foo' => 'bar'), $node->getNode()->getDefaultValue());
+        $this->assertEquals(['enabled' => false, 'foo' => 'bar'], $node->getNode()->getDefaultValue());
     }
 
     /**
@@ -196,9 +198,9 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->canBeDisabled();
 
         $this->assertTrue($this->getField($node, 'addDefaults'));
-        $this->assertEquals(array('enabled' => false), $this->getField($node, 'falseEquivalent'));
-        $this->assertEquals(array('enabled' => true), $this->getField($node, 'trueEquivalent'));
-        $this->assertEquals(array('enabled' => true), $this->getField($node, 'nullEquivalent'));
+        $this->assertEquals(['enabled' => false], $this->getField($node, 'falseEquivalent'));
+        $this->assertEquals(['enabled' => true], $this->getField($node, 'trueEquivalent'));
+        $this->assertEquals(['enabled' => true], $this->getField($node, 'nullEquivalent'));
 
         $nodeChildren = $this->getField($node, 'children');
         $this->assertArrayHasKey('enabled', $nodeChildren);
@@ -230,6 +232,25 @@ class ArrayNodeDefinitionTest extends TestCase
 
         $this->assertEquals($node, $result);
         $this->assertFalse($this->getField($node, 'normalizeKeys'));
+    }
+
+    public function testUnsetChild()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->children()
+                ->scalarNode('value')
+                    ->beforeNormalization()
+                        ->ifTrue(function ($value) {
+                            return empty($value);
+                        })
+                        ->thenUnset()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
+        $this->assertSame([], $node->getNode()->normalize(['value' => null]));
     }
 
     public function testPrototypeVariable()
@@ -276,14 +297,14 @@ class ArrayNodeDefinitionTest extends TestCase
 
     public function getEnableableNodeFixtures()
     {
-        return array(
-            array(array('enabled' => true, 'foo' => 'bar'), array(true), 'true enables an enableable node'),
-            array(array('enabled' => true, 'foo' => 'bar'), array(null), 'null enables an enableable node'),
-            array(array('enabled' => true, 'foo' => 'bar'), array(array('enabled' => true)), 'An enableable node can be enabled'),
-            array(array('enabled' => true, 'foo' => 'baz'), array(array('foo' => 'baz')), 'any configuration enables an enableable node'),
-            array(array('enabled' => false, 'foo' => 'baz'), array(array('foo' => 'baz', 'enabled' => false)), 'An enableable node can be disabled'),
-            array(array('enabled' => false, 'foo' => 'bar'), array(false), 'false disables an enableable node'),
-        );
+        return [
+            [['enabled' => true, 'foo' => 'bar'], [true], 'true enables an enableable node'],
+            [['enabled' => true, 'foo' => 'bar'], [null], 'null enables an enableable node'],
+            [['enabled' => true, 'foo' => 'bar'], [['enabled' => true]], 'An enableable node can be enabled'],
+            [['enabled' => true, 'foo' => 'baz'], [['foo' => 'baz']], 'any configuration enables an enableable node'],
+            [['enabled' => false, 'foo' => 'baz'], [['foo' => 'baz', 'enabled' => false]], 'An enableable node can be disabled'],
+            [['enabled' => false, 'foo' => 'bar'], [false], 'false disables an enableable node'],
+        ];
     }
 
     public function testRequiresAtLeastOneElement()
@@ -293,7 +314,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->requiresAtLeastOneElement()
             ->integerPrototype();
 
-        $node->getNode()->finalize(array(1));
+        $node->getNode()->finalize([1]);
 
         $this->addToAssertionCount(1);
     }
@@ -309,7 +330,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->cannotBeEmpty()
             ->integerPrototype();
 
-        $node->getNode()->finalize(array());
+        $node->getNode()->finalize([]);
     }
 
     public function testSetDeprecated()
@@ -335,7 +356,86 @@ class ArrayNodeDefinitionTest extends TestCase
         $node = new ArrayNodeDefinition('root');
         $node->cannotBeEmpty();
 
-        $node->getNode()->finalize(array());
+        $node->getNode()->finalize([]);
+    }
+
+    public function testFindShouldThrowExceptionIfNodeDoesNotExistInRootNode()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Node with name "child" does not exist in the current node "root".');
+
+        $rootNode = new ArrayNodeDefinition('root');
+        $rootNode
+            ->children()
+                ->arrayNode('social_media_channels')->end()
+            ->end()
+        ;
+
+        $rootNode->find('child');
+    }
+
+    public function testFindShouldHandleComplexConfigurationProperly()
+    {
+        $rootNode = new ArrayNodeDefinition('root');
+        $rootNode
+            ->children()
+                ->arrayNode('social_media_channels')
+                    ->children()
+                        ->booleanNode('enable')->end()
+                        ->arrayNode('twitter')->end()
+                        ->arrayNode('facebook')->end()
+                        ->arrayNode('instagram')
+                            ->children()
+                                ->booleanNode('enable')->end()
+                                ->arrayNode('accounts')->end()
+                            ->end()
+                    ->end()
+                ->end()
+                ->append(
+                    $mailerNode = (new ArrayNodeDefinition('mailer'))
+                        ->children()
+                            ->booleanNode('enable')->end()
+                            ->arrayNode('transports')->end()
+                        ->end()
+                )
+            ->end()
+        ;
+
+        $this->assertNode('social_media_channels', ArrayNodeDefinition::class, $rootNode->find('social_media_channels'));
+        $this->assertNode('enable', BooleanNodeDefinition::class, $rootNode->find('social_media_channels.enable'));
+        $this->assertNode('twitter', ArrayNodeDefinition::class, $rootNode->find('social_media_channels.twitter'));
+        $this->assertNode('facebook', ArrayNodeDefinition::class, $rootNode->find('social_media_channels.facebook'));
+        $this->assertNode('instagram', ArrayNodeDefinition::class, $rootNode->find('social_media_channels.instagram'));
+        $this->assertNode('enable', BooleanNodeDefinition::class, $rootNode->find('social_media_channels.instagram.enable'));
+        $this->assertNode('accounts', ArrayNodeDefinition::class, $rootNode->find('social_media_channels.instagram.accounts'));
+
+        $this->assertNode('enable', BooleanNodeDefinition::class, $mailerNode->find('enable'));
+        $this->assertNode('transports', ArrayNodeDefinition::class, $mailerNode->find('transports'));
+    }
+
+    public function testFindShouldWorkProperlyForNonDefaultPathSeparator()
+    {
+        $rootNode = new ArrayNodeDefinition('root');
+        $rootNode
+            ->setPathSeparator('.|')
+            ->children()
+            ->arrayNode('mailer.configuration')
+                ->children()
+                    ->booleanNode('enable')->end()
+                    ->arrayNode('transports')->end()
+                ->end()
+            ->end()
+        ;
+
+        $this->assertNode('mailer.configuration', ArrayNodeDefinition::class, $rootNode->find('mailer.configuration'));
+        $this->assertNode('enable', BooleanNodeDefinition::class, $rootNode->find('mailer.configuration.|enable'));
+        $this->assertNode('transports', ArrayNodeDefinition::class, $rootNode->find('mailer.configuration.|transports'));
+    }
+
+    protected function assertNode(string $expectedName, string $expectedType, NodeDefinition $actualNode): void
+    {
+        $this->assertInstanceOf($expectedType, $actualNode);
+        $this->assertSame($expectedName, $this->getField($actualNode, 'name'));
     }
 
     protected function getField($object, $field)

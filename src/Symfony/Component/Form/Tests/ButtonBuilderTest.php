@@ -22,14 +22,13 @@ class ButtonBuilderTest extends TestCase
 {
     public function getValidNames()
     {
-        return array(
-            array('reset'),
-            array('submit'),
-            array('foo'),
-            array('0'),
-            array(0),
-            array('button[]'),
-        );
+        return [
+            ['reset'],
+            ['submit'],
+            ['foo'],
+            ['0'],
+            [0],
+        ];
     }
 
     /**
@@ -40,13 +39,22 @@ class ButtonBuilderTest extends TestCase
         $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder($name));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The name "button[]" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").
+     */
+    public function testNameContainingIllegalCharacters()
+    {
+        $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder('button[]'));
+    }
+
     public function getInvalidNames()
     {
-        return array(
-            array(''),
-            array(false),
-            array(null),
-        );
+        return [
+            [''],
+            [false],
+            [null],
+        ];
     }
 
     /**

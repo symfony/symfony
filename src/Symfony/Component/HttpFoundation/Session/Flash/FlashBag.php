@@ -19,7 +19,7 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
 class FlashBag implements FlashBagInterface
 {
     private $name = 'flashes';
-    private $flashes = array();
+    private $flashes = [];
     private $storageKey;
 
     /**
@@ -62,7 +62,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function peek($type, array $default = array())
+    public function peek($type, array $default = [])
     {
         return $this->has($type) ? $this->flashes[$type] : $default;
     }
@@ -78,7 +78,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function get($type, array $default = array())
+    public function get($type, array $default = [])
     {
         if (!$this->has($type)) {
             return $default;
@@ -97,7 +97,7 @@ class FlashBag implements FlashBagInterface
     public function all()
     {
         $return = $this->peekAll();
-        $this->flashes = array();
+        $this->flashes = [];
 
         return $return;
     }
@@ -123,7 +123,7 @@ class FlashBag implements FlashBagInterface
      */
     public function has($type)
     {
-        return array_key_exists($type, $this->flashes) && $this->flashes[$type];
+        return \array_key_exists($type, $this->flashes) && $this->flashes[$type];
     }
 
     /**

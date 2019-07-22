@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-use Symfony\Component\DependencyInjection\ServiceSubscriberTrait;
+use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
 class TestServiceSubscriberChild extends TestServiceSubscriberParent
 {

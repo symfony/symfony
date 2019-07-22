@@ -33,9 +33,9 @@ class SerializerExtractor implements PropertyListExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = array())
+    public function getProperties(string $class, array $context = [])
     {
-        if (!isset($context['serializer_groups']) || !is_array($context['serializer_groups'])) {
+        if (!isset($context['serializer_groups']) || !\is_array($context['serializer_groups'])) {
             return;
         }
 
@@ -43,7 +43,7 @@ class SerializerExtractor implements PropertyListExtractorInterface
             return;
         }
 
-        $properties = array();
+        $properties = [];
         $serializerClassMetadata = $this->classMetadataFactory->getMetadataFor($class);
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {

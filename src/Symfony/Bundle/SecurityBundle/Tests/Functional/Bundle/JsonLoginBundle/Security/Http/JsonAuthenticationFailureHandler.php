@@ -20,6 +20,6 @@ class JsonAuthenticationFailureHandler implements AuthenticationFailureHandlerIn
 {
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new JsonResponse(array('message' => 'Something went wrong'), 500);
+        return new JsonResponse(['message' => 'Something went wrong'], 500);
     }
 }

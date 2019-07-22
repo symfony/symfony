@@ -1,6 +1,42 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * added argument `$context` to `MarkingStoreInterface::setMarking()`
+
+4.3.0
+-----
+
+ * Trigger `entered` event for subject entering in the Workflow for the first time.
+ * Added a context to `Workflow::apply()`. The `MethodMarkingStore` could be used to leverage this feature.
+ * The `TransitionEvent` is able to modify the context.
+ * Add style to transitions by declaring metadata:
+
+    use Symfony\Component\Workflow\Definition;
+    use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
+
+    $transitionsMetadata = new \SplObjectStorage();
+    $transitionsMetadata[$transition] = [
+        'color' => 'Red',
+        'arrow_color' => '#00ff00',
+    ];
+    $inMemoryMetadataStore = new InMemoryMetadataStore([], [], $transitionsMetadata);
+
+    return new Definition($places, $transitions, null, $inMemoryMetadataStore);
+ * Dispatch `GuardEvent` on `workflow.guard`
+ * Dispatch `LeaveEvent` on `workflow.leave`
+ * Dispatch `TransitionEvent` on `workflow.transition`
+ * Dispatch `EnterEvent` on `workflow.enter`
+ * Dispatch `EnteredEvent` on `workflow.entered`
+ * Dispatch `CompletedEvent` on `workflow.completed`
+ * Dispatch `AnnounceEvent` on `workflow.announce`
+ * Added support for many `initialPlaces`
+ * Deprecated `DefinitionBuilder::setInitialPlace()` method, use `DefinitionBuilder::setInitialPlaces()` instead.
+ * Deprecated the `MultipleStateMarkingStore` class, use the `MethodMarkingStore` instead.
+ * Deprecated the `SingleStateMarkingStore` class, use the `MethodMarkingStore` instead.
+
 4.1.0
 -----
 

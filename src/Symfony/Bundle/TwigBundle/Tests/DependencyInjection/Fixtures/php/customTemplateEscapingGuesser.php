@@ -1,7 +1,6 @@
 <?php
 
-$container->loadFromExtension('twig', array(
+$container->loadFromExtension('twig', [
     'autoescape_service' => 'my_project.some_bundle.template_escaping_guesser',
     'autoescape_service_method' => 'guess',
-    'strict_variables' => false, // to be removed in 5.0 relying on default
-));
+]);

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\Definition;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -26,6 +28,16 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
     use Traits\PublicTrait;
     use Traits\ShareTrait;
     use Traits\TagTrait;
+    use Traits\BindTrait;
+
+    private $path;
+
+    public function __construct(ServicesConfigurator $parent, Definition $definition, string $id, string $path = null)
+    {
+        parent::__construct($parent, $definition, $id, []);
+
+        $this->path = $path;
+    }
 
     /**
      * Defines an instanceof-conditional to be applied to following service definitions.

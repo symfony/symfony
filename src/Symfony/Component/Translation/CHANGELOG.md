@@ -1,6 +1,37 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed `TranslatorInterface`
+ * removed `MessageSelector`
+ * removed `ChoiceMessageFormatterInterface`
+ * removed `PluralizationRule`
+ * removed `Interval`
+ * removed `transChoice()` methods, use the trans() method instead with a %count% parameter
+ * removed `FileDumper::setBackup()` and `TranslationWriter::disableBackup()`
+ * removed `MessageFormatter::choiceFormat()`
+ * added argument `$filename` to `PhpExtractor::parseTokens()`
+
+4.3.0
+-----
+
+ * Improved Xliff 1.2 loader to load the original file's metadata
+ * Added `TranslatorPathsPass`
+
+4.2.0
+-----
+
+ * Started using ICU parent locales as fallback locales.
+ * allow using the ICU message format using domains with the "+intl-icu" suffix
+ * deprecated `Translator::transChoice()` in favor of using `Translator::trans()` with a `%count%` parameter
+ * deprecated `TranslatorInterface` in favor of `Symfony\Contracts\Translation\TranslatorInterface`
+ * deprecated `MessageSelector`, `Interval` and `PluralizationRules`; use `IdentityTranslator` instead
+ * Added `IntlFormatter` and `IntlFormatterInterface`
+ * added support for multiple files and directories in `XliffLintCommand`
+ * Marked `Translator::getFallbackLocales()` and `TranslationDataCollector::getFallbackLocales()` as internal
+
 4.1.0
 -----
 

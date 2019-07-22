@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class IpUtils
 {
-    private static $checkedIps = array();
+    private static $checkedIps = [];
 
     /**
      * This class should not be instantiated.
@@ -37,8 +37,8 @@ class IpUtils
      */
     public static function checkIp($requestIp, $ips)
     {
-        if (!is_array($ips)) {
-            $ips = array($ips);
+        if (!\is_array($ips)) {
+            $ips = [$ips];
         }
 
         $method = substr_count($requestIp, ':') > 1 ? 'checkIp6' : 'checkIp4';
@@ -116,7 +116,7 @@ class IpUtils
             return self::$checkedIps[$cacheKey];
         }
 
-        if (!((extension_loaded('sockets') && defined('AF_INET6')) || @inet_pton('::1'))) {
+        if (!((\extension_loaded('sockets') && \defined('AF_INET6')) || @inet_pton('::1'))) {
             throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');
         }
 

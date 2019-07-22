@@ -33,8 +33,8 @@ class DataCollectorExtension extends AbstractExtension
      */
     protected function loadTypeExtensions()
     {
-        return array(
+        return [
             new Type\DataCollectorTypeExtension($this->dataCollector),
-        );
+        ];
     }
 }

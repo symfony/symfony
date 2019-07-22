@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.49.82",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazian",
@@ -48,6 +48,7 @@
         "bug": "Buginese",
         "byn": "Blin",
         "ca": "Catalan",
+        "ccp": "Chakma",
         "ce": "Chechen",
         "ceb": "Cebuano",
         "cgg": "Chiga",
@@ -241,7 +242,6 @@
         "ms": "Malay",
         "mt": "Maltese",
         "mua": "Mundang",
-        "mul": "Maramihang Wika",
         "mus": "Creek",
         "mwl": "Mirandese",
         "my": "Burmese",
@@ -298,7 +298,6 @@
         "ro": "Romanian",
         "ro_MD": "Moldavian",
         "rof": "Rombo",
-        "root": "Root",
         "ru": "Russian",
         "rup": "Aromanian",
         "rw": "Kinyarwanda",
@@ -376,7 +375,6 @@
         "ug": "Uyghur",
         "uk": "Ukranian",
         "umb": "Umbundu",
-        "und": "Hindi Kilalang Wika",
         "ur": "Urdu",
         "uz": "Uzbek",
         "vai": "Vai",
@@ -404,7 +402,6 @@
         "zh_Hant": "Tradisyonal na Chinese",
         "zu": "Zulu",
         "zun": "Zuni",
-        "zxx": "Walang nilalaman na ukol sa wika",
         "zza": "Zaza"
     }
 }

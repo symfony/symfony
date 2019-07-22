@@ -32,10 +32,10 @@ class CollectionToArrayTransformerTest extends TestCase
 
     public function testTransform()
     {
-        $array = array(
+        $array = [
             2 => 'foo',
             3 => 'bar',
-        );
+        ];
 
         $this->assertSame($array, $this->transformer->transform(new ArrayCollection($array)));
     }
@@ -49,17 +49,17 @@ class CollectionToArrayTransformerTest extends TestCase
      */
     public function testTransformArray()
     {
-        $array = array(
+        $array = [
             2 => 'foo',
             3 => 'bar',
-        );
+        ];
 
         $this->assertSame($array, $this->transformer->transform($array));
     }
 
     public function testTransformNull()
     {
-        $this->assertSame(array(), $this->transformer->transform(null));
+        $this->assertSame([], $this->transformer->transform(null));
     }
 
     /**
@@ -72,10 +72,10 @@ class CollectionToArrayTransformerTest extends TestCase
 
     public function testReverseTransform()
     {
-        $array = array(
+        $array = [
             2 => 'foo',
             3 => 'bar',
-        );
+        ];
 
         $this->assertEquals(new ArrayCollection($array), $this->transformer->reverseTransform($array));
     }

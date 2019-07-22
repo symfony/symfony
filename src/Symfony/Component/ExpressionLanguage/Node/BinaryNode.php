@@ -20,24 +20,24 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class BinaryNode extends Node
 {
-    private static $operators = array(
+    private static $operators = [
         '~' => '.',
         'and' => '&&',
         'or' => '||',
-    );
+    ];
 
-    private static $functions = array(
+    private static $functions = [
         '**' => 'pow',
         '..' => 'range',
         'in' => 'in_array',
         'not in' => '!in_array',
-    );
+    ];
 
     public function __construct(string $operator, Node $left, Node $right)
     {
         parent::__construct(
-            array('left' => $left, 'right' => $right),
-            array('operator' => $operator)
+            ['left' => $left, 'right' => $right],
+            ['operator' => $operator]
         );
     }
 
@@ -93,7 +93,7 @@ class BinaryNode extends Node
             $right = $this->nodes['right']->evaluate($functions, $values);
 
             if ('not in' === $operator) {
-                return !in_array($left, $right);
+                return !\in_array($left, $right);
             }
             $f = self::$functions[$operator];
 
@@ -135,9 +135,9 @@ class BinaryNode extends Node
             case '<=':
                 return $left <= $right;
             case 'not in':
-                return !in_array($left, $right);
+                return !\in_array($left, $right);
             case 'in':
-                return in_array($left, $right);
+                return \in_array($left, $right);
             case '+':
                 return $left + $right;
             case '-':
@@ -157,6 +157,6 @@ class BinaryNode extends Node
 
     public function toArray()
     {
-        return array('(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')');
+        return ['(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')'];
     }
 }

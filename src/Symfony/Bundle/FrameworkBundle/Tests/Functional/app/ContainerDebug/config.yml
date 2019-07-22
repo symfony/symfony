@@ -1,6 +1,9 @@
 imports:
     - { resource: ../config/default.yml }
 
+parameters:
+    env(JSON): '[1, "2.5", 3]'
+
 services:
     _defaults: { public: true }
     public:
@@ -8,3 +11,12 @@ services:
     private_alias:
         alias: public
         public: false
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass
+    env:
+        class: stdClass
+        arguments:
+            - '%env(UNKNOWN)%'
+            - '%env(REAL)%'
+            - '%env(int:key:2:json:JSON)%'
+            - '%env(float:key:2:json:JSON)%'

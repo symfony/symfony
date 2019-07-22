@@ -20,8 +20,6 @@ final class PropertyAccess
 {
     /**
      * Creates a property accessor with the default configuration.
-     *
-     * @return PropertyAccessor
      */
     public static function createPropertyAccessor(): PropertyAccessor
     {

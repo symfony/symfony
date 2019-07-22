@@ -33,18 +33,18 @@ trait ClassResolverTrait
      */
     private function getClass($value)
     {
-        if (is_string($value)) {
-            if (!class_exists($value) && !interface_exists($value)) {
+        if (\is_string($value)) {
+            if (!class_exists($value) && !interface_exists($value, false)) {
                 throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $value));
             }
 
             return ltrim($value, '\\');
         }
 
-        if (!is_object($value)) {
-            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s"', gettype($value)));
+        if (!\is_object($value)) {
+            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s"', \gettype($value)));
         }
 
-        return get_class($value);
+        return \get_class($value);
     }
 }

@@ -11,12 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\HttpCache;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
-use Symfony\Component\HttpKernel\HttpCache\Esi;
-use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Manages HTTP cache objects in a Container.
@@ -37,7 +37,7 @@ class HttpCache extends BaseHttpCache
         $this->kernel = $kernel;
         $this->cacheDir = $cacheDir;
 
-        parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
+        parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge(['debug' => $kernel->isDebug()], $this->getOptions()));
     }
 
     /**
@@ -64,7 +64,7 @@ class HttpCache extends BaseHttpCache
      */
     protected function getOptions()
     {
-        return array();
+        return [];
     }
 
     protected function createSurrogate()

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Intl\Currencies;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * @Annotation
@@ -24,9 +26,18 @@ class Currency extends Constraint
 {
     const NO_SUCH_CURRENCY_ERROR = '69945ac1-2db4-405f-bec7-d2772f73df52';
 
-    protected static $errorNames = array(
+    protected static $errorNames = [
         self::NO_SUCH_CURRENCY_ERROR => 'NO_SUCH_CURRENCY_ERROR',
-    );
+    ];
 
     public $message = 'This value is not a valid currency.';
+
+    public function __construct($options = null)
+    {
+        if (!class_exists(Currencies::class)) {
+            throw new LogicException('The Intl component is required to use the Currency constraint. Try running "composer require symfony/intl".');
+        }
+
+        parent::__construct($options);
+    }
 }

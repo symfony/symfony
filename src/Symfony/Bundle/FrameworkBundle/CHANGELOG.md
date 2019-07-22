@@ -1,11 +1,89 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * Removed support to load translation resources from the legacy directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`
+ * Removed `ControllerNameParser`.
+ * Removed `ResolveControllerNameSubscriber`
+ * Removed support for `bundle:controller:action` to reference controllers. Use `serviceOrFqcn::method` instead
+ * Removed support for PHP templating, use Twig instead
+ * Removed `Controller`, use `AbstractController` instead
+ * Removed `Client`, use `KernelBrowser` instead
+ * Removed `ContainerAwareCommand`, use dependency injection instead
+ * Removed the `validation.strict_email` option, use `validation.email_validation_mode` instead
+ * Removed the `cache.app.simple` service and its corresponding PSR-16 autowiring alias
+ * Removed cache-related compiler passes and `RequestDataCollector`
+ * Removed the `translator.selector` and `session.save_listener` services
+ * Removed `SecurityUserValueResolver`, use `UserValueResolver` instead
+
+4.4.0
+-----
+
+ * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
+ * Deprecated the `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
+ * Deprecated the `controller_name_converter` and `resolve_controller_name_subscriber` services
+ * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`
+ * Added support for configuring chained cache pools
+ * Deprecated booting the kernel before running `WebTestCase::createClient()`
+
+4.3.0
+-----
+
+ * Deprecated the `framework.templating` option, use Twig instead.
+ * Added `WebTestAssertionsTrait` (included by default in `WebTestCase`)
+ * Renamed `Client` to `KernelBrowser`
+ * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
+   be mandatory in 5.0.
+ * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead
+ * Added the ability to specify a custom `serializer` option for each
+   transport under`framework.messenger.transports`.
+ * Added the `RegisterLocaleAwareServicesPass` and configured the `LocaleAwareListener`
+ * [BC Break] When using Messenger, the default transport changed from
+   using Symfony's serializer service to use `PhpSerializer`, which uses
+   PHP's native `serialize()` and `unserialize()` functions. To use the
+   original serialization method, set the `framework.messenger.default_serializer`
+   config option to `messenger.transport.symfony_serializer`. Or set the
+   `serializer` option under one specific `transport`.
+ * [BC Break] The `framework.messenger.serializer` config key changed to
+   `framework.messenger.default_serializer`, which holds the string service
+   id and `framework.messenger.symfony_serializer`, which configures the
+   options if you're using Symfony's serializer.
+ * [BC Break] Removed the `framework.messenger.routing.send_and_handle` configuration.
+   Instead of setting it to true, configure a `SyncTransport` and route messages to it.
+ * Added information about deprecated aliases in `debug:autowiring` 
+ * Added php ini session options `sid_length` and `sid_bits_per_character` 
+   to the `session` section of the configuration
+ * Added support for Translator paths, Twig paths in translation commands.
+ * Added support for PHP files with translations in translation commands.
+ * Added support for boolean container parameters within routes.
+ * Added the `messenger:setup-transports` command to setup messenger transports
+ * Added a `InMemoryTransport` to Messenger. Use it with a DSN starting with `in-memory://`.
+ * Added `framework.property_access.throw_exception_on_invalid_property_path` config option.
+ * Added `cache:pool:list` command to list all available cache pools.
+
 4.2.0
 -----
 
+ * Added a `AbstractController::addLink()` method to add Link headers to the current response
  * Allowed configuring taggable cache pools via a new `framework.cache.pools.tags` option (bool|service-id)
+ * Allowed configuring PDO-based cache pools via a new `cache.adapter.pdo` abstract service
  * Deprecated auto-injection of the container in AbstractController instances, register them as service subscribers instead
+ * Deprecated processing of services tagged `security.expression_language_provider` in favor of a new `AddExpressionLanguageProvidersPass` in SecurityBundle.
+ * Deprecated the `Symfony\Bundle\FrameworkBundle\Controller\Controller` class in favor of `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`.
+ * Enabled autoconfiguration for `Psr\Log\LoggerAwareInterface`
+ * Added new "auto" mode for `framework.session.cookie_secure` to turn it on when HTTPS is used
+ * Removed the `framework.messenger.encoder` and `framework.messenger.decoder` options. Use the `framework.messenger.serializer.id` option to replace the Messenger serializer.
+ * Deprecated the `ContainerAwareCommand` class in favor of `Symfony\Component\Console\Command\Command`
+ * Made `debug:container` and `debug:autowiring` ignore backslashes in service ids
+ * Deprecated the `Templating\Helper\TranslatorHelper::transChoice()` method, use the `trans()` one instead with a `%count%` parameter
+ * Deprecated `CacheCollectorPass`. Use `Symfony\Component\Cache\DependencyInjection\CacheCollectorPass` instead.
+ * Deprecated `CachePoolClearerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass` instead.
+ * Deprecated `CachePoolPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolPass` instead.
+ * Deprecated `CachePoolPrunerPass`. Use `Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass` instead.
+ * Deprecated support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
+ * Deprecated support for the legacy directory structure in `translation:update` and `debug:translation` commands.
 
 4.1.0
 -----
@@ -24,6 +102,7 @@ CHANGELOG
  * Deprecated `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
  * The `container.service_locator` tag of `ServiceLocator`s is now autoconfigured.
  * Add the ability to search a route in `debug:router`.
+ * Add the ability to use SameSite cookies for sessions.
 
 4.0.0
 -----
@@ -66,17 +145,17 @@ CHANGELOG
  * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
  * Deprecated `AddCacheClearerPass`, use tagged iterator arguments instead.
  * Deprecated `AddCacheWarmerPass`, use tagged iterator arguments instead.
- * Deprecated `TranslationDumperPass`, use 
+ * Deprecated `TranslationDumperPass`, use
    `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` instead
- * Deprecated `TranslationExtractorPass`, use 
+ * Deprecated `TranslationExtractorPass`, use
    `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` instead
- * Deprecated `TranslatorPass`, use 
+ * Deprecated `TranslatorPass`, use
    `Symfony\Component\Translation\DependencyInjection\TranslatorPass` instead
  * Added `command` attribute to the `console.command` tag which takes the command
    name as value, using it makes the command lazy
  * Added `cache:pool:prune` command to allow manual stale cache item pruning of supported PSR-6 and PSR-16 cache pool
    implementations
- * Deprecated `Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader`, use 
+ * Deprecated `Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader`, use
    `Symfony\Component\Translation\Reader\TranslationReader` instead
  * Deprecated `translation.loader` service, use `translation.reader` instead
  * `AssetsInstallCommand::__construct()` now takes an instance of
@@ -117,7 +196,7 @@ CHANGELOG
    The default value will be `state_machine` in Symfony 4.0.
  * Deprecated the `CompilerDebugDumpPass` class
  * Deprecated the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter
- * Added a new new version strategy option called json_manifest_path
+ * Added a new version strategy option called "json_manifest_path"
    that allows you to use the `JsonManifestVersionStrategy`.
  * Added `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`. It provides
    the same helpers as the `Controller` class, but does not allow accessing the dependency

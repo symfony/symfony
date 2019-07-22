@@ -30,7 +30,7 @@ class ManagerRegistryTest extends TestCase
     {
         $container = new \LazyServiceProjectServiceContainer();
 
-        $registry = new TestManagerRegistry('name', array(), array('defaultManager' => 'foo'), 'defaultConnection', 'defaultManager', 'proxyInterfaceName');
+        $registry = new TestManagerRegistry('name', [], ['defaultManager' => 'foo'], 'defaultConnection', 'defaultManager', 'proxyInterfaceName');
         $registry->setTestContainer($container);
 
         $foo = $container->get('foo');

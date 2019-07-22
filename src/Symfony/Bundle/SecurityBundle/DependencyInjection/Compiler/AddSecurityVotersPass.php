@@ -12,10 +12,12 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -41,16 +43,31 @@ class AddSecurityVotersPass implements CompilerPassInterface
             throw new LogicException('No security voters found. You need to tag at least one with "security.voter".');
         }
 
+        $debug = $container->getParameter('kernel.debug');
+        $voterServices = [];
         foreach ($voters as $voter) {
-            $definition = $container->getDefinition((string) $voter);
+            $voterServiceId = (string) $voter;
+            $definition = $container->getDefinition($voterServiceId);
+
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
             if (!is_a($class, VoterInterface::class, true)) {
                 throw new LogicException(sprintf('%s must implement the %s when used as a voter.', $class, VoterInterface::class));
             }
+
+            if ($debug) {
+                $voterServices[] = new Reference($debugVoterServiceId = 'debug.security.voter.'.$voterServiceId);
+
+                $container
+                    ->register($debugVoterServiceId, TraceableVoter::class)
+                    ->addArgument($voter)
+                    ->addArgument(new Reference('event_dispatcher'));
+            } else {
+                $voterServices[] = $voter;
+            }
         }
 
-        $adm = $container->getDefinition('security.access.decision_manager');
-        $adm->replaceArgument(0, new IteratorArgument($voters));
+        $container->getDefinition('security.access.decision_manager')
+            ->replaceArgument(0, new IteratorArgument($voterServices));
     }
 }

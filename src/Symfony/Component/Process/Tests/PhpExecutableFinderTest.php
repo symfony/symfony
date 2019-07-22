@@ -27,7 +27,7 @@ class PhpExecutableFinderTest extends TestCase
         $f = new PhpExecutableFinder();
 
         $current = PHP_BINARY;
-        $args = 'phpdbg' === PHP_SAPI ? ' -qrr' : '';
+        $args = 'phpdbg' === \PHP_SAPI ? ' -qrr' : '';
 
         $this->assertEquals($current.$args, $f->find(), '::find() returns the executable PHP');
         $this->assertEquals($current, $f->find(false), '::find() returns the executable PHP');
@@ -40,10 +40,10 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        if ('phpdbg' === PHP_SAPI) {
-            $this->assertEquals($f->findArguments(), array('-qrr'), '::findArguments() returns phpdbg arguments');
+        if ('phpdbg' === \PHP_SAPI) {
+            $this->assertEquals($f->findArguments(), ['-qrr'], '::findArguments() returns phpdbg arguments');
         } else {
-            $this->assertEquals($f->findArguments(), array(), '::findArguments() returns no arguments');
+            $this->assertEquals($f->findArguments(), [], '::findArguments() returns no arguments');
         }
     }
 }

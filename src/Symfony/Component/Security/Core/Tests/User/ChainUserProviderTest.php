@@ -13,8 +13,8 @@ namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\ChainUserProvider;
 
 class ChainUserProviderTest extends TestCase
 {
@@ -25,7 +25,7 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo('foo'))
-            ->will($this->throwException(new UsernameNotFoundException('not found')))
+            ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
         $provider2 = $this->getProvider();
@@ -33,10 +33,10 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo('foo'))
-            ->will($this->returnValue($account = $this->getAccount()))
+            ->willReturn($account = $this->getAccount())
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertSame($account, $provider->loadUserByUsername('foo'));
     }
 
@@ -50,7 +50,7 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo('foo'))
-            ->will($this->throwException(new UsernameNotFoundException('not found')))
+            ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
         $provider2 = $this->getProvider();
@@ -58,10 +58,10 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo('foo'))
-            ->will($this->throwException(new UsernameNotFoundException('not found')))
+            ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $provider->loadUserByUsername('foo');
     }
 
@@ -71,17 +71,17 @@ class ChainUserProviderTest extends TestCase
         $provider1
             ->expects($this->once())
             ->method('refreshUser')
-            ->will($this->throwException(new UnsupportedUserException('unsupported')))
+            ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
-            ->will($this->returnValue($account = $this->getAccount()))
+            ->willReturn($account = $this->getAccount())
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
@@ -91,17 +91,17 @@ class ChainUserProviderTest extends TestCase
         $provider1
             ->expects($this->once())
             ->method('refreshUser')
-            ->will($this->throwException(new UsernameNotFoundException('not found')))
+            ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
-            ->will($this->returnValue($account = $this->getAccount()))
+            ->willReturn($account = $this->getAccount())
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
@@ -114,17 +114,17 @@ class ChainUserProviderTest extends TestCase
         $provider1
             ->expects($this->once())
             ->method('refreshUser')
-            ->will($this->throwException(new UnsupportedUserException('unsupported')))
+            ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
-            ->will($this->throwException(new UnsupportedUserException('unsupported')))
+            ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $provider->refreshUser($this->getAccount());
     }
 
@@ -135,7 +135,7 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('supportsClass')
             ->with($this->equalTo('foo'))
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
         $provider2 = $this->getProvider();
@@ -143,10 +143,10 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('supportsClass')
             ->with($this->equalTo('foo'))
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertTrue($provider->supportsClass('foo'));
     }
 
@@ -157,7 +157,7 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('supportsClass')
             ->with($this->equalTo('foo'))
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
         $provider2 = $this->getProvider();
@@ -165,10 +165,10 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('supportsClass')
             ->with($this->equalTo('foo'))
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertFalse($provider->supportsClass('foo'));
     }
 
@@ -178,17 +178,17 @@ class ChainUserProviderTest extends TestCase
         $provider1
             ->expects($this->once())
             ->method('refreshUser')
-            ->will($this->throwException(new UnsupportedUserException('unsupported')))
+            ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
-            ->will($this->returnValue($account = $this->getAccount()))
+            ->willReturn($account = $this->getAccount())
         ;
 
-        $provider = new ChainUserProvider(new \ArrayObject(array($provider1, $provider2)));
+        $provider = new ChainUserProvider(new \ArrayObject([$provider1, $provider2]));
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 

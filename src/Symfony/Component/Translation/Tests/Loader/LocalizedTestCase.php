@@ -17,7 +17,7 @@ abstract class LocalizedTestCase extends TestCase
 {
     protected function setUp()
     {
-        if (!extension_loaded('intl')) {
+        if (!\extension_loaded('intl')) {
             $this->markTestSkipped('Extension intl is required.');
         }
     }

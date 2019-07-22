@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -61,7 +62,7 @@ class ContainerConfigurator extends AbstractConfigurator
 
     final public function import(string $resource, string $type = null, bool $ignoreErrors = false)
     {
-        $this->loader->setCurrentDir(dirname($this->path));
+        $this->loader->setCurrentDir(\dirname($this->path));
         $this->loader->import($resource, $type, $ignoreErrors, $this->file);
     }
 
@@ -93,6 +94,16 @@ function inline(string $class = null): InlineServiceConfigurator
 }
 
 /**
+ * Creates a service locator.
+ *
+ * @param ReferenceConfigurator[] $values
+ */
+function service_locator(array $values): ServiceLocatorArgument
+{
+    return new ServiceLocatorArgument(AbstractConfigurator::processValue($values, true));
+}
+
+/**
  * Creates a lazy iterator.
  *
  * @param ReferenceConfigurator[] $values
@@ -105,9 +116,17 @@ function iterator(array $values): IteratorArgument
 /**
  * Creates a lazy iterator by tag name.
  */
-function tagged(string $tag): TaggedIteratorArgument
+function tagged_iterator(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null): TaggedIteratorArgument
 {
-    return new TaggedIteratorArgument($tag);
+    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod);
+}
+
+/**
+ * Creates a service locator by tag name.
+ */
+function tagged_locator(string $tag, string $indexAttribute, string $defaultIndexMethod = null): ServiceLocatorArgument
+{
+    return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, true));
 }
 
 /**

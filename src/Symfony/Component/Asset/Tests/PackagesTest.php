@@ -27,7 +27,7 @@ class PackagesTest extends TestCase
         $this->assertEquals($default, $packages->getPackage());
         $this->assertEquals($a, $packages->getPackage('a'));
 
-        $packages = new Packages($default, array('a' => $a));
+        $packages = new Packages($default, ['a' => $a]);
 
         $this->assertEquals($default, $packages->getPackage());
         $this->assertEquals($a, $packages->getPackage('a'));
@@ -37,7 +37,7 @@ class PackagesTest extends TestCase
     {
         $packages = new Packages(
             new Package(new StaticVersionStrategy('default')),
-            array('a' => new Package(new StaticVersionStrategy('a')))
+            ['a' => new Package(new StaticVersionStrategy('a'))]
         );
 
         $this->assertEquals('default', $packages->getVersion('/foo'));
@@ -48,7 +48,7 @@ class PackagesTest extends TestCase
     {
         $packages = new Packages(
             new Package(new StaticVersionStrategy('default')),
-            array('a' => new Package(new StaticVersionStrategy('a')))
+            ['a' => new Package(new StaticVersionStrategy('a'))]
         );
 
         $this->assertEquals('/foo?default', $packages->getUrl('/foo'));

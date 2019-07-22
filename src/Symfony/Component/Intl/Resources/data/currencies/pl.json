@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.15",
+    "Version": "2.1.48.42",
     "Names": {
         "ADP": [
             "ADP",
@@ -935,6 +935,10 @@
         ],
         "VEF": [
             "VEF",
+            "boliwar wenezuelski (2008–2018)"
+        ],
+        "VES": [
+            "VES",
             "boliwar wenezuelski"
         ],
         "VND": [

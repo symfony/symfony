@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-use Symfony\Component\Validator\Exception\RuntimeException;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -34,11 +34,11 @@ class ImageValidator extends FileValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Image');
         }
 
-        $violations = count($this->context->getViolations());
+        $violations = \count($this->context->getViolations());
 
         parent::validate($value, $constraint);
 
-        $failed = count($this->context->getViolations()) !== $violations;
+        $failed = \count($this->context->getViolations()) !== $violations;
 
         if ($failed || null === $value || '' === $value) {
             return;
@@ -217,8 +217,8 @@ class ImageValidator extends FileValidator
         }
 
         if ($constraint->detectCorrupted) {
-            if (!function_exists('imagecreatefromstring')) {
-                throw new RuntimeException('Corrupted images detection requires installed and enabled GD extension');
+            if (!\function_exists('imagecreatefromstring')) {
+                throw new LogicException('Corrupted images detection requires installed and enabled GD extension');
             }
 
             $resource = @imagecreatefromstring(file_get_contents($value));

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.41",
+    "Version": "2.1.48.42",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Kaukasisch-Albanisch",
@@ -15,13 +15,12 @@
         "Blis": "Bliss-Symbole",
         "Bopo": "Bopomofo",
         "Brah": "Brahmi",
-        "Brai": "Blindenschrift",
+        "Brai": "Braille",
         "Bugi": "Buginesisch",
         "Buhd": "Buhid",
         "Cakm": "Chakma",
         "Cans": "UCAS",
         "Cari": "Karisch",
-        "Cham": "Cham",
         "Cher": "Cherokee",
         "Cirt": "Cirth",
         "Copt": "Koptisch",
@@ -92,7 +91,6 @@
         "Merc": "Meroitisch kursiv",
         "Mero": "Meroitisch",
         "Mlym": "Malayalam",
-        "Modi": "Modi",
         "Mong": "Mongolisch",
         "Moon": "Moon",
         "Mroo": "Mro",
@@ -166,7 +164,6 @@
         "Zsye": "Emoji",
         "Zsym": "Symbole",
         "Zxxx": "Schriftlos",
-        "Zyyy": "Verbreitet",
-        "Zzzz": "Unbekannte Schrift"
+        "Zyyy": "Verbreitet"
     }
 }

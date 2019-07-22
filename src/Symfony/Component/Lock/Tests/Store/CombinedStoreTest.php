@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\Strategy\UnanimousStrategy;
-use Symfony\Component\Lock\Strategy\StrategyInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\CombinedStore;
 use Symfony\Component\Lock\Store\RedisStore;
-use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\Strategy\StrategyInterface;
+use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -46,7 +47,7 @@ class CombinedStoreTest extends AbstractStoreTest
             self::markTestSkipped($e->getMessage());
         }
 
-        return new CombinedStore(array(new RedisStore($redis)), new UnanimousStrategy());
+        return new CombinedStore([new RedisStore($redis)], new UnanimousStrategy());
     }
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -58,13 +59,13 @@ class CombinedStoreTest extends AbstractStoreTest
     /** @var CombinedStore */
     private $store;
 
-    public function setup()
+    protected function setUp()
     {
         $this->strategy = $this->getMockBuilder(StrategyInterface::class)->getMock();
-        $this->store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
-        $this->store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $this->store1 = $this->getMockBuilder([PersistingStoreInterface::class, BlockingStoreInterface::class])->getMock();
+        $this->store2 = $this->getMockBuilder([PersistingStoreInterface::class, BlockingStoreInterface::class])->getMock();
 
-        $this->store = new CombinedStore(array($this->store1, $this->store2), $this->strategy);
+        $this->store = new CombinedStore([$this->store1, $this->store2], $this->strategy);
     }
 
     /**
@@ -266,10 +267,10 @@ class CombinedStoreTest extends AbstractStoreTest
 
     public function testPutOffExpirationIgnoreNonExpiringStorage()
     {
-        $store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
-        $store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $store1 = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store2 = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
 
-        $store = new CombinedStore(array($store1, $store2), $this->strategy);
+        $store = new CombinedStore([$store1, $store2], $this->strategy);
 
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);

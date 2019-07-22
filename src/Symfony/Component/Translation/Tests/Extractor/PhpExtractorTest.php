@@ -39,8 +39,8 @@ EOF;
 nowdoc key with whitespace and nonescaped \$\n sequences
 EOF;
         // Assert
-        $expectedCatalogue = array(
-            'messages' => array(
+        $expectedCatalogue = [
+            'messages' => [
                 'single-quoted key' => 'prefixsingle-quoted key',
                 'double-quoted key' => 'prefixdouble-quoted key',
                 'heredoc key' => 'prefixheredoc key',
@@ -50,29 +50,30 @@ EOF;
                 'single-quoted key with "quote mark at the end"' => 'prefixsingle-quoted key with "quote mark at the end"',
                 $expectedHeredoc => 'prefix'.$expectedHeredoc,
                 $expectedNowdoc => 'prefix'.$expectedNowdoc,
-                '{0} There is no apples|{1} There is one apple|]1,Inf[ There are %count% apples' => 'prefix{0} There is no apples|{1} There is one apple|]1,Inf[ There are %count% apples',
-            ),
-            'not_messages' => array(
+                'concatenated message with heredoc and nowdoc' => 'prefixconcatenated message with heredoc and nowdoc',
+                'default domain' => 'prefixdefault domain',
+            ],
+            'not_messages' => [
                 'other-domain-test-no-params-short-array' => 'prefixother-domain-test-no-params-short-array',
                 'other-domain-test-no-params-long-array' => 'prefixother-domain-test-no-params-long-array',
                 'other-domain-test-params-short-array' => 'prefixother-domain-test-params-short-array',
                 'other-domain-test-params-long-array' => 'prefixother-domain-test-params-long-array',
-                'other-domain-test-trans-choice-short-array-%count%' => 'prefixother-domain-test-trans-choice-short-array-%count%',
-                'other-domain-test-trans-choice-long-array-%count%' => 'prefixother-domain-test-trans-choice-long-array-%count%',
                 'typecast' => 'prefixtypecast',
-                'msg1' => 'prefixmsg1',
-                'msg2' => 'prefixmsg2',
-            ),
-        );
+            ],
+        ];
         $actualCatalogue = $catalogue->all();
 
         $this->assertEquals($expectedCatalogue, $actualCatalogue);
+
+        $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translation.html.php';
+        $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('single-quoted key'));
+        $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
     }
 
     public function resourcesProvider()
     {
         $directory = __DIR__.'/../fixtures/extractor/';
-        $splFiles = array();
+        $splFiles = [];
         foreach (new \DirectoryIterator($directory) as $fileInfo) {
             if ($fileInfo->isDot()) {
                 continue;
@@ -83,13 +84,13 @@ EOF;
             $splFiles[] = $fileInfo->getFileInfo();
         }
 
-        return array(
-            array($directory),
-            array($phpFile),
-            array(glob($directory.'*')),
-            array($splFiles),
-            array(new \ArrayObject(glob($directory.'*'))),
-            array(new \ArrayObject($splFiles)),
-        );
+        return [
+            [$directory],
+            [$phpFile],
+            [glob($directory.'*')],
+            [$splFiles],
+            [new \ArrayObject(glob($directory.'*'))],
+            [new \ArrayObject($splFiles)],
+        ];
     }
 }

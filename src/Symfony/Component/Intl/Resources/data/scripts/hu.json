@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.48.42",
     "Names": {
         "Arab": "Arab",
         "Armi": "Birodalmi arámi",
@@ -131,7 +131,6 @@
         "Zsye": "Emoji",
         "Zsym": "Szimbólum",
         "Zxxx": "Íratlan nyelvek kódja",
-        "Zyyy": "Meghatározatlan",
-        "Zzzz": "Ismeretlen írásrendszer"
+        "Zyyy": "Meghatározatlan"
     }
 }

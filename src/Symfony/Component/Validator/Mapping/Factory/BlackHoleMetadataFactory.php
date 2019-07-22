@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping\Factory;
 
+use Symfony\Component\Validator\Exception\LogicException;
+
 /**
  * Metadata factory that does not store metadata.
  *
@@ -27,7 +29,7 @@ class BlackHoleMetadataFactory implements MetadataFactoryInterface
      */
     public function getMetadataFor($value)
     {
-        throw new \LogicException('This class does not support metadata.');
+        throw new LogicException('This class does not support metadata.');
     }
 
     /**

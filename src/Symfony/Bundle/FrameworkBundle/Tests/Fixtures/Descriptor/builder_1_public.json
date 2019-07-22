@@ -14,6 +14,18 @@
             "factory_method": "get",
             "tags": []
         },
+        "definition_without_class": {
+            "class": "",
+            "public": false,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "file": null,
+            "tags": []
+        },
         "service_container": {
             "class": "Symfony\\Component\\DependencyInjection\\ContainerInterface",
             "public": true,
@@ -23,6 +35,7 @@
             "abstract": false,
             "autowire": false,
             "autoconfigure": false,
+            "description": "ContainerInterface is the interface implemented by service container classes.",
             "file": null,
             "tags": []
         }

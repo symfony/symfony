@@ -15,10 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -36,8 +36,8 @@ class YamlLintCommandTest extends TestCase
         $filename = $this->createFile('foo: bar');
 
         $tester->execute(
-            array('filename' => $filename),
-            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
+            ['filename' => $filename],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
@@ -52,7 +52,7 @@ bar';
         $tester = $this->createCommandTester();
         $filename = $this->createFile($incorrectContent);
 
-        $tester->execute(array('filename' => $filename), array('decorated' => false));
+        $tester->execute(['filename' => $filename], ['decorated' => false]);
 
         $this->assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
         $this->assertContains('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
@@ -67,7 +67,7 @@ bar';
         $filename = $this->createFile('');
         unlink($filename);
 
-        $tester->execute(array('filename' => $filename), array('decorated' => false));
+        $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
 
     public function testGetHelp()
@@ -103,8 +103,8 @@ EOF;
     {
         $tester = $this->createCommandTester($this->getKernelAwareApplicationMock());
         $tester->execute(
-            array('filename' => '@AppBundle/Resources'),
-            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
+            ['filename' => '@AppBundle/Resources'],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
@@ -186,7 +186,7 @@ EOF;
     protected function setUp()
     {
         @mkdir(sys_get_temp_dir().'/yml-lint-test');
-        $this->files = array();
+        $this->files = [];
     }
 
     protected function tearDown()

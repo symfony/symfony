@@ -77,8 +77,8 @@ class FormLoginAuthenticatorTest extends TestCase
 
     protected function setUp()
     {
-        $this->requestWithoutSession = new Request(array(), array(), array(), array(), array(), array());
-        $this->requestWithSession = new Request(array(), array(), array(), array(), array(), array());
+        $this->requestWithoutSession = new Request([], [], [], [], [], []);
+        $this->requestWithSession = new Request([], [], [], [], [], []);
 
         $session = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\Session\\SessionInterface')
             ->disableOriginalConstructor()
@@ -90,12 +90,6 @@ class FormLoginAuthenticatorTest extends TestCase
             ->setLoginUrl(self::LOGIN_URL)
             ->setDefaultSuccessRedirectUrl(self::DEFAULT_SUCCESS_URL)
         ;
-    }
-
-    protected function tearDown()
-    {
-        $this->request = null;
-        $this->requestWithSession = null;
     }
 }
 
@@ -109,7 +103,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
         return true;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
     {
     }
 

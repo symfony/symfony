@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'assets' => array(
+$container->loadFromExtension('framework', [
+    'assets' => [
         'enabled' => false,
-    ),
-));
+    ],
+]);

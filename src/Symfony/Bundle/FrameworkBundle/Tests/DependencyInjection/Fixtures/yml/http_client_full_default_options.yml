@@ -1,0 +1,22 @@
+framework:
+    http_client:
+        default_options:
+            headers:
+                X-powered: PHP
+            max_redirects: 2
+            http_version: 2.0
+            resolve: {'localhost': '127.0.0.1'}
+            proxy: proxy.org
+            timeout: 3.5
+            bindto: 127.0.0.1
+            verify_peer: true
+            verify_host: true
+            cafile: /etc/ssl/cafile
+            capath: /etc/ssl
+            local_cert: /etc/ssl/cert.pem
+            local_pk: /etc/ssl/private_key.pem
+            passphrase: password123456
+            ciphers: 'RC4-SHA:TLS13-AES-128-GCM-SHA256'
+            peer_fingerprint:
+                pin-sha256: ['14s5erg62v1v8471g2revg48r7==', 'jsda84hjtyd4821bgfesd215bsfg5412=']
+                md5: 'sdhtb481248721thbr='

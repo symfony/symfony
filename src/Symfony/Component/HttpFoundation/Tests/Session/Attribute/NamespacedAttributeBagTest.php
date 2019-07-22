@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
  */
 class NamespacedAttributeBagTest extends TestCase
 {
-    private $array = array();
+    private $array = [];
 
     /**
      * @var NamespacedAttributeBag
@@ -30,21 +30,21 @@ class NamespacedAttributeBagTest extends TestCase
 
     protected function setUp()
     {
-        $this->array = array(
+        $this->array = [
             'hello' => 'world',
             'always' => 'be happy',
             'user.login' => 'drak',
-            'csrf.token' => array(
+            'csrf.token' => [
                 'a' => '1234',
                 'b' => '4321',
-            ),
-            'category' => array(
-                'fishing' => array(
+            ],
+            'category' => [
+                'fishing' => [
                     'first' => 'cod',
                     'second' => 'sole',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->bag = new NamespacedAttributeBag('_sf2', '/');
         $this->bag->initialize($this->array);
     }
@@ -52,7 +52,7 @@ class NamespacedAttributeBagTest extends TestCase
     protected function tearDown()
     {
         $this->bag = null;
-        $this->array = array();
+        $this->array = [];
     }
 
     public function testInitialize()
@@ -60,7 +60,7 @@ class NamespacedAttributeBagTest extends TestCase
         $bag = new NamespacedAttributeBag();
         $bag->initialize($this->array);
         $this->assertEquals($this->array, $this->bag->all());
-        $array = array('should' => 'not stick');
+        $array = ['should' => 'not stick'];
         $bag->initialize($array);
 
         // should have remained the same
@@ -85,6 +85,17 @@ class NamespacedAttributeBagTest extends TestCase
     /**
      * @dataProvider attributesProvider
      */
+    public function testHasNoSideEffect($key, $value, $expected)
+    {
+        $expected = json_encode($this->bag->all());
+        $this->bag->has($key);
+
+        $this->assertEquals($expected, json_encode($this->bag->all()));
+    }
+
+    /**
+     * @dataProvider attributesProvider
+     */
     public function testGet($key, $value, $expected)
     {
         $this->assertEquals($value, $this->bag->get($key));
@@ -94,6 +105,17 @@ class NamespacedAttributeBagTest extends TestCase
     {
         $this->assertNull($this->bag->get('user2.login'));
         $this->assertEquals('default', $this->bag->get('user2.login', 'default'));
+    }
+
+    /**
+     * @dataProvider attributesProvider
+     */
+    public function testGetNoSideEffect($key, $value, $expected)
+    {
+        $expected = json_encode($this->bag->all());
+        $this->bag->get($key);
+
+        $this->assertEquals($expected, json_encode($this->bag->all()));
     }
 
     /**
@@ -117,7 +139,7 @@ class NamespacedAttributeBagTest extends TestCase
 
     public function testReplace()
     {
-        $array = array();
+        $array = [];
         $array['name'] = 'jack';
         $array['foo.bar'] = 'beep';
         $this->bag->replace($array);
@@ -155,28 +177,28 @@ class NamespacedAttributeBagTest extends TestCase
     public function testClear()
     {
         $this->bag->clear();
-        $this->assertEquals(array(), $this->bag->all());
+        $this->assertEquals([], $this->bag->all());
     }
 
     public function attributesProvider()
     {
-        return array(
-            array('hello', 'world', true),
-            array('always', 'be happy', true),
-            array('user.login', 'drak', true),
-            array('csrf.token', array('a' => '1234', 'b' => '4321'), true),
-            array('csrf.token/a', '1234', true),
-            array('csrf.token/b', '4321', true),
-            array('category', array('fishing' => array('first' => 'cod', 'second' => 'sole')), true),
-            array('category/fishing', array('first' => 'cod', 'second' => 'sole'), true),
-            array('category/fishing/missing/first', null, false),
-            array('category/fishing/first', 'cod', true),
-            array('category/fishing/second', 'sole', true),
-            array('category/fishing/missing/second', null, false),
-            array('user2.login', null, false),
-            array('never', null, false),
-            array('bye', null, false),
-            array('bye/for/now', null, false),
-        );
+        return [
+            ['hello', 'world', true],
+            ['always', 'be happy', true],
+            ['user.login', 'drak', true],
+            ['csrf.token', ['a' => '1234', 'b' => '4321'], true],
+            ['csrf.token/a', '1234', true],
+            ['csrf.token/b', '4321', true],
+            ['category', ['fishing' => ['first' => 'cod', 'second' => 'sole']], true],
+            ['category/fishing', ['first' => 'cod', 'second' => 'sole'], true],
+            ['category/fishing/missing/first', null, false],
+            ['category/fishing/first', 'cod', true],
+            ['category/fishing/second', 'sole', true],
+            ['category/fishing/missing/second', null, false],
+            ['user2.login', null, false],
+            ['never', null, false],
+            ['bye', null, false],
+            ['bye/for/now', null, false],
+        ];
     }
 }

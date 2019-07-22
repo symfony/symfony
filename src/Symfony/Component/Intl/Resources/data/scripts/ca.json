@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.48.42",
     "Names": {
         "Adlm": "adlam",
         "Afak": "afaka",
@@ -47,7 +47,7 @@
         "Grek": "grec",
         "Gujr": "gujarati",
         "Guru": "gurmukhi",
-        "Hanb": "hanb",
+        "Hanb": "han amb bopomofo",
         "Hang": "hangul",
         "Hani": "han",
         "Hano": "hanunoo",
@@ -172,7 +172,6 @@
         "Zsye": "emoji",
         "Zsym": "símbols",
         "Zxxx": "sense escriptura",
-        "Zyyy": "comú",
-        "Zzzz": "escriptura desconeguda"
+        "Zyyy": "comú"
     }
 }

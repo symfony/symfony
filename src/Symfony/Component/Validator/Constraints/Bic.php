@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Intl\Countries;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * @Annotation
@@ -26,14 +30,35 @@ class Bic extends Constraint
     const INVALID_BANK_CODE_ERROR = '00559357-6170-4f29-aebd-d19330aa19cf';
     const INVALID_COUNTRY_CODE_ERROR = '1ce76f8d-3c1f-451c-9e62-fe9c3ed486ae';
     const INVALID_CASE_ERROR = '11884038-3312-4ae5-9d04-699f782130c7';
+    const INVALID_IBAN_COUNTRY_CODE_ERROR = '29a2c3bb-587b-4996-b6f5-53081364cea5';
 
-    protected static $errorNames = array(
+    protected static $errorNames = [
         self::INVALID_LENGTH_ERROR => 'INVALID_LENGTH_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
         self::INVALID_BANK_CODE_ERROR => 'INVALID_BANK_CODE_ERROR',
         self::INVALID_COUNTRY_CODE_ERROR => 'INVALID_COUNTRY_CODE_ERROR',
         self::INVALID_CASE_ERROR => 'INVALID_CASE_ERROR',
-    );
+    ];
 
     public $message = 'This is not a valid Business Identifier Code (BIC).';
+    public $ibanMessage = 'This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.';
+    public $iban;
+    public $ibanPropertyPath;
+
+    public function __construct($options = null)
+    {
+        if (!class_exists(Countries::class)) {
+            throw new LogicException('The Intl component is required to use the Bic constraint. Try running "composer require symfony/intl".');
+        }
+
+        if (isset($options['iban']) && isset($options['ibanPropertyPath'])) {
+            throw new ConstraintDefinitionException('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time.');
+        }
+
+        if (isset($options['ibanPropertyPath']) && !class_exists(PropertyAccess::class)) {
+            throw new LogicException(sprintf('The "symfony/property-access" component is required to use the "%s" constraint with the "ibanPropertyPath" option.', self::class));
+        }
+
+        parent::__construct($options);
+    }
 }

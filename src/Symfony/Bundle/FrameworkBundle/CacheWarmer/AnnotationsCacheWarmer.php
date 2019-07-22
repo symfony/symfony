@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\DoctrineProvider;
 
@@ -31,13 +30,11 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     private $debug;
 
     /**
-     * @param Reader                 $annotationReader
-     * @param string                 $phpArrayFile     The PHP file where annotations are cached
-     * @param CacheItemPoolInterface $fallbackPool     The pool where runtime-discovered annotations are cached
+     * @param string $phpArrayFile The PHP file where annotations are cached
      */
-    public function __construct(Reader $annotationReader, string $phpArrayFile, CacheItemPoolInterface $fallbackPool, string $excludeRegexp = null, bool $debug = false)
+    public function __construct(Reader $annotationReader, string $phpArrayFile, string $excludeRegexp = null, bool $debug = false)
     {
-        parent::__construct($phpArrayFile, $fallbackPool);
+        parent::__construct($phpArrayFile);
         $this->annotationReader = $annotationReader;
         $this->excludeRegexp = $excludeRegexp;
         $this->debug = $debug;

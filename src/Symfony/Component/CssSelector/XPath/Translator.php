@@ -35,18 +35,18 @@ class Translator implements TranslatorInterface
     /**
      * @var ParserInterface[]
      */
-    private $shortcutParsers = array();
+    private $shortcutParsers = [];
 
     /**
      * @var Extension\ExtensionInterface[]
      */
-    private $extensions = array();
+    private $extensions = [];
 
-    private $nodeTranslators = array();
-    private $combinationTranslators = array();
-    private $functionTranslators = array();
-    private $pseudoClassTranslators = array();
-    private $attributeMatchingTranslators = array();
+    private $nodeTranslators = [];
+    private $combinationTranslators = [];
+    private $functionTranslators = [];
+    private $pseudoClassTranslators = [];
+    private $attributeMatchingTranslators = [];
 
     public function __construct(ParserInterface $parser = null)
     {
@@ -72,7 +72,7 @@ class Translator implements TranslatorInterface
         }
 
         $string = $element;
-        $parts = array();
+        $parts = [];
         while (true) {
             if (false !== $pos = strpos($string, "'")) {
                 $parts[] = sprintf("'%s'", substr($string, 0, $pos));
@@ -84,7 +84,7 @@ class Translator implements TranslatorInterface
             }
         }
 
-        return sprintf('concat(%s)', implode($parts, ', '));
+        return sprintf('concat(%s)', implode(', ', $parts));
     }
 
     /**
@@ -155,7 +155,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Node "%s" not supported.', $node->getNodeName()));
         }
 
-        return call_user_func($this->nodeTranslators[$node->getNodeName()], $node, $this);
+        return $this->nodeTranslators[$node->getNodeName()]($node, $this);
     }
 
     /**
@@ -167,7 +167,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Combiner "%s" not supported.', $combiner));
         }
 
-        return call_user_func($this->combinationTranslators[$combiner], $this->nodeToXPath($xpath), $this->nodeToXPath($combinedXpath));
+        return $this->combinationTranslators[$combiner]($this->nodeToXPath($xpath), $this->nodeToXPath($combinedXpath));
     }
 
     /**
@@ -179,7 +179,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Function "%s" not supported.', $function->getName()));
         }
 
-        return call_user_func($this->functionTranslators[$function->getName()], $xpath, $function);
+        return $this->functionTranslators[$function->getName()]($xpath, $function);
     }
 
     /**
@@ -191,7 +191,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Pseudo-class "%s" not supported.', $pseudoClass));
         }
 
-        return call_user_func($this->pseudoClassTranslators[$pseudoClass], $xpath);
+        return $this->pseudoClassTranslators[$pseudoClass]($xpath);
     }
 
     /**
@@ -203,7 +203,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Attribute matcher operator "%s" not supported.', $operator));
         }
 
-        return call_user_func($this->attributeMatchingTranslators[$operator], $xpath, $attribute, $value);
+        return $this->attributeMatchingTranslators[$operator]($xpath, $attribute, $value);
     }
 
     /**

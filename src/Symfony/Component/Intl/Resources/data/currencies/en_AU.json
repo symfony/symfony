@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.38.73",
+    "Version": "2.1.48.43",
     "Names": {
         "AUD": [
             "$",
@@ -96,6 +96,10 @@
         "UYU": [
             "UYU",
             "Peso Uruguayo"
+        ],
+        "VES": [
+            "VES",
+            "VES"
         ],
         "VND": [
             "VND",

@@ -16,28 +16,29 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.9",
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
-        "symfony/yaml": "~3.4|~4.0",
-        "symfony/config": "~3.4|~4.0",
-        "symfony/property-access": "~3.4|~4.0",
-        "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/cache": "~3.4|~4.0",
-        "symfony/property-info": "~3.4|~4.0",
-        "symfony/validator": "~3.4|~4.0",
+        "symfony/yaml": "^4.4|^5.0",
+        "symfony/config": "^4.4|^5.0",
+        "symfony/property-access": "^4.4|^5.0",
+        "symfony/http-foundation": "^4.4|^5.0",
+        "symfony/mime": "^4.4|^5.0",
+        "symfony/cache": "^4.4|^5.0",
+        "symfony/property-info": "^4.4|^5.0",
+        "symfony/validator": "^4.4|^5.0",
         "doctrine/annotations": "~1.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/dependency-injection": "^4.4|^5.0",
         "doctrine/cache": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },
     "conflict": {
         "phpdocumentor/type-resolver": "<0.2.1",
-        "symfony/dependency-injection": "<3.4",
-        "symfony/property-access": "<3.4",
-        "symfony/property-info": "<3.4",
-        "symfony/yaml": "<3.4"
+        "symfony/dependency-injection": "<4.4",
+        "symfony/property-access": "<4.4",
+        "symfony/property-info": "<4.4",
+        "symfony/yaml": "<4.4"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",
@@ -45,7 +46,7 @@
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
         "symfony/property-access": "For using the ObjectNormalizer.",
-        "symfony/http-foundation": "To use the DataUriNormalizer.",
+        "symfony/mime": "For using a MIME type guesser within the DataUriNormalizer.",
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
         "doctrine/cache": "For using the default cached annotation reader and metadata cache."
     },
@@ -58,7 +59,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     }
 }

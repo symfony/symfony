@@ -23,7 +23,7 @@ class TraceableTagAwareAdapterTest extends TraceableAdapterTest
     public function testInvalidateTags()
     {
         $pool = new TraceableTagAwareAdapter(new TagAwareAdapter(new FilesystemAdapter()));
-        $pool->invalidateTags(array('foo'));
+        $pool->invalidateTags(['foo']);
         $calls = $pool->getCalls();
         $this->assertCount(1, $calls);
 

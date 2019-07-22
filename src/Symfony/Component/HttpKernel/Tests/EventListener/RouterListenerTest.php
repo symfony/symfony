@@ -18,12 +18,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\RequestContext;
 
@@ -49,10 +49,10 @@ class RouterListenerTest extends TestCase
         $context->setHttpsPort($defaultHttpsPort);
         $urlMatcher->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $listener = new RouterListener($urlMatcher, $this->requestStack);
-        $event = $this->createGetResponseEventForUri($uri);
+        $event = $this->createRequestEventForUri($uri);
         $listener->onKernelRequest($event);
 
         $this->assertEquals($expectedHttpPort, $context->getHttpPort());
@@ -62,21 +62,21 @@ class RouterListenerTest extends TestCase
 
     public function getPortData()
     {
-        return array(
-            array(80, 443, 'http://localhost/', 80, 443),
-            array(80, 443, 'http://localhost:90/', 90, 443),
-            array(80, 443, 'https://localhost/', 80, 443),
-            array(80, 443, 'https://localhost:90/', 80, 90),
-        );
+        return [
+            [80, 443, 'http://localhost/', 80, 443],
+            [80, 443, 'http://localhost:90/', 90, 443],
+            [80, 443, 'https://localhost/', 80, 443],
+            [80, 443, 'https://localhost:90/', 80, 90],
+        ];
     }
 
-    private function createGetResponseEventForUri(string $uri): GetResponseEvent
+    private function createRequestEventForUri(string $uri): RequestEvent
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $request = Request::create($uri);
         $request->attributes->set('_controller', null); // Prevents going in to routing process
 
-        return new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        return new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
     }
 
     /**
@@ -89,15 +89,15 @@ class RouterListenerTest extends TestCase
 
     public function testRequestMatcher()
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $request = Request::create('http://localhost/');
-        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
         $requestMatcher->expects($this->once())
                        ->method('matchRequest')
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
-                       ->will($this->returnValue(array()));
+                       ->willReturn([]);
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
         $listener->onKernelRequest($event);
@@ -105,15 +105,15 @@ class RouterListenerTest extends TestCase
 
     public function testSubRequestWithDifferentMethod()
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $request = Request::create('http://localhost/', 'post');
-        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
         $requestMatcher->expects($this->any())
                        ->method('matchRequest')
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
-                       ->will($this->returnValue(array()));
+                       ->willReturn([]);
 
         $context = new RequestContext();
 
@@ -121,9 +121,9 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $request = Request::create('http://localhost/', 'get');
-        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST);
 
         $listener->onKernelRequest($event);
 
@@ -138,26 +138,26 @@ class RouterListenerTest extends TestCase
         $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
         $requestMatcher->expects($this->once())
             ->method('matchRequest')
-            ->will($this->returnValue($parameter));
+            ->willReturn($parameter);
 
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->once())
             ->method('info')
             ->with($this->equalTo($log), $this->equalTo($parameters));
 
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $request = Request::create('http://localhost/');
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext(), $logger);
-        $listener->onKernelRequest(new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function getLoggingParameterData()
     {
-        return array(
-            array(array('_route' => 'foo'), 'Matched route "{route}".', array('route' => 'foo', 'route_parameters' => array('_route' => 'foo'), 'request_uri' => 'http://localhost/', 'method' => 'GET')),
-            array(array(), 'Matched route "{route}".', array('route' => 'n/a', 'route_parameters' => array(), 'request_uri' => 'http://localhost/', 'method' => 'GET')),
-        );
+        return [
+            [['_route' => 'foo'], 'Matched route "{route}".', ['route' => 'foo', 'route_parameters' => ['_route' => 'foo'], 'request_uri' => 'http://localhost/', 'method' => 'GET']],
+            [[], 'Matched route "{route}".', ['route' => 'n/a', 'route_parameters' => [], 'request_uri' => 'http://localhost/', 'method' => 'GET']],
+        ];
     }
 
     public function testWithBadRequest()
@@ -209,9 +209,9 @@ class RouterListenerTest extends TestCase
      */
     public function testRequestWithBadHost()
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $request = Request::create('http://bad host %22/');
-        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
 

@@ -56,7 +56,7 @@ class Terminal
 
     private static function initDimensions()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {
                 // extract [w, H] from "wxh (WxH)"
                 // or [w, h] from "wxh"
@@ -87,23 +87,23 @@ class Terminal
      */
     private static function getConsoleMode()
     {
-        if (!function_exists('proc_open')) {
+        if (!\function_exists('proc_open')) {
             return;
         }
 
-        $descriptorspec = array(
-            1 => array('pipe', 'w'),
-            2 => array('pipe', 'w'),
-        );
-        $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-        if (is_resource($process)) {
+        $descriptorspec = [
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+        if (\is_resource($process)) {
             $info = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
             fclose($pipes[2]);
             proc_close($process);
 
             if (preg_match('/--------+\r?\n.+?(\d+)\r?\n.+?(\d+)\r?\n/', $info, $matches)) {
-                return array((int) $matches[2], (int) $matches[1]);
+                return [(int) $matches[2], (int) $matches[1]];
             }
         }
     }
@@ -115,17 +115,17 @@ class Terminal
      */
     private static function getSttyColumns()
     {
-        if (!function_exists('proc_open')) {
+        if (!\function_exists('proc_open')) {
             return;
         }
 
-        $descriptorspec = array(
-            1 => array('pipe', 'w'),
-            2 => array('pipe', 'w'),
-        );
+        $descriptorspec = [
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
 
-        $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-        if (is_resource($process)) {
+        $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+        if (\is_resource($process)) {
             $info = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
             fclose($pipes[2]);

@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\TraceableMessageBus;
@@ -33,15 +34,13 @@ class MessengerDataCollectorTest extends TestCase
         $this->dumper->setColors(false);
     }
 
-    /**
-     * @dataProvider getHandleTestData
-     */
-    public function testHandle($returnedValue, $expected)
+    public function testHandle()
     {
         $message = new DummyMessage('dummy message');
+        $envelope = new Envelope($message);
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->method('dispatch')->with($message)->willReturn($returnedValue);
+        $bus->method('dispatch')->with($message)->willReturn($envelope);
         $bus = new TraceableMessageBus($bus);
 
         $collector = new MessengerDataCollector();
@@ -54,15 +53,11 @@ class MessengerDataCollectorTest extends TestCase
         $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
 
-        $this->assertStringMatchesFormat($expected, $this->getDataAsString($messages[0]));
-    }
-
-    public function getHandleTestData()
-    {
         $file = __FILE__;
-        $messageDump = <<<DUMP
+        $expected = <<<DUMP
+array:4 [
   "bus" => "default"
-  "envelopeItems" => null
+  "stamps" => []
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
@@ -74,48 +69,10 @@ class MessengerDataCollectorTest extends TestCase
     "file" => "$file"
     "line" => %d
   ]
+]
 DUMP;
 
-        yield 'no returned value' => array(
-            null,
-            <<<DUMP
-array:5 [
-$messageDump
-  "result" => array:2 [
-    "type" => "NULL"
-    "value" => null
-  ]
-]
-DUMP
-        );
-
-        yield 'scalar returned value' => array(
-            'returned value',
-            <<<DUMP
-array:5 [
-$messageDump
-  "result" => array:2 [
-    "type" => "string"
-    "value" => "returned value"
-  ]
-]
-DUMP
-        );
-
-        yield 'array returned value' => array(
-            array('returned value'),
-            <<<DUMP
-array:5 [
-$messageDump
-  "result" => array:2 [
-    "type" => "array"
-    "value" => array:1 [
-      0 => "returned value"
-    ]
-  ]
-]
-DUMP
-        );
+        $this->assertStringMatchesFormat($expected, $this->getDataAsString($messages[0]));
     }
 
     public function testHandleWithException()
@@ -123,7 +80,7 @@ DUMP
         $message = new DummyMessage('dummy message');
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->method('dispatch')->with($message)->will($this->throwException(new \RuntimeException('foo')));
+        $bus->method('dispatch')->with($message)->willThrowException(new \RuntimeException('foo'));
         $bus = new TraceableMessageBus($bus);
 
         $collector = new MessengerDataCollector();
@@ -145,7 +102,7 @@ DUMP
         $this->assertStringMatchesFormat(<<<DUMP
 array:5 [
   "bus" => "default"
-  "envelopeItems" => null
+  "stamps" => []
   "message" => array:2 [
     "type" => "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"
     "value" => Symfony\Component\Messenger\Tests\Fixtures\DummyMessage %A
@@ -169,9 +126,11 @@ DUMP
     public function testKeepsOrderedDispatchCalls()
     {
         $firstBus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $firstBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
         $firstBus = new TraceableMessageBus($firstBus);
 
         $secondBus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $secondBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
         $secondBus = new TraceableMessageBus($secondBus);
 
         $collector = new MessengerDataCollector();

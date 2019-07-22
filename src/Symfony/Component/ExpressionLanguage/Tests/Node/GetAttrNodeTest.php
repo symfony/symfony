@@ -12,49 +12,49 @@
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
-use Symfony\Component\ExpressionLanguage\Node\NameNode;
-use Symfony\Component\ExpressionLanguage\Node\GetAttrNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\GetAttrNode;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
 class GetAttrNodeTest extends AbstractNodeTest
 {
     public function getEvaluateData()
     {
-        return array(
-            array('b', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), array('foo' => array('b' => 'a', 'b'))),
-            array('a', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), array('foo' => array('b' => 'a', 'b'))),
+        return [
+            ['b', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b']]],
+            ['a', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b']]],
 
-            array('bar', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
+            ['bar', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
 
-            array('baz', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), array('foo' => new Obj())),
-            array('a', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), array('foo' => array('b' => 'a', 'b'), 'index' => 'b')),
-        );
+            ['baz', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
+            ['a', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b'], 'index' => 'b']],
+        ];
     }
 
     public function getCompileData()
     {
-        return array(
-            array('$foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
-            array('$foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
+        return [
+            ['$foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['$foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)],
 
-            array('$foo->foo', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
+            ['$foo->foo', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
 
-            array('$foo->foo(array("b" => "a", 0 => "b"))', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), array('foo' => new Obj())),
-            array('$foo[$index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
-        );
+            ['$foo->foo(["b" => "a", 0 => "b"])', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
+            ['$foo[$index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)],
+        ];
     }
 
     public function getDumpData()
     {
-        return array(
-            array('foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
-            array('foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
+        return [
+            ['foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)],
+            ['foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)],
 
-            array('foo.foo', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
+            ['foo.foo', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
 
-            array('foo.foo({"b": "a", 0: "b"})', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), array('foo' => new Obj())),
-            array('foo[index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
-        );
+            ['foo.foo({"b": "a", 0: "b"})', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
+            ['foo[index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)],
+        ];
     }
 
     protected function getArrayNode()

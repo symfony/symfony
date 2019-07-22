@@ -71,7 +71,7 @@ class BooleanToStringTransformerTest extends TestCase
 
     public function testCustomFalseValues()
     {
-        $customFalseTransformer = new BooleanToStringTransformer(self::TRUE_VALUE, array('0', 'myFalse', true));
+        $customFalseTransformer = new BooleanToStringTransformer(self::TRUE_VALUE, ['0', 'myFalse', true]);
         $this->assertFalse($customFalseTransformer->reverseTransform('myFalse'));
         $this->assertFalse($customFalseTransformer->reverseTransform('0'));
         $this->assertFalse($customFalseTransformer->reverseTransform(true));
@@ -82,12 +82,12 @@ class BooleanToStringTransformerTest extends TestCase
      */
     public function testTrueValueContainedInFalseValues()
     {
-        new BooleanToStringTransformer('0', array(null, '0'));
+        new BooleanToStringTransformer('0', [null, '0']);
     }
 
     public function testBeStrictOnTrueInFalseValueCheck()
     {
-        $transformer = new BooleanToStringTransformer('0', array(null, false));
+        $transformer = new BooleanToStringTransformer('0', [null, false]);
         $this->assertInstanceOf(BooleanToStringTransformer::class, $transformer);
     }
 }

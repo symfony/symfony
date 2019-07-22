@@ -39,10 +39,10 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
      */
     public function reset()
     {
-        $this->data = array(
+        $this->data = [
             'memory' => 0,
             'memory_limit' => $this->convertToBytes(ini_get('memory_limit')),
-        );
+        ];
     }
 
     /**
@@ -98,9 +98,9 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         $memoryLimit = strtolower($memoryLimit);
         $max = strtolower(ltrim($memoryLimit, '+'));
         if (0 === strpos($max, '0x')) {
-            $max = intval($max, 16);
+            $max = \intval($max, 16);
         } elseif (0 === strpos($max, '0')) {
-            $max = intval($max, 8);
+            $max = \intval($max, 8);
         } else {
             $max = (int) $max;
         }

@@ -41,15 +41,15 @@ class PropertyPathTest extends TestCase
 
     public function providePathsContainingUnexpectedCharacters()
     {
-        return array(
-            array('property.'),
-            array('property.['),
-            array('property..'),
-            array('property['),
-            array('property[['),
-            array('property[.'),
-            array('property[]'),
-        );
+        return [
+            ['property.'],
+            ['property.['],
+            ['property..'],
+            ['property['],
+            ['property[['],
+            ['property[.'],
+            ['property[]'],
+        ];
     }
 
     /**

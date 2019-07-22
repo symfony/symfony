@@ -44,12 +44,12 @@ class ConstraintViolation implements ConstraintViolationInterface
      *                                         violation
      * @param int|null        $plural          The number for determining the plural
      *                                         form when translating the message
-     * @param mixed           $code            The error code of the violation
+     * @param string|null     $code            The error code of the violation
      * @param Constraint|null $constraint      The constraint whose validation
      *                                         caused the violation
      * @param mixed           $cause           The cause of the violation
      */
-    public function __construct(?string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, $code = null, Constraint $constraint = null, $cause = null)
+    public function __construct(string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, string $code = null, Constraint $constraint = null, $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;
@@ -70,22 +70,21 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function __toString()
     {
-        if (is_object($this->root)) {
-            $class = 'Object('.get_class($this->root).')';
-        } elseif (is_array($this->root)) {
+        if (\is_object($this->root)) {
+            $class = 'Object('.\get_class($this->root).')';
+        } elseif (\is_array($this->root)) {
             $class = 'Array';
         } else {
             $class = (string) $this->root;
         }
 
         $propertyPath = (string) $this->propertyPath;
-        $code = $this->code;
 
         if ('' !== $propertyPath && '[' !== $propertyPath[0] && '' !== $class) {
             $class .= '.';
         }
 
-        if (!empty($code)) {
+        if (null !== ($code = $this->code) && '' !== $code) {
             $code = ' (code '.$code.')';
         }
 

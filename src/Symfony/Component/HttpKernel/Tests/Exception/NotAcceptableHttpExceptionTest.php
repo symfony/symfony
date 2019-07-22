@@ -6,8 +6,8 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class NotAcceptableHttpExceptionTest extends HttpExceptionTest
 {
-    protected function createException()
+    protected function createException(string $message = null, \Throwable $previous = null, ?int $code = 0, array $headers = [])
     {
-        return new NotAcceptableHttpException();
+        return new NotAcceptableHttpException($message, $previous, $code, $headers);
     }
 }

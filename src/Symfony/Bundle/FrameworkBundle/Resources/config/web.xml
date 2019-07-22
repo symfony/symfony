@@ -2,20 +2,14 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
 
-        <service id="controller_name_converter" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser">
-            <tag name="monolog.logger" channel="request" />
-            <argument type="service" id="kernel" />
-        </service>
-
         <service id="controller_resolver" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver">
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="service_container" />
-            <argument type="service" id="controller_name_converter" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
@@ -71,8 +65,7 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
-        <service id="resolve_controller_name_subscriber" class="Symfony\Bundle\FrameworkBundle\EventListener\ResolveControllerNameSubscriber">
-            <argument type="service" id="controller_name_converter" />
+        <service id="disallow_search_engine_index_response_listener" class="Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener">
             <tag name="kernel.event_subscriber" />
         </service>
     </services>

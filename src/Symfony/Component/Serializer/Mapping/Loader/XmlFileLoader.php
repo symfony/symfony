@@ -66,12 +66,17 @@ class XmlFileLoader extends FileLoader
                 if (isset($attribute['max-depth'])) {
                     $attributeMetadata->setMaxDepth((int) $attribute['max-depth']);
                 }
+
+                if (isset($attribute['serialized-name'])) {
+                    $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
+                }
             }
 
             if (isset($xml->{'discriminator-map'})) {
-                $mapping = array();
+                $mapping = [];
                 foreach ($xml->{'discriminator-map'}->mapping as $element) {
-                    $mapping[(string) $element->attributes()->type] = (string) $element->attributes()->class;
+                    $elementAttributes = $element->attributes();
+                    $mapping[(string) $elementAttributes->type] = (string) $elementAttributes->class;
                 }
 
                 $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
@@ -123,7 +128,7 @@ class XmlFileLoader extends FileLoader
     private function getClassesFromXml()
     {
         $xml = $this->parseFile($this->file);
-        $classes = array();
+        $classes = [];
 
         foreach ($xml->class as $class) {
             $classes[(string) $class['name']] = $class;

@@ -24,11 +24,11 @@ class FileLoaderTest extends TestCase
 
         $locatorMockForAdditionalLoader = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
         $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
-                array('path/to/file1'),                    // Default
-                array('path/to/file1', 'path/to/file2'),   // First is imported
-                array('path/to/file1', 'path/to/file2'),   // Second is imported
-                array('path/to/file1'),                    // Exception
-                array('path/to/file1', 'path/to/file2')    // Exception
+                ['path/to/file1'],                    // Default
+                ['path/to/file1', 'path/to/file2'],   // First is imported
+                ['path/to/file1', 'path/to/file2'],   // Second is imported
+                ['path/to/file1'],                    // Exception
+                ['path/to/file1', 'path/to/file2']    // Exception
                 ));
 
         $fileLoader = new TestFileLoader($locatorMock);
@@ -38,7 +38,7 @@ class FileLoaderTest extends TestCase
         $additionalLoader = new TestFileLoader($locatorMockForAdditionalLoader);
         $additionalLoader->setCurrentDir('.');
 
-        $fileLoader->setResolver($loaderResolver = new LoaderResolver(array($fileLoader, $additionalLoader)));
+        $fileLoader->setResolver($loaderResolver = new LoaderResolver([$fileLoader, $additionalLoader]));
 
         // Default case
         $this->assertSame('path/to/file1', $fileLoader->import('my_resource'));
@@ -71,6 +71,7 @@ class FileLoaderTest extends TestCase
     public function testImportWithGlobLikeResource()
     {
         $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock->expects($this->once())->method('locate')->willReturn('');
         $loader = new TestFileLoader($locatorMock);
 
         $this->assertSame('[foo]', $loader->import('[foo]'));
@@ -79,6 +80,7 @@ class FileLoaderTest extends TestCase
     public function testImportWithNoGlobMatch()
     {
         $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock->expects($this->once())->method('locate')->willReturn('');
         $loader = new TestFileLoader($locatorMock);
 
         $this->assertNull($loader->import('./*.abc'));
@@ -88,7 +90,7 @@ class FileLoaderTest extends TestCase
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__));
 
-        $this->assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', DIRECTORY_SEPARATOR));
+        $this->assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', \DIRECTORY_SEPARATOR));
     }
 }
 
@@ -96,12 +98,12 @@ class TestFileLoader extends FileLoader
 {
     private $supports = true;
 
-    public function load($resource, $type = null)
+    public function load($resource, string $type = null)
     {
         return $resource;
     }
 
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return $this->supports;
     }
@@ -118,7 +120,7 @@ class TestFileLoader extends FileLoader
 
     public function clearLoading()
     {
-        self::$loading = array();
+        self::$loading = [];
     }
 
     public function setSupports($supports)

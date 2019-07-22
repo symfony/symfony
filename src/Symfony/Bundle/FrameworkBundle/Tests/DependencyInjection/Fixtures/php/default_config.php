@@ -1,3 +1,3 @@
 <?php
 
-$container->loadFromExtension('framework', array());
+$container->loadFromExtension('framework', []);

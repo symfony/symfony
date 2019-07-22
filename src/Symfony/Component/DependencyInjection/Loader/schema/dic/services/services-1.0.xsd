@@ -124,7 +124,7 @@
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="synthetic" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="abstract" type="boolean" />
     <xsd:attribute name="alias" type="xsd:string" />
     <xsd:attribute name="parent" type="xsd:string" />
@@ -141,11 +141,12 @@
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" use="required" />
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
   </xsd:complexType>
@@ -167,7 +168,7 @@
     <xsd:attribute name="exclude" type="xsd:string" />
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
-    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="lazy" type="xsd:string" />
     <xsd:attribute name="abstract" type="boolean" />
     <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
@@ -233,6 +234,8 @@
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
     <xsd:attribute name="tag" type="xsd:string" />
+    <xsd:attribute name="index-by" type="xsd:string" />
+    <xsd:attribute name="default-index-method" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">
@@ -240,6 +243,7 @@
       <xsd:element name="argument" type="argument" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="returns-clone" type="boolean" />
   </xsd:complexType>
 
   <xsd:simpleType name="parameter_type">
@@ -259,7 +263,9 @@
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
-      <xsd:enumeration value="tagged" />
+      <xsd:enumeration value="service_locator" />
+      <xsd:enumeration value="tagged_iterator" />
+      <xsd:enumeration value="tagged_locator" />
     </xsd:restriction>
   </xsd:simpleType>
 

@@ -28,28 +28,28 @@ class ControllerDoesNotReturnResponseException extends \LogicException
         $this->line = $controllerDefinition['line'];
         $r = new \ReflectionProperty(\Exception::class, 'trace');
         $r->setAccessible(true);
-        $r->setValue($this, array_merge(array(
-            array(
+        $r->setValue($this, array_merge([
+            [
                 'line' => $line,
                 'file' => $file,
-            ),
-        ), $this->getTrace()));
+            ],
+        ], $this->getTrace()));
     }
 
     private function parseControllerDefinition(callable $controller): ?array
     {
-        if (is_string($controller) && false !== strpos($controller, '::')) {
+        if (\is_string($controller) && false !== strpos($controller, '::')) {
             $controller = explode('::', $controller);
         }
 
-        if (is_array($controller)) {
+        if (\is_array($controller)) {
             try {
                 $r = new \ReflectionMethod($controller[0], $controller[1]);
 
-                return array(
+                return [
                     'file' => $r->getFileName(),
                     'line' => $r->getEndLine(),
-                );
+                ];
             } catch (\ReflectionException $e) {
                 return null;
             }
@@ -58,19 +58,25 @@ class ControllerDoesNotReturnResponseException extends \LogicException
         if ($controller instanceof \Closure) {
             $r = new \ReflectionFunction($controller);
 
-            return array(
+            return [
                 'file' => $r->getFileName(),
                 'line' => $r->getEndLine(),
-            );
+            ];
         }
 
-        if (is_object($controller)) {
+        if (\is_object($controller)) {
             $r = new \ReflectionClass($controller);
 
-            return array(
+            try {
+                $line = $r->getMethod('__invoke')->getEndLine();
+            } catch (\ReflectionException $e) {
+                $line = $r->getEndLine();
+            }
+
+            return [
                 'file' => $r->getFileName(),
-                'line' => $r->getEndLine(),
-            );
+                'line' => $line,
+            ];
         }
 
         return null;

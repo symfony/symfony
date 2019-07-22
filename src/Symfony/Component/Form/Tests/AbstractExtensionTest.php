@@ -35,7 +35,7 @@ class ConcreteExtension extends AbstractExtension
 {
     protected function loadTypes()
     {
-        return array(new FooType());
+        return [new FooType()];
     }
 
     protected function loadTypeGuesser()

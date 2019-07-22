@@ -13,10 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInvalidReferencesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveInvalidReferencesPassTest extends TestCase
 {
@@ -25,17 +25,17 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $container = new ContainerBuilder();
         $def = $container
             ->register('foo')
-            ->setArguments(array(
+            ->setArguments([
                 new Reference('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                 new Reference('baz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
-            ))
-            ->addMethodCall('foo', array(new Reference('moo', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
+            ])
+            ->addMethodCall('foo', [new Reference('moo', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)])
         ;
 
         $this->process($container);
 
         $arguments = $def->getArguments();
-        $this->assertSame(array(null, null), $arguments);
+        $this->assertSame([null, null], $arguments);
         $this->assertCount(0, $def->getMethodCalls());
     }
 
@@ -45,19 +45,19 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $container->register('baz');
         $def = $container
             ->register('foo')
-            ->setArguments(array(
-                array(
+            ->setArguments([
+                [
                     new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
                     $baz = new Reference('baz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
                     new Reference('moo', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                ),
-            ))
+                ],
+            ])
         ;
 
         $this->process($container);
 
         $arguments = $def->getArguments();
-        $this->assertSame(array($baz, null), $arguments[0]);
+        $this->assertSame([$baz, null], $arguments[0]);
     }
 
     public function testProcessKeepMethodCallOnInvalidArgumentInCollectionArgument()
@@ -66,20 +66,20 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $container->register('baz');
         $def = $container
             ->register('foo')
-            ->addMethodCall('foo', array(
-                array(
+            ->addMethodCall('foo', [
+                [
                     new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
                     $baz = new Reference('baz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
                     new Reference('moo', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                ),
-            ))
+                ],
+            ])
         ;
 
         $this->process($container);
 
         $calls = $def->getMethodCalls();
         $this->assertCount(1, $def->getMethodCalls());
-        $this->assertSame(array($baz, null), $calls[0][1][0]);
+        $this->assertSame([$baz, null], $calls[0][1][0]);
     }
 
     public function testProcessIgnoreNonExistentServices()
@@ -87,7 +87,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $container = new ContainerBuilder();
         $def = $container
             ->register('foo')
-            ->setArguments(array(new Reference('bar')))
+            ->setArguments([new Reference('bar')])
         ;
 
         $this->process($container);
@@ -106,7 +106,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals(array(), $def->getProperties());
+        $this->assertEquals([], $def->getProperties());
     }
 
     public function testProcessRemovesArgumentsOnInvalid()
@@ -114,17 +114,17 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $container = new ContainerBuilder();
         $def = $container
             ->register('foo')
-            ->addArgument(array(
-                array(
+            ->addArgument([
+                [
                     new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
                     new ServiceClosureArgument(new Reference('baz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
-                ),
-            ))
+                ],
+            ])
         ;
 
         $this->process($container);
 
-        $this->assertSame(array(array(array())), $def->getArguments());
+        $this->assertSame([[[]]], $def->getArguments());
     }
 
     protected function process(ContainerBuilder $container)

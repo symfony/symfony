@@ -21,16 +21,16 @@ class DiscriminatorMapTest extends TestCase
 {
     public function testGetTypePropertyAndMapping()
     {
-        $annotation = new DiscriminatorMap(array('typeProperty' => 'type', 'mapping' => array(
+        $annotation = new DiscriminatorMap(['typeProperty' => 'type', 'mapping' => [
             'foo' => 'FooClass',
             'bar' => 'BarClass',
-        )));
+        ]]);
 
         $this->assertEquals('type', $annotation->getTypeProperty());
-        $this->assertEquals(array(
+        $this->assertEquals([
             'foo' => 'FooClass',
             'bar' => 'BarClass',
-        ), $annotation->getMapping());
+        ], $annotation->getMapping());
     }
 
     /**
@@ -38,7 +38,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWithoutTypeProperty()
     {
-        new DiscriminatorMap(array('mapping' => array('foo' => 'FooClass')));
+        new DiscriminatorMap(['mapping' => ['foo' => 'FooClass']]);
     }
 
     /**
@@ -46,7 +46,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWithEmptyTypeProperty()
     {
-        new DiscriminatorMap(array('typeProperty' => '', 'mapping' => array('foo' => 'FooClass')));
+        new DiscriminatorMap(['typeProperty' => '', 'mapping' => ['foo' => 'FooClass']]);
     }
 
     /**
@@ -54,7 +54,7 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWithoutMappingProperty()
     {
-        new DiscriminatorMap(array('typeProperty' => 'type'));
+        new DiscriminatorMap(['typeProperty' => 'type']);
     }
 
     /**
@@ -62,6 +62,6 @@ class DiscriminatorMapTest extends TestCase
      */
     public function testExceptionWitEmptyMappingProperty()
     {
-        new DiscriminatorMap(array('typeProperty' => 'type', 'mapping' => array()));
+        new DiscriminatorMap(['typeProperty' => 'type', 'mapping' => []]);
     }
 }

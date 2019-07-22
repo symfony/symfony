@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * @Annotation
@@ -23,14 +24,24 @@ class Regex extends Constraint
 {
     const REGEX_FAILED_ERROR = 'de1e3db3-5ed4-4941-aae4-59f3667cc3a3';
 
-    protected static $errorNames = array(
+    protected static $errorNames = [
         self::REGEX_FAILED_ERROR => 'REGEX_FAILED_ERROR',
-    );
+    ];
 
     public $message = 'This value is not valid.';
     public $pattern;
     public $htmlPattern;
     public $match = true;
+    public $normalizer;
+
+    public function __construct($options = null)
+    {
+        parent::__construct($options);
+
+        if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
+            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', \is_object($this->normalizer) ? \get_class($this->normalizer) : \gettype($this->normalizer)));
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -45,7 +56,7 @@ class Regex extends Constraint
      */
     public function getRequiredOptions()
     {
-        return array('pattern');
+        return ['pattern'];
     }
 
     /**
@@ -70,7 +81,7 @@ class Regex extends Constraint
         }
 
         // Quit if delimiters not at very beginning/end (e.g. when options are passed)
-        if ($this->pattern[0] !== $this->pattern[strlen($this->pattern) - 1]) {
+        if ($this->pattern[0] !== $this->pattern[\strlen($this->pattern) - 1]) {
             return;
         }
 
@@ -79,7 +90,7 @@ class Regex extends Constraint
         // Unescape the delimiter
         $pattern = str_replace('\\'.$delimiter, $delimiter, substr($this->pattern, 1, -1));
 
-        // If the pattern is inverted, we can simply wrap it in
+        // If the pattern is inverted, we can wrap it in
         // ((?!pattern).)*
         if (!$this->match) {
             return '((?!'.$pattern.').)*';
@@ -95,7 +106,7 @@ class Regex extends Constraint
         $pattern = '^' === $pattern[0] ? substr($pattern, 1) : '.*'.$pattern;
 
         // Trim trailing $, otherwise append .*
-        $pattern = '$' === $pattern[strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
+        $pattern = '$' === $pattern[\strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
 
         return $pattern;
     }

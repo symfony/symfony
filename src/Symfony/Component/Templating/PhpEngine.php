@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Templating;
 
-use Symfony\Component\Templating\Storage\Storage;
-use Symfony\Component\Templating\Storage\FileStorage;
-use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\HelperInterface;
 use Symfony\Component\Templating\Loader\LoaderInterface;
+use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Storage\Storage;
+use Symfony\Component\Templating\Storage\StringStorage;
 
 /**
  * PhpEngine is an engine able to render PHP templates.
@@ -29,25 +29,23 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * @var HelperInterface[]
      */
-    protected $helpers = array();
-    protected $parents = array();
-    protected $stack = array();
+    protected $helpers = [];
+    protected $parents = [];
+    protected $stack = [];
     protected $charset = 'UTF-8';
-    protected $cache = array();
-    protected $escapers = array();
-    protected static $escaperCache = array();
-    protected $globals = array();
+    protected $cache = [];
+    protected $escapers = [];
+    protected static $escaperCache = [];
+    protected $globals = [];
     protected $parser;
 
     private $evalTemplate;
     private $evalParameters;
 
     /**
-     * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
-     * @param LoaderInterface             $loader  A loader instance
-     * @param HelperInterface[]           $helpers An array of helper instances
+     * @param HelperInterface[] $helpers An array of helper instances
      */
-    public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = array())
+    public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = [])
     {
         $this->parser = $parser;
         $this->loader = $loader;
@@ -65,7 +63,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException if the template does not exist
      */
-    public function render($name, array $parameters = array())
+    public function render($name, array $parameters = [])
     {
         $storage = $this->load($name);
         $key = hash('sha256', serialize($storage));
@@ -120,14 +118,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Evaluates a template.
      *
-     * @param Storage $template   The template to render
-     * @param array   $parameters An array of parameters to pass to the template
-     *
      * @return string|false The evaluated template, or false if the engine is unable to render the template
      *
      * @throws \InvalidArgumentException
      */
-    protected function evaluate(Storage $template, array $parameters = array())
+    protected function evaluate(Storage $template, array $parameters = [])
     {
         $this->evalTemplate = $template;
         $this->evalParameters = $parameters;
@@ -224,7 +219,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function addHelpers(array $helpers)
     {
         foreach ($helpers as $alias => $helper) {
-            $this->set($helper, is_int($alias) ? null : $alias);
+            $this->set($helper, \is_int($alias) ? null : $alias);
         }
     }
 
@@ -235,17 +230,14 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function setHelpers(array $helpers)
     {
-        $this->helpers = array();
+        $this->helpers = [];
         $this->addHelpers($helpers);
     }
 
     /**
      * Sets a helper.
-     *
-     * @param HelperInterface $helper The helper instance
-     * @param string          $alias  An alias
      */
-    public function set(HelperInterface $helper, $alias = null)
+    public function set(HelperInterface $helper, string $alias = null)
     {
         $this->helpers[$helper->getName()] = $helper;
         if (null !== $alias) {
@@ -258,11 +250,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Returns true if the helper if defined.
      *
-     * @param string $name The helper name
-     *
      * @return bool true if the helper is defined, false otherwise
      */
-    public function has($name)
+    public function has(string $name)
     {
         return isset($this->helpers[$name]);
     }
@@ -270,13 +260,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets a helper value.
      *
-     * @param string $name The helper name
-     *
      * @return HelperInterface The helper instance
      *
      * @throws \InvalidArgumentException if the helper is not defined
      */
-    public function get($name)
+    public function get(string $name)
     {
         if (!isset($this->helpers[$name])) {
             throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
@@ -290,7 +278,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $template The decorator logical name
      */
-    public function extend($template)
+    public function extend(string $template)
     {
         $this->parents[$this->current] = $template;
     }
@@ -298,12 +286,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Escapes a string by using the current charset.
      *
-     * @param mixed  $value   A variable to escape
-     * @param string $context The context name
+     * @param mixed $value A variable to escape
      *
      * @return string The escaped value
      */
-    public function escape($value, $context = 'html')
+    public function escape($value, string $context = 'html')
     {
         if (is_numeric($value)) {
             return $value;
@@ -313,21 +300,19 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         // the performance when the same value is escaped multiple times (e.g. loops)
         if (is_scalar($value)) {
             if (!isset(self::$escaperCache[$context][$value])) {
-                self::$escaperCache[$context][$value] = call_user_func($this->getEscaper($context), $value);
+                self::$escaperCache[$context][$value] = $this->getEscaper($context)($value);
             }
 
             return self::$escaperCache[$context][$value];
         }
 
-        return call_user_func($this->getEscaper($context), $value);
+        return $this->getEscaper($context)($value);
     }
 
     /**
      * Sets the charset to use.
-     *
-     * @param string $charset The charset
      */
-    public function setCharset($charset)
+    public function setCharset(string $charset)
     {
         if ('UTF8' === $charset = strtoupper($charset)) {
             $charset = 'UTF-8'; // iconv on Windows requires "UTF-8" instead of "UTF8"
@@ -351,26 +336,21 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Adds an escaper for the given context.
-     *
-     * @param string   $context The escaper context (html, js, ...)
-     * @param callable $escaper A PHP callable
      */
-    public function setEscaper($context, callable $escaper)
+    public function setEscaper(string $context, callable $escaper)
     {
         $this->escapers[$context] = $escaper;
-        self::$escaperCache[$context] = array();
+        self::$escaperCache[$context] = [];
     }
 
     /**
      * Gets an escaper for a given context.
      *
-     * @param string $context The context name
-     *
-     * @return callable $escaper A PHP callable
+     * @return callable A PHP callable
      *
      * @throws \InvalidArgumentException
      */
-    public function getEscaper($context)
+    public function getEscaper(string $context)
     {
         if (!isset($this->escapers[$context])) {
             throw new \InvalidArgumentException(sprintf('No registered escaper for context "%s".', $context));
@@ -380,10 +360,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      */
-    public function addGlobal($name, $value)
+    public function addGlobal(string $name, $value)
     {
         $this->globals[$name] = $value;
     }
@@ -419,7 +398,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     {
         $flags = ENT_QUOTES | ENT_SUBSTITUTE;
 
-        $this->escapers = array(
+        $this->escapers = [
             'html' =>
                 /**
                  * Runs the PHP function htmlspecialchars on the value passed.
@@ -431,7 +410,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                 function ($value) use ($flags) {
                     // Numbers and Boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value;
+                    return \is_string($value) ? htmlspecialchars($value, $flags, $this->getCharset(), false) : $value;
                 },
 
             'js' =>
@@ -472,9 +451,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
                     return $value;
                 },
-        );
+        ];
 
-        self::$escaperCache = array();
+        self::$escaperCache = [];
     }
 
     /**

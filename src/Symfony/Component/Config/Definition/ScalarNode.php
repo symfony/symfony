@@ -33,11 +33,7 @@ class ScalarNode extends VariableNode
     protected function validateType($value)
     {
         if (!is_scalar($value) && null !== $value) {
-            $ex = new InvalidTypeException(sprintf(
-                'Invalid type for path "%s". Expected scalar, but got %s.',
-                $this->getPath(),
-                gettype($value)
-            ));
+            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected scalar, but got %s.', $this->getPath(), \gettype($value)));
             if ($hint = $this->getInfo()) {
                 $ex->addHint($hint);
             }
@@ -52,6 +48,8 @@ class ScalarNode extends VariableNode
      */
     protected function isValueEmpty($value)
     {
+        // assume environment variables are never empty (which in practice is likely to be true during runtime)
+        // not doing so breaks many configs that are valid today
         if ($this->isHandlingPlaceholder()) {
             return false;
         }
@@ -64,6 +62,6 @@ class ScalarNode extends VariableNode
      */
     protected function getValidPlaceholderTypes(): array
     {
-        return array('bool', 'int', 'float', 'string');
+        return ['bool', 'int', 'float', 'string'];
     }
 }

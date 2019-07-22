@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Csrf;
 
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This extension protects forms by using a CSRF token.
@@ -26,11 +26,6 @@ class CsrfExtension extends AbstractExtension
     private $translator;
     private $translationDomain;
 
-    /**
-     * @param CsrfTokenManagerInterface $tokenManager      The CSRF token manager
-     * @param TranslatorInterface       $translator        The translator for translating error messages
-     * @param null|string               $translationDomain The translation domain for translating
-     */
     public function __construct(CsrfTokenManagerInterface $tokenManager, TranslatorInterface $translator = null, string $translationDomain = null)
     {
         $this->tokenManager = $tokenManager;
@@ -43,8 +38,8 @@ class CsrfExtension extends AbstractExtension
      */
     protected function loadTypeExtensions()
     {
-        return array(
+        return [
             new Type\FormTypeCsrfExtension($this->tokenManager, true, '_token', $this->translator, $this->translationDomain),
-        );
+        ];
     }
 }

@@ -14,6 +14,6 @@ namespace Symfony\Component\Messenger\Exception;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class NoHandlerForMessageException extends \LogicException implements ExceptionInterface
+class NoHandlerForMessageException extends LogicException
 {
 }

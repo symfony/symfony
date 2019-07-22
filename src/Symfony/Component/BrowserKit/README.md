@@ -4,6 +4,9 @@ BrowserKit Component
 The BrowserKit component simulates the behavior of a web browser, allowing you
 to make requests, click on links and submit forms programmatically.
 
+The component comes with a concrete implementation that uses the HttpClient
+component to make real HTTP requests.
+
 Resources
 ---------
 

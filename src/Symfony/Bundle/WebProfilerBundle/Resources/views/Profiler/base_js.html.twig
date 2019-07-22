@@ -24,6 +24,19 @@
 
         var profilerStorageKey = 'symfony/profiler/';
 
+        var addEventListener;
+
+        var el = document.createElement('div');
+        if (!('addEventListener' in el)) {
+            addEventListener = function (element, eventName, callback) {
+                element.attachEvent('on' + eventName, callback);
+            };
+        } else {
+            addEventListener = function (element, eventName, callback) {
+                element.addEventListener(eventName, callback, false);
+            };
+        }
+
         var request = function(url, onSuccess, onError, payload, options) {
             var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
             options = options || {};
@@ -118,6 +131,13 @@
                 removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
                 removeClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
             }
+
+            addEventListener(document.querySelector('.sf-toolbar-ajax-clear'), 'click', function() {
+                requestStack = [];
+                renderAjaxRequests();
+                successStreak = 4;
+                document.querySelector('.sf-toolbar-ajax-request-list').innerHTML = '';
+            });
         };
 
         var startAjaxRequest = function(index) {
@@ -128,13 +148,17 @@
 
             var nbOfAjaxRequest = tbody.rows.length;
             if (nbOfAjaxRequest >= 100) {
-                tbody.deleteRow(nbOfAjaxRequest - 1);
+                tbody.deleteRow(0);
             }
 
             var request = requestStack[index];
             pendingRequests++;
             var row = document.createElement('tr');
             request.DOMNode = row;
+
+            var requestNumberCell = document.createElement('td');
+            requestNumberCell.textContent = index + 1;
+            row.appendChild(requestNumberCell);
 
             var profilerCell = document.createElement('td');
             profilerCell.textContent = 'n/a';
@@ -177,7 +201,10 @@
             }, 100);
 
             row.className = 'sf-ajax-request sf-ajax-request-loading';
-            tbody.insertBefore(row, tbody.firstChild);
+            tbody.insertBefore(row, null);
+
+            var toolbarInfo = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
+            toolbarInfo.scrollTop = toolbarInfo.scrollHeight;
 
             renderAjaxRequests();
         };
@@ -205,11 +232,11 @@
             pendingRequests--;
             var row = request.DOMNode;
             /* Unpack the children from the row */
-            var profilerCell = row.children[0];
-            var methodCell = row.children[1];
-            var statusCodeCell = row.children[3];
+            var profilerCell = row.children[1];
+            var methodCell = row.children[2];
+            var statusCodeCell = row.children[4];
             var statusCodeElem = statusCodeCell.children[0];
-            var durationCell = row.children[5];
+            var durationCell = row.children[6];
 
             if (request.error) {
                 row.className = 'sf-ajax-request sf-ajax-request-error';
@@ -247,19 +274,6 @@
 
             renderAjaxRequests();
         };
-
-        var addEventListener;
-
-        var el = document.createElement('div');
-        if (!('addEventListener' in el)) {
-            addEventListener = function (element, eventName, callback) {
-                element.attachEvent('on' + eventName, callback);
-            };
-        } else {
-            addEventListener = function (element, eventName, callback) {
-                element.addEventListener(eventName, callback, false);
-            };
-        }
 
         {% if excluded_ajax_paths is defined %}
             if (window.fetch && window.fetch.polyfill === undefined) {
@@ -419,9 +433,10 @@
                     function(xhr, el) {
 
                         /* Evaluate in global scope scripts embedded inside the toolbar */
-                        eval.call({}, ([].slice.call(el.querySelectorAll('script')).map(function (script) {
-                          return script.firstChild.nodeValue;
-                        }).join(';\n')));
+                        var i, scripts = [].slice.call(el.querySelectorAll('script'));
+                        for (i = 0; i < scripts.length; ++i) {
+                            eval.call({}, scripts[i].firstChild.nodeValue);
+                        }
 
                         el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';
 
@@ -440,7 +455,7 @@
                         }
 
                         /* Handle toolbar-info position */
-                        var i, toolbarBlocks = [].slice.call(el.querySelectorAll('.sf-toolbar-block'));
+                        var toolbarBlocks = [].slice.call(el.querySelectorAll('.sf-toolbar-block'));
                         for (i = 0; i < toolbarBlocks.length; ++i) {
                             toolbarBlocks[i].onmouseover = function () {
                                 var toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];
@@ -491,6 +506,10 @@
                             setPreference('toolbar/displayState', 'block');
                         });
                         renderAjaxRequests();
+                        addEventListener(document.querySelector('.sf-toolbar-block-ajax'), 'mouseenter', function (event) {
+                            var elem = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
+                            elem.scrollTop = elem.scrollHeight;
+                        });
                         addEventListener(document.querySelector('.sf-toolbar-block-ajax > .sf-toolbar-icon'), 'click', function (event) {
                             event.preventDefault();
 
@@ -544,7 +563,7 @@
 
                 /* create the tab navigation for each group of tabs */
                 for (var i = 0; i < tabGroups.length; i++) {
-                    var tabs = tabGroups[i].querySelectorAll('.tab');
+                    var tabs = tabGroups[i].querySelectorAll(':scope > .tab');
                     var tabNavigation = document.createElement('ul');
                     tabNavigation.className = 'tab-navigation';
 
@@ -570,7 +589,7 @@
 
                 /* display the active tab and add the 'click' event listeners */
                 for (i = 0; i < tabGroups.length; i++) {
-                    tabNavigation = tabGroups[i].querySelectorAll('.tab-navigation li');
+                    tabNavigation = tabGroups[i].querySelectorAll(':scope > .tab-navigation li');
 
                     for (j = 0; j < tabNavigation.length; j++) {
                         tabId = tabNavigation[j].getAttribute('data-tab-id');
@@ -674,6 +693,105 @@
 
                     toggles[i].setAttribute('data-processed', 'true');
                 }
+            },
+
+            createFilters: function() {
+                document.querySelectorAll('[data-filters] [data-filter]').forEach(function (filter) {
+                    var filters = filter.closest('[data-filters]'),
+                        type = 'choice',
+                        name = filter.dataset.filter,
+                        ucName = name.charAt(0).toUpperCase()+name.slice(1),
+                        list = document.createElement('ul'),
+                        values = filters.dataset['filter'+ucName] || filters.querySelectorAll('[data-filter-'+name+']'),
+                        labels = {},
+                        defaults = null,
+                        indexed = {},
+                        processed = {};
+                    if (typeof values === 'string') {
+                        type = 'level';
+                        labels = values.split(',');
+                        values = values.toLowerCase().split(',');
+                        defaults = values.length - 1;
+                    }
+                    addClass(list, 'filter-list');
+                    addClass(list, 'filter-list-'+type);
+                    values.forEach(function (value, i) {
+                        if (value instanceof HTMLElement) {
+                            value = value.dataset['filter'+ucName];
+                        }
+                        if (value in processed) {
+                            return;
+                        }
+                        var option = document.createElement('li'),
+                            label = i in labels ? labels[i] : value,
+                            active = false,
+                            matches;
+                        if ('' === label) {
+                            option.innerHTML = '<em>(none)</em>';
+                        } else {
+                            option.innerText = label;
+                        }
+                        option.dataset.filter = value;
+                        option.setAttribute('title', 1 === (matches = filters.querySelectorAll('[data-filter-'+name+'="'+value+'"]').length) ? 'Matches 1 row' : 'Matches '+matches+' rows');
+                        indexed[value] = i;
+                        list.appendChild(option);
+                        addEventListener(option, 'click', function () {
+                            if ('choice' === type) {
+                                filters.querySelectorAll('[data-filter-'+name+']').forEach(function (row) {
+                                    if (option.dataset.filter === row.dataset['filter'+ucName]) {
+                                        toggleClass(row, 'filter-hidden-'+name);
+                                    }
+                                });
+                                toggleClass(option, 'active');
+                            } else if ('level' === type) {
+                                if (i === this.parentNode.querySelectorAll('.active').length - 1) {
+                                    return;
+                                }
+                                this.parentNode.querySelectorAll('li').forEach(function (currentOption, j) {
+                                    if (j <= i) {
+                                        addClass(currentOption, 'active');
+                                        if (i === j) {
+                                            addClass(currentOption, 'last-active');
+                                        } else {
+                                            removeClass(currentOption, 'last-active');
+                                        }
+                                    } else {
+                                        removeClass(currentOption, 'active');
+                                        removeClass(currentOption, 'last-active');
+                                    }
+                                });
+                                filters.querySelectorAll('[data-filter-'+name+']').forEach(function (row) {
+                                    if (i < indexed[row.dataset['filter'+ucName]]) {
+                                        addClass(row, 'filter-hidden-'+name);
+                                    } else {
+                                        removeClass(row, 'filter-hidden-'+name);
+                                    }
+                                });
+                            }
+                        });
+                        if ('choice' === type) {
+                            active = null === defaults || 0 <= defaults.indexOf(value);
+                        } else if ('level' === type) {
+                            active = i <= defaults;
+                            if (active && i === defaults) {
+                                addClass(option, 'last-active');
+                            }
+                        }
+                        if (active) {
+                            addClass(option, 'active');
+                        } else {
+                            filters.querySelectorAll('[data-filter-'+name+'="'+value+'"]').forEach(function (row) {
+                                toggleClass(row, 'filter-hidden-'+name);
+                            });
+                        }
+                        processed[value] = true;
+                    });
+
+                    if (1 < list.childNodes.length) {
+                        filter.appendChild(list);
+                        filter.dataset.filtered = '';
+                    }
+                });
             }
         };
     })();

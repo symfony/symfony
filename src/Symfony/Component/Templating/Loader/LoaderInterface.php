@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Templating\Loader;
 
-use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\Templating\Storage\Storage;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * LoaderInterface is the interface all loaders must implement.
@@ -31,10 +31,9 @@ interface LoaderInterface
     /**
      * Returns true if the template is still fresh.
      *
-     * @param TemplateReferenceInterface $template A template
-     * @param int                        $time     The last modification time of the cached template (timestamp)
+     * @param int $time The last modification time of the cached template (timestamp)
      *
      * @return bool
      */
-    public function isFresh(TemplateReferenceInterface $template, $time);
+    public function isFresh(TemplateReferenceInterface $template, int $time);
 }

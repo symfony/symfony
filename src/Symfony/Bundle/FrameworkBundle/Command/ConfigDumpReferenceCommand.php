@@ -11,12 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
+use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -39,11 +39,11 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (yaml or xml)', 'yaml'),
-            ))
+            ])
             ->setDescription('Dumps the default configuration for an extension')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the default configuration for an
@@ -81,17 +81,17 @@ EOF
 
         if (null === $name = $input->getArgument('name')) {
             $this->listBundles($errorIo);
-            $errorIo->comment(array(
+            $errorIo->comment([
                 'Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)',
                 'For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>config:dump-reference FrameworkBundle profiler.matcher</comment> to dump the <comment>framework.profiler.matcher</comment> configuration)',
-            ));
+            ]);
 
             return;
         }
 
         $extension = $this->findExtension($name);
 
-        $configuration = $extension->getConfiguration(array(), $this->getContainerBuilder());
+        $configuration = $extension->getConfiguration([], $this->getContainerBuilder());
 
         $this->validateConfiguration($extension, $configuration);
 

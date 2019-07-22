@@ -47,14 +47,14 @@ class AppKernel extends Kernel
 
     public function registerBundles()
     {
-        if (!file_exists($filename = $this->getRootDir().'/'.$this->testCase.'/bundles.php')) {
+        if (!file_exists($filename = $this->getProjectDir().'/'.$this->testCase.'/bundles.php')) {
             throw new \RuntimeException(sprintf('The bundles file "%s" does not exist.', $filename));
         }
 
         return include $filename;
     }
 
-    public function getRootDir()
+    public function getProjectDir()
     {
         return __DIR__;
     }
@@ -79,15 +79,14 @@ class AppKernel extends Kernel
         $container->register('logger', NullLogger::class);
     }
 
-    public function serialize()
+    public function __sleep()
     {
-        return serialize(array($this->varDir, $this->testCase, $this->rootConfig, $this->getEnvironment(), $this->isDebug()));
+        return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
     }
 
-    public function unserialize($str)
+    public function __wakeup()
     {
-        $a = unserialize($str);
-        $this->__construct($a[0], $a[1], $a[2], $a[3], $a[4]);
+        $this->__construct($this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug);
     }
 
     protected function getKernelParameters()

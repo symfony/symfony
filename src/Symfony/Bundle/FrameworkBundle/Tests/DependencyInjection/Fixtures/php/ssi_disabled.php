@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'ssi' => array(
+$container->loadFromExtension('framework', [
+    'ssi' => [
         'enabled' => false,
-    ),
-));
+    ],
+]);

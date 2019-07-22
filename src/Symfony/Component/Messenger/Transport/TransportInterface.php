@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.1
  */
 interface TransportInterface extends ReceiverInterface, SenderInterface
 {

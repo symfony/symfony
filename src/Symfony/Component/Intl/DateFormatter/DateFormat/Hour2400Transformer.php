@@ -55,9 +55,9 @@ class Hour2400Transformer extends HourTransformer
      */
     public function extractDateOptions(string $matched, int $length): array
     {
-        return array(
+        return [
             'hour' => (int) $matched,
             'hourInstance' => $this,
-        );
+        ];
     }
 }

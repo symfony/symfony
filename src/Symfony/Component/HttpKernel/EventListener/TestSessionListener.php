@@ -24,9 +24,10 @@ class TestSessionListener extends AbstractTestSessionListener
 {
     private $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, array $sessionOptions = [])
     {
         $this->container = $container;
+        parent::__construct($sessionOptions);
     }
 
     protected function getSession()

@@ -15,16 +15,16 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
+use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\TypedReference;
 
@@ -48,6 +48,22 @@ class AutowirePassTest extends TestCase
 
         $this->assertCount(1, $container->getDefinition('bar')->getArguments());
         $this->assertEquals(Foo::class, (string) $container->getDefinition('bar')->getArgument(0));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+     * @expectedExceptionMessage Cannot autowire service "Symfony\Component\DependencyInjection\Tests\CompilerEslaAction": argument "$notExisting" of method "Symfony\Component\DependencyInjection\Tests\Compiler\ElsaAction::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotExisting" but this class was not found.
+     */
+    public function testProcessNotExistingActionParam()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(Foo::class);
+        $barDefinition = $container->register(__NAMESPACE__.'EslaAction', __NAMESPACE__.'\ElsaAction');
+        $barDefinition->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
     }
 
     public function testProcessVariadic()
@@ -375,22 +391,22 @@ class AutowirePassTest extends TestCase
             ->setAutowired(true)
             // set the 2nd (index 1) argument only: autowire the first and third
             // args are: A, Foo, Dunglas
-            ->setArguments(array(
+            ->setArguments([
                 1 => new Reference('foo'),
-                3 => array('bar'),
-            ));
+                3 => ['bar'],
+            ]);
 
         (new ResolveClassPass())->process($container);
         (new AutowirePass())->process($container);
 
         $definition = $container->getDefinition('multiple');
         $this->assertEquals(
-            array(
+            [
                 new TypedReference(A::class, A::class),
                 new Reference('foo'),
                 new TypedReference(Dunglas::class, Dunglas::class),
-                array('bar'),
-            ),
+                ['bar'],
+            ],
             $definition->getArguments()
         );
     }
@@ -406,7 +422,7 @@ class AutowirePassTest extends TestCase
         $container->register(A::class);
         $container->register(Dunglas::class);
         $container->register('arg_no_type_hint', __NAMESPACE__.'\MultipleArguments')
-            ->setArguments(array(1 => 'foo'))
+            ->setArguments([1 => 'foo'])
             ->setAutowired(true);
 
         (new ResolveClassPass())->process($container);
@@ -459,12 +475,12 @@ class AutowirePassTest extends TestCase
 
         $definition = $container->getDefinition('with_optional_scalar');
         $this->assertEquals(
-            array(
+            [
                 new TypedReference(A::class, A::class),
                 // use the default value
                 'default_val',
                 new TypedReference(Lille::class, Lille::class),
-            ),
+            ],
             $definition->getArguments()
         );
     }
@@ -483,10 +499,10 @@ class AutowirePassTest extends TestCase
 
         $definition = $container->getDefinition('with_optional_scalar_last');
         $this->assertEquals(
-            array(
+            [
                 new TypedReference(A::class, A::class),
                 new TypedReference(Lille::class, Lille::class),
-            ),
+            ],
             $definition->getArguments()
         );
     }
@@ -503,7 +519,7 @@ class AutowirePassTest extends TestCase
 
         $definition = $container->getDefinition('foo');
         $this->assertEquals(
-            array('foo.txt'),
+            ['foo.txt'],
             $definition->getArguments()
         );
     }
@@ -520,7 +536,7 @@ class AutowirePassTest extends TestCase
         $container
             ->register('setter_injection', SetterInjection::class)
             ->setAutowired(true)
-            ->addMethodCall('setWithCallsConfigured', array('manual_arg1', 'manual_arg2'))
+            ->addMethodCall('setWithCallsConfigured', ['manual_arg1', 'manual_arg2'])
         ;
 
         (new ResolveClassPass())->process($container);
@@ -530,20 +546,36 @@ class AutowirePassTest extends TestCase
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
         $this->assertEquals(
-            array('setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'),
+            ['setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'],
             array_column($methodCalls, 0)
         );
 
         // test setWithCallsConfigured args
         $this->assertEquals(
-            array('manual_arg1', 'manual_arg2'),
+            ['manual_arg1', 'manual_arg2'],
             $methodCalls[0][1]
         );
         // test setFoo args
         $this->assertEquals(
-            array(new TypedReference(Foo::class, Foo::class)),
+            [new TypedReference(Foo::class, Foo::class)],
             $methodCalls[1][1]
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @exceptedExceptionMessage Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "setLogger()" does not exist.
+     */
+    public function testWithNonExistingSetterAndAutowiring()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(CaseSensitiveClass::class, CaseSensitiveClass::class)->setAutowired(true);
+        $definition->addMethodCall('setLogger');
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireRequiredMethodsPass())->process($container);
+        (new AutowirePass())->process($container);
     }
 
     public function testExplicitMethodInjection()
@@ -557,7 +589,7 @@ class AutowirePassTest extends TestCase
         $container
             ->register('setter_injection', SetterInjection::class)
             ->setAutowired(true)
-            ->addMethodCall('notASetter', array())
+            ->addMethodCall('notASetter', [])
         ;
 
         (new ResolveClassPass())->process($container);
@@ -567,21 +599,21 @@ class AutowirePassTest extends TestCase
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
         $this->assertEquals(
-            array('notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'),
+            ['notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'],
             array_column($methodCalls, 0)
         );
         $this->assertEquals(
-            array(new TypedReference(A::class, A::class)),
+            [new TypedReference(A::class, A::class)],
             $methodCalls[0][1]
         );
     }
 
     public function getCreateResourceTests()
     {
-        return array(
-            array('IdenticalClassResource', true),
-            array('ClassChangedConstructorArgs', false),
-        );
+        return [
+            ['IdenticalClassResource', true],
+            ['ClassChangedConstructorArgs', false],
+        ];
     }
 
     public function testIgnoreServiceWithClassNotExisting()
@@ -620,7 +652,7 @@ class AutowirePassTest extends TestCase
         }
 
         $this->assertNotNull($e);
-        $this->assertSame('Cannot autowire service "setter_injection_collision": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionCollision::setMultipleInstancesForOneArg()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "c1", "c2".', $e->getMessage());
+        $this->assertSame('Cannot autowire service "setter_injection_collision": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\SetterInjectionCollision::setMultipleInstancesForOneArg()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "c1", "c2".', (string) $e->getMessage());
     }
 
     /**
@@ -667,12 +699,12 @@ class AutowirePassTest extends TestCase
         $container->register(Lille::class);
         $container->register('foo', __NAMESPACE__.'\MultipleArgumentsOptionalScalar')
             ->setAutowired(true)
-            ->setArguments(array('', ''));
+            ->setArguments(['', '']);
 
         (new ResolveClassPass())->process($container);
         (new AutowirePass())->process($container);
 
-        $this->assertEquals(array(new TypedReference(A::class, A::class), '', new TypedReference(Lille::class, Lille::class)), $container->getDefinition('foo')->getArguments());
+        $this->assertEquals([new TypedReference(A::class, A::class), '', new TypedReference(Lille::class, Lille::class)], $container->getDefinition('foo')->getArguments());
     }
 
     public function testWithFactory()
@@ -681,13 +713,13 @@ class AutowirePassTest extends TestCase
 
         $container->register(Foo::class);
         $definition = $container->register('a', A::class)
-            ->setFactory(array(A::class, 'create'))
+            ->setFactory([A::class, 'create'])
             ->setAutowired(true);
 
         (new ResolveClassPass())->process($container);
         (new AutowirePass())->process($container);
 
-        $this->assertEquals(array(new TypedReference(Foo::class, Foo::class)), $definition->getArguments());
+        $this->assertEquals([new TypedReference(Foo::class, Foo::class)], $definition->getArguments());
     }
 
     /**
@@ -699,14 +731,14 @@ class AutowirePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $foo = $container->register('foo', NotWireable::class)->setAutowired(true)
-            ->addMethodCall('setBar', array())
-            ->addMethodCall('setOptionalNotAutowireable', array())
-            ->addMethodCall('setOptionalNoTypeHint', array())
-            ->addMethodCall('setOptionalArgNoAutowireable', array())
+            ->addMethodCall('setBar', [])
+            ->addMethodCall('setOptionalNotAutowireable', [])
+            ->addMethodCall('setOptionalNoTypeHint', [])
+            ->addMethodCall('setOptionalArgNoAutowireable', [])
         ;
 
         if ($method) {
-            $foo->addMethodCall($method, array());
+            $foo->addMethodCall($method, []);
         }
 
         if (method_exists($this, 'expectException')) {
@@ -723,11 +755,11 @@ class AutowirePassTest extends TestCase
 
     public function provideNotWireableCalls()
     {
-        return array(
-            array('setNotAutowireable', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class was not found.'),
-            array('setDifferentNamespace', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setDifferentNamespace()" references class "stdClass" but no such service exists.'),
-            array(null, 'Invalid service "foo": method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setProtectedMethod()" must be public.'),
-        );
+        return [
+            ['setNotAutowireable', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class was not found.'],
+            ['setDifferentNamespace', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setDifferentNamespace()" references class "stdClass" but no such service exists.'],
+            [null, 'Invalid service "foo": method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setProtectedMethod()" must be public.'],
+        ];
     }
 
     /**
@@ -740,7 +772,7 @@ class AutowirePassTest extends TestCase
 
         $container->register(LesTilleuls::class, LesTilleuls::class);
         $container->register('foo', NotWireable::class)->setAutowired(true)
-            ->addMethodCall('setNotAutowireableBecauseOfATypo', array())
+            ->addMethodCall('setNotAutowireableBecauseOfATypo', [])
         ;
 
         (new ResolveClassPass())->process($container);
@@ -813,7 +845,7 @@ class AutowirePassTest extends TestCase
         $pass = new AutowirePass();
         $pass->process($container);
 
-        $this->assertSame(array(), $container->getDefinition('autowired')->getArguments());
+        $this->assertSame([], $container->getDefinition('autowired')->getArguments());
     }
 
     public function testAutowireDecorator()
@@ -832,6 +864,29 @@ class AutowirePassTest extends TestCase
 
         $definition = $container->getDefinition(Decorator::class);
         $this->assertSame(Decorator::class.'.inner', (string) $definition->getArgument(1));
+    }
+
+    public function testAutowireDecoratorChain()
+    {
+        $container = new ContainerBuilder();
+        $container->register(LoggerInterface::class, NullLogger::class);
+        $container->register(Decorated::class, Decorated::class);
+        $container
+            ->register(Decorator::class, Decorator::class)
+            ->setDecoratedService(Decorated::class)
+            ->setAutowired(true)
+        ;
+        $container
+            ->register(DecoratedDecorator::class, DecoratedDecorator::class)
+            ->setDecoratedService(Decorated::class)
+            ->setAutowired(true)
+        ;
+
+        (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition(DecoratedDecorator::class);
+        $this->assertSame(DecoratedDecorator::class.'.inner', (string) $definition->getArgument(0));
     }
 
     public function testAutowireDecoratorRenamedId()
@@ -880,8 +935,31 @@ class AutowirePassTest extends TestCase
 
         (new AutowirePass())->process($container);
 
-        $erroredDefinition = new Definition(MissingClass::class);
+        $this->assertSame(['Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'], $container->getDefinition('.errored.some_locator.'.MissingClass::class)->getErrors());
+    }
 
-        $this->assertEquals($erroredDefinition->addError('Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'), $container->getDefinition('.errored.some_locator.'.MissingClass::class));
+    public function testNamedArgumentAliasResolveCollisions()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('c1', CollisionA::class);
+        $container->register('c2', CollisionB::class);
+        $container->setAlias(CollisionInterface::class.' $collision', 'c2');
+        $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollision::class);
+        $aDefinition->setAutowired(true);
+
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $pass = new AutowirePass();
+
+        $pass->process($container);
+
+        $expected = [
+            [
+                'setMultipleInstancesForOneArg',
+                [new TypedReference(CollisionInterface::class.' $collision', CollisionInterface::class)],
+            ],
+        ];
+        $this->assertEquals($expected, $container->getDefinition('setter_injection_collision')->getMethodCalls());
     }
 }

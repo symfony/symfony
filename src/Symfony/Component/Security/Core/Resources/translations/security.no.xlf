@@ -16,7 +16,7 @@
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
-                <target>Ugyldig påloggingsinformasjonen.</target>
+                <target>Ugyldig påloggingsinformasjon.</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>

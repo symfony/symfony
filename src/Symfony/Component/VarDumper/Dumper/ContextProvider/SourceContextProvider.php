@@ -72,9 +72,9 @@ final class SourceContextProvider implements ContextProviderInterface
 
                             if ($src) {
                                 $src = explode("\n", $src);
-                                $fileExcerpt = array();
+                                $fileExcerpt = [];
 
-                                for ($i = max($line - 3, 1), $max = min($line + 3, count($src)); $i <= $max; ++$i) {
+                                for ($i = max($line - 3, 1), $max = min($line + 3, \count($src)); $i <= $max; ++$i) {
                                     $fileExcerpt[] = '<li'.($i === $line ? ' class="selected"' : '').'><code>'.$this->htmlEncode($src[$i - 1]).'</code></li>';
                                 }
 
@@ -93,13 +93,13 @@ final class SourceContextProvider implements ContextProviderInterface
             $name = substr($name, strrpos($name, '/') + 1);
         }
 
-        $context = array('name' => $name, 'file' => $file, 'line' => $line);
+        $context = ['name' => $name, 'file' => $file, 'line' => $line];
         $context['file_excerpt'] = $fileExcerpt;
 
         if (null !== $this->projectDir) {
             $context['project_dir'] = $this->projectDir;
             if (0 === strpos($file, $this->projectDir)) {
-                $context['file_relative'] = ltrim(substr($file, strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                $context['file_relative'] = ltrim(substr($file, \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             }
         }
 

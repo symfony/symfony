@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.42",
     "Names": {
         "Arab": "arabik",
         "Armn": "armen",
@@ -43,7 +43,6 @@
         "Zsye": "emoji",
         "Zsym": "me simbole",
         "Zxxx": "i pashkruar",
-        "Zyyy": "i zakonshëm",
-        "Zzzz": "i panjohur"
+        "Zyyy": "i zakonshëm"
     }
 }

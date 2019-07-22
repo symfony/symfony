@@ -103,7 +103,7 @@ services:
         public: true
     deprecated_service:
         class: stdClass
-        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
+        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.
         public: true
     new_factory:
         class: FactoryClass
@@ -124,7 +124,7 @@ services:
         public: true
     factory_simple:
         class: SimpleFactoryClass
-        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
+        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.
         public: false
         arguments: ['foo']
     factory_service_simple:
@@ -157,7 +157,7 @@ services:
     tagged_iterator:
         class: Bar
         arguments:
-            - !tagged foo
+            - !tagged_iterator foo
         public: true
     Psr\Container\ContainerInterface:
         alias: service_container

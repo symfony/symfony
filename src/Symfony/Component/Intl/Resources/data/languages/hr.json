@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.11",
+    "Version": "2.1.48.42",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -72,6 +72,7 @@
         "car": "karipski",
         "cay": "cayuga",
         "cch": "atsam",
+        "ccp": "chakma",
         "ce": "čečenski",
         "ceb": "cebuano",
         "cgg": "chiga",
@@ -321,7 +322,6 @@
         "ms": "malajski",
         "mt": "malteški",
         "mua": "mundang",
-        "mul": "više jezika",
         "mus": "creek",
         "mwl": "mirandski",
         "mwr": "marwari",
@@ -397,7 +397,6 @@
         "ro_MD": "moldavski",
         "rof": "rombo",
         "rom": "romski",
-        "root": "korijenski",
         "ru": "ruski",
         "rup": "aromunski",
         "rw": "kinyarwanda",
@@ -495,7 +494,6 @@
         "uga": "ugaritski",
         "uk": "ukrajinski",
         "umb": "umbundu",
-        "und": "nepoznati jezik",
         "ur": "urdski",
         "uz": "uzbečki",
         "vai": "vai",
@@ -532,7 +530,6 @@
         "zh_Hant": "kineski (tradicionalni)",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "bez jezičnog sadržaja",
         "zza": "zazaki"
     }
 }

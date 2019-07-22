@@ -1,12 +1,11 @@
 {
-    "Version": "2.1.38.71",
+    "Version": "2.1.49.82",
     "Names": {
         "Arab": "Araab",
         "Cyrl": "Sirilik",
         "Hans": "Buñ woyofal",
         "Hant": "Cosaan",
         "Latn": "Latin",
-        "Zxxx": "Luñ bindul",
-        "Zzzz": "Mbind muñ xamul"
+        "Zxxx": "Luñ bindul"
     }
 }

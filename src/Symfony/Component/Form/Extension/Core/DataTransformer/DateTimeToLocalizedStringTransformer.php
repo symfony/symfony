@@ -51,11 +51,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             $timeFormat = \IntlDateFormatter::SHORT;
         }
 
-        if (!in_array($dateFormat, self::$formats, true)) {
+        if (!\in_array($dateFormat, self::$formats, true)) {
             throw new UnexpectedTypeException($dateFormat, implode('", "', self::$formats));
         }
 
-        if (!in_array($timeFormat, self::$formats, true)) {
+        if (!\in_array($timeFormat, self::$formats, true)) {
             throw new UnexpectedTypeException($timeFormat, implode('", "', self::$formats));
         }
 
@@ -106,7 +106,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     public function reverseTransform($value)
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 
@@ -162,11 +162,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     {
         $dateFormat = $this->dateFormat;
         $timeFormat = $this->timeFormat;
-        $timezone = $ignoreTimezone ? 'UTC' : $this->outputTimezone;
-        if (class_exists('IntlTimeZone', false)) {
-            // see https://bugs.php.net/bug.php?id=66323
-            $timezone = \IntlTimeZone::createTimeZone($timezone);
-        }
+        $timezone = new \DateTimeZone($ignoreTimezone ? 'UTC' : $this->outputTimezone);
+
         $calendar = $this->calendar;
         $pattern = $this->pattern;
 

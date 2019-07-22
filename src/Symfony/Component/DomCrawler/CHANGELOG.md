@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* Added argument `$selector` to ``Crawler::children()`
+* Added argument `$default` to ``Crawler::text()` and `html()`
+
+4.4.0
+-----
+
+* Added `Form::getName()` method.
+
+4.3.0
+-----
+
+* Added PHPUnit constraints: `CrawlerSelectorAttributeValueSame`, `CrawlerSelectorExists`, `CrawlerSelectorTextContains``
+  and `CrawlerSelectorTextSame`
+* Added return of element name (`_name`) in `extract()` method.
+* Added ability to return a default value in `text()` and `html()` instead of throwing an exception when node is empty.
+* When available, the [html5-php library](https://github.com/Masterminds/html5-php) is used to
+  parse HTML added to a Crawler for better support of HTML5 tags.
+
+4.2.0
+-----
+
+* The `$currentUri` constructor argument of the `AbstractUriElement`, `Link` and
+  `Image` classes is now optional.
+* The `Crawler::children()` method will have a new `$selector` argument in version 5.0, 
+  not defining it is deprecated.
+
 3.1.0
 -----
 

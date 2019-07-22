@@ -12,7 +12,6 @@
 namespace Symfony\Component\Workflow;
 
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
-use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 
 /**
@@ -21,32 +20,17 @@ use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
  */
 class Registry
 {
-    private $workflows = array();
-
-    /**
-     * @param Workflow                 $workflow
-     * @param SupportStrategyInterface $supportStrategy
-     *
-     * @deprecated since Symfony 4.1, use addWorkflow() instead
-     */
-    public function add(Workflow $workflow, $supportStrategy)
-    {
-        @trigger_error(sprintf('%s is deprecated since Symfony 4.1. Use addWorkflow() instead.', __METHOD__), E_USER_DEPRECATED);
-        $this->workflows[] = array($workflow, $supportStrategy);
-    }
+    private $workflows = [];
 
     public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)
     {
-        $this->workflows[] = array($workflow, $supportStrategy);
+        $this->workflows[] = [$workflow, $supportStrategy];
     }
 
     /**
-     * @param object      $subject
-     * @param string|null $workflowName
-     *
      * @return Workflow
      */
-    public function get($subject, $workflowName = null)
+    public function get(object $subject, string $workflowName = null)
     {
         $matched = null;
 
@@ -60,20 +44,18 @@ class Registry
         }
 
         if (!$matched) {
-            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', get_class($subject)));
+            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', \get_class($subject)));
         }
 
         return $matched;
     }
 
     /**
-     * @param object $subject
-     *
      * @return Workflow[]
      */
-    public function all($subject): array
+    public function all(object $subject): array
     {
-        $matched = array();
+        $matched = [];
         foreach ($this->workflows as list($workflow, $supportStrategy)) {
             if ($supportStrategy->supports($workflow, $subject)) {
                 $matched[] = $workflow;

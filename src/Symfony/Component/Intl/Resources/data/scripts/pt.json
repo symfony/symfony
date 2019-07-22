@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.39.20",
+    "Version": "2.1.48.42",
     "Names": {
         "Arab": "árabe",
         "Armi": "armi",
@@ -135,7 +135,6 @@
         "Zsye": "Emoji",
         "Zsym": "zsym",
         "Zxxx": "ágrafo",
-        "Zyyy": "comum",
-        "Zzzz": "escrita desconhecida"
+        "Zyyy": "comum"
     }
 }

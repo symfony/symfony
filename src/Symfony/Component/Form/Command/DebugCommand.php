@@ -22,6 +22,7 @@ use Symfony\Component\Form\Console\Helper\DescriptorHelper;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
  * A console command for retrieving information about form types.
@@ -37,8 +38,9 @@ class DebugCommand extends Command
     private $types;
     private $extensions;
     private $guessers;
+    private $fileLinkFormatter;
 
-    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = array('Symfony\Component\Form\Extension\Core\Type'), array $types = array(), array $extensions = array(), array $guessers = array())
+    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $guessers = [], FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 
@@ -47,6 +49,7 @@ class DebugCommand extends Command
         $this->types = $types;
         $this->extensions = $extensions;
         $this->guessers = $guessers;
+        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     /**
@@ -55,25 +58,34 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('class', InputArgument::OPTIONAL, 'The form type class'),
                 new InputArgument('option', InputArgument::OPTIONAL, 'The form type option'),
+                new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
-            ))
+            ])
             ->setDescription('Displays form type information')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays information about form types.
 
   <info>php %command.full_name%</info>
 
-The command lists all built-in types, services types, type extensions and guessers currently available.
+The command lists all built-in types, services types, type extensions and 
+guessers currently available.
 
   <info>php %command.full_name% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
   <info>php %command.full_name% ChoiceType</info>
 
-The command lists all defined options that contains the given form type, as well as their parents and type extensions.
+The command lists all defined options that contains the given form type, 
+as well as their parents and type extensions.
 
   <info>php %command.full_name% ChoiceType choice_value</info>
+
+Use the <info>--show-deprecated</info> option to display form types with 
+deprecated options or the deprecated options of the given form type:
+
+  <info>php %command.full_name% --show-deprecated</info>
+  <info>php %command.full_name% ChoiceType --show-deprecated</info>
 
 The command displays the definition of the given option name.
 
@@ -96,13 +108,17 @@ EOF
             $object = null;
             $options['core_types'] = $this->getCoreTypes();
             $options['service_types'] = array_values(array_diff($this->types, $options['core_types']));
+            if ($input->getOption('show-deprecated')) {
+                $options['core_types'] = $this->filterTypesByDeprecated($options['core_types']);
+                $options['service_types'] = $this->filterTypesByDeprecated($options['service_types']);
+            }
             $options['extensions'] = $this->extensions;
             $options['guessers'] = $this->guessers;
             foreach ($options as $k => $list) {
                 sort($options[$k]);
             }
         } else {
-            if (!class_exists($class)) {
+            if (!class_exists($class) || !is_subclass_of($class, FormTypeInterface::class)) {
                 $class = $this->getFqcnTypeClass($input, $io, $class);
             }
             $resolvedType = $this->formRegistry->getType($class);
@@ -111,10 +127,10 @@ EOF
                 $object = $resolvedType->getOptionsResolver();
 
                 if (!$object->isDefined($option)) {
-                    $message = sprintf('Option "%s" is not defined in "%s".', $option, get_class($resolvedType->getInnerType()));
+                    $message = sprintf('Option "%s" is not defined in "%s".', $option, \get_class($resolvedType->getInnerType()));
 
                     if ($alternatives = $this->findAlternatives($option, $object->getDefinedOptions())) {
-                        if (1 == count($alternatives)) {
+                        if (1 === \count($alternatives)) {
                             $message .= "\n\nDid you mean this?\n    ";
                         } else {
                             $message .= "\n\nDid you mean one of these?\n    ";
@@ -132,27 +148,34 @@ EOF
             }
         }
 
-        $helper = new DescriptorHelper();
+        $helper = new DescriptorHelper($this->fileLinkFormatter);
         $options['format'] = $input->getOption('format');
+        $options['show_deprecated'] = $input->getOption('show-deprecated');
         $helper->describe($io, $object, $options);
     }
 
     private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, $shortClassName)
     {
-        $classes = array();
+        $classes = [];
         sort($this->namespaces);
         foreach ($this->namespaces as $namespace) {
             if (class_exists($fqcn = $namespace.'\\'.$shortClassName)) {
                 $classes[] = $fqcn;
+            } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName))) {
+                $classes[] = $fqcn;
+            } elseif (class_exists($fqcn = $namespace.'\\'.ucfirst($shortClassName).'Type')) {
+                $classes[] = $fqcn;
+            } elseif ('type' === substr($shortClassName, -4) && class_exists($fqcn = $namespace.'\\'.ucfirst(substr($shortClassName, 0, -4).'Type'))) {
+                $classes[] = $fqcn;
             }
         }
 
-        if (0 === $count = count($classes)) {
+        if (0 === $count = \count($classes)) {
             $message = sprintf("Could not find type \"%s\" into the following namespaces:\n    %s", $shortClassName, implode("\n    ", $this->namespaces));
 
             $allTypes = array_merge($this->getCoreTypes(), $this->types);
             if ($alternatives = $this->findAlternatives($shortClassName, $allTypes)) {
-                if (1 == count($alternatives)) {
+                if (1 === \count($alternatives)) {
                     $message .= "\n\nDid you mean this?\n    ";
                 } else {
                     $message .= "\n\nDid you mean one of these?\n    ";
@@ -178,18 +201,34 @@ EOF
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
         $loadTypesRefMethod->setAccessible(true);
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-        $coreTypes = array_map(function (FormTypeInterface $type) { return get_class($type); }, $coreTypes);
+        $coreTypes = array_map(function (FormTypeInterface $type) { return \get_class($type); }, $coreTypes);
         sort($coreTypes);
 
         return $coreTypes;
     }
 
+    private function filterTypesByDeprecated(array $types): array
+    {
+        $typesWithDeprecatedOptions = [];
+        foreach ($types as $class) {
+            $optionsResolver = $this->formRegistry->getType($class)->getOptionsResolver();
+            foreach ($optionsResolver->getDefinedOptions() as $option) {
+                if ($optionsResolver->isDeprecated($option)) {
+                    $typesWithDeprecatedOptions[] = $class;
+                    break;
+                }
+            }
+        }
+
+        return $typesWithDeprecatedOptions;
+    }
+
     private function findAlternatives($name, array $collection)
     {
-        $alternatives = array();
+        $alternatives = [];
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
-            if ($lev <= strlen($name) / 3 || false !== strpos($item, $name)) {
+            if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {
                 $alternatives[$item] = isset($alternatives[$item]) ? $alternatives[$item] - $lev : $lev;
             }
         }

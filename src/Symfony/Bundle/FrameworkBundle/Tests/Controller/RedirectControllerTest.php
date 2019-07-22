@@ -11,13 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @author Marcin Sikon <marcin.sikon@gmail.com>
@@ -47,24 +47,25 @@ class RedirectControllerTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testRoute($permanent, $keepRequestMethod, $ignoreAttributes, $expectedCode, $expectedAttributes)
+    public function testRoute($permanent, $keepRequestMethod, $keepQueryParams, $ignoreAttributes, $expectedCode, $expectedAttributes)
     {
         $request = new Request();
 
         $route = 'new-route';
         $url = '/redirect-url';
-        $attributes = array(
+        $attributes = [
             'route' => $route,
             'permanent' => $permanent,
             '_route' => 'current-route',
-            '_route_params' => array(
+            '_route_params' => [
                 'route' => $route,
                 'permanent' => $permanent,
                 'additional-parameter' => 'value',
                 'ignoreAttributes' => $ignoreAttributes,
                 'keepRequestMethod' => $keepRequestMethod,
-            ),
-        );
+                'keepQueryParams' => $keepQueryParams,
+            ],
+        ];
 
         $request->attributes = new ParameterBag($attributes);
 
@@ -73,11 +74,11 @@ class RedirectControllerTest extends TestCase
             ->expects($this->once())
             ->method('generate')
             ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
-            ->will($this->returnValue($url));
+            ->willReturn($url);
 
         $controller = new RedirectController($router);
 
-        $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes, $keepRequestMethod);
+        $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes, $keepRequestMethod, $keepQueryParams);
 
         $this->assertRedirectUrl($returnResponse, $url);
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
@@ -85,16 +86,16 @@ class RedirectControllerTest extends TestCase
 
     public function provider()
     {
-        return array(
-            array(true, false, false, 301, array('additional-parameter' => 'value')),
-            array(false, false, false, 302, array('additional-parameter' => 'value')),
-            array(false, false, true, 302, array()),
-            array(false, false, array('additional-parameter'), 302, array()),
-            array(true, true, false, 308, array('additional-parameter' => 'value')),
-            array(false, true, false, 307, array('additional-parameter' => 'value')),
-            array(false, true, true, 307, array()),
-            array(false, true, array('additional-parameter'), 307, array()),
-        );
+        return [
+            [true, false, false, false, 301, ['additional-parameter' => 'value']],
+            [false, false, false, false, 302, ['additional-parameter' => 'value']],
+            [false, false, false, true, 302, []],
+            [false, false, false, ['additional-parameter'], 302, []],
+            [true, true, false, false, 308, ['additional-parameter' => 'value']],
+            [false, true, false, false, 307, ['additional-parameter' => 'value']],
+            [false, true, false, true, 307, []],
+            [false, true, true, ['additional-parameter'], 307, []],
+        ];
     }
 
     public function testEmptyPath()
@@ -160,33 +161,33 @@ class RedirectControllerTest extends TestCase
 
     public function urlRedirectProvider()
     {
-        return array(
+        return [
             // Standard ports
-            array('http',  null, null,  'http',  80,   ''),
-            array('http',  80,   null,  'http',  80,   ''),
-            array('https', null, null,  'http',  80,   ''),
-            array('https', 80,   null,  'http',  80,   ''),
+            ['http',  null, null,  'http',  80,   ''],
+            ['http',  80,   null,  'http',  80,   ''],
+            ['https', null, null,  'http',  80,   ''],
+            ['https', 80,   null,  'http',  80,   ''],
 
-            array('http',  null,  null, 'https', 443,  ''),
-            array('http',  null,  443,  'https', 443,  ''),
-            array('https', null,  null, 'https', 443,  ''),
-            array('https', null,  443,  'https', 443,  ''),
+            ['http',  null,  null, 'https', 443,  ''],
+            ['http',  null,  443,  'https', 443,  ''],
+            ['https', null,  null, 'https', 443,  ''],
+            ['https', null,  443,  'https', 443,  ''],
 
             // Non-standard ports
-            array('http',  null,  null, 'http',  8080, ':8080'),
-            array('http',  4080,  null, 'http',  8080, ':4080'),
-            array('http',  80,    null, 'http',  8080, ''),
-            array('https', null,  null, 'http',  8080, ''),
-            array('https', null,  8443, 'http',  8080, ':8443'),
-            array('https', null,  443,  'http',  8080, ''),
+            ['http',  null,  null, 'http',  8080, ':8080'],
+            ['http',  4080,  null, 'http',  8080, ':4080'],
+            ['http',  80,    null, 'http',  8080, ''],
+            ['https', null,  null, 'http',  8080, ''],
+            ['https', null,  8443, 'http',  8080, ':8443'],
+            ['https', null,  443,  'http',  8080, ''],
 
-            array('https', null,  null, 'https', 8443, ':8443'),
-            array('https', null,  4443, 'https', 8443, ':4443'),
-            array('https', null,  443,  'https', 8443, ''),
-            array('http',  null,  null, 'https', 8443, ''),
-            array('http',  8080,  4443, 'https', 8443, ':8080'),
-            array('http',  80,    4443, 'https', 8443, ''),
-        );
+            ['https', null,  null, 'https', 8443, ':8443'],
+            ['https', null,  4443, 'https', 8443, ':4443'],
+            ['https', null,  443,  'https', 8443, ''],
+            ['http',  null,  null, 'https', 8443, ''],
+            ['http',  8080,  4443, 'https', 8443, ':8080'],
+            ['http',  80,    4443, 'https', 8443, ''],
+        ];
     }
 
     /**
@@ -208,13 +209,13 @@ class RedirectControllerTest extends TestCase
 
     public function pathQueryParamsProvider()
     {
-        return array(
-            array('http://www.example.com/base/redirect-path', '/redirect-path',  ''),
-            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''),
-            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'),
-            array('http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'),
-            array('http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'),
-        );
+        return [
+            ['http://www.example.com/base/redirect-path', '/redirect-path',  ''],
+            ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''],
+            ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'],
+            ['http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'],
+            ['http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'],
+        ];
     }
 
     /**
@@ -243,10 +244,10 @@ class RedirectControllerTest extends TestCase
         $port = 80;
 
         $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'base=zaza');
-        $request->query = new ParameterBag(array('base' => 'zaza'));
-        $request->attributes = new ParameterBag(array('_route_params' => array('base2' => 'zaza')));
+        $request->query = new ParameterBag(['base' => 'zaza']);
+        $request->attributes = new ParameterBag(['_route_params' => ['base2' => 'zaza']]);
         $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
-        $urlGenerator->expects($this->once())->method('generate')->will($this->returnValue('/test?base=zaza&base2=zaza'))->with('/test', array('base' => 'zaza', 'base2' => 'zaza'), UrlGeneratorInterface::ABSOLUTE_URL);
+        $urlGenerator->expects($this->once())->method('generate')->willReturn('/test?base=zaza&base2=zaza')->with('/test', ['base' => 'zaza', 'base2' => 'zaza'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $controller = new RedirectController($urlGenerator);
         $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?base=zaza&base2=zaza');
@@ -260,10 +261,10 @@ class RedirectControllerTest extends TestCase
         $port = 80;
 
         $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'base=zaza');
-        $request->query = new ParameterBag(array('base' => 'zaza'));
-        $request->attributes = new ParameterBag(array('_route_params' => array('base' => 'zouzou')));
+        $request->query = new ParameterBag(['base' => 'zaza']);
+        $request->attributes = new ParameterBag(['_route_params' => ['base' => 'zouzou']]);
         $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
-        $urlGenerator->expects($this->once())->method('generate')->will($this->returnValue('/test?base=zouzou'))->with('/test', array('base' => 'zouzou'), UrlGeneratorInterface::ABSOLUTE_URL);
+        $urlGenerator->expects($this->once())->method('generate')->willReturn('/test?base=zouzou')->with('/test', ['base' => 'zouzou'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $controller = new RedirectController($urlGenerator);
         $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?base=zouzou');
@@ -275,23 +276,23 @@ class RedirectControllerTest extends TestCase
         $request
             ->expects($this->any())
             ->method('getScheme')
-            ->will($this->returnValue($scheme));
+            ->willReturn($scheme);
         $request
             ->expects($this->any())
             ->method('getHost')
-            ->will($this->returnValue($host));
+            ->willReturn($host);
         $request
             ->expects($this->any())
             ->method('getPort')
-            ->will($this->returnValue($port));
+            ->willReturn($port);
         $request
             ->expects($this->any())
             ->method('getBaseUrl')
-            ->will($this->returnValue($baseUrl));
+            ->willReturn($baseUrl);
         $request
             ->expects($this->any())
             ->method('getQueryString')
-            ->will($this->returnValue($queryString));
+            ->willReturn($queryString);
 
         return $request;
     }

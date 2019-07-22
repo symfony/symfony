@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -42,7 +43,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     private $optionsResolver;
 
-    public function __construct(FormTypeInterface $innerType, array $typeExtensions = array(), ResolvedFormTypeInterface $parent = null)
+    public function __construct(FormTypeInterface $innerType, array $typeExtensions = [], ResolvedFormTypeInterface $parent = null)
     {
         foreach ($typeExtensions as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
@@ -90,9 +91,13 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = array())
+    public function createBuilder(FormFactoryInterface $factory, $name, array $options = [])
     {
-        $options = $this->getOptionsResolver()->resolve($options);
+        try {
+            $options = $this->getOptionsResolver()->resolve($options);
+        } catch (ExceptionInterface $e) {
+            throw new $e(sprintf('An error has occurred resolving the options of the form "%s": %s', \get_class($this->getInnerType()), $e->getMessage()), $e->getCode(), $e);
+        }
 
         // Should be decoupled from the specific option at some point
         $dataClass = isset($options['data_class']) ? $options['data_class'] : null;
@@ -205,7 +210,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * Override this method if you want to customize the builder class.
      *
      * @param string               $name      The name of the builder
-     * @param string               $dataClass The data class
+     * @param string|null          $dataClass The data class
      * @param FormFactoryInterface $factory   The current form factory
      * @param array                $options   The builder options
      *

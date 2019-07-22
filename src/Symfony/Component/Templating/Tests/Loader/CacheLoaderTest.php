@@ -12,11 +12,11 @@
 namespace Symfony\Component\Templating\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Loader\CacheLoader;
+use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Storage\StringStorage;
-use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\Templating\TemplateReference;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class CacheLoaderTest extends TestCase
 {
@@ -29,7 +29,7 @@ class CacheLoaderTest extends TestCase
 
     public function testLoad()
     {
-        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.mt_rand(111111, 999999);
+        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.mt_rand(111111, 999999);
         mkdir($dir, 0777, true);
 
         $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), $dir);
@@ -39,7 +39,7 @@ class CacheLoaderTest extends TestCase
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with('Storing template in cache.', array('name' => 'index'));
+            ->with('Storing template in cache.', ['name' => 'index']);
         $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
 
@@ -47,7 +47,7 @@ class CacheLoaderTest extends TestCase
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with('Fetching template from cache.', array('name' => 'index'));
+            ->with('Fetching template from cache.', ['name' => 'index']);
         $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
     }
@@ -87,7 +87,7 @@ class ProjectTemplateLoaderVar extends Loader
         return false;
     }
 
-    public function isFresh(TemplateReferenceInterface $template, $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time)
     {
         return false;
     }

@@ -30,7 +30,7 @@ final class TransitionBlocker
      *                           blocked the transition. E.g. for a condition "distance must be larger than
      *                           5 miles", you might want to pass around the value of 5.
      */
-    public function __construct(string $message, string $code, array $parameters = array())
+    public function __construct(string $message, string $code, array $parameters = [])
     {
         $this->message = $message;
         $this->code = $code;
@@ -47,9 +47,9 @@ final class TransitionBlocker
      */
     public static function createBlockedByMarking(Marking $marking): self
     {
-        return new static('The marking does not enable the transition.', self::BLOCKED_BY_MARKING, array(
+        return new static('The marking does not enable the transition.', self::BLOCKED_BY_MARKING, [
             'marking' => $marking,
-        ));
+        ]);
     }
 
     /**
@@ -58,9 +58,9 @@ final class TransitionBlocker
      */
     public static function createBlockedByExpressionGuardListener(string $expression): self
     {
-        return new static('The expression blocks the transition.', self::BLOCKED_BY_EXPRESSION_GUARD_LISTENER, array(
+        return new static('The expression blocks the transition.', self::BLOCKED_BY_EXPRESSION_GUARD_LISTENER, [
             'expression' => $expression,
-        ));
+        ]);
     }
 
     /**

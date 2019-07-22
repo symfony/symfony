@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig;
 
+use Symfony\Bundle\FullStack;
 use Twig\Error\SyntaxError;
 
 /**
@@ -18,15 +19,15 @@ use Twig\Error\SyntaxError;
  */
 class UndefinedCallableHandler
 {
-    private static $filterComponents = array(
+    private static $filterComponents = [
         'humanize' => 'form',
         'trans' => 'translation',
         'transchoice' => 'translation',
         'yaml_encode' => 'yaml',
         'yaml_dump' => 'yaml',
-    );
+    ];
 
-    private static $functionComponents = array(
+    private static $functionComponents = [
         'asset' => 'asset',
         'asset_version' => 'asset',
         'dump' => 'debug-bundle',
@@ -54,7 +55,15 @@ class UndefinedCallableHandler
         'workflow_transitions' => 'workflow',
         'workflow_has_marked_place' => 'workflow',
         'workflow_marked_places' => 'workflow',
-    );
+    ];
+
+    private static $fullStackEnable = [
+        'form' => 'enable "framework.form"',
+        'security-core' => 'add the "SecurityBundle"',
+        'security-http' => 'add the "SecurityBundle"',
+        'web-link' => 'enable "framework.web_link"',
+        'workflow' => 'enable "framework.workflows"',
+    ];
 
     public static function onUndefinedFilter($name)
     {
@@ -62,8 +71,7 @@ class UndefinedCallableHandler
             return false;
         }
 
-        // Twig will append the source context to the message, so that it will end up being like "[...] Unknown filter "%s" in foo.html.twig on line 123."
-        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown filter "%s".', self::$filterComponents[$name], $name));
+        self::onUndefined($name, 'filter', self::$filterComponents[$name]);
     }
 
     public static function onUndefinedFunction($name)
@@ -72,6 +80,15 @@ class UndefinedCallableHandler
             return false;
         }
 
-        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown function "%s".', self::$functionComponents[$name], $name));
+        self::onUndefined($name, 'function', self::$functionComponents[$name]);
+    }
+
+    private static function onUndefined($name, $type, $component)
+    {
+        if (class_exists(FullStack::class) && isset(self::$fullStackEnable[$component])) {
+            throw new SyntaxError(sprintf('Did you forget to %s? Unknown %s "%s".', self::$fullStackEnable[$component], $type, $name));
+        }
+
+        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown %s "%s".', $component, $type, $name));
     }
 }

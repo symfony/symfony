@@ -38,6 +38,11 @@ final class Countries extends ResourceBundle
         return self::readEntry(['Regions'], 'meta');
     }
 
+    public static function getAlpha3Codes(): array
+    {
+        return self::readEntry(['Alpha3'], 'meta');
+    }
+
     public static function exists(string $country): bool
     {
         try {

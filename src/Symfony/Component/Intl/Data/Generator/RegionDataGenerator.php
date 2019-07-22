@@ -82,6 +82,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir)
     {
         $compiler->compile($sourceDir.'/region', $tempDir);
+        $compiler->compile($sourceDir.'/misc/metadata.txt', $tempDir);
     }
 
     /**
@@ -133,6 +134,7 @@ class RegionDataGenerator extends AbstractDataGenerator
         return [
             'Version' => $rootBundle['Version'],
             'Regions' => $this->regionCodes,
+            'Alpha3' => $this->generateAlpha3($reader, $tempDir),
         ];
     }
 
@@ -153,5 +155,23 @@ class RegionDataGenerator extends AbstractDataGenerator
         }
 
         return $regionNames;
+    }
+
+    protected function generateAlpha3(BundleEntryReaderInterface $reader, $tempDir)
+    {
+        $metadataBundle = $reader->read($tempDir, 'metadata');
+
+        $shortCodes = array_flip($this->regionCodes);
+        $alpha3 = [];
+        foreach ($metadataBundle['alias']['territory'] as $alias => $data) {
+            if (3 === strlen($alias) && 'overlong' === $data['reason'] && !ctype_digit($alias)) {
+                $short = $data['replacement'];
+                if (isset($shortCodes[$short])) {
+                    $alpha3[$short] = $alias;
+                }
+            }
+        }
+
+        return $alpha3;
     }
 }

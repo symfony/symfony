@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * preferred choices are repeated in the list of all choices
  * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
 
 4.3.0

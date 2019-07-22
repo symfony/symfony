@@ -13,6 +13,7 @@ namespace Symfony\Component\VarDumper\Tests\Cloner;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Tests\Fixtures\Php74;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -420,6 +421,73 @@ Symfony\Component\VarDumper\Cloner\Data Object
             [1] => Array
                 (
                     [foo] => 124
+                )
+
+        )
+
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+)
+
+EOTXT;
+        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testPhp74()
+    {
+        $data = new Php74();
+
+        $cloner = new VarCloner();
+        $clone = $cloner->cloneVar($data);
+
+        $expected = <<<'EOTXT'
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\Php74
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %i
+                            [refCount] => 0
+                            [position] => 1
+                            [attr] => Array
+                                (
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [p1] => 123
+                    [p2] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => stdClass
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %i
+                            [refCount] => 0
+                            [position] => 0
+                            [attr] => Array
+                                (
+                                )
+
+                        )
+
                 )
 
         )

@@ -41,6 +41,11 @@
         </service>
 
         <service id="routing.loader.service" class="Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoader">
+            <argument type="service" id="service_container" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4, use "routing.loader.container" instead.</deprecated>
+        </service>
+
+        <service id="routing.loader.container" class="Symfony\Component\Routing\Loader\ContainerLoader">
             <tag name="routing.loader" />
             <argument type="service" id="service_container" />
         </service>

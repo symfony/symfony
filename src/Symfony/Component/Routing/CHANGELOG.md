@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * Deprecated `ServiceRouterLoader` in favor of `ContainerLoader`.
+ * Deprecated `ObjectRouteLoader` in favor of `ObjectLoader`.
+
 4.3.0
 -----
 

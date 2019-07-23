@@ -12,50 +12,22 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Loader\ObjectLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Tests\Fixtures\TestObjectRouteLoader;
 
-/**
- * @group legacy
- */
-class ObjectRouteLoaderTest extends TestCase
+class ObjectLoaderTest extends TestCase
 {
-    /**
-     * @expectedDeprecation Referencing service route loaders with a single colon is deprecated since Symfony 4.1. Use my_route_provider_service::loadRoutes instead.
-     */
-    public function testLoadCallsServiceAndReturnsCollectionWithLegacyNotation()
-    {
-        $loader = new TestObjectRouteLoader();
-
-        // create a basic collection that will be returned
-        $collection = new RouteCollection();
-        $collection->add('foo', new Route('/foo'));
-
-        $loader->loaderMap = [
-            'my_route_provider_service' => new TestObjectRouteLoaderRouteService($collection),
-        ];
-
-        $actualRoutes = $loader->load(
-            'my_route_provider_service:loadRoutes',
-            'service'
-        );
-
-        $this->assertSame($collection, $actualRoutes);
-        // the service file should be listed as a resource
-        $this->assertNotEmpty($actualRoutes->getResources());
-    }
-
     public function testLoadCallsServiceAndReturnsCollection()
     {
-        $loader = new TestObjectRouteLoader();
+        $loader = new TestObjectLoader();
 
         // create a basic collection that will be returned
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
 
         $loader->loaderMap = [
-            'my_route_provider_service' => new TestObjectRouteLoaderRouteService($collection),
+            'my_route_provider_service' => new TestObjectLoaderRouteService($collection),
         ];
 
         $actualRoutes = $loader->load(
@@ -74,7 +46,7 @@ class ObjectRouteLoaderTest extends TestCase
      */
     public function testExceptionWithoutSyntax(string $resourceString): void
     {
-        $loader = new TestObjectRouteLoader();
+        $loader = new TestObjectLoader();
         $loader->load($resourceString);
     }
 
@@ -95,7 +67,7 @@ class ObjectRouteLoaderTest extends TestCase
      */
     public function testExceptionOnNoObjectReturned()
     {
-        $loader = new TestObjectRouteLoader();
+        $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => 'NOT_AN_OBJECT'];
         $loader->load('my_service::method');
     }
@@ -105,7 +77,7 @@ class ObjectRouteLoaderTest extends TestCase
      */
     public function testExceptionOnBadMethod()
     {
-        $loader = new TestObjectRouteLoader();
+        $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => new \stdClass()];
         $loader->load('my_service::method');
     }
@@ -122,13 +94,28 @@ class ObjectRouteLoaderTest extends TestCase
             ->method('loadRoutes')
             ->willReturn('NOT_A_COLLECTION');
 
-        $loader = new TestObjectRouteLoader();
+        $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => $service];
         $loader->load('my_service::loadRoutes');
     }
 }
 
-class TestObjectRouteLoaderRouteService
+class TestObjectLoader extends ObjectLoader
+{
+    public $loaderMap = [];
+
+    public function supports($resource, $type = null)
+    {
+        return 'service';
+    }
+
+    protected function getObject(string $id)
+    {
+        return $this->loaderMap[$id] ?? null;
+    }
+}
+
+class TestObjectLoaderRouteService
 {
     private $collection;
 

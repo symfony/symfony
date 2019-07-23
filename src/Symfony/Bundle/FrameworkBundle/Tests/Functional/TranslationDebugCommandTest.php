@@ -17,7 +17,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @group functional
  */
-class TranslationDebugCommandTest extends WebTestCase
+class TranslationDebugCommandTest extends AbstractWebTestCase
 {
     private $application;
 

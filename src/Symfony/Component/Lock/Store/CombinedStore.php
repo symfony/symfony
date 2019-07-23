@@ -23,7 +23,7 @@ use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
 
 /**
- * CombinedStore is a StoreInterface implementation able to manage and synchronize several StoreInterfaces.
+ * CombinedStore is a PersistingStoreInterface implementation able to manage and synchronize several StoreInterfaces.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */

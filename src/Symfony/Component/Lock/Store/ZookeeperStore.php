@@ -19,7 +19,7 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
- * ZookeeperStore is a StoreInterface implementation using Zookeeper as store engine.
+ * ZookeeperStore is a PersistingStoreInterface implementation using Zookeeper as store engine.
  *
  * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
  */

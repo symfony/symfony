@@ -19,7 +19,7 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
- * FlockStore is a StoreInterface implementation using the FileSystem flock.
+ * FlockStore is a PersistingStoreInterface implementation using the FileSystem flock.
  *
  * Original implementation in \Symfony\Component\Filesystem\LockHandler.
  *

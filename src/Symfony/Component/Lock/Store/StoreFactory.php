@@ -15,7 +15,7 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
-use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
  * StoreFactory create stores and connections.
@@ -27,7 +27,7 @@ class StoreFactory
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached|\Zookeeper|string $connection Connection or DSN or Store short name
      *
-     * @return StoreInterface
+     * @return PersistingStoreInterface
      */
     public static function createStore($connection)
     {

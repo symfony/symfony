@@ -21,7 +21,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
- * RetryTillSaveStore is a StoreInterface implementation which decorate a non blocking StoreInterface to provide a
+ * RetryTillSaveStore is a PersistingStoreInterface implementation which decorate a non blocking PersistingStoreInterface to provide a
  * blocking storage.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -35,7 +35,7 @@ class RetryTillSaveStore implements PersistingStoreInterface, BlockingStoreInter
     private $retryCount;
 
     /**
-     * @param PersistingStoreInterface $decorated  The decorated StoreInterface
+     * @param PersistingStoreInterface $decorated  The decorated PersistingStoreInterface
      * @param int                      $retrySleep Duration in ms between 2 retry
      * @param int                      $retryCount Maximum amount of retry
      */

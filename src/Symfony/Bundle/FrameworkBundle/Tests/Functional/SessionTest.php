@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-class SessionTest extends WebTestCase
+class SessionTest extends AbstractWebTestCase
 {
     /**
      * Tests session attributes persist.

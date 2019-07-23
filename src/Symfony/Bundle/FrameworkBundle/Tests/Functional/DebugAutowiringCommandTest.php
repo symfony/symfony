@@ -17,7 +17,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 /**
  * @group functional
  */
-class DebugAutowiringCommandTest extends WebTestCase
+class DebugAutowiringCommandTest extends AbstractWebTestCase
 {
     public function testBasicFunctionality()
     {

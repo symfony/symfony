@@ -19,7 +19,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @group functional
  */
-class ConfigDebugCommandTest extends WebTestCase
+class ConfigDebugCommandTest extends AbstractWebTestCase
 {
     private $application;
 

@@ -40,23 +40,22 @@ class ErrorRendererPass implements CompilerPassInterface
             return;
         }
 
-        $renderers = $registered = [];
+        $renderers = [];
         foreach ($container->findTaggedServiceIds($this->rendererTag, true) as $serviceId => $tags) {
             /** @var ErrorRendererInterface $class */
             $class = $container->getDefinition($serviceId)->getClass();
 
             foreach ($tags as $tag) {
                 $format = $tag['format'] ?? $class::getFormat();
-                if (!isset($registered[$format])) {
-                    $priority = $tag['priority'] ?? 0;
+                $priority = $tag['priority'] ?? 0;
+                if (!isset($renderers[$priority][$format])) {
                     $renderers[$priority][$format] = new Reference($serviceId);
-                    $registered[$format] = true;
                 }
             }
         }
 
         if ($renderers) {
-            krsort($renderers);
+            ksort($renderers);
             $renderers = array_merge(...$renderers);
         }
 

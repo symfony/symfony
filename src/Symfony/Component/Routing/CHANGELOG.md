@@ -9,6 +9,12 @@ CHANGELOG
  * `Serializable` implementing methods for `Route` and `CompiledRoute` are final
  * removed referencing service route loaders with a single colon
 
+4.4.0
+-----
+
+ * Deprecated `ServiceRouterLoader` in favor of `ContainerLoader`.
+ * Deprecated `ObjectRouteLoader` in favor of `ObjectLoader`.
+
 4.3.0
 -----
 

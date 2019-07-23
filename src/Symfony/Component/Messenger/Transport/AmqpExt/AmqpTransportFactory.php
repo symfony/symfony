@@ -22,6 +22,8 @@ class AmqpTransportFactory implements TransportFactoryInterface
 {
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
+        unset($options['transport_name']);
+
         return new AmqpTransport(Connection::fromDsn($dsn, $options), $serializer);
     }
 

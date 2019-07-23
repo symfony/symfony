@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-class LogoutTest extends WebTestCase
+class LogoutTest extends AbstractWebTestCase
 {
     public function testSessionLessRememberMeLogout()
     {

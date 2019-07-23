@@ -17,7 +17,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
  *
  * @see https://packagist.org/packages/mongodb/mongodb
- * @see http://php.net/manual/en/set.mongodb.php
+ * @see https://php.net/mongodb
  */
 class MongoDbSessionHandler extends AbstractSessionHandler
 {

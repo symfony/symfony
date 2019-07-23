@@ -31,6 +31,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
 
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
+        unset($options['transport_name']);
         $configuration = Connection::buildConfiguration($dsn, $options);
 
         try {

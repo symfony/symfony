@@ -843,10 +843,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testValidatesCachedResponsesUseSameHttpMethod()
     {
-        $test = $this;
-
-        $this->setNextResponse(200, [], 'Hello World', function ($request, $response) use ($test) {
-            $test->assertSame('OPTIONS', $request->getMethod());
+        $this->setNextResponse(200, [], 'Hello World', function ($request, $response) {
+            $this->assertSame('OPTIONS', $request->getMethod());
         });
 
         // build initial request

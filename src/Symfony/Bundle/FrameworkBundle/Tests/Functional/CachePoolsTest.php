@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
-class CachePoolsTest extends WebTestCase
+class CachePoolsTest extends AbstractWebTestCase
 {
     public function testCachePools()
     {

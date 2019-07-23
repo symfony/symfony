@@ -48,4 +48,20 @@ class ErrorRendererPassTest extends TestCase
         ];
         $this->assertEquals($expected, $serviceLocatorDefinition->getArgument(0));
     }
+
+    public function testServicesAreOrderedAccordingToPriority()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('error_renderer')->setArguments([null]);
+        $container->register('r2')->addTag('error_renderer.renderer', ['format' => 'json', 'priority' => 100]);
+        $container->register('r1')->addTag('error_renderer.renderer', ['format' => 'json', 'priority' => 200]);
+        $container->register('r3')->addTag('error_renderer.renderer', ['format' => 'json']);
+        (new ErrorRendererPass())->process($container);
+
+        $expected = [
+            'json' => new ServiceClosureArgument(new Reference('r1')),
+        ];
+        $serviceLocatorDefinition = $container->getDefinition((string) $definition->getArgument(0));
+        $this->assertEquals($expected, $serviceLocatorDefinition->getArgument(0));
+    }
 }

@@ -22,6 +22,6 @@ class TxtErrorRendererTest extends TestCase
         $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
         $expected = '[title] Internal Server Error%A[status] 500%A[detail] Foo%A[1] RuntimeException: Foo%A';
 
-        $this->assertStringMatchesFormat($expected, (new TxtErrorRenderer())->render($exception));
+        $this->assertStringMatchesFormat($expected, (new TxtErrorRenderer(true))->render($exception));
     }
 }

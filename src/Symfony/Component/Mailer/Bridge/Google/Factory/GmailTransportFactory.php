@@ -28,7 +28,7 @@ final class GmailTransportFactory extends AbstractTransportFactory
             return new GmailTransport($this->getUser($dsn), $this->getPassword($dsn), $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn);
+        throw new UnsupportedSchemeException($dsn, ['smtp']);
     }
 
     public function supports(Dsn $dsn): bool

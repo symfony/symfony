@@ -35,7 +35,7 @@ final class PostmarkTransportFactory extends AbstractTransportFactory
             return new Postmark\Smtp\PostmarkTransport($user, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn);
+        throw new UnsupportedSchemeException($dsn, ['api', 'smtp']);
     }
 
     public function supports(Dsn $dsn): bool

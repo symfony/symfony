@@ -24,7 +24,7 @@ final class SendmailTransportFactory extends AbstractTransportFactory
             return new SendmailTransport(null, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn);
+        throw new UnsupportedSchemeException($dsn, ['smtp']);
     }
 
     public function supports(Dsn $dsn): bool

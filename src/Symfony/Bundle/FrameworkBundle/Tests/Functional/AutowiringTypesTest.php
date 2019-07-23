@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 
-class AutowiringTypesTest extends WebTestCase
+class AutowiringTypesTest extends AbstractWebTestCase
 {
     public function testAnnotationReaderAutowiring()
     {

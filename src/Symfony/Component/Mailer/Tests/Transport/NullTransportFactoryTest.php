@@ -47,6 +47,9 @@ class NullTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield [new Dsn('foo', 'null')];
+        yield [
+            new Dsn('foo', 'null'),
+            'The "foo" scheme is not supported for mailer "null". Supported schemes are: "smtp".',
+        ];
     }
 }

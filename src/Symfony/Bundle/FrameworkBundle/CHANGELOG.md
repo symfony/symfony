@@ -27,6 +27,7 @@ CHANGELOG
  * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`
  * Added support for configuring chained cache pools
  * Deprecated booting the kernel before running `WebTestCase::createClient()`
+ * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
 
 4.3.0
 -----

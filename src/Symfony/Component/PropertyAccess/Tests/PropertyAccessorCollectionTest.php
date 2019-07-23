@@ -43,28 +43,6 @@ class PropertyAccessorCollectionTest_Car
     }
 }
 
-class PropertyAccessorCollectionTest_CarOnlyAdder
-{
-    public function addAxis($axis)
-    {
-    }
-
-    public function getAxes()
-    {
-    }
-}
-
-class PropertyAccessorCollectionTest_CarOnlyRemover
-{
-    public function removeAxis($axis)
-    {
-    }
-
-    public function getAxes()
-    {
-    }
-}
-
 class PropertyAccessorCollectionTest_CarNoAdderAndRemover
 {
     public function getAxes()

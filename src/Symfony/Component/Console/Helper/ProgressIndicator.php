@@ -181,11 +181,9 @@ class ProgressIndicator
             return;
         }
 
-        $self = $this;
-
-        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self) {
-            if ($formatter = $self::getPlaceholderFormatterDefinition($matches[1])) {
-                return $formatter($self);
+        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
+            if ($formatter = self::getPlaceholderFormatterDefinition($matches[1])) {
+                return $formatter($this);
             }
 
             return $matches[0];

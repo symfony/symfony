@@ -41,7 +41,7 @@ final class MailgunTransportFactory extends AbstractTransportFactory
             return new Mailgun\Smtp\MailgunTransport($user, $password, $region, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn);
+        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp']);
     }
 
     public function supports(Dsn $dsn): bool

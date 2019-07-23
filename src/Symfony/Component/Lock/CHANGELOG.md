@@ -6,7 +6,8 @@ CHANGELOG
 
  * added InvalidTtlException  
  * deprecated `StoreInterface` in favor of `BlockingStoreInterface` and `PersistingStoreInterface`
-   
+ * `Factory` is deprecated, use `LockFactory` instead
+
 4.2.0
 -----
 

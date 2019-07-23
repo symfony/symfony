@@ -47,6 +47,9 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield [new Dsn('http', 'sendmail')];
+        yield [
+            new Dsn('http', 'sendmail'),
+            'The "http" scheme is not supported for mailer "sendmail". Supported schemes are: "smtp".',
+        ];
     }
 }

@@ -100,7 +100,13 @@ final class HttplugClient implements HttpClient, RequestFactory, StreamFactory, 
         }
 
         if (\is_string($body ?? '')) {
-            return $this->client->createStream($body ?? '');
+            $body = $this->client->createStream($body ?? '');
+
+            if ($body->isSeekable()) {
+                $body->seek(0);
+            }
+
+            return $body;
         }
 
         if (\is_resource($body)) {

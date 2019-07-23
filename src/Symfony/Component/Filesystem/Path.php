@@ -23,6 +23,7 @@ use Symfony\Component\Filesystem\ExceptionInvalidArgumentException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Thomas Schulz <mail@king2500.net>
+ * @author Théo Fidry <theo.fidry@gmail.com>
  */
 final class Path
 {

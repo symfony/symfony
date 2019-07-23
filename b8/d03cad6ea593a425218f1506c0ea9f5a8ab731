@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dorumd at 2019-04-28T10:40:57Z
+
+@nicolas-grekas Ready for review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-11T10:19:14Z
+
+The bug has been fixed upstream, let's try again? Can you rerun the tests see if they pass now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-11T10:19:59Z
+
+Oh, would you mind doing a benchmark too? I'd be happy to know if the new way works faster than the current one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-08T13:14:52Z
+
+In theory, this should work, in practice, tests fail.
+Waiting for feedback on https://bugs.php.net/78263
+Could you please add a test case with a typed property that works by reference meanwhile?

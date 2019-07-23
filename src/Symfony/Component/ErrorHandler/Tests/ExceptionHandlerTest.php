@@ -52,16 +52,15 @@ class ExceptionHandlerTest extends TestCase
         $response = ob_get_clean();
 
         $this->assertContains('<h1 class="break-long-words exception-message">Foo</h1>', $response);
-        $this->assertContains('<div class="trace trace-as-html">', $response);
+        $this->assertContains('<div class="trace trace-as-html" id="trace-box-1">', $response);
 
         // taken from https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)
-        $htmlWithXss = '<body onload=alert(\'test1\')> <b onmouseover=alert(\'Wufff!\')>click me!</b> <img src="j&#X41vascript:alert(\'test2\')"> <meta http-equiv="refresh"
-content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg">';
+        $htmlWithXss = '<body onload=alert(\'test1\')> <b onmouseover=alert(\'Wufff!\')>click me!</b> <img src="j&#X41vascript:alert(\'test2\')"> <meta http-equiv="refresh" content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg">';
         ob_start();
         $handler->sendPhpResponse(new \RuntimeException($htmlWithXss));
         $response = ob_get_clean();
 
-        $this->assertContains(sprintf('<h1 class="break-long-words exception-message">%s</h1>', htmlspecialchars($htmlWithXss, ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')), $response);
+        $this->assertContains(sprintf('<h1 class="break-long-words exception-message long">%s</h1>', htmlspecialchars($htmlWithXss, ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')), $response);
     }
 
     public function testStatusCode()
@@ -106,7 +105,7 @@ content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"
         $handler->sendPhpResponse(new \RuntimeException('Foo', 0, new \RuntimeException('Bar')));
         $response = ob_get_clean();
 
-        $this->assertStringMatchesFormat('%A<p class="break-long-words trace-message">Foo</p>%A<p class="break-long-words trace-message">Bar</p>%A', $response);
+        $this->assertStringMatchesFormat('%A<h1 class="break-long-words exception-message">Foo</h1>%A<p class="break-long-words trace-message">Bar</p>%A', $response);
     }
 
     public function testHandle()

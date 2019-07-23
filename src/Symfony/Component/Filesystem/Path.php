@@ -101,9 +101,7 @@ final class Path
 
             // Collapse ".." with the previous part, if one exists
             // Don't collapse ".." if the previous part is also ".."
-            if ('..' === $part && \count($canonicalParts) > 0
-                    && '..' !== $canonicalParts[\count($canonicalParts) - 1]
-            ) {
+            if ('..' === $part && \count($canonicalParts) > 0 && '..' !== $canonicalParts[\count($canonicalParts) - 1]) {
                 \array_pop($canonicalParts);
 
                 continue;
@@ -686,7 +684,7 @@ final class Path
         $wasScheme = false;
 
         foreach ($paths as $path) {
-            $path = (string) $path;
+            $path = $path;
 
             if ('' === $path) {
                 continue;

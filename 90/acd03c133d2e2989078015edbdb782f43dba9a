@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-23T08:20:56Z
+
+Hum, but we don't want private properties. Maybe let's revert my latest patch on this class instead, it's not really needed actually...

@@ -40,7 +40,7 @@ class SwitchUserListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->tokenStorage = new TokenStorage();
         $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();

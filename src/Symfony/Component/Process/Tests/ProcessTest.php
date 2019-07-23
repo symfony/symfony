@@ -43,7 +43,7 @@ class ProcessTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (self::$process) {
             self::$process->stop(0);

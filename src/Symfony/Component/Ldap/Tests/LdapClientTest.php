@@ -30,7 +30,7 @@ class LdapClientTest extends LdapTestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
 

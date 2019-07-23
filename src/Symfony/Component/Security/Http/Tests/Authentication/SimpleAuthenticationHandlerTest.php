@@ -36,7 +36,7 @@ class SimpleAuthenticationHandlerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->successHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface')->getMock();
         $this->failureHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface')->getMock();

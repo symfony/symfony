@@ -47,7 +47,7 @@ class CacheWarmingTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->deleteTempDir();
     }
@@ -55,7 +55,7 @@ class CacheWarmingTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->deleteTempDir();
     }

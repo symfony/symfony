@@ -29,7 +29,7 @@ class StoreTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->request = Request::create('/');
         $this->response = new Response('hello world', 200, []);
@@ -42,7 +42,7 @@ class StoreTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->store = null;
         $this->request = null;

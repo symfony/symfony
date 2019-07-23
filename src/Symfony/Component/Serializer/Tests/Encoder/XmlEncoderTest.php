@@ -32,7 +32,7 @@ class XmlEncoderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->encoder = new XmlEncoder();
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);

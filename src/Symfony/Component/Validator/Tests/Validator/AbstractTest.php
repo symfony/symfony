@@ -46,7 +46,7 @@ abstract class AbstractTest extends AbstractValidatorTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::before();
 

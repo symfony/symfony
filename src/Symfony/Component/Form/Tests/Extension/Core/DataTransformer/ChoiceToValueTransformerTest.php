@@ -23,7 +23,7 @@ class ChoiceToValueTransformerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $list = new ArrayChoiceList(['', false, 'X', true]);
         $listWithNull = new ArrayChoiceList(['', false, 'X', null]);
@@ -35,7 +35,7 @@ class ChoiceToValueTransformerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->transformer = null;
         $this->transformerWithNull = null;

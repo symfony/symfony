@@ -38,7 +38,7 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::before();
 

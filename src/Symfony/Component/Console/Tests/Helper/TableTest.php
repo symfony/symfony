@@ -25,7 +25,7 @@ class TableTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->stream = fopen('php://memory', 'r+');
     }
@@ -33,7 +33,7 @@ class TableTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         fclose($this->stream);
         $this->stream = null;

@@ -25,7 +25,7 @@ class CollatorTest extends AbstractCollatorTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         IntlTestHelper::requireFullIntl($this, false);
 

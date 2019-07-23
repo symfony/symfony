@@ -31,7 +31,7 @@ class MongoDbSessionHandlerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
 

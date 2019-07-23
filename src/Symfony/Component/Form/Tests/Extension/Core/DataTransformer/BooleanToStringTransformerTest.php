@@ -26,7 +26,7 @@ class BooleanToStringTransformerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->transformer = new BooleanToStringTransformer(self::TRUE_VALUE);
     }
@@ -34,7 +34,7 @@ class BooleanToStringTransformerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->transformer = null;
     }

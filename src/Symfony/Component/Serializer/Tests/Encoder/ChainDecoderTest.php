@@ -27,7 +27,7 @@ class ChainDecoderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->decoder1 = $this
             ->getMockBuilder('Symfony\Component\Serializer\Encoder\DecoderInterface')

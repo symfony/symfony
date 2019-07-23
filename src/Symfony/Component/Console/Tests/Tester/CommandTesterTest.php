@@ -30,7 +30,7 @@ class CommandTesterTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->command = new Command('foo');
         $this->command->addArgument('command');
@@ -44,7 +44,7 @@ class CommandTesterTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->command = null;
         $this->tester = null;

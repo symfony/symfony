@@ -33,7 +33,7 @@ class XmlFileLoaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->loader = new XmlFileLoader(__DIR__.'/../../Fixtures/serialization.xml');
         $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');

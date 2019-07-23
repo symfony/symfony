@@ -22,7 +22,7 @@ class TemplateFilenameParserTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->parser = new TemplateFilenameParser();
     }
@@ -30,7 +30,7 @@ class TemplateFilenameParserTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->parser = null;
     }

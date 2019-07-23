@@ -33,7 +33,7 @@ class LogoutUrlGeneratorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
         $request = $this->getMockBuilder(Request::class)->getMock();

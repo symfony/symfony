@@ -34,7 +34,7 @@ abstract class AbstractEventDispatcherTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->dispatcher = $this->createEventDispatcher();
         $this->listener = new TestEventListener();
@@ -43,7 +43,7 @@ abstract class AbstractEventDispatcherTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->dispatcher = null;
         $this->listener = null;

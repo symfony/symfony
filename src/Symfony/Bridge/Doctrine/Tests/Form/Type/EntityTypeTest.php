@@ -62,7 +62,7 @@ class EntityTypeTest extends BaseTypeTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emRegistry = $this->createRegistryMock('default', $this->em);
@@ -95,7 +95,7 @@ class EntityTypeTest extends BaseTypeTest
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

@@ -43,7 +43,7 @@ class MockArraySessionStorageTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->attributes = new AttributeBag();
         $this->flashes = new FlashBag();
@@ -62,7 +62,7 @@ class MockArraySessionStorageTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->data = null;
         $this->flashes = null;

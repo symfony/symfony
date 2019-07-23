@@ -25,7 +25,7 @@ class LocaleTest extends AbstractLocaleTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         IntlTestHelper::requireFullIntl($this, false);
 

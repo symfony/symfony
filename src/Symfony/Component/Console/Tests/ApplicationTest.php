@@ -46,7 +46,7 @@ class ApplicationTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->colSize = getenv('COLUMNS');
     }
@@ -54,7 +54,7 @@ class ApplicationTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
         putenv('SHELL_VERBOSITY');

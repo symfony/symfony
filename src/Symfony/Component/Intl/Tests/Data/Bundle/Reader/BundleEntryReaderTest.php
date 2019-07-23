@@ -64,7 +64,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->readerImpl = $this->getMockBuilder('Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface')->getMock();
         $this->reader = new BundleEntryReader($this->readerImpl);

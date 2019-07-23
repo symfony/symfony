@@ -14,7 +14,7 @@ class Psr6CacheTest extends AbstractCacheTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->cache = new Psr6Cache(new ArrayAdapter());
     }

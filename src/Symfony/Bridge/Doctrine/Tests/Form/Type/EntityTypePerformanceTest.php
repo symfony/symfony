@@ -53,7 +53,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
 

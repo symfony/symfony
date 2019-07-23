@@ -22,7 +22,7 @@ class StreamOutputTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->stream = fopen('php://memory', 'a', false);
     }
@@ -30,7 +30,7 @@ class StreamOutputTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->stream = null;
     }

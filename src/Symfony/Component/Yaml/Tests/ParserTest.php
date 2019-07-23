@@ -25,7 +25,7 @@ class ParserTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->parser = new Parser();
     }
@@ -33,7 +33,7 @@ class ParserTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->parser = null;
 

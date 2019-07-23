@@ -57,7 +57,7 @@ class PhpArrayCacheTest extends CacheTestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');

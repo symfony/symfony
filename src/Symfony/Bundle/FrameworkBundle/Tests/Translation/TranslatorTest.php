@@ -25,7 +25,7 @@ class TranslatorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->tmpDir = sys_get_temp_dir().'/sf2_translation';
         $this->deleteTmpDir();
@@ -34,7 +34,7 @@ class TranslatorTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->deleteTmpDir();
     }

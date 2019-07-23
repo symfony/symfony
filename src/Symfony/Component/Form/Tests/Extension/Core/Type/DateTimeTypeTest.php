@@ -20,7 +20,7 @@ class DateTimeTypeTest extends BaseTypeTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         \Locale::setDefault('en');
 

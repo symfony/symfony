@@ -26,7 +26,7 @@ class GuardListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->configuration = [
             'test_is_granted' => 'is_granted("something")',
@@ -50,7 +50,7 @@ class GuardListenerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->authenticationChecker = null;
         $this->validator = null;

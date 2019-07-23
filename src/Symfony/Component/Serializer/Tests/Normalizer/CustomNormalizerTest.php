@@ -26,7 +26,7 @@ class CustomNormalizerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->normalizer = new CustomNormalizer();
         $this->normalizer->setSerializer(new Serializer());

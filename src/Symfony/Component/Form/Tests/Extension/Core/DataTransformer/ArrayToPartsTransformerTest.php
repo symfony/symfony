@@ -21,7 +21,7 @@ class ArrayToPartsTransformerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->transformer = new ArrayToPartsTransformer([
             'first' => ['a', 'b', 'c'],
@@ -32,7 +32,7 @@ class ArrayToPartsTransformerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->transformer = null;
     }

@@ -21,7 +21,7 @@ class ServicesResetterTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         ResettableService::$counter = 0;
         ClearableService::$counter = 0;

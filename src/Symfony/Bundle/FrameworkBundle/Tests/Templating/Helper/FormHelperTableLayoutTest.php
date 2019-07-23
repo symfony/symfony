@@ -80,7 +80,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->engine = null;
 

@@ -118,7 +118,7 @@ YAML;
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->files = [];
         @mkdir(sys_get_temp_dir().'/framework-yml-lint-test');
@@ -127,7 +127,7 @@ YAML;
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

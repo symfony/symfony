@@ -23,7 +23,7 @@ class FileResourceTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->file = sys_get_temp_dir().'/tmp.xml';
         $this->time = time();
@@ -34,7 +34,7 @@ class FileResourceTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (!file_exists($this->file)) {
             return;

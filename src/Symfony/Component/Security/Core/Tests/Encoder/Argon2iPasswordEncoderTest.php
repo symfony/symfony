@@ -24,7 +24,7 @@ class Argon2iPasswordEncoderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         if (!Argon2iPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');

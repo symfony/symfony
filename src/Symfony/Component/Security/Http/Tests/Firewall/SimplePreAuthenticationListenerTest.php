@@ -96,7 +96,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')
             ->disableOriginalConstructor()
@@ -122,7 +122,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->authenticationManager = null;
         $this->dispatcher = null;

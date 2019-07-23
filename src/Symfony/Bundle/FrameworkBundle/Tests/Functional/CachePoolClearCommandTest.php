@@ -23,7 +23,7 @@ class CachePoolClearCommandTest extends WebTestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         static::bootKernel(['test_case' => 'CachePoolClear', 'root_config' => 'config.yml']);
     }

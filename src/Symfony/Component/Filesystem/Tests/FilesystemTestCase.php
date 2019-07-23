@@ -72,7 +72,7 @@ class FilesystemTestCase extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
@@ -84,7 +84,7 @@ class FilesystemTestCase extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (!empty($this->longPathNamesWindows)) {
             foreach ($this->longPathNamesWindows as $path) {

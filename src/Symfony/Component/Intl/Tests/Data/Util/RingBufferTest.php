@@ -27,7 +27,7 @@ class RingBufferTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->buffer = new RingBuffer(2);
     }

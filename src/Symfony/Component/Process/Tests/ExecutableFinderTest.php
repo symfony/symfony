@@ -24,7 +24,7 @@ class ExecutableFinderTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if ($this->path) {
             // Restore path if it was changed.

@@ -64,7 +64,7 @@ class ViolationMapperTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->dispatcher = new EventDispatcher();
         $this->mapper = new ViolationMapper();

@@ -24,7 +24,7 @@ class SubRequestHandlerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         self::$globalState = $this->getGlobalState();
     }
@@ -32,7 +32,7 @@ class SubRequestHandlerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         Request::setTrustedProxies(self::$globalState[0], self::$globalState[1]);
     }

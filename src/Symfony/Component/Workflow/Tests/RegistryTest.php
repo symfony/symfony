@@ -17,7 +17,7 @@ class RegistryTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->registry = new Registry();
 
@@ -29,7 +29,7 @@ class RegistryTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->registry = null;
     }

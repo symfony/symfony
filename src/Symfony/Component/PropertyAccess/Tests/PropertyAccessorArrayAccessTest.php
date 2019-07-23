@@ -25,7 +25,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->propertyAccessor = new PropertyAccessor();
     }

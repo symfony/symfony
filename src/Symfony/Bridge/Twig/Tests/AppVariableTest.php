@@ -18,7 +18,7 @@ class AppVariableTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->appVariable = new AppVariable();
     }

@@ -22,7 +22,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->previousLocale = setlocale(LC_ALL, '0');
     }
@@ -30,7 +30,7 @@ class MoneyToLocalizedStringTransformerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         setlocale(LC_ALL, $this->previousLocale);
     }

@@ -29,7 +29,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->extractor = new ReflectionExtractor();
     }

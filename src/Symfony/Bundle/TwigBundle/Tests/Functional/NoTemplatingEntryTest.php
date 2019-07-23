@@ -33,7 +33,7 @@ class NoTemplatingEntryTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->deleteTempDir();
     }
@@ -41,7 +41,7 @@ class NoTemplatingEntryTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->deleteTempDir();
     }

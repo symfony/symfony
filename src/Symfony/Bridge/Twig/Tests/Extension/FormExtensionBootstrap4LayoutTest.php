@@ -36,7 +36,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::before();
 

@@ -27,7 +27,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::before();
 

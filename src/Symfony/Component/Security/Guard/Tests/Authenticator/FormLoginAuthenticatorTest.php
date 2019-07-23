@@ -130,7 +130,7 @@ class FormLoginAuthenticatorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->requestWithoutSession = new Request([], [], [], [], [], []);
         $this->requestWithSession = new Request([], [], [], [], [], []);

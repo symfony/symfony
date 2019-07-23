@@ -61,7 +61,7 @@ class ValidationListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();

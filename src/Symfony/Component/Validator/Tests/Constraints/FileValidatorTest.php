@@ -30,7 +30,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

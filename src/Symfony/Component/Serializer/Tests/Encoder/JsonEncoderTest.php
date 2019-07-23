@@ -24,7 +24,7 @@ class JsonEncoderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->encoder = new JsonEncoder();
         $this->serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);

@@ -19,7 +19,7 @@ class GlobResourceTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $dir = \dirname(__DIR__).'/Fixtures';
         @rmdir($dir.'/TmpGlob');

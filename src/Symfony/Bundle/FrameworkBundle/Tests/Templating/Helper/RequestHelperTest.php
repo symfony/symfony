@@ -23,7 +23,7 @@ class RequestHelperTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->requestStack = new RequestStack();
         $request = new Request();

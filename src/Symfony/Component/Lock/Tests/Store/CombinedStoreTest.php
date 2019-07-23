@@ -61,7 +61,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->strategy = $this->getMockBuilder(StrategyInterface::class)->getMock();
         $this->store1 = $this->getMockBuilder(StoreInterface::class)->getMock();

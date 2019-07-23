@@ -32,7 +32,7 @@ class CachingFactoryDecoratorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->decoratedFactory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
         $this->factory = new CachingFactoryDecorator($this->decoratedFactory);

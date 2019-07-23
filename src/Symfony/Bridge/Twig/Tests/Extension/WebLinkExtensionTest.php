@@ -35,7 +35,7 @@ class WebLinkExtensionTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->request = new Request();
 

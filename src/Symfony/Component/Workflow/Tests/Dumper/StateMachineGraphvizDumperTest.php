@@ -16,7 +16,7 @@ class StateMachineGraphvizDumperTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->dumper = new StateMachineGraphvizDumper();
     }

@@ -29,7 +29,7 @@ class ClockMockTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         ClockMock::withClockMock(1234567890.125);
     }

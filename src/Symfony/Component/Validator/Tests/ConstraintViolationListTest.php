@@ -22,7 +22,7 @@ class ConstraintViolationListTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->list = new ConstraintViolationList();
     }
@@ -30,7 +30,7 @@ class ConstraintViolationListTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->list = null;
     }

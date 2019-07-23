@@ -23,7 +23,7 @@ class GlobalVariablesTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->container = new Container();
         $this->globals = new GlobalVariables($this->container);

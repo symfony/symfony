@@ -22,7 +22,7 @@ abstract class MergeCollectionListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->form = $this->getForm('axes');
     }
@@ -30,7 +30,7 @@ abstract class MergeCollectionListenerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->form = null;
     }

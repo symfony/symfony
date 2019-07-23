@@ -20,7 +20,7 @@ abstract class AdapterTestCase extends CachePoolTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
 

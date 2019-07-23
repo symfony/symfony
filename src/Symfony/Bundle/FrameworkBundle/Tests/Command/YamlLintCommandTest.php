@@ -186,7 +186,7 @@ EOF;
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         @mkdir(sys_get_temp_dir().'/yml-lint-test');
         $this->files = [];
@@ -195,7 +195,7 @@ EOF;
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

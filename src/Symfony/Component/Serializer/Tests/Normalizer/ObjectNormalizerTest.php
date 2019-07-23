@@ -47,7 +47,7 @@ class ObjectNormalizerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->serializer = $this->getMockBuilder(__NAMESPACE__.'\ObjectSerializerNormalizer')->getMock();
         $this->normalizer = new ObjectNormalizer();

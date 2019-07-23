@@ -22,7 +22,7 @@ class MoneyTypeTest extends BaseTypeTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         // we test against different locales, so we need the full
         // implementation
@@ -36,7 +36,7 @@ class MoneyTypeTest extends BaseTypeTest
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

@@ -166,7 +166,7 @@ class DigestDataTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         class_exists('Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener', true);
     }

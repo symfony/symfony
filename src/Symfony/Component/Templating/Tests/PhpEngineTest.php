@@ -27,7 +27,7 @@ class PhpEngineTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->loader = new ProjectTemplateLoader();
     }
@@ -35,7 +35,7 @@ class PhpEngineTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->loader = null;
     }

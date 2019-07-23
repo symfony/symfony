@@ -25,7 +25,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->container = new ContainerBuilder();
         $this->dataCollectorTranslatorPass = new DataCollectorTranslatorPass();

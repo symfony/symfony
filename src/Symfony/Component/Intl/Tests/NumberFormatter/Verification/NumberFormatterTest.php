@@ -23,7 +23,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         IntlTestHelper::requireFullIntl($this, '55.1');
 

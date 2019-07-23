@@ -21,7 +21,7 @@ class InlineTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         Inline::initialize(0, 0);
     }

@@ -162,7 +162,7 @@ class FileBagTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         mkdir(sys_get_temp_dir().'/form_test', 0777, true);
     }
@@ -170,7 +170,7 @@ class FileBagTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         foreach (glob(sys_get_temp_dir().'/form_test/*') as $file) {
             unlink($file);

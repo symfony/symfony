@@ -34,7 +34,7 @@ class PhpMatcherDumperTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class PhpMatcherDumperTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

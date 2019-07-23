@@ -29,7 +29,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->factory = new ArgumentMetadataFactory();
     }

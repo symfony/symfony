@@ -90,7 +90,7 @@ class TranslationUpdateCommandTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
@@ -103,7 +103,7 @@ class TranslationUpdateCommandTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->fs->remove($this->translationDir);
     }

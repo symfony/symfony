@@ -27,7 +27,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         \Locale::setDefault('en');
     }

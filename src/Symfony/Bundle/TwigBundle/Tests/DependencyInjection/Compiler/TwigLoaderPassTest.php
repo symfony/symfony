@@ -34,7 +34,7 @@ class TwigLoaderPassTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->builder = new ContainerBuilder();
         $this->builder->register('twig');

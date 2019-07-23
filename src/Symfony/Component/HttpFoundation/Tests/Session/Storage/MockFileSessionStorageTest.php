@@ -36,7 +36,7 @@ class MockFileSessionStorageTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->sessionDir = sys_get_temp_dir().'/sf2test';
         $this->storage = $this->getStorage();
@@ -45,7 +45,7 @@ class MockFileSessionStorageTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->sessionDir = null;
         $this->storage = null;

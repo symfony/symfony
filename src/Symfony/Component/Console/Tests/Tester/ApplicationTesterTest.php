@@ -24,7 +24,7 @@ class ApplicationTesterTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->application = new Application();
         $this->application->setAutoExit(false);
@@ -40,7 +40,7 @@ class ApplicationTesterTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->application = null;
         $this->tester = null;

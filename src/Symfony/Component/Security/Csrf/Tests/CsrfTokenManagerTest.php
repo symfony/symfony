@@ -213,7 +213,7 @@ class CsrfTokenManagerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $_SERVER['HTTPS'] = 'on';
     }
@@ -221,7 +221,7 @@ class CsrfTokenManagerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

@@ -22,7 +22,7 @@ class CurrencyTypeTest extends BaseTypeTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         IntlTestHelper::requireIntl($this, false);
 

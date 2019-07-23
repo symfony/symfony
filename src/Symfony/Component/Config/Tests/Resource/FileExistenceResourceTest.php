@@ -23,7 +23,7 @@ class FileExistenceResourceTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->file = realpath(sys_get_temp_dir()).'/tmp.xml';
         $this->time = time();
@@ -33,7 +33,7 @@ class FileExistenceResourceTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (file_exists($this->file)) {
             unlink($this->file);

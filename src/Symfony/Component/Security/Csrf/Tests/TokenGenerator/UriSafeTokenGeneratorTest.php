@@ -41,7 +41,7 @@ class UriSafeTokenGeneratorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->generator = new UriSafeTokenGenerator(self::ENTROPY);
     }
@@ -49,7 +49,7 @@ class UriSafeTokenGeneratorTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->generator = null;
     }

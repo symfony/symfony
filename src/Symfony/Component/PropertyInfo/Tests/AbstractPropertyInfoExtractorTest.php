@@ -30,7 +30,7 @@ class AbstractPropertyInfoExtractorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $extractors = [new NullExtractor(), new DummyExtractor()];
         $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors);

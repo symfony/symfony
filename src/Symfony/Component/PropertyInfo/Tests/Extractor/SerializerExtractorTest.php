@@ -30,7 +30,7 @@ class SerializerExtractorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $this->extractor = new SerializerExtractor($classMetadataFactory);

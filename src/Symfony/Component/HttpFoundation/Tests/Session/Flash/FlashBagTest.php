@@ -31,7 +31,7 @@ class FlashBagTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
         $this->bag = new FlashBag();
@@ -42,7 +42,7 @@ class FlashBagTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->bag = null;
         parent::tearDown();

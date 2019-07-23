@@ -31,7 +31,7 @@ class AutowireServiceResourceTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->file = realpath(sys_get_temp_dir()).'/tmp.php';
         $this->time = time();
@@ -107,7 +107,7 @@ class AutowireServiceResourceTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (!file_exists($this->file)) {
             return;

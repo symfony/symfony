@@ -24,7 +24,7 @@ class FormFactoryBuilderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $factory = new \ReflectionClass('Symfony\Component\Form\FormFactory');
         $this->registry = $factory->getProperty('registry');

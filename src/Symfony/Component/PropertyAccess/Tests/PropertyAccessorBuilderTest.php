@@ -26,7 +26,7 @@ class PropertyAccessorBuilderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->builder = new PropertyAccessorBuilder();
     }
@@ -34,7 +34,7 @@ class PropertyAccessorBuilderTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->builder = null;
     }

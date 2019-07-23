@@ -35,7 +35,7 @@ class DirectoryLoaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $locator = new FileLocator(self::$fixturesPath);
         $this->container = new ContainerBuilder();

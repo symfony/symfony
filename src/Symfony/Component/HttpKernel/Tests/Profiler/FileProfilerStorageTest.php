@@ -23,7 +23,7 @@ class FileProfilerStorageTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->tmpDir = sys_get_temp_dir().'/sf2_profiler_file_storage';
         if (is_dir($this->tmpDir)) {
@@ -36,7 +36,7 @@ class FileProfilerStorageTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         self::cleanDir();
     }

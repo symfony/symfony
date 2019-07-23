@@ -38,7 +38,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->templateFinder = $this
             ->getMockBuilder(TemplateFinderInterface::class)
@@ -62,7 +62,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->filesystem->remove($this->tmpDir);
     }

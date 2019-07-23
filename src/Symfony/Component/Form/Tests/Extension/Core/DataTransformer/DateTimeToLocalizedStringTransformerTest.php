@@ -26,7 +26,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;

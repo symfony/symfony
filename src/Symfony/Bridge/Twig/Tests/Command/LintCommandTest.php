@@ -116,7 +116,7 @@ class LintCommandTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->files = [];
     }
@@ -124,7 +124,7 @@ class LintCommandTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

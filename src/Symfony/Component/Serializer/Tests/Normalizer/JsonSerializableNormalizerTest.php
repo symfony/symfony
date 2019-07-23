@@ -35,7 +35,7 @@ class JsonSerializableNormalizerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->serializer = $this->getMockBuilder(JsonSerializerNormalizer::class)->getMock();
         $this->normalizer = new JsonSerializableNormalizer();

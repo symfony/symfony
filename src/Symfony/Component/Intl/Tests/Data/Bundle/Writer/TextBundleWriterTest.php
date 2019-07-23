@@ -37,7 +37,7 @@ class TextBundleWriterTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->writer = new TextBundleWriter();
         $this->directory = sys_get_temp_dir().'/TextBundleWriterTest/'.mt_rand(1000, 9999);
@@ -49,7 +49,7 @@ class TextBundleWriterTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->filesystem->remove($this->directory);
     }

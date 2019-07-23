@@ -252,7 +252,7 @@ EOTXT
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode']);
@@ -268,7 +268,7 @@ EOTXT
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->passwordEncoderCommandTester = null;
     }

@@ -31,7 +31,7 @@ class AttributeBagTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->array = [
             'hello' => 'world',
@@ -55,7 +55,7 @@ class AttributeBagTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->bag = null;
         $this->array = [];

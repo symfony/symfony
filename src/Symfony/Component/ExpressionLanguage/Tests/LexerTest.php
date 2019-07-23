@@ -26,7 +26,7 @@ class LexerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->lexer = new Lexer();
     }

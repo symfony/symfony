@@ -24,7 +24,7 @@ class ValidateRequestListenerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         Request::setTrustedProxies([], -1);
     }

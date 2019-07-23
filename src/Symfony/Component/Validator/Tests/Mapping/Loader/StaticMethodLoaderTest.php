@@ -23,7 +23,7 @@ class StaticMethodLoaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->errorLevel = error_reporting();
     }
@@ -31,7 +31,7 @@ class StaticMethodLoaderTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         error_reporting($this->errorLevel);
     }

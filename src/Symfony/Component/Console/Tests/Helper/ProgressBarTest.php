@@ -26,7 +26,7 @@ class ProgressBarTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS=120');
@@ -35,7 +35,7 @@ class ProgressBarTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }

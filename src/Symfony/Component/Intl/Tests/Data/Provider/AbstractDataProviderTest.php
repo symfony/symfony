@@ -704,7 +704,7 @@ abstract class AbstractDataProviderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         \Locale::setDefault('en');
         Locale::setDefaultFallback('en');

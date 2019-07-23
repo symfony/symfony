@@ -38,7 +38,7 @@ class HttpCacheTestCase extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->kernel = null;
 
@@ -59,7 +59,7 @@ class HttpCacheTestCase extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if ($this->cache) {
             $this->cache->getStore()->cleanup();

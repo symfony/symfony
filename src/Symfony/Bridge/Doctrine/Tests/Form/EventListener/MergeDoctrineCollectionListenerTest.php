@@ -31,7 +31,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->collection = new ArrayCollection(['test']);
         $this->dispatcher = new EventDispatcher();
@@ -43,7 +43,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->collection = null;
         $this->dispatcher = null;

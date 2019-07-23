@@ -27,7 +27,7 @@ class PhpBundleReaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->reader = new PhpBundleReader();
     }

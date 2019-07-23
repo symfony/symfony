@@ -55,7 +55,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->engine = null;
 

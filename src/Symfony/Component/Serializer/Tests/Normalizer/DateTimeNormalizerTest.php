@@ -27,7 +27,7 @@ class DateTimeNormalizerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->normalizer = new DateTimeNormalizer();
     }

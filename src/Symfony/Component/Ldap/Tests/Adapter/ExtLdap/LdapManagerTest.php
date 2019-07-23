@@ -28,7 +28,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->adapter->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');

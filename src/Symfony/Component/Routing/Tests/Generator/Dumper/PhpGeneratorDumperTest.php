@@ -43,7 +43,7 @@ class PhpGeneratorDumperTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
 
@@ -58,7 +58,7 @@ class PhpGeneratorDumperTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

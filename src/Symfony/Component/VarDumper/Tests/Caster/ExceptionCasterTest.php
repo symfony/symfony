@@ -31,7 +31,7 @@ class ExceptionCasterTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         ExceptionCaster::$srcContext = 1;
         ExceptionCaster::$traceArgs = true;

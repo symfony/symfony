@@ -49,7 +49,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $user = $this->createUser();
         $this->tokenStorage = $this->createTokenStorage($user);

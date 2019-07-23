@@ -36,7 +36,7 @@ abstract class AbstractFormTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
@@ -46,7 +46,7 @@ abstract class AbstractFormTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->dispatcher = null;
         $this->factory = null;

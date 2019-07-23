@@ -22,7 +22,7 @@ class TerminalTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->colSize = getenv('COLUMNS');
         $this->lineSize = getenv('LINES');
@@ -31,7 +31,7 @@ class TerminalTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
         putenv($this->lineSize ? 'LINES' : 'LINES='.$this->lineSize);

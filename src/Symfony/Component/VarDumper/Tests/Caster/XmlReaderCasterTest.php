@@ -27,7 +27,7 @@ class XmlReaderCasterTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->reader = new \XmlReader();
         $this->reader->open(__DIR__.'/../Fixtures/xml_reader.xml');
@@ -36,7 +36,7 @@ class XmlReaderCasterTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->reader->close();
     }

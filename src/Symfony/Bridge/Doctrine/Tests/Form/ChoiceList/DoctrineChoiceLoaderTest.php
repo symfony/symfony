@@ -74,7 +74,7 @@ class DoctrineChoiceLoaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')->getMock();

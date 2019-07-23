@@ -21,7 +21,7 @@ class DirectoryResourceTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->directory = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
@@ -33,7 +33,7 @@ class DirectoryResourceTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (!is_dir($this->directory)) {
             return;

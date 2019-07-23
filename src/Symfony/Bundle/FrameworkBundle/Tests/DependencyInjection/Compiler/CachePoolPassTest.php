@@ -26,7 +26,7 @@ class CachePoolPassTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->cachePoolPass = new CachePoolPass();
     }

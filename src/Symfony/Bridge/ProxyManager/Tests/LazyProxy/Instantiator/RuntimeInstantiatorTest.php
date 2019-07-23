@@ -32,7 +32,7 @@ class RuntimeInstantiatorTest extends TestCase
      *
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->instantiator = new RuntimeInstantiator();
     }

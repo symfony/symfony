@@ -31,7 +31,7 @@ class LoaderResolverTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
 

@@ -32,7 +32,7 @@ class PhpBridgeSessionStorageTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->iniSet('session.save_handler', 'files');
         $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sf2test');
@@ -44,7 +44,7 @@ class PhpBridgeSessionStorageTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         session_write_close();
         array_map('unlink', glob($this->savePath.'/*'));

@@ -30,7 +30,7 @@ class EventTest extends TestCase
      *
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->event = new Event();
     }
@@ -41,7 +41,7 @@ class EventTest extends TestCase
      *
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->event = null;
     }

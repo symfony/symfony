@@ -28,7 +28,7 @@ class LdapTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
         $this->ldap = new Ldap($this->adapter);

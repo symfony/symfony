@@ -29,7 +29,7 @@ class ResponseListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
@@ -41,7 +41,7 @@ class ResponseListenerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->dispatcher = null;
         $this->kernel = null;

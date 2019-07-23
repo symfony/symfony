@@ -49,7 +49,7 @@ class WebProfilerExtensionTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
 
@@ -79,7 +79,7 @@ class WebProfilerExtensionTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

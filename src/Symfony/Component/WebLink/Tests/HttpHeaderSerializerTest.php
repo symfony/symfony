@@ -25,7 +25,7 @@ class HttpHeaderSerializerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->serializer = new HttpHeaderSerializer();
     }

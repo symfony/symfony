@@ -22,7 +22,7 @@ class NumberTypeTest extends BaseTypeTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ class NumberTypeTest extends BaseTypeTest
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

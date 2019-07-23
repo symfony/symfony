@@ -20,7 +20,7 @@ class TranslationDataCollectorTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         if (!class_exists('Symfony\Component\HttpKernel\DataCollector\DataCollector')) {
             $this->markTestSkipped('The "DataCollector" is not available');

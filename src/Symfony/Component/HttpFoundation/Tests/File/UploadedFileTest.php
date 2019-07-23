@@ -19,7 +19,7 @@ class UploadedFileTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         if (!ini_get('file_uploads')) {
             $this->markTestSkipped('file_uploads is disabled in php.ini');

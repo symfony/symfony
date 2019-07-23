@@ -85,7 +85,7 @@ class ProfilerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
         if (file_exists($this->tmp)) {
@@ -99,7 +99,7 @@ class ProfilerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (null !== $this->storage) {
             $this->storage->purge();

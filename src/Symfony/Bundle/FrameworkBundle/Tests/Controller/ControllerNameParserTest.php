@@ -23,7 +23,7 @@ class ControllerNameParserTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->loader = new ClassLoader();
         $this->loader->add('TestBundle', __DIR__.'/../Fixtures');
@@ -34,7 +34,7 @@ class ControllerNameParserTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->loader->unregister();
         $this->loader = null;

@@ -25,7 +25,7 @@ class IntlGlobalsTest extends AbstractIntlGlobalsTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         IntlTestHelper::requireFullIntl($this, false);
 

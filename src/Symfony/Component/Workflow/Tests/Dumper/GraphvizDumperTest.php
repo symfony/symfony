@@ -16,7 +16,7 @@ class GraphvizDumperTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->dumper = new GraphvizDumper();
     }

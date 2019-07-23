@@ -31,7 +31,7 @@ class GenericEventTest extends TestCase
      *
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->subject = new \stdClass();
         $this->event = new GenericEvent($this->subject, ['name' => 'Event']);
@@ -42,7 +42,7 @@ class GenericEventTest extends TestCase
      *
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->subject = null;
         $this->event = null;

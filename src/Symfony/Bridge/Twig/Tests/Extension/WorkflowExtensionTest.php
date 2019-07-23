@@ -26,7 +26,7 @@ class WorkflowExtensionTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $places = ['ordered', 'waiting_for_payment', 'processed'];
         $transitions = [

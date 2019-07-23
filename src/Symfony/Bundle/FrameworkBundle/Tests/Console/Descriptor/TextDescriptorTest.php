@@ -18,7 +18,7 @@ class TextDescriptorTest extends AbstractDescriptorTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         putenv('COLUMNS=121');
     }
@@ -26,7 +26,7 @@ class TextDescriptorTest extends AbstractDescriptorTest
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         putenv('COLUMNS');
     }

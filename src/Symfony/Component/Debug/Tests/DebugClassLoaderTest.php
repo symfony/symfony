@@ -27,7 +27,7 @@ class DebugClassLoaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->errorReporting = error_reporting(E_ALL);
         $this->loader = new ClassLoader();
@@ -38,7 +38,7 @@ class DebugClassLoaderTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         DebugClassLoader::disable();
         spl_autoload_unregister([$this->loader, 'loadClass']);

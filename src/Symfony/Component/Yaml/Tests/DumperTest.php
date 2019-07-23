@@ -40,7 +40,7 @@ class DumperTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();
@@ -50,7 +50,7 @@ class DumperTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->parser = null;
         $this->dumper = null;

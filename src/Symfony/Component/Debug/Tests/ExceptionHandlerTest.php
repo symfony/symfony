@@ -24,7 +24,7 @@ class ExceptionHandlerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         testHeader();
     }
@@ -32,7 +32,7 @@ class ExceptionHandlerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         testHeader();
     }

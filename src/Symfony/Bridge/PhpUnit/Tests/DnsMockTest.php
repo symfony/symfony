@@ -19,7 +19,7 @@ class DnsMockTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         DnsMock::withMockedHosts(array());
     }

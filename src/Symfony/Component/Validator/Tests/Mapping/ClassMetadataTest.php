@@ -31,7 +31,7 @@ class ClassMetadataTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }
@@ -39,7 +39,7 @@ class ClassMetadataTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->metadata = null;
     }

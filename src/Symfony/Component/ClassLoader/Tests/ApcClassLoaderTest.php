@@ -23,7 +23,7 @@ class ApcClassLoaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         if (!(filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN))) {
             $this->markTestSkipped('The apc extension is not enabled.');
@@ -35,7 +35,7 @@ class ApcClassLoaderTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         if (filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
             apcu_clear_cache();

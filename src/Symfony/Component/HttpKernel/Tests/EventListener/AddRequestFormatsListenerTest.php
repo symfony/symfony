@@ -31,7 +31,7 @@ class AddRequestFormatsListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->listener = new AddRequestFormatsListener(['csv' => ['text/csv', 'text/plain']]);
     }
@@ -39,7 +39,7 @@ class AddRequestFormatsListenerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->listener = null;
     }

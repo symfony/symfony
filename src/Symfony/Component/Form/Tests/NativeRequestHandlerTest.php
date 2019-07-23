@@ -28,7 +28,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::before();
 
@@ -44,7 +44,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         parent::tearDown();
 

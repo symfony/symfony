@@ -19,7 +19,7 @@ class DoctrineCacheTest extends AbstractCacheTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->cache = new DoctrineCache(new ArrayCache());
     }

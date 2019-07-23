@@ -32,7 +32,7 @@ class CacheClearCommandTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->fs = new Filesystem();
         $this->kernel = new TestAppKernel('test', true);
@@ -44,7 +44,7 @@ class CacheClearCommandTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->fs->remove($this->rootDir);
     }

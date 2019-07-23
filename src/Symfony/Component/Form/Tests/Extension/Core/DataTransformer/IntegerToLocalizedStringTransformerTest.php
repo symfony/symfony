@@ -22,7 +22,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
@@ -31,7 +31,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         \Locale::setDefault($this->defaultLocale);
     }

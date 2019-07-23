@@ -25,7 +25,7 @@ class PdoSessionHandlerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         // make sure the temporary database file is deleted when it has been created (even when a test fails)
         if ($this->dbFile) {

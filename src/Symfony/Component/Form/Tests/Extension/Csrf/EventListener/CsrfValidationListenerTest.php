@@ -30,7 +30,7 @@ class CsrfValidationListenerTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
@@ -43,7 +43,7 @@ class CsrfValidationListenerTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->dispatcher = null;
         $this->factory = null;

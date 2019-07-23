@@ -30,7 +30,7 @@ class AbstractProxyTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->proxy = $this->getMockForAbstractClass(AbstractProxy::class);
     }
@@ -38,7 +38,7 @@ class AbstractProxyTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $this->proxy = null;
     }

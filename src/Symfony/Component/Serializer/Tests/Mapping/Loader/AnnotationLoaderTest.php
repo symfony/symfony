@@ -30,7 +30,7 @@ class AnnotationLoaderTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->loader = new AnnotationLoader(new AnnotationReader());
     }

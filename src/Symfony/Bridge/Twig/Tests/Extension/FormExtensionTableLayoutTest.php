@@ -35,7 +35,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         parent::before();
 

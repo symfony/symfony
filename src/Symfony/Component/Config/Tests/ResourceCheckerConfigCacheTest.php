@@ -23,7 +23,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
     /**
      * @before
      */
-    protected function before(): void
+    protected function before()
     {
         $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
     }
@@ -31,7 +31,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
     /**
      * @after
      */
-    protected function after(): void
+    protected function after()
     {
         $files = [$this->cacheFile, "{$this->cacheFile}.meta"];
 

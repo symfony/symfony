@@ -1243,7 +1243,7 @@ class FrameworkExtension extends Extension
 
         if (interface_exists(TranslatorInterface::class) && class_exists(LegacyTranslatorProxy::class)) {
             $calls = $validatorBuilder->getMethodCalls();
-            $calls[1] = ['setTranslator', [new Definition(LegacyTranslatorProxy::class, [new Reference('translator')])]];
+            $calls[1] = ['setTranslator', [new Definition(LegacyTranslatorProxy::class, [new Reference('translator', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)])]];
             $validatorBuilder->setMethodCalls($calls);
         }
 

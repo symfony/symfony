@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class JsonLoginTest extends WebTestCase
+class JsonLoginTest extends AbstractWebTestCase
 {
     public function testDefaultJsonLoginSuccess()
     {

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Component\HttpKernel\Kernel;
 
-class JsonLoginLdapTest extends WebTestCase
+class JsonLoginLdapTest extends AbstractWebTestCase
 {
     public function testKernelBoot()
     {

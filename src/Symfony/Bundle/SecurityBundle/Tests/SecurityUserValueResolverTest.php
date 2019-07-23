@@ -94,11 +94,3 @@ class SecurityUserValueResolverTest extends TestCase
         $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user = null) {}));
     }
 }
-
-abstract class DummyUser implements UserInterface
-{
-}
-
-abstract class DummySubUser extends DummyUser
-{
-}

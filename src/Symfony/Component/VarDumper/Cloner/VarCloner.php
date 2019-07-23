@@ -40,7 +40,7 @@ class VarCloner extends AbstractCloner
         $currentDepth = 0;              // Current tree depth
         $currentDepthFinalIndex = 0;    // Final $queue index for current tree depth
         $minimumDepthReached = 0 === $minDepth; // Becomes true when minimum tree depth has been reached
-        $cookie = (object) [];     // Unique object used to detect hard references
+        $cookie = (object) [];          // Unique object used to detect hard references
         $a = null;                      // Array cast for nested structures
         $stub = null;                   // Stub capturing the main properties of an original item value
                                         // or null if the original value is used directly
@@ -80,8 +80,15 @@ class VarCloner extends AbstractCloner
             }
             foreach ($vals as $k => $v) {
                 // $v is the original value or a stub object in case of hard references
-                $refs[$k] = $cookie;
-                if ($zvalIsRef = $vals[$k] === $cookie) {
+
+                if (\PHP_VERSION_ID >= 70400) {
+                    $zvalIsRef = null !== \ReflectionReference::fromArrayElement($vals, $k);
+                } else {
+                    $refs[$k] = $cookie;
+                    $zvalIsRef = $vals[$k] === $cookie;
+                }
+
+                if ($zvalIsRef) {
                     $vals[$k] = &$stub;         // Break hard references to make $queue completely
                     unset($stub);               // independent from the original structure
                     if ($v instanceof Stub && isset($hardRefs[spl_object_id($v)])) {

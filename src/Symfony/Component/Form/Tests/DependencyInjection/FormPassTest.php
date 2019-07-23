@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\DependencyInjection\FormPass;
@@ -416,14 +415,6 @@ class FormPassTest extends TestCase
 
         return $container;
     }
-}
-
-class FormPassTest_Type1 extends AbstractType
-{
-}
-
-class FormPassTest_Type2 extends AbstractType
-{
 }
 
 class Type1TypeExtension extends AbstractTypeExtension

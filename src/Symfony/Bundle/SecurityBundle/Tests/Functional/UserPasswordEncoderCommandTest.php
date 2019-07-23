@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
  *
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
  */
-class UserPasswordEncoderCommandTest extends WebTestCase
+class UserPasswordEncoderCommandTest extends AbstractWebTestCase
 {
     /** @var CommandTester */
     private $passwordEncoderCommandTester;

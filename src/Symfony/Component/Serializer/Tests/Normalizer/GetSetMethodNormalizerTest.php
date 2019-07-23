@@ -687,43 +687,6 @@ class GetConstructorArgsWithDefaultValueDummy
     }
 }
 
-class GetCamelizedDummy
-{
-    private $kevinDunglas;
-    private $fooBar;
-    private $bar_foo;
-
-    public function __construct($kevinDunglas = null)
-    {
-        $this->kevinDunglas = $kevinDunglas;
-    }
-
-    public function getKevinDunglas()
-    {
-        return $this->kevinDunglas;
-    }
-
-    public function setFooBar($fooBar)
-    {
-        $this->fooBar = $fooBar;
-    }
-
-    public function getFooBar()
-    {
-        return $this->fooBar;
-    }
-
-    public function setBar_foo($bar_foo)
-    {
-        $this->bar_foo = $bar_foo;
-    }
-
-    public function getBar_foo()
-    {
-        return $this->bar_foo;
-    }
-}
-
 class ObjectConstructorArgsWithPrivateMutatorDummy
 {
     private $foo;

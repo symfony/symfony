@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-class SecurityRoutingIntegrationTest extends WebTestCase
+class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 {
     /**
      * @dataProvider getConfigs

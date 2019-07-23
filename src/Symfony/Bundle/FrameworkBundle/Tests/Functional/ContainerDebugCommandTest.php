@@ -17,7 +17,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 /**
  * @group functional
  */
-class ContainerDebugCommandTest extends WebTestCase
+class ContainerDebugCommandTest extends AbstractWebTestCase
 {
     public function testDumpContainerIfNotExists()
     {

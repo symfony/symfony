@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-class ProfilerTest extends WebTestCase
+class ProfilerTest extends AbstractWebTestCase
 {
     /**
      * @dataProvider getConfigs

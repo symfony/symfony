@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-23T13:21:58Z
+
+Looks like PHP's `IntlDateFormatter` class parses years with three digits without errors, but returns the wrong date (see https://3v4l.org/QJFTJ), probably due to the same reasons that cause #29610 and #31057).

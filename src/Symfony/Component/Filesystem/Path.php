@@ -47,8 +47,6 @@ final class Path
     private static $buffer = [];
 
     /**
-     * The size of the buffer.
-     *
      * @var int
      */
     private static $bufferSize = 0;
@@ -384,9 +382,6 @@ final class Path
         return \substr($path, 0, -\strlen($actualExtension)).$extension;
     }
 
-    /**
-     * Returns whether a path is absolute.
-     */
     public static function isAbsolute(string $path): bool
     {
         if ('' === $path) {
@@ -419,9 +414,6 @@ final class Path
         return false;
     }
 
-    /**
-     * Returns whether or not a path is relative.
-     */
     public static function isRelative(string $path): bool
     {
         return !self::isAbsolute($path);
@@ -802,9 +794,6 @@ final class Path
         return [$root, $path];
     }
 
-    /**
-     * Converts string to lower-case.
-     */
     private static function toLower(string $str): string
     {
         return \mb_strtolower($str, mb_detect_encoding($str));

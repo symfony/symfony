@@ -27,6 +27,17 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  */
 class RegionDataGenerator extends AbstractDataGenerator
 {
+    /**
+     * Source https://www.iso.org/obp/ui/#iso:pub:PUB500001:en
+     */
+    private static $preferredAlpha2ToAlpha3Mapping = [
+        'DE' => 'DEU',
+        'FR' => 'FRA',
+        'MM' => 'MMR',
+        'TL' => 'TLS',
+        'YE' => 'YEM',
+    ];
+
     private static $blacklist = [
         // Exceptional reservations
         'AC' => true, // Ascension Island
@@ -82,6 +93,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir)
     {
         $compiler->compile($sourceDir.'/region', $tempDir);
+        $compiler->compile($sourceDir.'/misc/metadata.txt', $tempDir);
     }
 
     /**
@@ -125,14 +137,25 @@ class RegionDataGenerator extends AbstractDataGenerator
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
     {
         $rootBundle = $reader->read($tempDir, 'root');
+        $metadataBundle = $reader->read($tempDir, 'metadata');
 
         $this->regionCodes = array_unique($this->regionCodes);
 
+        $alpha2ToAlpha3 = $this->generateAlpha3($metadataBundle);
+
         sort($this->regionCodes);
+
+        $alpha3ToAlpha2 = [];
+        foreach ($this->regionCodes as $alpha2Code) {
+            $alpha3code = $alpha2ToAlpha3[$alpha2Code];
+            $alpha3ToAlpha2[$alpha3code] = $alpha2Code;
+        }
 
         return [
             'Version' => $rootBundle['Version'],
             'Regions' => $this->regionCodes,
+            'Alpha2ToAlpha3' => $alpha2ToAlpha3,
+            'Alpha3ToAlpha2' => $alpha3ToAlpha2,
         ];
     }
 
@@ -153,5 +176,39 @@ class RegionDataGenerator extends AbstractDataGenerator
         }
 
         return $regionNames;
+    }
+
+    protected function generateAlpha3(ArrayAccessibleResourceBundle $metadataBundle)
+    {
+        $alpha2Codes = array_flip($this->regionCodes);
+        $alpha2ToAlpha3 = [];
+        foreach ($metadataBundle['alias']['territory'] as $alias => $data) {
+            if (3 !== \strlen($alias) || 'overlong' !== $data['reason'] || ctype_digit($alias)) {
+                continue;
+            }
+
+            $alpha2Code = $data['replacement'];
+            if (!isset($alpha2Codes[$alpha2Code])) {
+                continue;
+            }
+
+            if (!isset($alpha2ToAlpha3[$alpha2Code])) {
+                $alpha2ToAlpha3[$alpha2Code] = $alias;
+                continue;
+            }
+
+            // Found a second alias for the same country
+            if (isset(self::$preferredAlpha2ToAlpha3Mapping[$alpha2Code])) {
+                $preferred = self::$preferredAlpha2ToAlpha3Mapping[$alpha2Code];
+                // Only use the preferred mapping if it actually is in the mapping
+                if ($alias === $preferred) {
+                    $alpha2ToAlpha3[$alpha2Code] = $preferred;
+                }
+            }
+        }
+
+        asort($alpha2ToAlpha3);
+
+        return $alpha2ToAlpha3;
     }
 }

@@ -275,18 +275,6 @@ final class Path
     }
 
     /**
-     * Returns the file name from a file path.
-     */
-    public static function getFilename(string $path): string
-    {
-        if ('' === $path) {
-            return '';
-        }
-
-        return \basename($path);
-    }
-
-    /**
      * Returns the file name without the extension from a file path.
      *
      * @param string|null $extension if specified, only that extension is cut

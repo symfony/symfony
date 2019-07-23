@@ -17,6 +17,7 @@ use Symfony\Component\Filesystem\Path;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Thomas Schulz <mail@king2500.net>
+ * @author Théo Fidry <theo.fidry@gmail.com>
  */
 class PathTest extends TestCase
 {

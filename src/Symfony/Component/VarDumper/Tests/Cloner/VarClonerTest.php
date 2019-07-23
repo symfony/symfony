@@ -50,7 +50,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
     [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
     [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
-    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 21
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
 )
@@ -413,7 +413,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [attr] => Array
                                 (
                                     [file] => %a%eVarClonerTest.php
-                                    [line] => 20
+                                    [line] => 21
                                 )
 
                         )

@@ -169,7 +169,7 @@ Validator
 WebProfilerBundle
 -----------------
 
- * Deprecated the `ExceptionController::templateExists()` method
+ * Deprecated the `ExceptionController` class in favor of `ExceptionErrorController`
  * Deprecated the `TemplateManager::templateExists()` method
 
 WebServerBundle

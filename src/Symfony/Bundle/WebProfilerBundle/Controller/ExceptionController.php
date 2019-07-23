@@ -20,10 +20,14 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ExceptionController::class, ExceptionErrorController::class), E_USER_DEPRECATED);
+
 /**
  * ExceptionController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.4, use the ExceptionErrorController instead.
  */
 class ExceptionController
 {

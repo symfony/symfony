@@ -99,6 +99,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         $debugRepresentation = [
             'bus' => $busName,
             'stamps' => $tracedMessage['stamps'] ?? null,
+            'stamps_after_dispatch' => $tracedMessage['stamps_after_dispatch'] ?? null,
             'message' => [
                 'type' => new ClassStub(\get_class($message)),
                 'value' => $message,

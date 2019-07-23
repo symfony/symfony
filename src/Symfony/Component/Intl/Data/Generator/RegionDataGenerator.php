@@ -134,7 +134,7 @@ class RegionDataGenerator extends AbstractDataGenerator
         return [
             'Version' => $rootBundle['Version'],
             'Regions' => $this->regionCodes,
-            'Alpha3' => $this->generateAlpha3($reader, $tempDir),
+            'Alpha2ToAlpha3' => $this->generateAlpha3($reader, $tempDir),
         ];
     }
 
@@ -161,17 +161,17 @@ class RegionDataGenerator extends AbstractDataGenerator
     {
         $metadataBundle = $reader->read($tempDir, 'metadata');
 
-        $shortCodes = array_flip($this->regionCodes);
-        $alpha3 = [];
+        $alpha2Codes = array_flip($this->regionCodes);
+        $alpha2ToAlpha3 = [];
         foreach ($metadataBundle['alias']['territory'] as $alias => $data) {
             if (3 === strlen($alias) && 'overlong' === $data['reason'] && !ctype_digit($alias)) {
-                $short = $data['replacement'];
-                if (isset($shortCodes[$short])) {
-                    $alpha3[$short] = $alias;
+                $alpha2Code = $data['replacement'];
+                if (isset($alpha2Codes[$alpha2Code])) {
+                    $alpha2ToAlpha3[$alpha2Code] = $alias;
                 }
             }
         }
 
-        return $alpha3;
+        return $alpha2ToAlpha3;
     }
 }

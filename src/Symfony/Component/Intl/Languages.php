@@ -75,6 +75,11 @@ final class Languages extends ResourceBundle
         return self::readEntry(['Alpha2ToAlpha3', $language], 'meta');
     }
 
+    public static function getAlpha3Codes(): array
+    {
+        return self::readEntry(['Alpha2ToAlpha3'], 'meta');
+    }
+
     protected static function getPath(): string
     {
         return Intl::getDataDirectory().'/'.Intl::LANGUAGE_DIR;

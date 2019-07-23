@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ValidationMiddleware implements MiddlewareInterface
+class ValidationMiddleware implements MiddlewareInterface, DescriptionAwareMiddleware
 {
     private $validator;
 
@@ -46,5 +46,10 @@ class ValidationMiddleware implements MiddlewareInterface
         }
 
         return $stack->next()->handle($envelope, $stack);
+    }
+
+    public function getDescription(): MiddlewareDescription
+    {
+        return MiddlewareDescription::before('Validate message');
     }
 }

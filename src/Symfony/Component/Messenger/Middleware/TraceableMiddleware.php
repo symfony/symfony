@@ -19,7 +19,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-class TraceableMiddleware implements MiddlewareInterface
+class TraceableMiddleware implements MiddlewareInterface, DescriptionAwareMiddleware
 {
     private $stopwatch;
     private $busName;
@@ -44,6 +44,11 @@ class TraceableMiddleware implements MiddlewareInterface
         } finally {
             $stack->stop();
         }
+    }
+
+    public function getDescription(): MiddlewareDescription
+    {
+        return MiddlewareDescription::around('Star collecting profiler data', 'Finish collecting profiler data');
     }
 }
 

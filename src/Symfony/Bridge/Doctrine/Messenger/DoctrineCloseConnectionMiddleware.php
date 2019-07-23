@@ -13,6 +13,8 @@ namespace Symfony\Bridge\Doctrine\Messenger;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Middleware\DescriptionAwareMiddleware;
+use Symfony\Component\Messenger\Middleware\MiddlewareDescription;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
@@ -20,7 +22,7 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  *
  * @author Fuong <insidestyles@gmail.com>
  */
-class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware
+class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware implements DescriptionAwareMiddleware
 {
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
@@ -31,5 +33,10 @@ class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware
         } finally {
             $connection->close();
         }
+    }
+
+    public function getDescription(): MiddlewareDescription
+    {
+        return MiddlewareDescription::after('Close Doctrine connection');
     }
 }

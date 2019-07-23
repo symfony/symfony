@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class HandleMessageMiddleware implements MiddlewareInterface
+class HandleMessageMiddleware implements MiddlewareInterface, DescriptionAwareMiddleware
 {
     use LoggerAwareTrait;
 
@@ -91,5 +91,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
             });
 
         return \count($some) > 0;
+    }
+
+    public function getDescription(): MiddlewareDescription
+    {
+        return MiddlewareDescription::before('Call message handler');
     }
 }

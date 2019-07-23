@@ -13,6 +13,8 @@ namespace Symfony\Bridge\Doctrine\Messenger;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Middleware\DescriptionAwareMiddleware;
+use Symfony\Component\Messenger\Middleware\MiddlewareDescription;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
@@ -20,7 +22,7 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  *
  * @author Konstantin Myakshin <molodchick@gmail.com>
  */
-class DoctrineClearEntityManagerMiddleware extends AbstractDoctrineMiddleware
+class DoctrineClearEntityManagerMiddleware extends AbstractDoctrineMiddleware implements DescriptionAwareMiddleware
 {
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
@@ -29,5 +31,10 @@ class DoctrineClearEntityManagerMiddleware extends AbstractDoctrineMiddleware
         } finally {
             $entityManager->clear();
         }
+    }
+
+    public function getDescription(): MiddlewareDescription
+    {
+        return MiddlewareDescription::after('Clear Doctrine entity manager');
     }
 }

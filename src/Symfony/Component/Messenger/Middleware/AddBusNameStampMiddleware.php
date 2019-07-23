@@ -37,4 +37,9 @@ class AddBusNameStampMiddleware implements MiddlewareInterface
 
         return $stack->next()->handle($envelope, $stack);
     }
+
+    public function getDescription(): MiddlewareDescription
+    {
+        return MiddlewareDescription::before('Add bus name');
+    }
 }

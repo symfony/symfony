@@ -26,7 +26,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class SendMessageMiddleware implements MiddlewareInterface
+class SendMessageMiddleware implements MiddlewareInterface, DescriptionAwareMiddleware
 {
     use LoggerAwareTrait;
 
@@ -80,6 +80,11 @@ class SendMessageMiddleware implements MiddlewareInterface
 
         // message should only be sent and not be handled by the next middleware
         return $envelope;
+    }
+
+    public function getDescription(): MiddlewareDescription
+    {
+        return MiddlewareDescription::before('Send message to transport');
     }
 
     /**

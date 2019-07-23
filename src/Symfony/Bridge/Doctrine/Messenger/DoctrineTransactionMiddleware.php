@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Doctrine\Messenger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Middleware\DescriptionAwareMiddleware;
+use Symfony\Component\Messenger\Middleware\MiddlewareDescription;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
@@ -22,7 +24,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
+class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware implements DescriptionAwareMiddleware
 {
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
@@ -44,5 +46,10 @@ class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
 
             throw $exception;
         }
+    }
+
+    public function getDescription(): MiddlewareDescription
+    {
+        return MiddlewareDescription::around('Start Doctrine transaction', 'Commit/rollback Doctrine transaction');
     }
 }

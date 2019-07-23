@@ -17,6 +17,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\Middleware\DescriptionAwareMiddleware;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 
 /**
  * A console command to debug Messenger information.
@@ -78,23 +80,52 @@ EOF
         foreach ($mapping as $bus => $handlersByMessage) {
             $io->section($bus);
 
-            $tableRows = [];
-            foreach ($handlersByMessage as $message => $handlers) {
-                $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $message)];
-                foreach ($handlers as $handler) {
-                    $tableRows[] = [
-                        sprintf('    handled by <info>%s</>', $handler[0]).$this->formatConditions($handler[1]),
-                    ];
-                }
-            }
+            $this->describeMessages($handlersByMessage, $bus, $io);
+            // describe middlewares
+        }
+    }
 
-            if ($tableRows) {
-                $io->text('The following messages can be dispatched:');
-                $io->newLine();
-                $io->table([], $tableRows);
-            } else {
-                $io->warning(sprintf('No handled message found in bus "%s".', $bus));
+    private function describeMessages($handlersByMessage, $bus, SymfonyStyle $io): void
+    {
+        $tableRows = [];
+        foreach ($handlersByMessage as $message => $handlers) {
+            $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $message)];
+            foreach ($handlers as $handler) {
+                $tableRows[] = [
+                    sprintf('    handled by <info>%s</>', $handler[0]).$this->formatConditions($handler[1]),
+                ];
             }
+        }
+
+        if ($tableRows) {
+            $io->text('The following messages can be dispatched:');
+            $io->newLine();
+            $io->table([], $tableRows);
+        } else {
+            $io->warning(sprintf('No handled message found in bus "%s".', $bus));
+        }
+    }
+
+    /**
+     * @param MiddlewareInterface[] $middlewares
+     */
+    private function describeMiddlewares(array $middlewares): void
+    {
+        $before = $after = [];
+        foreach ($middlewares as $middleware) {
+            if ($middleware instanceof DescriptionAwareMiddleware) {
+                $before[] = $middleware->getDescription()->getBefore();
+                $after[] = $middleware->getDescription()->getAfter();
+            } else {
+                $before[] = 'aa';
+                $after[] = 'aaa';
+            }
+        }
+
+        $after = array_reverse($after);
+
+        foreach (array_merge($before, $after) as $line) {
+            // ...
         }
     }
 

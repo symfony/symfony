@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
 
-class SecurityTest extends WebTestCase
+class SecurityTest extends AbstractWebTestCase
 {
     public function testServiceIsFunctional()
     {

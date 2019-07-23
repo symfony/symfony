@@ -23,7 +23,7 @@
                 <argument type="service" id="validator.validator_factory" />
             </call>
             <call method="setTranslator">
-                <argument type="service" id="translator" />
+                <argument type="service" id="translator" on-invalid="ignore" />
             </call>
             <call method="setTranslationDomain">
                 <argument>%validator.translation_domain%</argument>

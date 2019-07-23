@@ -49,11 +49,17 @@ class Stub
         $properties = [];
 
         if (!isset(self::$defaultProperties[$c = \get_class($this)])) {
-            self::$defaultProperties[$c] = get_class_vars($c);
+            $defaultProperties = get_class_vars($c);
 
-            foreach ((new \ReflectionClass($c))->getStaticProperties() as $k => $v) {
-                unset(self::$defaultProperties[$c][$k]);
+            foreach ((new \ReflectionClass($c))->getProperties(\ReflectionProperty::IS_PUBLIC) as $v) {
+                if ($v->isStatic()) {
+                    unset($defaultProperties[$v->name]);
+                } elseif (!isset($defaultProperties[$v->name])) {
+                    $defaultProperties[$v->name] = null;
+                }
             }
+
+            self::$defaultProperties[$c] = $defaultProperties;
         }
 
         foreach (self::$defaultProperties[$c] as $k => $v) {

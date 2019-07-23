@@ -48,7 +48,7 @@ abstract class AbstractTest extends AbstractValidatorTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $this->validator = $this->createValidator($this->metadataFactory);
     }

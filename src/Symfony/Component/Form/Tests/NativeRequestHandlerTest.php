@@ -30,7 +30,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $_GET = [];
         $_POST = [];

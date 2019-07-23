@@ -84,7 +84,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     {
         $this->engine = null;
 
-        parent::tearDown();
+        parent::after();
     }
 
     protected function renderForm(FormView $view, array $vars = [])

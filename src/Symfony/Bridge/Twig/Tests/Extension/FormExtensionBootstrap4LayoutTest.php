@@ -38,7 +38,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',

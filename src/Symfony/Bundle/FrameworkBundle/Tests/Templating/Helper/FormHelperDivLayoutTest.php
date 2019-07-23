@@ -59,7 +59,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     {
         $this->engine = null;
 
-        parent::tearDown();
+        parent::after();
     }
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()

@@ -24,7 +24,7 @@ class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $this->propertyInfo = new PropertyInfoCacheExtractor($this->propertyInfo, new ArrayAdapter());
     }

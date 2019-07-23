@@ -38,7 +38,7 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',

@@ -29,7 +29,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $this->dataProvider = new LocaleDataProvider(
             $this->getDataDirectory().'/'.Intl::LOCALE_DIR,

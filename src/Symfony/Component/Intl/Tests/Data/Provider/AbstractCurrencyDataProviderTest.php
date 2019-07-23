@@ -595,7 +595,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $this->dataProvider = new CurrencyDataProvider(
             $this->getDataDirectory().'/'.Intl::CURRENCY_DIR,

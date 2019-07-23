@@ -225,7 +225,7 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $this->dataProvider = new ScriptDataProvider(
             $this->getDataDirectory().'/'.Intl::SCRIPT_DIR,

@@ -30,7 +30,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     {
         IntlTestHelper::requireFullIntl($this, false);
 
-        parent::setUp();
+        parent::before();
     }
 
     /**

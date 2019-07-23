@@ -27,7 +27,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
     {
         $this->object = new \stdClass();
 
-        parent::setUp();
+        parent::before();
     }
 
     protected function createChoiceList()

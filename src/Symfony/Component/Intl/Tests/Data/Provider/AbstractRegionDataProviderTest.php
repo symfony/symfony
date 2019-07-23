@@ -289,7 +289,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $this->dataProvider = new RegionDataProvider(
             $this->getDataDirectory().'/'.Intl::REGION_DIR,

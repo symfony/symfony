@@ -837,7 +837,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $this->dataProvider = new LanguageDataProvider(
             $this->getDataDirectory().'/'.Intl::LANGUAGE_DIR,

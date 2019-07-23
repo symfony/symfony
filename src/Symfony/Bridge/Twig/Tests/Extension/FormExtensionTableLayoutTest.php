@@ -37,7 +37,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
      */
     protected function before(): void
     {
-        parent::setUp();
+        parent::before();
 
         $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',

@@ -18,7 +18,7 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
- * MemcachedStore is a StoreInterface implementation using Memcached as store engine.
+ * MemcachedStore is a PersistingStoreInterface implementation using Memcached as store engine.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */

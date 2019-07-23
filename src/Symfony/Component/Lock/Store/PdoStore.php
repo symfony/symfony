@@ -22,7 +22,7 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
- * PdoStore is a StoreInterface implementation using a PDO connection.
+ * PdoStore is a PersistingStoreInterface implementation using a PDO connection.
  *
  * Lock metadata are stored in a table. You can use createTable() to initialize
  * a correctly defined table.

@@ -33,7 +33,7 @@ class DayTransformer extends Transformer
      */
     public function getReverseMatchingRegExp($length)
     {
-        return 1 === $length ? '\d{1,2}' : '\d{'.$length.'}';
+        return 1 === $length ? '\d{1,2}' : '\d{1,'.$length.'}';
     }
 
     /**

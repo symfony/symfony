@@ -183,6 +183,17 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         return $this->notImplemented(parent::parseQuarterProvider());
     }
 
+    public function testParseThreeDigitsYears()
+    {
+        if (PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Parsing three digits years requires a 64bit PHP.');
+        }
+
+        $formatter = $this->getDefaultDateFormatter('yyyy-M-d');
+        $this->assertSame(-32157648000, $formatter->parse('950-12-19'));
+        $this->assertIsIntlSuccess($formatter, 'U_ZERO_ERROR', IntlGlobals::U_ZERO_ERROR);
+    }
+
     protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
         return new IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern);

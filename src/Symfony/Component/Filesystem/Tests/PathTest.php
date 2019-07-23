@@ -232,25 +232,6 @@ class PathTest extends TestCase
         $this->assertSame($directory, Path::getDirectory($path));
     }
 
-    public function provideGetFilenameTests(): \Generator
-    {
-        yield ['/webmozart/symfony/style.css', 'style.css'];
-        yield ['/webmozart/symfony/STYLE.CSS', 'STYLE.CSS'];
-        yield ['/webmozart/symfony/style.css/', 'style.css'];
-        yield ['/webmozart/symfony/', 'symfony'];
-        yield ['/webmozart/symfony', 'symfony'];
-        yield ['/', ''];
-        yield ['', ''];
-    }
-
-    /**
-     * @dataProvider provideGetFilenameTests
-     */
-    public function testGetFilename(string $path, string $filename): void
-    {
-        $this->assertSame($filename, Path::getFilename($path));
-    }
-
     public function provideGetFilenameWithoutExtensionTests(): \Generator
     {
         yield ['/webmozart/symfony/style.css.twig', null, 'style.css'];

@@ -91,10 +91,11 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     private function renderException(FlattenException $exception, string $debugTemplate = 'views/exception_full.html.php'): string
     {
+        $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
         $statusText = $this->escape($exception->getTitle());
         $statusCode = $this->escape($exception->getStatusCode());
 
-        if (!$this->debug) {
+        if (!$debug) {
             return $this->include('views/error.html.php', [
                 'statusText' => $statusText,
                 'statusCode' => $statusCode,

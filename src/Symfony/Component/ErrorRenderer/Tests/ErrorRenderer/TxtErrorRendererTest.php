@@ -12,16 +12,58 @@
 namespace Symfony\Component\ErrorRenderer\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\TxtErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 class TxtErrorRendererTest extends TestCase
 {
-    public function testRender()
+    /**
+     * @dataProvider getRenderData
+     */
+    public function testRender(FlattenException $exception, ErrorRendererInterface $errorRenderer, string $expected)
     {
-        $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
-        $expected = '[title] Internal Server Error%A[status] 500%A[detail] Foo%A[1] RuntimeException: Foo%A';
+        $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception));
+    }
 
-        $this->assertStringMatchesFormat($expected, (new TxtErrorRenderer(true))->render($exception));
+    public function getRenderData()
+    {
+        $expectedDebug = <<<TXT
+[title] Internal Server Error
+[status] 500
+[detail] Foo
+[1] RuntimeException: Foo
+in %A
+TXT;
+
+        $expectedNonDebug = <<<TXT
+[title] Internal Server Error
+[status] 500
+[detail] Foo
+TXT;
+
+        yield '->render() returns the TXT content WITH stack traces in debug mode' => [
+            FlattenException::createFromThrowable(new \RuntimeException('Foo')),
+            new TxtErrorRenderer(true),
+            $expectedDebug,
+        ];
+
+        yield '->render() returns the TXT content WITHOUT stack traces in non-debug mode' => [
+            FlattenException::createFromThrowable(new \RuntimeException('Foo')),
+            new TxtErrorRenderer(false),
+            $expectedNonDebug,
+        ];
+
+        yield '->render() returns the TXT content WITHOUT stack traces in debug mode FORCING non-debug via X-Debug header' => [
+            FlattenException::createFromThrowable(new \RuntimeException('Foo'), null, ['X-Debug' => false]),
+            new TxtErrorRenderer(true),
+            $expectedNonDebug,
+        ];
+
+        yield '->render() returns the TXT content WITHOUT stack traces in non-debug mode EVEN FORCING debug via X-Debug header' => [
+            FlattenException::createFromThrowable(new \RuntimeException('Foo'), null, ['X-Debug' => true]),
+            new TxtErrorRenderer(false),
+            $expectedNonDebug,
+        ];
     }
 }

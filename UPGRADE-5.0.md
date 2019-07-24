@@ -467,6 +467,8 @@ TwigBundle
  * The default value (`false`) of the `twig.strict_variables` configuration option has been changed to `%kernel.debug%`.
  * The `transchoice` tag and filter have been removed, use the `trans` ones instead with a `%count%` parameter.
  * Removed support for legacy templates directories `src/Resources/views/` and `src/Resources/<BundleName>/views/`, use `templates/` and `templates/bundles/<BundleName>/` instead.
+ * The default value (`twig.controller.exception::showAction`) of the `twig.exception_controller` configuration option has been changed to `null`.
+ * Removed `ExceptionController` class and all built-in error templates
 
 TwigBridge
 ----------

@@ -14,6 +14,8 @@ namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\HttpKernel\Kernel;
 
 class EmptyAppTest extends TestCase
@@ -37,12 +39,13 @@ class EmptyAppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(function ($container) {
-            $container
-                ->loadFromExtension('twig', [ // to be removed in 5.0 relying on default
-                    'strict_variables' => false,
-                ])
-            ;
+        $loader->load(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('twig', [ // to be removed in 5.0 relying on default
+                'strict_variables' => false,
+                'exception_controller' => null,
+            ]);
+            $container->register('error_renderer', ErrorRenderer::class);
+            $container->setParameter('debug.file_link_format', null);
         });
     }
 

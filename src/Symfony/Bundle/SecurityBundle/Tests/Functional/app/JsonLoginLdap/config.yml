@@ -1,5 +1,5 @@
 imports:
-    - { resource: ./../config/default.yml }
+    - { resource: ./../config/framework.yml }
 services:
     Symfony\Component\Ldap\Ldap:
         arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']

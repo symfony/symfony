@@ -2,3 +2,4 @@
 twig:
     debug:            '%kernel.debug%'
     strict_variables: '%kernel.debug%'
+    exception_controller: Symfony\Bundle\SecurityBundle\Tests\Functional\app\ExceptionController

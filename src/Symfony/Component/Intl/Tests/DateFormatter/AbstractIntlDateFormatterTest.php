@@ -600,6 +600,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         return [
             ['y-M-d', '1970-1-1', 0],
+            ['y-MM-d', '1970-1-1', 0],
             ['y-MMM-d', '1970-Jan-1', 0],
             ['y-MMMM-d', '1970-January-1', 0],
         ];
@@ -618,6 +619,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         return [
             ['y-M-d', '1970-1-1', 0],
+            ['y-M-dd', '1970-1-1', 0],
             ['y-M-dd', '1970-1-01', 0],
             ['y-M-ddd', '1970-1-001', 0],
         ];

@@ -37,7 +37,7 @@ class YearTransformer extends Transformer
      */
     public function getReverseMatchingRegExp(int $length): string
     {
-        return 2 === $length ? '\d{2}' : '\d{4}';
+        return 2 === $length ? '\d{2}' : '\d{1,4}';
     }
 
     /**

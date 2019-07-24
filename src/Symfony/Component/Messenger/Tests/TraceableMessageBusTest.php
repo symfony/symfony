@@ -62,7 +62,7 @@ class TraceableMessageBusTest extends TestCase
         unset($actualTracedMessage['callTime']); // don't check, too variable
         $this->assertEquals([
             'message' => $message,
-            'stamps' => [[$stamp]],
+            'stamps' => [$stamp],
             'caller' => [
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,

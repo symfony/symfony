@@ -125,7 +125,13 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
      */
     public function createStream(string $content = ''): StreamInterface
     {
-        return $this->streamFactory->createStream($content);
+        $stream = $this->streamFactory->createStream($content);
+
+        if ($stream->isSeekable()) {
+            $stream->seek(0);
+        }
+
+        return $stream;
     }
 
     /**

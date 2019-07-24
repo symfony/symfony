@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-24T05:47:44Z
+
+@yceruto the deprecated layout.html.twig file is still referenced in https://github.com/symfony/symfony/blob/4045a134df3cfd2356b0b5a9fae7e91ec16d5f7d/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar_redirect.html.twig#L1 and the images in https://github.com/symfony/symfony/blob/4045a134df3cfd2356b0b5a9fae7e91ec16d5f7d/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/messenger.html.twig#L122-L123
+
+What's the plan there? Ah  #32695, I see. So we can remove the remaining deprecated templates/images separately after #32695

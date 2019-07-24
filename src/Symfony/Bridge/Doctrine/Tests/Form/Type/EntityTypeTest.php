@@ -848,7 +848,8 @@ class EntityTypeTest extends BaseTypeTest
         ]);
 
         $this->assertEquals([3 => new ChoiceView($entity3, '3', 'Baz'), 2 => new ChoiceView($entity2, '2', 'Bar')], $field->createView()->vars['preferred_choices']);
-        $this->assertEquals([1 => new ChoiceView($entity1, '1', 'Foo')], $field->createView()->vars['choices']);
+        $this->assertArrayHasKey(1, $field->createView()->vars['choices']);
+        $this->assertEquals(new ChoiceView($entity1, '1', 'Foo'), $field->createView()->vars['choices'][1]);
     }
 
     public function testOverrideChoicesWithPreferredChoices()
@@ -868,7 +869,8 @@ class EntityTypeTest extends BaseTypeTest
         ]);
 
         $this->assertEquals([3 => new ChoiceView($entity3, '3', 'Baz')], $field->createView()->vars['preferred_choices']);
-        $this->assertEquals([2 => new ChoiceView($entity2, '2', 'Bar')], $field->createView()->vars['choices']);
+        $this->assertArrayHasKey(2, $field->createView()->vars['choices']);
+        $this->assertEquals(new ChoiceView($entity2, '2', 'Bar'), $field->createView()->vars['choices'][2]);
     }
 
     public function testDisallowChoicesThatAreNotIncludedChoicesSingleIdentifier()

@@ -28,6 +28,7 @@ use Twig\Loader\ExistsLoaderInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @deprecated since Symfony 4.4, use the ExceptionErrorController instead.
+ * @internal since Symfony 4.4
  */
 class ExceptionController
 {

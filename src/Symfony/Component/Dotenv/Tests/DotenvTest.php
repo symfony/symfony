@@ -441,4 +441,43 @@ class DotenvTest extends TestCase
         $this->assertSame('no', $_ENV['TEST_USE_PUTENV']);
         $this->assertFalse(getenv('TEST_USE_PUTENV'));
     }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Following environment variables are missing: BAZ
+     */
+    public function testSomeEnvVarsAreMissing()
+    {
+        $dotenv = new Dotenv();
+        $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
+
+        $dotenv->checkRequired(['FOO', 'BAR', 'BAZ']);
+
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Following environment variables are missing: BAZ, FOOBAR
+     */
+    public function testRequiredEnvsExceptionsContainsAllMissingVariableNames()
+    {
+        $dotenv = new Dotenv();
+        $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
+
+        $dotenv->checkRequired(['FOO', 'BAR', 'BAZ', 'FOOBAR']);
+    }
+
+
+    /**
+     * When all of required variables are set, method should not throw anything
+     * @doesNotPerformAssertions
+     */
+    public function testNothingWillHappenWhenAllEnvVarsAreSet()
+    {
+
+        $dotenv = new Dotenv();
+        $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
+
+        $dotenv->checkRequired(['FOO', 'BAR']);
+    }
 }

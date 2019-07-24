@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by Seb33300 at 2019-07-22T16:42:22Z
+
+See https://github.com/symfony/symfony/pull/23690
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-22T20:51:31Z
+
+@Seb33300 I have now cherry-picked your commit from #23690 and updated the tests. Thank you for the initial work on it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-22T21:00:09Z
+
+`deps=high` jobs will pass once the changes are in `master`
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2019-07-23T04:23:33Z
+
+Maybe I misunderstood but if I didn't fixed the test on my previous PR it's because regarding the comments I thought we had to introduce this as a new optional feature (with a new option).
+
+But maybe I am wrong
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-23T07:26:56Z
+
+@Seb33300 I think we should revisit the decision made back then. This only improves the rendering. Adding an extra option for this seems to be unneeded complexity.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-23T07:28:26Z
+
+Back then the PR was not completed, so we didn't make any decision :)

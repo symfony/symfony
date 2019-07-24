@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-23T07:10:06Z
+
+IIRC, I think that the web profiler was compatible with right to left. Isn't the case anymore?
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-23T07:33:49Z
+
+Hello @fabpot .
+Thanks for reviewing.
+
+It should not follow the right-to-left style because it's not interesting to display it.
+It's best to stay with left-to-right.
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-23T07:42:42Z
+
+![Image](https://i.imgur.com/Wwer2cI.png)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-23T09:02:56Z
+
+Your screenshot looks like the default page should be fixed as well. 👀

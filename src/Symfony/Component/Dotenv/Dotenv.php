@@ -223,7 +223,7 @@ final class Dotenv
      *
      * @throws \RuntimeException when some of declared variables are not defined
      */
-    public function checkRequired(array $variables)
+    public function checkRequired(array $variables): void
     {
         $missingKeys = [];
 
@@ -234,7 +234,7 @@ final class Dotenv
         }
 
         if(count($missingKeys) > 0) {
-            throw new \RuntimeException(sprintf('Following environment variables are missing: %s', implode(',', $missingKeys)));
+            throw new \RuntimeException(sprintf('Following environment variables are missing: %s', implode(', ', $missingKeys)));
         }
 
     }

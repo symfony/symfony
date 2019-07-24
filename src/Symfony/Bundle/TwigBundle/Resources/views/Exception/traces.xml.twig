@@ -1,9 +1,0 @@
-{% deprecated 'The template "' ~ _self ~'" is deprecated since Symfony 4.4, will be removed in 5.0.' %}
-        <traces>
-{% for trace in exception.trace %}
-            <trace>
-{{ include('@Twig/Exception/trace.txt.twig', { trace: trace }, with_context = false) }}
-
-            </trace>
-{% endfor %}
-        </traces>

@@ -15,8 +15,6 @@ use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Loader\ExistsLoaderInterface;
 
 /**
  * Provides the ability to render custom Twig-based HTML error pages
@@ -63,7 +61,6 @@ class TwigHtmlErrorRenderer implements ErrorRendererInterface
         }
 
         return $this->twig->render($template, [
-            'legacy' => false, // to be removed in 5.0
             'exception' => $exception,
             'status_code' => $exception->getStatusCode(),
             'status_text' => $exception->getTitle(),
@@ -73,39 +70,15 @@ class TwigHtmlErrorRenderer implements ErrorRendererInterface
     private function findTemplate(int $statusCode): ?string
     {
         $template = sprintf('@Twig/Exception/error%s.html.twig', $statusCode);
-        if ($this->templateExists($template)) {
+        if ($this->twig->getLoader()->exists($template)) {
             return $template;
         }
 
         $template = '@Twig/Exception/error.html.twig';
-        if ($this->templateExists($template)) {
+        if ($this->twig->getLoader()->exists($template)) {
             return $template;
         }
 
         return null;
-    }
-
-    /**
-     * To be removed in 5.0.
-     *
-     * Use instead:
-     *
-     *   $this->twig->getLoader()->exists($template)
-     */
-    private function templateExists(string $template): bool
-    {
-        $loader = $this->twig->getLoader();
-        if ($loader instanceof ExistsLoaderInterface || method_exists($loader, 'exists')) {
-            return $loader->exists($template);
-        }
-
-        try {
-            $loader->getSourceContext($template);
-
-            return true;
-        } catch (LoaderError $e) {
-        }
-
-        return false;
     }
 }

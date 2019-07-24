@@ -579,6 +579,11 @@ Yaml
  * The parser is now stricter and will throw a `ParseException` when a
    mapping is found inside a multi-line string.
 
+WebProfilerBundle
+-----------------
+
+ * Removed the `ExceptionController` class, use `ExceptionErrorController` instead.
+
 WebServerBundle
 ---------------
 

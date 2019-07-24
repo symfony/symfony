@@ -726,6 +726,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testSingleChoiceWithPreferred()
     {
+        $this->requiresFeatureSet(404);
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
             'preferred_choices' => ['&b'],
@@ -750,6 +752,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testSingleChoiceWithPreferredAndNoSeparator()
     {
+        $this->requiresFeatureSet(404);
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
             'preferred_choices' => ['&b'],
@@ -773,6 +777,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testSingleChoiceWithPreferredAndBlankSeparator()
     {
+        $this->requiresFeatureSet(404);
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
             'preferred_choices' => ['&b'],
@@ -797,6 +803,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testChoiceWithOnlyPreferred()
     {
+        $this->requiresFeatureSet(404);
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
             'preferred_choices' => ['&a', '&b'],

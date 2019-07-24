@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+
+4.4.0
+-----
+
+ * added `Dotenv::checkRequired()` method to verify all required environment variables are set
+
 4.3.0
 -----
 

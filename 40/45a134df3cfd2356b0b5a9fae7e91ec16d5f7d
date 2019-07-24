@@ -1,0 +1,249 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-05-06T17:53:56Z
+
+Hi @OskarStark thanks for your review, but they aren't part of this PR (see description), the last commit should be reviewed for now.
+
+Please, move them to https://github.com/symfony/symfony/pull/31065 to track them in the right place ;)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-05-07T13:34:30Z
+
+https://github.com/symfony/symfony/pull/31398/commits/eea898f0e7eb5daa5f4e1806b8e4e0591c9655c2#diff-21899d8070b2bcedfb8ab7f6993331deR73
+https://ci.appveyor.com/project/fabpot/symfony/builds/24407001#L1264
+
+I have a problem with the ErrorHandler in functional tests, it does not work because the `DeprecationErrorHandler` is used instead, hence `$kernel->terminateWithException()` method is never called and we can't get the json response. Thoughts?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-05-08T22:07:06Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-05T13:23:09Z
+
+Check later if https://github.com/symfony/symfony/pull/31868 solve this issue https://github.com/symfony/symfony/pull/31398#issuecomment-490081769.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-05T13:24:28Z
+
+@yceruto Yes, it should fix the issue. I found it while reviewing your PR and Nicolas kindly fixed it. It will soon be on all branches so that you can rebase and see if that works (I tested locally and it worked well).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-05T13:29:43Z
+
+@fabpot perfect!! thanks.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-05T15:19:15Z
+
+It seems that it still does not work in test mode https://ci.appveyor.com/project/fabpot/symfony/builds/25063652#L1221
+
+this code never runs:
+https://github.com/symfony/symfony/blob/d3055814ad9680e00f2fb00e291aafa986002ad9/src/Symfony/Component/HttpKernel/EventListener/DebugHandlersListener.php#L117-L121
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-27T14:52:09Z
+
+I've reverted the changes related to the SecurityBundle because https://github.com/symfony/symfony/pull/31398#issuecomment-499129058, when we find a solution for that issue then we can improve that tests suite
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-29T06:25:40Z
+
+Update:
+ - deprecated `Exception/` directory to load Twig error templates (use `Error/` instead) and useful to get rid of built-in deprecations.
+ - deprecated `showAction()` method in favor of `__invoke()` method, which will enable the new feature (fallback to `ErrorFormatter`)
+ - deprecated default exception controller `twig.controller.exception::showAction` in favor of `twig.exception_controller` (invokable).
+
+Pending:
+ - Update CHANGELOG and UPGRADE files
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-29T16:48:54Z
+
+Another idea: It would be better IMO if twig is only used for html. So when using the `showAction` everything will be as before. But when using `__invoke`, then we only looks for a twig template in case the format is `html`. For anything else it should go directly to the ErrorCatcher. This way, we do not need the new template location (`@Twig/Error/`) at all. If people want to use twig for other formats as well, they should just overwrite the controller. To me that is an edge case that we should not support by default.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-30T13:41:50Z
+
+The cleanest implementation would also be to create a new `TwigHtmlErrorRenderer` that replaces `Symfony\Component\ErrorCatcher\ErrorRenderer\HtmlErrorRenderer`. That is what the `ErrorRendererInterface` is meant for. This way the controller is very slim and maybe not even needed anymore?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-30T22:15:04Z
+
+> Another idea: It would be better IMO if twig is only used for html. So when using the showAction everything will be as before. But when using __invoke, then we only looks for a twig template in case the format is html. For anything else it should go directly to the ErrorCatcher. This way, we do not need the new template location (@Twig/Error/) at all. ...
+
+What about the `error.html.twig` template ? it's being deprecated too.
+
+>... If people want to use twig for other formats as well, they should just overwrite the controller. To me that is an edge case that we should not support by default.
+
+> The cleanest implementation would also be to create a new TwigHtmlErrorRenderer that replaces Symfony\Component\ErrorCatcher\ErrorRenderer\HtmlErrorRenderer. That is what the ErrorRendererInterface is meant for. This way the controller is very slim and maybe not even needed anymore?
+
+If so, I guess the migration might be too hard for people/projects with custom error formats (no `html`), they should add support if they want to keep the current structure of the error, either (1) creating their own exception controller or (2) creating the "ErrorRenderer" for each format (I would do it for my projects).
+
+I think it's a big decision to make: @symfony/deciders?
+
+---
+
+In the other hand, the proposed migration path only forces you to move the custom error templates from one directory to another (keeping the support for all formats as now); even, if you don't want to migrate yet (built-in errors/formats) you can to copy the file template to your project (in the new location `Error/`) and it will work as before again (without warnings).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-30T22:34:28Z
+
+> What about the error.html.twig template ? it's being deprecated too.
+
+That it should be ignored as well when using __invoke by using a different name for example.
+
+> people/projects with custom error formats (no html)
+
+I don't think many people defined their own custom error formats for non-html formats using twig. That's my point. I wouldn't recommend to use twig to create an xml/json error response.
+Twig should be used to create custom 404 html responses which will work as before. But for API responses, we want to teach people to use the ErrorCatcher now. That is why you created it.
+
+> if you don't want to migrate yet (built-in errors/formats) you can to copy the file template to your project (in the new location Error/) and it will work as before again
+
+To solve that, we can provide a `LegacyErrorRenderer` in the ErrorCatcher component that renders exceptions using the format pre-sf-4.4. People can then simplly register it using the new error renderer tag.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-30T23:49:11Z
+
+> > What about the `error.html.twig` template ?
+
+> That should be ignored as well when using __invoke. So only use twig when showException = true and format = html.
+
+Hmm... I don't think so, the template `@Twig/Exception/error.html.twig` (which we ask if exists) could be a custom template located in `templates/bundles/TwigBundle/Exception/error.html.twig` and shouldn't be ignored anyway.
+
+Calling to `__invoke` with showException = **false** and format = html we should use twig as well, right? -> custom `error.html.twig` template or status code errors (e.g. `error404.html.twig`).
+
+BTW, thanks for your review and comments! they are being very helpful :)
+
+> I don't think many people defined their own custom error formats for non-html formats using twig. That's my point. I wouldn't recommend to use twig to create an xml/json error response.
+Twig should be used to create custom 404 html responses which will work as before. But for API responses, we want to teach people to use the ErrorCatcher now. That is why you created it.
+
+I agree totally with you, but that's my doubt: how many people defined their own custom error formats for non-html formats using twig, and how could these changes affect them. I'm not sure about that, but If we shouldn't take care about it, I keep going :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-05T15:37:57Z
+
+Update:
+ - Deprecated `ExceptionController` in favor of the new error renderer provided by the `ErrorCatcher` component.
+ - Deprecated the default `twig.controller.exception::showAction` controller in `twig.exception_controller` configuration option. You should set it to `null` to enable the new error renderer mechanism.
+ - Added a new `TwigHtmlErrorRenderer` integrated to the error renderer service to load custom HTML error templates in project side, as now.
+
+That mean we only support HTML custom error templates in project side (e.g `error.html.twig`, `errorXXX.html.twig`), for other formats use the new error renderer system.
+
+/cc @Tobion
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-09T11:14:25Z
+
+I'd like to merge this one before renaming the ErrorCatcher component (to avoid conflicts).
+
+(Travis failures with high deps is normal so far)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-11T17:55:45Z
+
+**Update**
+
+Now the default `HTMLErrorRenderer` has a full exception page, just like TwigBundle, which is also being deprecated. So, this proposal leaves us without Twig templates in TwigBundle for Symfony 5.0
+
+Because the `ErrorRenderer` component is not aware of Twig, I've needed to create a tiny PHP templating mechanism in `HTMLErrorRenderer` with `include`, `block`, etc, to look like the current one (same structure and composition), so, better maintenance.
+
+For a better review, I suggest you compare each template file with its TwigBundle counterpart, I have kept the same file name and its internal structure.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-13T01:58:45Z
+
+We just deprecated php templating support. And now this creates new php templates with it's own mini engine? Seems super awkward.
+
+The state described in https://github.com/symfony/symfony/pull/31398#issuecomment-508797243 sounded much better to me. If you want to full debug experience for exception rendering, it requires twig. You likely have twig anyway in debug mode because it's required by WebProfilerBundle. I don't see the value of these recent changes.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-13T05:43:00Z
+
+@Tobion there is no difference regarding the state described on https://github.com/symfony/symfony/pull/31398#issuecomment-508797243 and now.
+
+The latest changes relate to the new responsibility of the ErrorRenderer component and other reasons:
+ * having two full exception pages is bad for us, it is not also the responsibility of TwigBundle to provide one because it has a better templating engine.
+ * the new PHP templates and their rendering API are not public (internal details) I don't think that's a big deal. We already have a `welcome.html.php` template into HttpKernel component, we could have a big `exception_full.html.php` template here and remove the *awkward* mini templating engine introduced to keep the current composition and easier review.
+ * having a good exception page without TwigBundle is still a need.
+
+After that, TwigBundle would provide, in this scenario, the ability to render custom HTML error pages (based on Twig) for prod, nothing more.
+
+The work is done and it's worth it for me.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-13T16:08:16Z
+
+LGTM when my comments are adressed. Let' do it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-13T16:19:18Z
+
+@Tabion comments addressed, thank you!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-13T18:12:48Z
+
+https://github.com/symfony/symfony/pull/31398#discussion_r303208313 is still left.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-18T15:43:10Z
+
+Rebased and updated accordingly, this is ready.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-19T14:07:33Z
+
+**Summary**
+ * Added new `TwigHtmlErrorRenderer` (replaces and wraps the `HtmlErrorRenderer`) allowing to load custom Twig-based HTML error pages in non-debug mode, otherwise it falls back on `HtmlErrorRenderer`.
+ * The ErrorRenderer mechanism is not enabled by default when TwigBundle is installed, that's why we're deprecating the `ExceptionController` and the default value that enable it (`twig.exception_controller`) which would be `null` in 5.0, thus enabling the ErrorRenderer mechanism by default. (we should think about whether the `twig.exception_controller` config option is still relevant or not for other use cases, because in 5.0 it's useless for TwigBundle)
+ * Deprecating the `ExceptionController` we would also be deprecating the support to load non-HTML error page (e.g. `error.json.twig`, `error.xml.twig`, etc). because the new ErrorRenderer mechanism is in charge of that (people will have to migrate here).
+ * Last, the `ExceptionController` provides an advanced full exception page which is also being deprecated, in favor of the `HtmlErrorRenderer` which now contains a PHP version of it.
+
+I know, that's too much changes for one PR, and still there are more in the next iteration:
+ * Update WebProfilerBundle to decouple it from TwigBundle templates and better ErrorRenderer integration (already WIP)
+ * Refactor the HtmlErrorRenderer templates (grouping of PHP templates and other improvements)
+
+Let me know if a split of this PR is necessary.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-22T17:23:14Z
+
+**Update**
+
+PR splitted! requires https://github.com/symfony/symfony/pull/32659 to make it work properly.
+
+Also see https://github.com/symfony/symfony/pull/32660 and https://github.com/symfony/symfony/pull/32661
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-23T22:21:13Z
+
+requires https://github.com/symfony/symfony/pull/32693 to make it work properly

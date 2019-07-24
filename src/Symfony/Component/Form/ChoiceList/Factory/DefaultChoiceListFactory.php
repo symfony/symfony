@@ -157,9 +157,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         if ($isPreferred && false !== $preferredKey = $isPreferred($choice, $key, $value)) {
             $preferredViews[$nextIndex] = $view;
             $preferredViewsOrder[$nextIndex] = $preferredKey;
-        } else {
-            $otherViews[$nextIndex] = $view;
         }
+
+        $otherViews[$nextIndex] = $view;
     }
 
     private static function addChoiceViewsFromStructuredValues($values, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)

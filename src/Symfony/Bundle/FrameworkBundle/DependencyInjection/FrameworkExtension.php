@@ -1128,12 +1128,12 @@ class FrameworkExtension extends Extension
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            if (is_dir($dir = $bundle['path'].'/Resources/translations')) {
+            if ($container->fileExists($dir = $bundle['path'].'/Resources/translations')) {
                 $dirs[] = $dir;
             } else {
                 $nonExistingDirs[] = $dir;
             }
-            if (is_dir($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
+            if ($container->fileExists($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
                 @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
                 $dirs[] = $dir;
             } else {
@@ -1142,7 +1142,7 @@ class FrameworkExtension extends Extension
         }
 
         foreach ($config['paths'] as $dir) {
-            if (is_dir($dir)) {
+            if ($container->fileExists($dir)) {
                 $dirs[] = $transPaths[] = $dir;
             } else {
                 throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
@@ -1157,13 +1157,13 @@ class FrameworkExtension extends Extension
             $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
         }
 
-        if (is_dir($defaultDir)) {
+        if ($container->fileExists($defaultDir)) {
             $dirs[] = $defaultDir;
         } else {
             $nonExistingDirs[] = $defaultDir;
         }
 
-        if (is_dir($dir = $rootDir.'/Resources/translations')) {
+        if ($container->fileExists($dir = $rootDir.'/Resources/translations')) {
             if ($dir !== $defaultDir) {
                 @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
             }

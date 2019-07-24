@@ -216,6 +216,29 @@ final class Dotenv
         }
     }
 
+    /**
+     * Checks if all required variables are populated.
+     *
+     * @param string[] $variables Array with variable names that should be set in $_ENV
+     *
+     * @throws \RuntimeException when some of declared variables are not defined
+     */
+    public function checkRequired(array $variables)
+    {
+        $missingKeys = [];
+
+        foreach ($variables as $variable) {
+            if(!isset($_ENV[$variable])) {
+                $missingKeys[] = $variable;
+            }
+        }
+
+        if(count($missingKeys) > 0) {
+            throw new \RuntimeException(sprintf('Following environment variables are missing: %s', implode(',', $missingKeys)));
+        }
+
+    }
+
     private function lexVarname()
     {
         // var name + optional export

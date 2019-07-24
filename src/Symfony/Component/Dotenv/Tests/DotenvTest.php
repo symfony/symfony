@@ -452,7 +452,6 @@ class DotenvTest extends TestCase
         $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
 
         $dotenv->checkRequired(['FOO', 'BAR', 'BAZ']);
-
     }
 
     /**
@@ -467,14 +466,13 @@ class DotenvTest extends TestCase
         $dotenv->checkRequired(['FOO', 'BAR', 'BAZ', 'FOOBAR']);
     }
 
-
     /**
-     * When all of required variables are set, method should not throw anything
+     * When all of required variables are set, method should not throw anything.
+     *
      * @doesNotPerformAssertions
      */
     public function testNothingWillHappenWhenAllEnvVarsAreSet()
     {
-
         $dotenv = new Dotenv();
         $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
 

@@ -228,15 +228,14 @@ final class Dotenv
         $missingKeys = [];
 
         foreach ($variables as $variable) {
-            if(!isset($_ENV[$variable])) {
+            if (!isset($_ENV[$variable])) {
                 $missingKeys[] = $variable;
             }
         }
 
-        if(count($missingKeys) > 0) {
+        if (\count($missingKeys) > 0) {
             throw new \RuntimeException(sprintf('Following environment variables are missing: %s', implode(', ', $missingKeys)));
         }
-
     }
 
     private function lexVarname()

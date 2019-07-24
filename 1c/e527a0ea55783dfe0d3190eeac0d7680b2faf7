@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-11T21:59:00Z
+
+If this is really something we want to do, it should be deprecated before doing so, because it will break existing command that rely on this.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-07-14T14:50:25Z
+
+Any bugfix might break someone's behavior.
+I think that this qualifies as a bug, and that no one reported it because usually people rely on keys for choosing multi-words answers.
+
+This should apply to the 3.4 branch. And trimming should be disabled conditionally as of #31626 (4.4), we missed this part.
+
+---------------------------------------------------------------------------
+
+by IceMaD at 2019-07-15T20:32:26Z
+
+Without the trim on multiple answers, it might break cases where answers don't have spaces but user input have. Exemple :
+![break](https://user-images.githubusercontent.com/6181197/61246618-8eb51d80-a74f-11e9-889c-26a7ab94041f.png)
+
+Maybe set all ChoiceQuestion as Trimmable by default on 4.4 for backward compatibility ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-07-19T01:25:12Z
+
+@IceMad yes, trimming must stay enabled by default.
+
+Can you please rebase against the 3.4 branch and change the PR base branch accordingly?

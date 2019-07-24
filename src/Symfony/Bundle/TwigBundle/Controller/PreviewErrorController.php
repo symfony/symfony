@@ -11,8 +11,10 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
+use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -26,16 +28,22 @@ class PreviewErrorController
 {
     protected $kernel;
     protected $controller;
+    private $errorRenderer;
 
-    public function __construct(HttpKernelInterface $kernel, $controller)
+    public function __construct(HttpKernelInterface $kernel, $controller, ErrorRenderer $errorRenderer = null)
     {
         $this->kernel = $kernel;
         $this->controller = $controller;
+        $this->errorRenderer = $errorRenderer;
     }
 
     public function previewErrorPageAction(Request $request, $code)
     {
-        $exception = FlattenException::createFromThrowable(new \Exception('Something has intentionally gone wrong.'), $code);
+        $exception = FlattenException::createFromThrowable(new \Exception('Something has intentionally gone wrong.'), $code, ['X-Debug' => false]);
+
+        if (null === $this->controller && null !== $this->errorRenderer) {
+            return new Response($this->errorRenderer->render($exception, $request->getPreferredFormat()), $code);
+        }
 
         /*
          * This Request mimics the parameters set by

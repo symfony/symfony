@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
+/**
+ * @group legacy
+ */
 class ExceptionControllerTest extends TestCase
 {
     public function testShowActionCanBeForcedToShowErrorPage()

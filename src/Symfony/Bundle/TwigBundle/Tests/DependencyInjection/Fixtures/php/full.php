@@ -17,6 +17,7 @@ $container->loadFromExtension('twig', [
     'charset' => 'ISO-8859-1',
     'debug' => true,
     'strict_variables' => true,
+    'exception_controller' => null,
     'default_path' => '%kernel.project_dir%/Fixtures/templates',
     'paths' => [
         'path1',

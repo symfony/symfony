@@ -78,8 +78,8 @@
         "symfony/serializer": "<4.4",
         "symfony/stopwatch": "<4.4",
         "symfony/translation": "<4.4",
-        "symfony/twig-bundle": "<4.4",
         "symfony/twig-bridge": "<4.4",
+        "symfony/twig-bundle": "<4.4",
         "symfony/validator": "<4.4",
         "symfony/workflow": "<4.4"
     },

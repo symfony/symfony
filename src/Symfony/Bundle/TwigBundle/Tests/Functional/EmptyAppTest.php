@@ -14,6 +14,8 @@ namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\HttpKernel\Kernel;
 
 class EmptyAppTest extends TestCase
@@ -37,6 +39,10 @@ class EmptyAppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
+        $loader->load(static function (ContainerBuilder $container) {
+            $container->register('error_renderer', ErrorRenderer::class);
+            $container->setParameter('debug.file_link_format', null);
+        });
     }
 
     public function getCacheDir()

@@ -27,7 +27,13 @@
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
             <argument type="service" id="debug.file_link_formatter" />
-            <argument type="service" id="error_renderer.renderer.html" on-invalid="null" />
+            <argument type="service" id="error_renderer.renderer.html" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4, use the "web_profiler.controller.exception_error" service instead.</deprecated>
+        </service>
+
+        <service id="web_profiler.controller.exception_error" class="Symfony\Bundle\WebProfilerBundle\Controller\ExceptionErrorController" public="true">
+            <argument type="service" id="error_renderer.renderer.html" />
+            <argument type="service" id="profiler" on-invalid="null" />
         </service>
 
         <service id="web_profiler.csp.handler" class="Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler">

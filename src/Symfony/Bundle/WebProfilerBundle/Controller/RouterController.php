@@ -26,6 +26,8 @@ use Twig\Environment;
  * RouterController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal since Symfony 4.4
  */
 class RouterController
 {

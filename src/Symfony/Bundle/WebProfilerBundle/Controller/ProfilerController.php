@@ -24,6 +24,8 @@ use Twig\Environment;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal since Symfony 4.4
  */
 class ProfilerController
 {

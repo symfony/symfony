@@ -81,6 +81,15 @@ class MockResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
+    public function cancel(): void
+    {
+        $this->info['error'] = 'Response has been canceled.';
+        $this->body = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function close(): void
     {
         $this->body = [];
@@ -150,8 +159,11 @@ class MockResponse implements ResponseInterface
         foreach ($responses as $response) {
             $id = $response->id;
 
-            if (!$response->body) {
-                // Last chunk
+            if (null === $response->body) {
+                // Canceled response
+                $response->body = [];
+            } elseif ([] === $response->body) {
+                // Error chunk
                 $multi->handlesActivity[$id][] = null;
                 $multi->handlesActivity[$id][] = null !== $response->info['error'] ? new TransportException($response->info['error']) : null;
             } elseif (null === $chunk = array_shift($response->body)) {
@@ -242,7 +254,7 @@ class MockResponse implements ResponseInterface
 
         // populate info related to headers
         $info = $mock->getInfo() ?: [];
-        $response->info['http_code'] = ($info['http_code'] ?? 0) ?: $mock->getStatusCode(false) ?: 200;
+        $response->info['http_code'] = ($info['http_code'] ?? 0) ?: $mock->getStatusCode() ?: 200;
         $response->addResponseHeaders($info['response_headers'] ?? [], $response->info, $response->headers);
         $dlSize = isset($response->headers['content-encoding']) ? 0 : (int) ($response->headers['content-length'][0] ?? 0);
 

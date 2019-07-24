@@ -31,7 +31,7 @@ class TraceableMessageBus implements MessageBusInterface
     {
         $envelope = Envelope::wrap($message, $stamps);
         $context = [
-            'stamps' => array_values($envelope->all()),
+            'stamps' => array_merge([], ...array_values($envelope->all())),
             'message' => $envelope->getMessage(),
             'caller' => $this->getCaller(),
             'callTime' => microtime(true),

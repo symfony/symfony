@@ -741,8 +741,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./option)=3]
+    [count(./option)=4]
 '
         );
     }
@@ -763,8 +764,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./option)=2]
+    [count(./option)=3]
 '
         );
     }
@@ -786,8 +788,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.=""]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"][.="[trans]Choice&B[/trans]"]
     ]
-    [count(./option)=3]
+    [count(./option)=4]
 '
         );
     }
@@ -803,7 +806,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/select
-    [count(./option)=2]
+    [count(./option)=5]
 '
         );
     }

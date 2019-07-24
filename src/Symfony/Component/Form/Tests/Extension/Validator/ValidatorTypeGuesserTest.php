@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -105,6 +106,43 @@ class ValidatorTypeGuesserTest extends TestCase
 
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
         $this->assertNull($result);
+    }
+
+    public function testGuessMimeTypesForConstraintWithMimeTypesValue()
+    {
+        $mineTypes = ['image/png', 'image/jpeg'];
+        $constraint = new File(['mimeTypes' => $mineTypes]);
+        $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
+        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
+        $this->assertArrayHasKey('attr', $typeGuess->getOptions());
+        $this->assertArrayHasKey('accept', $typeGuess->getOptions()['attr']);
+        $this->assertEquals(implode(',', $mineTypes), $typeGuess->getOptions()['attr']['accept']);
+    }
+
+    public function testGuessMimeTypesForConstraintWithoutMimeTypesValue()
+    {
+        $constraint = new File();
+        $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
+        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
+        $this->assertArrayNotHasKey('attr', $typeGuess->getOptions());
+    }
+
+    public function testGuessMimeTypesForConstraintWithMimeTypesStringValue()
+    {
+        $constraint = new File(['mimeTypes' => 'image/*']);
+        $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
+        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
+        $this->assertArrayHasKey('attr', $typeGuess->getOptions());
+        $this->assertArrayHasKey('accept', $typeGuess->getOptions()['attr']);
+        $this->assertEquals('image/*', $typeGuess->getOptions()['attr']['accept']);
+    }
+
+    public function testGuessMimeTypesForConstraintWithMimeTypesEmptyStringValue()
+    {
+        $constraint = new File(['mimeTypes' => '']);
+        $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
+        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
+        $this->assertArrayNotHasKey('attr', $typeGuess->getOptions());
     }
 
     public function maxLengthTypeProvider()

@@ -79,6 +79,19 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCasters()
+    {
+        $casters = parent::getCasters();
+
+        // Unset the default caster truncating collectors data.
+        unset($casters['*']);
+
+        return $casters;
+    }
+
     private function collectMessage(string $busName, array $tracedMessage)
     {
         $message = $tracedMessage['message'];

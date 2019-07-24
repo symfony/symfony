@@ -13,6 +13,8 @@ CHANGELOG
  * Added button to clear the ajax request tab
  * Deprecated the `ExceptionController::templateExists()` method
  * Deprecated the `TemplateManager::templateExists()` method
+ * Deprecated the `ExceptionController` in favor of `ExceptionErrorController`
+ * Marked all classes of the WebProfilerBundle as internal
 
 4.3.0
 -----

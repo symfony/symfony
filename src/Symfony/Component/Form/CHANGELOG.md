@@ -22,7 +22,9 @@ CHANGELOG
 4.4.0
 -----
 
+ * preferred choices are repeated in the list of all choices
  * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
+ * The type guesser guesses the HTML accept attribute when a mime type is configured in the File or Image constraint.
 
 4.3.0
 -----

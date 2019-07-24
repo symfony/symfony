@@ -54,7 +54,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\KernelInterface')->getMock();
 
         $this->container = new ContainerBuilder();
-        $this->container->register('error_renderer.renderer.html', HtmlErrorRenderer::class);
+        $this->container->register('error_renderer.renderer.html', HtmlErrorRenderer::class)->setPublic(true);
         $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
         $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'))->setPublic(true);
         $this->container->register('twig', 'Twig\Environment')->setPublic(true);
@@ -92,10 +92,11 @@ class WebProfilerExtensionTest extends TestCase
 
         $extension = new WebProfilerExtension();
         $extension->load([[]], $this->container);
+        $this->container->removeDefinition('web_profiler.controller.exception');
 
         $this->assertFalse($this->container->has('web_profiler.debug_toolbar'));
 
-        $this->assertSaneContainer($this->getCompiledContainer());
+        self::assertSaneContainer($this->getCompiledContainer());
     }
 
     /**
@@ -105,10 +106,11 @@ class WebProfilerExtensionTest extends TestCase
     {
         $extension = new WebProfilerExtension();
         $extension->load([['toolbar' => $toolbarEnabled, 'intercept_redirects' => $interceptRedirects]], $this->container);
+        $this->container->removeDefinition('web_profiler.controller.exception');
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
-        $this->assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
+        self::assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
 
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());

@@ -109,13 +109,11 @@ class AppVariable
      */
     public function getSession()
     {
-        if (null === $this->requestStack) {
+        if ($request = $this->getRequest() && !$request->hasSession()) {
             throw new \RuntimeException('The "app.session" variable is not available.');
         }
 
-        if ($request = $this->getRequest()) {
-            return $request->getSession();
-        }
+        return $request->getSession();
     }
 
     /**

@@ -448,6 +448,10 @@ class DotenvTest extends TestCase
      */
     public function testSomeEnvVarsAreMissing()
     {
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+        unset($_ENV['BAZ']);
+
         $dotenv = new Dotenv();
         $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
 
@@ -460,6 +464,12 @@ class DotenvTest extends TestCase
      */
     public function testRequiredEnvsExceptionsContainsAllMissingVariableNames()
     {
+
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+        unset($_ENV['BAZ']);
+        unset($_ENV['FOOBAR']);
+
         $dotenv = new Dotenv();
         $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
 
@@ -473,6 +483,9 @@ class DotenvTest extends TestCase
      */
     public function testNothingWillHappenWhenAllEnvVarsAreSet()
     {
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+
         $dotenv = new Dotenv();
         $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
 

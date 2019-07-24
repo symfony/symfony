@@ -464,7 +464,6 @@ class DotenvTest extends TestCase
      */
     public function testRequiredEnvsExceptionsContainsAllMissingVariableNames()
     {
-
         unset($_ENV['FOO']);
         unset($_ENV['BAR']);
         unset($_ENV['BAZ']);

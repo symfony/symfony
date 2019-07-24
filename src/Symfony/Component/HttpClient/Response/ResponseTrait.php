@@ -327,7 +327,7 @@ trait ResponseTrait
 
                     unset($multi->handlesActivity[$j]);
 
-                    if ($chunk instanceof FirstChunk && null === $response->initializer) {
+                    if ($chunk instanceof FirstChunk && null === $response->initializer && null === $response->info['error']) {
                         // Ensure the HTTP status code is always checked
                         $response->getHeaders(true);
                     } elseif ($chunk instanceof ErrorChunk && !$chunk->didThrow()) {

@@ -505,6 +505,21 @@ abstract class HttpClientTestCase extends TestCase
         $response->getHeaders();
     }
 
+    public function testCancelInStream()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/404');
+
+        foreach ($client->stream($response) as $chunk) {
+            $response->cancel();
+        }
+
+        $this->expectException(TransportExceptionInterface::class);
+
+        foreach ($client->stream($response) as $chunk) {
+        }
+    }
+
     public function testOnProgressCancel()
     {
         $client = $this->getHttpClient(__FUNCTION__);

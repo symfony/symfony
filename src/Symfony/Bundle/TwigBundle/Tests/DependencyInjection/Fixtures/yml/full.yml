@@ -14,7 +14,6 @@ twig:
     debug:               true
     strict_variables:    true
     default_path: '%kernel.project_dir%/Fixtures/templates'
-    exception_controller: ~ # to be removed in 5.0 relying on default
     paths:
         path1: ''
         path2: ''

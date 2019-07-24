@@ -58,24 +58,8 @@ class ExceptionController
         $this->profiler->disable();
 
         $exception = $this->profiler->loadProfile($token)->getCollector('exception')->getException();
-        $template = $this->getTemplate();
 
-        if (!$this->twig->getLoader()->exists($template)) {
-            return new Response($this->errorRenderer->getBody($exception), 200, ['Content-Type' => 'text/html']);
-        }
-
-        $code = $exception->getStatusCode();
-
-        return new Response($this->twig->render(
-            $template,
-            [
-                'status_code' => $code,
-                'status_text' => Response::$statusTexts[$code],
-                'exception' => $exception,
-                'logger' => null,
-                'currentContent' => '',
-            ]
-        ), 200, ['Content-Type' => 'text/html']);
+        return new Response($this->errorRenderer->getBody($exception), 200, ['Content-Type' => 'text/html']);
     }
 
     /**
@@ -93,17 +77,6 @@ class ExceptionController
 
         $this->profiler->disable();
 
-        $template = $this->getTemplate();
-
-        if (!$this->twig->getLoader()->exists($template)) {
-            return new Response($this->errorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
-        }
-
-        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, ['Content-Type' => 'text/css']);
-    }
-
-    protected function getTemplate()
-    {
-        return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
+        return new Response($this->errorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
     }
 }

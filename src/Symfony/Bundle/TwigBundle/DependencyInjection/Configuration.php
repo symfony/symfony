@@ -35,11 +35,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('exception_controller')
-                    ->defaultValue(static function () {
-                        @trigger_error('Relying on the default value ("twig.controller.exception::showAction") of the "twig.exception_controller" configuration option is deprecated since Symfony 4.4, set it to "null" explicitly instead, which will be the new default in 5.0.', E_USER_DEPRECATED);
-
-                        return 'twig.controller.exception::showAction';
-                    })
+                    ->defaultNull()
                 ->end()
             ->end()
         ;

@@ -452,7 +452,7 @@ class DotenvTest extends TestCase
         unset($_ENV['BAR']);
         unset($_ENV['BAZ']);
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(false);
         $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
 
         $dotenv->checkRequired(['FOO', 'BAR', 'BAZ']);
@@ -469,7 +469,7 @@ class DotenvTest extends TestCase
         unset($_ENV['BAZ']);
         unset($_ENV['FOOBAR']);
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(false);
         $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
 
         $dotenv->checkRequired(['FOO', 'BAR', 'BAZ', 'FOOBAR']);
@@ -485,7 +485,7 @@ class DotenvTest extends TestCase
         unset($_ENV['FOO']);
         unset($_ENV['BAR']);
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(false);
         $dotenv->populate(['FOO' => 'foo', 'BAR' => 'bar']);
 
         $dotenv->checkRequired(['FOO', 'BAR']);

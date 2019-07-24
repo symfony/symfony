@@ -123,7 +123,7 @@ class ProfilerController
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
-        if ($request->hasSession() && ($session = $request->getSession()) && $session->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+        if ($request->hasSession() && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
             // keep current flashes for one more request if using AutoExpireFlashBag
             $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }

@@ -90,7 +90,7 @@ class ContextListener implements ListenerInterface
         }
 
         $request = $event->getRequest();
-        $session = $request->hasPreviousSession() ? $request->getSession() : null;
+        $session = $request->hasPreviousSession() && $request->hasSession() ? $request->getSession() : null;
 
         if (null === $session || null === $token = $session->get($this->sessionKey)) {
             $this->tokenStorage->setToken(null);
@@ -137,14 +137,14 @@ class ContextListener implements ListenerInterface
 
         $this->dispatcher->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
         $this->registered = false;
-        $session = $request->getSession();
+        $token = $this->tokenStorage->getToken();
 
-        if ((null === $token = $this->tokenStorage->getToken()) || $this->trustResolver->isAnonymous($token)) {
-            if ($request->hasPreviousSession()) {
-                $session->remove($this->sessionKey);
+        if (null === $token || $this->trustResolver->isAnonymous($token)) {
+            if ($request->hasPreviousSession() && $request->hasSession()) {
+                $request->getSession()->remove($this->sessionKey);
             }
         } else {
-            $session->set($this->sessionKey, serialize($token));
+            $request->getSession()->set($this->sessionKey, serialize($token));
 
             if (null !== $this->logger) {
                 $this->logger->debug('Stored the security token in the session.', ['key' => $this->sessionKey]);

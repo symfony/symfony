@@ -46,8 +46,7 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
         }
 
         // bootstrap the session
-        $session = $this->getSession();
-        if (!$session) {
+        if (!$session = $this->getSession()) {
             return;
         }
 

@@ -24,6 +24,8 @@ use Twig\Loader\ExistsLoaderInterface;
  * ExceptionController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal since Symfony 4.4
  */
 class ExceptionController
 {

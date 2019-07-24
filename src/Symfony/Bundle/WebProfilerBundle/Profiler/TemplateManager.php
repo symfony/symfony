@@ -24,6 +24,8 @@ use Twig\Loader\SourceContextLoaderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Artur Wielogórski <wodor@wodor.net>
+ *
+ * @internal since Symfony 4.4
  */
 class TemplateManager
 {

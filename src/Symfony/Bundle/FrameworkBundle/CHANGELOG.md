@@ -17,6 +17,7 @@ CHANGELOG
  * Removed cache-related compiler passes and `RequestDataCollector`
  * Removed the `translator.selector` and `session.save_listener` services
  * Removed `SecurityUserValueResolver`, use `UserValueResolver` instead
+ * Removed `routing.loader.service`.
 
 4.4.0
 -----

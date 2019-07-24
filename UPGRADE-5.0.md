@@ -251,6 +251,7 @@ FrameworkBundle
  * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
  * Removed support for `templating` engine in `TemplateController`, use Twig instead
  * Removed `ResolveControllerNameSubscriber`.
+ * Removed `routing.loader.service`.
 
 HttpClient
 ----------
@@ -368,6 +369,7 @@ Routing
  * `Serializable` implementing methods for `Route` and `CompiledRoute` are final.
    Instead of overwriting them, use `__serialize` and `__unserialize` as extension points which are forward compatible
    with the new serialization methods in PHP 7.4.
+ * Removed `ServiceRouterLoader` and `ObjectRouteLoader`.
 
 Security
 --------

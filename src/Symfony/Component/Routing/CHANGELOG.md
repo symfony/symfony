@@ -8,6 +8,7 @@ CHANGELOG
  * removed `generator_base_class`, `generator_cache_class`, `matcher_base_class` and `matcher_cache_class` router options
  * `Serializable` implementing methods for `Route` and `CompiledRoute` are final
  * removed referencing service route loaders with a single colon
+ * Removed `ServiceRouterLoader` and `ObjectRouteLoader`.
 
 4.4.0
 -----

@@ -40,13 +40,14 @@ class XmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(FlattenException $exception): string
     {
+        $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
         $title = $this->escapeXml($exception->getTitle());
         $message = $this->escapeXml($exception->getMessage());
         $statusCode = $this->escapeXml($exception->getStatusCode());
         $charset = $this->escapeXml($this->charset);
 
         $exceptions = '';
-        if ($this->debug) {
+        if ($debug) {
             $exceptions .= '<exceptions>';
             foreach ($exception->toArray() as $e) {
                 $exceptions .= sprintf('<exception class="%s" message="%s"><traces>', $e['class'], $this->escapeXml($e['message']));

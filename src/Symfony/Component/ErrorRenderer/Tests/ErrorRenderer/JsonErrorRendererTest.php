@@ -12,15 +12,23 @@
 namespace Symfony\Component\ErrorRenderer\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\JsonErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 class JsonErrorRendererTest extends TestCase
 {
-    public function testRender()
+    /**
+     * @dataProvider getRenderData
+     */
+    public function testRender(FlattenException $exception, ErrorRendererInterface $errorRenderer, string $expected)
     {
-        $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
-        $expected = <<<JSON
+        $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception));
+    }
+
+    public function getRenderData()
+    {
+        $expectedDebug = <<<JSON
 {
     "title": "Internal Server Error",
     "status": 500,
@@ -29,9 +37,40 @@ class JsonErrorRendererTest extends TestCase
         {
             "message": "Foo",
             "class": "RuntimeException",
-            "trace":
+            "trace": [
+%A
 JSON;
 
-        $this->assertStringStartsWith($expected, (new JsonErrorRenderer(true))->render($exception));
+        $expectedNonDebug = <<<JSON
+{
+    "title": "Internal Server Error",
+    "status": 500,
+    "detail": "Foo"
+}
+JSON;
+
+        yield '->render() returns the JSON content WITH stack traces in debug mode' => [
+            FlattenException::createFromThrowable(new \RuntimeException('Foo')),
+            new JsonErrorRenderer(true),
+            $expectedDebug,
+        ];
+
+        yield '->render() returns the JSON content WITHOUT stack traces in non-debug mode' => [
+            FlattenException::createFromThrowable(new \RuntimeException('Foo')),
+            new JsonErrorRenderer(false),
+            $expectedNonDebug,
+        ];
+
+        yield '->render() returns the JSON content WITHOUT stack traces in debug mode FORCING non-debug via X-Debug header' => [
+            FlattenException::createFromThrowable(new \RuntimeException('Foo'), null, ['X-Debug' => false]),
+            new JsonErrorRenderer(true),
+            $expectedNonDebug,
+        ];
+
+        yield '->render() returns the JSON content WITHOUT stack traces in non-debug mode EVEN FORCING debug via X-Debug header' => [
+            FlattenException::createFromThrowable(new \RuntimeException('Foo'), null, ['X-Debug' => true]),
+            new JsonErrorRenderer(false),
+            $expectedNonDebug,
+        ];
     }
 }

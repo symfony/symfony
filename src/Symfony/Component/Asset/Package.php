@@ -68,6 +68,11 @@ class Package implements PackageInterface
         return $this->versionStrategy;
     }
 
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
     protected function isAbsoluteUrl($url)
     {
         return false !== strpos($url, '://') || '//' === substr($url, 0, 2);

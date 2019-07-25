@@ -45,6 +45,10 @@ class TimeType extends AbstractType
             throw new InvalidConfigurationException('You can not disable minutes if you have enabled seconds.');
         }
 
+        if (null !== $options['reference_date'] && $options['reference_date']->getTimezone()->getName() !== $options['model_timezone']) {
+            throw new InvalidConfigurationException(sprintf('The configured "model_timezone" (%s) must match the timezone of the "reference_date" (%s).', $options['model_timezone'], $options['reference_date']->getTimezone()->getName()));
+        }
+
         if ($options['with_minutes']) {
             $format .= ':i';
             $parts[] = 'minute';
@@ -56,8 +60,6 @@ class TimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
-
             // handle seconds ignored by user's browser when with_seconds enabled
             // https://codereview.chromium.org/450533009/
             if ($options['with_seconds']) {
@@ -68,6 +70,20 @@ class TimeType extends AbstractType
                     }
                 });
             }
+
+            if (null !== $options['reference_date']) {
+                $format = 'Y-m-d '.$format;
+
+                $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($options) {
+                    $data = $event->getData();
+
+                    if (preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $data)) {
+                        $event->setData($options['reference_date']->format('Y-m-d ').$data);
+                    }
+                });
+            }
+
+            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = [
                 'error_bubbling' => true,
@@ -157,7 +173,7 @@ class TimeType extends AbstractType
                 $builder->add('second', self::$widgets[$options['widget']], $secondOptions);
             }
 
-            $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
+            $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget'], $options['reference_date']));
         }
 
         if ('datetime_immutable' === $options['input']) {
@@ -262,6 +278,7 @@ class TimeType extends AbstractType
             'with_seconds' => false,
             'model_timezone' => null,
             'view_timezone' => null,
+            'reference_date' => null,
             'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
@@ -279,6 +296,14 @@ class TimeType extends AbstractType
             'compound' => $compound,
             'choice_translation_domain' => false,
         ]);
+
+        $resolver->setDeprecated('model_timezone', function (Options $options, $modelTimezone): string {
+            if (null !== $modelTimezone && $options['view_timezone'] !== $modelTimezone && null === $options['reference_date']) {
+                return sprintf('Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is deprecated since Symfony 4.4.');
+            }
+
+            return '';
+        });
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
@@ -300,6 +325,7 @@ class TimeType extends AbstractType
         $resolver->setAllowedTypes('minutes', 'array');
         $resolver->setAllowedTypes('seconds', 'array');
         $resolver->setAllowedTypes('input_format', 'string');
+        $resolver->setAllowedTypes('reference_date', ['null', \DateTimeInterface::class]);
     }
 
     /**

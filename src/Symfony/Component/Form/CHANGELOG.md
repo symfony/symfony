@@ -4,6 +4,8 @@ CHANGELOG
 4.4.0
 -----
 
+ * using different values for the "model_timezone" and "view_timezone" options of the `TimeType` without configuring a
+   reference date is deprecated
  * preferred choices are repeated in the list of all choices
  * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
  * The type guesser guesses the HTML accept attribute when a mime type is configured in the File or Image constraint.

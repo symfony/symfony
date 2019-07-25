@@ -72,6 +72,8 @@ Filesystem
 Form
 ----
 
+ * Using different values for the "model_timezone" and "view_timezone" options of the `TimeType` without configuring a
+   reference date is deprecated.
  * Using `int` or `float` as data for the `NumberType` when the `input` option is set to `string` is deprecated.
 
 FrameworkBundle

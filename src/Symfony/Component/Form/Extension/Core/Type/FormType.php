@@ -15,6 +15,7 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormConfigBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -58,6 +59,14 @@ class FormType extends BaseType
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
         }
+
+        if (!method_exists($builder, 'setIsEmptyCallback')) {
+            @trigger_error(sprintf('Not implementing the "%s::setIsEmptyCallback()" method in "%s" is deprecated since Symfony 5.1.', FormConfigBuilderInterface::class, \get_class($builder)), E_USER_DEPRECATED);
+
+            return;
+        }
+
+        $builder->setIsEmptyCallback($options['is_empty_callback']);
     }
 
     /**
@@ -190,6 +199,7 @@ class FormType extends BaseType
             'help_attr' => [],
             'help_html' => false,
             'help_translation_parameters' => [],
+            'is_empty_callback' => null,
         ]);
 
         $resolver->setAllowedTypes('label_attr', 'array');
@@ -197,6 +207,7 @@ class FormType extends BaseType
         $resolver->setAllowedTypes('help', ['string', 'null']);
         $resolver->setAllowedTypes('help_attr', 'array');
         $resolver->setAllowedTypes('help_html', 'bool');
+        $resolver->setAllowedTypes('is_empty_callback', ['null', 'callable']);
     }
 
     /**

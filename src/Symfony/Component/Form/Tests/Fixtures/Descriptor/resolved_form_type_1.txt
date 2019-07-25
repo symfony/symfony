@@ -22,6 +22,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
                                                    help_html                                             
                                                    help_translation_parameters                           
                                                    inherit_data                                          
+                                                   is_empty_callback                                     
                                                    label                                                 
                                                    label_attr                                            
                                                    label_format                                          

@@ -801,38 +801,39 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
         $options = $container->getDefinition('translator.default')->getArgument(4);
 
-        $files = array_map('realpath', $options['resource_files']['en']);
+        $paths = array_map('realpath', $options['paths']);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
+
         $this->assertContains(
-            strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
-            $files,
+            strtr(\dirname($ref->getFileName()).'/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $paths,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
         $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
-            $files,
+            strtr(\dirname($ref->getFileName()).'/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $paths,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
         $ref = new \ReflectionClass('Symfony\Component\Security\Core\Security');
         $this->assertContains(
-            strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', \DIRECTORY_SEPARATOR),
-            $files,
+            strtr(\dirname($ref->getFileName()).'/Resources/translations', '/', \DIRECTORY_SEPARATOR),
+            $paths,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );
         $this->assertContains(
-            strtr(__DIR__.'/Fixtures/translations/test_paths.en.yml', '/', \DIRECTORY_SEPARATOR),
-            $files,
+            strtr(__DIR__.'/Fixtures/translations', '/', \DIRECTORY_SEPARATOR),
+            $paths,
             '->registerTranslatorConfiguration() finds translation resources in custom paths'
         );
         $this->assertContains(
-            strtr(__DIR__.'/translations/test_default.en.xlf', '/', \DIRECTORY_SEPARATOR),
-            $files,
+            strtr(__DIR__.'/translations', '/', \DIRECTORY_SEPARATOR),
+            $paths,
             '->registerTranslatorConfiguration() finds translation resources in default path'
         );
         $this->assertContains(
-            strtr(__DIR__.'/Fixtures/translations/domain.with.dots.en.yml', '/', \DIRECTORY_SEPARATOR),
-            $files,
+            strtr(__DIR__.'/Fixtures/translations', '/', \DIRECTORY_SEPARATOR),
+            $paths,
             '->registerTranslatorConfiguration() finds translation resources with dots in domain'
         );
 
@@ -868,10 +869,10 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full', ['kernel.root_dir' => __DIR__.'/Fixtures']);
         $options = $container->getDefinition('translator.default')->getArgument(4);
-        $files = array_map('realpath', $options['resource_files']['en']);
+        $paths = array_map('realpath', $options['paths']);
 
-        $dir = str_replace('/', \DIRECTORY_SEPARATOR, __DIR__.'/Fixtures/Resources/translations/test_default.en.xlf');
-        $this->assertContains($dir, $files, '->registerTranslatorConfiguration() finds translation resources in legacy directory');
+        $dir = str_replace('/', \DIRECTORY_SEPARATOR, __DIR__.'/Fixtures/Resources/translations');
+        $this->assertContains($dir, $paths, '->registerTranslatorConfiguration() finds translation resources in legacy directory');
     }
 
     public function testTranslatorMultipleFallbacks()

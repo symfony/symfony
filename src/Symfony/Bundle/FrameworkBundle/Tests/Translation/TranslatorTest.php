@@ -146,7 +146,10 @@ class TranslatorTest extends TestCase
         $translator->trans('foo');
     }
 
-    public function testLoadResourcesWithoutCaching()
+    /**
+     * @group legacy
+     */
+    public function testLoadResourceFilesWithoutCaching()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = [
@@ -156,6 +159,17 @@ class TranslatorTest extends TestCase
         ];
 
         $translator = $this->getTranslator($loader, ['resource_files' => $resourceFiles], 'yml');
+        $translator->setLocale('fr');
+
+        $this->assertEquals('répertoire', $translator->trans('folder'));
+    }
+
+    public function testLoadResourcesWithoutCaching()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $paths = [__DIR__.'/../Fixtures/Resources/translations'];
+
+        $translator = $this->getTranslator($loader, ['paths' => $paths], 'yml');
         $translator->setLocale('fr');
 
         $this->assertEquals('répertoire', $translator->trans('folder'));
@@ -180,7 +194,10 @@ class TranslatorTest extends TestCase
         (new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']));
     }
 
-    /** @dataProvider getDebugModeAndCacheDirCombinations */
+    /**
+     * @dataProvider getDebugModeAndCacheDirCombinations
+     * @group legacy
+     */
     public function testResourceFilesOptionLoadsBeforeOtherAddedResources($debug, $enableCache)
     {
         $someCatalogue = $this->getCatalogue('some_locale', []);
@@ -225,7 +242,10 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function testCatalogResourcesAreAddedForScannedDirectories()
+    /**
+     * @group legacy
+     */
+    public function testCatalogResourceFilesAreAddedForScannedDirectories()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = [
@@ -237,6 +257,25 @@ class TranslatorTest extends TestCase
         /** @var Translator $translator */
         $translator = $this->getTranslator($loader, [
             'resource_files' => $resourceFiles,
+            'scanned_directories' => [__DIR__, '/tmp/I/sure/hope/this/does/not/exist'],
+        ], 'yml');
+
+        $catalogue = $translator->getCatalogue('fr');
+
+        $resources = $catalogue->getResources();
+
+        $this->assertEquals(new DirectoryResource(__DIR__), $resources[1]);
+        $this->assertEquals(new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'), $resources[2]);
+    }
+
+    public function testCatalogResourcesAreAddedForScannedDirectories()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $paths = [__DIR__.'/../Fixtures/Resources/translations'];
+
+        /** @var Translator $translator */
+        $translator = $this->getTranslator($loader, [
+            'paths' => $paths,
             'scanned_directories' => [__DIR__, '/tmp/I/sure/hope/this/does/not/exist'],
         ], 'yml');
 
@@ -348,7 +387,10 @@ class TranslatorTest extends TestCase
         return $translator;
     }
 
-    public function testWarmup()
+    /**
+     * @group legacy
+     */
+    public function testWarmupResourceFiles()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = [
@@ -373,7 +415,33 @@ class TranslatorTest extends TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    public function testLoadingTranslationFilesWithDotsInMessageDomain()
+    public function testWarmup()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $resourceFiles = [
+            __DIR__.'/../Fixtures/Resources/translations',
+        ];
+
+        // prime the cache
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'paths' => $resourceFiles], 'yml');
+        $translator->setFallbackLocales(['fr']);
+        $translator->warmup($this->tmpDir);
+
+        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $loader
+            ->expects($this->never())
+            ->method('load');
+
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'paths' => $resourceFiles], 'yml');
+        $translator->setLocale('fr');
+        $translator->setFallbackLocales(['fr']);
+        $this->assertEquals('répertoire', $translator->trans('folder'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLoadingTranslationResourceFilesWithDotsInMessageDomain()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = [
@@ -383,6 +451,19 @@ class TranslatorTest extends TestCase
         ];
 
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml');
+        $translator->setLocale('en');
+        $translator->setFallbackLocales(['fr']);
+        $this->assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));
+    }
+
+    public function testLoadingTranslationFilesWithDotsInMessageDomain()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $resourceFiles = [
+            __DIR__.'/../Fixtures/Resources/translations',
+        ];
+
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'paths' => $resourceFiles], 'yml');
         $translator->setLocale('en');
         $translator->setFallbackLocales(['fr']);
         $this->assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));

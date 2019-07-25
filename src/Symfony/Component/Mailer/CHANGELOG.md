@@ -9,8 +9,9 @@ CHANGELOG
    instead of `Symfony\Component\EventDispatcher\EventDispatcherInterface`.
  * Added possibility to register custom transport for dsn by implementing
    `Symfony\Component\Mailer\Transport\TransportFactoryInterface` and tagging with `mailer.transport_factory` tag in DI.
+ * Added `Symfony\Component\Mailer\Test\TransportFactoryTestCase` to ease testing custom transport factories.
 
 4.3.0
 -----
 
- * Added the component
+ * Added the component.

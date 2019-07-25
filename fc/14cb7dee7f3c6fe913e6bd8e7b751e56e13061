@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-19T07:16:16Z
+
+The renaming looks like a good idea to me 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-19T07:56:37Z
+
+Please update the CHANGELOG file.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-22T20:21:59Z
+
+Branch rebased, PR is ready for review.
+
+1st commit about renaming classes in bridges
+2nd about some cleanup of built transports: abstract http and api classes moved under transport, in same time transport implementations moved under corresponsing sub-namespaces. So now `Transport` sub-namespace [contains only abstractions + Dsn](https://github.com/symfony/symfony/tree/b9dd600ffd4a347148b57af359fdc2df7cdf576d/src/Symfony/Component/Mailer/Transport)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-23T07:37:49Z
+
+Having shorter namespaces is also a goal. I would revert the creation of the `Chain`, `Null`, and `Sendmail` namespaces.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-23T07:55:30Z
+
+But in this case we got mess inside `Transport` subnamespace: a lot of classes, abstractions mixed with implementations.
+
+There are 2 PRs with new transports (file, in-memory) that contribute to same `Transport` Subnamespace.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-23T21:38:14Z
+
+![изображение](https://user-images.githubusercontent.com/191082/61749326-2ac3d200-adab-11e9-97e7-4119c479683d.png)
+vs
+![изображение](https://user-images.githubusercontent.com/191082/61749338-30b9b300-adab-11e9-9d5d-211ae7f6f330.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-24T10:03:02Z
+
+But File and InMemory transports do not exist (and will probably never exist).
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-24T10:24:19Z
+
+There are pending PRs about that: #31947, #32409
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-24T10:25:33Z
+
+Haven't had time to have a look at them yet, but I don't think they will be merged.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-24T21:10:38Z
+
+Creation of the `Chain`, `Null`, and `Sendmail` namespaces has been reverted.

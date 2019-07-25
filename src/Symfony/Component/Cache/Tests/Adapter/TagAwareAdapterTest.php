@@ -176,6 +176,31 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($cache->prune());
     }
 
+    public function testUsesTagsPoolForTags()
+    {
+        $tagsPool = $this->createMock(AdapterInterface::class);
+        $tagsPool
+            ->expects($this->once())
+            ->method('getItems')
+            ->with(["foo\0tags\0"])
+            ->willReturn(["foo\0tags\0" => new CacheItem()])
+        ;
+
+        $tagsPool
+            ->expects($this->once())
+            ->method('saveDeferred')
+        ;
+
+        $tagsPool
+            ->expects($this->exactly(2))
+            ->method('commit')
+        ;
+
+        $pool = new TagAwareAdapter(new FilesystemAdapter(), $tagsPool);
+        $item = $pool->getItem('item')->tag('foo');
+        $pool->save($item);
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
      */

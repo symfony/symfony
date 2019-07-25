@@ -137,9 +137,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $f = $this->createCacheItem;
 
         foreach ($tagsByKey as $key => $tags) {
-            $this->pool->saveDeferred($f(static::TAGS_PREFIX.$key, array_intersect_key($tagVersions, $tags), $items[$key]));
+            $this->tags->saveDeferred($f(static::TAGS_PREFIX.$key, array_intersect_key($tagVersions, $tags), $items[$key]));
         }
-        $ok = $this->pool->commit() && $ok;
+        $ok = $this->tags->commit() && $ok;
 
         if ($invalidatedTags) {
             $f = $this->invalidateTags;

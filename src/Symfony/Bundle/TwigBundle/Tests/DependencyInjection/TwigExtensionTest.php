@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
+use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -195,9 +196,9 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path1', 'namespace1'],
             ['namespaced_path2', 'namespace2'],
             ['namespaced_path3', 'namespace3'],
-            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
+            [__DIR__.'/Fixtures/templates/bundles/AcmeBundle', 'Acme'],
+            [__DIR__.'/AcmeBundle/Resources/views', 'Acme'],
+            [__DIR__.'/AcmeBundle/Resources/views', '!Acme'],
             [__DIR__.'/Fixtures/templates'],
         ], $paths);
     }
@@ -205,7 +206,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @group legacy
      * @dataProvider getFormats
-     * @expectedDeprecation Loading Twig templates for "TwigBundle" from the "%s/Resources/TwigBundle/views" directory is deprecated since Symfony 4.2, use "%s/templates/bundles/TwigBundle" instead.
+     * @expectedDeprecation Loading Twig templates for "AcmeBundle" from the "%s/Resources/AcmeBundle/views" directory is deprecated since Symfony 4.2, use "%s/templates/bundles/AcmeBundle" instead.
      * @expectedDeprecation Loading Twig templates from the "%s/Resources/views" directory is deprecated since Symfony 4.2, use "%s/templates" instead.
      */
     public function testLegacyTwigLoaderPaths($format)
@@ -230,10 +231,10 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path1', 'namespace1'],
             ['namespaced_path2', 'namespace2'],
             ['namespaced_path3', 'namespace3'],
-            [__DIR__.'/../Fixtures/templates/Resources/TwigBundle/views', 'Twig'],
-            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
+            [__DIR__.'/../Fixtures/templates/Resources/AcmeBundle/views', 'Acme'],
+            [__DIR__.'/Fixtures/templates/bundles/AcmeBundle', 'Acme'],
+            [__DIR__.'/AcmeBundle/Resources/views', 'Acme'],
+            [__DIR__.'/AcmeBundle/Resources/views', '!Acme'],
             [__DIR__.'/../Fixtures/templates/Resources/views'],
             [__DIR__.'/Fixtures/templates'],
         ], $paths);
@@ -323,12 +324,12 @@ class TwigExtensionTest extends TestCase
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => false,
             'kernel.bundles' => [
-                'TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle',
+                'AcmeBundle' => AcmeBundle::class,
             ],
             'kernel.bundles_metadata' => [
-                'TwigBundle' => [
-                    'namespace' => 'Symfony\\Bundle\\TwigBundle',
-                    'path' => realpath(__DIR__.'/../..'),
+                'AcmeBundle' => [
+                    'namespace' => 'Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle',
+                    'path' => __DIR__.'/AcmeBundle',
                 ],
             ],
         ]));

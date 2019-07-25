@@ -16,6 +16,8 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\FailoverTransport;
+use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
@@ -43,12 +45,12 @@ class TransportTest extends TestCase
 
         yield 'failover transport' => [
             'dummy://a || dummy://b',
-            new Transport\FailoverTransport([$transportA, $transportB]),
+            new FailoverTransport([$transportA, $transportB]),
         ];
 
         yield 'round robin transport' => [
             'dummy://a && dummy://b',
-            new Transport\RoundRobinTransport([$transportA, $transportB]),
+            new RoundRobinTransport([$transportA, $transportB]),
         ];
     }
 }

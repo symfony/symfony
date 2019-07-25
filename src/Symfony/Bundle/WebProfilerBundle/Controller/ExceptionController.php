@@ -18,15 +18,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ExceptionController::class, ExceptionErrorController::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ExceptionController::class, ExceptionPanelController::class), E_USER_DEPRECATED);
 
 /**
  * ExceptionController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since Symfony 4.4, use the ExceptionErrorController instead.
- * @internal since Symfony 4.4
+ * @deprecated since Symfony 4.4, use the ExceptionPanelController instead.
  */
 class ExceptionController
 {

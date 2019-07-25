@@ -11,27 +11,27 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="mailer.transport_factory.amazon" class="Symfony\Component\Mailer\Bridge\Amazon\Factory\SesTransportFactory" parent="mailer.transport_factory.abstract">
+        <service id="mailer.transport_factory.amazon" class="Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory" parent="mailer.transport_factory.abstract">
             <tag name="mailer.transport_factory" />
         </service>
 
-        <service id="mailer.transport_factory.gmail" class="Symfony\Component\Mailer\Bridge\Google\Factory\GmailTransportFactory" parent="mailer.transport_factory.abstract">
+        <service id="mailer.transport_factory.gmail" class="Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory" parent="mailer.transport_factory.abstract">
             <tag name="mailer.transport_factory" />
         </service>
 
-        <service id="mailer.transport_factory.mailchimp" class="Symfony\Component\Mailer\Bridge\Mailchimp\Factory\MandrillTransportFactory" parent="mailer.transport_factory.abstract">
+        <service id="mailer.transport_factory.mailchimp" class="Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory" parent="mailer.transport_factory.abstract">
             <tag name="mailer.transport_factory" />
         </service>
 
-        <service id="mailer.transport_factory.mailgun" class="Symfony\Component\Mailer\Bridge\Mailgun\Factory\MailgunTransportFactory" parent="mailer.transport_factory.abstract">
+        <service id="mailer.transport_factory.mailgun" class="Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory" parent="mailer.transport_factory.abstract">
             <tag name="mailer.transport_factory" />
         </service>
 
-        <service id="mailer.transport_factory.postmark" class="Symfony\Component\Mailer\Bridge\Postmark\Factory\PostmarkTransportFactory" parent="mailer.transport_factory.abstract">
+        <service id="mailer.transport_factory.postmark" class="Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory" parent="mailer.transport_factory.abstract">
             <tag name="mailer.transport_factory" />
         </service>
 
-        <service id="mailer.transport_factory.sendgrid" class="Symfony\Component\Mailer\Bridge\Sendgrid\Factory\SendgridTransportFactory" parent="mailer.transport_factory.abstract">
+        <service id="mailer.transport_factory.sendgrid" class="Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory" parent="mailer.transport_factory.abstract">
             <tag name="mailer.transport_factory" />
         </service>
 

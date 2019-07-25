@@ -16,7 +16,6 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\ErrorHandler\ExceptionHandler;
 use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException;
@@ -137,19 +136,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
         if ($this->exceptionHandler) {
             if ($handler instanceof ErrorHandler) {
-                $h = $handler->setExceptionHandler('var_dump');
-                if (\is_array($h) && $h[0] instanceof ExceptionHandler) {
-                    $handler->setExceptionHandler($h);
-                    $handler = $h[0];
-                } else {
-                    $handler->setExceptionHandler($this->exceptionHandler);
-                }
-            }
-            if ($handler instanceof ExceptionHandler) {
-                $handler->setHandler($this->exceptionHandler);
-                if (null !== $this->fileLinkFormat) {
-                    $handler->setFileLinkFormat($this->fileLinkFormat);
-                }
+                $handler->setExceptionHandler($this->exceptionHandler);
             }
             $this->exceptionHandler = null;
         }

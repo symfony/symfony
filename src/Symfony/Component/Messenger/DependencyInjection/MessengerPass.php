@@ -317,5 +317,16 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $container->getDefinition($busId)->replaceArgument(0, new IteratorArgument($middlewareReferences));
+
+        //FIXME: add argument to console command
+        if ($container->hasDefinition('console.command.messenger_debug')) {
+            $debugCommandMapping = $handlersByBusAndMessage;
+            foreach ($busIds as $bus) {
+                if (!isset($debugCommandMapping[$bus])) {
+                    $debugCommandMapping[$bus] = [];
+                }
+            }
+            $container->getDefinition('console.command.messenger_debug')->replaceArgument(0, $debugCommandMapping);
+        }
     }
 }

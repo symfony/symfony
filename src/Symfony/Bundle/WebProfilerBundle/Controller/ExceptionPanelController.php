@@ -20,8 +20,10 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  * Renders the exception panel.
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
+ *
+ * @internal
  */
-class ExceptionErrorController
+class ExceptionPanelController
 {
     private $htmlErrorRenderer;
     private $profiler;
@@ -46,7 +48,7 @@ class ExceptionErrorController
             ->getException()
         ;
 
-        return new Response($this->htmlErrorRenderer->getBody($exception));
+        return new Response($this->htmlErrorRenderer->getBody($exception), 200, ['Content-Type' => 'text/html']);
     }
 
     /**
@@ -54,6 +56,6 @@ class ExceptionErrorController
      */
     public function stylesheet(): Response
     {
-        return new Response($this->htmlErrorRenderer->getStylesheet());
+        return new Response($this->htmlErrorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
     }
 }

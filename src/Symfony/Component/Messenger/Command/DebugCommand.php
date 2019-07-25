@@ -81,11 +81,11 @@ EOF
             $io->section($bus);
 
             $this->describeMessages($handlersByMessage, $bus, $io);
-            // describe middlewares
+            $this->describeMiddlewares([], $bus, $io);
         }
     }
 
-    private function describeMessages($handlersByMessage, $bus, SymfonyStyle $io): void
+    private function describeMessages($handlersByMessage, string $bus, SymfonyStyle $io): void
     {
         $tableRows = [];
         foreach ($handlersByMessage as $message => $handlers) {
@@ -109,7 +109,7 @@ EOF
     /**
      * @param MiddlewareInterface[] $middlewares
      */
-    private function describeMiddlewares(array $middlewares): void
+    private function describeMiddlewares(array $middlewares, string $bus, SymfonyStyle $io): void
     {
         $before = $after = [];
         foreach ($middlewares as $middleware) {
@@ -122,11 +122,10 @@ EOF
             }
         }
 
-        $after = array_reverse($after);
-
-        foreach (array_merge($before, $after) as $line) {
-            // ...
-        }
+        $lines = array_merge($before, array_reverse($after));
+        $io->text('The following middlewares are registered:');
+        $io->newLine();
+        $io->listing($lines);
     }
 
     private function formatConditions(array $options): string

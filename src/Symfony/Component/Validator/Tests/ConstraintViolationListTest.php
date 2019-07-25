@@ -155,6 +155,19 @@ EOF;
         ];
     }
 
+    public function testIsEmpty()
+    {
+        $list = new ConstraintViolationList();
+
+        $this->assertTrue($list->isEmpty());
+
+        $list->set(0, $this->getViolation('Error'));
+        $this->assertFalse($list->isEmpty());
+
+        $list->remove(0);
+        $this->assertTrue($list->isEmpty());
+    }
+
     protected function getViolation($message, $root = null, $propertyPath = null, $code = null)
     {
         return new ConstraintViolation($message, $message, [], $root, $propertyPath, null, null, $code);

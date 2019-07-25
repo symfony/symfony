@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator;
  * A list of constraint violations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method bool isEmpty() whether the list is empty or not - not implementing it is deprecated since Symfony 4.4
  */
 interface ConstraintViolationListInterface extends \Traversable, \Countable, \ArrayAccess
 {

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -56,6 +57,7 @@ class CacheClearCommand extends Command
             ->setDefinition([
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
+                new InputOption('watch', '', InputOption::VALUE_NONE, 'Watch files and recompile whenever they change'),
             ])
             ->setDescription('Clears the cache')
             ->setHelp(<<<'EOF'
@@ -175,6 +177,10 @@ EOF
         }
 
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+
+        if ($input->getOption('watch')) {
+            $this->watch($kernel->getContainer()->getParameter('kernel.project_dir'), $realCacheDir, $io);
+        }
     }
 
     private function warmup(string $warmupDir, string $realCacheDir, bool $enableOptionalWarmers = true)
@@ -201,6 +207,54 @@ EOF
             $content = str_replace($search, $replace, file_get_contents($file), $count);
             if ($count) {
                 file_put_contents($file, $content);
+            }
+        }
+    }
+
+    private function watch(string $projectDir, string $realCacheDir, OutputStyle $io)
+    {
+        if (!\function_exists('inotify_init')) {
+            throw new \RuntimeException('The "inotify" extension is required for watching the project files.');
+        }
+
+        $io->comment('Preparing for watching...');
+
+        $watchers = [];
+        $inotify = inotify_init();
+        $baseMask = IN_CREATE | IN_ATTRIB | IN_MODIFY | IN_MOVE | IN_MOVE_SELF | IN_DELETE | IN_DELETE_SELF;
+        $watchers[inotify_add_watch($inotify, $projectDir, $baseMask)] = $projectDir;
+        foreach (Finder::create()->in($projectDir)->directories()->exclude([substr($realCacheDir, \strlen($projectDir) + 1), 'vendor'])->sortByName() as $dir) { // FIXME ignoreVCSIgnored(true) does not work here
+            $watchers[inotify_add_watch($inotify, $dir->getRealPath(), $baseMask)] = $dir;
+        }
+
+        $io->comment(sprintf('Watching %s (%s subdirs)', $projectDir, \count($watchers)));
+
+        while ($events = inotify_read($inotify)) {
+            $paths = [];
+            foreach ($events as $e) {
+                $path = rtrim($watchers[$e['wd']].'/'.$e['name'], '/');
+                $paths[$path] = ($paths[$path] ?? 0) | $e['mask'];
+            }
+
+            $warmup = false;
+            foreach ($paths as $path => $mask) {
+                if ($mask & IN_CREATE && is_dir($path)) {
+                    $watchers[inotify_add_watch($inotify, $path, $baseMask)] = $path;
+                    $io->write(substr($path, \strlen($projectDir) + 1).' ');
+                }
+                if ($mask & $baseMask) {
+                    $warmup = true;
+                    $io->write(substr($path, \strlen($projectDir) + 1).' ');
+                }
+            }
+
+            if ($warmup) {
+                try {
+                    $this->warmup($realCacheDir, $realCacheDir);
+                    $io->writeln('<info>ok</info>');
+                } catch (\Exception $e) {
+                    $io->writeln(sprintf('<comment>%s</comment>', $e->getMessage()));
+                }
             }
         }
     }

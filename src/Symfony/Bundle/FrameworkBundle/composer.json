@@ -86,6 +86,7 @@
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",
+        "ext-inotify": "For watching files and recompiling whenever they change",
         "symfony/console": "For using the console commands",
         "symfony/form": "For using forms",
         "symfony/serializer": "For using the serializer service",

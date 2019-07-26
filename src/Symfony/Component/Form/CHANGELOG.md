@@ -4,6 +4,8 @@ CHANGELOG
 5.0.0
 -----
 
+ * Removed support for using different values for the "model_timezone" and "view_timezone" options of the `TimeType`
+   without configuring a reference date.
  * Removed the `scale` option of the `IntegerType`.
  * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
    set to `single_text` is not supported anymore.

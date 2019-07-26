@@ -22,7 +22,6 @@ abstract class AdapterTestCase extends CachePoolTest
      */
     protected function before()
     {
-        parent::setUp();
 
         if (!\array_key_exists('testDeferredSaveWithoutCommit', $this->skippedTests) && \defined('HHVM_VERSION')) {
             $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Destructors are called late on HHVM.';

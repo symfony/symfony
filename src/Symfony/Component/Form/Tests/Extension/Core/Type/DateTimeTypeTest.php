@@ -24,7 +24,6 @@ class DateTimeTypeTest extends BaseTypeTest
     {
         \Locale::setDefault('en');
 
-        parent::setUp();
     }
 
     public function testSubmitDateTime()

@@ -31,7 +31,6 @@ class DoctrineExtensionTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->extension = $this
             ->getMockBuilder('Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension')

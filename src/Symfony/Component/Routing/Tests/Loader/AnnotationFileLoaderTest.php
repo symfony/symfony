@@ -25,7 +25,6 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->reader = $this->getReader();
         $this->loader = new AnnotationFileLoader(new FileLocator(), $this->getClassLoader($this->reader));

@@ -43,7 +43,6 @@ class TemplateManagerTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         $profiler = $this->mockProfiler();
         $twigEnvironment = $this->mockTwigEnvironment();

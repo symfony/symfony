@@ -29,7 +29,6 @@ class IntlGlobalsTest extends AbstractIntlGlobalsTest
     {
         IntlTestHelper::requireFullIntl($this, false);
 
-        parent::setUp();
     }
 
     protected function getIntlErrorName($errorCode)

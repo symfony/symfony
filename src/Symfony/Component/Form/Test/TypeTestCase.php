@@ -31,7 +31,6 @@ abstract class TypeTestCase extends FormIntegrationTestCase
 
     private function doSetUp()
     {
-        parent::setUp();
 
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->builder = new FormBuilder('', null, $this->dispatcher, $this->factory);

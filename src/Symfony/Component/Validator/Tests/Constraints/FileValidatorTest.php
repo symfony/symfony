@@ -32,7 +32,6 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
@@ -44,7 +43,6 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
      */
     protected function after()
     {
-        parent::tearDown();
 
         if (\is_resource($this->file)) {
             fclose($this->file);

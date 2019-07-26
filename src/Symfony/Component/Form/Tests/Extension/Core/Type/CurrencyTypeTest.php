@@ -26,7 +26,6 @@ class CurrencyTypeTest extends BaseTypeTest
     {
         IntlTestHelper::requireIntl($this, false);
 
-        parent::setUp();
     }
 
     public function testCurrenciesAreSelectable()

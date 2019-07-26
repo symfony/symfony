@@ -44,7 +44,6 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->image = __DIR__.'/Fixtures/test.gif';
         $this->imageLandscape = __DIR__.'/Fixtures/test_landscape.gif';

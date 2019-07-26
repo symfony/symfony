@@ -27,7 +27,6 @@ class DateTimeToRfc3339TransformerTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->dateTime = new \DateTime('2010-02-03 04:05:06 UTC');
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');

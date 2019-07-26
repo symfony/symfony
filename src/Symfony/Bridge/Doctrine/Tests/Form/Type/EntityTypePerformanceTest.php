@@ -57,8 +57,6 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
 
-        parent::setUp();
-
         $schemaTool = new SchemaTool($this->em);
         $classes = [
             $this->em->getClassMetadata(self::ENTITY_CLASS),

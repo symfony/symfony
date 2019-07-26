@@ -48,7 +48,6 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
 
-        parent::setUp();
     }
 
     /**
@@ -59,7 +58,6 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager = null;
         $this->translator = null;
 
-        parent::tearDown();
     }
 
     protected function getExtensions()

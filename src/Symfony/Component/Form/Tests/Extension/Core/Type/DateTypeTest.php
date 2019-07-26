@@ -27,7 +27,6 @@ class DateTypeTest extends BaseTypeTest
      */
     protected function before()
     {
-        parent::setUp();
         $this->defaultTimezone = date_default_timezone_get();
         $this->defaultLocale = \Locale::getDefault();
     }

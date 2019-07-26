@@ -56,7 +56,6 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->encoder = $this->createPasswordEncoder();
         $this->encoderFactory = $this->createEncoderFactory($this->encoder);
 
-        parent::setUp();
     }
 
     public function testPasswordIsValid()

@@ -36,7 +36,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->csrfTokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
 
-        parent::setUp();
     }
 
     protected function getExtensions()
@@ -53,7 +52,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->csrfTokenManager = null;
 
-        parent::tearDown();
     }
 
     protected function assertXpathNodeValue(\DOMElement $element, $expression, $nodeValue)

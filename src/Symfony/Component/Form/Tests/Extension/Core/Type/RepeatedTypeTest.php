@@ -27,7 +27,6 @@ class RepeatedTypeTest extends BaseTypeTest
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->form = $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,

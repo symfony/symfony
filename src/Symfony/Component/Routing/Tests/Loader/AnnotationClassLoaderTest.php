@@ -23,7 +23,6 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->reader = $this->getReader();
         $this->loader = $this->getClassLoader($this->reader);

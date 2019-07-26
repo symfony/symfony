@@ -24,7 +24,6 @@ class IntegerTypeTest extends BaseTypeTest
     {
         IntlTestHelper::requireIntl($this, false);
 
-        parent::setUp();
     }
 
     public function testSubmitRejectsFloats()

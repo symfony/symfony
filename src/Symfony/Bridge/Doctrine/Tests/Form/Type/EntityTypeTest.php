@@ -67,8 +67,6 @@ class EntityTypeTest extends BaseTypeTest
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emRegistry = $this->createRegistryMock('default', $this->em);
 
-        parent::setUp();
-
         $schemaTool = new SchemaTool($this->em);
         $classes = [
             $this->em->getClassMetadata(self::ITEM_GROUP_CLASS),
@@ -97,7 +95,6 @@ class EntityTypeTest extends BaseTypeTest
      */
     protected function after()
     {
-        parent::tearDown();
 
         $this->em = null;
         $this->emRegistry = null;

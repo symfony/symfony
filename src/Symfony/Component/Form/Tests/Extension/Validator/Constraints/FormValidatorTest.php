@@ -56,8 +56,6 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
 
-        parent::setUp();
-
         $this->constraint = new Form();
     }
 

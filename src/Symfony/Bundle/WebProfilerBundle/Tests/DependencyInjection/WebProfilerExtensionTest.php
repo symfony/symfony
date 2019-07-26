@@ -51,7 +51,6 @@ class WebProfilerExtensionTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\KernelInterface')->getMock();
 
@@ -81,7 +80,6 @@ class WebProfilerExtensionTest extends TestCase
      */
     protected function after()
     {
-        parent::tearDown();
 
         $this->container = null;
         $this->kernel = null;

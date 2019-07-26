@@ -36,7 +36,6 @@ class PhpMatcherDumperTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->matcherClass = uniqid('ProjectUrlMatcher');
         $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.$this->matcherClass.'.php';
@@ -47,7 +46,6 @@ class PhpMatcherDumperTest extends TestCase
      */
     protected function after()
     {
-        parent::tearDown();
 
         @unlink($this->dumpPath);
     }

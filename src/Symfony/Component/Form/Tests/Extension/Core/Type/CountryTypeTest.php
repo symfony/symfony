@@ -26,7 +26,6 @@ class CountryTypeTest extends BaseTypeTest
     {
         IntlTestHelper::requireIntl($this, false);
 
-        parent::setUp();
     }
 
     public function testCountriesAreSelectable()

@@ -21,7 +21,6 @@ class JsonResponseTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         if (!\defined('HHVM_VERSION')) {
             $this->iniSet('serialize_precision', 14);

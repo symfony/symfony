@@ -65,7 +65,6 @@ class ChoiceTypeTest extends BaseTypeTest
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->objectChoices = [
             (object) ['id' => 1, 'name' => 'Bernhard'],
@@ -81,7 +80,6 @@ class ChoiceTypeTest extends BaseTypeTest
      */
     protected function after()
     {
-        parent::tearDown();
 
         $this->objectChoices = null;
     }

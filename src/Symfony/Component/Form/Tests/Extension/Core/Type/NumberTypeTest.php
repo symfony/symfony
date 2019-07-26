@@ -24,7 +24,6 @@ class NumberTypeTest extends BaseTypeTest
      */
     protected function before()
     {
-        parent::setUp();
 
         // we test against "de_DE", so we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -38,7 +37,6 @@ class NumberTypeTest extends BaseTypeTest
      */
     protected function after()
     {
-        parent::tearDown();
 
         \Locale::setDefault($this->defaultLocale);
     }

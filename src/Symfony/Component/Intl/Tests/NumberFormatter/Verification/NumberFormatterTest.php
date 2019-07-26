@@ -27,7 +27,6 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
     {
         IntlTestHelper::requireFullIntl($this, '55.1');
 
-        parent::setUp();
     }
 
     public function testCreate()

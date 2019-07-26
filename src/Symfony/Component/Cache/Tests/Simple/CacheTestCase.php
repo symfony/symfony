@@ -22,7 +22,6 @@ abstract class CacheTestCase extends SimpleCacheTest
      */
     protected function before()
     {
-        parent::setUp();
 
         if (!\array_key_exists('testPrune', $this->skippedTests) && !$this->createSimpleCache() instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';

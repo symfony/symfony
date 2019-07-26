@@ -29,7 +29,6 @@ class LocaleTest extends AbstractLocaleTest
     {
         IntlTestHelper::requireFullIntl($this, false);
 
-        parent::setUp();
     }
 
     protected function call($methodName)

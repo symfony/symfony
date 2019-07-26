@@ -26,7 +26,6 @@ class LocaleTypeTest extends BaseTypeTest
     {
         IntlTestHelper::requireIntl($this, false);
 
-        parent::setUp();
     }
 
     public function testLocalesAreSelectable()

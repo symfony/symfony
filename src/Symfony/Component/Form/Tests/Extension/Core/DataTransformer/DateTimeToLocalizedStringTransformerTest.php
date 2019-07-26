@@ -28,7 +28,6 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '57.1');

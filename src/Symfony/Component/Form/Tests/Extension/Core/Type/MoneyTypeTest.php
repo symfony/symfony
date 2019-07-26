@@ -28,8 +28,6 @@ class MoneyTypeTest extends BaseTypeTest
         // implementation
         IntlTestHelper::requireFullIntl($this, false);
 
-        parent::setUp();
-
         $this->defaultLocale = \Locale::getDefault();
     }
 
@@ -38,7 +36,6 @@ class MoneyTypeTest extends BaseTypeTest
      */
     protected function after()
     {
-        parent::tearDown();
 
         \Locale::setDefault($this->defaultLocale);
     }

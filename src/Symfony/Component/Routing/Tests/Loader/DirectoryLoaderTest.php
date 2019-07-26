@@ -28,7 +28,6 @@ class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
      */
     protected function before()
     {
-        parent::setUp();
 
         $locator = new FileLocator();
         $this->reader = $this->getReader();

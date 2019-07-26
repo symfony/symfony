@@ -45,7 +45,6 @@ class PhpGeneratorDumperTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         $this->routeCollection = new RouteCollection();
         $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection);
@@ -60,7 +59,6 @@ class PhpGeneratorDumperTest extends TestCase
      */
     protected function after()
     {
-        parent::tearDown();
 
         @unlink($this->testTmpFilepath);
 

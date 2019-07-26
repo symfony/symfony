@@ -33,7 +33,6 @@ class FlashBagTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
         $this->bag = new FlashBag();
         $this->array = ['notice' => ['A previous flash message']];
         $this->bag->initialize($this->array);
@@ -45,7 +44,6 @@ class FlashBagTest extends TestCase
     protected function after()
     {
         $this->bag = null;
-        parent::tearDown();
     }
 
     public function testInitialize()

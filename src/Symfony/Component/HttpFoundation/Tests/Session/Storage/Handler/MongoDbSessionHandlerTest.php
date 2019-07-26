@@ -33,7 +33,6 @@ class MongoDbSessionHandlerTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
 
         if (\extension_loaded('mongodb')) {
             if (!class_exists('MongoDB\Client')) {

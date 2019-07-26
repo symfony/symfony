@@ -46,7 +46,6 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
      */
     protected function after()
     {
-        parent::tearDown();
 
         $_GET = [];
         $_POST = [];

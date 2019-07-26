@@ -33,7 +33,6 @@ class MetadataBagTest extends TestCase
      */
     protected function before()
     {
-        parent::setUp();
         $this->bag = new MetadataBag();
         $this->array = [MetadataBag::CREATED => 1234567, MetadataBag::UPDATED => 12345678, MetadataBag::LIFETIME => 0];
         $this->bag->initialize($this->array);
@@ -46,7 +45,6 @@ class MetadataBagTest extends TestCase
     {
         $this->array = [];
         $this->bag = null;
-        parent::tearDown();
     }
 
     public function testInitialize()

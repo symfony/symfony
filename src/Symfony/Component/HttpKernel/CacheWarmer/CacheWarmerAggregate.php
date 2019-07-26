@@ -52,35 +52,36 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     {
         if ($this->debug) {
             $collectedLogs = [];
-            $previousHandler = \defined('PHPUNIT_COMPOSER_INSTALL');
-            $previousHandler = $previousHandler ?: set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
-                if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
-                    return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
-                }
-
-                if (isset($collectedLogs[$message])) {
-                    ++$collectedLogs[$message]['count'];
-
-                    return;
-                }
-
-                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-                // Clean the trace by removing first frames added by the error handler itself.
-                for ($i = 0; isset($backtrace[$i]); ++$i) {
-                    if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
-                        $backtrace = \array_slice($backtrace, 1 + $i);
-                        break;
+            $previousHandler = \defined('PHPUNIT_COMPOSER_INSTALL') ?
+                constant('PHPUNIT_COMPOSER_INSTALL') :
+                set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
+                    if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
+                        return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
                     }
-                }
 
-                $collectedLogs[$message] = [
-                    'type' => $type,
-                    'message' => $message,
-                    'file' => $file,
-                    'line' => $line,
-                    'trace' => $backtrace,
-                    'count' => 1,
-                ];
+                    if (isset($collectedLogs[$message])) {
+                        ++$collectedLogs[$message]['count'];
+
+                        return null;
+                    }
+
+                    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+                    // Clean the trace by removing first frames added by the error handler itself.
+                    for ($i = 0; isset($backtrace[$i]); ++$i) {
+                        if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
+                            $backtrace = \array_slice($backtrace, 1 + $i);
+                            break;
+                        }
+                    }
+
+                    $collectedLogs[$message] = [
+                        'type' => $type,
+                        'message' => $message,
+                        'file' => $file,
+                        'line' => $line,
+                        'trace' => $backtrace,
+                        'count' => 1,
+                    ];
             });
         }
 
@@ -96,7 +97,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                 $warmer->warmUp($cacheDir);
             }
         } finally {
-            if ($this->debug && true !== $previousHandler) {
+            if ($this->debug && constant('PHPUNIT_COMPOSER_INSTALL') !== $previousHandler) {
                 restore_error_handler();
 
                 if (file_exists($this->deprecationLogsFilepath)) {

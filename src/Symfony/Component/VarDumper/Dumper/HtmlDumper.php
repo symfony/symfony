@@ -94,6 +94,26 @@ class HtmlDumper extends CliDumper
         $this->styles = $styles + $this->styles;
     }
 
+    /**
+     * Replace a single css styles.
+     *
+     * @param string $class    Any existing css class like default, num, const, etc
+     * @param string $property CSS property existing within class
+     * @param string $value    Desired value of property
+     *
+     * @return static
+     */
+    public function changeStyle(string $class, string $property, string $value)
+    {
+        if (!isset($this->styles[$class])) {
+            return $this;
+        }
+
+        $this->styles[$class] = preg_replace('/'.preg_quote($property).':[a-zA-Z0-9#%-., ]+(;|$)/', "{$property}:{$value};", $this->styles[$class]);
+
+        return $this;
+    }
+
     public function setTheme(string $themeName)
     {
         if (!isset(static::$themes[$themeName])) {

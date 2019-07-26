@@ -33,8 +33,8 @@ class MockHttpClient implements HttpClientInterface
 
     /**
      * @param callable|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
-     * @param string|null $baseUri
-     * @param array $defaultOptions
+     * @param string|null                                                  $baseUri
+     * @param array                                                        $defaultOptions
      */
     public function __construct($responseFactory = null, string $baseUri = null, array $defaultOptions = [])
     {

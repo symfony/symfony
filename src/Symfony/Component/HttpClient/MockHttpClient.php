@@ -27,13 +27,16 @@ class MockHttpClient implements HttpClientInterface
 {
     use HttpClientTrait;
 
-    private $responseFactory;
     private $baseUri;
+    private $defaultOptions = self::OPTIONS_DEFAULTS;
+    private $responseFactory;
 
     /**
      * @param callable|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
+     * @param string|null $baseUri
+     * @param array $defaultOptions
      */
-    public function __construct($responseFactory = null, string $baseUri = null)
+    public function __construct($responseFactory = null, string $baseUri = null, array $defaultOptions = [])
     {
         if ($responseFactory instanceof ResponseInterface) {
             $responseFactory = [$responseFactory];
@@ -45,6 +48,10 @@ class MockHttpClient implements HttpClientInterface
             })();
         }
 
+        if ($defaultOptions) {
+            [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::OPTIONS_DEFAULTS);
+        }
+
         $this->responseFactory = $responseFactory;
         $this->baseUri = $baseUri;
     }
@@ -54,7 +61,10 @@ class MockHttpClient implements HttpClientInterface
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        [$url, $options] = $this->prepareRequest($method, $url, $options, ['base_uri' => $this->baseUri], true);
+        $defaultOptions = $this->defaultOptions;
+        $defaultOptions['base_uri'] = $this->baseUri;
+
+        [$url, $options] = $this->prepareRequest($method, $url, $options, $defaultOptions, true);
         $url = implode('', $url);
 
         if (null === $this->responseFactory) {

@@ -82,7 +82,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                         'trace' => $backtrace,
                         'count' => 1,
                     ];
-            });
+                });
         }
 
         try {

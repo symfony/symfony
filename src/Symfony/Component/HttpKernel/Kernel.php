@@ -542,7 +542,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                         'trace' => [$backtrace[0]],
                         'count' => 1,
                     ];
-            });
+                });
         }
 
         try {

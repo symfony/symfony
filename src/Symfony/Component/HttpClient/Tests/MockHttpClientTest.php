@@ -87,7 +87,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 $mock = $this->getMockBuilder(ResponseInterface::class)->getMock();
                 $mock->expects($this->any())
                     ->method('getStatusCode')
-                    ->willThrowException(new TransportException('DSN error'));
+                    ->willThrowException(new TransportException('DNS error'));
                 $mock->expects($this->any())
                     ->method('getInfo')
                     ->willReturn([]);

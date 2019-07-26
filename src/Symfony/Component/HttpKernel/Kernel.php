@@ -506,7 +506,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         if ($this->debug) {
             $collectedLogs = [];
             $previousHandler = \defined('PHPUNIT_COMPOSER_INSTALL') ?
-                constant('PHPUNIT_COMPOSER_INSTALL') :
+                \constant('PHPUNIT_COMPOSER_INSTALL') :
                 set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
                     if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
                         return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
@@ -550,7 +550,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $container = $this->buildContainer();
             $container->compile();
         } finally {
-            if ($this->debug && constant('PHPUNIT_COMPOSER_INSTALL') !== $previousHandler) {
+            if ($this->debug && \constant('PHPUNIT_COMPOSER_INSTALL') !== $previousHandler) {
                 restore_error_handler();
 
                 file_put_contents($cacheDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));

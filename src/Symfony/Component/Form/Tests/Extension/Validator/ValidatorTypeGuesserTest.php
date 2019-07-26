@@ -110,13 +110,13 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessMimeTypesForConstraintWithMimeTypesValue()
     {
-        $mineTypes = ['image/png', 'image/jpeg'];
-        $constraint = new File(['mimeTypes' => $mineTypes]);
+        $mimeTypes = ['image/png', 'image/jpeg'];
+        $constraint = new File(['mimeTypes' => $mimeTypes]);
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
         $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
         $this->assertArrayHasKey('attr', $typeGuess->getOptions());
         $this->assertArrayHasKey('accept', $typeGuess->getOptions()['attr']);
-        $this->assertEquals(implode(',', $mineTypes), $typeGuess->getOptions()['attr']['accept']);
+        $this->assertEquals(implode(',', $mimeTypes), $typeGuess->getOptions()['attr']['accept']);
     }
 
     public function testGuessMimeTypesForConstraintWithoutMimeTypesValue()

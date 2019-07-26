@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Tests;
+namespace Symfony\Component\Mailer\Test;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -21,6 +21,11 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * A test case to ease testing Transport Factory.
+ *
+ * @author Konstantin Myakshin <molodchick@gmail.com>
+ */
 abstract class TransportFactoryTestCase extends TestCase
 {
     protected const USER = 'u$er';

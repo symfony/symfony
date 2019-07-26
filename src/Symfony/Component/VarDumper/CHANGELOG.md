@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added `VarDumperTestTrait::setUpVarDumper()` and `VarDumperTestTrait::tearDownVarDumper()` 
+   to configure casters & flags to use in tests
+
 4.3.0
 -----
 

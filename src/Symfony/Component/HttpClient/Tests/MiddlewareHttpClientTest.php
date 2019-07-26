@@ -37,7 +37,7 @@ class ModifyUserDataMiddleware implements MiddlewareInterface
 {
     public function __invoke(string $method, string $url, array $options, callable $next): ResponseInterface
     {
-        $options['user_data'] = $options['user_data'] === 10 ? 42 : 10;
+        $options['user_data'] = 10 === $options['user_data'] ? 42 : 10;
 
         return $next($method, $url, $options);
     }

@@ -1,7 +1,15 @@
 <?php
 
-declare(strict_types=1);
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
+declare(strict_types=1);
 
 namespace Symfony\Component\HttpClient;
 
@@ -60,7 +68,7 @@ class MiddlewareHttpClient implements HttpClientInterface
      * Yields responses chunk by chunk as they complete.
      *
      * @param ResponseInterface|ResponseInterface[]|iterable $responses One or more responses created by the current HTTP client
-     * @param float|null $timeout The inactivity timeout before exiting the iterator
+     * @param float|null                                     $timeout   The inactivity timeout before exiting the iterator
      */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {

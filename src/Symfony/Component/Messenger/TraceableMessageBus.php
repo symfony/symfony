@@ -38,13 +38,13 @@ class TraceableMessageBus implements MessageBusInterface
         ];
 
         try {
-            return $this->decoratedBus->dispatch($message, $stamps);
+            return $envelope = $this->decoratedBus->dispatch($message, $stamps);
         } catch (\Throwable $e) {
             $context['exception'] = $e;
 
             throw $e;
         } finally {
-            $this->dispatchedMessages[] = $context;
+            $this->dispatchedMessages[] = $context + ['stamps_after_dispatch' => array_merge([], ...array_values($envelope->all()))];
         }
     }
 
@@ -65,7 +65,19 @@ class TraceableMessageBus implements MessageBusInterface
         $file = $trace[1]['file'];
         $line = $trace[1]['line'];
 
-        for ($i = 2; $i < 8; ++$i) {
+        $handleTraitFile = (new \ReflectionClass(HandleTrait::class))->getFileName();
+        $found = false;
+        for ($i = 1; $i < 8; ++$i) {
+            if (isset($trace[$i]['file'], $trace[$i + 1]['file'], $trace[$i + 1]['line']) && $trace[$i]['file'] === $handleTraitFile) {
+                $file = $trace[$i + 1]['file'];
+                $line = $trace[$i + 1]['line'];
+                $found = true;
+
+                break;
+            }
+        }
+
+        for ($i = 2; $i < 8 && !$found; ++$i) {
             if (isset($trace[$i]['class'], $trace[$i]['function'])
                 && 'dispatch' === $trace[$i]['function']
                 && is_a($trace[$i]['class'], MessageBusInterface::class, true)

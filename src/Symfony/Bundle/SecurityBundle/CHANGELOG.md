@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+ * The `switch_user.stateless` firewall option has been removed.
  * Removed the ability to configure encoders using `argon2i` or `bcrypt` as algorithm, use `auto` instead
  * The `simple_form` and `simple_preauth` authentication listeners have been removed,
    use Guard instead.

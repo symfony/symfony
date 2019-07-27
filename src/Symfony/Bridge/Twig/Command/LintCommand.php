@@ -107,7 +107,7 @@ EOF
         return $filesInfo;
     }
 
-    protected function findFiles($filename)
+    protected function findFiles(string $filename)
     {
         if (is_file($filename)) {
             return [$filename];

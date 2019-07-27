@@ -46,13 +46,9 @@ class EntityType extends DoctrineType
     /**
      * Return the default loader object.
      *
-     * @param ObjectManager $manager
-     * @param QueryBuilder  $queryBuilder
-     * @param string        $class
-     *
      * @return ORMQueryBuilderLoader
      */
-    public function getLoader(ObjectManager $manager, $queryBuilder, $class)
+    public function getLoader(ObjectManager $manager, QueryBuilder $queryBuilder, string $class)
     {
         return new ORMQueryBuilderLoader($queryBuilder);
     }
@@ -69,14 +65,12 @@ class EntityType extends DoctrineType
      * We consider two query builders with an equal SQL string and
      * equal parameters to be equal.
      *
-     * @param QueryBuilder $queryBuilder
-     *
      * @return array
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash($queryBuilder)
+    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder)
     {
         return [
             $queryBuilder->getQuery()->getSQL(),

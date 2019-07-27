@@ -1149,15 +1149,21 @@ class Application implements ResetInterface
         $utf8String = mb_convert_encoding($string, 'utf8', $encoding);
         $lines = [];
         $line = '';
-        foreach (preg_split('//u', $utf8String) as $char) {
-            // test if $char could be appended to current line
-            if (mb_strwidth($line.$char, 'utf8') <= $width) {
-                $line .= $char;
-                continue;
+
+        $offset = 0;
+        while (preg_match('/.{1,10000}/u', $utf8String, $m, 0, $offset)) {
+            $offset += \strlen($m[0]);
+
+            foreach (preg_split('//u', $m[0]) as $char) {
+                // test if $char could be appended to current line
+                if (mb_strwidth($line.$char, 'utf8') <= $width) {
+                    $line .= $char;
+                    continue;
+                }
+                // if not, push current line to array and make new line
+                $lines[] = str_pad($line, $width);
+                $line = $char;
             }
-            // if not, push current line to array and make new line
-            $lines[] = str_pad($line, $width);
-            $line = $char;
         }
 
         $lines[] = \count($lines) ? str_pad($line, $width) : $line;

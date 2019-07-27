@@ -54,7 +54,7 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn((new Envelope($message))->with(new HandledStamp('result', 'handlerName')));
+        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn((new Envelope($message))->with($stamp = new HandledStamp('result', 'handlerName')));
 
         $traceableBus = new TraceableMessageBus($bus);
         (new TestTracesWithHandleTraitAction($traceableBus))($message);
@@ -64,6 +64,7 @@ class TraceableMessageBusTest extends TestCase
         $this->assertEquals([
             'message' => $message,
             'stamps' => [],
+            'stamps_after_dispatch' => [$stamp],
             'caller' => [
                 'name' => 'TestTracesWithHandleTraitAction.php',
                 'file' => (new \ReflectionClass(TestTracesWithHandleTraitAction::class))->getFileName(),

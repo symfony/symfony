@@ -675,7 +675,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listener->replaceArgument(3, $id);
         $listener->replaceArgument(6, $config['parameter']);
         $listener->replaceArgument(7, $config['role']);
-        $listener->replaceArgument(9, $stateless ?: $config['stateless']);
+        $listener->replaceArgument(9, $stateless);
 
         return $switchUserListenerId;
     }

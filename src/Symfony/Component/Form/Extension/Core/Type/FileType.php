@@ -148,7 +148,7 @@ class FileType extends AbstractType
         return 'file';
     }
 
-    private function getFileUploadError($errorCode)
+    private function getFileUploadError(int $errorCode)
     {
         $messageParameters = [];
 
@@ -217,7 +217,7 @@ class FileType extends AbstractType
      *
      * This method should be kept in sync with Symfony\Component\Validator\Constraints\FileValidator::factorizeSizes().
      */
-    private function factorizeSizes($size, $limit)
+    private function factorizeSizes(int $size, int $limit)
     {
         $coef = self::MIB_BYTES;
         $coefFactor = self::KIB_BYTES;

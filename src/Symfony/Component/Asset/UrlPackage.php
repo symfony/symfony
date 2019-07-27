@@ -123,7 +123,7 @@ class UrlPackage extends Package
         return (int) fmod(hexdec(substr(hash('sha256', $path), 0, 10)), \count($this->baseUrls));
     }
 
-    private function getSslUrls($urls)
+    private function getSslUrls(array $urls)
     {
         $sslUrls = [];
         foreach ($urls as $url) {

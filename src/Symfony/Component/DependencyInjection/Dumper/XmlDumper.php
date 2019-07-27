@@ -91,14 +91,7 @@ class XmlDumper extends Dumper
         }
     }
 
-    /**
-     * Adds a service.
-     *
-     * @param Definition  $definition
-     * @param string      $id
-     * @param \DOMElement $parent
-     */
-    private function addService($definition, $id, \DOMElement $parent)
+    private function addService(Definition $definition, ?string $id, \DOMElement $parent)
     {
         $service = $this->document->createElement('service');
         if (null !== $id) {
@@ -215,14 +208,7 @@ class XmlDumper extends Dumper
         $parent->appendChild($service);
     }
 
-    /**
-     * Adds a service alias.
-     *
-     * @param string      $alias
-     * @param Alias       $id
-     * @param \DOMElement $parent
-     */
-    private function addServiceAlias($alias, Alias $id, \DOMElement $parent)
+    private function addServiceAlias(string $alias, Alias $id, \DOMElement $parent)
     {
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
@@ -263,15 +249,7 @@ class XmlDumper extends Dumper
         $parent->appendChild($services);
     }
 
-    /**
-     * Converts parameters.
-     *
-     * @param array       $parameters
-     * @param string      $type
-     * @param \DOMElement $parent
-     * @param string      $keyAttribute
-     */
-    private function convertParameters(array $parameters, $type, \DOMElement $parent, $keyAttribute = 'key')
+    private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key')
     {
         $withKeys = array_keys($parameters) !== range(0, \count($parameters) - 1);
         foreach ($parameters as $key => $value) {

@@ -220,8 +220,6 @@ class YamlDumper extends Dumper
     /**
      * Dumps the value to YAML format.
      *
-     * @param mixed $value
-     *
      * @return mixed
      *
      * @throws RuntimeException When trying to dump object or resource
@@ -303,7 +301,7 @@ class YamlDumper extends Dumper
         return sprintf('%%%s%%', $id);
     }
 
-    private function getExpressionCall($expression)
+    private function getExpressionCall(string $expression)
     {
         return sprintf('@=%s', $expression);
     }

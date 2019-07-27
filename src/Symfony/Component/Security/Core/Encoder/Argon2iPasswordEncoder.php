@@ -102,12 +102,12 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
         throw new \LogicException('Argon2i algorithm is not supported. Please install the libsodium extension or upgrade to PHP 7.2+.');
     }
 
-    private function encodePasswordNative($raw)
+    private function encodePasswordNative(string $raw)
     {
         return password_hash($raw, \PASSWORD_ARGON2I, $this->config);
     }
 
-    private function encodePasswordSodiumFunction($raw)
+    private function encodePasswordSodiumFunction(string $raw)
     {
         $hash = sodium_crypto_pwhash_str(
             $raw,
@@ -119,7 +119,7 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
         return $hash;
     }
 
-    private function encodePasswordSodiumExtension($raw)
+    private function encodePasswordSodiumExtension(string $raw)
     {
         $hash = \Sodium\crypto_pwhash_str(
             $raw,

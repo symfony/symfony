@@ -186,11 +186,9 @@ class ContentSecurityPolicyHandler
     /**
      * Converts a Content-Security-Policy header value into a directive set array.
      *
-     * @param string $header The header value
-     *
      * @return array The directive set
      */
-    private function parseDirectives($header)
+    private function parseDirectives(string $header)
     {
         $directives = [];
 
@@ -214,7 +212,7 @@ class ContentSecurityPolicyHandler
      *
      * @return bool
      */
-    private function authorizesInline(array $directivesSet, $type)
+    private function authorizesInline(array $directivesSet, string $type)
     {
         if (isset($directivesSet[$type])) {
             $directives = $directivesSet[$type];

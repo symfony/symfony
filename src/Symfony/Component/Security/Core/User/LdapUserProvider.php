@@ -140,11 +140,8 @@ class LdapUserProvider implements UserProviderInterface
 
     /**
      * Fetches a required unique attribute value from an LDAP entry.
-     *
-     * @param Entry|null $entry
-     * @param string     $attribute
      */
-    private function getAttributeValue(Entry $entry, $attribute)
+    private function getAttributeValue(Entry $entry, string $attribute)
     {
         if (!$entry->hasAttribute($attribute)) {
             throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $attribute, $entry->getDn()));

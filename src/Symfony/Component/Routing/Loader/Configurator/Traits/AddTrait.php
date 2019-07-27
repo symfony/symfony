@@ -83,7 +83,7 @@ trait AddTrait
         return $this->add($name, $path);
     }
 
-    private function createRoute($path): Route
+    private function createRoute(string $path): Route
     {
         return new Route($path);
     }

@@ -323,7 +323,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     {
     }
 
-    private function preProcess($eventName)
+    private function preProcess(string $eventName)
     {
         if (!$this->dispatcher->hasListeners($eventName)) {
             $this->orphanedEvents[$this->currentRequestHash][] = $eventName;
@@ -341,7 +341,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         }
     }
 
-    private function postProcess($eventName)
+    private function postProcess(string $eventName)
     {
         unset($this->wrappedListeners[$eventName]);
         $skipped = false;

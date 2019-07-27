@@ -63,7 +63,7 @@ EOF
         $this->removeSingleMessage($input->getArgument('id'), $receiver, $io, $shouldForce);
     }
 
-    private function removeSingleMessage($id, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce)
+    private function removeSingleMessage(string $id, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce)
     {
         if (!$receiver instanceof ListableReceiverInterface) {
             throw new RuntimeException(sprintf('The "%s" receiver does not support removing specific messages.', $this->getReceiverName()));

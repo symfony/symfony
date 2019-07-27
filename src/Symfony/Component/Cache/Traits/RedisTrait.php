@@ -48,7 +48,7 @@ trait RedisTrait
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
      */
-    private function init($redisClient, $namespace, $defaultLifetime, ?MarshallerInterface $marshaller)
+    private function init($redisClient, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
     {
         parent::__construct($namespace, $defaultLifetime);
 

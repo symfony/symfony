@@ -518,7 +518,7 @@ class Email extends Message
         return $this;
     }
 
-    private function addListAddressHeaderBody($name, array $addresses)
+    private function addListAddressHeaderBody(string $name, array $addresses)
     {
         if (!$to = $this->getHeaders()->get($name)) {
             return $this->setListAddressHeaderBody($name, $addresses);
@@ -528,7 +528,7 @@ class Email extends Message
         return $this;
     }
 
-    private function setListAddressHeaderBody($name, array $addresses)
+    private function setListAddressHeaderBody(string $name, array $addresses)
     {
         $addresses = Address::createArray($addresses);
         $headers = $this->getHeaders();

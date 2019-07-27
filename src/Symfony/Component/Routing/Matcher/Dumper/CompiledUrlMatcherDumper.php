@@ -455,7 +455,7 @@ EOF;
         return $this->expressionLanguage;
     }
 
-    private function indent($code, $level = 1)
+    private function indent(string $code, int $level = 1)
     {
         return preg_replace('/^./m', str_repeat('    ', $level).'$0', $code);
     }

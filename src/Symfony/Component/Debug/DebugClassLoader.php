@@ -174,7 +174,7 @@ class DebugClassLoader
         $this->checkClass($class, $file);
     }
 
-    private function checkClass($class, $file = null)
+    private function checkClass(string $class, string $file = null)
     {
         $exists = null === $file || class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 
@@ -262,7 +262,7 @@ class DebugClassLoader
         }
 
         $parent = get_parent_class($class);
-        $parentAndOwnInterfaces = $this->getOwnInterfaces($class, $parent);
+        $parentAndOwnInterfaces = $this->getOwnInterfaces($class, $parent ?: null);
         if ($parent) {
             $parentAndOwnInterfaces[$parent] = $parent;
 
@@ -436,7 +436,7 @@ class DebugClassLoader
     /**
      * `realpath` on MacOSX doesn't normalize the case of characters.
      */
-    private function darwinRealpath($real)
+    private function darwinRealpath(string $real)
     {
         $i = 1 + strrpos($real, '/');
         $file = substr($real, $i);
@@ -503,12 +503,9 @@ class DebugClassLoader
     /**
      * `class_implements` includes interfaces from the parents so we have to manually exclude them.
      *
-     * @param string       $class
-     * @param string|false $parent
-     *
      * @return string[]
      */
-    private function getOwnInterfaces($class, $parent)
+    private function getOwnInterfaces(string $class, ?string $parent)
     {
         $ownInterfaces = class_implements($class, false);
 

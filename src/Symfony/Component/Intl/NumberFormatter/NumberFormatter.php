@@ -672,15 +672,12 @@ class NumberFormatter
      *
      * The only actual rounding data as of this writing, is CHF.
      *
-     * @param float  $value    The numeric currency value
-     * @param string $currency The 3-letter ISO 4217 currency code indicating the currency to use
-     *
      * @return float The rounded numeric currency value
      *
      * @see http://en.wikipedia.org/wiki/Swedish_rounding
      * @see http://www.docjar.com/html/api/com/ibm/icu/util/Currency.java.html#1007
      */
-    private function roundCurrency($value, $currency)
+    private function roundCurrency(float $value, string $currency)
     {
         $fractionDigits = Currencies::getFractionDigits($currency);
         $roundingIncrement = Currencies::getRoundingIncrement($currency);
@@ -700,12 +697,11 @@ class NumberFormatter
     /**
      * Rounds a value.
      *
-     * @param int|float $value     The value to round
-     * @param int       $precision The number of decimal digits to round to
+     * @param int|float $value The value to round
      *
      * @return int|float The rounded value
      */
-    private function round($value, $precision)
+    private function round($value, int $precision)
     {
         $precision = $this->getUninitializedPrecision($value, $precision);
 
@@ -741,12 +737,11 @@ class NumberFormatter
     /**
      * Formats a number.
      *
-     * @param int|float $value     The numeric value to format
-     * @param int       $precision The number of decimal digits to use
+     * @param int|float $value The numeric value to format
      *
      * @return string The formatted number
      */
-    private function formatNumber($value, $precision)
+    private function formatNumber($value, int $precision)
     {
         $precision = $this->getUninitializedPrecision($value, $precision);
 
@@ -756,12 +751,11 @@ class NumberFormatter
     /**
      * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is uninitialized.
      *
-     * @param int|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is uninitialized
-     * @param int       $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
+     * @param int|float $value The value to get the precision from if the FRACTION_DIGITS attribute is uninitialized
      *
      * @return int The precision value
      */
-    private function getUninitializedPrecision($value, $precision)
+    private function getUninitializedPrecision($value, int $precision)
     {
         if (self::CURRENCY == $this->style) {
             return $precision;
@@ -780,11 +774,9 @@ class NumberFormatter
     /**
      * Check if the attribute is initialized (value set by client code).
      *
-     * @param string $attr The attribute name
-     *
      * @return bool true if the value was set by client, false otherwise
      */
-    private function isInitializedAttribute($attr)
+    private function isInitializedAttribute(string $attr)
     {
         return isset($this->initializedAttributes[$attr]);
     }
@@ -793,11 +785,10 @@ class NumberFormatter
      * Returns the numeric value using the $type to convert to the right data type.
      *
      * @param mixed $value The value to be converted
-     * @param int   $type  The type to convert. Can be TYPE_DOUBLE (float) or TYPE_INT32 (int)
      *
      * @return int|float|false The converted value
      */
-    private function convertValueDataType($value, $type)
+    private function convertValueDataType($value, int $type)
     {
         if (self::TYPE_DOUBLE == $type) {
             $value = (float) $value;
@@ -813,8 +804,6 @@ class NumberFormatter
     /**
      * Convert the value data type to int or returns false if the value is out of the integer value range.
      *
-     * @param mixed $value The value to be converted
-     *
      * @return int|false The converted value
      */
     private function getInt32Value($value)
@@ -828,8 +817,6 @@ class NumberFormatter
 
     /**
      * Convert the value data type to int or returns false if the value is out of the integer value range.
-     *
-     * @param mixed $value The value to be converted
      *
      * @return int|float|false The converted value
      */
@@ -849,11 +836,9 @@ class NumberFormatter
     /**
      * Check if the rounding mode is invalid.
      *
-     * @param int $value The rounding mode value to check
-     *
      * @return bool true if the rounding mode is invalid, false otherwise
      */
-    private function isInvalidRoundingMode($value)
+    private function isInvalidRoundingMode(int $value)
     {
         if (\in_array($value, self::$roundingModes, true)) {
             return false;
@@ -866,8 +851,6 @@ class NumberFormatter
      * Returns the normalized value for the GROUPING_USED attribute. Any value that can be converted to int will be
      * cast to Boolean and then to int again. This way, negative values are converted to 1 and string values to 0.
      *
-     * @param mixed $value The value to be normalized
-     *
      * @return int The normalized value for the attribute (0 or 1)
      */
     private function normalizeGroupingUsedValue($value)
@@ -877,8 +860,6 @@ class NumberFormatter
 
     /**
      * Returns the normalized value for the FRACTION_DIGITS attribute.
-     *
-     * @param mixed $value The value to be normalized
      *
      * @return int The normalized value for the attribute
      */

@@ -59,7 +59,7 @@ class SemaphoreStore implements StoreInterface, BlockingStoreInterface
         $this->lock($key, true);
     }
 
-    private function lock(Key $key, $blocking)
+    private function lock(Key $key, bool $blocking)
     {
         if ($key->hasState(__CLASS__)) {
             return;

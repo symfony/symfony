@@ -261,7 +261,7 @@ class Store implements StoreInterface
      *
      * @return bool true if the two environments match, false otherwise
      */
-    private function requestsMatch($vary, $env1, $env2)
+    private function requestsMatch(?string $vary, array $env1, array $env2)
     {
         if (empty($vary)) {
             return true;
@@ -284,11 +284,9 @@ class Store implements StoreInterface
      *
      * Use this method only if you know what you are doing.
      *
-     * @param string $key The store key
-     *
      * @return array An array of data associated with the key
      */
-    private function getMetadata($key)
+    private function getMetadata(string $key)
     {
         if (!$entries = $this->load($key)) {
             return [];
@@ -320,11 +318,9 @@ class Store implements StoreInterface
     /**
      * Purges data for the given URL.
      *
-     * @param string $url A URL
-     *
      * @return bool true if the URL exists and has been purged, false otherwise
      */
-    private function doPurge($url)
+    private function doPurge(string $url)
     {
         $key = $this->getCacheKey(Request::create($url));
         if (isset($this->locks[$key])) {
@@ -345,11 +341,9 @@ class Store implements StoreInterface
     /**
      * Loads data for the given key.
      *
-     * @param string $key The store key
-     *
      * @return string The data associated with the key
      */
-    private function load($key)
+    private function load(string $key)
     {
         $path = $this->getPath($key);
 
@@ -359,12 +353,9 @@ class Store implements StoreInterface
     /**
      * Save data for the given key.
      *
-     * @param string $key  The store key
-     * @param string $data The data to store
-     *
      * @return bool
      */
-    private function save($key, $data)
+    private function save(string $key, string $data)
     {
         $path = $this->getPath($key);
 
@@ -470,12 +461,9 @@ class Store implements StoreInterface
     /**
      * Restores a Response from the HTTP headers and body.
      *
-     * @param array  $headers An array of HTTP headers for the Response
-     * @param string $body    The Response body
-     *
      * @return Response
      */
-    private function restoreResponse($headers, $body = null)
+    private function restoreResponse(array $headers, string $body = null)
     {
         $status = $headers['X-Status'][0];
         unset($headers['X-Status']);

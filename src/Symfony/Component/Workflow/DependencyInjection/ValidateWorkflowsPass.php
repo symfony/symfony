@@ -51,7 +51,7 @@ class ValidateWorkflowsPass implements CompilerPassInterface
         }
     }
 
-    private function createValidator($tag)
+    private function createValidator(array $tag)
     {
         if ('state_machine' === $tag['type']) {
             return new StateMachineValidator();

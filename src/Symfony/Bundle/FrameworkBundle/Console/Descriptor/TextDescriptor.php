@@ -503,7 +503,7 @@ class TextDescriptor extends Descriptor
         $this->writeText($this->formatCallable($callable), $options);
     }
 
-    private function renderEventListenerTable(EventDispatcherInterface $eventDispatcher, $event, array $eventListeners, SymfonyStyle $io)
+    private function renderEventListenerTable(EventDispatcherInterface $eventDispatcher, string $event, array $eventListeners, SymfonyStyle $io)
     {
         $tableHeaders = ['Order', 'Callable', 'Priority'];
         $tableRows = [];

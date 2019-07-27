@@ -169,7 +169,7 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
         throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', \is_object($ttl) ? \get_class($ttl) : \gettype($ttl)));
     }
 
-    private function generateValues($values, &$keys, $default)
+    private function generateValues(iterable $values, array &$keys, $default)
     {
         try {
             foreach ($values as $id => $value) {

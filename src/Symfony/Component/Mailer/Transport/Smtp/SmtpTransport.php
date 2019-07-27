@@ -167,12 +167,12 @@ class SmtpTransport extends AbstractTransport
         $this->executeCommand(sprintf("HELO %s\r\n", $this->domain), [250]);
     }
 
-    private function doMailFromCommand($address): void
+    private function doMailFromCommand(string $address): void
     {
         $this->executeCommand(sprintf("MAIL FROM:<%s>\r\n", $address), [250]);
     }
 
-    private function doRcptToCommand($address): void
+    private function doRcptToCommand(string $address): void
     {
         $this->executeCommand(sprintf("RCPT TO:<%s>\r\n", $address), [250, 251, 252]);
     }

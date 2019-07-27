@@ -96,7 +96,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         return $this->authenticateViaGuard($guardAuthenticator, $token);
     }
 
-    private function authenticateViaGuard($guardAuthenticator, PreAuthenticationGuardToken $token)
+    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);

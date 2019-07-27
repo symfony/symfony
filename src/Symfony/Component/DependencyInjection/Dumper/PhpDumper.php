@@ -358,7 +358,7 @@ EOF;
         return $this->proxyDumper;
     }
 
-    private function analyzeCircularReferences($sourceId, array $edges, &$checkedNodes, &$currentPath = [], $byConstructor = true)
+    private function analyzeCircularReferences(string $sourceId, array $edges, array &$checkedNodes, array &$currentPath = [], bool $byConstructor = true)
     {
         $checkedNodes[$sourceId] = true;
         $currentPath[$sourceId] = $byConstructor;
@@ -380,7 +380,7 @@ EOF;
         unset($currentPath[$sourceId]);
     }
 
-    private function connectCircularReferences($sourceId, &$currentPath, $byConstructor, &$subPath = [])
+    private function connectCircularReferences(string $sourceId, array &$currentPath, bool $byConstructor, array &$subPath = [])
     {
         $currentPath[$sourceId] = $subPath[$sourceId] = $byConstructor;
 
@@ -394,7 +394,7 @@ EOF;
         unset($currentPath[$sourceId], $subPath[$sourceId]);
     }
 
-    private function addCircularReferences($id, $currentPath, $byConstructor)
+    private function addCircularReferences(string $id, array $currentPath, bool $byConstructor)
     {
         $currentPath[$id] = $byConstructor;
         $circularRefs = [];
@@ -418,7 +418,7 @@ EOF;
         }
     }
 
-    private function collectLineage($class, array &$lineage)
+    private function collectLineage(string $class, array &$lineage)
     {
         if (isset($lineage[$class])) {
             return;
@@ -1965,7 +1965,7 @@ EOF;
         return $this->doExport($value, true);
     }
 
-    private function doExport($value, $resolveEnv = false)
+    private function doExport($value, bool $resolveEnv = false)
     {
         $shouldCacheValue = $resolveEnv && \is_string($value);
         if ($shouldCacheValue && isset($this->exportedVariables[$value])) {

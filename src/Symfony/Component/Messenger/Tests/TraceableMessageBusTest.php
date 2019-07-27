@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\TestTracesWithHandleTraitAction;
 use Symfony\Component\Messenger\TraceableMessageBus;
 
 class TraceableMessageBusTest extends TestCase
@@ -43,6 +45,29 @@ class TraceableMessageBusTest extends TestCase
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
                 'line' => $line,
+            ],
+        ], $actualTracedMessage);
+    }
+
+    public function testItTracesDispatchWhenHandleTraitIsUsed()
+    {
+        $message = new DummyMessage('Hello');
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn((new Envelope($message))->with(new HandledStamp('result', 'handlerName')));
+
+        $traceableBus = new TraceableMessageBus($bus);
+        (new TestTracesWithHandleTraitAction($traceableBus))($message);
+        $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
+        $actualTracedMessage = $tracedMessages[0];
+        unset($actualTracedMessage['callTime']); // don't check, too variable
+        $this->assertEquals([
+            'message' => $message,
+            'stamps' => [],
+            'caller' => [
+                'name' => 'TestTracesWithHandleTraitAction.php',
+                'file' => (new \ReflectionClass(TestTracesWithHandleTraitAction::class))->getFileName(),
+                'line' => (new \ReflectionMethod(TestTracesWithHandleTraitAction::class, '__invoke'))->getStartLine() + 2,
             ],
         ], $actualTracedMessage);
     }

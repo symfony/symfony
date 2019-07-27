@@ -43,7 +43,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * {@inheritdoc}
      */
-    protected function doWarmUp($cacheDir, ArrayAdapter $arrayAdapter)
+    protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter)
     {
         $annotatedClassPatterns = $cacheDir.'/annotations.map';
 
@@ -77,7 +77,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         return true;
     }
 
-    private function readAllComponents(Reader $reader, $class)
+    private function readAllComponents(Reader $reader, string $class)
     {
         $reflectionClass = new \ReflectionClass($class);
         $reader->getClassAnnotations($reflectionClass);

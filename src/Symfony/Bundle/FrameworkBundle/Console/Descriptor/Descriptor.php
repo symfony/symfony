@@ -96,11 +96,8 @@ abstract class Descriptor implements DescriptorInterface
 
     /**
      * Writes content to output.
-     *
-     * @param string $content
-     * @param bool   $decorated
      */
-    protected function write($content, $decorated = false)
+    protected function write(string $content, bool $decorated = false)
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
@@ -224,12 +221,9 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param string           $serviceId
-     *
      * @return mixed
      */
-    protected function resolveServiceDefinition(ContainerBuilder $builder, $serviceId)
+    protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId)
     {
         if ($builder->hasDefinition($serviceId)) {
             return $builder->getDefinition($serviceId);
@@ -249,12 +243,9 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param bool             $showHidden
-     *
      * @return array
      */
-    protected function findDefinitionsByTag(ContainerBuilder $builder, $showHidden)
+    protected function findDefinitionsByTag(ContainerBuilder $builder, bool $showHidden)
     {
         $definitions = [];
         $tags = $builder->findTags();

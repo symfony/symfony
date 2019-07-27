@@ -7,6 +7,33 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.30 (2019-07-27)
+
+ * bug #32503 Fix multiSelect ChoiceQuestion when answers have spaces (IceMaD)
+ * bug #32688 [Yaml] fix inline handling when dumping tagged values (xabbuh)
+ * bug #32644 [WebProfileBundle] Avoid getting right to left style (Arman-Hosseini)
+ * bug #32679 [Intl] relax some date parser patterns (xabbuh)
+ * bug #31303 [VarDumper] Use \ReflectionReference for determining if a key is a reference (php >= 7.4) (dorumd, nicolas-grekas)
+ * bug #32485 [Validator] Added support for validation of giga values (kernig)
+ * bug #32572 Bump minimum version of symfony/phpunit-bridge (fancyweb)
+ * bug #32438 [Serializer] XmlEncoder: don't cast padded strings (ogizanagi)
+ * bug #32579 [Config] Do not use absolute path when computing the vendor freshness (lyrixx)
+ * bug #32563 Container*::getServiceIds() should return strings (mathroc)
+ * bug #32466 [Config] Fix for signatures of typed properties (tvandervorm)
+ * bug #32500 [Debug][DebugClassLoader] Include found files instead of requiring them (fancyweb)
+ * bug #32464 [WebProfilerBundle] Fix Twig 1.x compatibility (yceruto)
+ * bug #31620 [FrameworkBundle] Inform the user when save_path will be ignored (gnat42)
+ * bug #32096 Don't assume port 0 for X-Forwarded-Port (alexbowers, xabbuh)
+ * bug #31267 [Translator] Load plurals from mo files properly (Stadly)
+ * bug #31266 [Translator] Load plurals from po files properly (Stadly)
+ * bug #32421 [EventDispatcher] Add tag kernel.rest on 'debug.event_dispatcher' service (lyrixx)
+ * bug #32379 [SecurityBundle] conditionally register services (xabbuh)
+ * bug #32363 [FrameworkBundle] reset cache pools between requests (nicolas-grekas)
+ * bug #32365 [DI] fix processing of regular parameter bags by MergeExtensionConfigurationPass (nicolas-grekas)
+ * bug #32187 [PHPUnit] Fixed composer error on Windows (misterx)
+ * bug #32206 Catch JsonException and rethrow in JsonEncode (phil-davis)
+ * bug #32200 [Security/Core] work around sodium_compat issue (nicolas-grekas)
+
 * 3.4.29 (2019-06-26)
 
  * bug #32137 [HttpFoundation] fix accessing session bags (xabbuh)

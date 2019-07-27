@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-25T10:59:18Z
+
+Can you give us some numbers you measured about this improvement?
+
+---------------------------------------------------------------------------
+
+by paxal at 2019-07-25T12:19:25Z
+
+Please don't judge me ‒ my exception was 1166286 (~1 MB) chars long (very **very** long doctrine request).
+
+Snippet :
+```php
+<?php
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Output\NullOutput;
+
+require_once __DIR__.'/vendor/autoload.php';
+
+$start = microtime(true);
+
+$application = new Application();
+$longText = str_repeat('Oh my god ! ', 100000);
+$application->renderException(new \Exception($longText), new NullOutput());
+echo sprintf('%d ms / %d MB', 1000*(microtime(true)-$start), memory_get_peak_usage()/1024**2).PHP_EOL;
+```
+
+Results before (faster, but a lot of memory) : `963 ms / 106 MB`
+Results after (longer, but less memory) : `5337 ms / 8 MB`
+With a chunk size of `10 000` (seems good enough to me, I'll send a small patch) : `964 ms / 8 MB`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-26T07:55:39Z
+
+Thank :)
+Can you please try this patch instead?
+Does it perform better?
+```diff
+--- a/src/Symfony/Component/Console/Application.php
++++ b/src/Symfony/Component/Console/Application.php
+@@ -1149,7 +1149,11 @@ class Application implements ResetInterface
+         $utf8String = mb_convert_encoding($string, 'utf8', $encoding);
+         $lines = [];
+         $line = '';
+-        foreach (preg_split('//u', $utf8String) as $char) {
++        $offset = 0;
++        while (preg_match('/.{1,1000}/u', $utf8String, $m, 0, $offset)) {
++            $offset += \strlen($m[0]);
++
++            foreach (preg_split('//u', $m[0]) as $char) {
+             // test if $char could be appended to current line
+             if (mb_strwidth($line.$char, 'utf8') <= $width) {
+                 $line .= $char;
+@@ -1158,6 +1162,7 @@ class Application implements ResetInterface
+             // if not, push current line to array and make new line
+             $lines[] = str_pad($line, $width);
+             $line = $char;
++            }
+         }
+```
+
+---------------------------------------------------------------------------
+
+by paxal at 2019-07-26T08:29:58Z
+
+Tested with `1000` : `1337 ms / 8 MB`
+Tested with `10000` : `1002 ms / 8 MB`
+
+Which value do you want me to apply for the patch ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-26T08:31:25Z
+
+10k is good
+
+---------------------------------------------------------------------------
+
+by paxal at 2019-07-26T09:56:33Z
+
+I think we're good :+1: Thanks @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-26T13:43:15Z
+
+For `4.4`?

@@ -459,7 +459,7 @@ Symfony is the result of the work of many people who made the code better
  - Miha Vrhovnik
  - Alessandro Desantis
  - hubert lecorche (hlecorche)
- - Arman Hosseini
+ - Arman Hosseini (arman)
  - Marc Morales Valldepérez (kuert)
  - Jean-Baptiste GOMOND (mjbgo)
  - Vadim Kharitonov (virtuozzz)

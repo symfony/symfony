@@ -61,4 +61,20 @@ class ChoiceQuestionTest extends TestCase
             ],
         ];
     }
+
+    public function testNonTrimmable()
+    {
+        $question = new ChoiceQuestion('A question', [
+            'First response ',
+            ' Second response',
+            '  Third response  ',
+        ]);
+        $question->setTrimmable(false);
+
+        $this->assertSame('  Third response  ', $question->getValidator()('  Third response  '));
+
+        $question->setMultiselect(true);
+
+        $this->assertSame(['First response ', ' Second response'], $question->getValidator()('First response , Second response'));
+    }
 }

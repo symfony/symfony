@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-24T16:30:43Z
+
+Here we go. I rewrite everything, I hope you will like it
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-26T15:56:37Z
+
+OK, I updated the PR thanks to @nicolas-grekas
+Now the image is collapsed by default, and you can click on the caret to display it
+![image](https://user-images.githubusercontent.com/408368/61964664-b5384b80-afce-11e9-9bfa-adc009ecea15.png)

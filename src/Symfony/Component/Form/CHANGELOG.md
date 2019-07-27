@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+ * Removed the `scale` option of the `IntegerType`.
  * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
    set to `single_text` is not supported anymore.
  * The `format` option of `DateType` and `DateTimeType` cannot be used when the `html5` option is enabled.

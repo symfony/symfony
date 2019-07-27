@@ -141,7 +141,7 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    private function addCompilerPassIfExists(ContainerBuilder $container, $class, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, $priority = 0)
+    private function addCompilerPassIfExists(ContainerBuilder $container, string $class, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
         $container->addResource(new ClassExistenceResource($class));
 

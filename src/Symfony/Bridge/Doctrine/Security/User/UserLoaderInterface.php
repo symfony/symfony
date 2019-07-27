@@ -31,9 +31,7 @@ interface UserLoaderInterface
      *
      * This method must return null if the user is not found.
      *
-     * @param string $username The username
-     *
      * @return UserInterface|null
      */
-    public function loadUserByUsername($username);
+    public function loadUserByUsername(string $username);
 }

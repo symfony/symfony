@@ -129,10 +129,7 @@ class ContainerAwareEventManager extends EventManager
         }
     }
 
-    /**
-     * @param string $eventName
-     */
-    private function initializeListeners($eventName)
+    private function initializeListeners(string $eventName)
     {
         foreach ($this->listeners[$eventName] as $hash => $listener) {
             if (\is_string($listener)) {

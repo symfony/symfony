@@ -44,7 +44,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir)
     {
         foreach ($this->registry->getManagers() as $em) {
             // we need the directory no matter the proxy cache generation strategy

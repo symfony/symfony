@@ -27,11 +27,11 @@
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/form": "^4.4|^5.0",
-        "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/form": "^5.0",
+        "symfony/http-kernel": "^5.0",
         "symfony/messenger": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
-        "symfony/property-info": "^4.4|^5.0",
+        "symfony/property-info": "^5.0",
         "symfony/proxy-manager-bridge": "^4.4|^5.0",
         "symfony/security-core": "^5.0",
         "symfony/expression-language": "^4.4|^5.0",
@@ -48,8 +48,11 @@
     "conflict": {
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
-        "symfony/form": "<4.4",
+        "symfony/form": "<5",
+        "symfony/http-kernel": "<5",
         "symfony/messenger": "<4.4",
+        "symfony/property-info": "<5",
+        "symfony/security-bundle": "<5",
         "symfony/security-core": "<5"
     },
     "suggest": {

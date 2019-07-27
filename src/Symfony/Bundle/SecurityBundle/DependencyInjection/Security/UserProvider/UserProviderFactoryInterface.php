@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 interface UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config);
+    public function create(ContainerBuilder $container, string $id, array $config);
 
     public function getKey();
 

@@ -53,7 +53,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntitiesByIds($identifier, array $values)
+    public function getEntitiesByIds(string $identifier, array $values)
     {
         $qb = clone $this->queryBuilder;
         $alias = current($qb->getRootAliases());

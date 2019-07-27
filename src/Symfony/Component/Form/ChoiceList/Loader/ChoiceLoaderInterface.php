@@ -36,7 +36,7 @@ interface ChoiceLoaderInterface
      *
      * @return ChoiceListInterface The loaded choice list
      */
-    public function loadChoiceList($value = null);
+    public function loadChoiceList(callable $value = null);
 
     /**
      * Loads the choices corresponding to the given values.
@@ -54,7 +54,7 @@ interface ChoiceLoaderInterface
      *
      * @return array An array of choices
      */
-    public function loadChoicesForValues(array $values, $value = null);
+    public function loadChoicesForValues(array $values, callable $value = null);
 
     /**
      * Loads the values corresponding to the given choices.
@@ -72,5 +72,5 @@ interface ChoiceLoaderInterface
      *
      * @return string[] An array of choice values
      */
-    public function loadValuesForChoices(array $choices, $value = null);
+    public function loadValuesForChoices(array $choices, callable $value = null);
 }

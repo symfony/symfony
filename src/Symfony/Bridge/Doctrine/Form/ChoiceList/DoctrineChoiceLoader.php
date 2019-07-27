@@ -62,7 +62,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadChoiceList($value = null)
+    public function loadChoiceList(callable $value = null)
     {
         if ($this->choiceList) {
             return $this->choiceList;
@@ -78,7 +78,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadValuesForChoices(array $choices, $value = null)
+    public function loadValuesForChoices(array $choices, callable $value = null)
     {
         // Performance optimization
         if (empty($choices)) {
@@ -110,7 +110,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadChoicesForValues(array $values, $value = null)
+    public function loadChoicesForValues(array $values, callable $value = null)
     {
         // Performance optimization
         // Also prevents the generation of "WHERE id IN ()" queries through the

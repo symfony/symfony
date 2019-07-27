@@ -31,11 +31,9 @@ interface RegistryInterface extends ManagerRegistryInterface
     /**
      * Gets a named entity manager.
      *
-     * @param string $name The entity manager name (null for the default one)
-     *
      * @return EntityManager
      */
-    public function getEntityManager($name = null);
+    public function getEntityManager(string $name = null);
 
     /**
      * Gets an array of all registered entity managers.
@@ -57,24 +55,20 @@ interface RegistryInterface extends ManagerRegistryInterface
      * hold an obsolete reference. You can inject the registry instead
      * to avoid this problem.
      *
-     * @param string $name The entity manager name (null for the default one)
-     *
      * @return EntityManager
      */
-    public function resetEntityManager($name = null);
+    public function resetEntityManager(string $name = null);
 
     /**
      * Resolves a registered namespace alias to the full namespace.
      *
      * This method looks for the alias in all registered entity managers.
      *
-     * @param string $alias The alias
-     *
      * @return string The full namespace
      *
      * @see Configuration::getEntityNamespace
      */
-    public function getEntityNamespace($alias);
+    public function getEntityNamespace(string $alias);
 
     /**
      * Gets all connection names.
@@ -86,9 +80,7 @@ interface RegistryInterface extends ManagerRegistryInterface
     /**
      * Gets the entity manager associated with a given class.
      *
-     * @param string $class A Doctrine Entity class name
-     *
      * @return EntityManager|null
      */
-    public function getEntityManagerForClass($class);
+    public function getEntityManagerForClass(string $class);
 }

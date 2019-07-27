@@ -40,7 +40,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = [])
+    public function getProperties(string $class, array $context = [])
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -62,7 +62,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = [])
+    public function getTypes(string $class, string $property, array $context = [])
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -162,7 +162,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = [])
+    public function isReadable(string $class, string $property, array $context = [])
     {
         return null;
     }
@@ -170,7 +170,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = [])
+    public function isWritable(string $class, string $property, array $context = [])
     {
         if (
             null === ($metadata = $this->getMetadata($class))

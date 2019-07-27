@@ -7,6 +7,7 @@ CHANGELOG
  * added `VarDumperTestTrait::setUpVarDumper()` and `VarDumperTestTrait::tearDownVarDumper()`
    to configure casters & flags to use in tests
  * added `ImagineCaster` and infrastructure to dump images
+ * added the stamps of a message after it is dispatched in `TraceableMessageBus` and `MessengerDataCollector` collected data
 
 4.3.0
 -----

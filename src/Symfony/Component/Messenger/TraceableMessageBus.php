@@ -38,13 +38,13 @@ class TraceableMessageBus implements MessageBusInterface
         ];
 
         try {
-            return $this->decoratedBus->dispatch($message, $stamps);
+            return $envelope = $this->decoratedBus->dispatch($message, $stamps);
         } catch (\Throwable $e) {
             $context['exception'] = $e;
 
             throw $e;
         } finally {
-            $this->dispatchedMessages[] = $context;
+            $this->dispatchedMessages[] = $context + ['stamps_after_dispatch' => array_merge([], ...array_values($envelope->all()))];
         }
     }
 

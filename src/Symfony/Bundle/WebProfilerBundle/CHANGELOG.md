@@ -4,11 +4,12 @@ CHANGELOG
 4.4.0
 -----
 
- * Added button to clear the ajax request tab
- * Deprecated the `ExceptionController::templateExists()` method
- * Deprecated the `TemplateManager::templateExists()` method
- * Deprecated the `ExceptionController` in favor of `ExceptionPanelController`
- * Marked all classes of the WebProfilerBundle as internal
+ * added button to clear the ajax request tab
+ * deprecated the `ExceptionController::templateExists()` method
+ * deprecated the `TemplateManager::templateExists()` method
+ * deprecated the `ExceptionController` in favor of `ExceptionPanelController`
+ * marked all classes of the WebProfilerBundle as internal
+ * added a section with the stamps of a message after it is dispatched in the Messenger panel
 
 4.3.0
 -----

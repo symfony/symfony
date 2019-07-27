@@ -31,6 +31,7 @@ CHANGELOG
 4.1.0
 -----
 
+ * The `switch_user.stateless` firewall option is deprecated, use the `stateless` option instead.
  * The `logout_on_user_change` firewall option is deprecated.
  * deprecated `SecurityUserValueResolver`, use
    `Symfony\Component\Security\Http\Controller\UserValueResolver` instead.

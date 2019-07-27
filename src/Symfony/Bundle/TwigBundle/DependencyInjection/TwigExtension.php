@@ -170,7 +170,7 @@ class TwigExtension extends Extension
         return $bundleHierarchy;
     }
 
-    private function normalizeBundleName($name)
+    private function normalizeBundleName(string $name)
     {
         if ('Bundle' === substr($name, -6)) {
             $name = substr($name, 0, -6);

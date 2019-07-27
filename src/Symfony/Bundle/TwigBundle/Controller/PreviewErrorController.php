@@ -37,7 +37,7 @@ class PreviewErrorController
         $this->errorRenderer = $errorRenderer;
     }
 
-    public function previewErrorPageAction(Request $request, $code)
+    public function previewErrorPageAction(Request $request, int $code)
     {
         $exception = FlattenException::createFromThrowable(new \Exception('Something has intentionally gone wrong.'), $code, ['X-Debug' => false]);
 

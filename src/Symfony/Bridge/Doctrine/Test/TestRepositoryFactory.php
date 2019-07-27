@@ -50,7 +50,7 @@ final class TestRepositoryFactory implements RepositoryFactory
     /**
      * @return ObjectRepository
      */
-    private function createRepository(EntityManagerInterface $entityManager, $entityName)
+    private function createRepository(EntityManagerInterface $entityManager, string $entityName)
     {
         /* @var $metadata ClassMetadata */
         $metadata = $entityManager->getClassMetadata($entityName);
@@ -59,7 +59,7 @@ final class TestRepositoryFactory implements RepositoryFactory
         return new $repositoryClassName($entityManager, $metadata);
     }
 
-    private function getRepositoryHash(EntityManagerInterface $entityManager, $entityName)
+    private function getRepositoryHash(EntityManagerInterface $entityManager, string $entityName)
     {
         return $entityManager->getClassMetadata($entityName)->getName().spl_object_hash($entityManager);
     }

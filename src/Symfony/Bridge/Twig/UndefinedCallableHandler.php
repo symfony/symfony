@@ -65,7 +65,7 @@ class UndefinedCallableHandler
         'workflow' => 'enable "framework.workflows"',
     ];
 
-    public static function onUndefinedFilter($name)
+    public static function onUndefinedFilter(string $name)
     {
         if (!isset(self::$filterComponents[$name])) {
             return false;
@@ -74,7 +74,7 @@ class UndefinedCallableHandler
         self::onUndefined($name, 'filter', self::$filterComponents[$name]);
     }
 
-    public static function onUndefinedFunction($name)
+    public static function onUndefinedFunction(string $name)
     {
         if (!isset(self::$functionComponents[$name])) {
             return false;

@@ -34,7 +34,7 @@ class YamlExtension extends AbstractExtension
         ];
     }
 
-    public function encode($input, $inline = 0, $dumpObjects = 0)
+    public function encode($input, int $inline = 0, int $dumpObjects = 0)
     {
         static $dumper;
 
@@ -49,7 +49,7 @@ class YamlExtension extends AbstractExtension
         return $dumper->dump($input, $inline, 0, false, $dumpObjects);
     }
 
-    public function dump($value, $inline = 0, $dumpObjects = false)
+    public function dump($value, int $inline = 0, int $dumpObjects = 0)
     {
         if (\is_resource($value)) {
             return '%Resource%';

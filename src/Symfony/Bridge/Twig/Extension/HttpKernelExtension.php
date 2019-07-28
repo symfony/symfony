@@ -31,7 +31,7 @@ class HttpKernelExtension extends AbstractExtension
         ];
     }
 
-    public static function controller($controller, $attributes = [], $query = [])
+    public static function controller(string $controller, array $attributes = [], array $query = [])
     {
         return new ControllerReference($controller, $attributes, $query);
     }

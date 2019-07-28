@@ -25,13 +25,13 @@
         "symfony/asset": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
-        "symfony/form": "^4.4|^5.0",
+        "symfony/form": "^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "^4.4|^5.0",
-        "symfony/translation": "^4.4|^5.0",
+        "symfony/translation": "^5.0",
         "symfony/yaml": "^4.4|^5.0",
         "symfony/security-acl": "^2.8|^3.0",
         "symfony/security-csrf": "^4.4|^5.0",
@@ -45,9 +45,9 @@
     },
     "conflict": {
         "symfony/console": "<4.4",
-        "symfony/form": "<4.4",
+        "symfony/form": "<5.0",
         "symfony/http-foundation": "<4.4",
-        "symfony/translation": "<4.4",
+        "symfony/translation": "<5.0",
         "symfony/workflow": "<4.4"
     },
     "suggest": {

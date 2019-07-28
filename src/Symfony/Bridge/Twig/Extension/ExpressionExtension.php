@@ -32,7 +32,7 @@ class ExpressionExtension extends AbstractExtension
         ];
     }
 
-    public function createExpression($expression)
+    public function createExpression(string $expression)
     {
         return new Expression($expression);
     }

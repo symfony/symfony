@@ -47,7 +47,7 @@ class LogoutUrlExtension extends AbstractExtension
      *
      * @return string The relative logout URL
      */
-    public function getLogoutPath($key = null)
+    public function getLogoutPath(string $key = null)
     {
         return $this->generator->getLogoutPath($key);
     }
@@ -59,7 +59,7 @@ class LogoutUrlExtension extends AbstractExtension
      *
      * @return string The absolute logout URL
      */
-    public function getLogoutUrl($key = null)
+    public function getLogoutUrl(string $key = null)
     {
         return $this->generator->getLogoutUrl($key);
     }

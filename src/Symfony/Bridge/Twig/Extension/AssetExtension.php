@@ -46,12 +46,9 @@ class AssetExtension extends AbstractExtension
      * If the package used to generate the path is an instance of
      * UrlPackage, you will always get a URL and not a path.
      *
-     * @param string $path        A public path
-     * @param string $packageName The name of the asset package to use
-     *
      * @return string The public path of the asset
      */
-    public function getAssetUrl($path, $packageName = null)
+    public function getAssetUrl(string $path, string $packageName = null)
     {
         return $this->packages->getUrl($path, $packageName);
     }
@@ -59,12 +56,9 @@ class AssetExtension extends AbstractExtension
     /**
      * Returns the version of an asset.
      *
-     * @param string $path        A public path
-     * @param string $packageName The name of the asset package to use
-     *
      * @return string The asset version
      */
-    public function getAssetVersion($path, $packageName = null)
+    public function getAssetVersion(string $path, string $packageName = null)
     {
         return $this->packages->getVersion($path, $packageName);
     }

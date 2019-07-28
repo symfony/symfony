@@ -50,14 +50,11 @@ class Scope
     /**
      * Stores data into current scope.
      *
-     * @param string $key
-     * @param mixed  $value
-     *
      * @return $this
      *
      * @throws \LogicException
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         if ($this->left) {
             throw new \LogicException('Left scope is not mutable.');
@@ -71,11 +68,9 @@ class Scope
     /**
      * Tests if a data is visible from current scope.
      *
-     * @param string $key
-     *
      * @return bool
      */
-    public function has($key)
+    public function has(string $key)
     {
         if (\array_key_exists($key, $this->data)) {
             return true;
@@ -91,12 +86,9 @@ class Scope
     /**
      * Returns data visible from current scope.
      *
-     * @param string $key
-     * @param mixed  $default
-     *
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         if (\array_key_exists($key, $this->data)) {
             return $this->data[$key];

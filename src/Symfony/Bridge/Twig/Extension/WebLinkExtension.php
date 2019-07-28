@@ -49,13 +49,12 @@ class WebLinkExtension extends AbstractExtension
     /**
      * Adds a "Link" HTTP header.
      *
-     * @param string $uri        The relation URI
      * @param string $rel        The relation type (e.g. "preload", "prefetch", "prerender" or "dns-prefetch")
      * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The relation URI
      */
-    public function link($uri, $rel, array $attributes = [])
+    public function link(string $uri, string $rel, array $attributes = [])
     {
         if (!$request = $this->requestStack->getMasterRequest()) {
             return $uri;
@@ -75,12 +74,11 @@ class WebLinkExtension extends AbstractExtension
     /**
      * Preloads a resource.
      *
-     * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['crossorigin' => 'use-credentials']")
+     * @param array $attributes The attributes of this link (e.g. "['as' => true]", "['crossorigin' => 'use-credentials']")
      *
      * @return string The path of the asset
      */
-    public function preload($uri, array $attributes = [])
+    public function preload(string $uri, array $attributes = [])
     {
         return $this->link($uri, 'preload', $attributes);
     }
@@ -88,12 +86,11 @@ class WebLinkExtension extends AbstractExtension
     /**
      * Resolves a resource origin as early as possible.
      *
-     * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
+     * @param array $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The path of the asset
      */
-    public function dnsPrefetch($uri, array $attributes = [])
+    public function dnsPrefetch(string $uri, array $attributes = [])
     {
         return $this->link($uri, 'dns-prefetch', $attributes);
     }
@@ -101,12 +98,11 @@ class WebLinkExtension extends AbstractExtension
     /**
      * Initiates a early connection to a resource (DNS resolution, TCP handshake, TLS negotiation).
      *
-     * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
+     * @param array $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The path of the asset
      */
-    public function preconnect($uri, array $attributes = [])
+    public function preconnect(string $uri, array $attributes = [])
     {
         return $this->link($uri, 'preconnect', $attributes);
     }
@@ -114,12 +110,11 @@ class WebLinkExtension extends AbstractExtension
     /**
      * Indicates to the client that it should prefetch this resource.
      *
-     * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
+     * @param array $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The path of the asset
      */
-    public function prefetch($uri, array $attributes = [])
+    public function prefetch(string $uri, array $attributes = [])
     {
         return $this->link($uri, 'prefetch', $attributes);
     }
@@ -127,12 +122,11 @@ class WebLinkExtension extends AbstractExtension
     /**
      * Indicates to the client that it should prerender this resource .
      *
-     * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
+     * @param array $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The path of the asset
      */
-    public function prerender($uri, array $attributes = [])
+    public function prerender(string $uri, array $attributes = [])
     {
         return $this->link($uri, 'prerender', $attributes);
     }

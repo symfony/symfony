@@ -31,14 +31,13 @@ class HttpKernelRuntime
     /**
      * Renders a fragment.
      *
-     * @param string|ControllerReference $uri     A URI as a string or a ControllerReference instance
-     * @param array                      $options An array of options
+     * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
      *
      * @return string The fragment content
      *
      * @see FragmentHandler::render()
      */
-    public function renderFragment($uri, $options = [])
+    public function renderFragment($uri, array $options = [])
     {
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
@@ -49,15 +48,13 @@ class HttpKernelRuntime
     /**
      * Renders a fragment.
      *
-     * @param string                     $strategy A strategy name
-     * @param string|ControllerReference $uri      A URI as a string or a ControllerReference instance
-     * @param array                      $options  An array of options
+     * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
      *
      * @return string The fragment content
      *
      * @see FragmentHandler::render()
      */
-    public function renderFragmentStrategy($strategy, $uri, $options = [])
+    public function renderFragmentStrategy(string $strategy, $uri, array $options = [])
     {
         return $this->handler->render($uri, $strategy, $options);
     }

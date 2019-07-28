@@ -103,7 +103,7 @@ class TransNode extends Node
         $compiler->raw(");\n");
     }
 
-    protected function compileString(Node $body, ArrayExpression $vars, $ignoreStrictCheck = false)
+    protected function compileString(Node $body, ArrayExpression $vars, bool $ignoreStrictCheck = false)
     {
         if ($body instanceof ConstantExpression) {
             $msg = $body->getAttribute('value');

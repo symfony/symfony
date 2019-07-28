@@ -46,13 +46,11 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * This method returns the path unchanged if no request is available.
      *
-     * @param string $path The path
-     *
      * @return string The absolute URL
      *
      * @see Request::getUriForPath()
      */
-    public function generateAbsoluteUrl($path)
+    public function generateAbsoluteUrl(string $path)
     {
         return $this->urlHelper->getAbsoluteUrl($path);
     }
@@ -62,13 +60,11 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * This method returns the path unchanged if no request is available.
      *
-     * @param string $path The path
-     *
      * @return string The relative path
      *
      * @see Request::getRelativeUriForPath()
      */
-    public function generateRelativePath($path)
+    public function generateRelativePath(string $path)
     {
         return $this->urlHelper->getRelativePath($path);
     }

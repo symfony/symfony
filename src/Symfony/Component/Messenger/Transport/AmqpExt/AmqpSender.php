@@ -45,10 +45,7 @@ class AmqpSender implements SenderInterface
 
         /** @var DelayStamp|null $delayStamp */
         $delayStamp = $envelope->last(DelayStamp::class);
-        $delay = 0;
-        if (null !== $delayStamp) {
-            $delay = $delayStamp->getDelay();
-        }
+        $delay = $delayStamp ? $delayStamp->getDelay() : 0;
 
         $amqpStamp = $envelope->last(AmqpStamp::class);
         if (isset($encodedMessage['headers']['Content-Type'])) {

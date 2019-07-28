@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | 4.4 for features / 3.4, 4.2 or 4.3 for bug fixes <!-- see below -->
+| Branch?       | 4.4 for features / 3.4 or 4.3 for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | BC breaks?    | no     <!-- see https://symfony.com/bc -->

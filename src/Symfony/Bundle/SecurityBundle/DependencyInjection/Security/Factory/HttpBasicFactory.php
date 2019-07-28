@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class HttpBasicFactory implements SecurityFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
@@ -66,7 +66,7 @@ class HttpBasicFactory implements SecurityFactoryInterface
         ;
     }
 
-    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPoint)
     {
         if (null !== $defaultEntryPoint) {
             return $defaultEntryPoint;

@@ -59,7 +59,7 @@ class FormLoginFactory extends AbstractFactory
         return 'security.authentication.listener.form';
     }
 
-    protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
+    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
@@ -72,7 +72,7 @@ class FormLoginFactory extends AbstractFactory
         return $provider;
     }
 
-    protected function createListener($container, $id, $config, $userProvider)
+    protected function createListener(ContainerBuilder $container, string $id, array $config, string $userProvider)
     {
         $listenerId = parent::createListener($container, $id, $config, $userProvider);
 
@@ -84,7 +84,7 @@ class FormLoginFactory extends AbstractFactory
         return $listenerId;
     }
 
-    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPoint)
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container

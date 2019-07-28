@@ -57,6 +57,8 @@ class ConsumeMessagesCommand extends Command
         // to be deprecated in 4.4
         if ($routableBus instanceof ContainerInterface) {
             $routableBus = new RoutableMessageBus($routableBus);
+        } elseif (!$routableBus instanceof RoutableMessageBus) {
+            throw new \TypeError(sprintf('The first argument must be an instance of "%s".', RoutableMessageBus::class));
         }
 
         if (\is_array($retryStrategyLocator)) {

@@ -480,7 +480,7 @@ Serializer
 Stopwatch
 ---------
 
- * Removed support of passing `null` as 1st (`$id`) argument of `Section::get()` method, pass a valid child section identifier instead.
+ * Removed support for passing `null` as 1st (`$id`) argument of `Section::get()` method, pass a valid child section identifier instead.
 
 Translation
 -----------

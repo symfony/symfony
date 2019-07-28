@@ -81,7 +81,7 @@ class Stopwatch implements ResetInterface
      *
      * @throws \LogicException When there's no started section to be stopped
      */
-    public function stopSection(?string $id)
+    public function stopSection(string $id)
     {
         $this->stop('__section__');
 

@@ -32,7 +32,7 @@ class DoctrineReceiverTest extends TestCase
         $serializer = $this->createSerializer();
 
         $doctrineEnvelope = $this->createDoctrineEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('get')->willReturn($doctrineEnvelope);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
@@ -62,7 +62,7 @@ class DoctrineReceiverTest extends TestCase
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $doctrineEnvelop = $this->createDoctrineEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('get')->willReturn($doctrineEnvelop);
         $connection->expects($this->once())->method('reject');
 

@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Parameter;
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config)
+    public function create(ContainerBuilder $container, string $id, array $config)
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
         $defaultPassword = new Parameter('container.build_id');

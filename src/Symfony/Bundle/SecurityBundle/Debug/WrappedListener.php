@@ -45,7 +45,7 @@ final class WrappedListener
     /**
      * Proxies all method calls to the original listener.
      */
-    public function __call($method, $arguments)
+    public function __call(string $method, array $arguments)
     {
         return $this->listener->{$method}(...$arguments);
     }

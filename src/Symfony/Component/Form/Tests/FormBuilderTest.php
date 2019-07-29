@@ -81,6 +81,9 @@ class FormBuilderTest extends TestCase
         $this->assertTrue($this->builder->has('foo'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testAddIntegerName()
     {
         $this->assertFalse($this->builder->has(0));

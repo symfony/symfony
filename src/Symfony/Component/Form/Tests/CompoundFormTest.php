@@ -188,6 +188,9 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertSame(['foo' => $child], $this->form->all());
     }
 
+    /**
+     * @group legacy
+     */
     public function testAddUsingIntegerNameAndType()
     {
         $child = $this->getBuilder(0)->getForm();

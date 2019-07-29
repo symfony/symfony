@@ -26,7 +26,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class RetryTillSaveStore implements PersistingStoreInterface, BlockingStoreInterface, StoreInterface, LoggerAwareInterface
+class RetryTillSaveStore implements BlockingStoreInterface, StoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 

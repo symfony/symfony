@@ -16,7 +16,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 /**
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-interface BlockingStoreInterface
+interface BlockingStoreInterface extends PersistingStoreInterface
 {
     /**
      * Waits until a key becomes free, then stores the resource.

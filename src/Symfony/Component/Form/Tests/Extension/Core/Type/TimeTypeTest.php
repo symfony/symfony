@@ -860,6 +860,16 @@ class TimeTypeTest extends BaseTypeTest
         ]);
     }
 
+    public function testModelTimezoneDefaultToReferenceDateTimezoneIfProvided()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'view_timezone' => 'Europe/Berlin',
+            'reference_date' => new \DateTimeImmutable('now', new \DateTimeZone('Europe/Berlin')),
+        ]);
+
+        $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('model_timezone'));
+    }
+
     public function testPassDefaultChoiceTranslationDomain()
     {
         $form = $this->factory->create(static::TESTED_TYPE);

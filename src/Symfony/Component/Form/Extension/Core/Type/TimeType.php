@@ -267,6 +267,18 @@ class TimeType extends AbstractType
             ];
         };
 
+        $modelTimezone = static function (Options $options, $value): ?string {
+            if (null !== $value) {
+                return $value;
+            }
+
+            if (null !== $options['reference_date']) {
+                return $options['reference_date']->getTimezone()->getName();
+            }
+
+            return null;
+        };
+
         $resolver->setDefaults([
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
@@ -276,7 +288,7 @@ class TimeType extends AbstractType
             'input_format' => 'H:i:s',
             'with_minutes' => true,
             'with_seconds' => false,
-            'model_timezone' => null,
+            'model_timezone' => $modelTimezone,
             'view_timezone' => null,
             'reference_date' => null,
             'placeholder' => $placeholderDefault,
@@ -325,6 +337,8 @@ class TimeType extends AbstractType
         $resolver->setAllowedTypes('minutes', 'array');
         $resolver->setAllowedTypes('seconds', 'array');
         $resolver->setAllowedTypes('input_format', 'string');
+        $resolver->setAllowedTypes('model_timezone', ['null', 'string']);
+        $resolver->setAllowedTypes('view_timezone', ['null', 'string']);
         $resolver->setAllowedTypes('reference_date', ['null', \DateTimeInterface::class]);
     }
 

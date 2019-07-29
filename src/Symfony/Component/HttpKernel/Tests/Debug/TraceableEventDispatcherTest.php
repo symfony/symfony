@@ -62,15 +62,13 @@ class TraceableEventDispatcherTest extends TestCase
     public function testStopwatchStopControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')
-            ->setMethods(['isStarted', 'stop', 'stopSection'])
+            ->setMethods(['isStarted', 'stop'])
             ->getMock();
         $stopwatch->expects($this->once())
             ->method('isStarted')
             ->willReturn(true);
         $stopwatch->expects($this->once())
             ->method('stop');
-        $stopwatch->expects($this->once())
-            ->method('stopSection');
 
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch);
 

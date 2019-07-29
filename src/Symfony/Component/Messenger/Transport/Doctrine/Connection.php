@@ -302,7 +302,7 @@ class Connection
 
     private function getSchema(): Schema
     {
-        $schema = new Schema();
+        $schema = new Schema([], [], $this->driverConnection->getSchemaManager()->createSchemaConfig());
         $table = $schema->createTable($this->configuration['table_name']);
         $table->addColumn('id', Type::BIGINT)
             ->setAutoincrement(true)

@@ -217,7 +217,7 @@ FrameworkBundle
 
  * Dropped support for booting the kernel before running `WebTestCase::createClient()`. `createClient()` will throw an
    exception if the kernel was already booted before.
- * Removed the `framework.templating` option, use Twig instead.
+ * Removed the `framework.templating` option, configure the Twig bundle instead.
  * The project dir argument of the constructor of `AssetsInstallCommand` is required.
  * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`
    instead where `serviceOrFqcn` is either the service ID when using controllers as services or the FQCN of the controller.

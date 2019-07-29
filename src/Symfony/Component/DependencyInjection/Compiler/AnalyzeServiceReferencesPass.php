@@ -128,7 +128,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
         $this->lazy = false;
 
         $byConstructor = $this->byConstructor;
-        $this->byConstructor = true;
+        $this->byConstructor = $isRoot || $byConstructor;
         $this->processValue($value->getFactory());
         $this->processValue($value->getArguments());
 

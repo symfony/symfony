@@ -29,6 +29,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
             'baz6' => 'getBaz6Service',
             'connection' => 'getConnectionService',
             'connection2' => 'getConnection2Service',
+            'connection3' => 'getConnection3Service',
+            'connection4' => 'getConnection4Service',
             'dispatcher' => 'getDispatcherService',
             'dispatcher2' => 'getDispatcher2Service',
             'foo' => 'getFooService',
@@ -40,9 +42,12 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
             'foobar2' => 'getFoobar2Service',
             'foobar3' => 'getFoobar3Service',
             'foobar4' => 'getFoobar4Service',
+            'listener3' => 'getListener3Service',
+            'listener4' => 'getListener4Service',
             'logger' => 'getLoggerService',
             'manager' => 'getManagerService',
             'manager2' => 'getManager2Service',
+            'manager3' => 'getManager3Service',
             'root' => 'getRootService',
             'subscriber' => 'getSubscriberService',
         ];
@@ -75,6 +80,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
             'level5' => true,
             'level6' => true,
             'logger2' => true,
+            'manager4' => true,
             'multiuse1' => true,
             'subscriber2' => true,
         ];
@@ -185,6 +191,34 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $c->handler2 = new \stdClass(($this->services['manager2'] ?? $this->getManager2Service()));
 
         $b->logger2 = $c;
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'connection3' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getConnection3Service()
+    {
+        $this->services['connection3'] = $instance = new \stdClass();
+
+        $instance->listener = [0 => ($this->services['listener3'] ?? $this->getListener3Service())];
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'connection4' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getConnection4Service()
+    {
+        $this->services['connection4'] = $instance = new \stdClass();
+
+        $instance->listener = [0 => ($this->services['listener4'] ?? $this->getListener4Service())];
 
         return $instance;
     }
@@ -350,6 +384,36 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     }
 
     /**
+     * Gets the public 'listener3' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getListener3Service()
+    {
+        $this->services['listener3'] = $instance = new \stdClass();
+
+        $instance->manager = ($this->services['manager3'] ?? $this->getManager3Service());
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'listener4' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getListener4Service()
+    {
+        $a = ($this->privates['manager4'] ?? $this->getManager4Service());
+
+        if (isset($this->services['listener4'])) {
+            return $this->services['listener4'];
+        }
+
+        return $this->services['listener4'] = new \stdClass($a);
+    }
+
+    /**
      * Gets the public 'logger' shared service.
      *
      * @return \stdClass
@@ -399,6 +463,22 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         }
 
         return $this->services['manager2'] = new \stdClass($a);
+    }
+
+    /**
+     * Gets the public 'manager3' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getManager3Service($lazyLoad = true)
+    {
+        $a = ($this->services['connection3'] ?? $this->getConnection3Service());
+
+        if (isset($this->services['manager3'])) {
+            return $this->services['manager3'];
+        }
+
+        return $this->services['manager3'] = new \stdClass($a);
     }
 
     /**
@@ -463,5 +543,21 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $a->call($instance);
 
         return $instance;
+    }
+
+    /**
+     * Gets the private 'manager4' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getManager4Service($lazyLoad = true)
+    {
+        $a = ($this->services['connection4'] ?? $this->getConnection4Service());
+
+        if (isset($this->privates['manager4'])) {
+            return $this->privates['manager4'];
+        }
+
+        return $this->privates['manager4'] = new \stdClass($a);
     }
 }

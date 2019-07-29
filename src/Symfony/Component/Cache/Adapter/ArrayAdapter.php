@@ -34,7 +34,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
     {
         $this->storeSerialized = $storeSerialized;
         $this->createCacheItem = \Closure::bind(
-            function ($key, $value, $isHit) use ($defaultLifetime) {
+            static function ($key, $value, $isHit) use ($defaultLifetime) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;

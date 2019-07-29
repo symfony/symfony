@@ -1423,6 +1423,13 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals((object) ['bar6' => (object) []], $foo6);
 
         $this->assertInstanceOf(\stdClass::class, $container->get('root'));
+
+        $manager3 = $container->get('manager3');
+        $listener3 = $container->get('listener3');
+        $this->assertSame($manager3, $listener3->manager, 'Both should identically be the manager3 service');
+
+        $listener4 = $container->get('listener4');
+        $this->assertInstanceOf('stdClass', $listener4);
     }
 
     public function provideAlmostCircular()

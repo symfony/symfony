@@ -42,6 +42,9 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
                 break;
             case KernelEvents::TERMINATE:
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
+                if (null === $token) {
+                    break;
+                }
                 // There is a very special case when using built-in AppCache class as kernel wrapper, in the case
                 // of an ESI request leading to a `stale` response [B]  inside a `fresh` cached response [A].
                 // In this case, `$token` contains the [B] debug token, but the  open `stopwatch` section ID
@@ -66,12 +69,18 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
                 break;
             case KernelEvents::RESPONSE:
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
+                if (null === $token) {
+                    break;
+                }
                 $this->stopwatch->stopSection($token);
                 break;
             case KernelEvents::TERMINATE:
                 // In the special case described in the `preDispatch` method above, the `$token` section
                 // does not exist, then closing it throws an exception which must be caught.
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
+                if (null === $token) {
+                    break;
+                }
                 try {
                     $this->stopwatch->stopSection($token);
                 } catch (\LogicException $e) {

@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-02-06T18:25:11Z
+
+> the required service reference graph is too crazy
+
+well, thank you :}
+
+conceptually it evolves around using PSR4 prototyped + autowired services, where EM service is bound with a private alias pointing to the actual doctrine EM service. Cool huh :sweat_smile:
+
+bind: https://github.com/msgphp/msgphp/blob/61f5678b2ab764fb94bd912e6eceab5f3546a8b3/src/UserBundle/Resources/config/doctrine.php#L27
+load: https://github.com/msgphp/msgphp/blob/61f5678b2ab764fb94bd912e6eceab5f3546a8b3/src/UserBundle/Resources/config/doctrine.php#L36
+alias: https://github.com/msgphp/msgphp/blob/61f5678b2ab764fb94bd912e6eceab5f3546a8b3/src/Domain/Infra/DependencyInjection/BundleHelper.php#L138
+
+Im not sure it's related to the scope where services are registered, in my case from an extension config file, but the alias is registered during bundle booting.
+
+Ill try to replicate it in a minimal DI definition :+1: renamed the repo meanwhile.
+
+Confirmed the patch works. Thanks :100:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-06T18:38:13Z
+
+Status: needs work
+I'll try to fix #29637 here also, it's related somehow, and not fixed yet.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-29T17:10:22Z
+
+:tada:
+I've been chasing this for more than one year [almost day-to-day](https://github.com/symfony/symfony/pull/28060).
+This PR is now green and fixes all the reproducers provided in linked issues + the test cases from @weaverryan (thank you dude!)

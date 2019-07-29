@@ -2,7 +2,6 @@
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCalls;
 
@@ -101,6 +100,35 @@ $container->register('dispatcher2', 'stdClass')->setPublic($public)
 
 $container->register('subscriber2', 'stdClass')->setPublic(false)
     ->addArgument(new Reference('manager2'));
+
+// doctrine-like event system with listener
+
+$container->register('manager3', 'stdClass')
+    ->setLazy(true)
+    ->setPublic(true)
+    ->addArgument(new Reference('connection3'));
+
+$container->register('connection3', 'stdClass')
+    ->setPublic($public)
+    ->setProperty('listener', [new Reference('listener3')]);
+
+$container->register('listener3', 'stdClass')
+    ->setPublic(true)
+    ->setProperty('manager', new Reference('manager3'));
+
+// doctrine-like event system with small differences
+
+$container->register('manager4', 'stdClass')
+    ->setLazy(true)
+    ->addArgument(new Reference('connection4'));
+
+$container->register('connection4', 'stdClass')
+    ->setPublic($public)
+    ->setProperty('listener', [new Reference('listener4')]);
+
+$container->register('listener4', 'stdClass')
+    ->setPublic(true)
+    ->addArgument(new Reference('manager4'));
 
 // private service involved in a loop
 

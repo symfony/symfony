@@ -116,7 +116,7 @@ class ExceptionHandlerTest extends TestCase
         });
 
         $handler->handle(new \Exception());
-        ob_end_flush(); // Necessary because of this PHP bug : https://bugs.php.net/bug.php?id=76563
+        ob_end_flush(); // Necessary because of this PHP bug : https://bugs.php.net/76563
         $this->assertSame('ccc', ob_get_clean());
     }
 

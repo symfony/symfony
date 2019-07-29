@@ -27,7 +27,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 class LanguageDataGenerator extends AbstractDataGenerator
 {
     /**
-     * Source: http://www-01.sil.org/iso639-3/codes.asp.
+     * Source: https://iso639-3.sil.org/code_tables/639/data
      */
     private static $preferredAlpha2ToAlpha3Mapping = [
         'ak' => 'aka',

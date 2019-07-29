@@ -198,7 +198,7 @@ class NumberFormatter
      * The mapping between NumberFormatter rounding modes to the available
      * modes in PHP's round() function.
      *
-     * @see http://www.php.net/manual/en/function.round.php
+     * @see https://php.net/round
      */
     private static $phpRoundingMap = [
         self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
@@ -249,7 +249,7 @@ class NumberFormatter
      *                        NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                        described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
-     * @see http://www.php.net/manual/en/numberformatter.create.php
+     * @see https://php.net/numberformatter.create
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
@@ -288,7 +288,7 @@ class NumberFormatter
      *
      * @return self
      *
-     * @see http://www.php.net/manual/en/numberformatter.create.php
+     * @see https://php.net/numberformatter.create
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
@@ -309,7 +309,7 @@ class NumberFormatter
      *
      * @return string The formatted currency value
      *
-     * @see http://www.php.net/manual/en/numberformatter.formatcurrency.php
+     * @see https://php.net/numberformatter.formatcurrency
      * @see https://en.wikipedia.org/wiki/ISO_4217#Active_codes
      */
     public function formatCurrency($value, $currency)
@@ -346,7 +346,7 @@ class NumberFormatter
      *
      * @return bool|string The formatted value or false on error
      *
-     * @see http://www.php.net/manual/en/numberformatter.format.php
+     * @see https://php.net/numberformatter.format
      *
      * @throws NotImplementedException                    If the method is called with the class $style 'CURRENCY'
      * @throws MethodArgumentValueNotImplementedException If the $type is different than TYPE_DEFAULT
@@ -387,7 +387,7 @@ class NumberFormatter
      *
      * @return bool|int The attribute value on success or false on error
      *
-     * @see http://www.php.net/manual/en/numberformatter.getattribute.php
+     * @see https://php.net/numberformatter.getattribute
      */
     public function getAttribute($attr)
     {
@@ -399,7 +399,7 @@ class NumberFormatter
      *
      * @return int The error code from last formatter call
      *
-     * @see http://www.php.net/manual/en/numberformatter.geterrorcode.php
+     * @see https://php.net/numberformatter.geterrorcode
      */
     public function getErrorCode()
     {
@@ -411,7 +411,7 @@ class NumberFormatter
      *
      * @return string The error message from last formatter call
      *
-     * @see http://www.php.net/manual/en/numberformatter.geterrormessage.php
+     * @see https://php.net/numberformatter.geterrormessage
      */
     public function getErrorMessage()
     {
@@ -428,7 +428,7 @@ class NumberFormatter
      * @return string The locale used to create the formatter. Currently always
      *                returns "en".
      *
-     * @see http://www.php.net/manual/en/numberformatter.getlocale.php
+     * @see https://php.net/numberformatter.getlocale
      */
     public function getLocale($type = Locale::ACTUAL_LOCALE)
     {
@@ -440,7 +440,7 @@ class NumberFormatter
      *
      * @return bool|string The pattern string used by the formatter or false on error
      *
-     * @see http://www.php.net/manual/en/numberformatter.getpattern.php
+     * @see https://php.net/numberformatter.getpattern
      *
      * @throws MethodNotImplementedException
      */
@@ -456,7 +456,7 @@ class NumberFormatter
      *
      * @return bool|string The symbol value or false on error
      *
-     * @see http://www.php.net/manual/en/numberformatter.getsymbol.php
+     * @see https://php.net/numberformatter.getsymbol
      */
     public function getSymbol($attr)
     {
@@ -470,7 +470,7 @@ class NumberFormatter
      *
      * @return bool|string The attribute value or false on error
      *
-     * @see http://www.php.net/manual/en/numberformatter.gettextattribute.php
+     * @see https://php.net/numberformatter.gettextattribute
      */
     public function getTextAttribute($attr)
     {
@@ -486,7 +486,7 @@ class NumberFormatter
      *
      * @return bool|string The parsed numeric value or false on error
      *
-     * @see http://www.php.net/manual/en/numberformatter.parsecurrency.php
+     * @see https://php.net/numberformatter.parsecurrency
      *
      * @throws MethodNotImplementedException
      */
@@ -504,7 +504,7 @@ class NumberFormatter
      *
      * @return int|float|false The parsed value or false on error
      *
-     * @see http://www.php.net/manual/en/numberformatter.parse.php
+     * @see https://php.net/numberformatter.parse
      */
     public function parse($value, $type = self::TYPE_DOUBLE, &$position = 0)
     {
@@ -558,7 +558,7 @@ class NumberFormatter
      *
      * @return bool true on success or false on failure
      *
-     * @see http://www.php.net/manual/en/numberformatter.setattribute.php
+     * @see https://php.net/numberformatter.setattribute
      *
      * @throws MethodArgumentValueNotImplementedException When the $attr is not supported
      * @throws MethodArgumentValueNotImplementedException When the $value is not supported
@@ -608,7 +608,7 @@ class NumberFormatter
      *
      * @return bool true on success or false on failure
      *
-     * @see http://www.php.net/manual/en/numberformatter.setpattern.php
+     * @see https://php.net/numberformatter.setpattern
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      *
      * @throws MethodNotImplementedException
@@ -626,7 +626,7 @@ class NumberFormatter
      *
      * @return bool true on success or false on failure
      *
-     * @see http://www.php.net/manual/en/numberformatter.setsymbol.php
+     * @see https://php.net/numberformatter.setsymbol
      *
      * @throws MethodNotImplementedException
      */
@@ -643,7 +643,7 @@ class NumberFormatter
      *
      * @return bool true on success or false on failure
      *
-     * @see http://www.php.net/manual/en/numberformatter.settextattribute.php
+     * @see https://php.net/numberformatter.settextattribute
      *
      * @throws MethodNotImplementedException
      */

@@ -431,10 +431,10 @@ abstract class ControllerTraitTest extends TestCase
     public function testRedirect()
     {
         $controller = $this->createController();
-        $response = $controller->redirect('http://dunglas.fr', 301);
+        $response = $controller->redirect('https://dunglas.fr', 301);
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
-        $this->assertSame('http://dunglas.fr', $response->getTargetUrl());
+        $this->assertSame('https://dunglas.fr', $response->getTargetUrl());
         $this->assertSame(301, $response->getStatusCode());
     }
 

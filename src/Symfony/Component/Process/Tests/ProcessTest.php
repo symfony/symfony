@@ -1178,7 +1178,7 @@ class ProcessTest extends TestCase
         ];
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            // Avoid XL buffers on Windows because of https://bugs.php.net/bug.php?id=65650
+            // Avoid XL buffers on Windows because of https://bugs.php.net/65650
             $sizes = [1, 2, 4, 8];
         } else {
             $sizes = [1, 16, 64, 1024, 4096];

@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * @deprecated since version 3.4, to be removed in 4.0. Use \SessionHandler instead.
- * @see http://php.net/sessionhandler
+ * @see https://php.net/sessionhandler
  */
 class NativeSessionHandler extends \SessionHandler
 {

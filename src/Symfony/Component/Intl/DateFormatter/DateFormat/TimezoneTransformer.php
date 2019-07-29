@@ -92,8 +92,7 @@ class TimezoneTransformer extends Transformer
      *
      * @return string A timezone identifier
      *
-     * @see    http://php.net/manual/en/timezones.others.php
-     * @see    http://www.twinsun.com/tz/tz-link.htm
+     * @see https://php.net/timezones.others
      *
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
      * @throws \InvalidArgumentException When the value can not be matched with pattern

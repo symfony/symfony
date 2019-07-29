@@ -54,7 +54,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * List of options for $options array with their defaults.
      *
-     * @see http://php.net/session.configuration for options
+     * @see https://php.net/session.configuration for options
      * but we omit 'session.' from the beginning of the keys for convenience.
      *
      * ("auto_start", is not supported as it tells PHP to start a session before
@@ -212,7 +212,7 @@ class NativeSessionStorage implements SessionStorageInterface
         $isRegenerated = session_regenerate_id($destroy);
 
         // The reference to $_SESSION in session bags is lost in PHP7 and we need to re-create it.
-        // @see https://bugs.php.net/bug.php?id=70013
+        // @see https://bugs.php.net/70013
         $this->loadSession();
 
         return $isRegenerated;
@@ -337,7 +337,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @param array $options Session ini directives [key => value]
      *
-     * @see http://php.net/session.configuration
+     * @see https://php.net/session.configuration
      */
     public function setOptions(array $options)
     {
@@ -378,10 +378,10 @@ class NativeSessionStorage implements SessionStorageInterface
      * constructor, for a template see NativeFileSessionHandler or use handlers in
      * composer package drak/native-session
      *
-     * @see http://php.net/session-set-save-handler
-     * @see http://php.net/sessionhandlerinterface
-     * @see http://php.net/sessionhandler
-     * @see http://github.com/drak/NativeSession
+     * @see https://php.net/session-set-save-handler
+     * @see https://php.net/sessionhandlerinterface
+     * @see https://php.net/sessionhandler
+     * @see https://github.com/zikula/NativeSession
      *
      * @param \SessionHandlerInterface|null $saveHandler
      *

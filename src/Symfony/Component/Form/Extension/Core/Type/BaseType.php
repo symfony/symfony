@@ -71,7 +71,7 @@ abstract class BaseType extends AbstractType
 
             // Strip leading underscores and digits. These are allowed in
             // form names, but not in HTML4 ID attributes.
-            // http://www.w3.org/TR/html401/struct/global.html#adef-id
+            // https://www.w3.org/TR/html401/struct/global#adef-id
             $id = ltrim($id, '_0123456789');
         }
 

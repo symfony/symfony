@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-07-05T07:29:58Z
+
+@derrabus @fabpot Redundant information in doc blocks have been removed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-27T06:39:41Z
+
+@jschaedl Can you have a look at the remaining comments? Thank you.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-28T18:34:06Z
+
+I rebased and fixed the comments. It seems the webprofiler toolbar request does not have the x-debug-token and called the stopwatch needlessly. I skipped it in this case and checked the symfony timeline panel and nothing changed. So this seems fine.
+Edit: I extracted that to #32799 to fix in lower branches as well.

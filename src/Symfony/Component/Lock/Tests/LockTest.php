@@ -97,7 +97,7 @@ class LockTest extends TestCase
     public function testAcquireBlocking()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder([PersistingStoreInterface::class, BlockingStoreInterface::class])->getMock();
+        $store = $this->createMock(BlockingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -213,7 +213,7 @@ class LockTest extends TestCase
     public function testReleaseOnDestruction()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder([PersistingStoreInterface::class, BlockingStoreInterface::class])->getMock();
+        $store = $this->createMock(BlockingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
@@ -232,7 +232,7 @@ class LockTest extends TestCase
     public function testNoAutoReleaseWhenNotConfigured()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder([PersistingStoreInterface::class, BlockingStoreInterface::class])->getMock();
+        $store = $this->createMock(BlockingStoreInterface::class);
         $lock = new Lock($key, $store, 10, false);
 
         $store

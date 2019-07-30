@@ -172,8 +172,8 @@ class HttpClientTraitTest extends TestCase
     public function testAuthBearerOption()
     {
         [, $options] = self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foobar'], HttpClientInterface::OPTIONS_DEFAULTS);
-        $this->assertSame('Bearer foobar', $options['headers']['authorization'][0]);
-        $this->assertSame('authorization: Bearer foobar', $options['request_headers'][0]);
+        $this->assertSame(['Authorization: Bearer foobar'], $options['headers']);
+        $this->assertSame(['Authorization: Bearer foobar'], $options['normalized_headers']['authorization']);
     }
 
     /**
@@ -226,7 +226,7 @@ class HttpClientTraitTest extends TestCase
     public function testPrepareAuthBasic($arg, $result)
     {
         [, $options] = $this->prepareRequest('POST', 'http://example.com', ['auth_basic' => $arg], HttpClientInterface::OPTIONS_DEFAULTS);
-        $this->assertSame('Basic '.$result, $options['headers']['authorization'][0]);
+        $this->assertSame('Authorization: Basic '.$result, $options['normalized_headers']['authorization'][0]);
     }
 
     public function provideFingerprints()

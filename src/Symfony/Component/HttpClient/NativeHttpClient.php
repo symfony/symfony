@@ -73,13 +73,13 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         $options['body'] = self::getBodyAsString($options['body']);
 
-        if ('' !== $options['body'] && 'POST' === $method && !isset($options['headers']['content-type'])) {
-            $options['request_headers'][] = 'content-type: application/x-www-form-urlencoded';
+        if ('' !== $options['body'] && 'POST' === $method && !isset($options['normalized_headers']['content-type'])) {
+            $options['headers'][] = 'Content-Type: application/x-www-form-urlencoded';
         }
 
-        if ($gzipEnabled = \extension_loaded('zlib') && !isset($options['headers']['accept-encoding'])) {
+        if ($gzipEnabled = \extension_loaded('zlib') && !isset($options['normalized_headers']['accept-encoding'])) {
             // gzip is the most widely available algo, no need to deal with deflate
-            $options['request_headers'][] = 'accept-encoding: gzip';
+            $options['headers'][] = 'Accept-Encoding: gzip';
         }
 
         if ($options['peer_fingerprint']) {
@@ -160,12 +160,12 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         [$host, $port, $url['authority']] = self::dnsResolve($url, $this->multi, $info, $onProgress);
 
-        if (!isset($options['headers']['host'])) {
-            $options['request_headers'][] = 'host: '.$host.$port;
+        if (!isset($options['normalized_headers']['host'])) {
+            $options['headers'][] = 'Host: '.$host.$port;
         }
 
-        if (!isset($options['headers']['user-agent'])) {
-            $options['request_headers'][] = 'user-agent: Symfony HttpClient/Native';
+        if (!isset($options['normalized_headers']['user-agent'])) {
+            $options['headers'][] = 'User-Agent: Symfony HttpClient/Native';
         }
 
         $context = [
@@ -208,7 +208,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         $resolveRedirect = self::createRedirectResolver($options, $host, $proxy, $noProxy, $info, $onProgress);
         $context = stream_context_create($context, ['notification' => $notification]);
-        self::configureHeadersAndProxy($context, $host, $options['request_headers'], $proxy, $noProxy);
+        self::configureHeadersAndProxy($context, $host, $options['headers'], $proxy, $noProxy);
 
         return new NativeResponse($this->multi, $context, implode('', $url), $options, $gzipEnabled, $info, $resolveRedirect, $onProgress, $this->logger);
     }
@@ -335,12 +335,12 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         $redirectHeaders = [];
         if (0 < $maxRedirects = $options['max_redirects']) {
             $redirectHeaders = ['host' => $host];
-            $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['request_headers'], static function ($h) {
+            $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
                 return 0 !== stripos($h, 'Host:');
             });
 
-            if (isset($options['headers']['authorization']) || isset($options['headers']['cookie'])) {
-                $redirectHeaders['no_auth'] = array_filter($options['request_headers'], static function ($h) {
+            if (isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {
+                $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
                     return 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:');
                 });
             }
@@ -393,7 +393,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             if (false !== (parse_url($location, PHP_URL_HOST) ?? false)) {
                 // Authorization and Cookie headers MUST NOT follow except for the initial host name
                 $requestHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
-                $requestHeaders[] = 'host: '.$host.$port;
+                $requestHeaders[] = 'Host: '.$host.$port;
                 self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy, $noProxy);
             }
 

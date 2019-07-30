@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-30T12:36:24Z
+
+Can we add a test case for this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T12:37:28Z
+
+Not sure, see https://github.com/symfony/symfony/pull/32790#discussion_r307997166

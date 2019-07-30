@@ -113,7 +113,12 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         if ($onProgress = $options['on_progress']) {
             // Memoize the last progress to ease calling the callback periodically when no network transfer happens
             $lastProgress = [0, 0];
-            $onProgress = static function (...$progress) use ($onProgress, &$lastProgress, &$info) {
+            $maxDuration = 0 < $options['max_duration'] ? $options['max_duration'] : INF;
+            $onProgress = static function (...$progress) use ($onProgress, &$lastProgress, &$info, $maxDuration) {
+                if ($info['total_time'] >= $maxDuration) {
+                    throw new TransportException(sprintf('Max duration was reached for "%s".', implode('', $info['url'])));
+                }
+
                 $progressInfo = $info;
                 $progressInfo['url'] = implode('', $info['url']);
                 unset($progressInfo['size_body']);
@@ -126,6 +131,13 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 }
 
                 $onProgress($lastProgress[0], $lastProgress[1], $progressInfo);
+            };
+        } elseif (0 < $options['max_duration']) {
+            $maxDuration = $options['max_duration'];
+            $onProgress = static function () use (&$info, $maxDuration): void {
+                if ($info['total_time'] >= $maxDuration) {
+                    throw new TransportException(sprintf('Max duration was reached for "%s".', implode('', $info['url'])));
+                }
             };
         }
 
@@ -164,6 +176,10 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         if (!isset($options['normalized_headers']['user-agent'])) {
             $options['headers'][] = 'User-Agent: Symfony HttpClient/Native';
+        }
+
+        if (0 < $options['max_duration']) {
+            $options['timeout'] = min($options['max_duration'], $options['timeout']);
         }
 
         $context = [

@@ -9,6 +9,7 @@ $container->loadFromExtension('framework', [
             'resolve' => ['localhost' => '127.0.0.1'],
             'proxy' => 'proxy.org',
             'timeout' => 3.5,
+            'max_duration' => 10.1,
             'bindto' => '127.0.0.1',
             'verify_peer' => true,
             'verify_host' => true,

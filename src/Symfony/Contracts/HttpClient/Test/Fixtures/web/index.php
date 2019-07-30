@@ -132,6 +132,16 @@ switch ($vars['REQUEST_URI']) {
         header('Content-Encoding: gzip');
         echo str_repeat('-', 1000);
         exit;
+
+    case '/max-duration':
+        ignore_user_abort(false);
+        while (true) {
+            echo '<1>';
+            @ob_flush();
+            flush();
+            usleep(500);
+        }
+        exit;
 }
 
 header('Content-Type: application/json', true);

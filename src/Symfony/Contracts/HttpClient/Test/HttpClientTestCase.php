@@ -778,4 +778,25 @@ abstract class HttpClientTestCase extends TestCase
         $this->expectException(TransportExceptionInterface::class);
         $response->getContent();
     }
+
+    public function testMaxDuration()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/max-duration', [
+            'max_duration' => 0.1,
+        ]);
+
+        $start = microtime(true);
+
+        try {
+            $response->getContent();
+        } catch (TransportExceptionInterface $e) {
+            $this->addToAssertionCount(1);
+        }
+
+        $duration = microtime(true) - $start;
+
+        $this->assertGreaterThanOrEqual(0.1, $duration);
+        $this->assertLessThan(0.2, $duration);
+    }
 }

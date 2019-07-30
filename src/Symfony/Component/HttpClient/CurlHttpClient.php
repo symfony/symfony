@@ -284,6 +284,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             $curlopts[file_exists($options['bindto']) ? CURLOPT_UNIX_SOCKET_PATH : CURLOPT_INTERFACE] = $options['bindto'];
         }
 
+        if (0 < $options['max_duration']) {
+            $curlopts[CURLOPT_TIMEOUT_MS] = 1000 * $options['max_duration'];
+        }
+
         $ch = curl_init();
 
         foreach ($curlopts as $opt => $value) {

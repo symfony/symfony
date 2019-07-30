@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by deguif at 2019-07-24T18:13:31Z
+
+Ok, it's ready.
+Finally I needed to change the `CheckDefinitionValidityPass` order too, as `ServiceLocatorTagPass` add some definition classes to service locator which haven't them yet before this pass and `CheckDefinitionValidityPass` checks that each definition has a class set.

@@ -24,11 +24,11 @@ class UndefinedMethodFatalErrorHandler implements FatalErrorHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handleError(array $error, FatalErrorException $exception)
+    public function handleError(array $error, FatalErrorException $exception): ?UndefinedMethodException
     {
         preg_match('/^Call to undefined method (.*)::(.*)\(\)$/', $error['message'], $matches);
         if (!$matches) {
-            return;
+            return null;
         }
 
         $className = $matches[1];

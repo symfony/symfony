@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-24T12:25:27Z
+
+Any reason why you're proposing this?
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-24T12:41:55Z
+
+@nicolas-grekas
+Just improving the codes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-27T08:41:38Z
+
+We do not change code that works. We did such refactoring in the past and that introduced some bugs. So, we either refactor to fix a bug or we keep the current code.
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-27T11:07:03Z
+
+@nicolas-grekas thank you.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-07-28T17:41:41Z
+
+@xabbuh fixed, thanks

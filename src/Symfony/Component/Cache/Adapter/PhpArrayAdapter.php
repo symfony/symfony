@@ -42,7 +42,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
         $this->pool = $fallbackPool;
         $this->zendDetectUnicode = filter_var(ini_get('zend.detect_unicode'), FILTER_VALIDATE_BOOLEAN);
         $this->createCacheItem = \Closure::bind(
-            function ($key, $value, $isHit) {
+            static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;

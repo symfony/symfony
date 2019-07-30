@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by soufianZantar at 2019-07-27T13:21:34Z
+
+> This should be merged into 3.4 right?
+
+Also 4.3 is  affected, i think this should merged into 4.3 and 3.4.
+
+Multi-line strings support will be removed in 4.4 and 5.0 versions, right?

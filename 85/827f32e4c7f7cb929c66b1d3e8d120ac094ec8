@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-24T14:29:51Z
+
+This partly reverts https://github.com/symfony/symfony/pull/28937 /cc @rpkamp
+See also https://github.com/symfony/symfony/issues/27600 and https://github.com/php-translation/symfony-bundle/issues/198
+We should be sure we go in the right direction, with the target being set by these issues.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-07-24T14:34:07Z
+
+Well, #28937 passed the scanned directories to the translator cache. But it won't automatically bring in the new resource files if the container itself is not rebuilt. So this revert is indeed necessary.
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-07-24T17:42:30Z
+
+> so when adding a new translation file, the container needs to be recompiled otherwise the translator won't know about the new file.
+
+New files within previously known directories should be fine. It seems to me the problem is newly added directories (like a new bundle, or a new directory added to the `paths` of the translator configuration) do not trigger the container to recompile, thus the translator will also not be triggered to recompile.
+
+It looks like #27600 is still solved with this PR (`MessageCatalogue` will still correctly report it's not fresh when a translation file was changed / added / removed), but the added benefit of #28937 that the container no longer needs to be recompiled when a translation is changed is gone (the container will report it's not fresh when any translation file was added / removed / changed).
+
+---------------------------------------------------------------------------
+
+by stof at 2019-07-24T17:49:49Z
+
+@rpkamp this PR still does not rebuild the container when you change a file.
+
+What we need based on the responsibility of each:
+1. rebuild the container cache when a translation folder or a translation file in it is added or removed, as the container is holding the list of resource files
+2. rebuild the translation cache when the list of resource file is changed (adding or removing a file in it)
+3. rebuild the translation cache when the one of the resource file is changed (editing translations)
+
+Symfony 4.2 and older were doing 1 and 3 properly, but failing on 2. #28937 is adding the support for 2, but is breaking 1 (as it never rebuilds the container cache for such things). This PR is reintroducing 1 partially (it detects when you add or remove a translation folder, due to adding a bundle for instance, but not when you add a file in an existing folder, due to adding a new locale or catalogue in this folder).
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-07-24T18:23:13Z
+
+> @rpkamp this PR still does not rebuild the container when you change a file.
+
+As far as I can tell it does, because all directories that contain translation files are marked as DirectoryResource in the container, which are considered non fresh when the mtime changes, and that changes when the mtime of one of the files within that directory changes.
+
+Which is fine, correctness over performance and all that, but it would be nice if we could have our cake and eat it to :cake:
+
+---------------------------------------------------------------------------
+
+by pierredup at 2019-07-25T08:23:17Z
+
+One option around the issue is to deprecate the behaviour of caching the list of resources in the container and only passing the directories so that the translator is fully independent of the container cache. I created a POC at #32735 to discuss this option, but for now, this PR solves the other issues mentioned.

@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
@@ -309,12 +310,12 @@ class TimeType extends AbstractType
             'choice_translation_domain' => false,
         ]);
 
-        $resolver->setDeprecated('model_timezone', function (Options $options, $modelTimezone): string {
+        $resolver->setNormalizer('model_timezone', function (Options $options, $modelTimezone): ?string {
             if (null !== $modelTimezone && $options['view_timezone'] !== $modelTimezone && null === $options['reference_date']) {
-                return sprintf('Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is deprecated since Symfony 4.4.');
+                throw new LogicException(sprintf('Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is not supported.'));
             }
 
-            return '';
+            return $modelTimezone;
         });
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);

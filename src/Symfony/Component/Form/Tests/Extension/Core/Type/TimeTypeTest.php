@@ -426,8 +426,8 @@ class TimeTypeTest extends BaseTypeTest
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is deprecated since Symfony 4.4.
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
+     * @expectedExceptionMessage Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is not supported.
      */
     public function testSetDataDifferentTimezonesWithoutReferenceDate()
     {

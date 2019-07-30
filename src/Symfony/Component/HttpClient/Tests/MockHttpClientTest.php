@@ -107,7 +107,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 $mock = $this->getMockBuilder(ResponseInterface::class)->getMock();
                 $mock->expects($this->any())
                     ->method('getHeaders')
-                    ->willThrowException(new TransportException('Timeout'));
+                    ->willThrowException(TransportException::readTimeoutReached('http://localhost:8057/timeout-header', 0.1));
 
                 $responses[] = $mock;
                 break;
@@ -115,7 +115,7 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testResolve':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
-                $responses[] = new MockResponse((function () { throw new \Exception('Fake connection timeout'); yield ''; })(), ['response_headers' => $headers]);
+                $responses[] = new MockResponse((function () { throw TransportException::connectionTimeoutReached('http://symfony.com:8057/', 3); yield ''; })(), ['response_headers' => $headers]);
                 break;
 
             case 'testTimeoutOnStream':

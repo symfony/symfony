@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
-use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
+use Symfony\Component\HttpClient\Chunk\TimeoutChunk;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
@@ -28,6 +28,8 @@ class MockResponse implements ResponseInterface
     use ResponseTrait {
         doDestruct as public __destruct;
     }
+
+    public const DEFAULT_TIMEOUT_VALUE = 1;
 
     private $body;
     private $requestOptions = [];
@@ -278,7 +280,7 @@ class MockResponse implements ResponseInterface
             foreach ($body as $chunk) {
                 if ('' === $chunk = (string) $chunk) {
                     // simulate a timeout
-                    $response->body[] = new ErrorChunk($offset);
+                    $response->body[] = new TimeoutChunk($offset, $response->info['url'], $response->timeout ?? $response->requestOptions['timeout'] ?? self::DEFAULT_TIMEOUT_VALUE);
                 } else {
                     $response->body[] = $chunk;
                     $offset += \strlen($chunk);

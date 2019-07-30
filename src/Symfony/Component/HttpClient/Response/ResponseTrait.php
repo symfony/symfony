@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
+use Symfony\Component\HttpClient\Chunk\TimeoutChunk;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
@@ -308,7 +309,8 @@ trait ResponseTrait
                         unset($responses[$j]);
                         continue;
                     } elseif ($isTimeout) {
-                        $multi->handlesActivity[$j] = [new ErrorChunk($response->offset)];
+                        $info = $response->getInfo();
+                        $multi->handlesActivity[$j] = [new TimeoutChunk($response->offset, $info['url'], $timeoutMax)];
                     } else {
                         continue;
                     }

@@ -18,4 +18,13 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  */
 final class TransportException extends \RuntimeException implements TransportExceptionInterface
 {
+    public static function connectionTimeoutReached(string $url, float $seconds): self
+    {
+        return new self(sprintf('Failed connecting to "%s". The idle timeout was reached after %s second%s.', $url, $seconds, $seconds > 1 ? 's' : ''));
+    }
+
+    public static function readTimeoutReached(string $url, float $seconds): self
+    {
+        return new self(sprintf('Failed reading the complete response stream from "%s". The idle timeout was reached after %s second%s.', $url, $seconds, $seconds > 1 ? 's' : ''));
+    }
 }

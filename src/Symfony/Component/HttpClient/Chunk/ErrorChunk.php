@@ -21,16 +21,14 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
  */
 class ErrorChunk implements ChunkInterface
 {
-    private $didThrow = false;
+    protected $didThrow = false;
     private $offset;
-    private $errorMessage;
     private $error;
 
-    public function __construct(int $offset, \Throwable $error = null)
+    public function __construct(int $offset, \Throwable $error)
     {
         $this->offset = $offset;
         $this->error = $error;
-        $this->errorMessage = null !== $error ? $error->getMessage() : 'Reading from the response stream reached the idle timeout.';
     }
 
     /**
@@ -38,13 +36,7 @@ class ErrorChunk implements ChunkInterface
      */
     public function isTimeout(): bool
     {
-        $this->didThrow = true;
-
-        if (null !== $this->error) {
-            throw new TransportException($this->errorMessage, 0, $this->error);
-        }
-
-        return true;
+        $this->throw();
     }
 
     /**
@@ -52,8 +44,7 @@ class ErrorChunk implements ChunkInterface
      */
     public function isFirst(): bool
     {
-        $this->didThrow = true;
-        throw new TransportException($this->errorMessage, 0, $this->error);
+        $this->throw();
     }
 
     /**
@@ -61,8 +52,7 @@ class ErrorChunk implements ChunkInterface
      */
     public function isLast(): bool
     {
-        $this->didThrow = true;
-        throw new TransportException($this->errorMessage, 0, $this->error);
+        $this->throw();
     }
 
     /**
@@ -70,8 +60,7 @@ class ErrorChunk implements ChunkInterface
      */
     public function getContent(): string
     {
-        $this->didThrow = true;
-        throw new TransportException($this->errorMessage, 0, $this->error);
+        $this->throw();
     }
 
     /**
@@ -87,7 +76,7 @@ class ErrorChunk implements ChunkInterface
      */
     public function getError(): ?string
     {
-        return $this->errorMessage;
+        return $this->error->getMessage();
     }
 
     /**
@@ -101,8 +90,13 @@ class ErrorChunk implements ChunkInterface
     public function __destruct()
     {
         if (!$this->didThrow) {
-            $this->didThrow = true;
-            throw new TransportException($this->errorMessage, 0, $this->error);
+            $this->throw();
         }
+    }
+
+    private function throw(): void
+    {
+        $this->didThrow = true;
+        throw $this->error instanceof TransportException ? $this->error : new TransportException($this->error->getMessage(), 0, $this->error);
     }
 }

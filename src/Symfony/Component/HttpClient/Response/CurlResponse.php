@@ -140,7 +140,8 @@ final class CurlResponse implements ResponseInterface
         // Schedule the request in a non-blocking way
         $multi->openHandles[$id] = $ch;
         curl_multi_add_handle($multi->handle, $ch);
-        self::perform($multi);
+        $responses = [$this];
+        self::perform($multi, $responses);
     }
 
     /**
@@ -149,7 +150,8 @@ final class CurlResponse implements ResponseInterface
     public function getInfo(string $type = null)
     {
         if (!$info = $this->finalInfo) {
-            self::perform($this->multi);
+            $responses = [$this];
+            self::perform($this->multi, $responses);
 
             $info = array_merge($this->info, curl_getinfo($this->handle));
             $info['url'] = $this->info['url'] ?? $info['url'];
@@ -258,8 +260,16 @@ final class CurlResponse implements ResponseInterface
             while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active));
 
             while ($info = curl_multi_info_read($multi->handle)) {
-                $multi->handlesActivity[(int) $info['handle']][] = null;
-                $multi->handlesActivity[(int) $info['handle']][] = \in_array($info['result'], [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || (\CURLE_WRITE_ERROR === $info['result'] && 'destruct' === @curl_getinfo($info['handle'], CURLINFO_PRIVATE)) ? null : new TransportException(sprintf('%s for "%s".', curl_strerror($info['result']), curl_getinfo($info['handle'], CURLINFO_EFFECTIVE_URL)));
+                $multi->handlesActivity[$id = (int) $info['handle']][] = null;
+                if (\in_array($info['result'], [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || (\CURLE_WRITE_ERROR === $info['result'] && 'destruct' === @curl_getinfo($info['handle'], CURLINFO_PRIVATE))) {
+                    $exception = null;
+                } elseif (CURLE_COULDNT_CONNECT === $info['result'] || (CURLE_OPERATION_TIMEOUTED === $info['result'] && 0 === curl_getinfo($info['handle'], CURLINFO_HTTP_CODE))) {
+                    $exception = TransportException::connectionTimeoutReached(curl_getinfo($info['handle'], CURLINFO_EFFECTIVE_URL), $responses[$id]->timeout);
+                } else {
+                    $exception = new TransportException(sprintf('%s for "%s".', curl_strerror($info['result']), curl_getinfo($info['handle'], CURLINFO_EFFECTIVE_URL)));
+                }
+
+                $multi->handlesActivity[$id][] = $exception;
             }
         } finally {
             self::$performing = false;

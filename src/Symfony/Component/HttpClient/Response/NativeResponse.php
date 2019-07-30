@@ -107,7 +107,18 @@ final class NativeResponse implements ResponseInterface
 
     private function open(): void
     {
-        set_error_handler(function ($type, $msg) { throw new TransportException($msg); });
+        set_error_handler(function ($type, $msg) {
+            if (E_WARNING === $type) {
+                switch ($msg) {
+                    case sprintf('fopen(%s): failed to open stream: Operation timed out', $this->url):
+                        throw TransportException::connectionTimeoutReached(implode('', $this->info['url']), $this->timeout);
+                    case sprintf('fopen(%s): failed to open stream: HTTP request failed! ', $this->url):
+                        throw TransportException::readTimeoutReached(implode('', $this->info['url']), $this->timeout);
+                }
+            }
+
+            throw new TransportException($msg);
+        });
 
         try {
             $this->info['start_time'] = microtime(true);

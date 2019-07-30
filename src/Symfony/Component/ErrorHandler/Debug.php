@@ -24,7 +24,6 @@ class Debug
      * Enables the debug tools.
      *
      * This method registers an error handler and an exception handler.
-     *
      */
     public static function enable(int $errorReportingLevel = E_ALL, bool $displayErrors = true): void
     {

@@ -105,7 +105,6 @@ class ErrorHandler
 
     /**
      * Registers the error handler.
-     *
      */
     public static function register(self $handler = null, bool $replace = true): self
     {

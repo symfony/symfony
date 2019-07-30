@@ -130,7 +130,7 @@ class DebugClassLoader
 
     public function findFile(string $class): ?string
     {
-        return $this->isFinder ? ( $this->classLoader[0]->findFile($class) ?: null ) : null;
+        return $this->isFinder ? ($this->classLoader[0]->findFile($class) ?: null) : null;
     }
 
     /**
@@ -422,6 +422,7 @@ class DebugClassLoader
         ) {
             return [substr($tail, -$tailLen + 1), substr($real, -$tailLen + 1), substr($real, 0, -$tailLen + 1)];
         }
+
         return null;
     }
 
@@ -503,7 +504,7 @@ class DebugClassLoader
     private function getOwnInterfaces(string $class, $parent): array
     {
         $ownInterfaces = class_implements($class, false);
-        if ($ownInterfaces === false){
+        if (false === $ownInterfaces) {
             return [];
         }
 

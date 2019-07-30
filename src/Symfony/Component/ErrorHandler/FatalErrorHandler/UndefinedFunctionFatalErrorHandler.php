@@ -24,23 +24,23 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handleError(array $error, FatalErrorException $exception): ?UndefinedFunctionException
+    public function handleError(array $error, FatalErrorException $exception)
     {
         $messageLen = \strlen($error['message']);
         $notFoundSuffix = '()';
         $notFoundSuffixLen = \strlen($notFoundSuffix);
         if ($notFoundSuffixLen > $messageLen) {
-            return null;
+            return;
         }
 
         if (0 !== substr_compare($error['message'], $notFoundSuffix, -$notFoundSuffixLen)) {
-            return null;
+            return;
         }
 
         $prefix = 'Call to undefined function ';
         $prefixLen = \strlen($prefix);
         if (0 !== strpos($error['message'], $prefix)) {
-            return null;
+            return;
         }
 
         $fullyQualifiedFunctionName = substr($error['message'], $prefixLen, -$notFoundSuffixLen);

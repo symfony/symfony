@@ -63,6 +63,14 @@ DependencyInjection
    ```php
    new Definition('%my_class%');
    ```
+   
+DoctrineBridge
+--------------
+ * Deprecated injecting `ClassMetadataFactory` in `DoctrineExtractor`, an instance of `EntityManagerInterface` should be
+   injected instead.
+ * Deprecated passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field.
+ * Deprecated not passing an `IdReader` to the `DoctrineChoiceLoader` when the query can be optimized with single id field.
+ * Deprecated `RegistryInterface`, use `Doctrine\Common\Persistence\ManagerRegistry`.
 
 Filesystem
 ----------

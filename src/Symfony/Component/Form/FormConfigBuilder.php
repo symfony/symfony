@@ -106,10 +106,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Creates an empty form configuration.
      *
-     * @param string|null              $name       The form name
-     * @param string|null              $dataClass  The class of the form's data
-     * @param EventDispatcherInterface $dispatcher The event dispatcher
-     * @param array                    $options    The form options
+     * @param string|null $name      The form name
+     * @param string|null $dataClass The class of the form's data
      *
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters

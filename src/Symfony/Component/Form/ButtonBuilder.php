@@ -69,9 +69,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param string|int|FormBuilderInterface $child
-     * @param string|FormTypeInterface        $type
-     * @param array                           $options
+     * @param string|FormBuilderInterface $child
+     * @param string|FormTypeInterface    $type
      *
      * @throws BadMethodCallException
      */

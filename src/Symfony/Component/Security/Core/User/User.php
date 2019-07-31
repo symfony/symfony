@@ -165,4 +165,9 @@ final class User implements UserInterface, EquatableInterface
 
         return true;
     }
+
+    public function setPassword(string $password)
+    {
+        $this->password = $password;
+    }
 }

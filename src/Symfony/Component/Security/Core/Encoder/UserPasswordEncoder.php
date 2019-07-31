@@ -50,10 +50,10 @@ class UserPasswordEncoder implements UserPasswordEncoderInterface
     /**
      * {@inheritdoc}
      */
-    public function needsRehash(UserInterface $user, string $encoded): bool
+    public function needsRehash(UserInterface $user): bool
     {
         $encoder = $this->encoderFactory->getEncoder($user);
 
-        return $encoder->needsRehash($encoded);
+        return $encoder->needsRehash($user->getPassword());
     }
 }

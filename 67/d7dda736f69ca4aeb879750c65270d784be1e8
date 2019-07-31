@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by tweichart at 2019-07-30T12:37:52Z
+
+`php ./phpunit src/Symfony/Component/HttpKernel/` is running fine locally, I actually don't know why this is failing at appveyor right now. Before the last commit the test was fine, I highly doubt that the last commit did anything concerning the HttpKernel test. Apart from the fact that it just reverted things to the way they were before the PR...
+edit: seems fixed, thanks
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T14:31:46Z
+
+could you please also remove the useless `null` default here:
+https://github.com/symfony/symfony/blob/b2dadc110d4fea28ca981b66aef1d771f238bda5/src/Symfony/Component/ErrorHandler/ErrorHandler.php#L101
+
+---------------------------------------------------------------------------
+
+by tweichart at 2019-07-30T15:27:57Z
+
+various checks seem fine for me locally:
+```bash
+$> php ./phpunit src/Symfony/Bundle/SecurityBundle/
+#...
+OK (231 tests, 679 assertions)
+```
+```bash
+$> docker run -it --rm --name spu -v "$PWD":/usr/src/spu -w /usr/src/spu php:7.2.19-cli php ./phpunit src/Symfony/Component/HttpClient
+#...
+OK, but incomplete, skipped, or risky tests!
+Tests: 245, Assertions: 511, Skipped: 5.
+```
+```bash
+$> php ./phpunit src/Symfony/Component/ErrorHandler/
+#...
+OK (64 tests, 196 assertions)
+```
+php version 7.2.20
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T15:31:40Z
+
+@tweichart don't worry about AppVeyor's failure, it's not related to your changes.

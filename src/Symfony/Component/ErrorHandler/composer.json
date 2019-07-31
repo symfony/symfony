@@ -27,7 +27,6 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorHandler\\": "" },
-        "classmap": [ "Resources/stubs/Debug.php" ],
         "exclude-from-classmap": [
             "/Tests/"
         ]

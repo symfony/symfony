@@ -45,7 +45,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $this->tags = $tagsPool ?: $itemsPool;
         $this->knownTagVersionsTtl = $knownTagVersionsTtl;
         $this->createCacheItem = \Closure::bind(
-            function ($key, $value, CacheItem $protoItem) {
+            static function ($key, $value, CacheItem $protoItem) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
@@ -59,7 +59,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             CacheItem::class
         );
         $this->setCacheItemTags = \Closure::bind(
-            function (CacheItem $item, $key, array &$itemTags) {
+            static function (CacheItem $item, $key, array &$itemTags) {
                 $item->isTaggable = true;
                 if (!$item->isHit) {
                     return $item;
@@ -80,7 +80,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             CacheItem::class
         );
         $this->getTagsByKey = \Closure::bind(
-            function ($deferred) {
+            static function ($deferred) {
                 $tagsByKey = [];
                 foreach ($deferred as $key => $item) {
                     $tagsByKey[$key] = $item->newMetadata[CacheItem::METADATA_TAGS] ?? [];
@@ -92,7 +92,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             CacheItem::class
         );
         $this->invalidateTags = \Closure::bind(
-            function (AdapterInterface $tagsAdapter, array $tags) {
+            static function (AdapterInterface $tagsAdapter, array $tags) {
                 foreach ($tags as $v) {
                     $v->defaultLifetime = 0;
                     $v->expiry = null;

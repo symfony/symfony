@@ -40,7 +40,7 @@ class PhpFileLoader extends FileLoader
 
         // the closure forbids access to the private scope in the included file
         $loader = $this;
-        $load = \Closure::bind(function ($file) use ($loader) {
+        $load = \Closure::bind(static function ($file) use ($loader) {
             return include $file;
         }, null, ProtectedPhpFileLoader::class);
 

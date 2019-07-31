@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -24,6 +25,8 @@ use Symfony\Component\Security\Http\Authentication\SimpleAuthenticationHandler;
  */
 class SimpleAuthenticationHandlerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $successHandler;
 
     private $failureHandler;
@@ -36,7 +39,7 @@ class SimpleAuthenticationHandlerTest extends TestCase
 
     private $response;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->successHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface')->getMock();
         $this->failureHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface')->getMock();

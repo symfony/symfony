@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
@@ -21,6 +22,8 @@ use Symfony\Component\Form\FormEvents;
 
 class MergeDoctrineCollectionListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @var \Doctrine\Common\Collections\ArrayCollection */
     private $collection;
     /** @var \Symfony\Component\EventDispatcher\EventDispatcher */
@@ -28,7 +31,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
     private $factory;
     private $form;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->collection = new ArrayCollection(['test']);
         $this->dispatcher = new EventDispatcher();
@@ -37,7 +40,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
             ->getForm();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->collection = null;
         $this->dispatcher = null;

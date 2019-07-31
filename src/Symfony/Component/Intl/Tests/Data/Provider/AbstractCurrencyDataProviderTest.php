@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Provider;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Data\Provider\CurrencyDataProvider;
 use Symfony\Component\Intl\Intl;
 
@@ -21,6 +22,8 @@ use Symfony\Component\Intl\Intl;
  */
 abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
 {
+    use ForwardCompatTestTrait;
+
     // The below arrays document the state of the ICU data bundled with this package.
 
     protected static $currencies = [
@@ -592,7 +595,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     protected $dataProvider;
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 

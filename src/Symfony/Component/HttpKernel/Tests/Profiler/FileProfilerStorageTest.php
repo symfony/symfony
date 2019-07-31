@@ -12,15 +12,18 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class FileProfilerStorageTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $tmpDir;
     private $storage;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->tmpDir = sys_get_temp_dir().'/sf_profiler_file_storage';
         if (is_dir($this->tmpDir)) {
@@ -30,7 +33,7 @@ class FileProfilerStorageTest extends TestCase
         $this->storage->purge();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         self::cleanDir();
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
@@ -19,12 +20,14 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
  */
 class FilesystemAdapterTest extends AdapterTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function createCachePool($defaultLifetime = 0)
     {
         return new FilesystemAdapter('', $defaultLifetime);
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         self::rmdir(sys_get_temp_dir().'/symfony-cache');
     }

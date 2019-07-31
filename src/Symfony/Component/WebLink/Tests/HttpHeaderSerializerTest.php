@@ -13,16 +13,19 @@ namespace Symfony\Component\WebLink\Tests;
 
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 class HttpHeaderSerializerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var HttpHeaderSerializer
      */
     private $serializer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->serializer = new HttpHeaderSerializer();
     }

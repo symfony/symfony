@@ -13,6 +13,7 @@ namespace Symfony\Bridge\PhpUnit\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * @author Dominic Tubach <dominic.tubach@to.com>
@@ -21,12 +22,14 @@ use Symfony\Bridge\PhpUnit\ClockMock;
  */
 class ClockMockTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    use ForwardCompatTestTrait;
+
+    private static function doSetUpBeforeClass()
     {
         ClockMock::register(__CLASS__);
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         ClockMock::withClockMock(1234567890.125);
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Composer\Autoload\ClassLoader;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\HttpKernel\Kernel;
@@ -21,9 +22,11 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class ControllerNameParserTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $loader;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->loader = new ClassLoader();
         $this->loader->add('TestBundle', __DIR__.'/../Fixtures');
@@ -31,7 +34,7 @@ class ControllerNameParserTest extends TestCase
         $this->loader->register();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->loader->unregister();
         $this->loader = null;

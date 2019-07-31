@@ -12,14 +12,17 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class JsonEncodeTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $encode;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->encode = new JsonEncode();
     }

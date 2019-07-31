@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -23,15 +24,17 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class ProgressBarTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $colSize;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS=120');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }

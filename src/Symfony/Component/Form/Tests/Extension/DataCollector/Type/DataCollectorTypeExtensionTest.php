@@ -12,10 +12,13 @@
 namespace Symfony\Component\Form\Tests\Extension\DataCollector\Type;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension;
 
 class DataCollectorTypeExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var DataCollectorTypeExtension
      */
@@ -26,7 +29,7 @@ class DataCollectorTypeExtensionTest extends TestCase
      */
     private $dataCollector;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->dataCollector = $this->getMockBuilder('Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface')->getMock();
         $this->extension = new DataCollectorTypeExtension($this->dataCollector);

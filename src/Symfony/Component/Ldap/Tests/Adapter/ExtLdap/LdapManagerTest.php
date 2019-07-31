@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\UpdateOperation;
@@ -24,10 +25,12 @@ use Symfony\Component\Ldap\Exception\UpdateOperationException;
  */
 class LdapManagerTest extends LdapTestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @var Adapter */
     private $adapter;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->adapter->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');

@@ -12,12 +12,15 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class StoreTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $request;
     protected $response;
 
@@ -26,7 +29,7 @@ class StoreTest extends TestCase
      */
     protected $store;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->request = Request::create('/');
         $this->response = new Response('hello world', 200, []);
@@ -36,7 +39,7 @@ class StoreTest extends TestCase
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->store = null;
         $this->request = null;

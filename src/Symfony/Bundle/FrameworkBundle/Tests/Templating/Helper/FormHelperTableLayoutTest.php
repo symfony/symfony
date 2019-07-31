@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
@@ -25,6 +26,8 @@ use Symfony\Component\Templating\PhpEngine;
  */
 class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var PhpEngine
      */
@@ -100,7 +103,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         ]);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->engine = null;
 

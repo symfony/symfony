@@ -12,12 +12,15 @@
 namespace Symfony\Component\Translation\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
 use Symfony\Component\Translation\DataCollectorTranslator;
 
 class TranslationDataCollectorTest extends TestCase
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         if (!class_exists('Symfony\Component\HttpKernel\DataCollector\DataCollector')) {
             $this->markTestSkipped('The "DataCollector" is not available');

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\File\MimeType;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\File\MimeType\FileBinaryMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
@@ -21,6 +22,8 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
  */
 class MimeTypeTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGuessImageWithoutExtension()
     {
         $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test'));
@@ -78,7 +81,7 @@ class MimeTypeTest extends TestCase
         }
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         $path = __DIR__.'/../Fixtures/to_delete';
         if (file_exists($path)) {

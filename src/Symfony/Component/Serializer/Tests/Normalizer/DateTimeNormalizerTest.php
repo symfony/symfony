@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 /**
@@ -19,12 +20,14 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
  */
 class DateTimeNormalizerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var DateTimeNormalizer
      */
     private $normalizer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->normalizer = new DateTimeNormalizer();
     }

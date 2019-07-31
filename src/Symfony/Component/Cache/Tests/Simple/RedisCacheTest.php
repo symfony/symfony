@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Simple\RedisCache;
 
 /**
@@ -18,7 +19,9 @@ use Symfony\Component\Cache\Simple\RedisCache;
  */
 class RedisCacheTest extends AbstractRedisCacheTest
 {
-    public static function setupBeforeClass()
+    use ForwardCompatTestTrait;
+
+    private static function doSetUpBeforeClass()
     {
         parent::setupBeforeClass();
         self::$redis = RedisCache::createConnection('redis://'.getenv('REDIS_HOST'));

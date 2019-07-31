@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
@@ -23,10 +24,12 @@ use Symfony\Component\Form\FormFactoryBuilder;
 
 class ResizeFormListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $factory;
     private $form;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
         $this->form = $this->getBuilder()
@@ -35,7 +38,7 @@ class ResizeFormListenerTest extends TestCase
             ->getForm();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->factory = null;
         $this->form = null;

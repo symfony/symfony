@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
@@ -23,12 +24,14 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class AbstractPropertyInfoExtractorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var PropertyInfoExtractor
      */
     protected $propertyInfo;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $extractors = [new NullExtractor(), new DummyExtractor()];
         $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);

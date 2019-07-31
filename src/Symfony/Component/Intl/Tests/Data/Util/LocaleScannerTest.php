@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Data\Util;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 
@@ -20,6 +21,8 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  */
 class LocaleScannerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $directory;
 
     /**
@@ -32,7 +35,7 @@ class LocaleScannerTest extends TestCase
      */
     private $scanner;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->directory = sys_get_temp_dir().'/LocaleScannerTest/'.mt_rand(1000, 9999);
         $this->filesystem = new Filesystem();
@@ -62,7 +65,7 @@ class LocaleScannerTest extends TestCase
         file_put_contents($this->directory.'/fr_child.txt', 'en_GB{%%Parent{"fr"}}');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->filesystem->remove($this->directory);
     }

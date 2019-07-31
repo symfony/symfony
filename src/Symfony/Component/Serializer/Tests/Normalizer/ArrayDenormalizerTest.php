@@ -12,11 +12,14 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ArrayDenormalizerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var ArrayDenormalizer
      */
@@ -27,7 +30,7 @@ class ArrayDenormalizerTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')->getMock();
         $this->denormalizer = new ArrayDenormalizer();

@@ -21,7 +21,7 @@ class SwitchUserTokenTest extends TestCase
     public function testSerialize()
     {
         $originalToken = new UsernamePasswordToken('user', 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
-        $token = new SwitchUserToken('admin', 'bar', 'provider-key', ['ROLE_USER'], $originalToken);
+        $token = new SwitchUserToken('admin', 'bar', 'provider-key', ['ROLE_USER'], $originalToken, 'https://symfony.com/blog');
 
         $unserializedToken = unserialize(serialize($token));
 
@@ -30,6 +30,7 @@ class SwitchUserTokenTest extends TestCase
         $this->assertSame('bar', $unserializedToken->getCredentials());
         $this->assertSame('provider-key', $unserializedToken->getFirewallName());
         $this->assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
+        $this->assertSame('https://symfony.com/blog', $unserializedToken->getOriginatedFromUri());
 
         $unserializedOriginalToken = $unserializedToken->getOriginalToken();
 
@@ -72,5 +73,15 @@ class SwitchUserTokenTest extends TestCase
         $token = new SwitchUserToken($impersonated, 'bar', 'provider-key', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
         $token->setUser($impersonated);
         $this->assertTrue($token->isAuthenticated());
+    }
+
+    public function testSerializeNullImpersonateUrl()
+    {
+        $originalToken = new UsernamePasswordToken('user', 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
+        $token = new SwitchUserToken('admin', 'bar', 'provider-key', ['ROLE_USER'], $originalToken);
+
+        $unserializedToken = unserialize(serialize($token));
+
+        $this->assertNull($unserializedToken->getOriginatedFromUri());
     }
 }

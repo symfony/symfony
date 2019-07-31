@@ -181,7 +181,8 @@ class SwitchUserListener extends AbstractListener
 
         $roles = $user->getRoles();
         $roles[] = 'ROLE_PREVIOUS_ADMIN';
-        $token = new SwitchUserToken($user, $user->getPassword(), $this->firewallName, $roles, $token);
+        $originatedFromUri = str_replace('/&', '/?', preg_replace('#[&?]'.$this->usernameParameter.'=[^&]*#', '', $request->getRequestUri()));
+        $token = new SwitchUserToken($user, $user->getPassword(), $this->firewallName, $roles, $token, $originatedFromUri);
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser(), $token);

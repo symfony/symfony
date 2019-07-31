@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * added support for dumping the container in one file instead of many files
  * deprecated support for short factories and short configurators in Yaml
  * deprecated `tagged` in favor of `tagged_iterator`
  * deprecated passing an instance of `Symfony\Component\DependencyInjection\Parameter` as class name to `Symfony\Component\DependencyInjection\Definition`

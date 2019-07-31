@@ -72,6 +72,7 @@ class PhpDumper extends Dumper
     private $namespace;
     private $asFiles;
     private $hotPathTag;
+    private $inlineFactories;
     private $inlineRequires;
     private $inlinedRequires = [];
     private $circularReferences = [];
@@ -134,6 +135,7 @@ class PhpDumper extends Dumper
             'as_files' => false,
             'debug' => true,
             'hot_path_tag' => 'container.hot_path',
+            'inline_factories_parameter' => 'container.dumper.inline_factories',
             'inline_class_loader_parameter' => 'container.dumper.inline_class_loader',
             'service_locator_tag' => 'container.service_locator',
             'build_time' => time(),
@@ -143,6 +145,7 @@ class PhpDumper extends Dumper
         $this->namespace = $options['namespace'];
         $this->asFiles = $options['as_files'];
         $this->hotPathTag = $options['hot_path_tag'];
+        $this->inlineFactories = $this->asFiles && $options['inline_factories_parameter'] && $this->container->hasParameter($options['inline_factories_parameter']) && $this->container->getParameter($options['inline_factories_parameter']);
         $this->inlineRequires = $options['inline_class_loader_parameter'] && $this->container->hasParameter($options['inline_class_loader_parameter']) && $this->container->getParameter($options['inline_class_loader_parameter']);
         $this->serviceLocatorTag = $options['service_locator_tag'];
 
@@ -216,12 +219,16 @@ class PhpDumper extends Dumper
             }
         }
 
+        $proxyClasses = $this->inlineFactories ? $this->generateProxyClasses() : null;
+
         $code =
             $this->startClass($options['class'], $baseClass, $baseClassWithNamespace).
             $this->addServices($services).
             $this->addDeprecatedAliases().
             $this->addDefaultParametersMethod()
         ;
+
+        $proxyClasses = $proxyClasses ?? $this->generateProxyClasses();
 
         if ($this->addGetService) {
             $code = preg_replace(
@@ -259,13 +266,24 @@ EOF;
                 $files['removed-ids.php'] = $c .= "];\n";
             }
 
-            foreach ($this->generateServiceFiles($services) as $file => $c) {
-                $files[$file] = $fileStart.$c;
+            if (!$this->inlineFactories) {
+                foreach ($this->generateServiceFiles($services) as $file => $c) {
+                    $files[$file] = $fileStart.$c;
+                }
+                foreach ($proxyClasses as $file => $c) {
+                    $files[$file] = "<?php\n".$c;
+                }
             }
-            foreach ($this->generateProxyClasses() as $file => $c) {
-                $files[$file] = "<?php\n".$c;
+
+            $code .= $this->endClass();
+
+            if ($this->inlineFactories) {
+                foreach ($proxyClasses as $c) {
+                    $code .= $c;
+                }
             }
-            $files[$options['class'].'.php'] = $code.$this->endClass();
+
+            $files[$options['class'].'.php'] = $code;
             $hash = ucfirst(strtr(ContainerBuilder::hash($files), '._', 'xx'));
             $code = [];
 
@@ -304,7 +322,7 @@ return new \\Container{$hash}\\{$options['class']}([
 EOF;
         } else {
             $code .= $this->endClass();
-            foreach ($this->generateProxyClasses() as $c) {
+            foreach ($proxyClasses as $c) {
                 $code .= $c;
             }
         }
@@ -431,8 +449,9 @@ EOF;
         $lineage[$class] = substr($exportedFile, 1, -1);
     }
 
-    private function generateProxyClasses()
+    private function generateProxyClasses(): array
     {
+        $proxyClasses = [];
         $alreadyGenerated = [];
         $definitions = $this->container->getDefinitions();
         $strip = '' === $this->docStar && method_exists('Symfony\Component\HttpKernel\Kernel', 'stripComments');
@@ -451,19 +470,39 @@ EOF;
             if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition)) {
                 continue;
             }
+
+            if ($this->inlineRequires) {
+                $lineage = [];
+                $this->collectLineage($class, $lineage);
+
+                $code = '';
+                foreach (array_diff_key(array_flip($lineage), $this->inlinedRequires) as $file => $class) {
+                    if ($this->inlineFactories) {
+                        $this->inlinedRequires[$file] = true;
+                    }
+                    $file = preg_replace('#^\\$this->targetDirs\[(\d++)\]#', sprintf('\dirname(__DIR__, %d + $1)', $this->asFiles), $file);
+                    $code .= sprintf("include_once %s;\n", $file);
+                }
+
+                $proxyCode = $code.$proxyCode;
+            }
+
             if ($strip) {
                 $proxyCode = "<?php\n".$proxyCode;
                 $proxyCode = substr(Kernel::stripComments($proxyCode), 5);
             }
-            yield sprintf('%s.php', explode(' ', $proxyCode, 3)[1]) => $proxyCode;
+
+            $proxyClasses[sprintf('%s.php', explode(' ', $proxyCode, 3)[1])] = $proxyCode;
         }
+
+        return $proxyClasses;
     }
 
     private function addServiceInclude(string $cId, Definition $definition): string
     {
         $code = '';
 
-        if ($this->inlineRequires && !$this->isHotPath($definition)) {
+        if ($this->inlineRequires && (!$this->isHotPath($definition) || $this->getProxyDumper()->isProxyCandidate($definition))) {
             $lineage = [];
             foreach ($this->inlinedDefinitions as $def) {
                 if (!$def->isDeprecated() && \is_string($class = \is_array($factory = $def->getFactory()) && \is_string($factory[0]) ? $factory[0] : $def->getClass())) {
@@ -693,7 +732,7 @@ EOF;
             $lazyInitialization = '';
         }
 
-        $asFile = $this->asFiles && !$this->isHotPath($definition);
+        $asFile = $this->asFiles && !$this->inlineFactories && !$this->isHotPath($definition);
         $methodName = $this->generateMethodName($id);
         if ($asFile) {
             $file = $methodName.'.php';
@@ -719,17 +758,16 @@ EOF;
         $this->serviceCalls = [];
         $this->inlinedDefinitions = $this->getDefinitionsFromArguments([$definition], null, $this->serviceCalls);
 
-        $code .= $this->addServiceInclude($id, $definition);
+        if ($definition->isDeprecated()) {
+            $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
+        }
 
         if ($this->getProxyDumper()->isProxyCandidate($definition)) {
             $factoryCode = $asFile ? ($definition->isShared() ? "\$this->load('%s.php', false)" : '$this->factories[%2$s](false)') : '$this->%s(false)';
             $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName, $this->doExport($id)));
         }
 
-        if ($definition->isDeprecated()) {
-            $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
-        }
-
+        $code .= $this->addServiceInclude($id, $definition);
         $code .= $this->addInlineService($id, $definition);
 
         if ($asFile) {
@@ -1044,7 +1082,7 @@ EOF;
 
         $code .= $this->addSyntheticIds();
         $code .= $this->addMethodMap();
-        $code .= $this->asFiles ? $this->addFileMap() : '';
+        $code .= $this->asFiles && !$this->inlineFactories ? $this->addFileMap() : '';
         $code .= $this->addAliases();
         $code .= $this->addInlineRequires();
         $code .= <<<EOF
@@ -1063,7 +1101,7 @@ EOF;
 EOF;
         $code .= $this->addRemovedIds();
 
-        if ($this->asFiles) {
+        if ($this->asFiles && !$this->inlineFactories) {
             $code .= <<<EOF
 
     protected function load(\$file, \$lazyLoad = true)
@@ -1079,10 +1117,10 @@ EOF;
             if (!$proxyDumper->isProxyCandidate($definition)) {
                 continue;
             }
-            if ($this->asFiles) {
+            if ($this->asFiles && !$this->inlineFactories) {
                 $proxyLoader = '$this->load("{$class}.php")';
-            } elseif ($this->namespace) {
-                $proxyLoader = 'class_alias("'.$this->namespace.'\\\\{$class}", $class, false)';
+            } elseif ($this->namespace || $this->inlineFactories) {
+                $proxyLoader = 'class_alias(__NAMESPACE__."\\\\$class", $class, false)';
             } else {
                 $proxyLoader = '';
             }
@@ -1160,7 +1198,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isPublic() && (!$this->asFiles || $this->isHotPath($definition))) {
+            if (!$definition->isSynthetic() && $definition->isPublic() && (!$this->asFiles || $this->inlineFactories || $this->isHotPath($definition))) {
                 $code .= '            '.$this->doExport($id).' => '.$this->doExport($this->generateMethodName($id)).",\n";
             }
         }
@@ -1257,6 +1295,11 @@ EOF;
 
         foreach ($this->container->findTaggedServiceIds($this->hotPathTag) as $id => $tags) {
             $definition = $this->container->getDefinition($id);
+
+            if ($this->getProxyDumper()->isProxyCandidate($definition)) {
+                continue;
+            }
+
             $inlinedDefinitions = $this->getDefinitionsFromArguments([$definition]);
 
             foreach ($inlinedDefinitions as $def) {
@@ -1604,7 +1647,7 @@ EOF;
                             continue;
                         }
                         $definition = $this->container->findDefinition($id = (string) $v);
-                        $load = !($definition->hasErrors() && $e = $definition->getErrors()) ? $this->asFiles && !$this->isHotPath($definition) : reset($e);
+                        $load = !($definition->hasErrors() && $e = $definition->getErrors()) ? $this->asFiles && !$this->inlineFactories && !$this->isHotPath($definition) : reset($e);
                         $serviceMap .= sprintf("\n            %s => [%s, %s, %s, %s],",
                             $this->export($k),
                             $this->export($definition->isShared() ? ($definition->isPublic() ? 'services' : 'privates') : false),
@@ -1747,7 +1790,7 @@ EOF;
                     $code = sprintf('$this->%s[%s] = %s', $definition->isPublic() ? 'services' : 'privates', $this->doExport($id), $code);
                 }
                 $code = "($code)";
-            } elseif ($this->asFiles && !$this->isHotPath($definition)) {
+            } elseif ($this->asFiles && !$this->inlineFactories && !$this->isHotPath($definition)) {
                 $code = sprintf("\$this->load('%s.php')", $this->generateMethodName($id));
                 if (!$definition->isShared()) {
                     $factory = sprintf('$this->factories%s[%s]', $definition->isPublic() ? '' : "['service_container']", $this->doExport($id));

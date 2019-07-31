@@ -75,7 +75,7 @@ class DebugClassLoader
      *
      * @return callable The wrapped class loader
      */
-    public function getClassLoader()
+    public function getClassLoader(): callable
     {
         return $this->classLoader;
     }
@@ -83,7 +83,7 @@ class DebugClassLoader
     /**
      * Wraps all autoloaders.
      */
-    public static function enable()
+    public static function enable(): void
     {
         // Ensures we don't hit https://bugs.php.net/42098
         class_exists('Symfony\Component\ErrorHandler\ErrorHandler');
@@ -109,7 +109,7 @@ class DebugClassLoader
     /**
      * Disables the wrapping.
      */
-    public static function disable()
+    public static function disable(): void
     {
         if (!\is_array($functions = spl_autoload_functions())) {
             return;
@@ -128,29 +128,24 @@ class DebugClassLoader
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function findFile($class)
+    public function findFile(string $class): ?string
     {
-        return $this->isFinder ? $this->classLoader[0]->findFile($class) ?: null : null;
+        return $this->isFinder ? ($this->classLoader[0]->findFile($class) ?: null) : null;
     }
 
     /**
      * Loads the given class or interface.
      *
-     * @param string $class The name of the class
-     *
      * @throws \RuntimeException
      */
-    public function loadClass($class)
+    public function loadClass(string $class): void
     {
         $e = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
 
         try {
             if ($this->isFinder && !isset($this->loaded[$class])) {
                 $this->loaded[$class] = true;
-                if (!$file = $this->classLoader[0]->findFile($class) ?: false) {
+                if (!$file = $this->classLoader[0]->findFile($class) ?: '') {
                     // no-op
                 } elseif (\function_exists('opcache_is_script_cached') && @opcache_is_script_cached($file)) {
                     include $file;
@@ -161,7 +156,7 @@ class DebugClassLoader
                 }
             } else {
                 ($this->classLoader)($class);
-                $file = false;
+                $file = '';
             }
         } finally {
             error_reporting($e);
@@ -170,7 +165,7 @@ class DebugClassLoader
         $this->checkClass($class, $file);
     }
 
-    private function checkClass($class, $file = null)
+    private function checkClass(string $class, string $file = null): void
     {
         $exists = null === $file || class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 
@@ -218,7 +213,7 @@ class DebugClassLoader
         }
     }
 
-    public function checkAnnotations(\ReflectionClass $refl, $class)
+    public function checkAnnotations(\ReflectionClass $refl, string $class): array
     {
         $deprecations = [];
 
@@ -395,7 +390,7 @@ class DebugClassLoader
         return $deprecations;
     }
 
-    public function checkCase(\ReflectionClass $refl, $file, $class)
+    public function checkCase(\ReflectionClass $refl, string $file, string $class): ?array
     {
         $real = explode('\\', $class.strrchr($file, '.'));
         $tail = explode(\DIRECTORY_SEPARATOR, str_replace('/', \DIRECTORY_SEPARATOR, $file));
@@ -411,7 +406,7 @@ class DebugClassLoader
         array_splice($tail, 0, $i + 1);
 
         if (!$tail) {
-            return;
+            return null;
         }
 
         $tail = \DIRECTORY_SEPARATOR.implode(\DIRECTORY_SEPARATOR, $tail);
@@ -427,12 +422,14 @@ class DebugClassLoader
         ) {
             return [substr($tail, -$tailLen + 1), substr($real, -$tailLen + 1), substr($real, 0, -$tailLen + 1)];
         }
+
+        return null;
     }
 
     /**
      * `realpath` on MacOSX doesn't normalize the case of characters.
      */
-    private function darwinRealpath($real)
+    private function darwinRealpath(string $real): string
     {
         $i = 1 + strrpos($real, '/');
         $file = substr($real, $i);
@@ -504,7 +501,7 @@ class DebugClassLoader
      *
      * @return string[]
      */
-    private function getOwnInterfaces($class, $parent)
+    private function getOwnInterfaces(string $class, $parent): array
     {
         $ownInterfaces = class_implements($class, false);
 

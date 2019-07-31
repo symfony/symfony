@@ -19,14 +19,15 @@
         "php": "^7.1.3",
         "psr/log": "~1.0"
     },
-    "conflict": {
-        "symfony/http-kernel": "<3.4"
-    },
     "require-dev": {
         "symfony/http-kernel": "^3.4|^4.0|^5.0"
     },
+    "conflict": {
+        "symfony/http-kernel": "<3.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorHandler\\": "" },
+        "classmap": [ "Resources/stubs/Debug.php" ],
         "exclude-from-classmap": [
             "/Tests/"
         ]

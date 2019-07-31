@@ -22,12 +22,12 @@ class BufferingLogger extends AbstractLogger
 {
     private $logs = [];
 
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         $this->logs[] = [$level, $message, $context];
     }
 
-    public function cleanLogs()
+    public function cleanLogs(): array
     {
         $logs = $this->logs;
         $this->logs = [];

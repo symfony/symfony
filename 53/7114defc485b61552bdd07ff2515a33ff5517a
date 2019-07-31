@@ -1,0 +1,152 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-25T08:06:00Z
+
+> Can someone answer the questions in symfony/recipes#630 (comment) ?
+
+I agree with you for the `Debug` class' argument: we could drop them to me.
+The purpose of this class is to quickly setup the PHP engine in debug mode.
+About keeping the classes in the Debug component, I don't think that makes sense.
+Let's make things simple for the future.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T18:47:51Z
+
+> I think we should really use classmap.
+To make it work, we should make the new component conflict with debug <4.4, and add a check in Debug's Debug class to call this components' Debug class when it exists. :)
+
+In Symfony 4.4 the Debug component won't be a hard dependency on any component. Unless you have `symfony/debug` as a dependency on your project (which is unlikely to happen), updating to 4.4 would uninstall the Debug component automatically. The same would happen if we created a new project based on 4.4: the Debug component won't exist there. This means we can't use Debug's Debug class to solve this or I'm missing something?
+
+About `... we should make the new component conflict with debug <4.4 ...` :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T18:52:09Z
+
+I didn't understand the issue then :)
+If we have both Debug and ErrorHandler installed, then we must ensure ErrorHandler's debug class is used, which is what my comment above fixes.
+If Debug is not installed, then I don't get why the classmap directive fails.
+Which class cannot be loaded? Having it loaded on-demand is desired.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T19:08:16Z
+
+>If we have both Debug and ErrorHandler installed, then we must ensure ErrorHandler's debug class is used, which is what my comment above fixes.
+
+Of course, in that case your comment is valid, but that won't be the next scenario :)
+
+> If Debug is not installed, then I don't get why the classmap directive fails.
+
+Using `classmap` won't load the defined alias in `Symfony\Component\ErrorHandler\Debug` to make it work properly when `class_exists(Debug::class)` is invoked in `console` or `Debug::enable()` is called directly in `index.php`, because it'll look for `Symfony\Component\Debug\Debug` class/file instead. See also https://github.com/symfony/symfony/pull/32665#discussion_r306311523 and https://github.com/symfony/symfony/pull/32665#discussion_r306311920
+
+>Which class cannot be loaded? Having it loaded on-demand is desired.
+
+The entry points `bin/console` and `public/index.php` are using `Symfony\Component\Debug\Debug` class, which won't exist in 4.4. We can fix that for new projects updating the recipe to use `Symfony\Component\ErrorHandler\Debug` (https://github.com/symfony/recipes/pull/630/files) BUT existent projects don't have a smooth migration.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-30T19:11:41Z
+
+@nicolas-grekas https://github.com/symfony/recipes/blob/f0e5358bcd7205880fe6894ac6e1e1e02dea4437/symfony/framework-bundle/4.2/public/index.php#L12 requires the Debug class. But updating to SF 4.4 will uninstall debug component as @yceruto explained. So peoples front controller will break. This PR creates an alias from the old debug class to the new, so the existing code still works. But for that we need to always load the new Debug class to create the alias.
+__Another idea which nicolas maybe talks about but I don't know if it works__: Create a classmap for `\Symfony\Component\Debug\Debug` to a file inside the _ErrorHandler_ component. And inside this file, we can create the alias from `Symfony\Component\Debug\Debug` to `\Symfony\Component\ErrorHandler\Debug`. This way we only need to load the Debug class when it is actually used.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T19:17:34Z
+
+> Create a classmap for \Symfony\Component\Debug\Debug to a file inside the ErrorHandler component. And inside this file, we can create the alias from Symfony\Component\Debug\Debug to \Symfony\Component\ErrorHandler\Debug. This way we only need to load the Debug class when it is actually used.
+
+That's absolutely my original idea and what I'm talking about since the beginning, sorry it wasn't clear enough.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T19:24:41Z
+
+> Another idea which nicolas maybe talks about but I don't know if it works: Create a classmap for \Symfony\Component\Debug\Debug to a file inside the ErrorHandler component. And inside this file, we can create the alias from Symfony\Component\Debug\Debug to \Symfony\Component\ErrorHandler\Debug. This way we only need to load the Debug class when it is actually used.
+
+How can you define a classmap for `Symfony\Component\Debug\Debug` to a file placed under the `ErrorHandler` directory?
+
+Are you refering to this classmap https://getcomposer.org/doc/04-schema.md#classmap ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T19:26:39Z
+
+Defining this:
+```json
+    "autoload": {
+        "classmap": [ "Debug.php" ]
+    },
+```
+we get this in `autoload_classmap.php`:
+```php
+'Symfony\\Component\\ErrorHandler\\Debug' => $vendorDir . '/symfony/symfony/src/Symfony/Component/ErrorHandler/Debug.php',
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T19:29:54Z
+
+Oh, so I meant a psr-4 line sorry (or maybe psr-0?) that would target the class specifically.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T19:40:22Z
+
+either psr-4 or psr-0 namespace declarations should end with `\\` and the value should be a directory, but I'll try with this `"Symfony\\Component\\Debug\\Debug\\": "Debug.php"` to see what happen.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T19:46:32Z
+
+PSR-0  doesn't need to, so we could put the file in
+`Resources\stub\Symfony\Component\Debug\Debug.php` and that'd work with "psr-0" and
+`"Symfony\\Component\\Debug\\Debug": "Resources\\stub"`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T19:57:24Z
+
+I have a better alternative!
+Use classmap + this trick, next to the alias https://github.com/twigphp/Twig/blob/5bfe590de545c791e4c3c98a908f65cc6c79b404/lib/Twig/BaseNodeVisitor.php#L9-L14
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T20:02:10Z
+
+Okey, it works with PSR-0! now I need to check what happen when both components are installed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T20:05:59Z
+
+I checked: we must use classmap, because it has higher priority than psr-0. The trick above should work.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T20:07:48Z
+
+> I have a better alternative!
+Use classmap + this trick, next to the alias https://github.com/twigphp/Twig/blob/5bfe590de545c791e4c3c98a908f65cc6c79b404/lib/Twig/BaseNodeVisitor.php#L9-L14
+
+classmap? do you have a better example?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T20:54:25Z
+
+@nicolas-grekas let me know if this is what you have in mind.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T21:07:29Z
+
+I checked this last solution with both component installed and it works fine. The ErrorHandler's Debug class has priority over the Debug's Debug class.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-07-30T22:07:46Z
+
+@nicolas-grekas comments addressed :)

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
@@ -27,13 +28,14 @@ use Twig\Loader\FilesystemLoader;
  */
 class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
 {
+    use ForwardCompatTestTrait;
     use RuntimeLoaderProvider;
     /**
      * @var FormRenderer
      */
     private $renderer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 

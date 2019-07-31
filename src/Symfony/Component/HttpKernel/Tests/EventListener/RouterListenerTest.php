@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,9 +30,11 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $requestStack;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
     }

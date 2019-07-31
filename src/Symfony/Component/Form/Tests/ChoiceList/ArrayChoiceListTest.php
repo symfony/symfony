@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\ChoiceList;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 
 /**
@@ -18,9 +19,11 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
  */
 class ArrayChoiceListTest extends AbstractChoiceListTest
 {
+    use ForwardCompatTestTrait;
+
     private $object;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->object = new \stdClass();
 

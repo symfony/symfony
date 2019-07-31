@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Cache;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Validator\Mapping\Cache\Psr6Cache;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -11,7 +12,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Psr6CacheTest extends AbstractCacheTest
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         $this->cache = new Psr6Cache(new ArrayAdapter());
     }

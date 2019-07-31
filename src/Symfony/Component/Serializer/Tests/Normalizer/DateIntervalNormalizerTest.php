@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 
 /**
@@ -10,12 +11,14 @@ use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
  */
 class DateIntervalNormalizerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var DateIntervalNormalizer
      */
     private $normalizer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->normalizer = new DateIntervalNormalizer();
     }

@@ -12,12 +12,15 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
 
 abstract class AbstractFormTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var EventDispatcherInterface
      */
@@ -33,14 +36,14 @@ abstract class AbstractFormTest extends TestCase
      */
     protected $form;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->form = $this->createForm();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->dispatcher = null;
         $this->factory = null;

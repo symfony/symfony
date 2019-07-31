@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Csrf\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
@@ -22,12 +23,14 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 class CsrfValidationListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $dispatcher;
     protected $factory;
     protected $tokenManager;
     protected $form;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
@@ -37,7 +40,7 @@ class CsrfValidationListenerTest extends TestCase
             ->getForm();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->dispatcher = null;
         $this->factory = null;

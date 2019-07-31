@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class TypeValidatorTest extends ConstraintValidatorTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected static $file;
 
     protected function createValidator()
@@ -218,7 +221,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         return static::$file;
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         if (static::$file) {
             fclose(static::$file);

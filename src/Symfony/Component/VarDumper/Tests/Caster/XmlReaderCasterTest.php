@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
@@ -19,18 +20,19 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
  */
 class XmlReaderCasterTest extends TestCase
 {
+    use ForwardCompatTestTrait;
     use VarDumperTestTrait;
 
     /** @var \XmlReader */
     private $reader;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->reader = new \XmlReader();
         $this->reader->open(__DIR__.'/../Fixtures/xml_reader.xml');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->reader->close();
     }

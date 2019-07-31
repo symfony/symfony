@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
  */
 class PhpFilesAdapterTest extends AdapterTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $skippedTests = [
         'testDefaultLifeTime' => 'PhpFilesAdapter does not allow configuring a default lifetime.',
     ];
@@ -28,7 +31,7 @@ class PhpFilesAdapterTest extends AdapterTestCase
         return new PhpFilesAdapter('sf-cache');
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
     }

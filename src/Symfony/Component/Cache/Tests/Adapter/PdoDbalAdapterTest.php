@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Doctrine\DBAL\DriverManager;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
 
@@ -20,11 +21,12 @@ use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
  */
 class PdoDbalAdapterTest extends AdapterTestCase
 {
+    use ForwardCompatTestTrait;
     use PdoPruneableTrait;
 
     protected static $dbFile;
 
-    public static function setupBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         if (!\extension_loaded('pdo_sqlite')) {
             self::markTestSkipped('Extension pdo_sqlite required.');
@@ -35,7 +37,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
         $pool = new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         @unlink(self::$dbFile);
     }

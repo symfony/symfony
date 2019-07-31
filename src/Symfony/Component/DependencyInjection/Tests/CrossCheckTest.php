@@ -12,14 +12,17 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CrossCheckTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected static $fixturesPath;
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$fixturesPath = __DIR__.'/Fixtures/';
 

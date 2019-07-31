@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
@@ -22,15 +23,17 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslatorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $tmpDir;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->tmpDir = sys_get_temp_dir().'/sf_translation';
         $this->deleteTmpDir();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->deleteTmpDir();
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler;
 
 /**
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHan
  */
 class MemcachedSessionHandlerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const PREFIX = 'prefix_';
     const TTL = 1000;
 
@@ -30,7 +33,7 @@ class MemcachedSessionHandlerTest extends TestCase
 
     protected $memcached;
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 
@@ -45,7 +48,7 @@ class MemcachedSessionHandlerTest extends TestCase
         );
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->memcached = null;
         $this->storage = null;

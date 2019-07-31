@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Validator;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Expression;
@@ -33,6 +34,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 abstract class AbstractTest extends AbstractValidatorTest
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var ValidatorInterface
      */
@@ -43,7 +46,7 @@ abstract class AbstractTest extends AbstractValidatorTest
      */
     abstract protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = []);
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 

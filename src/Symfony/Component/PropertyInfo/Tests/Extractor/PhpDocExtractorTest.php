@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Tests\PhpDocExtractor;
 
 use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -21,12 +22,14 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class PhpDocExtractorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var PhpDocExtractor
      */
     private $extractor;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->extractor = new PhpDocExtractor();
     }

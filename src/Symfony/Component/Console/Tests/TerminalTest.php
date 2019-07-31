@@ -12,20 +12,23 @@
 namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Terminal;
 
 class TerminalTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $colSize;
     private $lineSize;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->colSize = getenv('COLUMNS');
         $this->lineSize = getenv('LINES');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
         putenv($this->lineSize ? 'LINES' : 'LINES='.$this->lineSize);

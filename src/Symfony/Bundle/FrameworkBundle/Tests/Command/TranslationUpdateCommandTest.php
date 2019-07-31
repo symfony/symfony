@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -21,6 +22,8 @@ use Symfony\Component\HttpKernel;
 
 class TranslationUpdateCommandTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $fs;
     private $translationDir;
 
@@ -88,7 +91,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf_translation', true);
@@ -96,7 +99,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/templates');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->fs->remove($this->translationDir);
     }

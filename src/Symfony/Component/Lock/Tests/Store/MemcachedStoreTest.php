@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\MemcachedStore;
 
@@ -21,9 +22,10 @@ use Symfony\Component\Lock\Store\MemcachedStore;
  */
 class MemcachedStoreTest extends AbstractStoreTest
 {
+    use ForwardCompatTestTrait;
     use ExpiringStoreTestTrait;
 
-    public static function setupBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         $memcached = new \Memcached();
         $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);

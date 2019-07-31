@@ -11,16 +11,19 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
 
 class TextDescriptorTest extends AbstractDescriptorTest
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         putenv('COLUMNS=121');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         putenv('COLUMNS');
     }

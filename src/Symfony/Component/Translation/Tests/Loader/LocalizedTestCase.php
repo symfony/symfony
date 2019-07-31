@@ -12,10 +12,13 @@
 namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 abstract class LocalizedTestCase extends TestCase
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         if (!\extension_loaded('intl')) {
             $this->markTestSkipped('Extension intl is required.');

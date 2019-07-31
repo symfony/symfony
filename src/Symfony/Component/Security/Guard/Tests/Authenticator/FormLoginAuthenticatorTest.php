@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Guard\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -24,6 +25,8 @@ use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticato
  */
 class FormLoginAuthenticatorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $requestWithoutSession;
     private $requestWithSession;
     private $authenticator;
@@ -75,7 +78,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->requestWithoutSession = new Request([], [], [], [], [], []);
         $this->requestWithSession = new Request([], [], [], [], [], []);

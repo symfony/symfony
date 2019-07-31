@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Csrf\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -22,6 +23,8 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
  */
 class CsrfTokenManagerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getManagerGeneratorAndStorage
      */
@@ -212,12 +215,12 @@ class CsrfTokenManagerTest extends TestCase
         ];
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         $_SERVER['HTTPS'] = 'on';
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         parent::tearDown();
 

@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Command\LintCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,6 +22,8 @@ use Twig\Loader\FilesystemLoader;
 
 class LintCommandTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $files;
 
     public function testLintCorrectFile()
@@ -95,12 +98,12 @@ class LintCommandTest extends TestCase
         return $filename;
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->files = [];
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

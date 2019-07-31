@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -48,6 +49,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTr
  */
 class ObjectNormalizerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
     use AttributesTestTrait;
     use CallbacksTestTrait;
     use CircularReferenceTestTrait;
@@ -68,7 +70,7 @@ class ObjectNormalizerTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->createNormalizer();
     }

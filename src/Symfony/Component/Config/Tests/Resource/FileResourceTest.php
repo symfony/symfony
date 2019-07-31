@@ -12,15 +12,18 @@
 namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\FileResource;
 
 class FileResourceTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $resource;
     protected $file;
     protected $time;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->file = sys_get_temp_dir().'/tmp.xml';
         $this->time = time();
@@ -28,7 +31,7 @@ class FileResourceTest extends TestCase
         $this->resource = new FileResource($this->file);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         if (!file_exists($this->file)) {
             return;

@@ -12,19 +12,22 @@
 namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ConfigCacheTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $cacheFile = null;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $files = [$this->cacheFile, $this->cacheFile.'.meta'];
 

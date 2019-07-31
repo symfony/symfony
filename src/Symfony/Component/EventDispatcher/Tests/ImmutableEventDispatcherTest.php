@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -20,6 +21,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImmutableEventDispatcherTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -30,7 +33,7 @@ class ImmutableEventDispatcherTest extends TestCase
      */
     private $dispatcher;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->innerDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->dispatcher = new ImmutableEventDispatcher($this->innerDispatcher);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -26,9 +27,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected static $fixturesPath;
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/TestCommand.php';

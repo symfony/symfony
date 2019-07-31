@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Log;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\Log\Logger;
 
 /**
@@ -22,6 +23,8 @@ use Symfony\Component\HttpKernel\Log\Logger;
  */
 class LoggerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var LoggerInterface
      */
@@ -32,13 +35,13 @@ class LoggerTest extends TestCase
      */
     private $tmpFile;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->tmpFile = tempnam(sys_get_temp_dir(), 'log');
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         if (!@unlink($this->tmpFile)) {
             file_put_contents($this->tmpFile, '');

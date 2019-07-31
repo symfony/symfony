@@ -241,6 +241,7 @@ final class NativeResponse implements ResponseInterface
                     try {
                         // Notify the progress callback so that it can e.g. cancel
                         // the request if the stream is inactive for too long
+                        $info['total_time'] = microtime(true) - $info['start_time'];
                         $onProgress();
                     } catch (\Throwable $e) {
                         // no-op

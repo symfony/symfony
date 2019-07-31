@@ -844,7 +844,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
         if (!$child instanceof FormInterface) {
             if (!\is_string($child) && !\is_int($child)) {
-                throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormInterface');
+                throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormInterface');
             }
 
             $child = (string) $child;

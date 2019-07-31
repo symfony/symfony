@@ -42,7 +42,7 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
         }
         $cacheItemPrototype = &$this->cacheItemPrototype;
         $createCacheItem = \Closure::bind(
-            function ($key, $value, $allowInt = false) use (&$cacheItemPrototype) {
+            static function ($key, $value, $allowInt = false) use (&$cacheItemPrototype) {
                 $item = clone $cacheItemPrototype;
                 $item->key = $allowInt && \is_int($key) ? (string) $key : CacheItem::validateKey($key);
                 $item->value = $value;

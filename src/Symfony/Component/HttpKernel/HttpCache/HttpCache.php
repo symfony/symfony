@@ -98,8 +98,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'trace_header' => 'X-Symfony-Cache',
         ], $options);
 
-        if (!isset($options['trace_level']) && $this->options['debug']) {
-            $this->options['trace_level'] = 'full';
+        if (!isset($options['trace_level'])) {
+            $this->options['trace_level'] = $this->options['debug'] ? 'full' : 'none';
         }
     }
 

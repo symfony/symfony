@@ -26,8 +26,6 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
-use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -745,17 +743,6 @@ abstract class FrameworkExtensionTest extends TestCase
         );
 
         $this->assertNotEmpty($nonExistingDirectories, 'FrameworkBundle should pass non existing directories to Translator');
-
-        $resources = $container->getResources();
-        foreach ($resources as $resource) {
-            if ($resource instanceof DirectoryResource) {
-                $this->assertNotContains('translations', $resource->getResource());
-            }
-
-            if ($resource instanceof FileExistenceResource) {
-                $this->assertNotContains('translations', $resource->getResource());
-            }
-        }
     }
 
     public function testTranslatorMultipleFallbacks()

@@ -87,7 +87,7 @@ class HttpUtils
         static $setSession;
 
         if (null === $setSession) {
-            $setSession = \Closure::bind(function ($newRequest, $request) { $newRequest->session = $request->session; }, null, Request::class);
+            $setSession = \Closure::bind(static function ($newRequest, $request) { $newRequest->session = $request->session; }, null, Request::class);
         }
         $setSession($newRequest, $request);
 

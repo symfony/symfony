@@ -41,7 +41,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace);
         $this->namespaceLen = \strlen($namespace);
         $this->createCacheItem = \Closure::bind(
-            function ($key, $innerItem) use ($defaultLifetime, $poolHash) {
+            static function ($key, $innerItem) use ($defaultLifetime, $poolHash) {
                 $item = new CacheItem();
                 $item->key = $key;
 
@@ -77,7 +77,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             /**
              * @param array $item A CacheItem cast to (array); accessing protected properties requires adding the "\0*\0" PHP prefix
              */
-            function (CacheItemInterface $innerItem, array $item) {
+            static function (CacheItemInterface $innerItem, array $item) {
                 // Tags are stored separately, no need to account for them when considering this item's newly set metadata
                 if (isset(($metadata = $item["\0*\0newMetadata"])[CacheItem::METADATA_TAGS])) {
                     unset($metadata[CacheItem::METADATA_TAGS]);

@@ -107,10 +107,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Creates an empty form configuration.
      *
-     * @param string|int               $name       The form name
-     * @param string|null              $dataClass  The class of the form's data
-     * @param EventDispatcherInterface $dispatcher The event dispatcher
-     * @param array                    $options    The form options
+     * @param string      $name      The form name
+     * @param string|null $dataClass The class of the form's data
      *
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters
@@ -767,7 +765,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string|int|null $name The tested form name
+     * @param string|null $name The tested form name
      *
      * @throws UnexpectedTypeException  if the name is not a string or an integer
      * @throws InvalidArgumentException if the name contains invalid characters
@@ -775,7 +773,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     public static function validateName($name)
     {
         if (null !== $name && !\is_string($name) && !\is_int($name)) {
-            throw new UnexpectedTypeException($name, 'string, integer or null');
+            throw new UnexpectedTypeException($name, 'string or null');
         }
 
         if (!self::isValidName($name)) {

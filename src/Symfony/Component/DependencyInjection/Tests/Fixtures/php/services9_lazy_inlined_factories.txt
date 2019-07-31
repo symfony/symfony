@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class ProjectServiceContainer extends Container
 {
@@ -96,9 +96,8 @@ class ProjectServiceContainer extends Container
         return new \Bar\FooClass(new \Bar\FooLazyClass());
     }
 
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
-        $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
         }
@@ -113,9 +112,8 @@ class ProjectServiceContainer extends Container
         return $this->parameters[$name];
     }
 
-    public function hasParameter($name)
+    public function hasParameter(string $name)
     {
-        $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
             return true;
         }
@@ -123,7 +121,7 @@ class ProjectServiceContainer extends Container
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter(string $name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }

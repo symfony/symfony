@@ -68,7 +68,7 @@ class FatalErrorException extends \ErrorException
         }
     }
 
-    protected function setTrace($trace)
+    protected function setTrace(array $trace): void
     {
         $traceReflector = new \ReflectionProperty('Exception', 'trace');
         $traceReflector->setAccessible(true);

@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Ariel Ferrandini <arielferrandini@gmail.com>
  *
- * @method bool needsRehash(UserInterface $user, string $encoded)
+ * @method bool needsRehash(UserInterface $user)
  */
 interface UserPasswordEncoderInterface
 {

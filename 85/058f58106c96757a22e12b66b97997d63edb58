@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-17T16:05:42Z
+
+This will need some tests. At least functional tests, to unsure we can boot() the kernel (several times)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-17T17:19:55Z
+
+Unit tests added.
+
+> At least functional tests, to unsure we can boot() the kernel (several times)
+
+not added because this would be unrelated: this PR changes absolutely nothing in terms of how the container is loaded.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-19T07:53:41Z
+
+What are the pros/cons of setting `container.dumper.inline_factories` to `true/false`? Do we really need two modes?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-19T08:01:39Z
+
+We demonstrated in the past that loading a set of smaller files is faster than loading a single big container file. The drawback that @lyrixx experienced is found on workers: because they are long-running, they are more likely to be affected by the removal of one of those files. This doesn't happen for requests that reload everything all the time.
+
+What is unknown is how PHP 7.4 will change the situation regarding performance. With preloading, a single big file can, in theory, be similarly fast or faster. But anyway, we're not going to support only PHP 7.4. If that's confirmed, we'll be able to have a recipe that sets this param to true on PHP 7.4, and drop that in Symfony 6.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-19T16:38:22Z
+
+> The drawback that @lyrixx experienced is found on workers: because they are long-running, they are more likely to be affected by the removal of one of those files.
+
+Why would a file be removed? Sounds like a deployment problem.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-19T16:54:58Z
+
+On dev I suppose, it disrupts the workflow.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-19T17:48:27Z
+
+Yes it's in development of course 👍
+As soon as you change a constructor the cache is built again
+So running consumers explode

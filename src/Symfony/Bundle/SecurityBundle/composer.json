@@ -51,7 +51,8 @@
         "symfony/twig-bundle": "<4.4",
         "symfony/var-dumper": "<3.4",
         "symfony/framework-bundle": "<4.4",
-        "symfony/console": "<3.4"
+        "symfony/console": "<3.4",
+        "symfony/ldap": "<4.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },

@@ -141,6 +141,7 @@ Routing
 Security
 --------
 
+ * The `LdapUserProvider` class has been deprecated, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead.
  * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` should add a new `needsRehash()` method
 
 Stopwatch

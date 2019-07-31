@@ -20,6 +20,9 @@
         "symfony/options-resolver": "^4.2|^5.0",
         "ext-ldap": "*"
     },
+    "require-dev": {
+        "symfony/security-core": "^4.4"
+    },
     "conflict": {
         "symfony/options-resolver": "<4.2"
     },

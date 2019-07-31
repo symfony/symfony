@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -27,10 +28,12 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
 class ArgumentResolverTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @var ArgumentResolver */
     private static $resolver;
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         $factory = new ArgumentMetadataFactory();
 

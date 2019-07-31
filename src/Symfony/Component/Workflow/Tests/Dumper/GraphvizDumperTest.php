@@ -3,17 +3,19 @@
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
 
 class GraphvizDumperTest extends TestCase
 {
+    use ForwardCompatTestTrait;
     use WorkflowBuilderTrait;
 
     private $dumper;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->dumper = new GraphvizDumper();
     }

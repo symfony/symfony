@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
+
 class RedisArrayAdapterTest extends AbstractRedisAdapterTest
 {
-    public static function setupBeforeClass()
+	use ForwardCompatTestTrait;
+
+    private static function doSetUpBeforeClass()
     {
         parent::setupBeforeClass();
         if (!class_exists('RedisArray')) {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,11 +23,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ResponseListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $dispatcher;
 
     private $kernel;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
@@ -35,7 +38,7 @@ class ResponseListenerTest extends TestCase
         $this->kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->dispatcher = null;
         $this->kernel = null;

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
@@ -19,9 +20,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class LocaleListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $requestStack;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
     }

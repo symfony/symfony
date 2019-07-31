@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,12 +24,14 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class LoaderResolverTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private static $fixturesPath;
 
     /** @var LoaderResolver */
     private $resolver;
 
-    protected function setUp()
+    private function doSetUp()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
 

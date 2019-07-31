@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ExtensionCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,10 +23,12 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
  */
 class ExtensionCompilerPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $container;
     private $pass;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->container = new ContainerBuilder();
         $this->pass = new ExtensionCompilerPass();

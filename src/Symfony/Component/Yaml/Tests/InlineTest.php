@@ -12,13 +12,16 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         Inline::initialize(0, 0);
     }

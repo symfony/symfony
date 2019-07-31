@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests\Strategy;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
@@ -19,10 +20,12 @@ use Symfony\Component\Lock\Strategy\UnanimousStrategy;
  */
 class UnanimousStrategyTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @var UnanimousStrategy */
     private $strategy;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->strategy = new UnanimousStrategy();
     }

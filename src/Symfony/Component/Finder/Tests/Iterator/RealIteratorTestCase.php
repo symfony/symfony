@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
+
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected static $tmpDir;
     protected static $files;
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$tmpDir = realpath(sys_get_temp_dir()).\DIRECTORY_SEPARATOR.'symfony_finder';
 
@@ -58,7 +62,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         touch(self::toAbsolute('test.php'), strtotime('2005-10-15'));
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         $paths = new \RecursiveIteratorIterator(
              new \RecursiveDirectoryIterator(self::$tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS),

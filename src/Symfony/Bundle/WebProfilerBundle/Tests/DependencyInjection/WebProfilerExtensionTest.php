@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -22,6 +23,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class WebProfilerExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $kernel;
     /**
      * @var \Symfony\Component\DependencyInjection\Container
@@ -46,7 +49,7 @@ class WebProfilerExtensionTest extends TestCase
         self::assertEquals([], $errors, $message);
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 
@@ -73,7 +76,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->addCompilerPass(new RegisterListenersPass());
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         parent::tearDown();
 

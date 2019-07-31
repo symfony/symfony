@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Registry;
@@ -21,9 +22,11 @@ use Symfony\Component\Workflow\Workflow;
 
 class WorkflowExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $extension;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $places = ['ordered', 'waiting_for_payment', 'processed'];
         $transitions = [

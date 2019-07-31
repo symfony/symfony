@@ -3,6 +3,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -25,6 +26,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDumm
  */
 class AbstractNormalizerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var AbstractNormalizerDummy
      */
@@ -35,7 +38,7 @@ class AbstractNormalizerTest extends TestCase
      */
     private $classMetadata;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $loader = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\Loader\LoaderChain')->setConstructorArgs([[]])->getMock();
         $this->classMetadata = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory')->setConstructorArgs([$loader])->getMock();

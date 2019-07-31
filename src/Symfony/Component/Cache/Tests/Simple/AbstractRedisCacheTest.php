@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Simple\RedisCache;
 
 abstract class AbstractRedisCacheTest extends CacheTestCase
 {
+	use ForwardCompatTestTrait;
+
     protected $skippedTests = [
         'testSetTtl' => 'Testing expiration slows down the test suite',
         'testSetMultipleTtl' => 'Testing expiration slows down the test suite',
@@ -28,7 +31,7 @@ abstract class AbstractRedisCacheTest extends CacheTestCase
         return new RedisCache(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
-    public static function setupBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
@@ -39,7 +42,7 @@ abstract class AbstractRedisCacheTest extends CacheTestCase
         }
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         self::$redis = null;
     }

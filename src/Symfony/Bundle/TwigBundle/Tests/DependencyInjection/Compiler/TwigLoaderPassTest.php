@@ -12,12 +12,15 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 class TwigLoaderPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var ContainerBuilder
      */
@@ -31,7 +34,7 @@ class TwigLoaderPassTest extends TestCase
      */
     private $pass;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->builder = new ContainerBuilder();
         $this->builder->register('twig');

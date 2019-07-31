@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
@@ -20,9 +21,11 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 
 class MemberMetadataTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $metadata;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->metadata = new TestMemberMetadata(
             'Symfony\Component\Validator\Tests\Fixtures\Entity',
@@ -31,7 +34,7 @@ class MemberMetadataTest extends TestCase
         );
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->metadata = null;
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
@@ -20,12 +21,14 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
  */
 class TagAwareAdapterTest extends AdapterTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function createCachePool($defaultLifetime = 0)
     {
         return new TagAwareAdapter(new FilesystemAdapter('', $defaultLifetime));
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
     }

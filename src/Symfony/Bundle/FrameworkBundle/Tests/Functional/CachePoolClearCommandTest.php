@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -20,7 +21,9 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class CachePoolClearCommandTest extends AbstractWebTestCase
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         static::bootKernel(['test_case' => 'CachePoolClear', 'root_config' => 'config.yml']);
     }

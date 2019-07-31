@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Generator\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -20,6 +21,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 class PhpGeneratorDumperTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var RouteCollection
      */
@@ -40,7 +43,7 @@ class PhpGeneratorDumperTest extends TestCase
      */
     private $largeTestTmpFilepath;
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 
@@ -52,7 +55,7 @@ class PhpGeneratorDumperTest extends TestCase
         @unlink($this->largeTestTmpFilepath);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         parent::tearDown();
 

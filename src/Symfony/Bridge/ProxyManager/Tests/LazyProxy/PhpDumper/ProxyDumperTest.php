@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -24,6 +25,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
  */
 class ProxyDumperTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var ProxyDumper
      */
@@ -32,7 +35,7 @@ class ProxyDumperTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    private function doSetUp()
     {
         $this->dumper = new ProxyDumper();
     }

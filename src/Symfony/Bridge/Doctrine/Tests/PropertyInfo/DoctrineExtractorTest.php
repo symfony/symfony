@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -23,12 +24,14 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var DoctrineExtractor
      */
     private $extractor;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $config = Setup::createAnnotationMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'], true);
         $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
  */
 class CachingFactoryDecoratorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -29,7 +32,7 @@ class CachingFactoryDecoratorTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->decoratedFactory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
         $this->factory = new CachingFactoryDecorator($this->decoratedFactory);

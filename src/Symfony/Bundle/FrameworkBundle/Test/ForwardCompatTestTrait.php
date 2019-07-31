@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
 
-// Auto-adapt to PHPUnit 8 that added a `void` return-type to the tearDown method
+// Auto-adapt to PHPUnit 8 that added a `void` return-type to the setUp/tearDown methods
 
 if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \ReflectionMethod(TestCase::class, 'tearDown'))->hasReturnType()) {
     eval('
@@ -22,11 +22,24 @@ if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \Reflection
     /**
      * @internal
      */
-    trait KernelShutdownOnTearDownTrait
+    trait ForwardCompatTestTrait
     {
+        private function doSetUp(): void
+        {
+        }
+
+        private function doTearDown(): void
+        {
+        }
+
+        protected function setUp(): void
+        {
+            $this->doSetUp();
+        }
+
         protected function tearDown(): void
         {
-            static::ensureKernelShutdown();
+            $this->doTearDown();
         }
     }
 ');
@@ -34,14 +47,36 @@ if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \Reflection
     /**
      * @internal
      */
-    trait KernelShutdownOnTearDownTrait
+    trait ForwardCompatTestTrait
     {
+        /**
+         * @return void
+         */
+        private function doSetUp()
+        {
+        }
+
+        /**
+         * @return void
+         */
+        private function doTearDown()
+        {
+        }
+
+        /**
+         * @return void
+         */
+        protected function setUp()
+        {
+            $this->doSetUp();
+        }
+
         /**
          * @return void
          */
         protected function tearDown()
         {
-            static::ensureKernelShutdown();
+            $this->doTearDown();
         }
     }
 }

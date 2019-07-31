@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Simple\NullCache;
 use Symfony\Component\Cache\Simple\PhpArrayCache;
 use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
@@ -20,6 +21,8 @@ use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
  */
 class PhpArrayCacheTest extends CacheTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $skippedTests = [
         'testBasicUsageWithLongKey' => 'PhpArrayCache does no writes',
 
@@ -49,12 +52,12 @@ class PhpArrayCacheTest extends CacheTestCase
 
     protected static $file;
 
-    public static function setupBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$file = sys_get_temp_dir().'/symfony-cache/php-array-adapter-test.php';
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');

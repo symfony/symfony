@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
@@ -31,9 +32,11 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  */
 class NativeSessionStorageTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $savePath;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->iniSet('session.save_handler', 'files');
         $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sf2test');
@@ -42,7 +45,7 @@ class NativeSessionStorageTest extends TestCase
         }
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         session_write_close();
         array_map('unlink', glob($this->savePath.'/*'));

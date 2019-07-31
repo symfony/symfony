@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
+
 class RedisClusterAdapterTest extends AbstractRedisAdapterTest
 {
-    public static function setupBeforeClass()
+    use ForwardCompatTestTrait;
+
+    private static function doSetUpBeforeClass()
     {
         if (!class_exists('RedisCluster')) {
             self::markTestSkipped('The RedisCluster class is required.');

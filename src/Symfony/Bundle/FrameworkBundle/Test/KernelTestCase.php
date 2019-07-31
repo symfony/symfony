@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 abstract class KernelTestCase extends TestCase
 {
-    use KernelShutdownOnTearDownTrait;
+    use ForwardCompatTestTrait;
 
     protected static $class;
 
@@ -31,6 +31,11 @@ abstract class KernelTestCase extends TestCase
      * @var KernelInterface
      */
     protected static $kernel;
+
+    private function doTearDown()
+    {
+        static::ensureKernelShutdown();
+    }
 
     /**
      * Finds the directory where the phpunit.xml(.dist) is stored.

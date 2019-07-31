@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -28,6 +29,8 @@ use Symfony\Component\Validator\Tests\Fixtures\Reference;
  */
 abstract class AbstractValidatorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const ENTITY_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
 
     const REFERENCE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Reference';
@@ -47,7 +50,7 @@ abstract class AbstractValidatorTest extends TestCase
      */
     public $referenceMetadata;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->metadataFactory = new FakeMetadataFactory();
         $this->metadata = new ClassMetadata(self::ENTITY_CLASS);
@@ -56,7 +59,7 @@ abstract class AbstractValidatorTest extends TestCase
         $this->metadataFactory->addMetadata($this->referenceMetadata);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->metadataFactory = null;
         $this->metadata = null;

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -21,6 +22,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 class PhpMatcherDumperTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var string
      */
@@ -31,7 +34,7 @@ class PhpMatcherDumperTest extends TestCase
      */
     private $dumpPath;
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 
@@ -39,7 +42,7 @@ class PhpMatcherDumperTest extends TestCase
         $this->dumpPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_matcher.'.$this->matcherClass.'.php';
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         parent::tearDown();
 

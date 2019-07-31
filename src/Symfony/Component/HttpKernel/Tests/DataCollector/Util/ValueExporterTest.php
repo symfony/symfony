@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector\Util;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 
 /**
@@ -19,12 +20,14 @@ use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
  */
 class ValueExporterTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var ValueExporter
      */
     private $valueExporter;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->valueExporter = new ValueExporter();
     }

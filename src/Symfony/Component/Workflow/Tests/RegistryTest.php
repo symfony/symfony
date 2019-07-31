@@ -3,6 +3,7 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
@@ -12,9 +13,11 @@ use Symfony\Component\Workflow\Workflow;
 
 class RegistryTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $registry;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->registry = new Registry();
 
@@ -23,7 +26,7 @@ class RegistryTest extends TestCase
         $this->registry->add(new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createSupportStrategy(Subject2::class));
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->registry = null;
     }

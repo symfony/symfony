@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\ChoiceList\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 
@@ -20,6 +21,8 @@ use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
  */
 class CallbackChoiceLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var \Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader
      */
@@ -45,7 +48,7 @@ class CallbackChoiceLoaderTest extends TestCase
      */
     private static $lazyChoiceList;
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$loader = new CallbackChoiceLoader(function () {
             return self::$choices;
@@ -91,7 +94,7 @@ class CallbackChoiceLoaderTest extends TestCase
         );
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         self::$loader = null;
         self::$value = null;

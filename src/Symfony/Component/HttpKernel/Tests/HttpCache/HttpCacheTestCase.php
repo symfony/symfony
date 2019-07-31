@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class HttpCacheTestCase extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $kernel;
     protected $cache;
     protected $caches;
@@ -35,7 +38,7 @@ class HttpCacheTestCase extends TestCase
      */
     protected $store;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->kernel = null;
 
@@ -53,7 +56,7 @@ class HttpCacheTestCase extends TestCase
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         if ($this->cache) {
             $this->cache->getStore()->cleanup();

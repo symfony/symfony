@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
@@ -21,6 +22,8 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class XmlFileLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var XmlFileLoader
      */
@@ -30,7 +33,7 @@ class XmlFileLoaderTest extends TestCase
      */
     private $metadata;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->loader = new XmlFileLoader(__DIR__.'/../../Fixtures/serialization.xml');
         $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');

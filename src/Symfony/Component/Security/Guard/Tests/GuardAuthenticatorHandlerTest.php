@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Guard\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -22,6 +23,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class GuardAuthenticatorHandlerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $tokenStorage;
     private $dispatcher;
     private $token;
@@ -156,7 +159,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $handler->authenticateWithToken($this->token, $this->request, 'some_provider_key');
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
@@ -166,7 +169,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->tokenStorage = null;
         $this->dispatcher = null;

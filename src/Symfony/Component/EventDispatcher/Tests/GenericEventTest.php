@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\EventDispatcher\GenericEvent;
  */
 class GenericEventTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var GenericEvent
      */
@@ -29,7 +32,7 @@ class GenericEventTest extends TestCase
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    private function doSetUp()
     {
         $this->subject = new \stdClass();
         $this->event = new GenericEvent($this->subject, ['name' => 'Event']);
@@ -38,7 +41,7 @@ class GenericEventTest extends TestCase
     /**
      * Cleans up the environment after running a test.
      */
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->subject = null;
         $this->event = null;

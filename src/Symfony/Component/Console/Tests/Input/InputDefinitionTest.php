@@ -12,12 +12,15 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 class InputDefinitionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected static $fixtures;
 
     protected $foo;
@@ -25,7 +28,7 @@ class InputDefinitionTest extends TestCase
     protected $foo1;
     protected $foo2;
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$fixtures = __DIR__.'/../Fixtures/';
     }

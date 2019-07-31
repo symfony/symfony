@@ -13,11 +13,14 @@ namespace Symfony\Component\Cache\Tests\Simple;
 
 use Cache\IntegrationTests\SimpleCacheTest;
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\PruneableInterface;
 
 abstract class CacheTestCase extends SimpleCacheTest
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         parent::setUp();
 

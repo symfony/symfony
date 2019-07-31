@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -27,6 +28,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 class SessionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var \Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface
      */
@@ -37,13 +40,13 @@ class SessionTest extends TestCase
      */
     protected $session;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->storage = new MockArraySessionStorage();
         $this->session = new Session($this->storage, new AttributeBag(), new FlashBag());
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->storage = null;
         $this->session = null;

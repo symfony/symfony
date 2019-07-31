@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Logout;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -21,11 +22,13 @@ use Symfony\Component\Security\Http\Logout\CsrfTokenClearingLogoutHandler;
 
 class CsrfTokenClearingLogoutHandlerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $session;
     private $csrfTokenStorage;
     private $csrfTokenClearingLogoutHandler;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->csrfTokenStorage = new SessionTokenStorage($this->session, 'foo');

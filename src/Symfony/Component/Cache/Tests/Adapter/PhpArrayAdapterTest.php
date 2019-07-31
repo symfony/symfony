@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
@@ -20,6 +21,8 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
  */
 class PhpArrayAdapterTest extends AdapterTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $skippedTests = [
         'testBasicUsage' => 'PhpArrayAdapter is read-only.',
         'testBasicUsageWithLongKey' => 'PhpArrayAdapter is read-only.',
@@ -55,12 +58,12 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
     protected static $file;
 
-    public static function setupBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$file = sys_get_temp_dir().'/symfony-cache/php-array-adapter-test.php';
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');

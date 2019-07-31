@@ -14,18 +14,21 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class CollectionToArrayTransformerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var CollectionToArrayTransformer
      */
     private $transformer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->transformer = new CollectionToArrayTransformer();
     }

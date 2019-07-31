@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 
 /**
@@ -21,6 +22,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHand
  */
 class MemcacheSessionHandlerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const PREFIX = 'prefix_';
     const TTL = 1000;
 
@@ -31,7 +34,7 @@ class MemcacheSessionHandlerTest extends TestCase
 
     protected $memcache;
 
-    protected function setUp()
+    private function doSetUp()
     {
         if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('PHPUnit_MockObject cannot mock the Memcache class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
@@ -45,7 +48,7 @@ class MemcacheSessionHandlerTest extends TestCase
         );
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->memcache = null;
         $this->storage = null;

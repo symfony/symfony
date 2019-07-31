@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Form;
 
 class RepeatedTypeTest extends BaseTypeTest
 {
+    use ForwardCompatTestTrait;
+
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
 
     /**
@@ -22,7 +25,7 @@ class RepeatedTypeTest extends BaseTypeTest
      */
     protected $form;
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 

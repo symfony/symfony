@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 
 /**
@@ -19,11 +20,13 @@ use Symfony\Component\HttpKernel\Config\EnvParametersResource;
  */
 class EnvParametersResourceTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $prefix = '__DUMMY_';
     protected $initialEnv;
     protected $resource;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->initialEnv = [
             $this->prefix.'1' => 'foo',
@@ -37,7 +40,7 @@ class EnvParametersResourceTest extends TestCase
         $this->resource = new EnvParametersResource($this->prefix);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         foreach ($_SERVER as $key => $value) {
             if (0 === strpos($key, $this->prefix)) {

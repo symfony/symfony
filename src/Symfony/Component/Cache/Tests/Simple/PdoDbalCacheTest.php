@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Doctrine\DBAL\DriverManager;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Simple\PdoCache;
 use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
 
@@ -20,11 +21,12 @@ use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
  */
 class PdoDbalCacheTest extends CacheTestCase
 {
+	use ForwardCompatTestTrait;
     use PdoPruneableTrait;
 
     protected static $dbFile;
 
-    public static function setupBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         if (!\extension_loaded('pdo_sqlite')) {
             self::markTestSkipped('Extension pdo_sqlite required.');
@@ -36,7 +38,7 @@ class PdoDbalCacheTest extends CacheTestCase
         $pool->createTable();
     }
 
-    public static function tearDownAfterClass()
+    private static function doTearDownAfterClass()
     {
         @unlink(self::$dbFile);
     }

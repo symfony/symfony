@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 
@@ -20,6 +21,8 @@ use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
  */
 class AutowireServiceResourceTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var AutowireServiceResource
      */
@@ -28,7 +31,7 @@ class AutowireServiceResourceTest extends TestCase
     private $class;
     private $time;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->file = realpath(sys_get_temp_dir()).'/tmp.php';
         $this->time = time();
@@ -101,7 +104,7 @@ class AutowireServiceResourceTest extends TestCase
         $this->assertFalse($resource->isFresh($this->getStaleFileTime()), '->isFresh() returns false if the class no longer exists');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         if (!file_exists($this->file)) {
             return;

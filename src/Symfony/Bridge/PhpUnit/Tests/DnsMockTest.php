@@ -13,10 +13,13 @@ namespace Symfony\Bridge\PhpUnit\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DnsMock;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class DnsMockTest extends TestCase
 {
-    protected function tearDown()
+    use ForwardCompatTestTrait;
+
+    private function doTearDown()
     {
         DnsMock::withMockedHosts(array());
     }

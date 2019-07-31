@@ -12,20 +12,23 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class PercentToLocalizedStringTransformerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $defaultLocale;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         \Locale::setDefault($this->defaultLocale);
     }

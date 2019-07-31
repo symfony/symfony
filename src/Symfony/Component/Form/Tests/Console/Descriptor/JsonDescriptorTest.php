@@ -11,16 +11,19 @@
 
 namespace Symfony\Component\Form\Tests\Console\Descriptor;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Console\Descriptor\JsonDescriptor;
 
 class JsonDescriptorTest extends AbstractDescriptorTest
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         putenv('COLUMNS=121');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         putenv('COLUMNS');
     }

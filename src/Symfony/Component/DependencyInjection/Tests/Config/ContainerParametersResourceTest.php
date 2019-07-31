@@ -12,14 +12,17 @@
 namespace Symfony\Component\DependencyInjection\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 
 class ContainerParametersResourceTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @var ContainerParametersResource */
     private $resource;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->resource = new ContainerParametersResource(['locales' => ['fr', 'en'], 'default_locale' => 'fr']);
     }

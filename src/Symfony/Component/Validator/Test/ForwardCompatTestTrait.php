@@ -22,7 +22,7 @@ if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \Reflection
     /**
      * @internal
      */
-    trait TestCaseSetUpTearDownTrait
+    trait ForwardCompatTestTrait
     {
         private function doSetUp(): void
         {
@@ -47,7 +47,7 @@ if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \Reflection
     /**
      * @internal
      */
-    trait TestCaseSetUpTearDownTrait
+    trait ForwardCompatTestTrait
     {
         /**
          * @return void

@@ -12,18 +12,21 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
 
 class ValueToDuplicatesTransformerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $transformer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->transformer = new ValueToDuplicatesTransformer(['a', 'b', 'c']);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->transformer = null;
     }

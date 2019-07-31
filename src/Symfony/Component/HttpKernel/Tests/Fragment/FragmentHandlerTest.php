@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
@@ -21,9 +22,11 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
  */
 class FragmentHandlerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $requestStack;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->requestStack = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
             ->disableOriginalConstructor()

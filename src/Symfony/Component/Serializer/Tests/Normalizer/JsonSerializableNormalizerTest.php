@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -22,6 +23,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\JsonSerializableDummy;
  */
 class JsonSerializableNormalizerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var JsonSerializableNormalizer
      */
@@ -32,7 +35,7 @@ class JsonSerializableNormalizerTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->serializer = $this->getMockBuilder(JsonSerializerNormalizer::class)->getMock();
         $this->normalizer = new JsonSerializableNormalizer();

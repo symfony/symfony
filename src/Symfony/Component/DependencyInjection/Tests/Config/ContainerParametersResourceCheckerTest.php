@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker;
@@ -19,6 +20,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContainerParametersResourceCheckerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @var ContainerParametersResource */
     private $resource;
 
@@ -28,7 +31,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
     /** @var ContainerInterface */
     private $container;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->resource = new ContainerParametersResource(['locales' => ['fr', 'en'], 'default_locale' => 'fr']);
         $this->container = $this->getMockBuilder(ContainerInterface::class)->getMock();

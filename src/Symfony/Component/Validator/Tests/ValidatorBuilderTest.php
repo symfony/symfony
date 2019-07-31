@@ -12,22 +12,25 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Validator\ValidatorBuilderInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var ValidatorBuilderInterface
      */
     protected $builder;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->builder = new ValidatorBuilder();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->builder = null;
     }

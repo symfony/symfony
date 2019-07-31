@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Locale\Verification;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Tests\Locale\AbstractLocaleTest;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
@@ -22,7 +23,9 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class LocaleTest extends AbstractLocaleTest
 {
-    protected function setUp()
+    use ForwardCompatTestTrait;
+
+    private function doSetUp()
     {
         IntlTestHelper::requireFullIntl($this, false);
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
@@ -39,16 +40,18 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ApplicationTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected static $fixturesPath;
 
     private $colSize;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->colSize = getenv('COLUMNS');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
         putenv('SHELL_VERBOSITY');
@@ -56,7 +59,7 @@ class ApplicationTest extends TestCase
         unset($_SERVER['SHELL_VERBOSITY']);
     }
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/Fixtures/');
         require_once self::$fixturesPath.'/FooCommand.php';

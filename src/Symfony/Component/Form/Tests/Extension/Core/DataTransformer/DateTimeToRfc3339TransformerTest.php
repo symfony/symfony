@@ -12,17 +12,20 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
 
 class DateTimeToRfc3339TransformerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     use DateTimeEqualsTrait;
 
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
 
-    protected function setUp()
+    private function doSetUp()
     {
         parent::setUp();
 
@@ -30,7 +33,7 @@ class DateTimeToRfc3339TransformerTest extends TestCase
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;

@@ -12,13 +12,16 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 
 class ArrayToPartsTransformerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $transformer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->transformer = new ArrayToPartsTransformer([
             'first' => ['a', 'b', 'c'],
@@ -26,7 +29,7 @@ class ArrayToPartsTransformerTest extends TestCase
         ]);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->transformer = null;
     }

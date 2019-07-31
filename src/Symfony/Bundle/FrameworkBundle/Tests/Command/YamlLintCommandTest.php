@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -28,6 +29,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class YamlLintCommandTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $files;
 
     public function testLintCorrectFile()
@@ -183,13 +186,13 @@ EOF;
         return $application;
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         @mkdir(sys_get_temp_dir().'/yml-lint-test');
         $this->files = [];
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

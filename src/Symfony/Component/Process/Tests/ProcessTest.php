@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -25,12 +26,14 @@ use Symfony\Component\Process\Process;
  */
 class ProcessTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private static $phpBin;
     private static $process;
     private static $sigchild;
     private static $notEnhancedSigchild = false;
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         $phpBin = new PhpExecutableFinder();
         self::$phpBin = getenv('SYMFONY_PROCESS_PHP_TEST_BINARY') ?: ('phpdbg' === \PHP_SAPI ? 'php' : $phpBin->find());
@@ -40,7 +43,7 @@ class ProcessTest extends TestCase
         self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         if (self::$process) {
             self::$process->stop(0);

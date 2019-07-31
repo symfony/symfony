@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
  */
 class PdoCacheTest extends CacheTestCase
 {
-	use ForwardCompatTestTrait;
+    use ForwardCompatTestTrait;
     use PdoPruneableTrait;
 
     protected static $dbFile;

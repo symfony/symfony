@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Simple\RedisCache;
 
 class RedisCacheTest extends AbstractRedisCacheTest
 {
-	use ForwardCompatTestTrait;
+    use ForwardCompatTestTrait;
 
     private static function doSetUpBeforeClass()
     {

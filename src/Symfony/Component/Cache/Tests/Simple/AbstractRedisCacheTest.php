@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Simple\RedisCache;
 
 abstract class AbstractRedisCacheTest extends CacheTestCase
 {
-	use ForwardCompatTestTrait;
+    use ForwardCompatTestTrait;
 
     protected $skippedTests = [
         'testSetTtl' => 'Testing expiration slows down the test suite',

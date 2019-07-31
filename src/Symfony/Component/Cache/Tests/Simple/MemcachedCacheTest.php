@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Simple\MemcachedCache;
 
 class MemcachedCacheTest extends CacheTestCase
 {
-	use ForwardCompatTestTrait;
+    use ForwardCompatTestTrait;
 
     protected $skippedTests = [
         'testSetTtl' => 'Testing expiration slows down the test suite',

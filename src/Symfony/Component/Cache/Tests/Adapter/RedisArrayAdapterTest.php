@@ -15,7 +15,7 @@ use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class RedisArrayAdapterTest extends AbstractRedisAdapterTest
 {
-	use ForwardCompatTestTrait;
+    use ForwardCompatTestTrait;
 
     private static function doSetUpBeforeClass()
     {

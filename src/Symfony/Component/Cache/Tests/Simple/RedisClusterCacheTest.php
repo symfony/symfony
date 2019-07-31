@@ -15,7 +15,7 @@ use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class RedisClusterCacheTest extends AbstractRedisCacheTest
 {
-	use ForwardCompatTestTrait;
+    use ForwardCompatTestTrait;
 
     private static function doSetUpBeforeClass()
     {

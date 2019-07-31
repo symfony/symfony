@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-29T23:13:12Z
+
+This needs to target 3.4
+
+---------------------------------------------------------------------------
+
+by phansys at 2019-06-29T23:26:31Z
+
+> This needs to target 3.4
+
+Target updated :+1:
+
+---------------------------------------------------------------------------
+
+by phansys at 2019-06-30T21:17:12Z
+
+Of course!
+I'll try to check how to fix the job, since the issue seems to be APC related ([ref.](https://travis-ci.community/t/add-php-7-4-branch-to-test-against/2179/4)).
+
+---------------------------------------------------------------------------
+
+by phansys at 2019-06-30T21:35:21Z
+
+The tests are running now. The failures are caused by unsilenced deprecation notices.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-30T21:46:18Z
+
+> Function ReflectionType::__toString() is deprecated
+
+this happened to Twig today too and [was fixed by removing the use of some mocks](https://github.com/twigphp/Twig/pull/3081)
+Not sure we can do it for Symfony.
+Instead, we could try making the `phpunit` script (see repo root) use phpunit 8.2 on PHP 7.4.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-30T22:01:11Z
+
+We should mute this specific deprecation in the bridge I think, because many projects will be affected. /cc @greg0ire
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-01T07:50:34Z
+
+> We should mute this specific deprecation in the bridge I think, because many projects will be affected. /cc @greg0ire
+
+:thinking: 	maybe we could add a new deprecation group called `muted` and have a way to display them anyway, just in case? `SYMFONY_DEPRECATIONS_HELPER="scream=true"`? I wonder if this use case will happen a lot.
+
+---------------------------------------------------------------------------
+
+by phansys at 2019-07-01T14:59:25Z
+
+PHPUnit ^8.0 seems to require some missing return declarations at inherited methods, by instance:
+```
+Declaration of Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection\WebProfilerExtensionTest::setUp() must be compatible with PHPUnit\Framework\TestCase::setUp(): void
+```
+Given that, I think this version bump can't be done in a minor release. Please, let me know how to proceed if you have elaborated some concerns about this.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-06T07:49:56Z
+
+> Given that, I think this version bump can't be done in a minor release.
+
+You might be able to, but it will take some black magic:
+
+https://github.com/symfony/symfony/blob/6811aaa8e087665769dd66c69fb3109d002196ef/src/Symfony/Bridge/PhpUnit/CoverageListener.php#L14-L20
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-06T08:23:03Z
+
+[I built a thing!](https://github.com/greg0ire/symfony/commit/ca675239922a4f335091145c09d66b4e9ec6afd6) I'm a bit unsure if this should be considered bugfix or feature, and what version of the phpunit bridge is used to test 3.4 . Please advise.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-08T12:39:25Z
+
+@greg0ire sorry I should have been more specific: we should mute based on the message AND the stack trace: only deprecations from phpunit should be muted.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-08T16:04:26Z
+
+Oh ok it makes a lot more sense now ^^
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-08T18:18:29Z
+
+I ended up picking 4.3, see link above.
+
+---------------------------------------------------------------------------
+
+by phansys at 2019-07-18T14:53:51Z
+
+@greg0ire, here is a sample build on `4.3` after the merge of #32443: https://travis-ci.org/phansys/symfony/jobs/560515287.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-18T16:13:03Z
+
+Needs https://github.com/egulias/EmailValidator/pull/203 now
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-07-19T05:42:07Z
+
+> @greg0ire, here is a sample build on 4.3 after the merge of #32443: https://travis-ci.org/phansys/symfony/jobs/560515287.
+
+Oh wow my fix works already? I thought it would be necessary to have it land in the `vendor` directory, which implies a new release… plus you are targetting 3.4, so I really don't get it :thinking: Anyway, cool :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-19T21:30:45Z
+
+Next step unlocked. We could replace all setup/teardown methods by before/after ones, with the same as annotations.

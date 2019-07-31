@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-31T06:11:39Z
+
+What about `ETag`?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-31T06:45:18Z
+
+@nicolas-grekas as you said here https://github.com/symfony/symfony/issues/32819#issuecomment-516562159
+
+* In HTTP 1, headers should be lowercase _(but some APIs don't respect that)_
+* In HTTP/2, headers can only be lowercase
+
+So, could we leave headers as-is when using HTTP 1 (no strtolower, no ucwords, no changes whatsoever) and just apply `strtolower()` unconditionally when using HTTP/2? Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T07:15:35Z
+
+Got it, see also comments on the linked issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T07:24:26Z
+
+> So, could we leave headers as-is when using HTTP 1 (no strtolower, no ucwords, no changes whatsoever) and just apply strtolower() unconditionally when using HTTP/2? Thanks.
+
+That is not possible, because the protocol can be decided automatically.
+The only sensible way is to preserve the input case.
+That will break normalization, but since this is internal concern, there should be ways around.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T11:27:46Z
+
+PR updated, ready.

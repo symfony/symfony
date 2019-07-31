@@ -14,7 +14,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 /**
  * @internal
  */
-trait ForwardCompatTraitForV8
+trait ForwardCompatTestTraitForV8
 {
     public static function setUpBeforeClass(): void
     {

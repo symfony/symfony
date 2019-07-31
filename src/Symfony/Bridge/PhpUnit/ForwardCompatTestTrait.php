@@ -16,13 +16,13 @@ use PHPUnit\Framework\TestCase;
 // A trait to provide forward compatibility with newest PHPUnit versions
 
 if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \ReflectionMethod(TestCase::class, 'tearDown'))->hasReturnType()) {
-    trait ForwardCompatTrait
+    trait ForwardCompatTestTrait
     {
-        use Legacy\ForwardCompatTraitForV8;
+        use Legacy\ForwardCompatTestTraitForV8;
     }
 } else {
-    trait ForwardCompatTrait
+    trait ForwardCompatTestTrait
     {
-        use Legacy\ForwardCompatTraitForV5;
+        use Legacy\ForwardCompatTestTraitForV5;
     }
 }

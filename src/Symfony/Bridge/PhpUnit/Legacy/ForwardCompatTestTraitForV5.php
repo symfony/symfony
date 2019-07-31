@@ -14,7 +14,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 /**
  * @internal
  */
-trait ForwardCompatTraitForV5
+trait ForwardCompatTestTraitForV5
 {
     /**
      * @return void

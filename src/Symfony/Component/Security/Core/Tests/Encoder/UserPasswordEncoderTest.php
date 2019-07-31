@@ -85,9 +85,9 @@ class UserPasswordEncoderTest extends TestCase
 
         $passwordEncoder = new UserPasswordEncoder($mockEncoderFactory);
 
-        $hash = $passwordEncoder->encodePassword($user, 'foo', 'salt');
-        $this->assertFalse($passwordEncoder->needsRehash($user, $hash));
-        $this->assertTrue($passwordEncoder->needsRehash($user, $hash));
-        $this->assertFalse($passwordEncoder->needsRehash($user, $hash));
+        $user->setPassword($passwordEncoder->encodePassword($user, 'foo', 'salt'));
+        $this->assertFalse($passwordEncoder->needsRehash($user));
+        $this->assertTrue($passwordEncoder->needsRehash($user));
+        $this->assertFalse($passwordEncoder->needsRehash($user));
     }
 }

@@ -40,8 +40,8 @@ interface HttpClientInterface
                                 //   value if they are not defined - typically "application/json"
         'user_data' => null,    // mixed - any extra data to attach to the request (scalar, callable, object...) that
                                 //   MUST be available via $response->getInfo('user_data') - not used internally
-        'max_redirects' => 20,  // int - the maximum number of redirects to follow; a value lower or equal to 0 means
-                                //   redirects should not be followed; "Authorization" and "Cookie" headers MUST
+        'max_redirects' => 20,  // int - the maximum number of redirects to follow; a value lower than or equal to 0
+                                //   means redirects should not be followed; "Authorization" and "Cookie" headers MUST
                                 //   NOT follow except for the initial host name
         'http_version' => null, // string - defaults to the best supported version, typically 1.1 or 2.0
         'base_uri' => null,     // string - the URI to resolve relative URLs, following rules in RFC 3986, section 2

@@ -386,6 +386,9 @@ class Parser
                     $value = '';
 
                     foreach ($this->lines as $line) {
+                        if ('' !== ltrim($line) && '#' === ltrim($line)[0]) {
+                            continue;
+                        }
                         // If the indentation is not consistent at offset 0, it is to be considered as a ParseError
                         if (0 === $this->offset && !$deprecatedUsage && isset($line[0]) && ' ' === $line[0]) {
                             throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);

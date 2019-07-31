@@ -2152,6 +2152,18 @@ YAML;
 
         return $tests;
     }
+
+    public function testMultiLineComment()
+    {
+        $yaml = <<<YAML
+parameters:
+    abc
+
+# Comment 
+YAML;
+
+        $this->assertSame(['parameters' => 'abc'], $this->parser->parse($yaml));
+    }
 }
 
 class B

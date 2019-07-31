@@ -44,7 +44,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }
         $this->createCacheItem = \Closure::bind(
-            function ($key, $value, $isHit) use ($defaultLifetime) {
+            static function ($key, $value, $isHit) use ($defaultLifetime) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $v = $value;
@@ -67,7 +67,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         );
         $getId = \Closure::fromCallable([$this, 'getId']);
         $this->mergeByLifetime = \Closure::bind(
-            function ($deferred, $namespace, &$expiredIds) use ($getId) {
+            static function ($deferred, $namespace, &$expiredIds) use ($getId) {
                 $byLifetime = [];
                 $now = microtime(true);
                 $expiredIds = [];

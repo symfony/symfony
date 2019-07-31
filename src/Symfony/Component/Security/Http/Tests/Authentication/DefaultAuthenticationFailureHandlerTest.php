@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Security;
@@ -19,6 +20,8 @@ use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureH
 
 class DefaultAuthenticationFailureHandlerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $httpKernel;
     private $httpUtils;
     private $logger;
@@ -26,7 +29,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     private $session;
     private $exception;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->httpKernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $this->httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();

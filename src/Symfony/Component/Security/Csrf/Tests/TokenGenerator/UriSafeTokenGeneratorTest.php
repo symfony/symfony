@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Csrf\Tests\TokenGenerator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
  */
 class UriSafeTokenGeneratorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const ENTROPY = 1000;
 
     /**
@@ -33,17 +36,17 @@ class UriSafeTokenGeneratorTest extends TestCase
      */
     private $generator;
 
-    public static function setUpBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         self::$bytes = base64_decode('aMf+Tct/RLn2WQ==');
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->generator = new UriSafeTokenGenerator(self::ENTROPY);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->generator = null;
     }

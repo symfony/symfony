@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Attribute;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
 
 /**
@@ -21,6 +22,8 @@ use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
  */
 class NamespacedAttributeBagTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $array = [];
 
     /**
@@ -28,7 +31,7 @@ class NamespacedAttributeBagTest extends TestCase
      */
     private $bag;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->array = [
             'hello' => 'world',
@@ -49,7 +52,7 @@ class NamespacedAttributeBagTest extends TestCase
         $this->bag->initialize($this->array);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->bag = null;
         $this->array = [];

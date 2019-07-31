@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
@@ -25,10 +26,12 @@ use Symfony\Component\Workflow\Workflow;
 
 class WorkflowExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $extension;
     private $t1;
 
-    protected function setUp()
+    private function doSetUp()
     {
         if (!class_exists(Workflow::class)) {
             $this->markTestSkipped('The Workflow component is needed to run tests for this extension.');

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class CacheWarmingTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testCacheIsProperlyWarmedWhenTemplatingIsAvailable()
     {
         $kernel = new CacheWarmingKernel(true);
@@ -47,12 +50,12 @@ class CacheWarmingTest extends TestCase
         $this->assertFileExists($kernel->getCacheDir().'/twig');
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->deleteTempDir();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->deleteTempDir();
     }

@@ -12,19 +12,22 @@
 namespace Symfony\Component\Templating\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReference;
 
 class TemplateNameParserTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $parser;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->parser = new TemplateNameParser();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->parser = null;
     }

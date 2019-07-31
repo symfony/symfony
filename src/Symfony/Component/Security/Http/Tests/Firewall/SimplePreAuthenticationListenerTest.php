@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -24,6 +25,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
  */
 class SimplePreAuthenticationListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $authenticationManager;
     private $dispatcher;
     private $event;
@@ -97,7 +100,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
         $listener($this->event);
     }
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')
             ->disableOriginalConstructor()
@@ -120,7 +123,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
         $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->authenticationManager = null;
         $this->dispatcher = null;

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
 
 /**
@@ -19,12 +20,14 @@ use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
  */
 class JsonBundleReaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var JsonBundleReader
      */
     private $reader;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->reader = new JsonBundleReader();
     }

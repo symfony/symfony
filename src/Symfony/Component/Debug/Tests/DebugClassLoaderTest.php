@@ -12,6 +12,7 @@
 namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Debug\DebugClassLoader;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Debug\DebugClassLoader;
  */
 class DebugClassLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var int Error reporting level before running tests
      */
@@ -26,7 +29,7 @@ class DebugClassLoaderTest extends TestCase
 
     private $loader;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->errorReporting = error_reporting(E_ALL);
         $this->loader = new ClassLoader();
@@ -34,7 +37,7 @@ class DebugClassLoaderTest extends TestCase
         DebugClassLoader::enable();
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         DebugClassLoader::disable();
         spl_autoload_unregister([$this->loader, 'loadClass']);

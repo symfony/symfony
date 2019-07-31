@@ -12,16 +12,19 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
 class JsonEncoderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $encoder;
     private $serializer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->encoder = new JsonEncoder();
         $this->serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);

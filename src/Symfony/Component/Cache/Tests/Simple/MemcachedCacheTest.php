@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Simple\MemcachedCache;
 
@@ -19,6 +20,8 @@ use Symfony\Component\Cache\Simple\MemcachedCache;
  */
 class MemcachedCacheTest extends CacheTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $skippedTests = [
         'testSetTtl' => 'Testing expiration slows down the test suite',
         'testSetMultipleTtl' => 'Testing expiration slows down the test suite',
@@ -27,7 +30,7 @@ class MemcachedCacheTest extends CacheTestCase
 
     protected static $client;
 
-    public static function setupBeforeClass()
+    private static function doSetUpBeforeClass()
     {
         if (!MemcachedCache::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');

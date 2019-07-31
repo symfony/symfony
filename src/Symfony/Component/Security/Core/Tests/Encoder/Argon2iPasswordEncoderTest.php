@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
 /**
@@ -21,9 +22,11 @@ use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
  */
 class Argon2iPasswordEncoderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const PASSWORD = 'password';
 
-    protected function setUp()
+    private function doSetUp()
     {
         if (!Argon2iPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');

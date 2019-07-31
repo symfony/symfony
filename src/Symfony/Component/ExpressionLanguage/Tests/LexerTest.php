@@ -12,18 +12,21 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Token;
 use Symfony\Component\ExpressionLanguage\TokenStream;
 
 class LexerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var Lexer
      */
     private $lexer;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->lexer = new Lexer();
     }

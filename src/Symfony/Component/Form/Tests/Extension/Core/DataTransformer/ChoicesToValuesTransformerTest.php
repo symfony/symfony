@@ -12,15 +12,18 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
 
 class ChoicesToValuesTransformerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     protected $transformer;
     protected $transformerWithNull;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $list = new ArrayChoiceList(['', false, 'X']);
         $listWithNull = new ArrayChoiceList(['', false, 'X', null]);
@@ -29,7 +32,7 @@ class ChoicesToValuesTransformerTest extends TestCase
         $this->transformerWithNull = new ChoicesToValuesTransformer($listWithNull);
     }
 
-    protected function tearDown()
+    private function doTearDown()
     {
         $this->transformer = null;
         $this->transformerWithNull = null;

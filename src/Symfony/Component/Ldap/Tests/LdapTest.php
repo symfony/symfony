@@ -12,6 +12,7 @@
 namespace Symfony\Component\Ldap\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\ConnectionInterface;
 use Symfony\Component\Ldap\Exception\DriverNotFoundException;
@@ -19,13 +20,15 @@ use Symfony\Component\Ldap\Ldap;
 
 class LdapTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $adapter;
 
     /** @var Ldap */
     private $ldap;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
         $this->ldap = new Ldap($this->adapter);

@@ -12,12 +12,15 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\FormFieldRegistry;
 
 class FormTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    use ForwardCompatTestTrait;
+
+    private static function doSetUpBeforeClass()
     {
         // Ensure that the private helper class FormFieldRegistry is loaded
         class_exists('Symfony\\Component\\DomCrawler\\Form');

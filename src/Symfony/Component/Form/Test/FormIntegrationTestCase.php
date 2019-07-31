@@ -20,7 +20,7 @@ use Symfony\Component\Form\Forms;
  */
 abstract class FormIntegrationTestCase extends TestCase
 {
-    use TestCaseSetUpTearDownTrait;
+    use ForwardCompatTestTrait;
 
     /**
      * @var FormFactoryInterface

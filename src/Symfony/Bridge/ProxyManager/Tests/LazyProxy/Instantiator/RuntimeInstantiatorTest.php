@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Instantiator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -22,6 +23,8 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class RuntimeInstantiatorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var RuntimeInstantiator
      */
@@ -30,7 +33,7 @@ class RuntimeInstantiatorTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    private function doSetUp()
     {
         $this->instantiator = new RuntimeInstantiator();
     }

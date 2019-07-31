@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Annotation\Route as RouteAnnotation;
 use Symfony\Component\Routing\Loader\AnnotationClassLoader;
 use Symfony\Component\Routing\Route;
@@ -40,12 +41,14 @@ use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\Utf8ActionContro
 
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var AnnotationClassLoader
      */
     private $loader;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $reader = new AnnotationReader();
         $this->loader = new class($reader) extends AnnotationClassLoader {

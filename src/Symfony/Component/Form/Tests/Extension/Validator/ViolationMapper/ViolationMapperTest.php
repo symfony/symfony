@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\CallbackTransformer;
@@ -31,6 +32,8 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  */
 class ViolationMapperTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const LEVEL_0 = 0;
     const LEVEL_1 = 1;
     const LEVEL_1B = 2;
@@ -61,7 +64,7 @@ class ViolationMapperTest extends TestCase
      */
     private $params;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->dispatcher = new EventDispatcher();
         $this->mapper = new ViolationMapper();

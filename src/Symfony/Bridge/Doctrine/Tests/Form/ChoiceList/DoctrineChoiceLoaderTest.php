@@ -19,6 +19,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 
@@ -27,6 +28,8 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
  */
 class DoctrineChoiceLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @var ChoiceListFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -72,7 +75,7 @@ class DoctrineChoiceLoaderTest extends TestCase
      */
     private $obj3;
 
-    protected function setUp()
+    private function doSetUp()
     {
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')->getMock();

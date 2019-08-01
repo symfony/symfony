@@ -286,7 +286,6 @@ HttpFoundation
 HttpKernel
 ----------
 
- * The `getPublicDir()` method has been added to the `BundleInterface`.
  * Removed `Client`, use `HttpKernelBrowser` instead
  * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
  * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
@@ -303,6 +302,32 @@ HttpKernel
  * Removed `TranslatorListener` in favor of `LocaleAwareListener`
  * The `DebugHandlersListener` class has been made `final`
  * Removed `SaveSessionListener` in favor of `AbstractSessionListener`
+ * Added new Bundle directory convention consistent with standard skeletons:
+
+    ```
+    └── MyBundle/
+        ├── config/
+        ├── public/
+        ├── src/
+        │   └── MyBundle.php
+        ├── templates/
+        └── translations/
+    ```
+
+   To make this work properly, it is necessary to change the root path of the bundle:
+
+    ```php
+    class MyBundle extends Bundle
+    {
+        public function getPath(): string
+        {
+            return \dirname(__DIR__);
+        }
+    }
+    ```
+
+   As many bundles must be compatible with a range of Symfony versions, the current 
+   directory convention is not deprecated yet, but it will be in the future.
 
 Intl
 ----

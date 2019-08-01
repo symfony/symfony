@@ -48,11 +48,10 @@ class DoctrineValidationPass implements CompilerPassInterface
         }
 
         $files = $container->getParameter('validator.mapping.loader.'.$mapping.'_files_loader.mapping_files');
-        $validationPath = 'Resources/config/validation.'.$this->managerType.'.'.$extension;
+        $validationPath = '/config/validation.'.$this->managerType.'.'.$extension;
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if ($container->fileExists($file = \dirname($reflection->getFileName()).'/'.$validationPath)) {
+        foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
+            if ($container->fileExists($file = $bundle['path'].'/Resources'.$validationPath) || $container->fileExists($file = $bundle['path'].$validationPath)) {
                 $files[] = $file;
             }
         }

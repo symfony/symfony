@@ -12,10 +12,13 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class AbstractCrawlerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     abstract public function getDoctype(): string;
 
     protected function createCrawler($node = null, string $uri = null, string $baseHref = null)
@@ -795,7 +798,7 @@ HTML;
     public function testLinks()
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
-        $this->assertInternalType('array', $crawler->links(), '->links() returns an array');
+        $this->assertIsArray($crawler->links(), '->links() returns an array');
 
         $this->assertCount(4, $crawler->links(), '->links() returns an array');
         $links = $crawler->links();
@@ -807,7 +810,7 @@ HTML;
     public function testImages()
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectImage('Bar');
-        $this->assertInternalType('array', $crawler->images(), '->images() returns an array');
+        $this->assertIsArray($crawler->images(), '->images() returns an array');
 
         $this->assertCount(4, $crawler->images(), '->images() returns an array');
         $images = $crawler->images();

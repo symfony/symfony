@@ -151,7 +151,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
     /**
      * @return string
      */
-    private function generateLocaleName(BundleEntryReaderInterface $reader, $tempDir, $locale, $displayLocale, $pattern, $separator)
+    private function generateLocaleName(BundleEntryReaderInterface $reader, string $tempDir, string $locale, string $displayLocale, string $pattern, string $separator)
     {
         // Apply generic notation using square brackets as described per http://cldr.unicode.org/translation/language-names
         $name = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/lang', $displayLocale, ['Languages', \Locale::getPrimaryLanguage($locale)]));

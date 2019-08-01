@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
@@ -19,6 +20,8 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class AbstractRememberMeServicesTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetRememberMeParameter()
     {
         $service = $this->getService(null, ['remember_me_parameter' => 'foo']);
@@ -261,7 +264,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService();
 
         $encoded = $this->callProtected($service, 'encodeCookie', [$cookieParts]);
-        $this->assertInternalType('string', $encoded);
+        $this->assertIsString($encoded);
 
         $decoded = $this->callProtected($service, 'decodeCookie', [$encoded]);
         $this->assertSame($cookieParts, $decoded);

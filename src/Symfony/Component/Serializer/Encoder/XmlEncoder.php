@@ -458,8 +458,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Tests the value being passed and decide what sort of element to create.
      *
-     * @param mixed $val
-     *
      * @throws NotEncodableValueException
      */
     private function selectNodeType(\DOMNode $node, $val): bool

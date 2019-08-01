@@ -127,7 +127,7 @@ class ServiceLocator implements ServiceProviderInterface
         return new ServiceCircularReferenceException($id, $path);
     }
 
-    private function formatAlternatives(array $alternatives = null, $separator = 'and')
+    private function formatAlternatives(array $alternatives = null, string $separator = 'and')
     {
         $format = '"%s"%s';
         if (null === $alternatives) {

@@ -220,8 +220,6 @@ class YamlDumper extends Dumper
     /**
      * Dumps the value to YAML format.
      *
-     * @param mixed $value
-     *
      * @return mixed
      *
      * @throws RuntimeException When trying to dump object or resource

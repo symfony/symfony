@@ -48,7 +48,7 @@ class PhpSerializer implements SerializerInterface
         ];
     }
 
-    private function safelyUnserialize($contents)
+    private function safelyUnserialize(string $contents)
     {
         $e = null;
         $signalingException = new MessageDecodingFailedException(sprintf('Could not decode message using PHP serialization: %s.', $contents));

@@ -186,8 +186,6 @@ class ContentSecurityPolicyHandler
     /**
      * Converts a Content-Security-Policy header value into a directive set array.
      *
-     * @param string $header The header value
-     *
      * @return array The directive set
      */
     private function parseDirectives(string $header)

@@ -103,7 +103,7 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    private function findClasses($namespace, $pattern, array $excludePatterns)
+    private function findClasses(string $namespace, string $pattern, array $excludePatterns)
     {
         $parameterBag = $this->container->getParameterBag();
 

@@ -1638,7 +1638,7 @@ class EntityTypeTest extends BaseTypeTest
         ]);
         $form->setData($emptyArray);
         $form->submit(null);
-        $this->assertInternalType('array', $form->getData());
+        $this->assertIsArray($form->getData());
         $this->assertEquals([], $form->getData());
         $this->assertEquals([], $form->getNormData());
         $this->assertSame([], $form->getViewData(), 'View data is always an array');
@@ -1656,7 +1656,7 @@ class EntityTypeTest extends BaseTypeTest
         $existing = [0 => $entity1];
         $form->setData($existing);
         $form->submit(null);
-        $this->assertInternalType('array', $form->getData());
+        $this->assertIsArray($form->getData());
         $this->assertEquals([], $form->getData());
         $this->assertEquals([], $form->getNormData());
         $this->assertSame([], $form->getViewData(), 'View data is always an array');

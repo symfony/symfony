@@ -447,7 +447,7 @@ class AutowirePass extends AbstractRecursivePass
         return sprintf(' You should maybe alias this %s to %s.', class_exists($type, false) ? 'class' : 'interface', $message);
     }
 
-    private function getAliasesSuggestionForType(ContainerBuilder $container, string $type, $extraContext = null)
+    private function getAliasesSuggestionForType(ContainerBuilder $container, string $type)
     {
         $aliases = [];
         foreach (class_parents($type) + class_implements($type) as $parent) {
@@ -456,9 +456,8 @@ class AutowirePass extends AbstractRecursivePass
             }
         }
 
-        $extraContext = $extraContext ? ' '.$extraContext : '';
         if (1 < $len = \count($aliases)) {
-            $message = sprintf('Try changing the type-hint%s to one of its parents: ', $extraContext);
+            $message = 'Try changing the type-hint to one of its parents: ';
             for ($i = 0, --$len; $i < $len; ++$i) {
                 $message .= sprintf('%s "%s", ', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
             }
@@ -468,7 +467,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if ($aliases) {
-            return sprintf('Try changing the type-hint%s to "%s" instead.', $extraContext, $aliases[0]);
+            return sprintf('Try changing the type-hint to "%s" instead.', $aliases[0]);
         }
     }
 }

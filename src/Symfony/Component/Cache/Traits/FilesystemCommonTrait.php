@@ -23,7 +23,7 @@ trait FilesystemCommonTrait
     private $directory;
     private $tmp;
 
-    private function init($namespace, $directory)
+    private function init(string $namespace, ?string $directory)
     {
         if (!isset($directory[0])) {
             $directory = sys_get_temp_dir().'/symfony-cache';
@@ -86,7 +86,7 @@ trait FilesystemCommonTrait
         return @unlink($file);
     }
 
-    private function write($file, $data, $expiresAt = null)
+    private function write(string $file, string $data, int $expiresAt = null)
     {
         set_error_handler(__CLASS__.'::throwError');
         try {
@@ -105,7 +105,7 @@ trait FilesystemCommonTrait
         }
     }
 
-    private function getFile($id, $mkdir = false, string $directory = null)
+    private function getFile(string $id, bool $mkdir = false, string $directory = null)
     {
         // Use MD5 to favor speed over security, which is not an issue here
         $hash = str_replace('/', '-', base64_encode(hash('md5', static::class.$id, true)));

@@ -240,7 +240,7 @@ EOF
         $io->table($headers, $rows);
     }
 
-    private function formatState($state): string
+    private function formatState(int $state): string
     {
         if (self::MESSAGE_MISSING === $state) {
             return '<error> missing </error>';

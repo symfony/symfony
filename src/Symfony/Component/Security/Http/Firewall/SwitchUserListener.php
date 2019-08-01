@@ -110,15 +110,12 @@ class SwitchUserListener
     /**
      * Attempts to switch to another user.
      *
-     * @param Request $request  A Request instance
-     * @param string  $username
-     *
      * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
      *
      * @throws \LogicException
      * @throws AccessDeniedException
      */
-    private function attemptSwitchUser(Request $request, $username): ?TokenInterface
+    private function attemptSwitchUser(Request $request, string $username): ?TokenInterface
     {
         $token = $this->tokenStorage->getToken();
         $originalToken = $this->getOriginalToken($token);

@@ -264,11 +264,6 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Reads the path from an object up to a given path index.
      *
-     * @param array                 $zval                 The array containing the object or array to read from
-     * @param PropertyPathInterface $propertyPath         The property path to read
-     * @param int                   $lastIndex            The index up to which should be read
-     * @param bool                  $ignoreInvalidIndices Whether to ignore invalid indices or throw an exception
-     *
      * @return array The values read in the path
      *
      * @throws UnexpectedTypeException if a value within the path is neither object nor array
@@ -342,14 +337,13 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Reads a key from an array-like structure.
      *
-     * @param array      $zval  The array containing the array or \ArrayAccess object to read from
      * @param string|int $index The key to read
      *
      * @return array The array containing the value of the key
      *
      * @throws NoSuchIndexException If the array does not implement \ArrayAccess or it is not an array
      */
-    private function readIndex($zval, $index)
+    private function readIndex(array $zval, $index)
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !\is_array($zval[self::VALUE])) {
             throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, \get_class($zval[self::VALUE])));
@@ -374,10 +368,6 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Reads the a property from an object.
-     *
-     * @param array  $zval                  The array containing the object to read from
-     * @param string $property              The property to read
-     * @param bool   $ignoreInvalidProperty Whether to ignore invalid property or throw an exception
      *
      * @return array The array containing the value of the property
      *
@@ -511,7 +501,6 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Sets the value of an index in a given array-accessible value.
      *
-     * @param array      $zval  The array containing the array or \ArrayAccess object to write to
      * @param string|int $index The index to write at
      * @param mixed      $value The value to write
      *
@@ -529,9 +518,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Sets the value of a property in the given object.
      *
-     * @param array  $zval     The array containing the object to write to
-     * @param string $property The property to write
-     * @param mixed  $value    The value to write
+     * @param mixed $value The value to write
      *
      * @throws NoSuchPropertyException if the property does not exist or is not public
      */
@@ -569,14 +556,8 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Adjusts a collection-valued property by calling add*() and remove*() methods.
-     *
-     * @param array    $zval         The array containing the object to write to
-     * @param string   $property     The property to write
-     * @param iterable $collection   The collection to write
-     * @param string   $addMethod    The add*() method
-     * @param string   $removeMethod The remove*() method
      */
-    private function writeCollection(array $zval, string $property, $collection, string $addMethod, string $removeMethod)
+    private function writeCollection(array $zval, string $property, iterable $collection, string $addMethod, string $removeMethod)
     {
         // At this point the add and remove methods have been found
         $previousValue = $this->readProperty($zval, $property);

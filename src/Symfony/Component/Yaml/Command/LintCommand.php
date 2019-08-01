@@ -109,7 +109,7 @@ EOF
         return $this->display($io, $filesInfo);
     }
 
-    private function validate($content, $flags, $file = null)
+    private function validate(string $content, int $flags, string $file = null)
     {
         $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
             if (E_USER_DEPRECATED === $level) {
@@ -182,7 +182,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function getFiles($fileOrDirectory)
+    private function getFiles(string $fileOrDirectory)
     {
         if (is_file($fileOrDirectory)) {
             yield new \SplFileInfo($fileOrDirectory);
@@ -222,7 +222,7 @@ EOF
         return $this->parser;
     }
 
-    private function getDirectoryIterator($directory)
+    private function getDirectoryIterator(string $directory)
     {
         $default = function ($directory) {
             return new \RecursiveIteratorIterator(
@@ -238,7 +238,7 @@ EOF
         return $default($directory);
     }
 
-    private function isReadable($fileOrDirectory)
+    private function isReadable(string $fileOrDirectory)
     {
         $default = function ($fileOrDirectory) {
             return is_readable($fileOrDirectory);

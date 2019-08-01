@@ -178,8 +178,6 @@ class ArgvInput extends Input
     /**
      * Adds a short option value.
      *
-     * @param mixed $value The value for the option
-     *
      * @throws RuntimeException When option given doesn't exist
      */
     private function addShortOption(string $shortcut, $value)
@@ -193,8 +191,6 @@ class ArgvInput extends Input
 
     /**
      * Adds a long option value.
-     *
-     * @param mixed $value The value for the option
      *
      * @throws RuntimeException When option given doesn't exist
      */

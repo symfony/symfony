@@ -67,7 +67,7 @@ class IniFileLoader extends FileLoader
      *  * strings with escaped quotes are not supported "foo\"bar";
      *  * string concatenation ("foo" "bar").
      */
-    private function phpize($value)
+    private function phpize(string $value)
     {
         // trim on the right as comments removal keep whitespaces
         if ($value !== $v = rtrim($value)) {

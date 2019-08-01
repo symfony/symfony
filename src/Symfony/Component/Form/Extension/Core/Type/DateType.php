@@ -326,7 +326,7 @@ class DateType extends AbstractType
         return 'date';
     }
 
-    private function formatTimestamps(\IntlDateFormatter $formatter, $regex, array $timestamps)
+    private function formatTimestamps(\IntlDateFormatter $formatter, string $regex, array $timestamps)
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimeZoneId();

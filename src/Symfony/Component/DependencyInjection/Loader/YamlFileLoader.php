@@ -306,14 +306,11 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a definition.
      *
-     * @param string       $id
      * @param array|string $service
-     * @param string       $file
-     * @param array        $defaults
      *
      * @throws InvalidArgumentException When tags are invalid
      */
-    private function parseDefinition($id, $service, $file, array $defaults)
+    private function parseDefinition(string $id, $service, string $file, array $defaults)
     {
         if (preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
             throw new InvalidArgumentException(sprintf('Service names that start with an underscore are reserved. Rename the "%s" service or define it in XML instead.', $id));
@@ -575,7 +572,6 @@ class YamlFileLoader extends FileLoader
      * Parses a callable.
      *
      * @param string|array $callable  A callable reference
-     * @param string       $parameter The type of callable (e.g. 'factory' or 'configurator')
      *
      * @throws InvalidArgumentException When errors occur
      *
@@ -649,14 +645,11 @@ class YamlFileLoader extends FileLoader
     /**
      * Validates a YAML file.
      *
-     * @param mixed  $content
-     * @param string $file
-     *
      * @return array
      *
      * @throws InvalidArgumentException When service file is not valid
      */
-    private function validate($content, $file)
+    private function validate($content, string $file)
     {
         if (null === $content) {
             return $content;
@@ -683,13 +676,9 @@ class YamlFileLoader extends FileLoader
     /**
      * Resolves services.
      *
-     * @param mixed  $value
-     * @param string $file
-     * @param bool   $isParameter
-     *
      * @return array|string|Reference|ArgumentInterface
      */
-    private function resolveServices($value, $file, $isParameter = false)
+    private function resolveServices($value, string $file, bool $isParameter = false)
     {
         if ($value instanceof TaggedValue) {
             $argument = $value->getValue();
@@ -821,12 +810,8 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Checks the keywords used to define a service.
-     *
-     * @param string $id         The service name
-     * @param array  $definition The service definition to check
-     * @param string $file       The loaded YAML file
      */
-    private function checkDefinition($id, array $definition, $file)
+    private function checkDefinition(string $id, array $definition, string $file)
     {
         if ($this->isLoadingInstanceof) {
             $keywords = self::$instanceofKeywords;

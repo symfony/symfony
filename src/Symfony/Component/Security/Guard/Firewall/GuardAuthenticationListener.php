@@ -92,7 +92,7 @@ class GuardAuthenticationListener
         }
     }
 
-    private function executeGuardAuthenticator($uniqueGuardKey, AuthenticatorInterface $guardAuthenticator, RequestEvent $event)
+    private function executeGuardAuthenticator(string $uniqueGuardKey, AuthenticatorInterface $guardAuthenticator, RequestEvent $event)
     {
         $request = $event->getRequest();
         try {

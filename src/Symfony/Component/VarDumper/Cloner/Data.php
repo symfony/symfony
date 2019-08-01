@@ -268,12 +268,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Depth-first dumping of items.
      *
-     * @param DumperInterface $dumper The dumper being used for dumping
-     * @param Cursor          $cursor A cursor used for tracking dumper state position
-     * @param array           &$refs  A map of all references discovered while dumping
-     * @param mixed           $item   A Stub object or the original value being dumped
+     * @param mixed $item A Stub object or the original value being dumped
      */
-    private function dumpItem($dumper, $cursor, &$refs, $item)
+    private function dumpItem(DumperInterface $dumper, Cursor $cursor, array &$refs, $item)
     {
         $cursor->refIndex = 0;
         $cursor->softRefTo = $cursor->softRefHandle = $cursor->softRefCount = 0;
@@ -371,17 +368,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Dumps children of hash structures.
      *
-     * @param DumperInterface $dumper
-     * @param Cursor          $parentCursor The cursor of the parent hash
-     * @param array           &$refs        A map of all references discovered while dumping
-     * @param array           $children     The children to dump
-     * @param int             $hashCut      The number of items removed from the original hash
-     * @param string          $hashType     A Cursor::HASH_* const
-     * @param bool            $dumpKeys     Whether keys should be dumped or not
-     *
      * @return int The final number of removed items
      */
-    private function dumpChildren($dumper, $parentCursor, &$refs, $children, $hashCut, $hashType, $dumpKeys)
+    private function dumpChildren(DumperInterface $dumper, Cursor $parentCursor, array &$refs, array $children, int $hashCut, int $hashType, bool $dumpKeys)
     {
         $cursor = clone $parentCursor;
         ++$cursor->depth;

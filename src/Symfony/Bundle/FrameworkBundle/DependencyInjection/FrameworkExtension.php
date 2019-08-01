@@ -934,7 +934,7 @@ class FrameworkExtension extends Extension
     /**
      * Returns a definition for an asset package.
      */
-    private function createPackageDefinition($basePath, array $baseUrls, Reference $version)
+    private function createPackageDefinition(?string $basePath, array $baseUrls, Reference $version)
     {
         if ($basePath && $baseUrls) {
             throw new \LogicException('An asset package cannot have base URLs and base paths.');
@@ -950,7 +950,7 @@ class FrameworkExtension extends Extension
         return $package;
     }
 
-    private function createVersion(ContainerBuilder $container, $version, $format, $jsonManifestPath, $name)
+    private function createVersion(ContainerBuilder $container, ?string $version, ?string $format, ?string $jsonManifestPath, string $name)
     {
         // Configuration prevents $version and $jsonManifestPath from being set
         if (null !== $version) {
@@ -1182,7 +1182,7 @@ class FrameworkExtension extends Extension
         $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
     }
 
-    private function registerMappingFilesFromDir($dir, callable $fileRecorder)
+    private function registerMappingFilesFromDir(string $dir, callable $fileRecorder)
     {
         foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
             $fileRecorder($file->getExtension(), $file->getRealPath());
@@ -1206,7 +1206,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, $loader)
+    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         if (!$this->annotationsConfigEnabled) {
             return;

@@ -253,14 +253,11 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses the config elements (default, requirement, option).
      *
-     * @param \DOMElement $node Element to parse that contains the configs
-     * @param string      $path Full path of the XML file being processed
-     *
      * @return array An array with the defaults as first item, requirements as second and options as third
      *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    private function parseConfigs(\DOMElement $node, $path)
+    private function parseConfigs(\DOMElement $node, string $path)
     {
         $defaults = [];
         $requirements = [];
@@ -329,12 +326,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses the "default" elements.
      *
-     * @param \DOMElement $element The "default" element to parse
-     * @param string      $path    Full path of the XML file being processed
-     *
      * @return array|bool|float|int|string|null The parsed value of the "default" element
      */
-    private function parseDefaultsConfig(\DOMElement $element, $path)
+    private function parseDefaultsConfig(\DOMElement $element, string $path)
     {
         if ($this->isElementValueNull($element)) {
             return;
@@ -364,14 +358,11 @@ class XmlFileLoader extends FileLoader
     /**
      * Recursively parses the value of a "default" element.
      *
-     * @param \DOMElement $node The node value
-     * @param string      $path Full path of the XML file being processed
-     *
      * @return array|bool|float|int|string The parsed value
      *
      * @throws \InvalidArgumentException when the XML is invalid
      */
-    private function parseDefaultNode(\DOMElement $node, $path)
+    private function parseDefaultNode(\DOMElement $node, string $path)
     {
         if ($this->isElementValueNull($node)) {
             return;

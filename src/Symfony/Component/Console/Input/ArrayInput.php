@@ -143,8 +143,6 @@ class ArrayInput extends Input
     /**
      * Adds a short option value.
      *
-     * @param mixed $value The value for the option
-     *
      * @throws InvalidOptionException When option given doesn't exist
      */
     private function addShortOption(string $shortcut, $value)
@@ -158,8 +156,6 @@ class ArrayInput extends Input
 
     /**
      * Adds a long option value.
-     *
-     * @param mixed $value The value for the option
      *
      * @throws InvalidOptionException When option given doesn't exist
      * @throws InvalidOptionException When a required value is missing
@@ -188,8 +184,8 @@ class ArrayInput extends Input
     /**
      * Adds an argument value.
      *
-     * @param string $name  The argument name
-     * @param mixed  $value The value for the argument
+     * @param string|int $name  The argument name
+     * @param mixed      $value The value for the argument
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */

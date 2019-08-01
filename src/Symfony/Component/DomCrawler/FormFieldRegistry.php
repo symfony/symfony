@@ -157,7 +157,7 @@ class FormFieldRegistry
      *
      * @return array The list of fields as [string] Fully qualified name => (mixed) value)
      */
-    private function walk(array $array, string $base = '', array &$output = [])
+    private function walk(array $array, ?string $base = '', array &$output = [])
     {
         foreach ($array as $k => $v) {
             $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);

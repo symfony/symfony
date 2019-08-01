@@ -65,7 +65,7 @@ class FlockStore implements StoreInterface, BlockingStoreInterface
         $this->lock($key, true);
     }
 
-    private function lock(Key $key, $blocking)
+    private function lock(Key $key, bool $blocking)
     {
         // The lock is maybe already acquired.
         if ($key->hasState(__CLASS__)) {

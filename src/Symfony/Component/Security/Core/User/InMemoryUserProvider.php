@@ -93,8 +93,6 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * Returns the user by given username.
      *
-     * @param string $username The username
-     *
      * @return User
      *
      * @throws UsernameNotFoundException if user whose given username does not exist

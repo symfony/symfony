@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 
@@ -20,6 +21,8 @@ use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
  */
 class NumberFormatterTest extends AbstractNumberFormatterTest
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
      */
@@ -59,7 +62,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
     public function testSetAttributeInvalidRoundingMode()
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
-        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, null);
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, -1);
     }
 
     public function testConstructWithoutLocale()

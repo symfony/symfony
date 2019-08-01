@@ -295,12 +295,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * traversal, the object will be iterated and each nested object will be
      * validated instead.
      *
-     * @param object|int|float|string   $object            The object to cascade
-     * @param string                    $propertyPath      The current property path
-     * @param (string|GroupSequence)[]  $groups            The validated groups
-     * @param int                       $traversalStrategy The strategy for traversing the
-     *                                                     cascaded object
-     * @param ExecutionContextInterface $context           The current execution context
      *
      * @throws NoSuchMetadataException      If the object has no associated metadata
      *                                      and does not implement {@link \Traversable}
@@ -310,7 +304,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                      metadata factory does not implement
      *                                      {@link ClassMetadataInterface}
      */
-    private function validateObject($object, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
+    private function validateObject($object, string $propertyPath, array $groups, int $traversalStrategy, ExecutionContextInterface $context)
     {
         try {
             $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -354,13 +348,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * for their classes.
      *
      * Nested arrays are also iterated.
-     *
-     * @param iterable                  $collection   The collection
-     * @param string                    $propertyPath The current property path
-     * @param (string|GroupSequence)[]  $groups       The validated groups
-     * @param ExecutionContextInterface $context      The current execution context
      */
-    private function validateEachObjectIn($collection, $propertyPath, array $groups, ExecutionContextInterface $context)
+    private function validateEachObjectIn(iterable $collection, string $propertyPath, array $groups, ExecutionContextInterface $context)
     {
         foreach ($collection as $key => $value) {
             if (\is_array($value)) {
@@ -413,22 +402,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * in the class metadata. If this is the case, the group sequence is
      * validated instead.
      *
-     * @param object                    $object            The validated object
-     * @param string                    $cacheKey          The key for caching
-     *                                                     the validated object
-     * @param ClassMetadataInterface    $metadata          The class metadata of
-     *                                                     the object
-     * @param string                    $propertyPath      The property path leading
-     *                                                     to the object
-     * @param (string|GroupSequence)[]  $groups            The groups in which the
-     *                                                     object should be validated
-     * @param string[]|null             $cascadedGroups    The groups in which
-     *                                                     cascaded objects should
-     *                                                     be validated
-     * @param int                       $traversalStrategy The strategy used for
-     *                                                     traversing the object
-     * @param ExecutionContextInterface $context           The current execution context
-     *
      * @throws UnsupportedMetadataException  If a property metadata does not
      *                                       implement {@link PropertyMetadataInterface}
      * @throws ConstraintDefinitionException If traversal was enabled but the
@@ -437,7 +410,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @see TraversalStrategy
      */
-    private function validateClassNode(object $object, $cacheKey, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
+    private function validateClassNode(object $object, ?string $cacheKey, ClassMetadataInterface $metadata, string $propertyPath, array $groups, ?array $cascadedGroups, int $traversalStrategy, ExecutionContextInterface $context)
     {
         $context->setNode($object, $object, $metadata, $propertyPath);
 
@@ -597,26 +570,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * constraints. If the value is an array, it is traversed regardless of
      * the given strategy.
      *
-     * @param mixed                     $value             The validated value
-     * @param object|null               $object            The current object
-     * @param string                    $cacheKey          The key for caching
-     *                                                     the validated value
-     * @param MetadataInterface         $metadata          The metadata of the
-     *                                                     value
-     * @param string                    $propertyPath      The property path leading
-     *                                                     to the value
-     * @param (string|GroupSequence)[]  $groups            The groups in which the
-     *                                                     value should be validated
-     * @param string[]|null             $cascadedGroups    The groups in which
-     *                                                     cascaded objects should
-     *                                                     be validated
-     * @param int                       $traversalStrategy The strategy used for
-     *                                                     traversing the value
-     * @param ExecutionContextInterface $context           The current execution context
-     *
      * @see TraversalStrategy
      */
-    private function validateGenericNode($value, ?object $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
+    private function validateGenericNode($value, ?object $object, ?string $cacheKey, ?MetadataInterface $metadata, string $propertyPath, array $groups, ?array $cascadedGroups, int $traversalStrategy, ExecutionContextInterface $context)
     {
         $context->setNode($value, $object, $metadata, $propertyPath);
 
@@ -706,25 +662,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * If any of the constraints generates a violation, subsequent groups in the
      * group sequence are skipped.
-     *
-     * @param mixed                     $value             The validated value
-     * @param object|null               $object            The current object
-     * @param string                    $cacheKey          The key for caching
-     *                                                     the validated value
-     * @param MetadataInterface         $metadata          The metadata of the
-     *                                                     value
-     * @param string                    $propertyPath      The property path leading
-     *                                                     to the value
-     * @param int                       $traversalStrategy The strategy used for
-     *                                                     traversing the value
-     * @param GroupSequence             $groupSequence     The group sequence
-     * @param string|null               $cascadedGroup     The group that should
-     *                                                     be passed to cascaded
-     *                                                     objects instead of
-     *                                                     the group sequence
-     * @param ExecutionContextInterface $context           The execution context
      */
-    private function stepThroughGroupSequence($value, ?object $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, $cascadedGroup, ExecutionContextInterface $context)
+    private function stepThroughGroupSequence($value, ?object $object, ?string $cacheKey, ?MetadataInterface $metadata, string $propertyPath, int $traversalStrategy, GroupSequence $groupSequence, ?string $cascadedGroup, ExecutionContextInterface $context)
     {
         $violationCount = \count($context->getViolations());
         $cascadedGroups = $cascadedGroup ? [$cascadedGroup] : null;
@@ -767,14 +706,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Validates a node's value against all constraints in the given group.
      *
-     * @param mixed                     $value    The validated value
-     * @param string                    $cacheKey The key for caching the
-     *                                            validated value
-     * @param MetadataInterface         $metadata The metadata of the value
-     * @param string                    $group    The group to validate
-     * @param ExecutionContextInterface $context  The execution context
+     * @param mixed $value The validated value
      */
-    private function validateInGroup($value, $cacheKey, MetadataInterface $metadata, $group, ExecutionContextInterface $context)
+    private function validateInGroup($value, ?string $cacheKey, MetadataInterface $metadata, string $group, ExecutionContextInterface $context)
     {
         $context->setGroup($group);
 

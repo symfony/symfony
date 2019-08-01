@@ -107,7 +107,7 @@ EOF
         $io->comment('Run <comment>messenger:failed:show {id} -vv</comment> to see message details.');
     }
 
-    private function showMessage($id, SymfonyStyle $io)
+    private function showMessage(string $id, SymfonyStyle $io)
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver();

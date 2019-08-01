@@ -297,7 +297,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $this->catalogues[$locale] = include $cache->getPath();
     }
 
-    private function dumpCatalogue($locale, ConfigCacheInterface $cache): void
+    private function dumpCatalogue(string $locale, ConfigCacheInterface $cache): void
     {
         $this->initializeCatalogue($locale);
         $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
@@ -352,7 +352,7 @@ EOF
         return $fallbackContent;
     }
 
-    private function getCatalogueCachePath($locale)
+    private function getCatalogueCachePath(string $locale)
     {
         return $this->cacheDir.'/catalogue.'.$locale.'.'.strtr(substr(base64_encode(hash('sha256', serialize($this->fallbackLocales), true)), 0, 7), '/', '_').'.php';
     }
@@ -374,7 +374,7 @@ EOF
         }
     }
 
-    private function loadFallbackCatalogues($locale): void
+    private function loadFallbackCatalogues(string $locale): void
     {
         $current = $this->catalogues[$locale];
 

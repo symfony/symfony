@@ -119,7 +119,7 @@ EOF;
         return 'po';
     }
 
-    private function escape($str)
+    private function escape(string $str)
     {
         return addcslashes($str, "\0..\37\42\134");
     }

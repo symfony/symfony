@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -22,6 +23,8 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 abstract class AbstractNumberFormatterTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider formatCurrencyWithDecimalStyleProvider
      */

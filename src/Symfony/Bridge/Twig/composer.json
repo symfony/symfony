@@ -35,6 +35,7 @@
         "symfony/translation": "^4.2.1",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/security-acl": "~2.8|~3.0",
+        "symfony/security-core": "~3.0|~4.0",
         "symfony/security-csrf": "~3.4|~4.0",
         "symfony/security-http": "~3.4|~4.0",
         "symfony/stopwatch": "~3.4|~4.0",

@@ -147,7 +147,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         return $this->profile;
     }
 
-    private function getComputedData(string $index)
+    private function getComputedData($index)
     {
         if (null === $this->computed) {
             $this->computed = $this->computeData($this->getProfile());

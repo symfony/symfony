@@ -118,7 +118,7 @@ EOF
         throw new RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
     }
 
-    private function validate(string $template, $file)
+    private function validate($template, $file)
     {
         $realLoader = $this->twig->getLoader();
         try {
@@ -136,7 +136,7 @@ EOF
         return ['template' => $template, 'file' => $file, 'valid' => true];
     }
 
-    private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, array $files)
+    private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, $files)
     {
         switch ($input->getOption('format')) {
             case 'txt':
@@ -148,7 +148,7 @@ EOF
         }
     }
 
-    private function displayTxt(OutputInterface $output, SymfonyStyle $io, array $filesInfo)
+    private function displayTxt(OutputInterface $output, SymfonyStyle $io, $filesInfo)
     {
         $errors = 0;
 
@@ -170,7 +170,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function displayJson(OutputInterface $output, array $filesInfo)
+    private function displayJson(OutputInterface $output, $filesInfo)
     {
         $errors = 0;
 
@@ -189,7 +189,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function renderException(OutputInterface $output, string $template, Error $exception, string $file = null)
+    private function renderException(OutputInterface $output, $template, Error $exception, $file = null)
     {
         $line = $exception->getTemplateLine();
 
@@ -212,7 +212,7 @@ EOF
         }
     }
 
-    private function getContext(string $template, int $line, int $context = 3)
+    private function getContext($template, $line, $context = 3)
     {
         $lines = explode("\n", $template);
 

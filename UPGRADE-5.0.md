@@ -301,7 +301,7 @@ HttpKernel
  * Removed `PostResponseEvent`, use `TerminateEvent` instead
  * Removed `TranslatorListener` in favor of `LocaleAwareListener`
  * The `DebugHandlersListener` class has been made `final`
- * Removed `SaveSessionListener` in favor of `AbstractSessionListener` 
+ * Removed `SaveSessionListener` in favor of `AbstractSessionListener`
 
 Intl
 ----
@@ -456,16 +456,16 @@ Serializer
 ----------
 
  * The default value of the `CsvEncoder` "as_collection" option was changed to `true`.
- * Individual encoders & normalizers options as constructor arguments were removed. 
+ * Individual encoders & normalizers options as constructor arguments were removed.
    Use the default context instead.
  * The following method and properties:
      - `AbstractNormalizer::$circularReferenceLimit`
      - `AbstractNormalizer::$circularReferenceHandler`
      - `AbstractNormalizer::$callbacks`
      - `AbstractNormalizer::$ignoredAttributes`
-     - `AbstractNormalizer::$camelizedAttributes` 
+     - `AbstractNormalizer::$camelizedAttributes`
      - `AbstractNormalizer::setCircularReferenceLimit()`
-     - `AbstractNormalizer::setCircularReferenceHandler()` 
+     - `AbstractNormalizer::setCircularReferenceHandler()`
      - `AbstractNormalizer::setCallbacks()`
      - `AbstractNormalizer::setIgnoredAttributes()`
      - `AbstractObjectNormalizer::$maxDepthHandler`

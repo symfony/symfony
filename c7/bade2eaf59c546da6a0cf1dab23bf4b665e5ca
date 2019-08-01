@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-01T18:29:06Z
+
+Why is the PR for master?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-01T18:42:22Z
+
+> Why is the PR for master?
+
+The reason is that the master version of the bridge is used to test all branches, so merging here first will unlock testing the PR on 3.4 (and we will merge this patch also on 3.4 then)

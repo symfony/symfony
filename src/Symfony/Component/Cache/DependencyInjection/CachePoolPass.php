@@ -192,7 +192,7 @@ class CachePoolPass implements CompilerPassInterface
         }
     }
 
-    private function getNamespace($seed, $id)
+    private function getNamespace(string $seed, string $id)
     {
         return substr(str_replace('/', '-', base64_encode(hash('sha256', $id.$seed, true))), 0, 10);
     }

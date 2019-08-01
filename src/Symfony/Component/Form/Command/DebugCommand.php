@@ -154,7 +154,7 @@ EOF
         $helper->describe($io, $object, $options);
     }
 
-    private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, $shortClassName)
+    private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, string $shortClassName)
     {
         $classes = [];
         sort($this->namespaces);
@@ -223,7 +223,7 @@ EOF
         return $typesWithDeprecatedOptions;
     }
 
-    private function findAlternatives($name, array $collection)
+    private function findAlternatives(string $name, array $collection)
     {
         $alternatives = [];
         foreach ($collection as $item) {

@@ -372,7 +372,7 @@ final class Dotenv
         }
     }
 
-    private function resolveCommands($value)
+    private function resolveCommands(string $value)
     {
         if (false === strpos($value, '$')) {
             return $value;
@@ -419,7 +419,7 @@ final class Dotenv
         }, $value);
     }
 
-    private function resolveVariables($value)
+    private function resolveVariables(string $value)
     {
         if (false === strpos($value, '$')) {
             return $value;
@@ -471,13 +471,13 @@ final class Dotenv
         return $value;
     }
 
-    private function moveCursor($text)
+    private function moveCursor(string $text)
     {
         $this->cursor += \strlen($text);
         $this->lineno += substr_count($text, "\n");
     }
 
-    private function createFormatException($message)
+    private function createFormatException(string $message)
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }

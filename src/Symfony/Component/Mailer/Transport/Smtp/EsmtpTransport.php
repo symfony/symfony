@@ -129,7 +129,7 @@ class EsmtpTransport extends SmtpTransport
         }
     }
 
-    private function getCapabilities($ehloResponse): array
+    private function getCapabilities(string $ehloResponse): array
     {
         $capabilities = [];
         $lines = explode("\r\n", trim($ehloResponse));

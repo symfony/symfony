@@ -119,7 +119,7 @@ class WebServerConfig
         return gethostbyname($localHostname).':'.$this->port;
     }
 
-    private function findFrontController($documentRoot, $env)
+    private function findFrontController(string $documentRoot, string $env)
     {
         $fileNames = $this->getFrontControllerFileNames($env);
 
@@ -130,7 +130,7 @@ class WebServerConfig
         }
     }
 
-    private function getFrontControllerFileNames($env)
+    private function getFrontControllerFileNames(string $env)
     {
         return ['app_'.$env.'.php', 'app.php', 'index_'.$env.'.php', 'index.php'];
     }

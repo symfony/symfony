@@ -59,7 +59,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
     public function testSetAttributeInvalidRoundingMode()
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
-        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, null);
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, -1);
     }
 
     public function testConstructWithoutLocale()

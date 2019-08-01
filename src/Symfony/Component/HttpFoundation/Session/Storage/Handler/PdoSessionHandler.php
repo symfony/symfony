@@ -423,10 +423,8 @@ class PdoSessionHandler extends AbstractSessionHandler
 
     /**
      * Lazy-connects to the database.
-     *
-     * @param string $dsn DSN string
      */
-    private function connect($dsn)
+    private function connect(string $dsn)
     {
         $this->pdo = new \PDO($dsn, $this->username, $this->password, $this->connectionOptions);
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -436,13 +434,11 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Builds a PDO DSN from a URL-like connection string.
      *
-     * @param string $dsnOrUrl
-     *
      * @return string
      *
      * @todo implement missing support for oci DSN (which look totally different from other PDO ones)
      */
-    private function buildDsnFromUrl($dsnOrUrl)
+    private function buildDsnFromUrl(string $dsnOrUrl)
     {
         // (pdo_)?sqlite3?:///... => (pdo_)?sqlite3?://localhost/... or else the URL will be invalid
         $url = preg_replace('#^((?:pdo_)?sqlite3?):///#', '$1://localhost/', $dsnOrUrl);
@@ -775,13 +771,9 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Returns an insert statement supported by the database for writing session data.
      *
-     * @param string $sessionId   Session ID
-     * @param string $sessionData Encoded session data
-     * @param int    $maxlifetime session.gc_maxlifetime
-     *
      * @return \PDOStatement The insert statement
      */
-    private function getInsertStatement($sessionId, $sessionData, $maxlifetime)
+    private function getInsertStatement(string $sessionId, string $sessionData, int $maxlifetime)
     {
         switch ($this->driver) {
             case 'oci':
@@ -808,13 +800,9 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Returns an update statement supported by the database for writing session data.
      *
-     * @param string $sessionId   Session ID
-     * @param string $sessionData Encoded session data
-     * @param int    $maxlifetime session.gc_maxlifetime
-     *
      * @return \PDOStatement The update statement
      */
-    private function getUpdateStatement($sessionId, $sessionData, $maxlifetime)
+    private function getUpdateStatement(string $sessionId, string $sessionData, int $maxlifetime)
     {
         switch ($this->driver) {
             case 'oci':

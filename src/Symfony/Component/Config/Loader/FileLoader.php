@@ -125,7 +125,7 @@ abstract class FileLoader extends Loader
         yield from $resource;
     }
 
-    private function doImport($resource, $type = null, bool $ignoreErrors = false, $sourceResource = null)
+    private function doImport($resource, string $type = null, bool $ignoreErrors = false, $sourceResource = null)
     {
         try {
             $loader = $this->resolve($resource, $type);

@@ -207,7 +207,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $this->pool->commit();
     }
 
-    private function doSave(CacheItemInterface $item, $method)
+    private function doSave(CacheItemInterface $item, string $method)
     {
         if (!$item instanceof CacheItem) {
             return false;
@@ -233,7 +233,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         return $this->pool->$method($innerItem);
     }
 
-    private function generateItems($items)
+    private function generateItems(iterable $items)
     {
         $f = $this->createCacheItem;
 

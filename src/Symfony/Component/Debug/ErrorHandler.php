@@ -353,7 +353,7 @@ class ErrorHandler
     /**
      * Re-registers as a PHP error handler if levels changed.
      */
-    private function reRegister($prev)
+    private function reRegister(int $prev)
     {
         if ($prev !== $this->thrownErrors | $this->loggedErrors) {
             $handler = set_error_handler('var_dump');
@@ -691,7 +691,7 @@ class ErrorHandler
     /**
      * Cleans the trace by removing function arguments and the frames added by the error handler and DebugClassLoader.
      */
-    private function cleanTrace($backtrace, $type, $file, $line, $throw)
+    private function cleanTrace(array $backtrace, int $type, string $file, int $line, bool $throw)
     {
         $lightTrace = $backtrace;
 

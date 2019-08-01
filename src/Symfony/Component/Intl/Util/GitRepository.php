@@ -85,7 +85,7 @@ final class GitRepository
         $this->execInPath(sprintf('git checkout %s', escapeshellarg($branch)));
     }
 
-    private function execInPath($command)
+    private function execInPath(string $command)
     {
         return self::exec(sprintf('cd %s && %s', escapeshellarg($this->path), $command));
     }

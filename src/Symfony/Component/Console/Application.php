@@ -1029,11 +1029,9 @@ class Application implements ResetInterface
     /**
      * Returns abbreviated suggestions in string format.
      *
-     * @param array $abbrevs Abbreviated suggestions to convert
-     *
      * @return string A formatted string of abbreviated suggestions
      */
-    private function getAbbreviationSuggestions($abbrevs)
+    private function getAbbreviationSuggestions(array $abbrevs)
     {
         return '    '.implode("\n    ", $abbrevs);
     }
@@ -1060,12 +1058,9 @@ class Application implements ResetInterface
      * Finds alternative of $name among $collection,
      * if nothing is found in $collection, try in $abbrevs.
      *
-     * @param string   $name       The string
-     * @param iterable $collection The collection
-     *
      * @return string[] A sorted array of similar string
      */
-    private function findAlternatives($name, $collection)
+    private function findAlternatives(string $name, iterable $collection)
     {
         $threshold = 1e3;
         $alternatives = [];
@@ -1137,7 +1132,7 @@ class Application implements ResetInterface
         return $this->singleCommand;
     }
 
-    private function splitStringByWidth($string, $width)
+    private function splitStringByWidth(string $string, int $width)
     {
         // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
         // additionally, array_slice() is not enough as some character has doubled width.
@@ -1176,11 +1171,9 @@ class Application implements ResetInterface
     /**
      * Returns all namespaces of the command name.
      *
-     * @param string $name The full name of the command
-     *
      * @return string[] The namespaces of the command
      */
-    private function extractAllNamespaces($name)
+    private function extractAllNamespaces(string $name)
     {
         // -1 as third argument is needed to skip the command short name when exploding
         $parts = explode(':', $name, -1);

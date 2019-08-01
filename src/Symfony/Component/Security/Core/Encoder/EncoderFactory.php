@@ -82,7 +82,7 @@ class EncoderFactory implements EncoderFactoryInterface
         return $reflection->newInstanceArgs($config['arguments']);
     }
 
-    private function getEncoderConfigFromAlgorithm($config)
+    private function getEncoderConfigFromAlgorithm(array $config)
     {
         if ('auto' === $config['algorithm']) {
             $encoderChain = [];

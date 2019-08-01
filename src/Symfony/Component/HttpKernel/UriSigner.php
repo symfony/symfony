@@ -82,7 +82,7 @@ class UriSigner
         return $this->computeHash($this->buildUrl($url, $params)) === $hash;
     }
 
-    private function computeHash($uri)
+    private function computeHash(string $uri)
     {
         return base64_encode(hash_hmac('sha256', $uri, $this->secret, true));
     }

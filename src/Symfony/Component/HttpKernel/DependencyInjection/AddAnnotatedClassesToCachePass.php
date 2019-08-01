@@ -104,7 +104,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return array_keys($classes);
     }
 
-    private function patternsToRegexps($patterns)
+    private function patternsToRegexps(array $patterns)
     {
         $regexps = [];
 
@@ -126,7 +126,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return $regexps;
     }
 
-    private function matchAnyRegexps($class, $regexps)
+    private function matchAnyRegexps(string $class, array $regexps)
     {
         $blacklisted = false !== strpos($class, 'Test');
 

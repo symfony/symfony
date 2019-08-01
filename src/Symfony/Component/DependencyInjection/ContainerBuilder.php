@@ -558,7 +558,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->doGet($id, $invalidBehavior);
     }
 
-    private function doGet($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, array &$inlineServices = null, $isConstructorArgument = false)
+    private function doGet(string $id, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, array &$inlineServices = null, bool $isConstructorArgument = false)
     {
         if (isset($inlineServices[$id])) {
             return $inlineServices[$id];
@@ -1066,17 +1066,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Creates a service for a service definition.
      *
-     * @param Definition $definition A service definition instance
-     * @param string     $id         The service identifier
-     * @param bool       $tryProxy   Whether to try proxying the service with a lazy proxy
-     *
      * @return object The service described by the service definition
      *
      * @throws RuntimeException         When the factory definition is incomplete
      * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
-    private function createService(Definition $definition, array &$inlineServices, $isConstructorArgument = false, $id = null, $tryProxy = true)
+    private function createService(Definition $definition, array &$inlineServices, bool $isConstructorArgument = false, string $id = null, bool $tryProxy = true)
     {
         if (null === $id && isset($inlineServices[$h = spl_object_hash($definition)])) {
             return $inlineServices[$h];
@@ -1207,7 +1203,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->doResolveServices($value);
     }
 
-    private function doResolveServices($value, array &$inlineServices = [], $isConstructorArgument = false)
+    private function doResolveServices($value, array &$inlineServices = [], bool $isConstructorArgument = false)
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {
@@ -1614,7 +1610,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
-    private function callMethod($service, $call, array &$inlineServices)
+    private function callMethod($service, array $call, array &$inlineServices)
     {
         foreach (self::getServiceConditionals($call[1]) as $s) {
             if (!$this->has($s)) {
@@ -1635,11 +1631,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Shares a given service in the container.
      *
-     * @param Definition  $definition
-     * @param object      $service
-     * @param string|null $id
+     * @param object $service
      */
-    private function shareService(Definition $definition, $service, $id, array &$inlineServices)
+    private function shareService(Definition $definition, $service, ?string $id, array &$inlineServices)
     {
         $inlineServices[null !== $id ? $id : spl_object_hash($definition)] = $service;
 
@@ -1661,7 +1655,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->expressionLanguage;
     }
 
-    private function inVendors($path)
+    private function inVendors(string $path)
     {
         if (null === $this->vendors) {
             $resource = new ComposerResource();

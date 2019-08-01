@@ -269,7 +269,7 @@ class BinaryFileResponse extends Response
         return $this;
     }
 
-    private function hasValidIfRangeHeader($header)
+    private function hasValidIfRangeHeader(?string $header)
     {
         if ($this->getEtag() === $header) {
             return true;

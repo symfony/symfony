@@ -48,7 +48,7 @@ class XliffFileLoader implements LoaderInterface
         return $catalogue;
     }
 
-    private function extract($resource, MessageCatalogue $catalogue, $domain)
+    private function extract($resource, MessageCatalogue $catalogue, string $domain)
     {
         try {
             $dom = XmlUtils::loadFile($resource);

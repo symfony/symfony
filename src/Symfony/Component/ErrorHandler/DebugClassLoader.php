@@ -496,7 +496,6 @@ class DebugClassLoader
     /**
      * `class_implements` includes interfaces from the parents so we have to manually exclude them.
      *
-     * @param string       $class
      * @param string|false $parent
      *
      * @return string[]

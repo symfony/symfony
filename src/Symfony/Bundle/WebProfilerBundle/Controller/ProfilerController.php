@@ -382,7 +382,7 @@ class ProfilerController
         $this->profiler->disable();
     }
 
-    private function renderWithCspNonces(Request $request, $template, $variables, $code = 200, $headers = ['Content-Type' => 'text/html'])
+    private function renderWithCspNonces(Request $request, string $template, array $variables, int $code = 200, array $headers = ['Content-Type' => 'text/html'])
     {
         $response = new Response('', $code, $headers);
 

@@ -420,7 +420,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->configCacheFactory;
     }
 
-    private function checkDeprecatedOption($key)
+    private function checkDeprecatedOption(string $key)
     {
         switch ($key) {
             case 'generator_base_class':

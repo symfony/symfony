@@ -70,11 +70,9 @@ class TemplateFinder implements TemplateFinderInterface
     /**
      * Find templates in the given directory.
      *
-     * @param string $dir The folder where to look for templates
-     *
      * @return TemplateReferenceInterface[]
      */
-    private function findTemplatesInFolder($dir)
+    private function findTemplatesInFolder(string $dir)
     {
         $templates = [];
 

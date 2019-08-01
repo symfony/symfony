@@ -240,7 +240,7 @@ class ContextListener implements ListenerInterface
         throw new \RuntimeException(sprintf('There is no user provider for user "%s".', \get_class($user)));
     }
 
-    private function safelyUnserialize($serializedToken)
+    private function safelyUnserialize(string $serializedToken)
     {
         $e = $token = null;
         $prevUnserializeHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');

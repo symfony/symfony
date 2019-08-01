@@ -242,7 +242,7 @@ class Profiler implements ResetInterface
         return $this->collectors[$name];
     }
 
-    private function getTimestamp($value)
+    private function getTimestamp(?string $value)
     {
         if (null === $value || '' == $value) {
             return;

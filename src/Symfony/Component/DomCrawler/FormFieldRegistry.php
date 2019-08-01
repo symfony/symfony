@@ -163,13 +163,9 @@ class FormFieldRegistry
     /**
      * Transforms a PHP array in a list of fully qualified name / value.
      *
-     * @param array  $array  The PHP array
-     * @param string $base   The name of the base field
-     * @param array  $output The initial values
-     *
      * @return array The list of fields as [string] Fully qualified name => (mixed) value)
      */
-    private function walk(array $array, $base = '', array &$output = [])
+    private function walk(array $array, ?string $base = '', array &$output = [])
     {
         foreach ($array as $k => $v) {
             $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
@@ -188,11 +184,9 @@ class FormFieldRegistry
      *
      *     getSegments('base[foo][3][]') = ['base', 'foo, '3', ''];
      *
-     * @param string $name The name of the field
-     *
      * @return string[] The list of segments
      */
-    private function getSegments($name)
+    private function getSegments(string $name)
     {
         if (preg_match('/^(?P<base>[^[]+)(?P<extra>(\[.*)|$)/', $name, $m)) {
             $segments = [$m['base']];

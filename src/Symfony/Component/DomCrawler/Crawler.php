@@ -949,11 +949,9 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * The XPath expression should already be processed to apply it in the context of each node.
      *
-     * @param string $xpath
-     *
      * @return self
      */
-    private function filterRelativeXPath($xpath)
+    private function filterRelativeXPath(string $xpath)
     {
         $prefixes = $this->findNamespacePrefixes($xpath);
 

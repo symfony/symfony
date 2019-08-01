@@ -359,7 +359,7 @@ EOF;
 EOF;
     }
 
-    private function decorate($content, $css)
+    private function decorate(string $content, string $css)
     {
         return <<<EOF
 <!DOCTYPE html>
@@ -376,14 +376,14 @@ EOF;
 EOF;
     }
 
-    private function formatClass($class)
+    private function formatClass(string $class)
     {
         $parts = explode('\\', $class);
 
         return sprintf('<abbr title="%s">%s</abbr>', $class, array_pop($parts));
     }
 
-    private function formatPath($path, $line)
+    private function formatPath(string $path, int $line)
     {
         $file = $this->escapeHtml(preg_match('#[^/\\\\]*+$#', $path, $file) ? $file[0] : $path);
         $fmt = $this->fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
@@ -449,7 +449,7 @@ EOF;
     /**
      * HTML-encodes a string.
      */
-    private function escapeHtml($str)
+    private function escapeHtml(string $str)
     {
         return htmlspecialchars($str, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
     }

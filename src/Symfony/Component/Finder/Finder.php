@@ -794,11 +794,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * Excluding: (s)ftp:// wrapper
      *
-     * @param string $dir
-     *
      * @return string
      */
-    private function normalizeDir($dir)
+    private function normalizeDir(string $dir)
     {
         $dir = rtrim($dir, '/'.\DIRECTORY_SEPARATOR);
 

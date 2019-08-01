@@ -222,7 +222,7 @@ class TraceableCache implements Psr16CacheInterface, PruneableInterface, Resetta
         }
     }
 
-    private function start($name)
+    private function start(string $name)
     {
         $this->calls[] = $event = new TraceableCacheEvent();
         $event->name = $name;

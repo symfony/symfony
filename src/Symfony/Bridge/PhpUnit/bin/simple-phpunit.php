@@ -119,6 +119,8 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
         passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
+
+    passthru("$COMPOSER config --unset platform");
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
         passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
         passthru("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', DIRECTORY_SEPARATOR, $path)));

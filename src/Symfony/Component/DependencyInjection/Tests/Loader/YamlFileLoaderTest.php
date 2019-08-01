@@ -599,7 +599,7 @@ class YamlFileLoaderTest extends TestCase
 
         // Anonymous service in a callable
         $factory = $definition->getFactory();
-        $this->assertInternalType('array', $factory);
+        $this->assertIsArray($factory);
         $this->assertInstanceOf(Reference::class, $factory[0]);
         $this->assertTrue($container->has((string) $factory[0]));
         $this->assertRegExp('/^\d+_Quz~[._A-Za-z0-9]{7}$/', (string) $factory[0]);

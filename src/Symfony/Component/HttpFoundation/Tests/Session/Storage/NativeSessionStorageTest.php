@@ -101,7 +101,7 @@ class NativeSessionStorageTest extends TestCase
 
         $storage->start();
         $id = $storage->getId();
-        $this->assertInternalType('string', $id);
+        $this->assertIsString($id);
         $this->assertNotSame('', $id);
 
         $storage->save();

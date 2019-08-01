@@ -50,7 +50,7 @@ class SerializerCacheWarmerTest extends TestCase
 
         $values = $fallbackPool->getValues();
 
-        $this->assertInternalType('array', $values);
+        $this->assertIsArray($values);
         $this->assertCount(2, $values);
         $this->assertArrayHasKey('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person', $values);
         $this->assertArrayHasKey('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author', $values);
@@ -74,7 +74,7 @@ class SerializerCacheWarmerTest extends TestCase
 
         $values = $fallbackPool->getValues();
 
-        $this->assertInternalType('array', $values);
+        $this->assertIsArray($values);
         $this->assertCount(0, $values);
     }
 }

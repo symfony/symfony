@@ -16,6 +16,7 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
@@ -45,6 +46,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testDefaultRegisteredDefinitions()
     {
         $builder = new ContainerBuilder();
@@ -168,7 +171,7 @@ class ContainerBuilderTest extends TestCase
         $builder = new ContainerBuilder();
         $builder->register('foo', 'stdClass');
 
-        $this->assertInternalType('object', $builder->get('foo'), '->get() returns the service definition associated with the id');
+        $this->assertIsObject($builder->get('foo'), '->get() returns the service definition associated with the id');
     }
 
     public function testGetReturnsRegisteredService()
@@ -662,7 +665,7 @@ class ContainerBuilderTest extends TestCase
         $container->resolveEnvPlaceholders('%dummy%', true);
         $container->resolveEnvPlaceholders('%dummy2%', true);
 
-        $this->assertInternalType('array', $container->resolveEnvPlaceholders('%dummy2%', true));
+        $this->assertIsArray($container->resolveEnvPlaceholders('%dummy2%', true));
 
         foreach ($dummyArray as $key => $value) {
             $this->assertArrayHasKey($key, $container->resolveEnvPlaceholders('%dummy2%', true));

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Simulates a browser and makes requests to a Kernel object.
@@ -202,5 +205,18 @@ $profilerCode
 EOF;
 
         return $code.$this->getHandleScript();
+    }
+
+    public function loginUser(UserInterface $user, string $firewallContext = 'main'): self
+    {
+        $token = new UsernamePasswordToken($user, null, $firewallContext, $user->getRoles());
+        $session = $this->getContainer()->get('session');
+        $session->set('_security_'.$firewallContext, serialize($token));
+        $session->save();
+
+        $cookie = new Cookie($session->getName(), $session->getId());
+        $this->getCookieJar()->set($cookie);
+
+        return $this;
     }
 }

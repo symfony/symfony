@@ -31,13 +31,13 @@ class EventDispatcherTest extends TestCase
 
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->createEventDispatcher();
         $this->listener = new TestEventListener();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dispatcher = null;
         $this->listener = null;

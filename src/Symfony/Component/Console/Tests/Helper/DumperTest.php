@@ -20,13 +20,13 @@ class DumperTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         putenv('DUMP_LIGHT_ARRAY=1');
         putenv('DUMP_COMMA_SEPARATOR=1');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         putenv('DUMP_LIGHT_ARRAY');
         putenv('DUMP_COMMA_SEPARATOR');

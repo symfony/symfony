@@ -71,7 +71,7 @@ class RegistryTest extends TestCase
     public function testAllWithOneMatchWithSuccess()
     {
         $workflows = $this->registry->all(new Subject1());
-        $this->assertInternalType('array', $workflows);
+        $this->assertIsArray($workflows);
         $this->assertCount(1, $workflows);
         $this->assertInstanceOf(Workflow::class, $workflows[0]);
         $this->assertSame('workflow1', $workflows[0]->getName());
@@ -80,7 +80,7 @@ class RegistryTest extends TestCase
     public function testAllWithMultipleMatchWithSuccess()
     {
         $workflows = $this->registry->all(new Subject2());
-        $this->assertInternalType('array', $workflows);
+        $this->assertIsArray($workflows);
         $this->assertCount(2, $workflows);
         $this->assertInstanceOf(Workflow::class, $workflows[0]);
         $this->assertInstanceOf(Workflow::class, $workflows[1]);
@@ -91,7 +91,7 @@ class RegistryTest extends TestCase
     public function testAllWithNoMatch()
     {
         $workflows = $this->registry->all(new \stdClass());
-        $this->assertInternalType('array', $workflows);
+        $this->assertIsArray($workflows);
         $this->assertCount(0, $workflows);
     }
 

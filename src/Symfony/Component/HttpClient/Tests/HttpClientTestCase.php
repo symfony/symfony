@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testToStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -28,7 +31,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertFalse(feof($stream));
         $this->assertTrue(rewind($stream));
 
-        $this->assertInternalType('array', json_decode(fread($stream, 1024), true));
+        $this->assertIsArray(json_decode(fread($stream, 1024), true));
         $this->assertSame('', fread($stream, 1));
         $this->assertTrue(feof($stream));
     }

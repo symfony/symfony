@@ -23,7 +23,7 @@ class CachePoolDeleteCommandTest extends TestCase
 {
     private $cachePool;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cachePool = $this->getMockBuilder(CacheItemPoolInterface::class)
             ->getMock();

@@ -12,16 +12,19 @@
 namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Mapping\GetterMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
 class GetterMetadataTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
 
     public function testInvalidPropertyName()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ValidatorException');
+        $this->expectException('Symfony\Component\Validator\Exception\ValidatorException');
 
         new GetterMetadata(self::CLASSNAME, 'foobar');
     }

@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
 class CollectionTypeTest extends BaseTypeTest
 {
+    use ForwardCompatTestTrait;
+
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CollectionType';
 
     public function testContainsNoChildByDefault()
@@ -61,7 +64,7 @@ class CollectionTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
         ]);
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $form->setData(new \stdClass());
     }
 

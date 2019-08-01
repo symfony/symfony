@@ -52,13 +52,13 @@ class FormBuilderTest extends TestCase
 
     public function testAddNameNoStringAndNoInteger()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $this->builder->add(true);
     }
 
     public function testAddTypeNoString()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $this->builder->add('foo', 1234);
     }
 
@@ -170,12 +170,8 @@ class FormBuilderTest extends TestCase
 
     public function testGetUnknown()
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
-            $this->expectExceptionMessage('The child with the name "foo" does not exist.');
-        } else {
-            $this->setExpectedException('Symfony\Component\Form\Exception\InvalidArgumentException', 'The child with the name "foo" does not exist.');
-        }
+        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The child with the name "foo" does not exist.');
 
         $this->builder->get('foo');
     }

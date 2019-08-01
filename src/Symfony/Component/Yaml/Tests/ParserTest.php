@@ -1488,11 +1488,7 @@ EOT
      */
     public function testParseInvalidBinaryData($data, $expectedMessage)
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectExceptionMessageRegExp($expectedMessage);
-        } else {
-            $this->setExpectedExceptionRegExp(ParseException::class, $expectedMessage);
-        }
+        $this->expectExceptionMessageRegExp($expectedMessage);
 
         $this->parser->parse($data);
     }
@@ -1559,12 +1555,8 @@ EOT;
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('\Symfony\Component\Yaml\Exception\ParseException');
-            $this->expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
-        } else {
-            $this->setExpectedException('\Symfony\Component\Yaml\Exception\ParseException', sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
-        }
+        $this->expectException('\Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
 
         $this->parser->parse($yaml);
     }

@@ -12,10 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Definition;
 
 class DefinitionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $def = new Definition('stdClass');
@@ -69,12 +72,8 @@ class DefinitionTest extends TestCase
 
         $def = new Definition('stdClass');
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('InvalidArgumentException');
-            $this->expectExceptionMessage('The decorated service inner name for "foo" must be different than the service name itself.');
-        } else {
-            $this->setExpectedException('InvalidArgumentException', 'The decorated service inner name for "foo" must be different than the service name itself.');
-        }
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The decorated service inner name for "foo" must be different than the service name itself.');
 
         $def->setDecoratedService('foo', 'foo');
     }

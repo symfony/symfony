@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -21,6 +22,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class AddSecurityVotersPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
      */
@@ -101,12 +104,8 @@ class AddSecurityVotersPassTest extends TestCase
         $exception = LogicException::class;
         $message = 'stdClass should implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface interface when used as voter.';
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException($exception);
-            $this->expectExceptionMessage($message);
-        } else {
-            $this->setExpectedException($exception, $message);
-        }
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $container = new ContainerBuilder();
         $container

@@ -549,12 +549,8 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefined('option');
         $this->resolver->setAllowedTypes('option', $allowedType);
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-            $this->expectExceptionMessage($exceptionMessage);
-        } else {
-            $this->setExpectedException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException', $exceptionMessage);
-        }
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage($exceptionMessage);
 
         $this->resolver->resolve(['option' => $actualType]);
     }

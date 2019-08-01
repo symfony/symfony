@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
@@ -22,6 +23,8 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithValueAsDefault;
 
 class ConstraintTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testSetProperties()
     {
         $constraint = new ConstraintA([
@@ -35,7 +38,7 @@ class ConstraintTest extends TestCase
 
     public function testSetNotExistingPropertyThrowsException()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
         new ConstraintA([
             'foo' => 'bar',
@@ -46,14 +49,14 @@ class ConstraintTest extends TestCase
     {
         $constraint = new ConstraintA();
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
         $constraint->foo = 'bar';
     }
 
     public function testInvalidAndRequiredOptionsPassed()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
         new ConstraintC([
             'option1' => 'default',
@@ -101,14 +104,14 @@ class ConstraintTest extends TestCase
 
     public function testSetUndefinedDefaultProperty()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         new ConstraintB('foo');
     }
 
     public function testRequiredOptionsMustBeDefined()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\MissingOptionsException');
+        $this->expectException('Symfony\Component\Validator\Exception\MissingOptionsException');
 
         new ConstraintC();
     }

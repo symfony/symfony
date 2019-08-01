@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
  */
 class ProcessFailedExceptionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * tests ProcessFailedException throws exception if the process was successful.
      */
@@ -29,12 +32,8 @@ class ProcessFailedExceptionTest extends TestCase
             ->method('isSuccessful')
             ->willReturn(true);
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(\InvalidArgumentException::class);
-            $this->expectExceptionMessage('Expected a failed process, but the given process was successful.');
-        } else {
-            $this->setExpectedException(\InvalidArgumentException::class, 'Expected a failed process, but the given process was successful.');
-        }
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected a failed process, but the given process was successful.');
 
         new ProcessFailedException($process);
     }

@@ -314,12 +314,8 @@ class ApplicationTest extends TestCase
 
         $expectedMsg = "The namespace \"f\" is ambiguous.\nDid you mean one of these?\n    foo\n    foo1";
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(CommandNotFoundException::class);
-            $this->expectExceptionMessage($expectedMsg);
-        } else {
-            $this->setExpectedException(CommandNotFoundException::class, $expectedMsg);
-        }
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectExceptionMessage($expectedMsg);
 
         $application->findNamespace('f');
     }
@@ -423,12 +419,8 @@ class ApplicationTest extends TestCase
     public function testFindWithAmbiguousAbbreviations($abbreviation, $expectedExceptionMessage)
     {
         putenv('COLUMNS=120');
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('Symfony\Component\Console\Exception\CommandNotFoundException');
-            $this->expectExceptionMessage($expectedExceptionMessage);
-        } else {
-            $this->setExpectedException('Symfony\Component\Console\Exception\CommandNotFoundException', $expectedExceptionMessage);
-        }
+        $this->expectException('Symfony\Component\Console\Exception\CommandNotFoundException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $application = new Application();
         $application->add(new \FooCommand());

@@ -12,6 +12,7 @@
 namespace Symfony\Component\CssSelector\Tests\Parser;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 use Symfony\Component\CssSelector\Node\FunctionNode;
 use Symfony\Component\CssSelector\Node\SelectorNode;
@@ -20,6 +21,8 @@ use Symfony\Component\CssSelector\Parser\Token;
 
 class ParserTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @dataProvider getParserTestData */
     public function testParser($source, $representation)
     {
@@ -89,7 +92,7 @@ class ParserTest extends TestCase
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
+        $this->expectException('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
         Parser::parseSeries($function->getArguments());
     }
 

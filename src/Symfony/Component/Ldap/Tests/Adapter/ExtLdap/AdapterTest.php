@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Query;
@@ -23,6 +24,8 @@ use Symfony\Component\Ldap\LdapInterface;
  */
 class AdapterTest extends LdapTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testLdapEscape()
     {
         $ldap = new Adapter();
@@ -74,7 +77,7 @@ class AdapterTest extends LdapTestCase
     public function testLdapQueryWithoutBind()
     {
         $ldap = new Adapter($this->getLdapConfig());
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
+        $this->expectException(NotBoundException::class);
         $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', []);
         $query->execute();
     }

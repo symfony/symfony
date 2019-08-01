@@ -12,10 +12,13 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Input\InputOption;
 
 class InputOptionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $option = new InputOption('foo');
@@ -78,12 +81,8 @@ class InputOptionTest extends TestCase
      */
     public function testInvalidModes($mode)
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('InvalidArgumentException');
-            $this->expectExceptionMessage(sprintf('Option mode "%s" is not valid.', $mode));
-        } else {
-            $this->setExpectedException('InvalidArgumentException', sprintf('Option mode "%s" is not valid.', $mode));
-        }
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage(sprintf('Option mode "%s" is not valid.', $mode));
 
         new InputOption('foo', 'f', $mode);
     }

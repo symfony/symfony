@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -41,6 +42,8 @@ class ComparisonTest_Class
  */
 abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected static function addPhp5Dot5Comparisons(array $comparisons)
     {
         $result = $comparisons;
@@ -163,12 +166,8 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     {
         $constraint = $this->createConstraint(['propertyPath' => 'foo']);
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(ConstraintDefinitionException::class);
-            $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
-        } else {
-            $this->setExpectedException(ConstraintDefinitionException::class, sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
-        }
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
 
         $object = new ComparisonTest_Class(5);
 

@@ -12,11 +12,14 @@
 namespace Symfony\Component\Translation\Tests\Catalogue;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
 abstract class AbstractOperationTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetEmptyDomains()
     {
         $this->assertEquals(
@@ -41,7 +44,7 @@ abstract class AbstractOperationTest extends TestCase
 
     public function testGetMessagesFromUnknownDomain()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         $this->createOperation(
             new MessageCatalogue('en'),
             new MessageCatalogue('en')

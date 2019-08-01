@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Cloner;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -19,6 +20,8 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DataTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testBasicData()
     {
         $values = [1 => 123, 4.5, 'abc', null, false];
@@ -69,7 +72,7 @@ class DataTest extends TestCase
 
         $children = $data->getValue();
 
-        $this->assertInternalType('array', $children);
+        $this->assertIsArray($children);
 
         $this->assertInstanceOf(Data::class, $children[0]);
         $this->assertInstanceOf(Data::class, $children[1]);

@@ -12,10 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
 class EnvPlaceholderParameterBagTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
@@ -42,7 +45,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $placeholder = array_values($placeholderForVariable)[0];
 
         $this->assertCount(1, $placeholderForVariable);
-        $this->assertInternalType('string', $placeholder);
+        $this->assertIsString($placeholder);
         $this->assertContains($envVariableName, $placeholder);
     }
 
@@ -65,7 +68,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $placeholder = array_values($placeholderForVariable)[0];
 
         $this->assertCount(1, $placeholderForVariable);
-        $this->assertInternalType('string', $placeholder);
+        $this->assertIsString($placeholder);
         $this->assertContains($envVariableName, $placeholder);
     }
 

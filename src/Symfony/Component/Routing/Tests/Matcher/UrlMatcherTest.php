@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Matcher;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -21,13 +22,15 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlMatcherTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testNoMethodSoAllowed()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
 
         $matcher = $this->getUrlMatcher($coll);
-        $this->assertInternalType('array', $matcher->match('/foo'));
+        $this->assertIsArray($matcher->match('/foo'));
     }
 
     public function testMethodNotAllowed()
@@ -66,7 +69,7 @@ class UrlMatcherTest extends TestCase
         $coll->add('foo', new Route('/foo', [], [], [], '', [], ['get']));
 
         $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'head'));
-        $this->assertInternalType('array', $matcher->match('/foo'));
+        $this->assertIsArray($matcher->match('/foo'));
     }
 
     public function testMethodNotAllowedAggregatesAllowedMethods()
@@ -108,7 +111,7 @@ class UrlMatcherTest extends TestCase
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo', [], [], [], '', [], ['get', 'head']));
         $matcher = $this->getUrlMatcher($collection);
-        $this->assertInternalType('array', $matcher->match('/foo'));
+        $this->assertIsArray($matcher->match('/foo'));
 
         // route does not match with POST method context
         $matcher = $this->getUrlMatcher($collection, new RequestContext('', 'post'));
@@ -120,9 +123,9 @@ class UrlMatcherTest extends TestCase
 
         // route does match with GET or HEAD method context
         $matcher = $this->getUrlMatcher($collection);
-        $this->assertInternalType('array', $matcher->match('/foo'));
+        $this->assertIsArray($matcher->match('/foo'));
         $matcher = $this->getUrlMatcher($collection, new RequestContext('', 'head'));
-        $this->assertInternalType('array', $matcher->match('/foo'));
+        $this->assertIsArray($matcher->match('/foo'));
 
         // route with an optional variable as the first segment
         $collection = new RouteCollection();

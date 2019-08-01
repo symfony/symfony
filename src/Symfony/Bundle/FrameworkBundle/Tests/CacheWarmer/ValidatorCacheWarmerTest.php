@@ -46,7 +46,7 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $values = $fallbackPool->getValues();
 
-        $this->assertInternalType('array', $values);
+        $this->assertIsArray($values);
         $this->assertCount(2, $values);
         $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Person', $values);
         $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author', $values);
@@ -77,7 +77,7 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $values = $fallbackPool->getValues();
 
-        $this->assertInternalType('array', $values);
+        $this->assertIsArray($values);
         $this->assertCount(2, $values);
         $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category', $values);
         $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.SubCategory', $values);
@@ -99,7 +99,7 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $values = $fallbackPool->getValues();
 
-        $this->assertInternalType('array', $values);
+        $this->assertIsArray($values);
         $this->assertCount(0, $values);
     }
 }

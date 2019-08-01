@@ -2080,7 +2080,7 @@ YAML;
 
     public function testParseFile()
     {
-        $this->assertInternalType('array', $this->parser->parseFile(__DIR__.'/Fixtures/index.yml'));
+        $this->assertIsArray($this->parser->parseFile(__DIR__.'/Fixtures/index.yml'));
     }
 
     /**

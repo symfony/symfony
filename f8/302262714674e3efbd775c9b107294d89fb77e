@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-30T15:49:40Z
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-01T03:17:29Z
+
+I think it's good to do that here. But also I think it's a huge risk to add incompatibilities that are not covered by tests. I would not trust the phpdocs all the time and private functions mostly had no phpdocs at all. So the only way the add types there is by tracing all the entry points individually which I guess was a huge pain and is almost impossible to review.
+For changes like this, I wish we had phpstan active. That would give us much more confidence.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-01T07:46:23Z
+
+As this is for 4.4, we will have plenty of people testing this in real life, which is way much better than any static analysis tool.

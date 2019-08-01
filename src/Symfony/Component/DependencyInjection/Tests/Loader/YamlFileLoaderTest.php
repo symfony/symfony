@@ -311,7 +311,7 @@ class YamlFileLoaderTest extends TestCase
     public function testTagWithNonStringNameThrowsException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('The tag name for service "\.+" must be a non-empty string');
+        $this->expectExceptionMessageRegExp('/The tag name for service ".+" in .+ must be a non-empty string/');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('tag_name_no_string.yml');
     }

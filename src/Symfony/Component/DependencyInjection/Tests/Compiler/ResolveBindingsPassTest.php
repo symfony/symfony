@@ -68,7 +68,7 @@ class ResolveBindingsPassTest extends TestCase
     public function testMissingParent()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('Unused binding "$quz" in service [\s\S]+ Invalid service ".*\\ParentNotExists": class NotExists not found\.');
+        $this->expectExceptionMessageRegExp('/Unused binding "\$quz" in service [\s\S]+/');
         if (\PHP_VERSION_ID >= 70400) {
             throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
         }

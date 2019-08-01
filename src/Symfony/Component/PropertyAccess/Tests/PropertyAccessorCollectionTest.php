@@ -191,8 +191,8 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueFailsIfAdderAndRemoverExistButValueIsNotTraversable()
     {
-        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-expectedExceptionMessageRegExp /The property "axes" in class "Mock_PropertyAccessorCollectionTest_Car[^"]*" can be defined with the methods "addAxis()", "removeAxis()" but the new value must be an array or an instance of \Traversable, "string" given./');
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
+        $this->expectExceptionMessage('Could not determine access type for property "axes" in class "Symfony\Component\PropertyAccess\Tests\PropertyAccessorCollectionTest_Car".');
         $car = new PropertyAccessorCollectionTest_Car();
 
         $this->propertyAccessor->setValue($car, 'axes', 'Not an array or Traversable');

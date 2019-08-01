@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Store\RedisStore;
 
 /**
@@ -18,6 +19,7 @@ use Symfony\Component\Lock\Store\RedisStore;
  */
 abstract class AbstractRedisStoreTest extends AbstractStoreTest
 {
+    use ForwardCompatTestTrait;
     use ExpiringStoreTestTrait;
 
     /**

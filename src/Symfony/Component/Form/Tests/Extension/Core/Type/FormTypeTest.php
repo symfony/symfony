@@ -20,8 +20,6 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormTest_AuthorWithoutRefSetter
 {
-    use ForwardCompatTestTrait;
-
     protected $reference;
 
     protected $referenceCopy;
@@ -54,6 +52,8 @@ class FormTest_AuthorWithoutRefSetter
 
 class FormTypeTest extends BaseTypeTest
 {
+    use ForwardCompatTestTrait;
+
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FormType';
 
     public function testCreateFormInstances()

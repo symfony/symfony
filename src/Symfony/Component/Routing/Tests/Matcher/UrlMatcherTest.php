@@ -339,7 +339,7 @@ class UrlMatcherTest extends TestCase
 
     public function testSchemeRequirement()
     {
-        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $this->getExpectedException() ?: $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
         $matcher = $this->getUrlMatcher($coll);

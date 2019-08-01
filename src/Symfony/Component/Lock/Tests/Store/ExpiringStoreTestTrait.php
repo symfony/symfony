@@ -21,8 +21,6 @@ use Symfony\Component\Lock\StoreInterface;
  */
 trait ExpiringStoreTestTrait
 {
-    use ForwardCompatTestTrait;
-
     /**
      * Amount of microseconds used as a delay to test expiration. Should be
      * small enough not to slow the test suite too much, and high enough not to

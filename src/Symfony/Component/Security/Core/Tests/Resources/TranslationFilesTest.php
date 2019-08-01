@@ -12,19 +12,16 @@
 namespace Symfony\Component\Security\Core\Tests\Resources;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class TranslationFilesTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider provideTranslationFiles
      */
     public function testTranslationFileIsValid($filePath)
     {
         if (class_exists('PHPUnit_Util_XML')) {
-            \PHPUnit\Util\XML::loadfile($filePath, false, false, true);
+            \PHPUnit_Util_XML::loadfile($filePath, false, false, true);
         } else {
             \PHPUnit\Util\XML::loadfile($filePath, false, false, true);
         }

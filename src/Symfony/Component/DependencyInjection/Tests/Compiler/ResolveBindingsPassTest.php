@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Warning;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
@@ -69,6 +70,10 @@ class ResolveBindingsPassTest extends TestCase
      */
     public function testMissingParent()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
         $container = new ContainerBuilder();
 
         $definition = $container->register(ParentNotExists::class, ParentNotExists::class);

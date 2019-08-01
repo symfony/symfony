@@ -11,6 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * Client simulates a browser and makes requests to a Kernel object.
  *
@@ -18,4 +22,17 @@ namespace Symfony\Bundle\FrameworkBundle;
  */
 class KernelBrowser extends Client
 {
+    public function loginUser(UserInterface $user, string $firewallContext = 'main'): self
+    {
+
+        $token = new UsernamePasswordToken($user, null, $firewallContext, $user->getRoles());
+        $session = $this->getContainer()->get('session');
+        $session->set('_security_'.$firewallContext, serialize($token));
+        $session->save();
+
+        $cookie = new Cookie($session->getName(), $session->getId());
+        $this->getCookieJar()->set($cookie);
+
+        return $this;
+    }
 }

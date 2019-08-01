@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Currencies;
 
 /**
@@ -18,6 +19,8 @@ use Symfony\Component\Intl\Currencies;
  */
 class CurrenciesTest extends ResourceBundleTestCase
 {
+    use ForwardCompatTestTrait;
+
     // The below arrays document the state of the ICU data bundled with this package.
 
     private static $currencies = [
@@ -693,7 +696,7 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetRoundingIncrement($currency)
     {
-        $this->assertInternalType('numeric', Currencies::getRoundingIncrement($currency));
+        $this->assertIsNumeric(Currencies::getRoundingIncrement($currency));
     }
 
     public function provideCurrenciesWithNumericEquivalent()

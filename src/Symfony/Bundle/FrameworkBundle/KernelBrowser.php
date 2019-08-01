@@ -24,7 +24,6 @@ class KernelBrowser extends Client
 {
     public function loginUser(UserInterface $user, string $firewallContext = 'main'): self
     {
-
         $token = new UsernamePasswordToken($user, null, $firewallContext, $user->getRoles());
         $session = $this->getContainer()->get('session');
         $session->set('_security_'.$firewallContext, serialize($token));

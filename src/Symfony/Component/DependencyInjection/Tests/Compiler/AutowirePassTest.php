@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Warning;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
@@ -395,6 +396,10 @@ class AutowirePassTest extends TestCase
      */
     public function testParentClassNotFoundThrowsException()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
         $container = new ContainerBuilder();
 
         $aDefinition = $container->register('a', __NAMESPACE__.'\BadParentTypeHintedArgument');
@@ -707,6 +712,10 @@ class AutowirePassTest extends TestCase
 
     public function testIgnoreServiceWithClassNotExisting()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
         $container = new ContainerBuilder();
 
         $container->register('class_not_exist', __NAMESPACE__.'\OptionalServiceClass');
@@ -917,6 +926,10 @@ class AutowirePassTest extends TestCase
      */
     public function testExceptionWhenAliasDoesNotExist()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
         $container = new ContainerBuilder();
 
         // multiple I instances... but no IInterface alias

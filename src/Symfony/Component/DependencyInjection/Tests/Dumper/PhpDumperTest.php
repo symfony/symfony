@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Warning;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
@@ -906,6 +907,10 @@ class PhpDumperTest extends TestCase
 
     public function testHotPathOptimizations()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
         $container = include self::$fixturesPath.'/containers/container_inline_requires.php';
         $container->setParameter('inline_requires', true);
         $container->compile();

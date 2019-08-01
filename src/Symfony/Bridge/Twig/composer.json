@@ -76,6 +76,9 @@
     },
     "minimum-stability": "dev",
     "extra": {
+        "symfony": {
+            "require": ">=3.4"
+        },
         "branch-alias": {
             "dev-master": "4.4-dev"
         }

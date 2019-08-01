@@ -12,12 +12,16 @@
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
 trait ForwardCompatTestTraitForV5
 {
+    private $forwardCompatExpectedExceptionMessage = '';
+    private $forwardCompatExpectedExceptionCode = null;
+
     /**
      * @return void
      */
@@ -209,5 +213,94 @@ trait ForwardCompatTestTraitForV5
     public static function assertIsIterable($actual, $message = '')
     {
         static::assertInternalType('iterable', $actual, $message);
+    }
+
+    /**
+     * @param string $exception
+     *
+     * @return void
+     */
+    public function expectException($exception)
+    {
+        if (method_exists(TestCase::class, 'expectException')) {
+            parent::expectException($exception);
+
+            return;
+        }
+
+        parent::setExpectedException($exception, $this->forwardCompatExpectedExceptionMessage, $this->forwardCompatExpectedExceptionCode);
+    }
+
+    /**
+     * @return void
+     */
+    public function expectExceptionCode($code)
+    {
+        if (method_exists(TestCase::class, 'expectExceptionCode')) {
+            parent::expectExceptionCode($code);
+
+            return;
+        }
+
+        $this->forwardCompatExpectedExceptionCode = $code;
+        parent::setExpectedException(parent::getExpectedException(), $this->forwardCompatExpectedExceptionMessage, $this->forwardCompatExpectedExceptionCode);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    public function expectExceptionMessage($message)
+    {
+        if (method_exists(TestCase::class, 'expectExceptionMessage')) {
+            parent::expectExceptionMessage($message);
+
+            return;
+        }
+
+        $this->forwardCompatExpectedExceptionMessage = $message;
+        parent::setExpectedException(parent::getExpectedException(), $this->forwardCompatExpectedExceptionMessage, $this->forwardCompatExpectedExceptionCode);
+    }
+
+    /**
+     * @param string $messageRegExp
+     *
+     * @return void
+     */
+    public function expectExceptionMessageRegExp($messageRegExp)
+    {
+        if (method_exists(TestCase::class, 'expectExceptionMessageRegExp')) {
+            parent::expectExceptionMessageRegExp($messageRegExp);
+
+            return;
+        }
+
+        parent::setExpectedExceptionRegExp(parent::getExpectedException(), $messageRegExp, $this->forwardCompatExpectedExceptionCode);
+    }
+
+    /**
+     * @param string $exceptionMessage
+     *
+     * @return void
+     */
+    public function setExpectedException($exceptionName, $exceptionMessage = '', $exceptionCode = null)
+    {
+        $this->forwardCompatExpectedExceptionMessage = $exceptionMessage;
+        $this->forwardCompatExpectedExceptionCode = $exceptionCode;
+
+        parent::setExpectedException($exceptionName, $exceptionMessage, $exceptionCode);
+    }
+
+    /**
+     * @param string $exceptionMessageRegExp
+     *
+     * @return void
+     */
+    public function setExpectedExceptionRegExp($exceptionName, $exceptionMessageRegExp = '', $exceptionCode = null)
+    {
+        $this->forwardCompatExpectedExceptionCode = $exceptionCode;
+
+        parent::setExpectedExceptionRegExp($exceptionName, $exceptionMessageRegExp, $exceptionCode);
     }
 }

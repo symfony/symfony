@@ -30,6 +30,6 @@ trait ForwardCompatTestTraitForV7
             ->disableOriginalClone()
             ->disableArgumentCloning()
             ->disallowMockingUnknownTypes()
-                ->getMock();
+            ->getMock();
     }
 }

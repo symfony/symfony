@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -21,6 +22,8 @@ use Symfony\Component\Form\ResolvedFormTypeFactory;
 
 class DebugCommandTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testDebugDefaults()
     {
         $tester = $this->createCommandTester();
@@ -68,12 +71,8 @@ Did you mean one of these?
     Symfony\Component\Form\Tests\Fixtures\Debug\B\AmbiguousType
 TXT;
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(InvalidArgumentException::class);
-            $this->expectExceptionMessage($expectedMessage);
-        } else {
-            $this->setExpectedException(InvalidArgumentException::class, $expectedMessage);
-        }
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
         $tester = $this->createCommandTester([
             'Symfony\Component\Form\Tests\Fixtures\Debug\A',

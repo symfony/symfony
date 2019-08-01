@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Exception\RuntimeException;
 use Symfony\Component\Intl\Util\GitRepository;
@@ -21,6 +22,8 @@ use Symfony\Component\Intl\Util\GitRepository;
  */
 class GitRepositoryTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private $targetDir;
 
     const REPO_URL = 'https://github.com/symfony/intl.git';
@@ -39,11 +42,7 @@ class GitRepositoryTest extends TestCase
 
     public function testItThrowsAnExceptionIfInitialisedWithNonGitDirectory()
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(RuntimeException::class);
-        } else {
-            $this->setExpectedException(RuntimeException::class);
-        }
+        $this->expectException(RuntimeException::class);
 
         @mkdir($this->targetDir, 0777, true);
 

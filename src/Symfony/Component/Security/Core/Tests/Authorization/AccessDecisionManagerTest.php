@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -20,6 +21,8 @@ use Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterfa
 
 class AccessDecisionManagerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -147,12 +150,8 @@ class AccessDecisionManagerTest extends TestCase
         $exception = LogicException::class;
         $message = sprintf('stdClass should implement the %s interface when used as voter.', VoterInterface::class);
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException($exception);
-            $this->expectExceptionMessage($message);
-        } else {
-            $this->setExpectedException($exception, $message);
-        }
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $adm = new AccessDecisionManager([new \stdClass()]);
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();

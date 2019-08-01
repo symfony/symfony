@@ -12,10 +12,13 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 
 class DateTimeToTimestampTransformerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testTransform()
     {
         $transformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
@@ -72,7 +75,7 @@ class DateTimeToTimestampTransformerTest extends TestCase
     {
         $transformer = new DateTimeToTimestampTransformer();
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('1234');
     }
@@ -109,7 +112,7 @@ class DateTimeToTimestampTransformerTest extends TestCase
     {
         $reverseTransformer = new DateTimeToTimestampTransformer();
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
     }

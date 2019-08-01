@@ -960,12 +960,8 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('foo');
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('Symfony\Component\Process\Exception\LogicException');
-            $this->expectExceptionMessage(sprintf('Process must be started before calling %s.', $method));
-        } else {
-            $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', sprintf('Process must be started before calling %s.', $method));
-        }
+        $this->expectException('Symfony\Component\Process\Exception\LogicException');
+        $this->expectExceptionMessage(sprintf('Process must be started before calling %s.', $method));
 
         $process->{$method}();
     }
@@ -1614,12 +1610,8 @@ EOTXT;
             if (!$expectException) {
                 $this->markTestSkipped('PHP is compiled with --enable-sigchild.');
             } elseif (self::$notEnhancedSigchild) {
-                if (method_exists($this, 'expectException')) {
-                    $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
-                    $this->expectExceptionMessage('This PHP has been compiled with --enable-sigchild.');
-                } else {
-                    $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild.');
-                }
+                $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
+                $this->expectExceptionMessage('This PHP has been compiled with --enable-sigchild.');
             }
         }
     }

@@ -39,7 +39,7 @@ class DataCollectorExtensionTest extends TestCase
     {
         $typeExtensions = $this->extension->getTypeExtensions('Symfony\Component\Form\Extension\Core\Type\FormType');
 
-        $this->assertInternalType('array', $typeExtensions);
+        $this->assertIsArray($typeExtensions);
         $this->assertCount(1, $typeExtensions);
         $this->assertInstanceOf('Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension', array_shift($typeExtensions));
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Stopwatch\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -23,6 +24,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class StopwatchTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const DELTA = 20;
 
     public function testStart()
@@ -115,9 +118,9 @@ class StopwatchTest extends TestCase
         $stopwatch->start('foo');
         $event = $stopwatch->stop('foo');
 
-        $this->assertInternalType('float', $event->getStartTime());
-        $this->assertInternalType('float', $event->getEndTime());
-        $this->assertInternalType('float', $event->getDuration());
+        $this->assertIsFloat($event->getStartTime());
+        $this->assertIsFloat($event->getEndTime());
+        $this->assertIsFloat($event->getDuration());
     }
 
     public function testSection()

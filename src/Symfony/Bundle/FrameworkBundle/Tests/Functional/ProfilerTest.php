@@ -30,7 +30,7 @@ class ProfilerTest extends AbstractWebTestCase
         $client->enableProfiler();
         $this->assertFalse($client->getProfile());
         $client->request('GET', '/profiler');
-        $this->assertInternalType('object', $client->getProfile());
+        $this->assertIsObject($client->getProfile());
 
         $client->request('GET', '/profiler');
         $this->assertFalse($client->getProfile());

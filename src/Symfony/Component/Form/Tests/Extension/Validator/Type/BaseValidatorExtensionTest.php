@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
@@ -20,6 +21,8 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 abstract class BaseValidatorExtensionTest extends TypeTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testValidationGroupNullByDefault()
     {
         $form = $this->createForm();
@@ -60,7 +63,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => [$this, 'testValidationGroupsCanBeSetToCallback'],
         ]);
 
-        $this->assertInternalType('callable', $form->getConfig()->getOption('validation_groups'));
+        $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToClosure()
@@ -69,7 +72,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
             'validation_groups' => function (FormInterface $form) { },
         ]);
 
-        $this->assertInternalType('callable', $form->getConfig()->getOption('validation_groups'));
+        $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));
     }
 
     public function testValidationGroupsCanBeSetToGroupSequence()

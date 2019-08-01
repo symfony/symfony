@@ -40,7 +40,7 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
     public function setToken(TokenInterface $token = null)
     {
         if (null !== $token && !method_exists($token, 'getRoleNames')) {
-            @trigger_error(sprintf('Not implementing the getRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($token), TokenInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), E_USER_DEPRECATED);
         }
 
         $this->token = $token;

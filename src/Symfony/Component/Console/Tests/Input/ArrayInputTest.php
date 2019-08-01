@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -19,6 +20,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ArrayInputTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetFirstArgument()
     {
         $input = new ArrayInput([]);
@@ -127,12 +130,8 @@ class ArrayInputTest extends TestCase
      */
     public function testParseInvalidInput($parameters, $definition, $expectedExceptionMessage)
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('InvalidArgumentException');
-            $this->expectExceptionMessage($expectedExceptionMessage);
-        } else {
-            $this->setExpectedException('InvalidArgumentException', $expectedExceptionMessage);
-        }
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         new ArrayInput($parameters, $definition);
     }

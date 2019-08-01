@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -19,6 +20,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $bag = new ParameterBag($parameters = [
@@ -78,12 +81,8 @@ class ParameterBagTest extends TestCase
             'fiz' => ['bar' => ['boo' => 12]],
         ]);
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(ParameterNotFoundException::class);
-            $this->expectExceptionMessage($exceptionMessage);
-        } else {
-            $this->setExpectedException(ParameterNotFoundException::class, $exceptionMessage);
-        }
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $bag->get($parameterKey);
     }

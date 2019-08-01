@@ -12,10 +12,13 @@
 namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\BrowserKit\Cookie;
 
 class CookieTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testToString()
     {
         $cookie = new Cookie('foo', 'bar', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true);

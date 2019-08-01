@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\FormConfigBuilder;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Form\FormConfigBuilder;
  */
 class FormConfigTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function getHtml4Ids()
     {
         return [
@@ -67,10 +70,8 @@ class FormConfigTest extends TestCase
     {
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
 
-        if (null !== $expectedException && method_exists($this, 'expectException')) {
+        if (null !== $expectedException) {
             $this->expectException($expectedException);
-        } elseif (null !== $expectedException) {
-            $this->setExpectedException($expectedException);
         }
 
         $formConfigBuilder = new FormConfigBuilder($name, null, $dispatcher);

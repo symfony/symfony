@@ -12,11 +12,14 @@
 namespace Symfony\Component\Translation\Tests\Catalogue;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
 abstract class AbstractOperationTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetEmptyDomains()
     {
         $this->assertEquals(

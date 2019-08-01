@@ -76,11 +76,7 @@ class CachePoolDeleteCommandTest extends TestCase
             ->with('bar')
             ->willReturn(false);
 
-        if (method_exists($this, 'expectExceptionMessage')) {
-            $this->expectExceptionMessage('Cache item "bar" could not be deleted.');
-        } else {
-            $this->setExpectedException('Exception', 'Cache item "bar" could not be deleted.');
-        }
+        $this->expectExceptionMessage('Cache item "bar" could not be deleted.');
 
         $tester = $this->getCommandTester($this->getKernel());
         $tester->execute(['pool' => 'foo', 'key' => 'bar']);

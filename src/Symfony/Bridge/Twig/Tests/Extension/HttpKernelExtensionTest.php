@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,8 @@ use Twig\Loader\ArrayLoader;
 
 class HttpKernelExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @expectedException \Twig\Error\RuntimeError
      */
@@ -49,12 +52,8 @@ class HttpKernelExtensionTest extends TestCase
         ;
         $renderer = new FragmentHandler($context);
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('InvalidArgumentException');
-            $this->expectExceptionMessage('The "inline" renderer does not exist.');
-        } else {
-            $this->setExpectedException('InvalidArgumentException', 'The "inline" renderer does not exist.');
-        }
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The "inline" renderer does not exist.');
 
         $renderer->render('/foo');
     }

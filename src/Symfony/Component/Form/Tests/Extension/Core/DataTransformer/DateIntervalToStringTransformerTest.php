@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToStringTransformer;
@@ -20,6 +21,8 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToStringTr
  */
 class DateIntervalToStringTransformerTest extends DateIntervalTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function dataProviderISO()
     {
         $data = [

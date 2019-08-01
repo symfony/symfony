@@ -12,10 +12,13 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 
 class DateTimeToStringTransformerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function dataProvider()
     {
         $data = [

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Warning;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Tests\Fixtures\BadParent;
 use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
@@ -77,6 +78,10 @@ EOF
 
     public function testBadParentWithTimestamp()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
         $res = new ClassExistenceResource(BadParent::class, false);
         $this->assertTrue($res->isFresh(time()));
     }
@@ -87,6 +92,10 @@ EOF
      */
     public function testBadParentWithNoTimestamp()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
         $res = new ClassExistenceResource(BadParent::class, false);
         $res->isFresh(0);
     }

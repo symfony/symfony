@@ -25,12 +25,12 @@ class ParserTest extends TestCase
     /** @var Parser */
     protected $parser;
 
-    protected function setUp(): void
+    private function doSetUp()
     {
         $this->parser = new Parser();
     }
 
-    protected function tearDown(): void
+    private function doTearDown()
     {
         $this->parser = null;
 

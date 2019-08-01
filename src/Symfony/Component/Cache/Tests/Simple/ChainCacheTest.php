@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\Cache\Simple\ChainCache;
@@ -22,26 +23,24 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
  */
 class ChainCacheTest extends CacheTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function createSimpleCache($defaultLifetime = 0)
     {
         return new ChainCache([new ArrayCache($defaultLifetime), new FilesystemCache('', $defaultLifetime)], $defaultLifetime);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage At least one cache must be specified.
-     */
     public function testEmptyCachesException()
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('At least one cache must be specified.');
         new ChainCache([]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The class "stdClass" does not implement
-     */
     public function testInvalidCacheException()
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The class "stdClass" does not implement');
         new ChainCache([new \stdClass()]);
     }
 

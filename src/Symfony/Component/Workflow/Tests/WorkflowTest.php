@@ -3,6 +3,7 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
@@ -15,14 +16,13 @@ use Symfony\Component\Workflow\Workflow;
 
 class WorkflowTest extends TestCase
 {
+    use ForwardCompatTestTrait;
     use WorkflowBuilderTrait;
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".
-     */
     public function testGetMarkingWithInvalidStoreReturn()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
         $subject = new \stdClass();
         $subject->marking = null;
         $workflow = new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
@@ -30,12 +30,10 @@ class WorkflowTest extends TestCase
         $workflow->getMarking($subject);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage The Marking is empty and there is no initial place for workflow "unnamed".
-     */
     public function testGetMarkingWithEmptyDefinition()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectExceptionMessage('The Marking is empty and there is no initial place for workflow "unnamed".');
         $subject = new \stdClass();
         $subject->marking = null;
         $workflow = new Workflow(new Definition([], []), new MultipleStateMarkingStore());
@@ -43,12 +41,10 @@ class WorkflowTest extends TestCase
         $workflow->getMarking($subject);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage Place "nope" is not valid for workflow "unnamed".
-     */
     public function testGetMarkingWithImpossiblePlace()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectExceptionMessage('Place "nope" is not valid for workflow "unnamed".');
         $subject = new \stdClass();
         $subject->marking = ['nope' => 1];
         $workflow = new Workflow(new Definition([], []), new MultipleStateMarkingStore());
@@ -162,12 +158,10 @@ class WorkflowTest extends TestCase
         $this->assertSame(['workflow_name.guard.t3'], $dispatchedEvents);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage Unable to apply transition "t2" for workflow "unnamed".
-     */
     public function testApplyWithImpossibleTransition()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectExceptionMessage('Unable to apply transition "t2" for workflow "unnamed".');
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;

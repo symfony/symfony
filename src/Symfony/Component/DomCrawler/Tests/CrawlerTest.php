@@ -72,21 +72,17 @@ class CrawlerTest extends TestCase
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAddInvalidType()
     {
+        $this->expectException('InvalidArgumentException');
         $crawler = new Crawler();
         $crawler->add(1);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Attaching DOM nodes from multiple documents in the same crawler is forbidden.
-     */
     public function testAddMultipleDocumentNode()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Attaching DOM nodes from multiple documents in the same crawler is forbidden.');
         $crawler = $this->createTestCrawler();
         $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
     }
@@ -772,22 +768,18 @@ HTML;
         }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The selected node should be instance of DOMElement
-     */
     public function testInvalidLink()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->link();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The selected node should be instance of DOMElement
-     */
     public function testInvalidLinks()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->link();
     }
@@ -889,12 +881,10 @@ HTML;
         }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The selected node should be instance of DOMElement
-     */
     public function testInvalidForm()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The selected node should be instance of DOMElement');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->form();
     }
@@ -1002,7 +992,7 @@ HTML;
             $this->assertTrue(true, '->children() does not trigger a notice if the node has no children');
         } catch (\PHPUnit\Framework\Error\Notice $e) {
             $this->fail('->children() does not trigger a notice if the node has no children');
-        } catch (\PHPUnit_Framework_Error_Notice $e) {
+        } catch (\PHPUnit\Framework\Error\Notice $e) {
             $this->fail('->children() does not trigger a notice if the node has no children');
         }
     }
@@ -1112,11 +1102,9 @@ HTML;
         $this->assertSame('input', $crawler->first()->nodeName());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testEvaluateThrowsAnExceptionIfDocumentIsEmpty()
     {
+        $this->expectException('LogicException');
         (new Crawler())->evaluate('//form/input[1]');
     }
 

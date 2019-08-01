@@ -12,10 +12,13 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\BooleanNode;
 
 class BooleanNodeTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getValidValues
      */
@@ -48,10 +51,10 @@ class BooleanNodeTest extends TestCase
 
     /**
      * @dataProvider getInvalidValues
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
         $node = new BooleanNode('test');
         $node->normalize($value);
     }

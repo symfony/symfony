@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
@@ -19,6 +20,8 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ArrayNodeDefinitionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testAppendingSomeNode()
     {
         $parent = new ArrayNodeDefinition('root');
@@ -36,11 +39,11 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      * @dataProvider providePrototypeNodeSpecificCalls
      */
     public function testPrototypeNodeSpecificOption($method, $args)
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');
         $node = new ArrayNodeDefinition('root');
 
         \call_user_func_array([$node, $method], $args);
@@ -58,11 +61,9 @@ class ArrayNodeDefinitionTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
-     */
     public function testConcreteNodeSpecificOption()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');
         $node = new ArrayNodeDefinition('root');
         $node
             ->addDefaultsIfNotSet()
@@ -71,11 +72,9 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
-     */
     public function testPrototypeNodesCantHaveADefaultValueWhenUsingDefaultChildren()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');
         $node = new ArrayNodeDefinition('root');
         $node
             ->defaultValue([])

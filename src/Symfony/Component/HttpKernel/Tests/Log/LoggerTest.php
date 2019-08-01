@@ -110,27 +110,21 @@ class LoggerTest extends TestCase
         $this->assertSame([], $this->getLogs());
     }
 
-    /**
-     * @expectedException \Psr\Log\InvalidArgumentException
-     */
     public function testThrowsOnInvalidLevel()
     {
+        $this->expectException('Psr\Log\InvalidArgumentException');
         $this->logger->log('invalid level', 'Foo');
     }
 
-    /**
-     * @expectedException \Psr\Log\InvalidArgumentException
-     */
     public function testThrowsOnInvalidMinLevel()
     {
+        $this->expectException('Psr\Log\InvalidArgumentException');
         new Logger('invalid');
     }
 
-    /**
-     * @expectedException \Psr\Log\InvalidArgumentException
-     */
     public function testInvalidOutput()
     {
+        $this->expectException('Psr\Log\InvalidArgumentException');
         new Logger(LogLevel::DEBUG, '/');
     }
 

@@ -110,10 +110,10 @@ class TranslatorTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation The "Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct()" method takes the default locale as the 3rd argument since Symfony 3.3. Not passing it is deprecated and will trigger an error in 4.0.
-     * @expectedException \InvalidArgumentException
      */
     public function testTransWithCachingWithInvalidLocaleOmittingLocale()
     {
+        $this->expectException('InvalidArgumentException');
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale', null);
 
@@ -159,11 +159,11 @@ class TranslatorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Missing third $defaultLocale argument.
      */
     public function testGetDefaultLocaleOmittingLocaleWithPsrContainer()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Missing third $defaultLocale argument.');
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $translator = new Translator($container, new MessageFormatter());
     }
@@ -250,12 +250,10 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid "invalid locale" locale.
-     */
     public function testTransWithCachingWithInvalidLocale()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid "invalid locale" locale.');
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
 
@@ -285,12 +283,10 @@ class TranslatorTest extends TestCase
         $this->assertSame('en', $translator->getLocale());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The Translator does not support the following options: 'foo'
-     */
     public function testInvalidOptions()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The Translator does not support the following options: \'foo\'');
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
         (new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']));

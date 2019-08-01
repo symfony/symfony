@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
@@ -20,6 +21,8 @@ use Symfony\Component\Lock\StoreInterface;
  */
 trait ExpiringStoreTestTrait
 {
+    use ForwardCompatTestTrait;
+
     /**
      * Amount of microseconds used as a delay to test expiration. Should be
      * small enough not to slow the test suite too much, and high enough not to
@@ -57,11 +60,10 @@ trait ExpiringStoreTestTrait
 
     /**
      * Tests the store thrown exception when TTL expires.
-     *
-     * @expectedException \Symfony\Component\Lock\Exception\LockExpiredException
      */
     public function testAbortAfterExpiration()
     {
+        $this->expectException('\Symfony\Component\Lock\Exception\LockExpiredException');
         $key = new Key(uniqid(__METHOD__, true));
 
         /** @var StoreInterface $store */

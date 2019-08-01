@@ -11,12 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class CachePoolsTest extends AbstractWebTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testCachePools()
     {
         $this->doTestCachePools([], AdapterInterface::class);
@@ -34,7 +37,7 @@ class CachePoolsTest extends AbstractWebTestCase
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
             if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
                 throw $e;
             }
@@ -59,7 +62,7 @@ class CachePoolsTest extends AbstractWebTestCase
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
             if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
                 throw $e;
             }

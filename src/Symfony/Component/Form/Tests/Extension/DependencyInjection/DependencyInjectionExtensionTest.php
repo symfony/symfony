@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
@@ -20,6 +21,8 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 
 class DependencyInjectionExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetTypeExtensions()
     {
         $typeExtension1 = new DummyExtension('test');
@@ -40,11 +43,9 @@ class DependencyInjectionExtensionTest extends TestCase
         $this->assertSame([$typeExtension3], $extension->getTypeExtensions('other'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     */
     public function testThrowExceptionForInvalidExtendedType()
     {
+        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
         $extensions = [
             'test' => new \ArrayIterator([new DummyExtension('unmatched')]),
         ];
@@ -79,11 +80,11 @@ class DependencyInjectionExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      * @expectedDeprecation Passing four arguments to the Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension::__construct() method is deprecated since Symfony 3.3 and will be disallowed in Symfony 4.0. The new constructor only accepts three arguments.
      */
     public function testLegacyThrowExceptionForInvalidExtendedType()
     {
+        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
         $formTypeExtension = new DummyExtension('unmatched');
 
         $container = new ContainerBuilder();

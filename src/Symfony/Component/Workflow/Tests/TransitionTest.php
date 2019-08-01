@@ -3,16 +3,17 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Workflow\Transition;
 
 class TransitionTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The transition "foo.bar" contains invalid characters.
-     */
+    use ForwardCompatTestTrait;
+
     public function testValidateName()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The transition "foo.bar" contains invalid characters.');
         $transition = new Transition('foo.bar', 'a', 'b');
     }
 

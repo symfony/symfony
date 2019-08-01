@@ -12,11 +12,14 @@
 namespace Symfony\Component\Dotenv\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
 
 class DotenvTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getEnvDataWithFormatErrors
      */
@@ -200,11 +203,9 @@ class DotenvTest extends TestCase
         $this->assertSame('BAZ', $bar);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Dotenv\Exception\PathException
-     */
     public function testLoadDirectory()
     {
+        $this->expectException('Symfony\Component\Dotenv\Exception\PathException');
         $dotenv = new Dotenv();
         $dotenv->load(__DIR__);
     }

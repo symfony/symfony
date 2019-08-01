@@ -12,11 +12,14 @@
 namespace Symfony\Component\Config\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 
 class DelegatingLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $loader = new DelegatingLoader($resolver = new LoaderResolver());
@@ -56,11 +59,9 @@ class DelegatingLoaderTest extends TestCase
         $loader->load('foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Exception\FileLoaderLoadException
-     */
     public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded()
     {
+        $this->expectException('Symfony\Component\Config\Exception\FileLoaderLoadException');
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $loader->expects($this->once())->method('supports')->willReturn(false);
         $resolver = new LoaderResolver([$loader]);

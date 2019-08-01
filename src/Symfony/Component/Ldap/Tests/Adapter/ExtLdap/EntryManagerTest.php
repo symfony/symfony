@@ -11,18 +11,19 @@
 namespace Symfony\Component\Ldap\Tests\Adapter\ExtLdap;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Connection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\EntryManager;
 use Symfony\Component\Ldap\Entry;
 
 class EntryManagerTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Ldap\Exception\NotBoundException
-     * @expectedExceptionMessage Query execution is not possible without binding the connection first.
-     */
+    use ForwardCompatTestTrait;
+
     public function testGetResources()
     {
+        $this->expectException('Symfony\Component\Ldap\Exception\NotBoundException');
+        $this->expectExceptionMessage('Query execution is not possible without binding the connection first.');
         $connection = $this->getMockBuilder(Connection::class)->getMock();
         $connection
             ->expects($this->once())

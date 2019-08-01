@@ -12,11 +12,14 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Firewall\X509AuthenticationListener;
 
 class X509AuthenticationListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider dataProviderGetPreAuthenticatedData
      */
@@ -83,11 +86,9 @@ class X509AuthenticationListenerTest extends TestCase
         yield ['cert+something@example.com', 'emailAddress=cert+something@example.com'];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testGetPreAuthenticatedDataNoData()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $request = new Request([], [], [], [], [], []);
 
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();

@@ -93,20 +93,16 @@ class StopwatchTest extends TestCase
         $this->assertEquals(200, $event->getDuration(), '', self::DELTA);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testUnknownEvent()
     {
+        $this->expectException('LogicException');
         $stopwatch = new Stopwatch();
         $stopwatch->getEvent('foo');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testStopWithoutStart()
     {
+        $this->expectException('LogicException');
         $stopwatch = new Stopwatch();
         $stopwatch->stop('foo');
     }
@@ -168,11 +164,9 @@ class StopwatchTest extends TestCase
         $this->assertCount(2, $events['__section__']->getPeriods());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testReopenANewSectionShouldThrowAnException()
     {
+        $this->expectException('LogicException');
         $stopwatch = new Stopwatch();
         $stopwatch->openSection('section');
     }

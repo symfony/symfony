@@ -12,12 +12,15 @@
 namespace Symfony\Component\Asset\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class PackagesTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetterSetters()
     {
         $packages = new Packages();
@@ -55,20 +58,16 @@ class PackagesTest extends TestCase
         $this->assertEquals('/foo?a', $packages->getUrl('/foo', 'a'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Asset\Exception\LogicException
-     */
     public function testNoDefaultPackage()
     {
+        $this->expectException('Symfony\Component\Asset\Exception\LogicException');
         $packages = new Packages();
         $packages->getPackage();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Asset\Exception\InvalidArgumentException
-     */
     public function testUndefinedPackage()
     {
+        $this->expectException('Symfony\Component\Asset\Exception\InvalidArgumentException');
         $packages = new Packages();
         $packages->getPackage('a');
     }

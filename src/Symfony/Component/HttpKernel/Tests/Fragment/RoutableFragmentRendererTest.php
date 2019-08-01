@@ -12,11 +12,14 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 class RoutableFragmentRendererTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getGenerateFragmentUriData
      */
@@ -56,11 +59,11 @@ class RoutableFragmentRendererTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
-     * @dataProvider      getGenerateFragmentUriDataWithNonScalar
+     * @dataProvider getGenerateFragmentUriDataWithNonScalar
      */
     public function testGenerateFragmentUriWithNonScalar($controller)
     {
+        $this->expectException('LogicException');
         $this->callGenerateFragmentUriMethod($controller, Request::create('/'));
     }
 

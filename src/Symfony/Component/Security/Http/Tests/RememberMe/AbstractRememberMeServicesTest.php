@@ -42,11 +42,9 @@ class AbstractRememberMeServicesTest extends TestCase
         $this->assertNull($service->autoLogin(new Request()));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
     {
+        $this->expectException('RuntimeException');
         $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
         $request = new Request();
         $request->cookies->set('foo', 'foo');
@@ -270,12 +268,10 @@ class AbstractRememberMeServicesTest extends TestCase
         $this->assertSame($cookieParts, $decoded);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage cookie delimiter
-     */
     public function testThereShouldBeNoCookieDelimiterInCookieParts()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('cookie delimiter');
         $cookieParts = ['aa', 'b'.AbstractRememberMeServices::COOKIE_DELIMITER.'b', 'cc'];
         $service = $this->getService();
 

@@ -13,17 +13,18 @@ namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class RegisterEventListenersAndSubscribersPassTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
+    use ForwardCompatTestTrait;
+
     public function testExceptionOnAbstractTaggedSubscriber()
     {
+        $this->expectException('InvalidArgumentException');
         $container = $this->createBuilder();
 
         $abstractDefinition = new Definition('stdClass');
@@ -35,11 +36,9 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->process($container);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionOnAbstractTaggedListener()
     {
+        $this->expectException('InvalidArgumentException');
         $container = $this->createBuilder();
 
         $abstractDefinition = new Definition('stdClass');

@@ -12,26 +12,25 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DomCrawler\Link;
 
 class LinkTest extends TestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
+    use ForwardCompatTestTrait;
+
     public function testConstructorWithANonATag()
     {
+        $this->expectException('LogicException');
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
         new Link($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithAnInvalidCurrentUri()
     {
+        $this->expectException('InvalidArgumentException');
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
 

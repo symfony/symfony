@@ -180,11 +180,9 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => '$péß^a|'], $matcher->match('/bar'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testTrailingEncodedNewlineIsNotOverlooked()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
 
@@ -319,11 +317,9 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['page' => 'index', '_format' => 'mobile.html', '_route' => 'test'], $matcher->match('/index.mobile.html'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testDefaultRequirementOfVariableDisallowsSlash()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}'));
         $matcher = $this->getUrlMatcher($coll);
@@ -331,11 +327,9 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/index.sl/ash');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testDefaultRequirementOfVariableDisallowsNextSeparator()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}', [], ['_format' => 'html|xml']));
         $matcher = $this->getUrlMatcher($coll);
@@ -343,22 +337,18 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/do.t.html');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testSchemeRequirement()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
         $matcher = $this->getUrlMatcher($coll);
         $matcher->match('/foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testCondition()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $route = new Route('/foo');
         $route->setCondition('context.getMethod() == "POST"');
@@ -425,11 +415,9 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar', '_route' => 'bar', 'locale' => 'en'], $matcher->match('/bar/bar'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testWithOutHostHostDoesNotMatch()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}', [], [], [], '{locale}.example.com'));
 
@@ -437,11 +425,9 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo/bar');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testPathIsCaseSensitive()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/locale', [], ['locale' => 'EN|FR|DE']));
 
@@ -458,11 +444,9 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'locale' => 'en'], $matcher->match('/'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\NoConfigurationException
-     */
     public function testNoConfiguration()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\NoConfigurationException');
         $coll = new RouteCollection();
 
         $matcher = $this->getUrlMatcher($coll);
@@ -493,11 +477,9 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'buz'], $matcher->match('/prefix/buz'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testSchemeAndMethodMismatch()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/', [], [], [], null, ['https'], ['POST']));
 

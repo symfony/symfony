@@ -12,10 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class HeaderBagTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $bag = new HeaderBag(['foo' => 'bar']);
@@ -48,11 +51,9 @@ class HeaderBagTest extends TestCase
         $this->assertInstanceOf('DateTime', $headerDate);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetDateException()
     {
+        $this->expectException('RuntimeException');
         $bag = new HeaderBag(['foo' => 'Tue']);
         $headerDate = $bag->getDate('foo');
     }

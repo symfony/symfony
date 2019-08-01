@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Translation\Loader\IcuResFileLoader;
 
@@ -19,6 +20,8 @@ use Symfony\Component\Translation\Loader\IcuResFileLoader;
  */
 class IcuResFileLoaderTest extends LocalizedTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testLoad()
     {
         // resource is build using genrb command
@@ -31,20 +34,16 @@ class IcuResFileLoaderTest extends LocalizedTestCase
         $this->assertEquals([new DirectoryResource($resource)], $catalogue->getResources());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
-     */
     public function testLoadNonExistingResource()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\NotFoundResourceException');
         $loader = new IcuResFileLoader();
         $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
-     */
     public function testLoadInvalidResource()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
         $loader = new IcuResFileLoader();
         $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted', 'en', 'domain1');
     }

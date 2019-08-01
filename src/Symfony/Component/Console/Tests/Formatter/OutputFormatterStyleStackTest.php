@@ -12,11 +12,14 @@
 namespace Symfony\Component\Console\Tests\Formatter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Formatter\OutputFormatterStyleStack;
 
 class OutputFormatterStyleStackTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testPush()
     {
         $stack = new OutputFormatterStyleStack();
@@ -59,11 +62,9 @@ class OutputFormatterStyleStackTest extends TestCase
         $this->assertEquals($s1, $stack->pop());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidPop()
     {
+        $this->expectException('InvalidArgumentException');
         $stack = new OutputFormatterStyleStack();
         $stack->push(new OutputFormatterStyle('white', 'black'));
         $stack->pop(new OutputFormatterStyle('yellow', 'blue'));

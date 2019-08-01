@@ -12,11 +12,14 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Role\Role;
 
 class UsernamePasswordTokenTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
@@ -28,11 +31,9 @@ class UsernamePasswordTokenTest extends TestCase
         $this->assertEquals('key', $token->getProviderKey());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetAuthenticatedToTrue()
     {
+        $this->expectException('LogicException');
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->setAuthenticated(true);
     }

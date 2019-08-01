@@ -12,6 +12,7 @@
 namespace Symfony\Component\Filesystem\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\LockHandler;
@@ -21,24 +22,22 @@ use Symfony\Component\Filesystem\LockHandler;
  */
 class LockHandlerTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
-     * @expectedExceptionMessage Failed to create "/a/b/c/d/e": mkdir(): Permission denied.
-     */
+    use ForwardCompatTestTrait;
+
     public function testConstructWhenRepositoryDoesNotExist()
     {
+        $this->expectException('Symfony\Component\Filesystem\Exception\IOException');
+        $this->expectExceptionMessage('Failed to create "/a/b/c/d/e": mkdir(): Permission denied.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
         }
         new LockHandler('lock', '/a/b/c/d/e');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
-     * @expectedExceptionMessage The directory "/" is not writable.
-     */
     public function testConstructWhenRepositoryIsNotWriteable()
     {
+        $this->expectException('Symfony\Component\Filesystem\Exception\IOException');
+        $this->expectExceptionMessage('The directory "/" is not writable.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
         }

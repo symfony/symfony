@@ -61,12 +61,10 @@ class DirectoryLoaderTest extends TestCase
         $this->assertEquals(['ini' => 'ini', 'yaml' => 'yaml'], $this->container->getParameterBag()->all(), '->load() takes a single file that imports a directory');
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "foo" does not exist (in:
-     */
     public function testExceptionIsRaisedWhenDirectoryDoesNotExist()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The file "foo" does not exist (in:');
         $this->loader->load('foo/');
     }
 

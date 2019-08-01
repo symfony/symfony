@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Tests\Fixtures\Author;
@@ -19,6 +20,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormTest_AuthorWithoutRefSetter
 {
+    use ForwardCompatTestTrait;
+
     protected $reference;
 
     protected $referenceCopy;
@@ -160,11 +163,9 @@ class FormTypeTest extends BaseTypeTest
         ]));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     */
     public function testDataClassMustBeValidClassOrInterface()
     {
+        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
         $this->factory->createBuilder(static::TESTED_TYPE, null, [
             'data_class' => 'foobar',
         ]);
@@ -329,11 +330,9 @@ class FormTypeTest extends BaseTypeTest
         $this->assertEquals('Bernhard', $author->firstName);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testAttributesException()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->factory->create(static::TESTED_TYPE, null, ['attr' => '']);
     }
 

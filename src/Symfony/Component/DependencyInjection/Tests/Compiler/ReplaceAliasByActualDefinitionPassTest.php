@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -21,6 +22,8 @@ require_once __DIR__.'/../Fixtures/includes/foo.php';
 
 class ReplaceAliasByActualDefinitionPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -53,11 +56,9 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
         $this->assertSame('b_alias', (string) $resolvedFactory[0]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testProcessWithInvalidAlias()
     {
+        $this->expectException('InvalidArgumentException');
         $container = new ContainerBuilder();
         $container->setAlias('a_alias', 'a');
         $this->process($container);

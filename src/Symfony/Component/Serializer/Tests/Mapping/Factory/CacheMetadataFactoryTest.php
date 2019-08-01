@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
@@ -23,6 +24,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
  */
 class CacheMetadataFactoryTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetMetadataFor()
     {
         $metadata = new ClassMetadata(Dummy::class);
@@ -55,11 +58,9 @@ class CacheMetadataFactoryTest extends TestCase
         $this->assertTrue($factory->hasMetadataFor(Dummy::class));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
     public function testInvalidClassThrowsException()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
         $decorated = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
 

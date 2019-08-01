@@ -65,19 +65,15 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->storage = new MongoDbSessionHandler($this->mongo, $this->options);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorShouldThrowExceptionForInvalidMongo()
     {
+        $this->expectException('InvalidArgumentException');
         new MongoDbSessionHandler(new \stdClass(), $this->options);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorShouldThrowExceptionForMissingOptions()
     {
+        $this->expectException('InvalidArgumentException');
         new MongoDbSessionHandler($this->mongo, []);
     }
 

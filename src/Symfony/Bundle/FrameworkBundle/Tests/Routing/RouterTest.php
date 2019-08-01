@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\Routing\Route;
@@ -19,6 +20,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouterTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGenerateWithServiceParam()
     {
         $routes = new RouteCollection();
@@ -133,12 +136,10 @@ class RouterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Using "%env(FOO)%" is not allowed in routing configuration.
-     */
     public function testEnvPlaceholders()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%env(FOO)%'));
@@ -168,12 +169,10 @@ class RouterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent parameter "nope".
-     */
     public function testExceptionOnNonExistentParameter()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException');
+        $this->expectExceptionMessage('You have requested a non-existent parameter "nope".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%nope%'));
@@ -184,12 +183,10 @@ class RouterTest extends TestCase
         $router->getRouteCollection()->get('foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type object.
-     */
     public function testExceptionOnNonStringParameter()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type object.');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));

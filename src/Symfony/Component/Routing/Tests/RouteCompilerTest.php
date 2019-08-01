@@ -12,11 +12,14 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCompiler;
 
 class RouteCompilerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider provideCompileData
      */
@@ -243,41 +246,33 @@ class RouteCompilerTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testRouteWithSameVariableTwice()
     {
+        $this->expectException('LogicException');
         $route = new Route('/{name}/{name}');
 
         $compiled = $route->compile();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testRouteCharsetMismatch()
     {
+        $this->expectException('LogicException');
         $route = new Route("/\xE9/{bar}", [], ['bar' => '.'], ['utf8' => true]);
 
         $compiled = $route->compile();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testRequirementCharsetMismatch()
     {
+        $this->expectException('LogicException');
         $route = new Route('/foo/{bar}', [], ['bar' => "\xE9"], ['utf8' => true]);
 
         $compiled = $route->compile();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRouteWithFragmentAsPathParameter()
     {
+        $this->expectException('InvalidArgumentException');
         $route = new Route('/{_fragment}');
 
         $compiled = $route->compile();
@@ -285,10 +280,10 @@ class RouteCompilerTest extends TestCase
 
     /**
      * @dataProvider getVariableNamesStartingWithADigit
-     * @expectedException \DomainException
      */
     public function testRouteWithVariableNameStartingWithADigit($name)
     {
+        $this->expectException('DomainException');
         $route = new Route('/{'.$name.'}');
         $route->compile();
     }
@@ -373,11 +368,9 @@ class RouteCompilerTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \DomainException
-     */
     public function testRouteWithTooLongVariableName()
     {
+        $this->expectException('DomainException');
         $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
         $route->compile();
     }

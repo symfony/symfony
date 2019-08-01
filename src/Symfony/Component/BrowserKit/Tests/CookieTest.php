@@ -197,12 +197,10 @@ class CookieTest extends TestCase
         $this->assertFalse($cookie->isExpired());
     }
 
-    /**
-     * @expectedException        \UnexpectedValueException
-     * @expectedExceptionMessage The cookie expiration time "string" is not valid.
-     */
     public function testConstructException()
     {
+        $this->expectException('UnexpectedValueException');
+        $this->expectExceptionMessage('The cookie expiration time "string" is not valid.');
         $cookie = new Cookie('foo', 'bar', 'string');
     }
 }

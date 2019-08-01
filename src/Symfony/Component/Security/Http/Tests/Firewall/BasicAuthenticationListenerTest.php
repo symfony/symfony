@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
@@ -21,6 +22,8 @@ use Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener;
 
 class BasicAuthenticationListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testHandleWithValidUsernameAndPasswordServerParameters()
     {
         $request = new Request([], [], [], [], [], [
@@ -182,12 +185,10 @@ class BasicAuthenticationListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $providerKey must not be empty
-     */
     public function testItRequiresProviderKey()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('$providerKey must not be empty');
         new BasicAuthenticationListener(
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock(),
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),

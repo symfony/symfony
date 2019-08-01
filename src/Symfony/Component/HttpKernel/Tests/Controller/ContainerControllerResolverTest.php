@@ -115,12 +115,10 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame([NonInstantiableController::class, 'action'], $controller);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Controller "Symfony\Component\HttpKernel\Tests\Controller\ImpossibleConstructController" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?
-     */
     public function testNonConstructController()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ImpossibleConstructController" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
         $container = $this->getMockBuilder(Container::class)->getMock();
         $container->expects($this->at(0))
             ->method('has')
@@ -182,12 +180,10 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame([$service, 'action'], $controller);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?
-     */
     public function testExceptionWhenUsingRemovedControllerService()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
         $container = $this->getMockBuilder(Container::class)->getMock();
         $container->expects($this->at(0))
             ->method('has')
@@ -208,12 +204,10 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $resolver->getController($request);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Controller "app.my_controller" cannot be called without a method name. Did you forget an "__invoke" method?
-     */
     public function testExceptionWhenUsingControllerWithoutAnInvokeMethod()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('Controller "app.my_controller" cannot be called without a method name. Did you forget an "__invoke" method?');
         $container = $this->getMockBuilder(Container::class)->getMock();
         $container->expects($this->once())
             ->method('has')

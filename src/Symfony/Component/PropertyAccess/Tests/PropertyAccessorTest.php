@@ -96,10 +96,10 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
@@ -113,19 +113,17 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
      */
     public function testGetValueThrowsExceptionIfIndexNotFoundAndIndexExceptionsEnabled($objectOrArray, $path)
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException');
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
-     */
     public function testGetValueThrowsExceptionIfNotArrayAccess()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException');
         $this->propertyAccessor->getValue(new \stdClass(), '[index]');
     }
 
@@ -172,11 +170,9 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame(['Bernhard'], $object->firstName);
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     */
     public function testGetValueDoesNotReadMagicCallByDefault()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
         $this->propertyAccessor->getValue(new TestClassMagicCall('Bernhard'), 'magicCallProperty');
     }
 
@@ -197,11 +193,11 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getPathsWithUnexpectedType
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on
      */
     public function testGetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException');
+        $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
@@ -217,10 +213,10 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getPathsWithMissingProperty
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
     }
 
@@ -245,11 +241,9 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
-     */
     public function testSetValueThrowsExceptionIfNotArrayAccess()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException');
         $object = new \stdClass();
 
         $this->propertyAccessor->setValue($object, '[index]', 'Updated');
@@ -264,21 +258,17 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals('Updated', $author->__get('magicProperty'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     */
     public function testSetValueThrowsExceptionIfThereAreMissingParameters()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
         $object = new TestClass('Bernhard');
 
         $this->propertyAccessor->setValue($object, 'publicAccessorWithMoreRequiredParameters', 'Updated');
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     */
     public function testSetValueDoesNotUpdateMagicCallByDefault()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
         $author = new TestClassMagicCall('Bernhard');
 
         $this->propertyAccessor->setValue($author, 'magicCallProperty', 'Updated');
@@ -297,11 +287,11 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getPathsWithUnexpectedType
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on
      */
     public function testSetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException');
+        $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
         $this->propertyAccessor->setValue($objectOrArray, $path, 'value');
     }
 
@@ -533,23 +523,19 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals($value, $this->propertyAccessor->isWritable($object, $path));
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "DateTime", "string" given
-     */
     public function testThrowTypeError()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Expected argument of type "DateTime", "string" given');
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTime expected.');
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "DateTime", "NULL" given
-     */
     public function testThrowTypeErrorWithNullArgument()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Expected argument of type "DateTime", "NULL" given');
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', null);
@@ -598,12 +584,10 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame('2', $propertyAccessor->getValue($obj, 'a%2Fb'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "Countable", "string" given
-     */
     public function testThrowTypeErrorWithInterface()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Expected argument of type "Countable", "string" given');
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
@@ -671,10 +655,10 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @requires PHP 7.0
-     * @expectedException \TypeError
      */
     public function testThrowTypeErrorInsideSetterCall()
     {
+        $this->expectException('TypeError');
         $object = new TestClassTypeErrorInsideCall();
 
         $this->propertyAccessor->setValue($object, 'property', 'foo');
@@ -682,11 +666,10 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @requires PHP 7
-     *
-     * @expectedException \TypeError
      */
     public function testDoNotDiscardReturnTypeError()
     {
+        $this->expectException('TypeError');
         $object = new ReturnTyped();
 
         $this->propertyAccessor->setValue($object, 'foos', [new \DateTime()]);
@@ -694,11 +677,10 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @requires PHP 7
-     *
-     * @expectedException \TypeError
      */
     public function testDoNotDiscardReturnTypeErrorWhenWriterMethodIsMisconfigured()
     {
+        $this->expectException('TypeError');
         $object = new ReturnTyped();
 
         $this->propertyAccessor->setValue($object, 'name', 'foo');

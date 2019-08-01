@@ -110,11 +110,9 @@ class MockFileSessionStorageTest extends TestCase
         $this->assertEquals('bar', $storage2->getBag('attributes')->get('foo'), 'values persist between instances');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testSaveWithoutStart()
     {
+        $this->expectException('RuntimeException');
         $storage1 = $this->getStorage();
         $storage1->save();
     }

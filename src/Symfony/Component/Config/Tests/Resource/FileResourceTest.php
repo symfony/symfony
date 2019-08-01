@@ -56,12 +56,10 @@ class FileResourceTest extends TestCase
         $this->assertSame(realpath($this->file), (string) $this->resource);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The file ".*" does not exist./
-     */
     public function testResourceDoesNotExist()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessageRegExp('/The file ".*" does not exist./');
         $resource = new FileResource('/____foo/foobar'.mt_rand(1, 999999));
     }
 

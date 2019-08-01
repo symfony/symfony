@@ -33,11 +33,9 @@ class TagAwareAdapterTest extends AdapterTestCase
         FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
     }
 
-    /**
-     * @expectedException \Psr\Cache\InvalidArgumentException
-     */
     public function testInvalidTag()
     {
+        $this->expectException('Psr\Cache\InvalidArgumentException');
         $pool = $this->createCachePool();
         $item = $pool->getItem('foo');
         $item->tag(':');

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class ResponseHeaderBagTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testAllPreserveCase()
     {
         $headers = [
@@ -240,21 +243,17 @@ class ResponseHeaderBagTest extends TestCase
         $this->assertEquals([], $bag->getCookies());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetCookiesWithInvalidArgument()
     {
+        $this->expectException('InvalidArgumentException');
         $bag = new ResponseHeaderBag();
 
         $bag->getCookies('invalid_argument');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testMakeDispositionInvalidDisposition()
     {
+        $this->expectException('InvalidArgumentException');
         $headers = new ResponseHeaderBag();
 
         $headers->makeDisposition('invalid', 'foo.html');
@@ -298,10 +297,10 @@ class ResponseHeaderBagTest extends TestCase
 
     /**
      * @dataProvider provideMakeDispositionFail
-     * @expectedException \InvalidArgumentException
      */
     public function testMakeDispositionFail($disposition, $filename)
     {
+        $this->expectException('InvalidArgumentException');
         $headers = new ResponseHeaderBag();
 
         $headers->makeDisposition($disposition, $filename);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
@@ -19,6 +20,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class RememberMeListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testOnCoreSecurityDoesNotTryToPopulateNonEmptyTokenStorage()
     {
         list($listener, $tokenStorage) = $this->getListener();
@@ -103,12 +106,10 @@ class RememberMeListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessage Authentication failed.
-     */
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->expectExceptionMessage('Authentication failed.');
         list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, false);
 
         $tokenStorage

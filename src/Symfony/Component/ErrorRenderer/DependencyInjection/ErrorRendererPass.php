@@ -24,11 +24,13 @@ class ErrorRendererPass implements CompilerPassInterface
 {
     private $rendererService;
     private $rendererTag;
+    private $debugCommandService;
 
-    public function __construct(string $rendererService = 'error_renderer', string $rendererTag = 'error_renderer.renderer')
+    public function __construct(string $rendererService = 'error_renderer', string $rendererTag = 'error_renderer.renderer', string $debugCommandService = 'console.command.error_renderer_debug')
     {
         $this->rendererService = $rendererService;
         $this->rendererTag = $rendererTag;
+        $this->debugCommandService = $debugCommandService;
     }
 
     /**
@@ -61,5 +63,9 @@ class ErrorRendererPass implements CompilerPassInterface
 
         $definition = $container->getDefinition($this->rendererService);
         $definition->replaceArgument(0, ServiceLocatorTagPass::register($container, $renderers));
+
+        if ($container->hasDefinition($this->debugCommandService)) {
+            $container->getDefinition($this->debugCommandService)->replaceArgument(0, $renderers);
+        }
     }
 }

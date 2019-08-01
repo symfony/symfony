@@ -194,5 +194,11 @@
             <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <tag name="console.command" command="debug:form" />
         </service>
+
+        <service id="console.command.error_renderer_debug" class="Symfony\Component\ErrorRenderer\Command\DebugCommand">
+            <argument type="collection" /> <!-- All error renderers are injected here by ErrorRendererPass -->
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
+            <tag name="console.command" command="debug:error-renderer" />
+        </service>
     </services>
 </container>

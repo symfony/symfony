@@ -693,7 +693,7 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetRoundingIncrement($currency)
     {
-        $this->assertInternalType('numeric', Currencies::getRoundingIncrement($currency));
+        $this->assertIsNumeric(Currencies::getRoundingIncrement($currency));
     }
 
     public function provideCurrenciesWithNumericEquivalent()

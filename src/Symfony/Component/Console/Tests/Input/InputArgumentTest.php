@@ -12,10 +12,13 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Input\InputArgument;
 
 class InputArgumentTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $argument = new InputArgument('foo');
@@ -37,12 +40,11 @@ class InputArgumentTest extends TestCase
         $this->assertTrue($argument->isRequired(), '__construct() can take "InputArgument::REQUIRED" as its mode');
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Argument mode "-1" is not valid.
-     */
     public function testInvalidModes()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Argument mode "-1" is not valid.');
+
         new InputArgument('foo', '-1');
     }
 

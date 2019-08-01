@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -24,6 +25,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class ConfigurationTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testDefaultConfig()
     {
         $processor = new Processor();
@@ -140,12 +143,8 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(InvalidConfigurationException::class);
-            $this->expectExceptionMessage($expectedMessage);
-        } else {
-            $this->setExpectedException(InvalidConfigurationException::class, $expectedMessage);
-        }
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -194,12 +193,8 @@ class ConfigurationTest extends TestCase
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(InvalidConfigurationException::class);
-            $this->expectExceptionMessage($expectedMessage);
-        } else {
-            $this->setExpectedException(InvalidConfigurationException::class, $expectedMessage);
-        }
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($expectedMessage);
         $processor = new Processor();
         $configuration = new Configuration(true);
 

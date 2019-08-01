@@ -12,10 +12,13 @@
 namespace Symfony\Component\Config\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Util\XmlUtils;
 
 class XmlUtilsTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testLoadFile()
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
@@ -166,12 +169,8 @@ class XmlUtilsTest extends TestCase
     {
         $file = __DIR__.'/../Fixtures/foo.xml';
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('InvalidArgumentException');
-            $this->expectExceptionMessage(sprintf('File %s does not contain valid XML, it is empty.', $file));
-        } else {
-            $this->setExpectedException('InvalidArgumentException', sprintf('File %s does not contain valid XML, it is empty.', $file));
-        }
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage(sprintf('File %s does not contain valid XML, it is empty.', $file));
 
         XmlUtils::loadFile($file);
     }

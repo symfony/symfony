@@ -28,7 +28,7 @@ class MessengerDataCollectorTest extends TestCase
     /** @var CliDumper */
     private $dumper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dumper = new CliDumper();
         $this->dumper->setColors(false);

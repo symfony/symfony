@@ -24,7 +24,7 @@ class PdoStoreTest extends AbstractStoreTest
 
     protected static $dbFile;
 
-    public static function setupBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
@@ -32,7 +32,7 @@ class PdoStoreTest extends AbstractStoreTest
         $store->createTable();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         @unlink(self::$dbFile);
     }

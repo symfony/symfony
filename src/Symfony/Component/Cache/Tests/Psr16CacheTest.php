@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Psr16Cache;
  */
 class Psr16CacheTest extends SimpleCacheTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

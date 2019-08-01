@@ -25,7 +25,7 @@ class InMemoryTransportTest extends TestCase
      */
     private $transport;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transport = new InMemoryTransport();
     }

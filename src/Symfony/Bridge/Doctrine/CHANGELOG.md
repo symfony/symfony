@@ -12,6 +12,7 @@ CHANGELOG
 -----
 
  * added `DoctrineClearEntityManagerMiddleware`
+ * deprecated `RegistryInterface`, use `Doctrine\Common\Persistence\ManagerRegistry`
 
 
 4.3.0

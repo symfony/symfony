@@ -20,6 +20,7 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "symfony/console": "^4.4",
         "symfony/dependency-injection": "^4.4",
         "symfony/http-kernel": "^4.4"
     },

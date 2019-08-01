@@ -17,6 +17,8 @@ use Doctrine\ORM\EntityManager;
 /**
  * References Doctrine connections and entity managers.
  *
+ * @deprecated since Symfony 4.4, use Doctrine\Common\Persistence\ManagerRegistry instead
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface RegistryInterface extends ManagerRegistryInterface

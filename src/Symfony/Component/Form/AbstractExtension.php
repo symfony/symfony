@@ -182,7 +182,7 @@ abstract class AbstractExtension implements FormExtensionInterface
                     $extendedTypes[] = $extendedType;
                 }
             } else {
-                @trigger_error(sprintf('Not implementing the static getExtendedTypes() method in %s when implementing the %s is deprecated since Symfony 4.2. The method will be added to the interface in 5.0.', \get_class($extension), FormTypeExtensionInterface::class), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not implementing the "%s::getExtendedTypes()" method in "%s" is deprecated since Symfony 4.2.', FormTypeExtensionInterface::class, \get_class($extension)), E_USER_DEPRECATED);
 
                 $extendedTypes = [$extension->getExtendedType()];
             }

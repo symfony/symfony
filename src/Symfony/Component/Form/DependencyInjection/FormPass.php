@@ -96,7 +96,7 @@ class FormPass implements CompilerPassInterface
 
             if (isset($tag[0]['extended_type'])) {
                 if (!method_exists($typeExtensionClass, 'getExtendedTypes')) {
-                    @trigger_error(sprintf('Not implementing the static getExtendedTypes() method in %s when implementing the %s is deprecated since Symfony 4.2. The method will be added to the interface in 5.0.', $typeExtensionClass, FormTypeExtensionInterface::class), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Not implementing the "%s::getExtendedTypes()" method in "%s" is deprecated since Symfony 4.2.', FormTypeExtensionInterface::class, $typeExtensionClass), E_USER_DEPRECATED);
                 }
 
                 $typeExtensions[$tag[0]['extended_type']][] = new Reference($serviceId);

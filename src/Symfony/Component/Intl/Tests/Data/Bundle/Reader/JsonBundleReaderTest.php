@@ -36,7 +36,7 @@ class JsonBundleReaderTest extends TestCase
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/json', 'en');
 
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
         $this->assertSame('Bar', $data['Foo']);
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }

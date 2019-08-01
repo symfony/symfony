@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Field;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 
 class FileFormFieldTest extends FormFieldTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testInitialize()
     {
         $node = $this->createNode('input', '', ['type' => 'file']);
@@ -55,7 +58,7 @@ class FileFormFieldTest extends FormFieldTestCase
 
         $this->assertEquals(basename(__FILE__), $value['name'], "->$method() sets the name of the file field");
         $this->assertEquals('', $value['type'], "->$method() sets the type of the file field");
-        $this->assertInternalType('string', $value['tmp_name'], "->$method() sets the tmp_name of the file field");
+        $this->assertIsString($value['tmp_name'], "->$method() sets the tmp_name of the file field");
         $this->assertFileExists($value['tmp_name'], "->$method() creates a copy of the file at the tmp_name path");
         $this->assertEquals(0, $value['error'], "->$method() sets the error of the file field");
         $this->assertEquals(filesize(__FILE__), $value['size'], "->$method() sets the size of the file field");

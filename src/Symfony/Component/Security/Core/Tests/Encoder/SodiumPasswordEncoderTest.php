@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 
 class SodiumPasswordEncoderTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!SodiumPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Libsodium is not available.');

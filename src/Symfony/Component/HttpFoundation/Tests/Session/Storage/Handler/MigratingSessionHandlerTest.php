@@ -20,7 +20,7 @@ class MigratingSessionHandlerTest extends TestCase
     private $currentHandler;
     private $writeOnlyHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->currentHandler = $this->createMock(\SessionHandlerInterface::class);
         $this->writeOnlyHandler = $this->createMock(\SessionHandlerInterface::class);

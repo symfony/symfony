@@ -27,7 +27,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
     private $middleware;
     private $entityManagerName = 'default';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 

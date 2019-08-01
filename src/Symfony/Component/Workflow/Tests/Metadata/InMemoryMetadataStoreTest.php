@@ -14,7 +14,7 @@ class InMemoryMetadataStoreTest extends TestCase
     private $store;
     private $transition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $workflowMetadata = [
             'title' => 'workflow title',

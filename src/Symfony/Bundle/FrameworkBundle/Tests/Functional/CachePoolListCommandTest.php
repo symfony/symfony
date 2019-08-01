@@ -20,7 +20,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class CachePoolListCommandTest extends AbstractWebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         static::bootKernel(['test_case' => 'CachePools', 'root_config' => 'config.yml']);
     }

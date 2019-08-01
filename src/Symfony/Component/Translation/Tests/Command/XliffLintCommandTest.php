@@ -188,13 +188,13 @@ XLIFF;
         return new CommandTester($command);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->files = [];
         @mkdir(sys_get_temp_dir().'/translation-xliff-lint-test');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

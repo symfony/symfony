@@ -36,7 +36,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  */
 class AmqpExtIntegrationTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

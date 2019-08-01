@@ -19,7 +19,7 @@ class RedisTagAwareAdapterTest extends RedisAdapterTest
 {
     use TagAwareTestTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->skippedTests['testTagItemExpiry'] = 'Testing expiration slows down the test suite';

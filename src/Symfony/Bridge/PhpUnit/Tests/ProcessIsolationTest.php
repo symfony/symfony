@@ -3,6 +3,7 @@
 namespace Symfony\Bridge\PhpUnit\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * Don't remove this test case, it tests the legacy group.
@@ -13,6 +14,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ProcessIsolationTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @expectedDeprecation Test abc
      */
@@ -25,12 +28,8 @@ class ProcessIsolationTest extends TestCase
     public function testCallingOtherErrorHandler()
     {
         $class = class_exists('PHPUnit\Framework\Exception') ? 'PHPUnit\Framework\Exception' : 'PHPUnit_Framework_Exception';
-        if (method_exists($this, 'expectException')) {
-            $this->expectException($class);
-            $this->expectExceptionMessage('Test that PHPUnit\'s error handler fires.');
-        } else {
-            $this->setExpectedException($class, 'Test that PHPUnit\'s error handler fires.');
-        }
+        $this->expectException($class);
+        $this->expectExceptionMessage('Test that PHPUnit\'s error handler fires.');
 
         trigger_error('Test that PHPUnit\'s error handler fires.', E_USER_WARNING);
     }

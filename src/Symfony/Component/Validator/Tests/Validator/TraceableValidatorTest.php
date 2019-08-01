@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -23,6 +24,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TraceableValidatorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testValidate()
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);
@@ -94,10 +97,5 @@ class TraceableValidatorTest extends TestCase
 
         $expects('validatePropertyValue')->willReturn($expected = new ConstraintViolationList());
         $this->assertSame($expected, $validator->validatePropertyValue(new \stdClass(), 'property', 'value'), 'returns original validator validatePropertyValue() result');
-    }
-
-    protected function createMock($classname)
-    {
-        return $this->getMockBuilder($classname)->disableOriginalConstructor()->getMock();
     }
 }

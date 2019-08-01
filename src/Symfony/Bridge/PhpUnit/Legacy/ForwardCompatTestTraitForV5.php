@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
+use PHPUnit\Framework\MockObject\MockObject;
+
 /**
  * @internal
  */
@@ -78,6 +80,25 @@ trait ForwardCompatTestTraitForV5
     private function doTearDown()
     {
         parent::tearDown();
+    }
+
+    /**
+     * @param string $originalClassName
+     *
+     * @return MockObject
+     */
+    protected function createMock($originalClassName)
+    {
+        $mock = $this->getMockBuilder($originalClassName)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning();
+
+        if (method_exists($mock, 'disallowMockingUnknownTypes')) {
+            $mock = $mock->disallowMockingUnknownTypes();
+        }
+
+        return $mock->getMock();
     }
 
     /**

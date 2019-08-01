@@ -16,7 +16,7 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 abstract class AbstractMimeTypeGuesserTest extends TestCase
 {
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         $path = __DIR__.'/Fixtures/mimetypes/to_delete';
         if (file_exists($path)) {

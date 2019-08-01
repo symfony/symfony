@@ -23,7 +23,7 @@ class RedisExtIntegrationTest extends TestCase
     private $redis;
     private $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!getenv('MESSENGER_REDIS_DSN')) {
             $this->markTestSkipped('The "MESSENGER_REDIS_DSN" environment variable is required.');

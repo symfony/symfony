@@ -24,7 +24,7 @@ class CachePoolPassTest extends TestCase
 {
     private $cachePoolPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cachePoolPass = new CachePoolPass();
     }

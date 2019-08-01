@@ -24,7 +24,7 @@ class DateTimeZoneNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new DateTimeZoneNormalizer();
     }

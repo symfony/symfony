@@ -47,7 +47,7 @@ class IntlCallbackChoiceLoaderTest extends TestCase
      */
     private static $lazyChoiceList;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$loader = new IntlCallbackChoiceLoader(function () {
             return self::$choices;
@@ -98,7 +98,7 @@ class IntlCallbackChoiceLoaderTest extends TestCase
         );
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         self::$loader = null;
         self::$value = null;

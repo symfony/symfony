@@ -4,17 +4,18 @@ namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterMappingsPass;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterMappingsPassTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageould Could not find the manager name parameter in the container. Tried the following parameter names: "manager.param.one", "manager.param.two"
-     */
+    use ForwardCompatTestTrait;
+
     public function testNoDriverParmeterException()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Could not find the manager name parameter in the container. Tried the following parameter names: "manager.param.one", "manager.param.two"');
         $container = $this->createBuilder();
         $this->process($container, [
             'manager.param.one',

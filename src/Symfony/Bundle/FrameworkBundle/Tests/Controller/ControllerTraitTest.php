@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Fig\Link\Link;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -32,6 +33,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class ControllerTraitTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     abstract protected function createController();
 
     public function testForward()
@@ -88,12 +91,10 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertNull($controller->getUser());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The SecurityBundle is not registered in your application.
-     */
     public function testGetUserWithEmptyContainer()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
         $controller = $this->createController();
         $controller->setContainer(new Container());
 
@@ -275,11 +276,9 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertContains('test.php', $response->headers->get('content-disposition'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
-     */
     public function testFileWhichDoesNotExist()
     {
+        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
         $controller = $this->createController();
 
         /* @var BinaryFileResponse $response */
@@ -300,11 +299,9 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertTrue($controller->isGranted('foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testdenyAccessUnlessGranted()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
         $authorizationChecker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
 

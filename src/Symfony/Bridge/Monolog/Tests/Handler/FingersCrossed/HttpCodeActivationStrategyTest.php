@@ -20,19 +20,15 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HttpCodeActivationStrategyTest extends TestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
     public function testExclusionsWithoutCode()
     {
+        $this->expectException('LogicException');
         new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], Logger::WARNING);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testExclusionsWithoutUrls()
     {
+        $this->expectException('LogicException');
         new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], Logger::WARNING);
     }
 

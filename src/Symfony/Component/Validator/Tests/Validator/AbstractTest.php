@@ -414,11 +414,9 @@ abstract class AbstractTest extends AbstractValidatorTest
         $this->assertCount(0, $violations);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testExpectTraversableIfTraversalEnabledOnClass()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $entity = new Entity();
 
         $this->metadata->addConstraint(new Traverse(true));
@@ -572,11 +570,9 @@ abstract class AbstractTest extends AbstractValidatorTest
         $this->assertCount(1, $violations);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\RuntimeException
-     */
     public function testValidateFailsIfNoConstraintsAndNoObjectOrArray()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\RuntimeException');
         $this->validate('Foobar');
     }
 

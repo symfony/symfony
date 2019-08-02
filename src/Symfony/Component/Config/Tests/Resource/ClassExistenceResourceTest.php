@@ -13,12 +13,15 @@ namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Tests\Fixtures\BadParent;
 use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
 
 class ClassExistenceResourceTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testToString()
     {
         $res = new ClassExistenceResource('BarClass');
@@ -86,12 +89,10 @@ EOF
         $this->assertTrue($res->isFresh(time()));
     }
 
-    /**
-     * @expectedException \ReflectionException
-     * @expectedExceptionMessage Class Symfony\Component\Config\Tests\Fixtures\MissingParent not found
-     */
     public function testBadParentWithNoTimestamp()
     {
+        $this->expectException('ReflectionException');
+        $this->expectExceptionMessage('Class Symfony\Component\Config\Tests\Fixtures\MissingParent not found');
         if (\PHP_VERSION_ID >= 70400) {
             throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
         }

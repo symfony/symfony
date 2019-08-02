@@ -32,31 +32,27 @@ class TimezoneTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testExceptionForGroupedTimezonesByCountryWithWrongZone()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new Timezone([
             'zone' => \DateTimeZone::ALL,
             'countryCode' => 'AR',
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testExceptionForGroupedTimezonesByCountryWithoutZone()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new Timezone(['countryCode' => 'AR']);
     }
 
     /**
      * @dataProvider provideInvalidZones
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testExceptionForInvalidGroupedTimezones(int $zone)
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new Timezone(['zone' => $zone]);
     }
 

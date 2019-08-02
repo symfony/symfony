@@ -12,12 +12,10 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class HandleTraitTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\LogicException
-     * @expectedExceptionMessage You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, "NULL" given.
-     */
     public function testItThrowsOnNoMessageBusInstance()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\LogicException');
+        $this->expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, "NULL" given.');
         $queryBus = new TestQueryBus(null);
         $query = new DummyMessage('Hello');
 
@@ -48,12 +46,10 @@ class HandleTraitTest extends TestCase
         $this->assertSame('result', $queryBus->query($envelope));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\LogicException
-     * @expectedExceptionMessage Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled zero times. Exactly one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()".
-     */
     public function testHandleThrowsOnNoHandledStamp()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\LogicException');
+        $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled zero times. Exactly one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()".');
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
 
@@ -63,12 +59,10 @@ class HandleTraitTest extends TestCase
         $queryBus->query($query);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\LogicException
-     * @expectedExceptionMessage Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "SecondDummyHandler::__invoke".
-     */
     public function testHandleThrowsOnMultipleHandledStamps()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\LogicException');
+        $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "SecondDummyHandler::__invoke".');
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
 

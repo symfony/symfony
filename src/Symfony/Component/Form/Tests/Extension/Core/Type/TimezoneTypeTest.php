@@ -87,11 +87,11 @@ class TimezoneTypeTest extends BaseTypeTest
     /**
      * @group legacy
      * @expectedDeprecation The option "regions" is deprecated since Symfony 4.2.
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage The "regions" option can only be used if the "intl" option is set to false.
      */
     public function testFilterByRegionsWithIntl()
     {
+        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectExceptionMessage('The "regions" option can only be used if the "intl" option is set to false.');
         $this->factory->create(static::TESTED_TYPE, null, ['regions' => \DateTimeZone::EUROPE, 'intl' => true]);
     }
 
@@ -190,12 +190,10 @@ class TimezoneTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('Etc/UTC', 'Etc/UTC', 'за всесвітнім координованим часом'), $choices, '', false, false);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage The "choice_translation_locale" option can only be used if the "intl" option is set to true.
-     */
     public function testChoiceTranslationLocaleOptionWithoutIntl()
     {
+        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectExceptionMessage('The "choice_translation_locale" option can only be used if the "intl" option is set to true.');
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_locale' => 'uk',
         ]);

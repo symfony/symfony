@@ -41,12 +41,10 @@ class LegacyEventDispatcherTest extends EventDispatcherTest
         $this->createEventDispatcher()->dispatch('foo', new Event());
     }
 
-    /**
-     * @expectedException \TypeError
-     * @expectedExceptionMessage Argument 1 passed to "Symfony\Contracts\EventDispatcher\EventDispatcherInterface::dispatch()" must be an object, string given.
-     */
     public function testLegacySignatureWithNewEventObject()
     {
+        $this->expectException('TypeError');
+        $this->expectExceptionMessage('Argument 1 passed to "Symfony\Contracts\EventDispatcher\EventDispatcherInterface::dispatch()" must be an object, string given.');
         $this->createEventDispatcher()->dispatch('foo', new ContractsEvent());
     }
 

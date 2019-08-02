@@ -32,12 +32,10 @@ class MessageBusTest extends TestCase
         $this->assertInstanceOf(MessageBusInterface::class, $bus);
     }
 
-    /**
-     * @expectedException \TypeError
-     * @expectedExceptionMessage Invalid argument provided to "Symfony\Component\Messenger\MessageBus::dispatch()": expected object, but got string.
-     */
     public function testItDispatchInvalidMessageType()
     {
+        $this->expectException('TypeError');
+        $this->expectExceptionMessage('Invalid argument provided to "Symfony\Component\Messenger\MessageBus::dispatch()": expected object, but got string.');
         (new MessageBus())->dispatch('wrong');
     }
 

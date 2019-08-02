@@ -12,11 +12,14 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserChecker;
 
 class UserCheckerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testCheckPostAuthNotAdvancedUserInterface()
     {
         $checker = new UserChecker();
@@ -44,11 +47,9 @@ class UserCheckerTest extends TestCase
         $this->assertNull($checker->checkPostAuth($account));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
-     */
     public function testCheckPostAuthCredentialsExpired()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\CredentialsExpiredException');
         $checker = new UserChecker();
         $checker->checkPostAuth(new User('John', 'password', [], true, true, false, true));
     }
@@ -56,10 +57,10 @@ class UserCheckerTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation Calling "Symfony\Component\Security\Core\User\UserChecker::checkPostAuth()" with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
-     * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
      */
     public function testCheckPostAuthCredentialsExpiredAdvancedUser()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\CredentialsExpiredException');
         $checker = new UserChecker();
 
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
@@ -84,11 +85,9 @@ class UserCheckerTest extends TestCase
         $this->assertNull($checker->checkPreAuth($account));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\LockedException
-     */
     public function testCheckPreAuthAccountLocked()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\LockedException');
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], true, true, false, false));
     }
@@ -96,10 +95,10 @@ class UserCheckerTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation Calling "Symfony\Component\Security\Core\User\UserChecker::checkPreAuth()" with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
-     * @expectedException \Symfony\Component\Security\Core\Exception\LockedException
      */
     public function testCheckPreAuthAccountLockedAdvancedUser()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\LockedException');
         $checker = new UserChecker();
 
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
@@ -108,11 +107,9 @@ class UserCheckerTest extends TestCase
         $checker->checkPreAuth($account);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
-     */
     public function testCheckPreAuthDisabled()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\DisabledException');
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], false, true, false, true));
     }
@@ -120,10 +117,10 @@ class UserCheckerTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation Calling "Symfony\Component\Security\Core\User\UserChecker::checkPreAuth()" with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
-     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
      */
     public function testCheckPreAuthDisabledAdvancedUser()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\DisabledException');
         $checker = new UserChecker();
 
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
@@ -133,11 +130,9 @@ class UserCheckerTest extends TestCase
         $checker->checkPreAuth($account);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
-     */
     public function testCheckPreAuthAccountExpired()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AccountExpiredException');
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], true, false, true, true));
     }
@@ -145,10 +140,10 @@ class UserCheckerTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation Calling "Symfony\Component\Security\Core\User\UserChecker::checkPreAuth()" with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
      */
     public function testCheckPreAuthAccountExpiredAdvancedUser()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AccountExpiredException');
         $checker = new UserChecker();
 
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();

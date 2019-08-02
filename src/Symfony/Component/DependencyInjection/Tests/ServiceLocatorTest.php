@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -18,17 +19,17 @@ use Symfony\Contracts\Service\Test\ServiceLocatorTest as BaseServiceLocatorTest;
 
 class ServiceLocatorTest extends BaseServiceLocatorTest
 {
+    use ForwardCompatTestTrait;
+
     public function getServiceLocator(array $factories)
     {
         return new ServiceLocator($factories);
     }
 
-    /**
-     * @expectedException        \Psr\Container\NotFoundExceptionInterface
-     * @expectedExceptionMessage Service "dummy" not found: the container inside "Symfony\Component\DependencyInjection\Tests\ServiceLocatorTest" is a smaller service locator that only knows about the "foo" and "bar" services.
-     */
     public function testGetThrowsOnUndefinedService()
     {
+        $this->expectException('Psr\Container\NotFoundExceptionInterface');
+        $this->expectExceptionMessage('Service "dummy" not found: the container inside "Symfony\Component\DependencyInjection\Tests\ServiceLocatorTest" is a smaller service locator that only knows about the "foo" and "bar" services.');
         $locator = $this->getServiceLocator([
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
@@ -37,21 +38,17 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
         $locator->get('dummy');
     }
 
-    /**
-     * @expectedException        \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
-     * @expectedExceptionMessage Circular reference detected for service "bar", path: "bar -> baz -> bar".
-     */
     public function testThrowsOnCircularReference()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');
+        $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
         parent::testThrowsOnCircularReference();
     }
 
-    /**
-     * @expectedException        \Psr\Container\NotFoundExceptionInterface
-     * @expectedExceptionMessage Service "foo" not found: even though it exists in the app's container, the container inside "caller" is a smaller service locator that only knows about the "bar" service. Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "SomeServiceSubscriber::getSubscribedServices()".
-     */
     public function testThrowsInServiceSubscriber()
     {
+        $this->expectException('Psr\Container\NotFoundExceptionInterface');
+        $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "caller" is a smaller service locator that only knows about the "bar" service. Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "SomeServiceSubscriber::getSubscribedServices()".');
         $container = new Container();
         $container->set('foo', new \stdClass());
         $subscriber = new SomeServiceSubscriber();
@@ -61,12 +58,10 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
         $subscriber->getFoo();
     }
 
-    /**
-     * @expectedException        \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage Service "foo" not found: even though it exists in the app's container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.
-     */
     public function testGetThrowsServiceNotFoundException()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.');
         $container = new Container();
         $container->set('foo', new \stdClass());
 

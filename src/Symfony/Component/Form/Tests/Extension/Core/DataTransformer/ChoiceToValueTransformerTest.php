@@ -91,10 +91,10 @@ class ChoiceToValueTransformerTest extends TestCase
 
     /**
      * @dataProvider reverseTransformExpectsStringOrNullProvider
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsStringOrNull($value)
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->transformer->reverseTransform($value);
     }
 }

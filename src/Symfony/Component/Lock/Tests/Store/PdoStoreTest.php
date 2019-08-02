@@ -59,20 +59,16 @@ class PdoStoreTest extends AbstractStoreTest
         $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Lock\Exception\InvalidTtlException
-     */
     public function testInvalidTtl()
     {
+        $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Lock\Exception\InvalidTtlException
-     */
     public function testInvalidTtlConstruct()
     {
+        $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
         return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0.1);
     }
 }

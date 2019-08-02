@@ -66,21 +66,17 @@ class InlineTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage The constant "WRONG_CONSTANT" is not defined
-     */
     public function testParsePhpConstantThrowsExceptionWhenUndefined()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('The constant "WRONG_CONSTANT" is not defined');
         Inline::parse('!php/const WRONG_CONSTANT', Yaml::PARSE_CONSTANT);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessageRegExp #The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#
-     */
     public function testParsePhpConstantThrowsExceptionOnInvalidType()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessageRegExp('#The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#');
         Inline::parse('!php/const PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
@@ -121,72 +117,56 @@ class InlineTest extends TestCase
         $this->assertSame($value, Inline::parse(Inline::dump($value)));
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Found unknown escape character "\V".
-     */
     public function testParseScalarWithNonEscapedBlackslashShouldThrowException()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('Found unknown escape character "\V".');
         Inline::parse('"Foo\Var"');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     */
     public function testParseScalarWithNonEscapedBlackslashAtTheEndShouldThrowException()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         Inline::parse('"Foo\\"');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     */
     public function testParseScalarWithIncorrectlyQuotedStringShouldThrowException()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         $value = "'don't do somthin' like that'";
         Inline::parse($value);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     */
     public function testParseScalarWithIncorrectlyDoubleQuotedStringShouldThrowException()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         $value = '"don"t do somthin" like that"';
         Inline::parse($value);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     */
     public function testParseInvalidMappingKeyShouldThrowException()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         $value = '{ "foo " bar": "bar" }';
         Inline::parse($value);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}")
-     */
     public function testParseMappingKeyWithColonNotFollowedBySpace()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}")');
         Inline::parse('{foo:""}');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     */
     public function testParseInvalidMappingShouldThrowException()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         Inline::parse('[foo] bar');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     */
     public function testParseInvalidSequenceShouldThrowException()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         Inline::parse('{ foo: bar } bar');
     }
 
@@ -230,21 +210,17 @@ class InlineTest extends TestCase
         $this->assertSame([$foo], Inline::parse('[*foo]', 0, ['foo' => $foo]));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage A reference must contain at least one character at line 1.
-     */
     public function testParseUnquotedAsterisk()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('A reference must contain at least one character at line 1.');
         Inline::parse('{ foo: * }');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage A reference must contain at least one character at line 1.
-     */
     public function testParseUnquotedAsteriskFollowedByAComment()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('A reference must contain at least one character at line 1.');
         Inline::parse('{ foo: * #foo }');
     }
 
@@ -615,10 +591,10 @@ class InlineTest extends TestCase
 
     /**
      * @dataProvider getInvalidBinaryData
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
     public function testParseInvalidBinaryData($data, $expectedMessage)
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         $this->expectExceptionMessageRegExp($expectedMessage);
 
         Inline::parse($data);
@@ -634,12 +610,10 @@ class InlineTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Malformed inline YAML string: {this, is not, supported} at line 1.
-     */
     public function testNotSupportedMissingValue()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('Malformed inline YAML string: {this, is not, supported} at line 1.');
         Inline::parse('{this, is not, supported}');
     }
 
@@ -653,12 +627,10 @@ class InlineTest extends TestCase
         $this->assertEquals($longStringWithQuotes, $arrayFromYaml['longStringWithQuotes']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Missing mapping key
-     */
     public function testMappingKeysCannotBeOmitted()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('Missing mapping key');
         Inline::parse('{: foo}');
     }
 
@@ -684,13 +656,13 @@ class InlineTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Implicit casting of incompatible mapping keys to strings is not supported. Quote your evaluable mapping keys instead
      *
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
     public function testImplicitStringCastingOfMappingKeysIsDeprecated($yaml, $expected)
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('Implicit casting of incompatible mapping keys to strings is not supported. Quote your evaluable mapping keys instead');
         $this->assertSame($expected, Inline::parse($yaml));
     }
 
@@ -740,12 +712,10 @@ class InlineTest extends TestCase
         $this->assertSame('', $value['foo']->getValue());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Unexpected end of line, expected one of ",}" at line 1 (near "{abc: 'def'").
-     */
     public function testUnfinishedInlineMap()
     {
+        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectExceptionMessage('Unexpected end of line, expected one of ",}" at line 1 (near "{abc: \'def\'").');
         Inline::parse("{abc: 'def'");
     }
 }

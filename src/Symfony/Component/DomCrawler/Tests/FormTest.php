@@ -67,11 +67,10 @@ class FormTest extends TestCase
 
     /**
      * __construct() should throw \\LogicException if the form attribute is invalid.
-     *
-     * @expectedException \LogicException
      */
     public function testConstructorThrowsExceptionIfNoRelatedForm()
     {
+        $this->expectException('LogicException');
         $dom = new \DOMDocument();
         $dom->loadHTML('
             <html>
@@ -729,20 +728,16 @@ class FormTest extends TestCase
         $registry->remove('[t:dbt%3adate;]data_daterange_enddate_value');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExist()
     {
+        $this->expectException('InvalidArgumentException');
         $registry = new FormFieldRegistry();
         $registry->get('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFormFieldRegistrySetThrowAnExceptionWhenTheFieldDoesNotExist()
     {
+        $this->expectException('InvalidArgumentException');
         $registry = new FormFieldRegistry();
         $registry->set('foo', null);
     }
@@ -819,24 +814,20 @@ class FormTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot set value on a compound field "foo[bar]".
-     */
     public function testFormRegistrySetValueOnCompoundField()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Cannot set value on a compound field "foo[bar]".');
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('foo[bar][baz]'));
 
         $registry->set('foo[bar]', 'fbb');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unreachable field "0"
-     */
     public function testFormRegistrySetArrayOnNotCompoundField()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Unreachable field "0"');
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('bar'));
 

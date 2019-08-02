@@ -12,12 +12,15 @@
 namespace Symfony\Component\Templating\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\StreamingEngineInterface;
 
 class DelegatingEngineTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testRenderDelegatesToSupportedEngine()
     {
         $firstEngine = $this->getEngineMock('template.php', false);
@@ -34,12 +37,10 @@ class DelegatingEngineTest extends TestCase
         $this->assertSame('<html />', $result);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage No engine is able to work with the template "template.php"
-     */
     public function testRenderWithNoSupportedEngine()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('No engine is able to work with the template "template.php"');
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
 
@@ -61,12 +62,10 @@ class DelegatingEngineTest extends TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Template "template.php" cannot be streamed as the engine supporting it does not implement StreamingEngineInterface
-     */
     public function testStreamRequiresStreamingEngine()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('Template "template.php" cannot be streamed as the engine supporting it does not implement StreamingEngineInterface');
         $delegatingEngine = new DelegatingEngine([new TestEngine()]);
         $delegatingEngine->stream('template.php', ['foo' => 'bar']);
     }
@@ -112,12 +111,10 @@ class DelegatingEngineTest extends TestCase
         $this->assertSame($secondEngine, $delegatingEngine->getEngine('template.php'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage No engine is able to work with the template "template.php"
-     */
     public function testGetInvalidEngine()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('No engine is able to work with the template "template.php"');
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
 

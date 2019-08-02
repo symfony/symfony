@@ -235,11 +235,9 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener($this->event);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
     public function testReturnNullFromGetCredentials()
     {
+        $this->expectException('UnexpectedValueException');
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $providerKey = 'my_firewall4';
 

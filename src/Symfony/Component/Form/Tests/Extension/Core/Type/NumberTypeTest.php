@@ -186,11 +186,9 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345.55', $form->getViewData());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     */
     public function testGroupingNotAllowedWithHtml5Widget()
     {
+        $this->expectException('Symfony\Component\Form\Exception\LogicException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'grouping' => true,
             'html5' => true,

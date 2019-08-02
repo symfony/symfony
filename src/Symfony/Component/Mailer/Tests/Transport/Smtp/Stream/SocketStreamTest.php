@@ -16,24 +16,20 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 class SocketStreamTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Mailer\Exception\TransportException
-     * @expectedExceptionMessageRegExp /Connection refused|unable to connect/
-     */
     public function testSocketErrorNoConnection()
     {
+        $this->expectException('Symfony\Component\Mailer\Exception\TransportException');
+        $this->expectExceptionMessageRegExp('/Connection refused|unable to connect/');
         $s = new SocketStream();
         $s->setTimeout(0.1);
         $s->setPort(9999);
         $s->initialize();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Mailer\Exception\TransportException
-     * @expectedExceptionMessageRegExp /no valid certs found cafile stream|Unable to find the socket transport "ssl"/
-     */
     public function testSocketErrorBeforeConnectError()
     {
+        $this->expectException('Symfony\Component\Mailer\Exception\TransportException');
+        $this->expectExceptionMessageRegExp('/no valid certs found cafile stream|Unable to find the socket transport "ssl"/');
         $s = new SocketStream();
         $s->setStreamOptions([
             'ssl' => [

@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\TwigEngine;
 use Symfony\Component\Templating\TemplateReference;
 use Twig\Environment;
@@ -22,6 +23,8 @@ use Twig\Loader\ArrayLoader;
  */
 class TwigEngineTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testExistsWithTemplateInstances()
     {
         $engine = $this->getTwig();
@@ -61,11 +64,9 @@ class TwigEngineTest extends TestCase
         $this->assertSame('foo', $engine->render(new TemplateReference('index')));
     }
 
-    /**
-     * @expectedException \Twig\Error\SyntaxError
-     */
     public function testRenderWithError()
     {
+        $this->expectException('Twig\Error\SyntaxError');
         $engine = $this->getTwig();
 
         $engine->render(new TemplateReference('error'));

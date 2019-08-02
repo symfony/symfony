@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Issn;
 use Symfony\Component\Validator\Constraints\IssnValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -20,6 +21,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class IssnValidatorTest extends ConstraintValidatorTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected function createValidator()
     {
         return new IssnValidator();
@@ -106,11 +109,9 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsStringCompatibleType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $constraint = new Issn();
         $this->validator->validate(new \stdClass(), $constraint);
     }

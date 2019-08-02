@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Util\OrderedHashMap;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Form\Util\OrderedHashMap;
  */
 class OrderedHashMapTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGet()
     {
         $map = new OrderedHashMap();
@@ -27,11 +30,9 @@ class OrderedHashMapTest extends TestCase
         $this->assertSame(1, $map['first']);
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     */
     public function testGetNonExistingFails()
     {
+        $this->expectException('OutOfBoundsException');
         $map = new OrderedHashMap();
 
         $map['first'];

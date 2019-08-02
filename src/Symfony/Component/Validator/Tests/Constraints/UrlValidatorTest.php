@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Bridge\PhpUnit\DnsMock;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\UrlValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -21,6 +22,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UrlValidatorTest extends ConstraintValidatorTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected function createValidator()
     {
         return new UrlValidator();
@@ -47,11 +50,9 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsStringCompatibleType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate(new \stdClass(), new Url());
     }
 
@@ -355,7 +356,6 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      * @group legacy
      * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
@@ -363,6 +363,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      */
     public function testCheckDnsWithInvalidType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
         DnsMock::withMockedHosts(['example.com' => [['type' => 'A']]]);
 
         $constraint = new Url([

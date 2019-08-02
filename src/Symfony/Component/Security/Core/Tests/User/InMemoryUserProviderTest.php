@@ -12,11 +12,14 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
 
 class InMemoryUserProviderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $provider = $this->createProvider();
@@ -63,21 +66,17 @@ class InMemoryUserProviderTest extends TestCase
         $this->assertEquals('foo', $user->getPassword());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testCreateUserAlreadyExist()
     {
+        $this->expectException('LogicException');
         $provider = new InMemoryUserProvider();
         $provider->createUser(new User('fabien', 'foo'));
         $provider->createUser(new User('fabien', 'foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testLoadUserByUsernameDoesNotExist()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
         $provider = new InMemoryUserProvider();
         $provider->loadUserByUsername('fabien');
     }

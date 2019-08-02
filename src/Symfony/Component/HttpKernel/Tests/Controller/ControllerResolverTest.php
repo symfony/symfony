@@ -95,11 +95,9 @@ class ControllerResolverTest extends TestCase
         $this->assertInstanceOf(InvokableController::class, $controller);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetControllerOnObjectWithoutInvokeMethod()
     {
+        $this->expectException('InvalidArgumentException');
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');

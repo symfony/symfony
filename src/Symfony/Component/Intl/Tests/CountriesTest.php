@@ -337,11 +337,9 @@ class CountriesTest extends ResourceBundleTestCase
         $this->assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     */
     public function testGetNameWithInvalidCountryCode()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Countries::getName('foo');
     }
 

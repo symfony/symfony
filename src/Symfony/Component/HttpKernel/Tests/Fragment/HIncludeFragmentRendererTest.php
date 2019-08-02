@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
@@ -21,11 +22,11 @@ use Twig\Loader\ArrayLoader;
 
 class HIncludeFragmentRendererTest extends TestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
+    use ForwardCompatTestTrait;
+
     public function testRenderExceptionWhenControllerAndNoSigner()
     {
+        $this->expectException('LogicException');
         $strategy = new HIncludeFragmentRenderer();
         $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'));
     }

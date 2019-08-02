@@ -78,12 +78,10 @@ TXT
         return new CommandTester($application->find('debug:error-renderer'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No error renderer found for format "foo". Known format are json, xml, txt.
-     */
     public function testInvalidFormat()
     {
+        $this->expectException('Symfony\Component\Console\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('No error renderer found for format "foo". Known format are json, xml, txt.');
         $tester = $this->createCommandTester();
         $tester->execute(['format' => 'foo'], ['decorated' => false]);
     }

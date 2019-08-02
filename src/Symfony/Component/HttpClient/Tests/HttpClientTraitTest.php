@@ -176,39 +176,31 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame(['Authorization: Bearer foobar'], $options['normalized_headers']['authorization']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, object given.
-     */
     public function testInvalidAuthBearerOption()
     {
+        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, object given.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, invalid string given.
-     */
     public function testInvalidAuthBearerValue()
     {
+        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, invalid string given.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => "a\nb"], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.
-     */
     public function testSetAuthBasicAndBearerOptions()
     {
+        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Define either the "json" or the "body" option, setting both is not supported
-     */
     public function testSetJSONAndBodyOptions()
     {
+        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Define either the "json" or the "body" option, setting both is not supported');
         self::prepareRequest('POST', 'http://example.com', ['json' => ['foo' => 'bar'], 'body' => '<html/>'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
@@ -247,21 +239,17 @@ class HttpClientTraitTest extends TestCase
         self::assertSame($expected, $this->normalizePeerFingerprint($fingerprint));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot auto-detect fingerprint algorithm for "foo".
-     */
     public function testNormalizePeerFingerprintException()
     {
+        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Cannot auto-detect fingerprint algorithm for "foo".');
         $this->normalizePeerFingerprint('foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "peer_fingerprint" must be string or array, object given.
-     */
     public function testNormalizePeerFingerprintTypeException()
     {
+        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, object given.');
         $fingerprint = new \stdClass();
 
         $this->normalizePeerFingerprint($fingerprint);

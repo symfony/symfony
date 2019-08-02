@@ -12,11 +12,14 @@
 namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Loader\JsonFileLoader;
 
 class JsonFileLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testLoad()
     {
         $loader = new JsonFileLoader();
@@ -39,22 +42,18 @@ class JsonFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
-     */
     public function testLoadNonExistingResource()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\NotFoundResourceException');
         $loader = new JsonFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.json';
         $loader->load($resource, 'en', 'domain1');
     }
 
-    /**
-     * @expectedException           \Symfony\Component\Translation\Exception\InvalidResourceException
-     * @expectedExceptionMessage    Error parsing JSON - Syntax error, malformed JSON
-     */
     public function testParseException()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+        $this->expectExceptionMessage('Error parsing JSON - Syntax error, malformed JSON');
         $loader = new JsonFileLoader();
         $resource = __DIR__.'/../fixtures/malformed.json';
         $loader->load($resource, 'en', 'domain1');

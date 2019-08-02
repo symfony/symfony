@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 class EsiFragmentRendererTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testRenderFallbackToInlineStrategyIfEsiNotSupported()
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true));
@@ -65,11 +68,9 @@ class EsiFragmentRendererTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testRenderControllerReferenceWithoutSignerThrowsException()
     {
+        $this->expectException('LogicException');
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -79,11 +80,9 @@ class EsiFragmentRendererTest extends TestCase
         $strategy->render(new ControllerReference('main_controller'), $request);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testRenderAltControllerReferenceWithoutSignerThrowsException()
     {
+        $this->expectException('LogicException');
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');

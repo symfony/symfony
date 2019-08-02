@@ -12,12 +12,15 @@
 namespace Symfony\Component\Asset\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class UrlPackageTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getConfigs
      */
@@ -95,21 +98,18 @@ class UrlPackageTest extends TestCase
         $this->assertEquals('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Asset\Exception\LogicException
-     */
     public function testNoBaseUrls()
     {
+        $this->expectException('Symfony\Component\Asset\Exception\LogicException');
         new UrlPackage([], new EmptyVersionStrategy());
     }
 
     /**
      * @dataProvider getWrongBaseUrlConfig
-     *
-     * @expectedException \Symfony\Component\Asset\Exception\InvalidArgumentException
      */
     public function testWrongBaseUrl($baseUrls)
     {
+        $this->expectException('Symfony\Component\Asset\Exception\InvalidArgumentException');
         new UrlPackage($baseUrls, new EmptyVersionStrategy());
     }
 

@@ -108,11 +108,9 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->assertSame('0', $this->transformer->reverseTransform($input));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformPartiallyNull()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $input = [
             'a' => 'Foo',
             'b' => 'Foo',
@@ -122,11 +120,9 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->transformer->reverseTransform($input);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformDifferences()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $input = [
             'a' => 'Foo',
             'b' => 'Bar',
@@ -136,11 +132,9 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->transformer->reverseTransform($input);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformRequiresArray()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->transformer->reverseTransform('12345');
     }
 }

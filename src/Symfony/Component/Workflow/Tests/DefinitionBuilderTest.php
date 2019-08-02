@@ -3,12 +3,15 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Transition;
 
 class DefinitionBuilderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /** @group legacy */
     public function testSetInitialPlace()
     {

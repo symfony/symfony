@@ -34,12 +34,10 @@ class EmailTest extends TestCase
         $this->assertEquals(Email::VALIDATION_MODE_STRICT, $subject->mode);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "mode" parameter value is not valid.
-     */
     public function testUnknownModesTriggerException()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The "mode" parameter value is not valid.');
         new Email(['mode' => 'Unknown Mode']);
     }
 
@@ -50,21 +48,17 @@ class EmailTest extends TestCase
         $this->assertEquals('trim', $email->normalizer);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "normalizer" option must be a valid callable ("string" given).
-     */
     public function testInvalidNormalizerThrowsException()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Email(['normalizer' => 'Unknown Callable']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "normalizer" option must be a valid callable ("stdClass" given).
-     */
     public function testInvalidNormalizerObjectThrowsException()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Email(['normalizer' => new \stdClass()]);
     }
 }

@@ -102,11 +102,9 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
-     */
     public function testItThrowsATransportExceptionIfItCannotSendTheMessage()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 

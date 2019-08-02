@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -21,6 +22,8 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class HttpUtilsTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testCreateRedirectResponseWithPath()
     {
         $utils = new HttpUtils($this->getUrlGenerator());
@@ -251,11 +254,9 @@ class HttpUtilsTest extends TestCase
         $this->assertTrue($utils->checkRequestPath($request, 'foobar'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testCheckRequestPathWithUrlMatcherLoadingException()
     {
+        $this->expectException('RuntimeException');
         $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
         $urlMatcher
             ->expects($this->any())
@@ -280,12 +281,10 @@ class HttpUtilsTest extends TestCase
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'path/index.html'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Matcher must either implement UrlMatcherInterface or RequestMatcherInterface
-     */
     public function testUrlMatcher()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface');
         new HttpUtils($this->getUrlGenerator(), new \stdClass());
     }
 
@@ -307,12 +306,10 @@ class HttpUtilsTest extends TestCase
         $this->assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage You must provide a UrlGeneratorInterface instance to be able to use routes.
-     */
     public function testUrlGeneratorIsRequiredToGenerateUrl()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         $utils = new HttpUtils();
         $utils->generateUri(new Request(), 'route_name');
     }

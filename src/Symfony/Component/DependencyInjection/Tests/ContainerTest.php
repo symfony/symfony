@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -21,6 +22,8 @@ use Symfony\Contracts\Service\ResetInterface;
 
 class ContainerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $sc = new Container();
@@ -166,12 +169,10 @@ class ContainerTest extends TestCase
         $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "bar" service is already initialized, you cannot replace it.
-     */
     public function testSetWithNullOnInitializedPredefinedService()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The "bar" service is already initialized, you cannot replace it.');
         $sc = new Container();
         $sc->set('foo', new \stdClass());
         $sc->set('foo', null);
@@ -260,24 +261,20 @@ class ContainerTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage The "request" service is synthetic, it needs to be set at boot time before it can be used.
-     */
     public function testGetSyntheticServiceThrows()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('The "request" service is synthetic, it needs to be set at boot time before it can be used.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
         $container->get('request');
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.
-     */
     public function testGetRemovedServiceThrows()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
@@ -343,12 +340,10 @@ class ContainerTest extends TestCase
         $this->assertSame(1, $bar->resetCounter);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Something went terribly wrong!
-     */
     public function testGetThrowsException()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Something went terribly wrong!');
         $c = new ProjectServiceContainer();
 
         try {
@@ -413,12 +408,10 @@ class ContainerTest extends TestCase
         $this->assertFalse($c->has('internal'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent service "internal".
-     */
     public function testRequestAnInternalSharedPrivateService()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('You have requested a non-existent service "internal".');
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
         $c->get('internal');

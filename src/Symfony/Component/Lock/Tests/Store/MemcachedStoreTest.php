@@ -61,11 +61,9 @@ class MemcachedStoreTest extends AbstractStoreTest
         $this->markTestSkipped('Memcached expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Lock\Exception\InvalidTtlException
-     */
     public function testInvalidTtl()
     {
+        $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }

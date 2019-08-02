@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
+
 class PropertyAccessorCollectionTest_Car
 {
     private $axes;
@@ -100,6 +102,8 @@ class PropertyAccessorCollectionTest_CarStructure
 
 abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest
 {
+    use ForwardCompatTestTrait;
+
     public function testSetValueCallsAdderAndRemoverForCollections()
     {
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth']);
@@ -146,12 +150,10 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessageRegExp /Could not determine access type for property "axes" in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover_[^"]*"./
-     */
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
+        $this->expectExceptionMessageRegExp('/Could not determine access type for property "axes" in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover_[^"]*"./');
         $car = $this->getMockBuilder(__CLASS__.'_CarNoAdderAndRemover')->getMock();
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
         $axesAfter = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
@@ -187,12 +189,10 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessageRegExp /Could not determine access type for property "axes" in class "Symfony\\Component\\PropertyAccess\\Tests\\PropertyAccessorCollectionTest_Car[^"]*": The property "axes" in class "Symfony\\Component\\PropertyAccess\\Tests\\PropertyAccessorCollectionTest_Car[^"]*" can be defined with the methods "addAxis\(\)", "removeAxis\(\)" but the new value must be an array or an instance of \\Traversable, "string" given./
-     */
     public function testSetValueFailsIfAdderAndRemoverExistButValueIsNotTraversable()
     {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
+        $this->expectExceptionMessageRegExp('/Could not determine access type for property "axes" in class "Symfony\\\\Component\\\\PropertyAccess\\\\Tests\\\\PropertyAccessorCollectionTest_Car[^"]*": The property "axes" in class "Symfony\\\\Component\\\\PropertyAccess\\\\Tests\\\\PropertyAccessorCollectionTest_Car[^"]*" can be defined with the methods "addAxis\(\)", "removeAxis\(\)" but the new value must be an array or an instance of \\\\Traversable, "string" given./');
         $car = new PropertyAccessorCollectionTest_Car();
 
         $this->propertyAccessor->setValue($car, 'axes', 'Not an array or Traversable');

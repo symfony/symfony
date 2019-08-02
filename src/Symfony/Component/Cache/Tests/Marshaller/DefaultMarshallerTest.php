@@ -50,33 +50,29 @@ class DefaultMarshallerTest extends TestCase
         $this->assertSame(0, $marshaller->unmarshall(igbinary_serialize(0)));
     }
 
-    /**
-     * @expectedException \DomainException
-     * @expectedExceptionMessage Class not found: NotExistingClass
-     */
     public function testNativeUnserializeNotFoundClass()
     {
+        $this->expectException('DomainException');
+        $this->expectExceptionMessage('Class not found: NotExistingClass');
         $marshaller = new DefaultMarshaller();
         $marshaller->unmarshall('O:16:"NotExistingClass":0:{}');
     }
 
     /**
      * @requires extension igbinary
-     * @expectedException \DomainException
-     * @expectedExceptionMessage Class not found: NotExistingClass
      */
     public function testIgbinaryUnserializeNotFoundClass()
     {
+        $this->expectException('DomainException');
+        $this->expectExceptionMessage('Class not found: NotExistingClass');
         $marshaller = new DefaultMarshaller();
         $marshaller->unmarshall(rawurldecode('%00%00%00%02%17%10NotExistingClass%14%00'));
     }
 
-    /**
-     * @expectedException \DomainException
-     * @expectedExceptionMessage unserialize(): Error at offset 0 of 3 bytes
-     */
     public function testNativeUnserializeInvalid()
     {
+        $this->expectException('DomainException');
+        $this->expectExceptionMessage('unserialize(): Error at offset 0 of 3 bytes');
         $marshaller = new DefaultMarshaller();
         set_error_handler(function () { return false; });
         try {
@@ -88,11 +84,11 @@ class DefaultMarshallerTest extends TestCase
 
     /**
      * @requires extension igbinary
-     * @expectedException \DomainException
-     * @expectedExceptionMessage igbinary_unserialize_zval: unknown type '61', position 5
      */
     public function testIgbinaryUnserializeInvalid()
     {
+        $this->expectException('DomainException');
+        $this->expectExceptionMessage('igbinary_unserialize_zval: unknown type \'61\', position 5');
         $marshaller = new DefaultMarshaller();
         set_error_handler(function () { return false; });
         try {

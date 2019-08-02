@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DelegatingEngineTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testSupportsRetrievesEngineFromTheContainer()
     {
         $container = $this->getContainerMock([
@@ -46,12 +49,10 @@ class DelegatingEngineTest extends TestCase
         $this->assertSame($secondEngine, $delegatingEngine->getEngine('template.php'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage No engine is able to work with the template "template.php"
-     */
     public function testGetInvalidEngine()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('No engine is able to work with the template "template.php"');
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
         $container = $this->getContainerMock([

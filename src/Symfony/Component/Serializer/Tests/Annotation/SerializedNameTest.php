@@ -19,12 +19,10 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
  */
 class SerializedNameTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" should be set.
-     */
     public function testNotSetSerializedNameParameter()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" should be set.');
         new SerializedName([]);
     }
 
@@ -38,12 +36,11 @@ class SerializedNameTest extends TestCase
 
     /**
      * @dataProvider provideInvalidValues
-     *
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" must be a non-empty string.
      */
     public function testNotAStringSerializedNameParameter($value)
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" must be a non-empty string.');
         new SerializedName(['value' => $value]);
     }
 

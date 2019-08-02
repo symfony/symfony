@@ -12,10 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 class FrozenParameterBagTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstructor()
     {
         $parameters = [
@@ -26,38 +29,30 @@ class FrozenParameterBagTest extends TestCase
         $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testClear()
     {
+        $this->expectException('LogicException');
         $bag = new FrozenParameterBag([]);
         $bag->clear();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSet()
     {
+        $this->expectException('LogicException');
         $bag = new FrozenParameterBag([]);
         $bag->set('foo', 'bar');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAdd()
     {
+        $this->expectException('LogicException');
         $bag = new FrozenParameterBag([]);
         $bag->add([]);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testRemove()
     {
+        $this->expectException('LogicException');
         $bag = new FrozenParameterBag(['foo' => 'bar']);
         $bag->remove('foo');
     }

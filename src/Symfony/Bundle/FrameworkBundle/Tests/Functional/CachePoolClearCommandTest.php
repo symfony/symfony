@@ -68,12 +68,10 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertContains('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    /**
-     * @expectedException        \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent service "unknown_pool"
-     */
     public function testClearUnexistingPool()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('You have requested a non-existent service "unknown_pool"');
         $this->createCommandTester()
             ->execute(['pools' => ['unknown_pool']], ['decorated' => false]);
     }

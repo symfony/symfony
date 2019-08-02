@@ -112,12 +112,10 @@ class ProxyDumperTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Missing factory code to construct the service "foo".
-     */
     public function testGetProxyFactoryCodeWithoutCustomMethod()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Missing factory code to construct the service "foo".');
         $definition = new Definition(__CLASS__);
         $definition->setLazy(true);
         $this->dumper->getProxyFactoryCode($definition, 'foo');

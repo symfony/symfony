@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\SimpleAuthenticationProvider;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
@@ -22,11 +23,11 @@ use Symfony\Component\Security\Core\User\UserChecker;
  */
 class SimpleAuthenticationProviderTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
-     */
+    use ForwardCompatTestTrait;
+
     public function testAuthenticateWhenPreChecksFails()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\DisabledException');
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
 
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
@@ -49,11 +50,9 @@ class SimpleAuthenticationProviderTest extends TestCase
         $provider->authenticate($token);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\LockedException
-     */
     public function testAuthenticateWhenPostChecksFails()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\LockedException');
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
 
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();

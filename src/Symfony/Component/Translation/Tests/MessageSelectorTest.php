@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Translation\MessageSelector;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\Translation\MessageSelector;
  */
 class MessageSelectorTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getChooseTests
      */
@@ -38,10 +41,10 @@ class MessageSelectorTest extends TestCase
 
     /**
      * @dataProvider getNonMatchingMessages
-     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testThrowExceptionIfMatchingMessageCannotBeFound($id, $number)
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidArgumentException');
         $selector = new MessageSelector();
 
         $selector->choose($id, $number, 'en');

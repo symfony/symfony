@@ -23,44 +23,34 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
 {
     use ForwardCompatTestTrait;
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
-     */
     public function testConstructorWithUnsupportedLocale()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
         new NumberFormatter('pt_BR');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
-     */
     public function testConstructorWithUnsupportedStyle()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
         new NumberFormatter('en', NumberFormatter::PATTERN_DECIMAL);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException
-     */
     public function testConstructorWithPatternDifferentThanNull()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException');
         new NumberFormatter('en', NumberFormatter::DECIMAL, '');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
-     */
     public function testSetAttributeWithUnsupportedAttribute()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::LENIENT_PARSE, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
-     */
     public function testSetAttributeInvalidRoundingMode()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, -1);
     }
@@ -81,73 +71,69 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testFormatWithCurrencyStyle()
     {
+        $this->expectException('RuntimeException');
         parent::testFormatWithCurrencyStyle();
     }
 
     /**
      * @dataProvider formatTypeInt32Provider
-     * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
      */
     public function testFormatTypeInt32($formatter, $value, $expected, $message = '')
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
         parent::testFormatTypeInt32($formatter, $value, $expected, $message);
     }
 
     /**
      * @dataProvider formatTypeInt32WithCurrencyStyleProvider
-     * @expectedException \Symfony\Component\Intl\Exception\NotImplementedException
      */
     public function testFormatTypeInt32WithCurrencyStyle($formatter, $value, $expected, $message = '')
     {
+        $this->expectException('Symfony\Component\Intl\Exception\NotImplementedException');
         parent::testFormatTypeInt32WithCurrencyStyle($formatter, $value, $expected, $message);
     }
 
     /**
      * @dataProvider formatTypeInt64Provider
-     * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
      */
     public function testFormatTypeInt64($formatter, $value, $expected)
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
         parent::testFormatTypeInt64($formatter, $value, $expected);
     }
 
     /**
      * @dataProvider formatTypeInt64WithCurrencyStyleProvider
-     * @expectedException \Symfony\Component\Intl\Exception\NotImplementedException
      */
     public function testFormatTypeInt64WithCurrencyStyle($formatter, $value, $expected)
     {
+        $this->expectException('Symfony\Component\Intl\Exception\NotImplementedException');
         parent::testFormatTypeInt64WithCurrencyStyle($formatter, $value, $expected);
     }
 
     /**
      * @dataProvider formatTypeDoubleProvider
-     * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
      */
     public function testFormatTypeDouble($formatter, $value, $expected)
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
         parent::testFormatTypeDouble($formatter, $value, $expected);
     }
 
     /**
      * @dataProvider formatTypeDoubleWithCurrencyStyleProvider
-     * @expectedException \Symfony\Component\Intl\Exception\NotImplementedException
      */
     public function testFormatTypeDoubleWithCurrencyStyle($formatter, $value, $expected)
     {
+        $this->expectException('Symfony\Component\Intl\Exception\NotImplementedException');
         parent::testFormatTypeDoubleWithCurrencyStyle($formatter, $value, $expected);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
-     */
     public function testGetPattern()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->getPattern();
     }
@@ -158,38 +144,30 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
         $this->assertEquals(IntlGlobals::U_ZERO_ERROR, $formatter->getErrorCode());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
-     */
     public function testParseCurrency()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parseCurrency(null, $currency);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
-     */
     public function testSetPattern()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setPattern(null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
-     */
     public function testSetSymbol()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setSymbol(null, null);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
-     */
     public function testSetTextAttribute()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setTextAttribute(null, null);
     }

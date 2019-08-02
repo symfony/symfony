@@ -117,51 +117,39 @@ class AppVariableTest extends TestCase
         $this->assertNull($this->appVariable->getUser());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testEnvironmentNotSet()
     {
+        $this->expectException('RuntimeException');
         $this->appVariable->getEnvironment();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testDebugNotSet()
     {
+        $this->expectException('RuntimeException');
         $this->appVariable->getDebug();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetTokenWithTokenStorageNotSet()
     {
+        $this->expectException('RuntimeException');
         $this->appVariable->getToken();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetUserWithTokenStorageNotSet()
     {
+        $this->expectException('RuntimeException');
         $this->appVariable->getUser();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetRequestWithRequestStackNotSet()
     {
+        $this->expectException('RuntimeException');
         $this->appVariable->getRequest();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetSessionWithRequestStackNotSet()
     {
+        $this->expectException('RuntimeException');
         $this->appVariable->getSession();
     }
 

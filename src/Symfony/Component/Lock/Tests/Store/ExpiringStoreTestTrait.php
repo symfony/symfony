@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -57,11 +58,10 @@ trait ExpiringStoreTestTrait
 
     /**
      * Tests the store thrown exception when TTL expires.
-     *
-     * @expectedException \Symfony\Component\Lock\Exception\LockExpiredException
      */
     public function testAbortAfterExpiration()
     {
+        $this->expectException('\Symfony\Component\Lock\Exception\LockExpiredException');
         $key = new Key(uniqid(__METHOD__, true));
 
         /** @var PersistingStoreInterface $store */

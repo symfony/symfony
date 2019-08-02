@@ -12,10 +12,13 @@
 namespace Symfony\Component\CssSelector\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 class CssSelectorConverterTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testCssToXPath()
     {
         $converter = new CssSelectorConverter();
@@ -35,12 +38,10 @@ class CssSelectorConverterTest extends TestCase
         $this->assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\CssSelector\Exception\ParseException
-     * @expectedExceptionMessage Expected identifier, but <eof at 3> found.
-     */
     public function testParseExceptions()
     {
+        $this->expectException('Symfony\Component\CssSelector\Exception\ParseException');
+        $this->expectExceptionMessage('Expected identifier, but <eof at 3> found.');
         $converter = new CssSelectorConverter();
         $converter->toXPath('h1:');
     }

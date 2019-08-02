@@ -195,6 +195,22 @@ before_install:
 
 install:
     - |
+      # Install the phpunit-bridge from a PR if required
+      #
+      # To run a PR with a patched phpunit-bridge, first submit the path for the
+      # phpunit-bridge as a separate PR against the next feature-branch then
+      # uncomment and update the following line with that PR number
+      #SYMFONY_PHPUNIT_BRIDGE_PR=32886
+
+      if [[ $SYMFONY_PHPUNIT_BRIDGE_PR ]]; then
+          git fetch origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
+          git rm -rq src/Symfony/Bridge/PhpUnit
+          git checkout -q FETCH_HEAD -- src/Symfony/Bridge/PhpUnit
+          SYMFONY_VERSION=$(cat src/Symfony/Bridge/PhpUnit/composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*')
+          sed -i 's/"symfony\/phpunit-bridge": ".*"/"symfony\/phpunit-bridge": "'$SYMFONY_VERSION'.x@dev"/' composer.json
+      fi
+
+    - |
       # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
       if [[ ! $deps ]]; then
           php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit
@@ -205,6 +221,10 @@ install:
           php .github/build-packages.php HEAD^ $(find src/Symfony -mindepth 3 -type f -name composer.json -printf '%h\n') &&
           mv composer.json composer.json.phpunit &&
           mv composer.json.orig composer.json
+      fi
+      if [[ $SYMFONY_PHPUNIT_BRIDGE_PR ]]; then
+          git rm -fq -- src/Symfony/Bridge/PhpUnit/composer.json
+          git diff --staged -- src/Symfony/Bridge/PhpUnit/ | git apply -R --index
       fi
 
     - |

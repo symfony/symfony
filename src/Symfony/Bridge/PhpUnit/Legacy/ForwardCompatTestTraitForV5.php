@@ -106,6 +106,26 @@ trait ForwardCompatTestTraitForV5
     }
 
     /**
+     * @param string $originalClassName
+     *
+     * @return MockObject
+     */
+    protected function createPartialMock($originalClassName, array $methods)
+    {
+        $mock = $this->getMockBuilder($originalClassName)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->setMethods(empty($methods) ? null : $methods);
+
+        if (method_exists($mock, 'disallowMockingUnknownTypes')) {
+            $mock = $mock->disallowMockingUnknownTypes();
+        }
+
+        return $mock->getMock();
+    }
+
+    /**
      * @param string $message
      *
      * @return void

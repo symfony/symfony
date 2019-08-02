@@ -93,12 +93,11 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals('/path', $routes->get('action')->getPath());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"
-     */
     public function testRequirementsWithoutPlaceholderName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"');
+
         $this->loader->load(RequirementsWithoutPlaceholderNameController::class);
     }
 

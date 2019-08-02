@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Exception\AccountExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -20,6 +21,8 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class UserAuthenticationProviderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testSupports()
     {
         $provider = $this->getProvider();
@@ -28,22 +31,18 @@ class UserAuthenticationProviderTest extends TestCase
         $this->assertFalse($provider->supports($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessage The token is not supported by this authentication provider.
-     */
     public function testAuthenticateWhenTokenIsNotSupported()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->expectExceptionMessage('The token is not supported by this authentication provider.');
         $provider = $this->getProvider();
 
         $provider->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testAuthenticateWhenUsernameIsNotFound()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
         $provider = $this->getProvider(false, false);
         $provider->expects($this->once())
                  ->method('retrieveUser')
@@ -53,11 +52,9 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testAuthenticateWhenUsernameIsNotFoundAndHideIsTrue()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
                  ->method('retrieveUser')
@@ -67,11 +64,9 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationServiceException
-     */
     public function testAuthenticateWhenProviderDoesNotReturnAnUserInterface()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationServiceException');
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
                  ->method('retrieveUser')
@@ -81,11 +76,9 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
-     */
     public function testAuthenticateWhenPreChecksFails()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\CredentialsExpiredException');
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
                     ->method('checkPreAuth')
@@ -101,11 +94,9 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
-     */
     public function testAuthenticateWhenPostChecksFails()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AccountExpiredException');
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
@@ -121,12 +112,10 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     * @expectedExceptionMessage Bad credentials
-     */
     public function testAuthenticateWhenPostCheckAuthenticationFails()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectExceptionMessage('Bad credentials');
         $provider = $this->getProvider();
         $provider->expects($this->once())
                  ->method('retrieveUser')
@@ -140,12 +129,10 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     * @expectedExceptionMessage Foo
-     */
     public function testAuthenticateWhenPostCheckAuthenticationFailsWithHideFalse()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectExceptionMessage('Foo');
         $provider = $this->getProvider(false, false);
         $provider->expects($this->once())
                  ->method('retrieveUser')

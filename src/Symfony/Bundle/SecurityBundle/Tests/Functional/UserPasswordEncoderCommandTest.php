@@ -207,12 +207,10 @@ EOTXT
         $this->assertContains('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $this->passwordEncoderCommandTester->getDisplay());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage There are no configured encoders for the "security" extension.
-     */
     public function testThrowsExceptionOnNoConfiguredEncoders()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('There are no configured encoders for the "security" extension.');
         $application = new ConsoleApplication();
         $application->add(new UserPasswordEncoderCommand($this->getMockBuilder(EncoderFactoryInterface::class)->getMock(), []));
 

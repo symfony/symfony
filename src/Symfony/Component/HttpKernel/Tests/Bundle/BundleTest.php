@@ -12,12 +12,15 @@
 namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\ExtensionNotValidBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 
 class BundleTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetContainerExtension()
     {
         $bundle = new ExtensionPresentBundle();
@@ -28,12 +31,10 @@ class BundleTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface
-     */
     public function testGetContainerExtensionWithInvalidClass()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface');
         $bundle = new ExtensionNotValidBundle();
         $bundle->getContainerExtension();
     }

@@ -48,11 +48,9 @@ class LintCommandTest extends TestCase
         $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testLintFileNotReadable()
     {
+        $this->expectException('RuntimeException');
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
         unlink($filename);

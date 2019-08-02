@@ -50,13 +50,10 @@ class ProcessTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage The provided cwd "
-     * @expectedExceptionMessage "does not exist.
-     */
     public function testInvalidCwd()
     {
+        $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
+        $this->expectExceptionMessageRegExp('/The provided cwd ".*" does not exist\./');
         try {
             // Check that it works fine if the CWD exists
             $cmd = new Process(['echo', 'test'], __DIR__);
@@ -82,19 +79,15 @@ class ProcessTest extends TestCase
         $this->assertEquals(E_USER_NOTICE, $actualError['type']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     */
     public function testNegativeTimeoutFromConstructor()
     {
+        $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
         $this->getProcess('', null, null, null, -1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     */
     public function testNegativeTimeoutFromSetter()
     {
+        $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
         $p = $this->getProcess('');
         $p->setTimeout(-1);
     }
@@ -280,12 +273,10 @@ class ProcessTest extends TestCase
         $this->assertSame('hello', $p->getOutput());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage Input can not be set while the process is running.
-     */
     public function testSetInputWhileRunningThrowsAnException()
     {
+        $this->expectException('Symfony\Component\Process\Exception\LogicException');
+        $this->expectExceptionMessage('Input can not be set while the process is running.');
         $process = $this->getProcessForCode('sleep(30);');
         $process->start();
         try {
@@ -301,11 +292,11 @@ class ProcessTest extends TestCase
 
     /**
      * @dataProvider provideInvalidInputValues
-     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings, Traversable objects or stream resources.
      */
     public function testInvalidInput($value)
     {
+        $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Symfony\Component\Process\Process::setInput only accepts strings, Traversable objects or stream resources.');
         $process = $this->getProcess('foo');
         $process->setInput($value);
     }
@@ -510,12 +501,10 @@ class ProcessTest extends TestCase
         $this->assertTrue($process->isSuccessful());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage TTY mode is not supported on Windows platform.
-     */
     public function testTTYInWindowsEnvironment()
     {
+        $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
+        $this->expectExceptionMessage('TTY mode is not supported on Windows platform.');
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is for Windows platform only');
         }
@@ -559,11 +548,9 @@ class ProcessTest extends TestCase
         $this->assertEquals(0, $process->getExitCode());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testMustRunThrowsException()
     {
+        $this->expectException('Symfony\Component\Process\Exception\ProcessFailedException');
         $process = $this->getProcess('exit 1');
         $process->mustRun();
     }
@@ -713,12 +700,10 @@ class ProcessTest extends TestCase
         $this->assertEquals(15, $process->getTermSignal()); // SIGTERM
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessSignaledException
-     * @expectedExceptionMessage The process has been signaled with signal "9".
-     */
     public function testProcessThrowsExceptionWhenExternallySignaled()
     {
+        $this->expectException('Symfony\Component\Process\Exception\ProcessSignaledException');
+        $this->expectExceptionMessage('The process has been signaled with signal "9".');
         if (!\function_exists('posix_kill')) {
             $this->markTestSkipped('Function posix_kill is required.');
         }
@@ -752,12 +737,10 @@ class ProcessTest extends TestCase
         $this->assertNotEquals($process1->getOutput(), $process2->getOutput());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
-     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
-     */
     public function testRunProcessWithTimeout()
     {
+        $this->expectException('Symfony\Component\Process\Exception\ProcessTimedOutException');
+        $this->expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
         $process = $this->getProcessForCode('sleep(30);');
         $process->setTimeout(0.1);
         $start = microtime(true);
@@ -772,12 +755,10 @@ class ProcessTest extends TestCase
         throw $e;
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
-     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
-     */
     public function testIterateOverProcessWithTimeout()
     {
+        $this->expectException('Symfony\Component\Process\Exception\ProcessTimedOutException');
+        $this->expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
         $process = $this->getProcessForCode('sleep(30);');
         $process->setTimeout(0.1);
         $start = microtime(true);
@@ -806,12 +787,10 @@ class ProcessTest extends TestCase
         $this->assertNull($process->checkTimeout());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
-     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
-     */
     public function testCheckTimeoutOnStartedProcess()
     {
+        $this->expectException('Symfony\Component\Process\Exception\ProcessTimedOutException');
+        $this->expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
         $process = $this->getProcessForCode('sleep(33);');
         $process->setTimeout(0.1);
 
@@ -871,12 +850,10 @@ class ProcessTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
-     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
-     */
     public function testStartAfterATimeout()
     {
+        $this->expectException('Symfony\Component\Process\Exception\ProcessTimedOutException');
+        $this->expectExceptionMessage('exceeded the timeout of 0.1 seconds.');
         $process = $this->getProcessForCode('sleep(35);');
         $process->setTimeout(0.1);
 
@@ -950,12 +927,10 @@ class ProcessTest extends TestCase
         $this->assertEquals(137, $process->getExitCode());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage Can not send signal on a non running process.
-     */
     public function testSignalProcessNotRunning()
     {
+        $this->expectException('Symfony\Component\Process\Exception\LogicException');
+        $this->expectExceptionMessage('Can not send signal on a non running process.');
         $process = $this->getProcess('foo');
         $process->signal(1); // SIGHUP
     }
@@ -986,11 +961,11 @@ class ProcessTest extends TestCase
 
     /**
      * @dataProvider provideMethodsThatNeedATerminatedProcess
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage Process must be terminated before calling
      */
     public function testMethodsThatNeedATerminatedProcess($method)
     {
+        $this->expectException('Symfony\Component\Process\Exception\LogicException');
+        $this->expectExceptionMessage('Process must be terminated before calling');
         $process = $this->getProcessForCode('sleep(37);');
         $process->start();
         try {
@@ -1014,11 +989,9 @@ class ProcessTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     */
     public function testWrongSignal()
     {
+        $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('POSIX signals do not work on Windows');
         }
@@ -1045,23 +1018,19 @@ class ProcessTest extends TestCase
         $this->assertFalse($p->isOutputDisabled());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage Disabling output while the process is running is not possible.
-     */
     public function testDisableOutputWhileRunningThrowsException()
     {
+        $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
+        $this->expectExceptionMessage('Disabling output while the process is running is not possible.');
         $p = $this->getProcessForCode('sleep(39);');
         $p->start();
         $p->disableOutput();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage Enabling output while the process is running is not possible.
-     */
     public function testEnableOutputWhileRunningThrowsException()
     {
+        $this->expectException('Symfony\Component\Process\Exception\RuntimeException');
+        $this->expectExceptionMessage('Enabling output while the process is running is not possible.');
         $p = $this->getProcessForCode('sleep(40);');
         $p->disableOutput();
         $p->start();
@@ -1078,23 +1047,19 @@ class ProcessTest extends TestCase
         $this->assertTrue($p->isOutputDisabled());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage Output can not be disabled while an idle timeout is set.
-     */
     public function testDisableOutputWhileIdleTimeoutIsSet()
     {
+        $this->expectException('Symfony\Component\Process\Exception\LogicException');
+        $this->expectExceptionMessage('Output can not be disabled while an idle timeout is set.');
         $process = $this->getProcess('foo');
         $process->setIdleTimeout(1);
         $process->disableOutput();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage timeout can not be set while the output is disabled.
-     */
     public function testSetIdleTimeoutWhileOutputIsDisabled()
     {
+        $this->expectException('Symfony\Component\Process\Exception\LogicException');
+        $this->expectExceptionMessage('timeout can not be set while the output is disabled.');
         $process = $this->getProcess('foo');
         $process->disableOutput();
         $process->setIdleTimeout(1);
@@ -1109,11 +1074,11 @@ class ProcessTest extends TestCase
 
     /**
      * @dataProvider provideOutputFetchingMethods
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage Output has been disabled.
      */
     public function testGetOutputWhileDisabled($fetchMethod)
     {
+        $this->expectException('Symfony\Component\Process\Exception\LogicException');
+        $this->expectExceptionMessage('Output has been disabled.');
         $p = $this->getProcessForCode('sleep(41);');
         $p->disableOutput();
         $p->start();
@@ -1521,22 +1486,18 @@ EOTXT;
         $this->assertSame('"DEF"', rtrim($p->getOutput()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Command line is missing a value for key "$abc": echo "$abc".
-     */
     public function testPreparedCommandWithMissingValue()
     {
+        $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Command line is missing a value for key "$abc": echo "$abc".');
         $p = Process::fromShellCommandline('echo "$abc"');
         $p->run(null, ['bcd' => 'BCD']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Command line is missing a value for key "$abc": echo "$abc".
-     */
     public function testPreparedCommandWithNoValues()
     {
+        $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Command line is missing a value for key "$abc": echo "$abc".');
         $p = Process::fromShellCommandline('echo "$abc"');
         $p->run(null, []);
     }

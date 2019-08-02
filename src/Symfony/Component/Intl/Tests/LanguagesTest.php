@@ -907,18 +907,16 @@ class LanguagesTest extends ResourceBundleTestCase
 
     /**
      * @dataProvider provideLanguagesWithoutAlpha3Equivalent
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
     public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($language)
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Languages::getAlpha3Code($language);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     */
     public function testGetNameWithInvalidLanguageCode()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Languages::getName('foo');
     }
 

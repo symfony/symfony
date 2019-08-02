@@ -12,17 +12,18 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\ExpressionRequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExpressionRequestMatcherTest extends TestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
+    use ForwardCompatTestTrait;
+
     public function testWhenNoExpressionIsSet()
     {
+        $this->expectException('LogicException');
         $expressionRequestMatcher = new ExpressionRequestMatcher();
         $expressionRequestMatcher->matches(new Request());
     }

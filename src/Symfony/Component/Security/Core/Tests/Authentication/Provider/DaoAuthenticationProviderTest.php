@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -19,11 +20,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class DaoAuthenticationProviderTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationServiceException
-     */
+    use ForwardCompatTestTrait;
+
     public function testRetrieveUserWhenProviderDoesNotReturnAnUserInterface()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationServiceException');
         $provider = $this->getProvider('fabien');
         $method = new \ReflectionMethod($provider, 'retrieveUser');
         $method->setAccessible(true);
@@ -31,11 +32,9 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->invoke($provider, 'fabien', $this->getSupportedToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testRetrieveUserWhenUsernameIsNotFound()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
         $userProvider = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface')->getMock();
         $userProvider->expects($this->once())
                      ->method('loadUserByUsername')
@@ -49,11 +48,9 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->invoke($provider, 'fabien', $this->getSupportedToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationServiceException
-     */
     public function testRetrieveUserWhenAnExceptionOccurs()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationServiceException');
         $userProvider = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface')->getMock();
         $userProvider->expects($this->once())
                      ->method('loadUserByUsername')
@@ -106,11 +103,9 @@ class DaoAuthenticationProviderTest extends TestCase
         $this->assertSame($user, $method->invoke($provider, 'fabien', $this->getSupportedToken()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testCheckAuthenticationWhenCredentialsAreEmpty()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $encoder = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Encoder\\PasswordEncoderInterface')->getMock();
         $encoder
             ->expects($this->never())
@@ -154,11 +149,9 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->invoke($provider, new TestUser(), $token);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testCheckAuthenticationWhenCredentialsAreNotValid()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $encoder = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Encoder\\PasswordEncoderInterface')->getMock();
         $encoder->expects($this->once())
                 ->method('isPasswordValid')
@@ -178,11 +171,9 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->invoke($provider, new TestUser(), $token);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $user = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock();
         $user->expects($this->once())
              ->method('getPassword')

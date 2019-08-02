@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -22,14 +23,15 @@ use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 class FragmentRendererPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * Tests that content rendering not implementing FragmentRendererInterface
      * triggers an exception.
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testContentRendererWithoutInterface()
     {
+        $this->expectException('InvalidArgumentException');
         $builder = new ContainerBuilder();
         $fragmentHandlerDefinition = $builder->register('fragment.handler');
         $builder->register('my_content_renderer', 'Symfony\Component\DependencyInjection\Definition')

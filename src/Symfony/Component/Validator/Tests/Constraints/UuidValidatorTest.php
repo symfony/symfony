@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Uuid;
 use Symfony\Component\Validator\Constraints\UuidValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -20,6 +21,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UuidValidatorTest extends ConstraintValidatorTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected function createValidator()
     {
         return new UuidValidator();
@@ -39,21 +42,17 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
     public function testExpectsUuidConstraintCompatibleType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
         $constraint = $this->getMockForAbstractClass('Symfony\\Component\\Validator\\Constraint');
 
         $this->validator->validate('216fff40-98d9-11e3-a5e2-0800200c9a66', $constraint);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsStringCompatibleType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate(new \stdClass(), new Uuid());
     }
 

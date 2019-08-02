@@ -35,12 +35,10 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
         $this->assertNull($transformer->transform(null));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a \DateTimeImmutable.
-     */
     public function testTransformFail()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectExceptionMessage('Expected a \DateTimeImmutable.');
         $transformer = new DateTimeImmutableToDateTimeTransformer();
         $transformer->transform(new \DateTime());
     }
@@ -64,12 +62,10 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
         $this->assertNull($transformer->reverseTransform(null));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a \DateTime.
-     */
     public function testReverseTransformFail()
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectExceptionMessage('Expected a \DateTime.');
         $transformer = new DateTimeImmutableToDateTimeTransformer();
         $transformer->reverseTransform(new \DateTimeImmutable());
     }

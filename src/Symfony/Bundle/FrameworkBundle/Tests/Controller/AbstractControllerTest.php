@@ -80,12 +80,10 @@ class AbstractControllerTest extends TestCase
         $this->assertSame('bar', $controller->getParameter('foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage TestAbstractController::getParameter()" method is missing a parameter bag
-     */
     public function testMissingParameterBag()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
         $container = new Container();
 
         $controller = $this->createController();
@@ -148,12 +146,11 @@ class AbstractControllerTest extends TestCase
         $this->assertNull($controller->getUser());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The SecurityBundle is not registered in your application.
-     */
     public function testGetUserWithEmptyContainer()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
+
         $controller = $this->createController();
         $controller->setContainer(new Container());
 
@@ -335,11 +332,10 @@ class AbstractControllerTest extends TestCase
         $this->assertContains('test.php', $response->headers->get('content-disposition'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
-     */
     public function testFileWhichDoesNotExist()
     {
+        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+
         $controller = $this->createController();
 
         /* @var BinaryFileResponse $response */
@@ -360,11 +356,10 @@ class AbstractControllerTest extends TestCase
         $this->assertTrue($controller->isGranted('foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testdenyAccessUnlessGranted()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+
         $authorizationChecker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
 

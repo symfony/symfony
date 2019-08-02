@@ -53,11 +53,9 @@ class DoctrineReceiverTest extends TestCase
         $this->assertSame(1, $transportMessageIdStamp->getId());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\MessageDecodingFailedException
-     */
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\MessageDecodingFailedException');
         $serializer = $this->createMock(PhpSerializer::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 

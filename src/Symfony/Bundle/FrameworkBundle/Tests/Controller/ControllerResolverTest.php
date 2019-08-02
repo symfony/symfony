@@ -66,12 +66,11 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($container, $controller->getContainer());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController" has no container set, did you forget to define it as a service subscriber?
-     */
     public function testAbstractControllerGetsContainerWhenNotSet()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\TestAbstractController" has no container set, did you forget to define it as a service subscriber?');
+
         class_exists(AbstractControllerTest::class);
 
         $controller = new TestAbstractController(false);
@@ -88,12 +87,11 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($container, $controller->setContainer($container));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage "Symfony\Bundle\FrameworkBundle\Tests\Controller\DummyController" has no container set, did you forget to define it as a service subscriber?
-     */
     public function testAbstractControllerServiceWithFqcnIdGetsContainerWhenNotSet()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\DummyController" has no container set, did you forget to define it as a service subscriber?');
+
         class_exists(AbstractControllerTest::class);
 
         $controller = new DummyController();

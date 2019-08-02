@@ -12,12 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveChildDefinitionsPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -397,12 +400,10 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
-     * @expectedExceptionMessageRegExp /^Circular reference detected for service "c", path: "c -> b -> a -> c"./
-     */
     public function testProcessDetectsChildDefinitionIndirectCircularReference()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');
+        $this->expectExceptionMessageRegExp('/^Circular reference detected for service "c", path: "c -> b -> a -> c"./');
         $container = new ContainerBuilder();
 
         $container->register('a');

@@ -378,12 +378,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([$this->obj2], $loader->loadChoicesForValues(['2'], $value));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The second argument `$idReader` of "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader::__construct" must be null when the query cannot be optimized because of composite id fields.
-     */
     public function testPassingIdReaderWithoutSingleIdEntity()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The second argument `$idReader` of "Symfony\\Bridge\\Doctrine\\Form\\ChoiceList\\DoctrineChoiceLoader::__construct" must be null when the query cannot be optimized because of composite id fields.');
+
         $idReader = $this->createMock(IdReader::class);
         $idReader->expects($this->once())
             ->method('isSingleId')

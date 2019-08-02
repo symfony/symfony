@@ -273,11 +273,9 @@ class ScriptsTest extends ResourceBundleTestCase
         }
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     */
     public function testGetNameWithInvalidScriptCode()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Scripts::getName('foo');
     }
 

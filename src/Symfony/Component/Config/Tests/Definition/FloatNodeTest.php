@@ -12,10 +12,13 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\FloatNode;
 
 class FloatNodeTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getValidValues
      */
@@ -54,10 +57,10 @@ class FloatNodeTest extends TestCase
 
     /**
      * @dataProvider getInvalidValues
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
         $node = new FloatNode('test');
         $node->normalize($value);
     }

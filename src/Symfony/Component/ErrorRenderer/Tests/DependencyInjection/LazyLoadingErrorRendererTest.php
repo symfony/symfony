@@ -19,12 +19,10 @@ use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 class LazyLoadingErrorRendererTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException
-     * @expectedExceptionMessage No error renderer found for format "foo".
-     */
     public function testInvalidErrorRenderer()
     {
+        $this->expectException('Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException');
+        $this->expectExceptionMessage('No error renderer found for format "foo".');
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $container->expects($this->once())->method('has')->with('foo')->willReturn(false);
 

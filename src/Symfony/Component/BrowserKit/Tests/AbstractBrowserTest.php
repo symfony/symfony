@@ -92,12 +92,11 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals('http://example.com/', $client->getRequest()->getUri(), '->getCrawler() returns the Request of the last request');
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getRequest()".
-     */
     public function testGetRequestNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getRequest()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getRequest());
     }
@@ -130,22 +129,20 @@ class AbstractBrowserTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse(), '->getCrawler() returns the Response of the last request');
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getResponse()".
-     */
     public function testGetResponseNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getResponse()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getResponse());
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getInternalResponse()".
-     */
     public function testGetInternalResponseNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalResponse()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getInternalResponse());
     }
@@ -168,12 +165,11 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame($crawler, $client->getCrawler(), '->getCrawler() returns the Crawler of the last request');
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage  The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getCrawler()".
-     */
     public function testGetCrawlerNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getCrawler()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getCrawler());
     }
@@ -873,12 +869,11 @@ class AbstractBrowserTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Request', $client->getInternalRequest());
     }
 
-    /**
-     * @expectedException \Symfony\Component\BrowserKit\Exception\BadMethodCallException
-     * @expectedExceptionMessage The "request()" method must be called before "Symfony\Component\BrowserKit\AbstractBrowser::getInternalRequest()".
-     */
     public function testInternalRequestNull()
     {
+        $this->expectException('Symfony\Component\BrowserKit\Exception\BadMethodCallException');
+        $this->expectExceptionMessage('The "request()" method must be called before "Symfony\\Component\\BrowserKit\\AbstractBrowser::getInternalRequest()".');
+
         $client = $this->getBrowser();
         $this->assertNull($client->getInternalRequest());
     }

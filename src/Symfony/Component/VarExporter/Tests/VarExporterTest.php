@@ -20,12 +20,10 @@ class VarExporterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    /**
-     * @expectedException \Symfony\Component\VarExporter\Exception\ClassNotFoundException
-     * @expectedExceptionMessage Class "SomeNotExistingClass" not found.
-     */
     public function testPhpIncompleteClassesAreForbidden()
     {
+        $this->expectException('Symfony\Component\VarExporter\Exception\ClassNotFoundException');
+        $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
         $unserializeCallback = ini_set('unserialize_callback_func', 'var_dump');
         try {
             Registry::unserialize([], ['O:20:"SomeNotExistingClass":0:{}']);
@@ -36,11 +34,11 @@ class VarExporterTest extends TestCase
 
     /**
      * @dataProvider provideFailingSerialization
-     * @expectedException \Symfony\Component\VarExporter\Exception\NotInstantiableTypeException
-     * @expectedExceptionMessageRegexp Type ".*" is not instantiable.
      */
     public function testFailingSerialization($value)
     {
+        $this->expectException('Symfony\Component\VarExporter\Exception\NotInstantiableTypeException');
+        $this->expectExceptionMessageRegExp('/Type ".*" is not instantiable\./');
         $expectedDump = $this->getDump($value);
         try {
             VarExporter::export($value);

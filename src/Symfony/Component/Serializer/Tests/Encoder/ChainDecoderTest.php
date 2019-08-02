@@ -73,11 +73,9 @@ class ChainDecoderTest extends TestCase
         $this->chainDecoder->decode('string_to_decode', self::FORMAT_2);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
-     */
     public function testDecodeUnsupportedFormat()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\RuntimeException');
         $this->chainDecoder->decode('string_to_decode', self::FORMAT_3);
     }
 }

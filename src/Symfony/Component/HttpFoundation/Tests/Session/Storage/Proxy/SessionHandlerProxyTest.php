@@ -28,7 +28,7 @@ class SessionHandlerProxyTest extends TestCase
     use ForwardCompatTestTrait;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_Matcher
+     * @var \PHPUnit\Framework\MockObject\Matcher
      */
     private $mock;
 

@@ -55,11 +55,9 @@ class RingBufferTest extends TestCase
         $this->assertSame('bam', $this->buffer[2]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\OutOfBoundsException
-     */
     public function testReadNonExistingFails()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\OutOfBoundsException');
         $this->buffer['foo'];
     }
 
@@ -75,11 +73,9 @@ class RingBufferTest extends TestCase
         $this->assertArrayNotHasKey('foo', $this->buffer);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\OutOfBoundsException
-     */
     public function testReadOverwrittenFails()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\OutOfBoundsException');
         $this->buffer[0] = 'foo';
         $this->buffer['bar'] = 'baz';
         $this->buffer[2] = 'bam';

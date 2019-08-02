@@ -48,11 +48,9 @@ class ContainerBagTest extends TestCase
         $this->assertSame('value', $this->containerBag->get('foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     */
     public function testGetParameterNotFound()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
         $this->containerBag->get('bar');
     }
 

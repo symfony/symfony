@@ -80,24 +80,22 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a numeric string.
-     */
     public function testStringInputWithFloatData(): void
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectExceptionMessage('Expected a numeric string.');
+
         $this->factory->create(static::TESTED_TYPE, 12345.6789, [
             'input' => 'string',
             'scale' => 2,
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Expected a numeric string.
-     */
     public function testStringInputWithIntData(): void
     {
+        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectExceptionMessage('Expected a numeric string.');
+
         $this->factory->create(static::TESTED_TYPE, 12345, [
             'input' => 'string',
             'scale' => 2,
@@ -182,11 +180,9 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345.55', $form->getViewData());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     */
     public function testGroupingNotAllowedWithHtml5Widget()
     {
+        $this->expectException('Symfony\Component\Form\Exception\LogicException');
         $this->factory->create(static::TESTED_TYPE, null, [
             'grouping' => true,
             'html5' => true,

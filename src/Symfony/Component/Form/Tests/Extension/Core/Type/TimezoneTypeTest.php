@@ -167,12 +167,10 @@ class TimezoneTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('Etc/UTC', 'Etc/UTC', 'за всесвітнім координованим часом'), $choices, '', false, false);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage The "choice_translation_locale" option can only be used if the "intl" option is set to true.
-     */
     public function testChoiceTranslationLocaleOptionWithoutIntl()
     {
+        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectExceptionMessage('The "choice_translation_locale" option can only be used if the "intl" option is set to true.');
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_locale' => 'uk',
         ]);

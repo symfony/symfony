@@ -103,12 +103,10 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time
-     */
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectExceptionMessage('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time');
         new Bic([
             'iban' => 'value',
             'ibanPropertyPath' => 'propertyPath',
@@ -129,11 +127,9 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('UNCRIT2B912', $constraint);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsStringCompatibleType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate(new \stdClass(), new Bic());
     }
 

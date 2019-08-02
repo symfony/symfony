@@ -43,12 +43,10 @@ class CommandTest extends TestCase
         $this->assertEquals('foo:bar', $command->getName(), '__construct() takes the command name as its first argument');
     }
 
-    /**
-     * @expectedException        \LogicException
-     * @expectedExceptionMessage The command defined in "Symfony\Component\Console\Command\Command" cannot have an empty name.
-     */
     public function testCommandNameCannotBeEmpty()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The command defined in "Symfony\Component\Console\Command\Command" cannot have an empty name.');
         (new Application())->add(new Command());
     }
 
@@ -210,12 +208,10 @@ class CommandTest extends TestCase
         $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->getHelper() returns the correct helper');
     }
 
-    /**
-     * @expectedException        \LogicException
-     * @expectedExceptionMessage Cannot retrieve helper "formatter" because there is no HelperSet defined.
-     */
     public function testGetHelperWithoutHelperSet()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('Cannot retrieve helper "formatter" because there is no HelperSet defined.');
         $command = new \TestCommand();
         $command->getHelper('formatter');
     }
@@ -283,22 +279,18 @@ class CommandTest extends TestCase
         $this->assertEquals('execute called'.PHP_EOL, $tester->getDisplay(), '->run() does not call the interact() method if the input is not interactive');
     }
 
-    /**
-     * @expectedException        \LogicException
-     * @expectedExceptionMessage You must override the execute() method in the concrete command class.
-     */
     public function testExecuteMethodNeedsToBeOverridden()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('You must override the execute() method in the concrete command class.');
         $command = new Command('foo');
         $command->run(new StringInput(''), new NullOutput());
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Console\Exception\InvalidOptionException
-     * @expectedExceptionMessage The "--bar" option does not exist.
-     */
     public function testRunWithInvalidOption()
     {
+        $this->expectException('Symfony\Component\Console\Exception\InvalidOptionException');
+        $this->expectExceptionMessage('The "--bar" option does not exist.');
         $command = new \TestCommand();
         $tester = new CommandTester($command);
         $tester->execute(['--bar' => true]);

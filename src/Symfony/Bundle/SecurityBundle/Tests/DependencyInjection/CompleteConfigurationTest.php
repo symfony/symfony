@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -22,6 +23,8 @@ use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     abstract protected function getLoader(ContainerBuilder $container);
 
     abstract protected function getFileExtension();
@@ -418,12 +421,10 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertSame('app.access_decision_manager', (string) $container->getAlias('security.access.decision_manager'), 'The custom access decision manager service is aliased');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid configuration for path "security.access_decision_manager": "strategy" and "service" cannot be used together.
-     */
     public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('Invalid configuration for path "security.access_decision_manager": "strategy" and "service" cannot be used together.');
         $this->getContainer('access_decision_manager_service_and_strategy');
     }
 
@@ -438,21 +439,17 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertFalse($accessDecisionManagerDefinition->getArgument(3));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid firewall "main": user provider "undefined" not found.
-     */
     public function testFirewallUndefinedUserProvider()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('Invalid firewall "main": user provider "undefined" not found.');
         $this->getContainer('firewall_undefined_provider');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid firewall "main": user provider "undefined" not found.
-     */
     public function testFirewallListenerUndefinedProvider()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('Invalid firewall "main": user provider "undefined" not found.');
         $this->getContainer('listener_undefined_provider');
     }
 

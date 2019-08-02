@@ -12,6 +12,7 @@
 namespace Symfony\Component\Stopwatch\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
@@ -23,6 +24,8 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class StopwatchEventTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     const DELTA = 37;
 
     public function testGetOrigin()
@@ -103,11 +106,9 @@ class StopwatchEventTest extends TestCase
         $this->assertEquals(100, $event->getDuration(), '', self::DELTA);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testStopWithoutStart()
     {
+        $this->expectException('LogicException');
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->stop();
     }

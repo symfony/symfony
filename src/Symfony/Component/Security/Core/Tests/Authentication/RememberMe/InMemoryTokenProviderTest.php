@@ -12,11 +12,14 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\RememberMe;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 
 class InMemoryTokenProviderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testCreateNewToken()
     {
         $provider = new InMemoryTokenProvider();
@@ -27,11 +30,9 @@ class InMemoryTokenProviderTest extends TestCase
         $this->assertSame($provider->loadTokenBySeries('foo'), $token);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\TokenNotFoundException
-     */
     public function testLoadTokenBySeriesThrowsNotFoundException()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\TokenNotFoundException');
         $provider = new InMemoryTokenProvider();
         $provider->loadTokenBySeries('foo');
     }
@@ -49,11 +50,9 @@ class InMemoryTokenProviderTest extends TestCase
         $this->assertSame($token->getLastUsed(), $lastUsed);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\TokenNotFoundException
-     */
     public function testDeleteToken()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\TokenNotFoundException');
         $provider = new InMemoryTokenProvider();
 
         $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTime());

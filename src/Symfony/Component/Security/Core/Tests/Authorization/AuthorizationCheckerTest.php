@@ -70,11 +70,9 @@ class AuthorizationCheckerTest extends TestCase
         $this->assertSame($newToken, $this->tokenStorage->getToken());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
-     */
     public function testVoteWithoutAuthenticationToken()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
         $this->authorizationChecker->isGranted('ROLE_FOO');
     }
 

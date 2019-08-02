@@ -105,11 +105,9 @@ class XliffLintCommandTest extends TestCase
         $this->assertContains('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testLintFileNotReadable()
     {
+        $this->expectException('RuntimeException');
         $tester = $this->createCommandTester();
         $filename = $this->createFile();
         unlink($filename);

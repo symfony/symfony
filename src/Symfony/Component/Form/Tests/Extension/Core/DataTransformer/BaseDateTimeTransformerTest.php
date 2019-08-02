@@ -12,24 +12,23 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class BaseDateTimeTransformerTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage this_timezone_does_not_exist
-     */
+    use ForwardCompatTestTrait;
+
     public function testConstructFailsIfInputTimezoneIsInvalid()
     {
+        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('this_timezone_does_not_exist');
         $this->getMockBuilder('Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer')->setConstructorArgs(['this_timezone_does_not_exist'])->getMock();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     * @expectedExceptionMessage that_timezone_does_not_exist
-     */
     public function testConstructFailsIfOutputTimezoneIsInvalid()
     {
+        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('that_timezone_does_not_exist');
         $this->getMockBuilder('Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer')->setConstructorArgs([null, 'that_timezone_does_not_exist'])->getMock();
     }
 }

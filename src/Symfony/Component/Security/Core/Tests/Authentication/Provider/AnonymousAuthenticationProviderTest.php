@@ -12,10 +12,13 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider;
 
 class AnonymousAuthenticationProviderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testSupports()
     {
         $provider = $this->getProvider('foo');
@@ -24,22 +27,18 @@ class AnonymousAuthenticationProviderTest extends TestCase
         $this->assertFalse($provider->supports($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessage The token is not supported by this authentication provider.
-     */
     public function testAuthenticateWhenTokenIsNotSupported()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->expectExceptionMessage('The token is not supported by this authentication provider.');
         $provider = $this->getProvider('foo');
 
         $provider->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testAuthenticateWhenSecretIsNotValid()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $provider = $this->getProvider('foo');
 
         $provider->authenticate($this->getSupportedToken('bar'));

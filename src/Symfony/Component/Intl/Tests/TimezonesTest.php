@@ -527,19 +527,15 @@ class TimezonesTest extends ResourceBundleTestCase
         }
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     */
     public function testGetNameWithInvalidTimezone()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Timezones::getName('foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     */
     public function testGetNameWithAliasTimezone()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Timezones::getName('US/Pacific'); // alias in icu (not compiled), name unavailable in php
     }
 
@@ -561,12 +557,10 @@ class TimezonesTest extends ResourceBundleTestCase
         Timezones::getRawOffset('US/Pacific');
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Unknown or bad timezone (foobar)
-     */
     public function testGetRawOffsetWithUnknownTimezone()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Unknown or bad timezone (foobar)');
         Timezones::getRawOffset('foobar');
     }
 
@@ -595,28 +589,22 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertSame(['Europe/Berlin', 'Europe/Busingen'], Timezones::forCountryCode('DE'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     */
     public function testForCountryCodeWithUnknownCountry()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Timezones::forCountryCode('foobar');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     * @expectedExceptionMessage Country codes must be in uppercase, but "nl" was passed. Try with "NL" country code instead.
-     */
     public function testForCountryCodeWithWrongCountryCode()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectExceptionMessage('Country codes must be in uppercase, but "nl" was passed. Try with "NL" country code instead.');
         Timezones::forCountryCode('nl');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
-     */
     public function testGetCountryCodeWithUnknownTimezone()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         Timezones::getCountryCode('foobar');
     }
 

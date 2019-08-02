@@ -90,11 +90,9 @@ class GuardAuthenticationProviderTest extends TestCase
         $this->assertSame($authedToken, $actualAuthedToken);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testCheckCredentialsReturningNonTrueFailsAuthentication()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $providerKey = 'my_uncool_firewall';
 
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
@@ -123,11 +121,9 @@ class GuardAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->preAuthenticationToken);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationExpiredException
-     */
     public function testGuardWithNoLongerAuthenticatedTriggersLogout()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationExpiredException');
         $providerKey = 'my_firewall_abc';
 
         // create a token and mark it as NOT authenticated anymore
@@ -158,12 +154,10 @@ class GuardAuthenticationProviderTest extends TestCase
         $this->assertFalse($supports);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessageRegExp /second_firewall_0/
-     */
     public function testAuthenticateFailsOnNonOriginatingToken()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->expectExceptionMessageRegExp('/second_firewall_0/');
         $authenticatorA = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticators = [$authenticatorA];
 

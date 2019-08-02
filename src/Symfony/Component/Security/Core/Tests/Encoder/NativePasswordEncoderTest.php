@@ -19,19 +19,15 @@ use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
  */
 class NativePasswordEncoderTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCostBelowRange()
     {
+        $this->expectException('InvalidArgumentException');
         new NativePasswordEncoder(null, null, 3);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCostAboveRange()
     {
+        $this->expectException('InvalidArgumentException');
         new NativePasswordEncoder(null, null, 32);
     }
 

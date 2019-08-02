@@ -59,11 +59,9 @@ class MailboxHeaderTest extends TestCase
         $this->assertEquals('Fabien =?'.$header->getCharset().'?Q?P=8Ftencier?= <fabien@symfony.com>', $header->getBodyAsString());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Mime\Exception\AddressEncoderException
-     */
     public function testUtf8CharsInLocalPartThrows()
     {
+        $this->expectException('Symfony\Component\Mime\Exception\AddressEncoderException');
         $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com'));
         $header->getBodyAsString();
     }

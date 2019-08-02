@@ -82,12 +82,10 @@ TXT
         $this->assertContains('Symfony\Component\Form\Extension\Core\Type\FormType (method)', $tester->getDisplay());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not find type "NonExistentType"
-     */
     public function testDebugSingleFormTypeNotFound()
     {
+        $this->expectException('Symfony\Component\Console\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Could not find type "NonExistentType"');
         $tester = $this->createCommandTester();
         $tester->execute(['class' => 'NonExistentType'], ['decorated' => false, 'interactive' => false]);
     }
@@ -139,11 +137,9 @@ TXT
         , $output);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDebugInvalidFormType()
     {
+        $this->expectException('InvalidArgumentException');
         $this->createCommandTester()->execute(['class' => 'test']);
     }
 

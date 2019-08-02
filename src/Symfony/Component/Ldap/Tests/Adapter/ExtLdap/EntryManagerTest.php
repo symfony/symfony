@@ -11,18 +11,19 @@
 namespace Symfony\Component\Ldap\Tests\Adapter\ExtLdap;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Connection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\EntryManager;
 use Symfony\Component\Ldap\Entry;
 
 class EntryManagerTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Ldap\Exception\LdapException
-     * @expectedExceptionMessage Entry "$$$$$$" malformed, could not parse RDN.
-     */
+    use ForwardCompatTestTrait;
+
     public function testMove()
     {
+        $this->expectException('Symfony\Component\Ldap\Exception\LdapException');
+        $this->expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
         $connection = $this->createMock(Connection::class);
         $connection
             ->expects($this->once())
@@ -33,12 +34,10 @@ class EntryManagerTest extends TestCase
         $entryManager->move($entry, 'a');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Ldap\Exception\NotBoundException
-     * @expectedExceptionMessage Query execution is not possible without binding the connection first.
-     */
     public function testGetResources()
     {
+        $this->expectException('Symfony\Component\Ldap\Exception\NotBoundException');
+        $this->expectExceptionMessage('Query execution is not possible without binding the connection first.');
         $connection = $this->getMockBuilder(Connection::class)->getMock();
         $connection
             ->expects($this->once())

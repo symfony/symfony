@@ -3,6 +3,7 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
@@ -18,38 +19,33 @@ use Symfony\Component\Workflow\Workflow;
 
 class WorkflowTest extends TestCase
 {
+    use ForwardCompatTestTrait;
     use WorkflowBuilderTrait;
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".
-     */
     public function testGetMarkingWithInvalidStoreReturn()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
         $subject = new Subject();
         $workflow = new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
 
         $workflow->getMarking($subject);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage The Marking is empty and there is no initial place for workflow "unnamed".
-     */
     public function testGetMarkingWithEmptyDefinition()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectExceptionMessage('The Marking is empty and there is no initial place for workflow "unnamed".');
         $subject = new Subject();
         $workflow = new Workflow(new Definition([], []), new MethodMarkingStore());
 
         $workflow->getMarking($subject);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage Place "nope" is not valid for workflow "unnamed".
-     */
     public function testGetMarkingWithImpossiblePlace()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectExceptionMessage('Place "nope" is not valid for workflow "unnamed".');
         $subject = new Subject();
         $subject->setMarking(['nope' => 1]);
         $workflow = new Workflow(new Definition([], []), new MethodMarkingStore());
@@ -173,12 +169,10 @@ class WorkflowTest extends TestCase
         $this->assertTrue($workflow->can($subject, 'to_a'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\UndefinedTransitionException
-     * @expectedExceptionMessage Transition "404 Not Found" is not defined for workflow "unnamed".
-     */
     public function testBuildTransitionBlockerListReturnsUndefinedTransition()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\UndefinedTransitionException');
+        $this->expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
         $definition = $this->createSimpleWorkflowDefinition();
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
@@ -255,12 +249,10 @@ class WorkflowTest extends TestCase
         $this->assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[3]->getCode());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\UndefinedTransitionException
-     * @expectedExceptionMessage Transition "404 Not Found" is not defined for workflow "unnamed".
-     */
     public function testApplyWithNotExisingTransition()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\UndefinedTransitionException');
+        $this->expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());

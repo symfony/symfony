@@ -18,21 +18,17 @@ use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 class ErrorRendererTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException
-     * @expectedExceptionMessage No error renderer found for format "foo".
-     */
     public function testErrorRendererNotFound()
     {
+        $this->expectException('Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException');
+        $this->expectExceptionMessage('No error renderer found for format "foo".');
         $exception = FlattenException::createFromThrowable(new \Exception('foo'));
         (new ErrorRenderer([]))->render($exception, 'foo');
     }
 
-    /**
-     * @expectedException \TypeError
-     */
     public function testInvalidErrorRenderer()
     {
+        $this->expectException('TypeError');
         new ErrorRenderer([new \stdClass()]);
     }
 

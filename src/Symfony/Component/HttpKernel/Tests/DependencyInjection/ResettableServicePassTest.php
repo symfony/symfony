@@ -3,6 +3,7 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class ResettableServicePassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testCompilerPass()
     {
         $container = new ContainerBuilder();
@@ -48,12 +51,10 @@ class ResettableServicePassTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Tag kernel.reset requires the "method" attribute to be set.
-     */
     public function testMissingMethod()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Tag kernel.reset requires the "method" attribute to be set.');
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
             ->addTag('kernel.reset');

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -19,27 +20,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class GroupsTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
+    use ForwardCompatTestTrait;
+
     public function testEmptyGroupsParameter()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
         new Groups(['value' => []]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
     public function testNotAnArrayGroupsParameter()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
         new Groups(['value' => 12]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
     public function testInvalidGroupsParameter()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
         new Groups(['value' => ['a', 1, new \stdClass()]]);
     }
 

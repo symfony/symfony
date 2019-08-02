@@ -12,10 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class RedirectResponseTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGenerateMetaRedirect()
     {
         $response = new RedirectResponse('foo.bar');
@@ -26,20 +29,16 @@ class RedirectResponseTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot redirect to an empty URL.
-     */
     public function testRedirectResponseConstructorEmptyUrl()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Cannot redirect to an empty URL.');
         $response = new RedirectResponse('');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRedirectResponseConstructorWrongStatusCode()
     {
+        $this->expectException('InvalidArgumentException');
         $response = new RedirectResponse('foo.bar', 404);
     }
 
@@ -66,11 +65,9 @@ class RedirectResponseTest extends TestCase
         $this->assertEquals('baz.beep', $response->getTargetUrl());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetTargetUrlNull()
     {
+        $this->expectException('InvalidArgumentException');
         $response = new RedirectResponse('foo.bar');
         $response->setTargetUrl(null);
     }

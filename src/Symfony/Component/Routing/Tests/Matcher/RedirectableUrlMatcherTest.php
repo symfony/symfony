@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class RedirectableUrlMatcherTest extends UrlMatcherTest
 {
+    use ForwardCompatTestTrait;
+
     public function testMissingTrailingSlash()
     {
         $coll = new RouteCollection();
@@ -37,11 +40,9 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo/');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     */
     public function testRedirectWhenNoSlashForNonSafeMethod()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 

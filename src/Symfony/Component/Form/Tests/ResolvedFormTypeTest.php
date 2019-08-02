@@ -182,12 +182,10 @@ class ResolvedFormTypeTest extends TestCase
         $this->assertSame('\stdClass', $builder->getDataClass());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage An error has occurred resolving the options of the form "stdClass": The required option "foo" is missing.
-     */
     public function testFailsCreateBuilderOnInvalidFormOptionsResolution()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
+        $this->expectExceptionMessage('An error has occurred resolving the options of the form "stdClass": The required option "foo" is missing.');
         $optionsResolver = (new OptionsResolver())
             ->setRequired('foo')
         ;

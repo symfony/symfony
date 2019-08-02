@@ -69,12 +69,10 @@ class SetupTransportsCommandTest extends TestCase
         $this->assertContains('The "amqp" transport was setup successfully.', $display);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The "not_found" transport does not exist.
-     */
     public function testReceiverNameArgumentNotFound()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('The "not_found" transport does not exist.');
         // mock a service locator
         /** @var MockObject|ServiceLocator $serviceLocator */
         $serviceLocator = $this->createMock(ServiceLocator::class);

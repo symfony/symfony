@@ -12,11 +12,14 @@
 namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 
 class YamlFileLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testLoad()
     {
         $loader = new YamlFileLoader();
@@ -39,31 +42,25 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
-     */
     public function testLoadNonExistingResource()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\NotFoundResourceException');
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.yml';
         $loader->load($resource, 'en', 'domain1');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
-     */
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
         $loader = new YamlFileLoader();
         $resource = 'http://example.com/resources.yml';
         $loader->load($resource, 'en', 'domain1');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
-     */
     public function testLoadThrowsAnExceptionIfNotAnArray()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../fixtures/non-valid.yml';
         $loader->load($resource, 'en', 'domain1');

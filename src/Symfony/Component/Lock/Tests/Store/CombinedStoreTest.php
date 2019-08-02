@@ -70,11 +70,9 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->store = new CombinedStore([$this->store1, $this->store2], $this->strategy);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Lock\Exception\LockConflictedException
-     */
     public function testSaveThrowsExceptionOnFailure()
     {
+        $this->expectException('Symfony\Component\Lock\Exception\LockConflictedException');
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->store1
@@ -167,11 +165,9 @@ class CombinedStoreTest extends AbstractStoreTest
         }
     }
 
-    /**
-     * @expectedException \Symfony\Component\Lock\Exception\LockConflictedException
-     */
     public function testputOffExpirationThrowsExceptionOnFailure()
     {
+        $this->expectException('Symfony\Component\Lock\Exception\LockConflictedException');
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);
 

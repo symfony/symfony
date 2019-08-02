@@ -76,27 +76,21 @@ class IntlBundleReaderTest extends TestCase
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
-     */
     public function testReadFailsIfNonExistingLocale()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\ResourceBundleNotFoundException');
         $this->reader->read(__DIR__.'/Fixtures/res', 'foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
-     */
     public function testReadFailsIfNonExistingFallbackLocale()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\ResourceBundleNotFoundException');
         $this->reader->read(__DIR__.'/Fixtures/res', 'ro_AT');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
-     */
     public function testReadFailsIfNonExistingDirectory()
     {
+        $this->expectException('Symfony\Component\Intl\Exception\RuntimeException');
         $this->reader->read(__DIR__.'/foo', 'ro');
     }
 }

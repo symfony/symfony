@@ -234,7 +234,7 @@ EOF
         }
     }
 
-    private function displayGeneralJson(SymfonyStyle $io, $filter)
+    private function displayGeneralJson(SymfonyStyle $io, ?string $filter)
     {
         $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
@@ -288,7 +288,7 @@ EOF
         return $loaderPaths;
     }
 
-    private function getMetadata($type, $entity)
+    private function getMetadata(string $type, $entity)
     {
         if ('globals' === $type) {
             return $entity;
@@ -344,7 +344,7 @@ EOF
         }
     }
 
-    private function getPrettyMetadata($type, $entity, $decorated)
+    private function getPrettyMetadata(string $type, $entity, bool $decorated)
     {
         if ('tests' === $type) {
             return '';

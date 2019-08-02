@@ -20,11 +20,9 @@ class AccessDecisionManagerTest extends TestCase
 {
     use ForwardCompatTestTrait;
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetUnsupportedStrategy()
     {
+        $this->expectException('InvalidArgumentException');
         new AccessDecisionManager([$this->getVoter(VoterInterface::ACCESS_GRANTED)], 'fooBar');
     }
 

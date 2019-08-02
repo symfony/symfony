@@ -431,12 +431,10 @@ class EventDispatcherTest extends TestCase
         $this->dispatcher->dispatch('foo', new Event());
     }
 
-    /**
-     * @expectedException \TypeError
-     * @expectedExceptionMessage Argument 1 passed to "Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch()" must be an object, string given.
-     */
     public function testLegacySignatureWithNewEventObject()
     {
+        $this->expectException('TypeError');
+        $this->expectExceptionMessage('Argument 1 passed to "Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch()" must be an object, string given.');
         $this->dispatcher->dispatch('foo', new ContractsEvent());
     }
 }

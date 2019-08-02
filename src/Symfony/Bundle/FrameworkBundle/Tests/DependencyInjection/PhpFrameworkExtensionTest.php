@@ -11,23 +11,24 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 {
+    use ForwardCompatTestTrait;
+
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
         $loader->load($file.'.php');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAssetsCannotHavePathAndUrl()
     {
+        $this->expectException('LogicException');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -38,11 +39,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAssetPackageCannotHavePathAndUrl()
     {
+        $this->expectException('LogicException');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -57,12 +56,10 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
-     * @expectedExceptionMessage A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" where found on StateMachine "article".
-     */
     public function testWorkflowValidationStateMachine()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" where found on StateMachine "article".');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'workflows' => [
@@ -159,12 +156,12 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
-     * @expectedExceptionMessage The marking store of workflow "article" can not store many places. But the transition "a_to_b" has too many output (2). Only one is accepted.
      * @group legacy
      */
     public function testWorkflowValidationSingleState()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectExceptionMessage('The marking store of workflow "article" can not store many places. But the transition "a_to_b" has too many output (2). Only one is accepted.');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'workflows' => [

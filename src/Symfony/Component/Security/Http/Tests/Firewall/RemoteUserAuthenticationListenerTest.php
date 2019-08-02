@@ -12,11 +12,14 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener;
 
 class RemoteUserAuthenticationListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetPreAuthenticatedData()
     {
         $serverVars = [
@@ -42,11 +45,9 @@ class RemoteUserAuthenticationListenerTest extends TestCase
         $this->assertSame($result, ['TheUser', null]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testGetPreAuthenticatedDataNoUser()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $request = new Request([], [], [], [], [], []);
 
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();

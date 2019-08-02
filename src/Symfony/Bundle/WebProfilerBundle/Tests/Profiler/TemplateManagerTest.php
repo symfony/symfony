@@ -56,11 +56,9 @@ class TemplateManagerTest extends TestCase
         $this->templateManager = new TemplateManager($profiler, $twigEnvironment, $templates);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testGetNameOfInvalidTemplate()
     {
+        $this->expectException('Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
         $this->templateManager->getName(new Profile('token'), 'notexistingpanel');
     }
 

@@ -60,11 +60,9 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($this->metadata));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\MappingException
-     */
     public function testLoadClassMetadataReturnsThrowsInvalidMapping()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\MappingException');
         $loader = new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-mapping.yml');
         $loader->loadClassMetadata($this->metadata);
     }

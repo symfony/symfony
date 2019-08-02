@@ -33,11 +33,9 @@ class ButtonTest extends TestCase
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\AlreadySubmittedException
-     */
     public function testSetParentOnSubmittedButton()
     {
+        $this->expectException('Symfony\Component\Form\Exception\AlreadySubmittedException');
         $button = $this->getButtonBuilder('button')
             ->getForm()
         ;

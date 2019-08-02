@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
@@ -24,11 +25,11 @@ use Symfony\Component\Security\Core\User\LdapUserProvider;
  */
 class LdapUserProviderTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
+    use ForwardCompatTestTrait;
+
     public function testLoadUserByUsernameFailsIfCantConnectToLdap()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
             ->expects($this->once())
@@ -40,11 +41,9 @@ class LdapUserProviderTest extends TestCase
         $provider->loadUserByUsername('foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testLoadUserByUsernameFailsIfNoLdapEntries()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
@@ -73,11 +72,9 @@ class LdapUserProviderTest extends TestCase
         $provider->loadUserByUsername('foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
@@ -106,11 +103,9 @@ class LdapUserProviderTest extends TestCase
         $provider->loadUserByUsername('foo');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\InvalidArgumentException
-     */
     public function testLoadUserByUsernameFailsIfMoreThanOneLdapPasswordsInEntry()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\InvalidArgumentException');
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
@@ -191,11 +186,9 @@ class LdapUserProviderTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\InvalidArgumentException
-     */
     public function testLoadUserByUsernameFailsIfEntryHasNoPasswordAttribute()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\InvalidArgumentException');
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query

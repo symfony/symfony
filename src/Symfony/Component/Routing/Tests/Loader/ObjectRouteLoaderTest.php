@@ -12,12 +12,15 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Loader\ObjectRouteLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class ObjectRouteLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @group legacy
      * @expectedDeprecation Referencing service route loaders with a single colon is deprecated since Symfony 4.1. Use my_route_provider_service::loadRoutes instead.
@@ -67,11 +70,11 @@ class ObjectRouteLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @dataProvider getBadResourceStrings
      */
     public function testExceptionWithoutSyntax(string $resourceString): void
     {
+        $this->expectException('InvalidArgumentException');
         $loader = new ObjectRouteLoaderForTest();
         $loader->load($resourceString);
     }
@@ -88,31 +91,25 @@ class ObjectRouteLoaderTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testExceptionOnNoObjectReturned()
     {
+        $this->expectException('LogicException');
         $loader = new ObjectRouteLoaderForTest();
         $loader->loaderMap = ['my_service' => 'NOT_AN_OBJECT'];
         $loader->load('my_service::method');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testExceptionOnBadMethod()
     {
+        $this->expectException('BadMethodCallException');
         $loader = new ObjectRouteLoaderForTest();
         $loader->loaderMap = ['my_service' => new \stdClass()];
         $loader->load('my_service::method');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testExceptionOnMethodNotReturningCollection()
     {
+        $this->expectException('LogicException');
         $service = $this->getMockBuilder('stdClass')
             ->setMethods(['loadRoutes'])
             ->getMock();

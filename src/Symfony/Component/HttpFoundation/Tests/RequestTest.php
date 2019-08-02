@@ -895,11 +895,9 @@ class RequestTest extends TestCase
         $this->assertEquals(80, $port, 'With only PROTO set and value is not recognized, getPort() defaults to 80.');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetHostWithFakeHttpHostValue()
     {
+        $this->expectException('RuntimeException');
         $request = new Request();
         $request->initialize([], [], [], [], [], ['HTTP_HOST' => 'www.host.com?query=string']);
         $request->getHost();
@@ -1064,11 +1062,11 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException
      * @dataProvider getClientIpsWithConflictingHeadersProvider
      */
     public function testGetClientIpsWithConflictingHeaders($httpForwarded, $httpXForwardedFor)
     {
+        $this->expectException('Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException');
         $request = new Request();
 
         $server = [
@@ -2133,11 +2131,9 @@ class RequestTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testMethodSafeChecksCacheable()
     {
+        $this->expectException('BadMethodCallException');
         $request = new Request();
         $request->setMethod('OPTIONS');
         $request->isMethodSafe();

@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -19,6 +20,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class TypeTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testConstruct()
     {
         $type = new Type('object', true, 'ArrayObject', true, new Type('int'), new Type('string'));
@@ -43,12 +46,10 @@ class TypeTest extends TestCase
         $this->assertSame('iterable', $type->getBuiltinType());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "foo" is not a valid PHP type.
-     */
     public function testInvalidType()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('"foo" is not a valid PHP type.');
         new Type('foo');
     }
 }

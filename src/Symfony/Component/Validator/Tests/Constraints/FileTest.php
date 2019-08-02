@@ -12,11 +12,14 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class FileTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider provideValidSizes
      */
@@ -52,10 +55,10 @@ class FileTest extends TestCase
 
     /**
      * @dataProvider provideInvalidSizes
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $file = new File(['maxSize' => 1000]);
         $file->maxSize = $maxSize;
     }
@@ -77,10 +80,10 @@ class FileTest extends TestCase
 
     /**
      * @dataProvider provideInValidSizes
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testInvalidMaxSize($maxSize)
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         new File(['maxSize' => $maxSize]);
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\CountValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -20,6 +21,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 abstract class CountValidatorTest extends ConstraintValidatorTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected function createValidator()
     {
         return new CountValidator();
@@ -34,11 +37,9 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
-     */
     public function testExpectsCountableType()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
         $this->validator->validate(new \stdClass(), new Count(5));
     }
 

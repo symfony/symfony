@@ -12,10 +12,13 @@
 namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 
 class JsonManifestVersionStrategyTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetVersion()
     {
         $strategy = $this->createStrategy('manifest-valid.json');
@@ -37,21 +40,17 @@ class JsonManifestVersionStrategyTest extends TestCase
         $this->assertEquals('css/other.css', $strategy->getVersion('css/other.css'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testMissingManifestFileThrowsException()
     {
+        $this->expectException('RuntimeException');
         $strategy = $this->createStrategy('non-existent-file.json');
         $strategy->getVersion('main.js');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Error parsing JSON
-     */
     public function testManifestFileWithBadJSONThrowsException()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Error parsing JSON');
         $strategy = $this->createStrategy('manifest-invalid.json');
         $strategy->getVersion('main.js');
     }

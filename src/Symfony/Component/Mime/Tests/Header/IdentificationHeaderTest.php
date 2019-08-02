@@ -99,12 +99,10 @@ class IdentificationHeaderTest extends TestCase
         $this->assertEquals('<a.b+&%$.c@d>', $header->getBodyAsString());
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedMessageException "a b c" is not valid id-left
-     */
     public function testInvalidIdLeftThrowsException()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Email "a b c@d" does not comply with addr-spec of RFC 2822.');
         $header = new IdentificationHeader('References', 'a b c@d');
     }
 
@@ -137,21 +135,17 @@ class IdentificationHeaderTest extends TestCase
         $this->assertEquals('<a@xn--4ca>', $header->getBodyAsString());
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedMessageException "b c d" is not valid id-right
-     */
     public function testInvalidIdRightThrowsException()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Email "a@b c d" does not comply with addr-spec of RFC 2822.');
         $header = new IdentificationHeader('References', 'a@b c d');
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedMessageException "abc" is does not contain @
-     */
     public function testMissingAtSignThrowsException()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Email "abc" does not comply with addr-spec of RFC 2822.');
         /* -- RFC 2822, 3.6.4.
          msg-id          =       [CFWS] "<" id-left "@" id-right ">" [CFWS]
          */

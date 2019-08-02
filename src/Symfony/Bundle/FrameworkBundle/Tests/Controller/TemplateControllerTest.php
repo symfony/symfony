@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -20,6 +21,8 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
  */
 class TemplateControllerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testTwig()
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
@@ -42,12 +45,10 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.
-     */
     public function testNoTwigNorTemplating()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.');
         $controller = new TemplateController();
 
         $controller->templateAction('mytemplate')->getContent();

@@ -18,12 +18,10 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class AbstractTypeExtensionTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage You need to implement the static getExtendedTypes() method when implementing the Symfony\Component\Form\FormTypeExtensionInterface in Symfony\Component\Form\Tests\TypeExtensionWithoutExtendedTypes.
-     */
     public function testImplementingNeitherGetExtendedTypeNorExtendsTypeThrowsException()
     {
+        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectExceptionMessage('You need to implement the static getExtendedTypes() method when implementing the Symfony\Component\Form\FormTypeExtensionInterface in Symfony\Component\Form\Tests\TypeExtensionWithoutExtendedTypes.');
         $extension = new TypeExtensionWithoutExtendedTypes();
         $extension->getExtendedType();
     }

@@ -53,12 +53,10 @@ class DoctrineTransportFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
-     * @expectedExceptionMessage Could not find Doctrine connection from Messenger DSN "doctrine://default".
-     */
     public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
+        $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN "doctrine://default".');
         $registry = $this->createMock(RegistryInterface::class);
         $registry->expects($this->once())
             ->method('getConnection')

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
 use Psr\Log\LoggerAwareInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -57,6 +58,8 @@ use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     private static $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
@@ -118,12 +121,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(ArrayAdapter::class, $cache->getClass(), 'ArrayAdapter should be used in debug mode');
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage CSRF protection needs sessions to be enabled.
-     */
     public function testCsrfProtectionNeedsSessionToBeEnabled()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('CSRF protection needs sessions to be enabled.');
         $this->createContainerFromFile('csrf_needs_session');
     }
 
@@ -159,10 +160,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \LogicException
      */
     public function testAmbiguousWhenBothTemplatingAndFragments()
     {
+        $this->expectException('LogicException');
         $this->createContainerFromFile('template_and_fragments');
     }
 
@@ -311,49 +312,41 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(['workflow.definition' => [['name' => 'legacy', 'type' => 'state_machine']]], $workflowDefinition->getTags());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
-     * @expectedExceptionMessage A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" where found on StateMachine "my_workflow".
-     */
     public function testWorkflowAreValidated()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" where found on StateMachine "my_workflow".');
         $this->createContainerFromFile('workflow_not_valid');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "type" and "service" cannot be used together.
-     */
     public function testWorkflowCannotHaveBothTypeAndService()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('"type" and "service" cannot be used together.');
         $this->createContainerFromFile('workflow_legacy_with_type_and_service');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "supports" and "support_strategy" cannot be used together.
-     */
     public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('"supports" and "support_strategy" cannot be used together.');
         $this->createContainerFromFile('workflow_with_support_and_support_strategy');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "supports" or "support_strategy" should be configured.
-     */
     public function testWorkflowShouldHaveOneOfSupportsAndSupportStrategy()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('"supports" or "support_strategy" should be configured.');
         $this->createContainerFromFile('workflow_without_support_and_support_strategy');
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "arguments" and "service" cannot be used together.
      * @group legacy
      */
     public function testWorkflowCannotHaveBothArgumentsAndService()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('"arguments" and "service" cannot be used together.');
         $this->createContainerFromFile('workflow_legacy_with_arguments_and_service');
     }
 
@@ -512,11 +505,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('xml', $arguments[2]['resource_type'], '->registerRouterConfiguration() sets routing resource type');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testRouterRequiresResourceOption()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
         $loader->load([['router' => true]], $container);
@@ -558,11 +549,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
     public function testNullSessionHandlerWithSavePath()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $this->createContainerFromFile('session_savepath');
     }
 
@@ -781,12 +770,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('messenger.bus.commands', (string) $container->getAlias('messenger.default_bus'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, {"foo":["qux"],"bar":["baz"]} given.
-     */
     public function testMessengerMiddlewareFactoryErroneousFormat()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, {"foo":["qux"],"bar":["baz"]} given.');
         $this->createContainerFromFile('messenger_middleware_factory_erroneous_format');
     }
 
@@ -864,10 +851,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testTemplatingRequiresAtLeastOneEngine()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
         $loader->load([['templating' => null]], $container);
@@ -1040,11 +1027,11 @@ abstract class FrameworkExtensionTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "strict_email" and "email_validation_mode" cannot be used together.
      */
     public function testCannotConfigureStrictEmailAndEmailValidationModeAtTheSameTime()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('"strict_email" and "email_validation_mode" cannot be used together.');
         $this->createContainerFromFile('validation_strict_email_and_validation_mode');
     }
 

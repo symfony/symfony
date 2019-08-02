@@ -25,11 +25,9 @@ class HttpKernelExtensionTest extends TestCase
 {
     use ForwardCompatTestTrait;
 
-    /**
-     * @expectedException \Twig\Error\RuntimeError
-     */
     public function testFragmentWithError()
     {
+        $this->expectException('Twig\Error\RuntimeError');
         $renderer = $this->getFragmentHandler($this->throwException(new \Exception('foo')));
 
         $this->renderTemplate($renderer);

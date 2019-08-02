@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
@@ -20,6 +21,8 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 
 class DependencyInjectionExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetTypeExtensions()
     {
         $typeExtension1 = new TestTypeExtension();
@@ -41,11 +44,9 @@ class DependencyInjectionExtensionTest extends TestCase
         $this->assertSame([$typeExtension3, $typeExtension4], $extension->getTypeExtensions('other'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     */
     public function testThrowExceptionForInvalidExtendedType()
     {
+        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
         $extensions = [
             'unmatched' => new \ArrayIterator([new TestTypeExtension()]),
         ];

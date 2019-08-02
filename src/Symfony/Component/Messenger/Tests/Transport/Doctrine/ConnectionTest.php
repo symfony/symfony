@@ -78,11 +78,9 @@ class ConnectionTest extends TestCase
         $this->assertNull($doctrineEnvelope);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
-     */
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $driverConnection = $this->getDBALConnectionMock();
         $driverConnection->method('delete')->willThrowException(new DBALException());
 
@@ -90,11 +88,9 @@ class ConnectionTest extends TestCase
         $connection->ack('dummy_id');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
-     */
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $driverConnection = $this->getDBALConnectionMock();
         $driverConnection->method('delete')->willThrowException(new DBALException());
 
@@ -240,19 +236,15 @@ class ConnectionTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\InvalidArgumentException
-     */
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\InvalidArgumentException');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Messenger\Exception\InvalidArgumentException
-     */
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
+        $this->expectException('Symfony\Component\Messenger\Exception\InvalidArgumentException');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 

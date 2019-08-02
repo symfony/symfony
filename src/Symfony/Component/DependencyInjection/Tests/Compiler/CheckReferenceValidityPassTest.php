@@ -12,17 +12,18 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\CheckReferenceValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class CheckReferenceValidityPassTest extends TestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     */
+    use ForwardCompatTestTrait;
+
     public function testProcessDetectsReferenceToAbstractDefinition()
     {
+        $this->expectException('RuntimeException');
         $container = new ContainerBuilder();
 
         $container->register('a')->setAbstract(true);

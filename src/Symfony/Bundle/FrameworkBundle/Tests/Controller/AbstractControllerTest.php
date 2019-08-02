@@ -66,12 +66,10 @@ class AbstractControllerTest extends ControllerTraitTest
         $this->assertSame('bar', $controller->getParameter('foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage TestAbstractController::getParameter()" method is missing a parameter bag
-     */
     public function testMissingParameterBag()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
         $container = new Container();
 
         $controller = $this->createController();

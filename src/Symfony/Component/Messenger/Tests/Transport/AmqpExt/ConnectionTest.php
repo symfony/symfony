@@ -25,12 +25,10 @@ class ConnectionTest extends TestCase
 {
     private const DEFAULT_EXCHANGE_NAME = 'messages';
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The given AMQP DSN "amqp://:" is invalid.
-     */
     public function testItCannotBeConstructedWithAWrongDsn()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The given AMQP DSN "amqp://:" is invalid.');
         Connection::fromDsn('amqp://:');
     }
 
@@ -421,12 +419,10 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', [], 120000);
     }
 
-    /**
-     * @expectedException \AMQPException
-     * @expectedExceptionMessage Could not connect to the AMQP server. Please verify the provided DSN. ({"host":"localhost","port":5672,"vhost":"\/","login":"user","password":"********"})
-     */
     public function testObfuscatePasswordInDsn()
     {
+        $this->expectException('AMQPException');
+        $this->expectExceptionMessage('Could not connect to the AMQP server. Please verify the provided DSN. ({"host":"localhost","port":5672,"vhost":"\/","login":"user","password":"********"})');
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createMock(\AMQPConnection::class),
             $amqpChannel = $this->createMock(\AMQPChannel::class),

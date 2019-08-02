@@ -65,12 +65,10 @@ class XmlUtilsTest extends TestCase
         $this->assertSame([], libxml_get_errors());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Util\Exception\InvalidXmlException
-     * @expectedExceptionMessage The XML is not valid
-     */
     public function testParseWithInvalidValidatorCallable()
     {
+        $this->expectException('Symfony\Component\Config\Util\Exception\InvalidXmlException');
+        $this->expectExceptionMessage('The XML is not valid');
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
         $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();

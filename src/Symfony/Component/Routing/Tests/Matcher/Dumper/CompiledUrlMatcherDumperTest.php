@@ -474,12 +474,10 @@ class CompiledUrlMatcherDumperTest extends TestCase
             ->getMock();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Routing\Route cannot contain objects
-     */
     public function testGenerateDumperMatcherWithObject()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
         $routeCollection = new RouteCollection();
         $routeCollection->add('_', new Route('/', [new \stdClass()]));
         $dumper = new CompiledUrlMatcherDumper($routeCollection);

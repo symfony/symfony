@@ -12,10 +12,13 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\IntegerNode;
 
 class IntegerNodeTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getValidValues
      */
@@ -49,10 +52,10 @@ class IntegerNodeTest extends TestCase
 
     /**
      * @dataProvider getInvalidValues
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
         $node = new IntegerNode('test');
         $node->normalize($value);
     }

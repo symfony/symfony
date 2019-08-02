@@ -12,10 +12,13 @@
 namespace Symfony\Component\Security\Http\Tests\Session;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 class SessionAuthenticationStrategyTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testSessionIsNotChanged()
     {
         $request = $this->getRequest();
@@ -25,12 +28,10 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($request, $this->getToken());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid session authentication strategy "foo"
-     */
     public function testUnsupportedStrategy()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Invalid session authentication strategy "foo"');
         $request = $this->getRequest();
         $request->expects($this->never())->method('getSession');
 

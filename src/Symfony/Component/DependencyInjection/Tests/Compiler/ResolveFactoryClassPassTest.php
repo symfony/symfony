@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\ResolveFactoryClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -19,6 +20,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveFactoryClassPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -71,12 +74,10 @@ class ResolveFactoryClassPassTest extends TestCase
         $this->assertSame($factory, $container->getDefinition('factory')->getFactory());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage The "factory" service is defined to be created by a factory, but is missing the factory class. Did you forget to define the factory or service class?
-     */
     public function testNotAnyClassThrowsException()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('The "factory" service is defined to be created by a factory, but is missing the factory class. Did you forget to define the factory or service class?');
         $container = new ContainerBuilder();
 
         $factory = $container->register('factory');

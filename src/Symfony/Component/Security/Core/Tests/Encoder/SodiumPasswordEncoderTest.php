@@ -37,11 +37,9 @@ class SodiumPasswordEncoderTest extends TestCase
         $this->assertTrue($encoder->isPasswordValid('$2y$04$M8GDODMoGQLQRpkYCdoJh.lbiZPee3SZI32RcYK49XYTolDGwoRMm', 'abc', null));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testEncodePasswordLength()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $encoder = new SodiumPasswordEncoder();
         $encoder->encodePassword(str_repeat('a', 4097), 'salt');
     }

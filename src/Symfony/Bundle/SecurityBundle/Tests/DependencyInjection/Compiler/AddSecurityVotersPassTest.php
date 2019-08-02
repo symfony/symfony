@@ -25,12 +25,10 @@ class AddSecurityVotersPassTest extends TestCase
 {
     use ForwardCompatTestTrait;
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage No security voters found. You need to tag at least one with "security.voter".
-     */
     public function testNoVoters()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
+        $this->expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)

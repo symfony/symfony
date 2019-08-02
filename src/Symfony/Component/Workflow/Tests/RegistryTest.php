@@ -62,23 +62,19 @@ class RegistryTest extends TestCase
         $this->assertSame('workflow2', $workflow->getName());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     * @expectedExceptionMessage At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.
-     */
     public function testGetWithMultipleMatch()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.');
         $w1 = $this->registry->get(new Subject2());
         $this->assertInstanceOf(Workflow::class, $w1);
         $this->assertSame('workflow1', $w1->getName());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unable to find a workflow for class "stdClass".
-     */
     public function testGetWithNoMatch()
     {
+        $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Unable to find a workflow for class "stdClass".');
         $w1 = $this->registry->get(new \stdClass());
         $this->assertInstanceOf(Workflow::class, $w1);
         $this->assertSame('workflow1', $w1->getName());

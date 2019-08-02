@@ -39,12 +39,10 @@ class StreamOutputTest extends TestCase
         $this->assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The StreamOutput class needs a stream as its first argument.
-     */
     public function testStreamIsRequired()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The StreamOutput class needs a stream as its first argument.');
         new StreamOutput('foo');
     }
 

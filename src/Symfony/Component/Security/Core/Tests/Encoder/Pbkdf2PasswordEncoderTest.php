@@ -12,10 +12,13 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
 
 class Pbkdf2PasswordEncoderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testIsPasswordValid()
     {
         $encoder = new Pbkdf2PasswordEncoder('sha256', false, 1, 40);
@@ -35,20 +38,16 @@ class Pbkdf2PasswordEncoderTest extends TestCase
         $this->assertSame('8bc2f9167a81cdcfad1235cd9047f1136271c1f978fcfcb35e22dbeafa4634f6fd2214218ed63ebb', $encoder->encodePassword('password', ''));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testEncodePasswordAlgorithmDoesNotExist()
     {
+        $this->expectException('LogicException');
         $encoder = new Pbkdf2PasswordEncoder('foobar');
         $encoder->encodePassword('password', '');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testEncodePasswordLength()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $encoder = new Pbkdf2PasswordEncoder('foobar');
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');

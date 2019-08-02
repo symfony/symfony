@@ -12,10 +12,13 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 class MaxIdLengthAdapterTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testLongKey()
     {
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
@@ -62,12 +65,10 @@ class MaxIdLengthAdapterTest extends TestCase
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Namespace must be 26 chars max, 40 given ("----------------------------------------")
-     */
     public function testTooLongNamespace()
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Namespace must be 26 chars max, 40 given ("----------------------------------------")');
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs([str_repeat('-', 40)])
             ->getMock();

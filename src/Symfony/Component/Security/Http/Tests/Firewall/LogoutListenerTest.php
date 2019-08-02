@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -19,6 +20,8 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 class LogoutListenerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testHandleUnmatchedPath()
     {
         list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener();
@@ -123,11 +126,9 @@ class LogoutListenerTest extends TestCase
         $listener($event);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testSuccessHandlerReturnsNonResponse()
     {
+        $this->expectException('RuntimeException');
         $successHandler = $this->getSuccessHandler();
 
         list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener($successHandler);
@@ -147,11 +148,9 @@ class LogoutListenerTest extends TestCase
         $listener($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\LogoutException
-     */
     public function testCsrfValidationFails()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\LogoutException');
         $tokenManager = $this->getTokenManager();
 
         list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener(null, $tokenManager);

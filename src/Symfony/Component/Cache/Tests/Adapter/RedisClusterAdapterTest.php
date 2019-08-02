@@ -42,11 +42,11 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
 
     /**
      * @dataProvider provideFailedCreateConnection
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Redis connection failed
      */
     public function testFailedCreateConnection($dsn)
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Redis connection failed');
         RedisAdapter::createConnection($dsn);
     }
 

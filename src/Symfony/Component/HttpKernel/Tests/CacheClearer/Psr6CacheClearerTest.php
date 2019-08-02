@@ -13,10 +13,13 @@ namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 class Psr6CacheClearerTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testClearPoolsInjectedInConstructor()
     {
         $pool = $this->getMockBuilder(CacheItemPoolInterface::class)->getMock();
@@ -37,12 +40,10 @@ class Psr6CacheClearerTest extends TestCase
         (new Psr6CacheClearer(['pool' => $pool]))->clearPool('pool');
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Cache pool not found: unknown
-     */
     public function testClearPoolThrowsExceptionOnUnreferencedPool()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Cache pool not found: unknown');
         (new Psr6CacheClearer())->clearPool('unknown');
     }
 }

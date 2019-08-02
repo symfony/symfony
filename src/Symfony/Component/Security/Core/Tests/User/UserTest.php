@@ -12,17 +12,18 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
+    use ForwardCompatTestTrait;
+
     public function testConstructorException()
     {
+        $this->expectException('InvalidArgumentException');
         new User('', 'superpass');
     }
 

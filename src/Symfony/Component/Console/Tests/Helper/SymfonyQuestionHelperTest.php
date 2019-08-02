@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
@@ -14,6 +15,8 @@ use Symfony\Component\Console\Question\Question;
  */
 class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 {
+    use ForwardCompatTestTrait;
+
     public function testAskChoice()
     {
         $questionHelper = new SymfonyQuestionHelper();
@@ -122,12 +125,10 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertOutputContains('Question with a trailing \\', $output);
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
-     * @expectedExceptionMessage Aborted.
-     */
     public function testAskThrowsExceptionOnMissingInput()
     {
+        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectExceptionMessage('Aborted.');
         $dialog = new SymfonyQuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
     }

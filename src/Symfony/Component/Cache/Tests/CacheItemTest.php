@@ -12,10 +12,13 @@
 namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\CacheItem;
 
 class CacheItemTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testValidKey()
     {
         $this->assertSame('foo', CacheItem::validateKey('foo'));
@@ -23,11 +26,11 @@ class CacheItemTest extends TestCase
 
     /**
      * @dataProvider provideInvalidKey
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cache key
      */
     public function testInvalidKey($key)
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Cache key');
         CacheItem::validateKey($key);
     }
 
@@ -69,11 +72,11 @@ class CacheItemTest extends TestCase
 
     /**
      * @dataProvider provideInvalidKey
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cache tag
      */
     public function testInvalidTag($tag)
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Cache tag');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
         $r->setAccessible(true);
@@ -82,12 +85,10 @@ class CacheItemTest extends TestCase
         $item->tag($tag);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Cache\Exception\LogicException
-     * @expectedExceptionMessage Cache item "foo" comes from a non tag-aware pool: you cannot tag it.
-     */
     public function testNonTaggableItem()
     {
+        $this->expectException('Symfony\Component\Cache\Exception\LogicException');
+        $this->expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'key');
         $r->setAccessible(true);

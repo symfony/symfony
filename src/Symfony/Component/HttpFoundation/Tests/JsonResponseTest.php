@@ -210,29 +210,23 @@ class JsonResponseTest extends TestCase
         $this->assertSame('{"foo":"bar"}', $response->getContent());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetCallbackInvalidIdentifier()
     {
+        $this->expectException('InvalidArgumentException');
         $response = new JsonResponse('foo');
         $response->setCallback('+invalid');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetContent()
     {
+        $this->expectException('InvalidArgumentException');
         JsonResponse::create("\xB1\x31");
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage This error is expected
-     */
     public function testSetContentJsonSerializeError()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('This error is expected');
         if (!interface_exists('JsonSerializable', false)) {
             $this->markTestSkipped('JsonSerializable is required.');
         }

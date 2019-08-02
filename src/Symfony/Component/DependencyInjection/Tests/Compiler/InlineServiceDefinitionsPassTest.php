@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
@@ -22,6 +23,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class InlineServiceDefinitionsPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -112,12 +115,10 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertEquals(new Reference('bar'), $container->getDefinition('foo')->getArgument(0));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
-     * @expectedExceptionMessage Circular reference detected for service "bar", path: "bar -> foo -> bar".
-     */
     public function testProcessThrowsOnNonSharedLoops()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');
+        $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> foo -> bar".');
         $container = new ContainerBuilder();
         $container
             ->register('foo')

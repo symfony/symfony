@@ -26,11 +26,9 @@ class FileBagTest extends TestCase
 {
     use ForwardCompatTestTrait;
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFileMustBeAnArrayOrUploadedFile()
     {
+        $this->expectException('InvalidArgumentException');
         new FileBag(['file' => 'foo']);
     }
 

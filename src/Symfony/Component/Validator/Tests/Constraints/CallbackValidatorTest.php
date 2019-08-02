@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CallbackValidator;
@@ -46,6 +47,8 @@ class CallbackValidatorTest_Object
 
 class CallbackValidatorTest extends ConstraintValidatorTestCase
 {
+    use ForwardCompatTestTrait;
+
     protected function createValidator()
     {
         return new CallbackValidator();
@@ -180,21 +183,17 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testExpectValidMethods()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(['callback' => ['foobar']]));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
     public function testExpectValidCallbacks()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(['callback' => ['foo', 'bar']]));

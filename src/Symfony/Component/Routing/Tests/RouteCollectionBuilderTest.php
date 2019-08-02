@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
@@ -21,6 +22,8 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
 
 class RouteCollectionBuilderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testImport()
     {
         $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
@@ -75,11 +78,9 @@ class RouteCollectionBuilderTest extends TestCase
         $this->assertCount(1, $routeCollection->getResources());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testImportWithoutLoaderThrowsException()
     {
+        $this->expectException('BadMethodCallException');
         $collectionBuilder = new RouteCollectionBuilder();
         $collectionBuilder->import('routing.yml');
     }

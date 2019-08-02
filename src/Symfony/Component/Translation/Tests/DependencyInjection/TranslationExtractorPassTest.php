@@ -12,12 +12,15 @@
 namespace Symfony\Component\Translation\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 
 class TranslationExtractorPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -46,12 +49,10 @@ class TranslationExtractorPassTest extends TestCase
         $this->assertCount($aliasesBefore, $container->getAliases());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage The alias for the tag "translation.extractor" of service "foo.id" must be set.
-     */
     public function testProcessMissingAlias()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('The alias for the tag "translation.extractor" of service "foo.id" must be set.');
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->disableOriginalConstructor()->getMock();
         $container = new ContainerBuilder();
         $container->register('translation.extractor');

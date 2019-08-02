@@ -83,11 +83,9 @@ class HeaderUtilsTest extends TestCase
         $this->assertEquals('foo \\ bar', HeaderUtils::unquote('"foo \\\\ bar"'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testMakeDispositionInvalidDisposition()
     {
+        $this->expectException('InvalidArgumentException');
         HeaderUtils::makeDisposition('invalid', 'foo.html');
     }
 
@@ -113,10 +111,10 @@ class HeaderUtilsTest extends TestCase
 
     /**
      * @dataProvider provideMakeDispositionFail
-     * @expectedException \InvalidArgumentException
      */
     public function testMakeDispositionFail($disposition, $filename)
     {
+        $this->expectException('InvalidArgumentException');
         HeaderUtils::makeDisposition($disposition, $filename);
     }
 

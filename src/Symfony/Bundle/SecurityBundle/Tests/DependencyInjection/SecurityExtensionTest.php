@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -24,12 +25,12 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class SecurityExtensionTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The check_path "/some_area/login_check" for login method "form_login" is not matched by the firewall pattern "/secured_area/.*".
-     */
+    use ForwardCompatTestTrait;
+
     public function testInvalidCheckPath()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('The check_path "/some_area/login_check" for login method "form_login" is not matched by the firewall pattern "/secured_area/.*".');
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
@@ -50,12 +51,10 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage No authentication listener registered for firewall "some_firewall"
-     */
     public function testFirewallWithoutAuthenticationListener()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('No authentication listener registered for firewall "some_firewall"');
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
@@ -73,12 +72,10 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Unable to create definition for "security.user.provider.concrete.my_foo" user provider
-     */
     public function testFirewallWithInvalidUserProvider()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('Unable to create definition for "security.user.provider.concrete.my_foo" user provider');
         $container = $this->getRawContainer();
 
         $extension = $container->getExtension('security');
@@ -194,12 +191,10 @@ class SecurityExtensionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Not configuring explicitly the provider for the "http_basic" listener on "ambiguous" firewall is ambiguous as there is more than one registered provider.
-     */
     public function testMissingProviderForListener()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('Not configuring explicitly the provider for the "http_basic" listener on "ambiguous" firewall is ambiguous as there is more than one registered provider.');
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
             'providers' => [

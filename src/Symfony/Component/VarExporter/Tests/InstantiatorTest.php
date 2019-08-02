@@ -16,22 +16,20 @@ use Symfony\Component\VarExporter\Instantiator;
 
 class InstantiatorTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\VarExporter\Exception\ClassNotFoundException
-     * @expectedExceptionMessage Class "SomeNotExistingClass" not found.
-     */
     public function testNotFoundClass()
     {
+        $this->expectException('Symfony\Component\VarExporter\Exception\ClassNotFoundException');
+        $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
         Instantiator::instantiate('SomeNotExistingClass');
     }
 
     /**
      * @dataProvider provideFailingInstantiation
-     * @expectedException \Symfony\Component\VarExporter\Exception\NotInstantiableTypeException
-     * @expectedExceptionMessageRegexp Type ".*" is not instantiable.
      */
     public function testFailingInstantiation(string $class)
     {
+        $this->expectException('Symfony\Component\VarExporter\Exception\NotInstantiableTypeException');
+        $this->expectExceptionMessageRegExp('/Type ".*" is not instantiable\./');
         Instantiator::instantiate($class);
     }
 

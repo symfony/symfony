@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
@@ -21,6 +22,8 @@ use Symfony\Component\Routing\Tests\Fixtures\CustomXmlFileLoader;
 
 class XmlFileLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testSupports()
     {
         $loader = new XmlFileLoader($this->getMockBuilder('Symfony\Component\Config\FileLocator')->getMock());
@@ -201,21 +204,21 @@ class XmlFileLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles
      */
     public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
+        $this->expectException('InvalidArgumentException');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles
      */
     public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
     {
+        $this->expectException('InvalidArgumentException');
         $loader = new CustomXmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
@@ -225,12 +228,10 @@ class XmlFileLoaderTest extends TestCase
         return [['nonvalidnode.xml'], ['nonvalidroute.xml'], ['nonvalid.xml'], ['missing_id.xml'], ['missing_path.xml']];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Document types are not allowed.
-     */
     public function testDocTypeIsNotAllowed()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Document types are not allowed.');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load('withdoctype.xml');
     }
@@ -435,12 +436,10 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Blog:list', $route->getDefault('_controller'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/
-     */
     public function testOverrideControllerInDefaults()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessageRegExp('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('override_defaults.xml');
     }
@@ -469,12 +468,10 @@ class XmlFileLoaderTest extends TestCase
         yield ['import__controller.xml'];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/
-     */
     public function testImportWithOverriddenController()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessageRegExp('/The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/');
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('import_override_defaults.xml');
     }

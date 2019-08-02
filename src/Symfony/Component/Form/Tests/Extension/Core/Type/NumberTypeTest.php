@@ -11,18 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberTypeTest extends BaseTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
 
     private $defaultLocale;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -33,7 +30,7 @@ class NumberTypeTest extends BaseTypeTest
         \Locale::setDefault('de_DE');
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         parent::tearDown();
 

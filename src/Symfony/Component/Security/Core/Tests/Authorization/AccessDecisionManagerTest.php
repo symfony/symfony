@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -21,8 +20,6 @@ use Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterfa
 
 class AccessDecisionManagerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSetUnsupportedStrategy()
     {
         $this->expectException('InvalidArgumentException');

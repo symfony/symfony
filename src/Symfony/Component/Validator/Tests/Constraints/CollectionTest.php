@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Optional;
@@ -24,8 +23,6 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class CollectionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRejectInvalidFieldsOption()
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');

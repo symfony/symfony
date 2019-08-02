@@ -12,13 +12,10 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
 
 class DateTimeZoneToStringTransformerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSingle()
     {
         $transformer = new DateTimeZoneToStringTransformer();

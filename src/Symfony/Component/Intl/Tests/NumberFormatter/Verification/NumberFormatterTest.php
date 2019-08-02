@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\NumberFormatter\Verification;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Tests\NumberFormatter\AbstractNumberFormatterTest;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
@@ -21,9 +20,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class NumberFormatterTest extends AbstractNumberFormatterTest
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         IntlTestHelper::requireFullIntl($this, '55.1');
 

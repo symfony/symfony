@@ -12,7 +12,6 @@
 namespace Symfony\Component\Yaml\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -25,8 +24,6 @@ use Symfony\Component\Yaml\Command\LintCommand;
  */
 class LintCommandTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $files;
 
     public function testLintCorrectFile()
@@ -116,13 +113,13 @@ YAML;
         return new CommandTester($command);
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->files = [];
         @mkdir(sys_get_temp_dir().'/framework-yml-lint-test');
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

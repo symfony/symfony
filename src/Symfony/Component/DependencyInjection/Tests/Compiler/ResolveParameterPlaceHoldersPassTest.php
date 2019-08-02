@@ -12,19 +12,16 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveParameterPlaceHoldersPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $compilerPass;
     private $container;
     private $fooDefinition;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->compilerPass = new ResolveParameterPlaceHoldersPass();
         $this->container = $this->createContainerBuilder();

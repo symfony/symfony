@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
@@ -21,8 +20,6 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class ButtonBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function getValidNames()
     {
         return [

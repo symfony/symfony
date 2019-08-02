@@ -12,15 +12,12 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Translator;
 
 class TranslatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getInvalidLocalesTests
      */

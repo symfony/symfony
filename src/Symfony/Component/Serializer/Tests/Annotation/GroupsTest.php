@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class GroupsTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testEmptyGroupsParameter()
     {
         $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');

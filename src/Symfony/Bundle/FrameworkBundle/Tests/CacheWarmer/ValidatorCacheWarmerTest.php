@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
 use PHPUnit\Framework\Warning;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -23,8 +22,6 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 class ValidatorCacheWarmerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testWarmUp()
     {
         if (\PHP_VERSION_ID >= 70400) {

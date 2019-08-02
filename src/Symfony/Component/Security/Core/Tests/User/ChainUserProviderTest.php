@@ -12,15 +12,12 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 
 class ChainUserProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLoadUserByUsername()
     {
         $provider1 = $this->getProvider();

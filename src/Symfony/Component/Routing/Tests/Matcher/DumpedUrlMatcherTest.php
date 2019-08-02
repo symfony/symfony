@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 
 class DumpedUrlMatcherTest extends UrlMatcherTest
 {
-    use ForwardCompatTestTrait;
-
     public function testSchemeRequirement()
     {
         $this->expectException('LogicException');

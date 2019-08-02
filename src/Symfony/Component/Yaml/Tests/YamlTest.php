@@ -12,13 +12,10 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Yaml\Yaml;
 
 class YamlTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testParseAndDump()
     {
         $data = ['lorem' => 'ipsum', 'dolor' => 'sit'];

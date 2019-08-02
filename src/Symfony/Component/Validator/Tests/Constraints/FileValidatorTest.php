@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
@@ -19,8 +18,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 abstract class FileValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $path;
 
     protected $file;
@@ -30,7 +27,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         return new FileValidator();
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -39,7 +36,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         fwrite($this->file, ' ', 1);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         parent::tearDown();
 

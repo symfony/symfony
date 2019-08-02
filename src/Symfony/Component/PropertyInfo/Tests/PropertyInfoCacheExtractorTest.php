@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 
@@ -20,9 +19,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
  */
 class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

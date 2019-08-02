@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Cookie;
 
 /**
@@ -25,8 +24,6 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class CookieTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function invalidNames()
     {
         return [

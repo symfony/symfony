@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
@@ -24,8 +23,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class InlineServiceDefinitionsPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();

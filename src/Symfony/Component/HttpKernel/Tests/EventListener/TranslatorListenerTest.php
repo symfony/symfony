@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -21,13 +20,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class TranslatorListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $listener;
     private $translator;
     private $requestStack;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();

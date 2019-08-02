@@ -12,21 +12,18 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTimeToLocalizedStringTransformerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     use DateTimeEqualsTrait;
 
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -39,7 +36,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;

@@ -12,15 +12,12 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class AbstractEventDispatcherTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /* Some pseudo events */
     const preFoo = 'pre.foo';
     const postFoo = 'post.foo';
@@ -34,13 +31,13 @@ abstract class AbstractEventDispatcherTest extends TestCase
 
     private $listener;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->dispatcher = $this->createEventDispatcher();
         $this->listener = new TestEventListener();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->dispatcher = null;
         $this->listener = null;

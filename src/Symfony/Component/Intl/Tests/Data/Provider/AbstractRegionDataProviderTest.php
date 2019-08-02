@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Provider;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
 use Symfony\Component\Intl\Intl;
 
@@ -20,8 +19,6 @@ use Symfony\Component\Intl\Intl;
  */
 abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
 {
-    use ForwardCompatTestTrait;
-
     // The below arrays document the state of the ICU data bundled with this package.
 
     protected static $territories = [
@@ -287,7 +284,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
      */
     protected $dataProvider;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

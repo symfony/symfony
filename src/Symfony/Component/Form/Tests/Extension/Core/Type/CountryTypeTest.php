@@ -11,18 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CountryTypeTest extends BaseTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CountryType';
 
-    private function doSetUp()
+    protected function setUp()
     {
         IntlTestHelper::requireIntl($this, false);
 

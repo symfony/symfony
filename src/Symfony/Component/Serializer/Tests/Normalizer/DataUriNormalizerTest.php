@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 
@@ -21,8 +20,6 @@ use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
  */
 class DataUriNormalizerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const TEST_GIF_DATA = 'data:image/gif;base64,R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=';
     const TEST_TXT_DATA = 'data:text/plain,K%C3%A9vin%20Dunglas%0A';
     const TEST_TXT_CONTENT = "Kévin Dunglas\n";
@@ -32,7 +29,7 @@ class DataUriNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->normalizer = new DataUriNormalizer();
     }

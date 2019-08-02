@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\Stream;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,8 +19,6 @@ use Symfony\Component\HttpFoundation\Tests\File\FakeFile;
 
 class BinaryFileResponseTest extends ResponseTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstruction()
     {
         $file = __DIR__.'/../README.md';
@@ -357,7 +354,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         return new BinaryFileResponse(__DIR__.'/../README.md', 200, ['Content-Type' => 'application/octet-stream']);
     }
 
-    private static function doTearDownAfterClass()
+    public static function tearDownAfterClass()
     {
         $path = __DIR__.'/../Fixtures/to_delete';
         if (file_exists($path)) {

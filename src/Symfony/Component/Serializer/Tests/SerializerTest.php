@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
@@ -31,8 +30,6 @@ use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 
 class SerializerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testInterface()
     {
         $serializer = new Serializer();

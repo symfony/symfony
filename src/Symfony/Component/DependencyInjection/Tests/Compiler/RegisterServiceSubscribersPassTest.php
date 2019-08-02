@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\RegisterServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveServiceSubscribersPass;
@@ -29,8 +28,6 @@ require_once __DIR__.'/../Fixtures/includes/classes.php';
 
 class RegisterServiceSubscribersPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testInvalidClass()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');

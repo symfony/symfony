@@ -12,7 +12,6 @@
 namespace Symfony\Component\Stopwatch\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
@@ -24,8 +23,6 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class StopwatchEventTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const DELTA = 37;
 
     public function testGetOrigin()

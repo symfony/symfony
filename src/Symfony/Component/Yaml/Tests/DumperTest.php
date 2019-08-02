@@ -12,7 +12,6 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -20,8 +19,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class DumperTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $parser;
     protected $dumper;
     protected $path;
@@ -41,14 +38,14 @@ class DumperTest extends TestCase
         ],
     ];
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();
         $this->path = __DIR__.'/Fixtures';
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->parser = null;
         $this->dumper = null;

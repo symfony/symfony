@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -30,8 +29,6 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 
 class XmlFileLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
         $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -21,8 +20,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class IsbnValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected function createValidator()
     {
         return new IsbnValidator();

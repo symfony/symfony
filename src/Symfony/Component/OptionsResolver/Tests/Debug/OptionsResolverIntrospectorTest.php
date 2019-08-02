@@ -12,15 +12,12 @@
 namespace Symfony\Component\OptionsResolver\Tests\Debug;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OptionsResolverIntrospectorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetDefault()
     {
         $resolver = new OptionsResolver();

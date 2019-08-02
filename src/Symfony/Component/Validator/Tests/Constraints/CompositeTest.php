@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -38,8 +37,6 @@ class ConcreteComposite extends Composite
  */
 class CompositeTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testMergeNestedGroupsIfNoExplicitParentGroup()
     {
         $constraint = new ConcreteComposite([

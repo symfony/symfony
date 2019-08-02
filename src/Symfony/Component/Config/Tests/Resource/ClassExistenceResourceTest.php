@@ -13,15 +13,12 @@ namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Tests\Fixtures\BadParent;
 use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
 
 class ClassExistenceResourceTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testToString()
     {
         $res = new ClassExistenceResource('BarClass');

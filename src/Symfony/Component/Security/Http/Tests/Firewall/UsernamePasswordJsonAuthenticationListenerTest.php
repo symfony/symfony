@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Tests\Http\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -32,8 +31,6 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var UsernamePasswordJsonAuthenticationListener
      */

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Guard\Tests\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
@@ -25,8 +24,6 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
  */
 class GuardAuthenticationProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $userProvider;
     private $userChecker;
     private $preAuthenticationToken;
@@ -230,7 +227,7 @@ class GuardAuthenticationProviderTest extends TestCase
         $provider->authenticate($token);
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
         $this->userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
@@ -239,7 +236,7 @@ class GuardAuthenticationProviderTest extends TestCase
             ->getMock();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->userProvider = null;
         $this->userChecker = null;

@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 
@@ -21,8 +20,6 @@ use Symfony\Component\PropertyAccess\PropertyPathBuilder;
  */
 class PropertyPathBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const PREFIX = 'old1[old2].old3[old4][old5].old6';
 
     /**
@@ -30,7 +27,7 @@ class PropertyPathBuilderTest extends TestCase
      */
     private $builder;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->builder = new PropertyPathBuilder(new PropertyPath(self::PREFIX));
     }

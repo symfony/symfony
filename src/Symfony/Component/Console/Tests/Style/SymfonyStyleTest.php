@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\Style;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,15 +22,13 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class SymfonyStyleTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /** @var Command */
     protected $command;
     /** @var CommandTester */
     protected $tester;
     private $colSize;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS=121');
@@ -39,7 +36,7 @@ class SymfonyStyleTest extends TestCase
         $this->tester = new CommandTester($this->command);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
         $this->command = null;

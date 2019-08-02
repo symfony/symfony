@@ -5,7 +5,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -16,11 +15,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class AnnotationsCacheWarmerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $cacheDir;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->cacheDir = sys_get_temp_dir().'/'.uniqid();
         $fs = new Filesystem();
@@ -28,7 +25,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         parent::setUp();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $fs = new Filesystem();
         $fs->remove($this->cacheDir);

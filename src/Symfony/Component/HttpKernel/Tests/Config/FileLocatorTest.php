@@ -12,13 +12,10 @@
 namespace Symfony\Component\HttpKernel\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class FileLocatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLocate()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();

@@ -12,21 +12,18 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 class CustomNormalizerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var CustomNormalizer
      */
     private $normalizer;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->normalizer = new CustomNormalizer();
         $this->normalizer->setSerializer(new Serializer());

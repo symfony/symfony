@@ -12,7 +12,6 @@
 namespace Symfony\Component\Filesystem\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\LockHandler;
@@ -22,8 +21,6 @@ use Symfony\Component\Filesystem\LockHandler;
  */
 class LockHandlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructWhenRepositoryDoesNotExist()
     {
         $this->expectException('Symfony\Component\Filesystem\Exception\IOException');

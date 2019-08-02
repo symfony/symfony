@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\Data\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Locale;
@@ -22,8 +21,6 @@ use Symfony\Component\Intl\Locale;
  */
 abstract class AbstractDataProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     // Include the locales statically so that the data providers are decoupled
     // from the Intl class. Otherwise tests will fail if the intl extension is
     // not loaded, because it is NOT possible to skip the execution of data
@@ -704,7 +701,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
     private static $rootLocales;
 
-    private function doSetUp()
+    protected function setUp()
     {
         \Locale::setDefault('en');
         Locale::setDefaultFallback('en');

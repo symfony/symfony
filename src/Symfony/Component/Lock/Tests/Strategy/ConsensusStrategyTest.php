@@ -12,7 +12,6 @@
 namespace Symfony\Component\Lock\Tests\Strategy;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Strategy\ConsensusStrategy;
 
 /**
@@ -20,12 +19,10 @@ use Symfony\Component\Lock\Strategy\ConsensusStrategy;
  */
 class ConsensusStrategyTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /** @var ConsensusStrategy */
     private $strategy;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->strategy = new ConsensusStrategy();
     }

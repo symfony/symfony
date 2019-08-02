@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemInterface;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\CacheItem;
@@ -22,8 +21,6 @@ use Symfony\Component\Cache\CacheItem;
  */
 class ProxyAdapterTest extends AdapterTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $skippedTests = [
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',

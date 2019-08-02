@@ -12,15 +12,12 @@
 namespace Symfony\Component\Templating\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\StreamingEngineInterface;
 
 class DelegatingEngineTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRenderDelegatesToSupportedEngine()
     {
         $firstEngine = $this->getEngineMock('template.php', false);

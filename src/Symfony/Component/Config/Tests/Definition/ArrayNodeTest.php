@@ -12,15 +12,12 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {
         $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');

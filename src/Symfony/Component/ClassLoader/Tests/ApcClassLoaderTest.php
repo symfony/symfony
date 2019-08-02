@@ -12,7 +12,6 @@
 namespace Symfony\Component\ClassLoader\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\ClassLoader\ClassLoader;
 
@@ -21,9 +20,7 @@ use Symfony\Component\ClassLoader\ClassLoader;
  */
 class ApcClassLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         if (!(filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN))) {
             $this->markTestSkipped('The apc extension is not enabled.');
@@ -32,7 +29,7 @@ class ApcClassLoaderTest extends TestCase
         }
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         if (filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) && filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
             apcu_clear_cache();

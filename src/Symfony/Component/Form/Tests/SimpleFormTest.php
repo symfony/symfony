@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Form;
@@ -55,8 +54,6 @@ class SimpleFormTest_Traversable implements \IteratorAggregate
 
 class SimpleFormTest extends AbstractFormTest
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider provideFormNames
      */

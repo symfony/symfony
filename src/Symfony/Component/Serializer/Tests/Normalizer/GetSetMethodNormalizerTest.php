@@ -13,7 +13,6 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -28,8 +27,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 
 class GetSetMethodNormalizerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var GetSetMethodNormalizer
      */
@@ -39,7 +36,7 @@ class GetSetMethodNormalizerTest extends TestCase
      */
     private $serializer;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->serializer = $this->getMockBuilder(__NAMESPACE__.'\SerializerNormalizer')->getMock();
         $this->normalizer = new GetSetMethodNormalizer();

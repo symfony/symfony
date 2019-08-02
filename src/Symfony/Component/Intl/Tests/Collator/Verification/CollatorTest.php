@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\Collator\Verification;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Tests\Collator\AbstractCollatorTest;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
@@ -23,9 +22,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class CollatorTest extends AbstractCollatorTest
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         IntlTestHelper::requireFullIntl($this, false);
 

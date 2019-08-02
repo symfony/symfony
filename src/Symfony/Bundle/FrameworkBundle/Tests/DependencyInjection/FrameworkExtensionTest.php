@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -48,8 +47,6 @@ use Symfony\Component\Workflow\Registry;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private static $containerCache = [];
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);

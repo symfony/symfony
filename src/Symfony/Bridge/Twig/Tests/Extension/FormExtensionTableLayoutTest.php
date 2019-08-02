@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
@@ -24,7 +23,6 @@ use Twig\Environment;
 
 class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 {
-    use ForwardCompatTestTrait;
     use RuntimeLoaderProvider;
 
     /**
@@ -34,7 +32,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
     protected static $supportedFeatureSetVersion = 304;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -20,9 +19,7 @@ use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
  */
 class RedisArrayStoreTest extends AbstractRedisStoreTest
 {
-    use ForwardCompatTestTrait;
-
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         if (!class_exists('RedisArray')) {
             self::markTestSkipped('The RedisArray class is required.');

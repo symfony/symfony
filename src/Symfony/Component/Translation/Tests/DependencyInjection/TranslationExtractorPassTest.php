@@ -12,15 +12,12 @@
 namespace Symfony\Component\Translation\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 
 class TranslationExtractorPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();

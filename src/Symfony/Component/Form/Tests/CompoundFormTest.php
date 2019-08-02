@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
@@ -27,8 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CompoundFormTest extends AbstractFormTest
 {
-    use ForwardCompatTestTrait;
-
     public function testValidIfAllChildrenAreValid()
     {
         $this->form->add($this->getBuilder('firstName')->getForm());

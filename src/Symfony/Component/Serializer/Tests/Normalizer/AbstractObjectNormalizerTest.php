@@ -13,7 +13,6 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -27,8 +26,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testDenormalize()
     {
         $normalizer = new AbstractObjectNormalizerDummy();

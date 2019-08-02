@@ -3,15 +3,12 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
 
 class EnvVarProcessorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const TEST_CONST = 'test';
 
     /**

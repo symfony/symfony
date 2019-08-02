@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -23,8 +22,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 class XmlEncoderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var XmlEncoder
      */
@@ -32,7 +29,7 @@ class XmlEncoderTest extends TestCase
 
     private $exampleDateTimeString = '2017-02-19T15:16:08+0300';
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->encoder = new XmlEncoder();
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);

@@ -12,23 +12,20 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
 class StaticMethodLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $errorLevel;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->errorLevel = error_reporting();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         error_reporting($this->errorLevel);
     }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\ChoiceList;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 
@@ -21,8 +20,6 @@ use Symfony\Component\Form\ChoiceList\LazyChoiceList;
  */
 class LazyChoiceListTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var LazyChoiceList
      */
@@ -40,7 +37,7 @@ class LazyChoiceListTest extends TestCase
 
     private $value;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->loadedList = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
         $this->loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();

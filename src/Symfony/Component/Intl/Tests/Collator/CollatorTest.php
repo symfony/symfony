@@ -11,14 +11,11 @@
 
 namespace Symfony\Component\Intl\Tests\Collator;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Collator\Collator;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
 class CollatorTest extends AbstractCollatorTest
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructorWithUnsupportedLocale()
     {
         $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');

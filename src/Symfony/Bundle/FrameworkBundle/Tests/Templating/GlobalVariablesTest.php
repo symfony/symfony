@@ -11,19 +11,16 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 
 class GlobalVariablesTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $container;
     private $globals;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->container = new Container();
         $this->globals = new GlobalVariables($this->container);

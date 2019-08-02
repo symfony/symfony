@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
 /**
@@ -20,14 +19,12 @@ use Symfony\Component\Serializer\Encoder\CsvEncoder;
  */
 class CsvEncoderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var CsvEncoder
      */
     private $encoder;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->encoder = new CsvEncoder();
     }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
 /**
@@ -21,11 +20,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
  */
 class PdoSessionHandlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $dbFile;
 
-    private function doTearDown()
+    protected function tearDown()
     {
         // make sure the temporary database file is deleted when it has been created (even when a test fails)
         if ($this->dbFile) {

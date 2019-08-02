@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -22,8 +21,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouterDebugCommandTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testDebugAllRoutes()
     {
         $tester = $this->createCommandTester();

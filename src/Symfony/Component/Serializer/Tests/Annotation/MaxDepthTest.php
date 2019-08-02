@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  */
 class MaxDepthTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testNotSetMaxDepthParameter()
     {
         $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');

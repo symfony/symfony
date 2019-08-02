@@ -3,7 +3,6 @@
 namespace Symfony\Component\Workflow\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -19,14 +18,12 @@ use Symfony\Component\Workflow\Transition;
 
 class GuardListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $authenticationChecker;
     private $validator;
     private $listener;
     private $configuration;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->configuration = [
             'test_is_granted' => 'is_granted("something")',
@@ -47,7 +44,7 @@ class GuardListenerTest extends TestCase
         $this->listener = new GuardListener($this->configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, null, $this->validator);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->authenticationChecker = null;
         $this->validator = null;

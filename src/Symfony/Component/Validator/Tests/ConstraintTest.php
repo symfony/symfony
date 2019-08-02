@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
@@ -23,8 +22,6 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithValueAsDefault;
 
 class ConstraintTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSetProperties()
     {
         $constraint = new ConstraintA([

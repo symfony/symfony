@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -25,8 +24,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FormPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testDoNothingIfFormExtensionNotLoaded()
     {
         $container = new ContainerBuilder();

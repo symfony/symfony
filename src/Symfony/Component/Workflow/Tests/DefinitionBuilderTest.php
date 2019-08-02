@@ -3,14 +3,11 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Transition;
 
 class DefinitionBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testAddPlaceInvalidName()
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');

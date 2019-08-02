@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Ldap\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
@@ -23,14 +22,12 @@ use Symfony\Component\Ldap\LdapInterface;
  */
 class LdapClientTest extends LdapTestCase
 {
-    use ForwardCompatTestTrait;
-
     /** @var LdapClient */
     private $client;
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $ldap;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
 

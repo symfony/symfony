@@ -12,13 +12,10 @@
 namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\ConfigCacheFactory;
 
 class ConfigCacheFactoryTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCacheWithInvalidCallback()
     {
         $this->expectException('InvalidArgumentException');

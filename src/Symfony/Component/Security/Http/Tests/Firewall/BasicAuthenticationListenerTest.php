@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
@@ -22,8 +21,6 @@ use Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener;
 
 class BasicAuthenticationListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testHandleWithValidUsernameAndPasswordServerParameters()
     {
         $request = new Request([], [], [], [], [], [

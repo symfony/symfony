@@ -12,15 +12,12 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class DaoAuthenticationProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRetrieveUserWhenProviderDoesNotReturnAnUserInterface()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationServiceException');

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +31,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class TestSessionListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var TestSessionListener
      */
@@ -44,7 +41,7 @@ class TestSessionListenerTest extends TestCase
      */
     private $session;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener');
         $this->session = $this->getSession();

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank as BlankConstraint;
@@ -20,6 +21,8 @@ use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 
 class ContainerConstraintValidatorFactoryTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetInstanceCreatesValidator()
     {
         $factory = new ContainerConstraintValidatorFactory(new Container());
@@ -45,11 +48,9 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
         $this->assertSame($validator, $factory->getInstance(new DummyConstraint()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
-     */
     public function testGetInstanceInvalidValidatorClass()
     {
+        $this->expectException('Symfony\Component\Validator\Exception\ValidatorException');
         $constraint = $this->getMockBuilder(Constraint::class)->getMock();
         $constraint
             ->expects($this->once())

@@ -39,11 +39,9 @@ class Argon2iPasswordEncoderTest extends TestCase
         $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testEncodePasswordLength()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $encoder = new Argon2iPasswordEncoder();
         $encoder->encodePassword(str_repeat('a', 4097), 'salt');
     }

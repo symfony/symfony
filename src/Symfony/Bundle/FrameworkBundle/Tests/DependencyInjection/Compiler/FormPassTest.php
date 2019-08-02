@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -24,6 +25,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FormPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testDoNothingIfFormExtensionNotLoaded()
     {
         $container = new ContainerBuilder();
@@ -124,12 +127,10 @@ class FormPassTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage extended-type attribute, none was configured for the "my.type_extension" service
-     */
     public function testAddTaggedFormTypeExtensionWithoutExtendedTypeAttribute()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('extended-type attribute, none was configured for the "my.type_extension" service');
         $container = new ContainerBuilder();
         $container->addCompilerPass(new FormPass());
 

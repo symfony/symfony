@@ -12,10 +12,13 @@
 namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\CacheItem;
 
 class CacheItemTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testValidKey()
     {
         $this->assertSame('foo', CacheItem::validateKey('foo'));
@@ -23,11 +26,11 @@ class CacheItemTest extends TestCase
 
     /**
      * @dataProvider provideInvalidKey
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cache key
      */
     public function testInvalidKey($key)
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Cache key');
         CacheItem::validateKey($key);
     }
 
@@ -66,11 +69,11 @@ class CacheItemTest extends TestCase
 
     /**
      * @dataProvider provideInvalidKey
-     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cache tag
      */
     public function testInvalidTag($tag)
     {
+        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('Cache tag');
         $item = new CacheItem();
         $item->tag($tag);
     }

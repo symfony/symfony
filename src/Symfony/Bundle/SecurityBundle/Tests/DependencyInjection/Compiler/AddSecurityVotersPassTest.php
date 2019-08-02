@@ -24,11 +24,9 @@ class AddSecurityVotersPassTest extends TestCase
 {
     use ForwardCompatTestTrait;
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     */
     public function testNoVoters()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)

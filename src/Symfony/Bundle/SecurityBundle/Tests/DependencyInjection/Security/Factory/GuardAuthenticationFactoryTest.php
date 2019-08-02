@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -20,6 +21,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class GuardAuthenticationFactoryTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getValidConfigurationTests
      */
@@ -37,11 +40,11 @@ class GuardAuthenticationFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @dataProvider getInvalidConfigurationTests
      */
     public function testAddInvalidConfiguration(array $inputConfig)
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $factory = new GuardAuthenticationFactory();
         $nodeDefinition = new ArrayNodeDefinition('guard');
         $factory->addConfiguration($nodeDefinition);
@@ -130,11 +133,9 @@ class GuardAuthenticationFactoryTest extends TestCase
         $this->assertEquals('some_default_entry_point', $entryPointId);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testCannotOverrideDefaultEntryPoint()
     {
+        $this->expectException('LogicException');
         // any existing default entry point is used
         $config = [
             'authenticators' => ['authenticator123'],
@@ -143,11 +144,9 @@ class GuardAuthenticationFactoryTest extends TestCase
         $this->executeCreate($config, 'some_default_entry_point');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testMultipleAuthenticatorsRequiresEntryPoint()
     {
+        $this->expectException('LogicException');
         // any existing default entry point is used
         $config = [
             'authenticators' => ['authenticator123', 'authenticatorABC'],

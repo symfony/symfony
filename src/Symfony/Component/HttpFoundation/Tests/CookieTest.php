@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Cookie;
 
 /**
@@ -24,6 +25,8 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class CookieTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function invalidNames()
     {
         return [
@@ -41,18 +44,16 @@ class CookieTest extends TestCase
 
     /**
      * @dataProvider invalidNames
-     * @expectedException \InvalidArgumentException
      */
     public function testInstantiationThrowsExceptionIfCookieNameContainsInvalidCharacters($name)
     {
+        $this->expectException('InvalidArgumentException');
         new Cookie($name);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidExpiration()
     {
+        $this->expectException('InvalidArgumentException');
         new Cookie('MyCookie', 'foo', 'bar');
     }
 

@@ -49,11 +49,9 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('fööö.html', $response->getFile()->getFilename());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetContent()
     {
+        $this->expectException('LogicException');
         $response = new BinaryFileResponse(__FILE__);
         $response->setContent('foo');
     }

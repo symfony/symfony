@@ -889,11 +889,9 @@ class RequestTest extends TestCase
         $this->assertEquals(80, $port, 'With only PROTO set and value is not recognized, getPort() defaults to 80.');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetHostWithFakeHttpHostValue()
     {
+        $this->expectException('RuntimeException');
         $request = new Request();
         $request->initialize([], [], [], [], [], ['HTTP_HOST' => 'www.host.com?query=string']);
         $request->getHost();
@@ -1058,11 +1056,11 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException
      * @dataProvider getClientIpsWithConflictingHeadersProvider
      */
     public function testGetClientIpsWithConflictingHeaders($httpForwarded, $httpXForwardedFor)
     {
+        $this->expectException('Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException');
         $request = new Request();
 
         $server = [
@@ -1182,11 +1180,11 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */
     public function testGetContentCantBeCalledTwiceWithResources($first, $second)
     {
+        $this->expectException('LogicException');
         if (\PHP_VERSION_ID >= 50600) {
             $this->markTestSkipped('PHP >= 5.6 allows to open php://input several times.');
         }
@@ -1971,20 +1969,20 @@ class RequestTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
      */
     public function testSetTrustedProxiesInvalidHeaderName()
     {
+        $this->expectException('InvalidArgumentException');
         Request::create('http://example.com/');
         Request::setTrustedHeaderName('bogus name', 'X_MY_FOR');
     }
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
      */
     public function testGetTrustedProxiesInvalidHeaderName()
     {
+        $this->expectException('InvalidArgumentException');
         Request::create('http://example.com/');
         Request::getTrustedHeaderName('bogus name');
     }

@@ -81,11 +81,9 @@ class GenericEventTest extends TestCase
         $this->assertEquals('Event', $this->event->getArgument('name'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetArgException()
     {
+        $this->expectException('\InvalidArgumentException');
         $this->event->getArgument('nameNotExist');
     }
 

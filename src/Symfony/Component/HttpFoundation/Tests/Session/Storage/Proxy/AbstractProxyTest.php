@@ -83,10 +83,10 @@ class AbstractProxyTest extends TestCase
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
-     * @expectedException \LogicException
      */
     public function testNameException()
     {
+        $this->expectException('LogicException');
         session_start();
         $this->proxy->setName('foo');
     }
@@ -106,10 +106,10 @@ class AbstractProxyTest extends TestCase
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
-     * @expectedException \LogicException
      */
     public function testIdException()
     {
+        $this->expectException('LogicException');
         session_start();
         $this->proxy->setId('foo');
     }

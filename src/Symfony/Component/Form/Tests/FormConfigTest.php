@@ -139,11 +139,9 @@ class FormConfigTest extends TestCase
         self::assertSame('PATCH', $formConfigBuilder->getMethod());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     */
     public function testSetMethodDoesNotAllowOtherValues()
     {
+        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
         $this->getConfigBuilder()->setMethod('foo');
     }
 

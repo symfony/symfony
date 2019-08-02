@@ -48,11 +48,9 @@ class LintCommandTest extends TestCase
         $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testLintFileNotReadable()
     {
+        $this->expectException('RuntimeException');
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
         unlink($filename);
@@ -74,11 +72,11 @@ class LintCommandTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bridge\Twig\Command\LintCommand::__construct()" is deprecated since Symfony 3.4 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The Twig environment needs to be set.
      */
     public function testLegacyLintCommand()
     {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('The Twig environment needs to be set.');
         $command = new LintCommand();
 
         $application = new Application();

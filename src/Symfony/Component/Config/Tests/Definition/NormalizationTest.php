@@ -12,11 +12,14 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
 
 class NormalizationTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getEncoderTests
      */
@@ -169,12 +172,10 @@ class NormalizationTest extends TestCase
         return array_map(function ($v) { return [$v]; }, $configs);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The attribute "id" must be set for path "root.thing".
-     */
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
         $denormalized = [
             'thing' => [
                 ['foo', 'bar'], ['baz', 'qux'],

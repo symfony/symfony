@@ -12,11 +12,14 @@
 namespace Symfony\Component\Console\Tests\CommandLoader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 
 class FactoryCommandLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testHas()
     {
         $loader = new FactoryCommandLoader([
@@ -40,11 +43,9 @@ class FactoryCommandLoaderTest extends TestCase
         $this->assertInstanceOf(Command::class, $loader->get('bar'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Console\Exception\CommandNotFoundException
-     */
     public function testGetUnknownCommandThrows()
     {
+        $this->expectException('Symfony\Component\Console\Exception\CommandNotFoundException');
         (new FactoryCommandLoader([]))->get('unknown');
     }
 

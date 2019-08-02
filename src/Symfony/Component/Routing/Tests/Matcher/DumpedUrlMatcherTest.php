@@ -11,27 +11,26 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 
 class DumpedUrlMatcherTest extends UrlMatcherTest
 {
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.
-     */
+    use ForwardCompatTestTrait;
+
     public function testSchemeRequirement()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
         parent::testSchemeRequirement();
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.
-     */
     public function testSchemeAndMethodMismatch()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
         parent::testSchemeRequirement();
     }
 

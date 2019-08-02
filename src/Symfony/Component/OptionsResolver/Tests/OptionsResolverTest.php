@@ -32,35 +32,29 @@ class OptionsResolverTest extends TestCase
         $this->resolver = new OptionsResolver();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @expectedExceptionMessage The option "foo" does not exist. Defined options are: "a", "z".
-     */
     public function testResolveFailsIfNonExistingOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectExceptionMessage('The option "foo" does not exist. Defined options are: "a", "z".');
         $this->resolver->setDefault('z', '1');
         $this->resolver->setDefault('a', '2');
 
         $this->resolver->resolve(['foo' => 'bar']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @expectedExceptionMessage The options "baz", "foo", "ping" do not exist. Defined options are: "a", "z".
-     */
     public function testResolveFailsIfMultipleNonExistingOptions()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectExceptionMessage('The options "baz", "foo", "ping" do not exist. Defined options are: "a", "z".');
         $this->resolver->setDefault('z', '1');
         $this->resolver->setDefault('a', '2');
 
         $this->resolver->resolve(['ping' => 'pong', 'foo' => 'bar', 'baz' => 'bam']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testResolveFailsFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->resolve([]);
         });
@@ -84,11 +78,9 @@ class OptionsResolverTest extends TestCase
         ], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfSetDefaultFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('lazy', function (Options $options) {
             $options->setDefault('default', 42);
         });
@@ -228,11 +220,9 @@ class OptionsResolverTest extends TestCase
         $this->assertSame($this->resolver, $this->resolver->setRequired('foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfSetRequiredFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->setRequired('bar');
         });
@@ -240,11 +230,9 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     */
     public function testResolveFailsIfRequiredOptionMissing()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
         $this->resolver->setRequired('foo');
 
         $this->resolver->resolve();
@@ -356,11 +344,9 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['bar'], $this->resolver->getMissingOptions());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfSetDefinedFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->setDefined('bar');
         });
@@ -453,11 +439,9 @@ class OptionsResolverTest extends TestCase
         $this->assertFalse($this->resolver->isDefined('foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
     public function testSetAllowedTypesFailsIfUnknownOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
         $this->resolver->setAllowedTypes('foo', 'string');
     }
 
@@ -470,11 +454,9 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => ['bar', 'baz']], $options);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfSetAllowedTypesFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->setAllowedTypes('bar', 'string');
         });
@@ -484,36 +466,30 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTime[]".
-     */
     public function testResolveFailsIfInvalidTypedArray()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTime[]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
 
         $this->resolver->resolve(['foo' => [new \DateTime()]]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value "bar" is expected to be of type "int[]", but is of type "string".
-     */
     public function testResolveFailsWithNonArray()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value "bar" is expected to be of type "int[]", but is of type "string".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
 
         $this->resolver->resolve(['foo' => 'bar']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass[]".
-     */
     public function testResolveFailsIfTypedArrayContainsInvalidTypes()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass[]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
         $values = range(1, 5);
@@ -525,12 +501,10 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve(['foo' => $values]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "double[][]".
-     */
     public function testResolveFailsWithCorrectLevelsButWrongScalar()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "double[][]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[][]');
 
@@ -577,12 +551,10 @@ class OptionsResolverTest extends TestCase
         $this->assertNotEmpty($this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value 42 is expected to be of type "string" or "bool", but is of type "integer".
-     */
     public function testResolveFailsIfInvalidTypeMultiple()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value 42 is expected to be of type "string" or "bool", but is of type "integer".');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->setAllowedTypes('foo', ['string', 'bool']);
 
@@ -620,30 +592,24 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals($data, $result);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testResolveFailsIfNotInstanceOfClass()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 'bar');
         $this->resolver->setAllowedTypes('foo', '\stdClass');
 
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
     public function testAddAllowedTypesFailsIfUnknownOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
         $this->resolver->addAllowedTypes('foo', 'string');
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfAddAllowedTypesFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->addAllowedTypes('bar', 'string');
         });
@@ -653,11 +619,9 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testResolveFailsIfInvalidAddedType()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->addAllowedTypes('foo', 'string');
 
@@ -672,11 +636,9 @@ class OptionsResolverTest extends TestCase
         $this->assertNotEmpty($this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testResolveFailsIfInvalidAddedTypeMultiple()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->addAllowedTypes('foo', ['string', 'bool']);
 
@@ -713,19 +675,15 @@ class OptionsResolverTest extends TestCase
         $this->assertNotEmpty($this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
     public function testSetAllowedValuesFailsIfUnknownOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
         $this->resolver->setAllowedValues('foo', 'bar');
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfSetAllowedValuesFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->setAllowedValues('bar', 'baz');
         });
@@ -735,35 +693,29 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value 42 is invalid. Accepted values are: "bar".
-     */
     public function testResolveFailsIfInvalidValue()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value 42 is invalid. Accepted values are: "bar".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedValues('foo', 'bar');
 
         $this->resolver->resolve(['foo' => 42]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value null is invalid. Accepted values are: "bar".
-     */
     public function testResolveFailsIfInvalidValueIsNull()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value null is invalid. Accepted values are: "bar".');
         $this->resolver->setDefault('foo', null);
         $this->resolver->setAllowedValues('foo', 'bar');
 
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testResolveFailsIfInvalidValueStrict()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->setAllowedValues('foo', '42');
 
@@ -786,12 +738,10 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => null], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value 42 is invalid. Accepted values are: "bar", false, null.
-     */
     public function testResolveFailsIfInvalidValueMultiple()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value 42 is invalid. Accepted values are: "bar", false, null.');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->setAllowedValues('foo', ['bar', false, null]);
 
@@ -837,11 +787,9 @@ class OptionsResolverTest extends TestCase
         $this->assertSame('bar', $passedValue);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testResolveFailsIfAllClosuresReturnFalse()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->setAllowedValues('foo', [
             function () { return false; },
@@ -864,19 +812,15 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
     public function testAddAllowedValuesFailsIfUnknownOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
         $this->resolver->addAllowedValues('foo', 'bar');
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfAddAllowedValuesFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->addAllowedValues('bar', 'baz');
         });
@@ -886,11 +830,9 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testResolveFailsIfInvalidAddedValue()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->addAllowedValues('foo', 'bar');
 
@@ -913,11 +855,9 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => null], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testResolveFailsIfInvalidAddedValueMultiple()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->addAllowedValues('foo', ['bar', 'baz']);
 
@@ -950,11 +890,9 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => 'baz'], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testResolveFailsIfAllAddedClosuresReturnFalse()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 42);
         $this->resolver->setAllowedValues('foo', function () { return false; });
         $this->resolver->addAllowedValues('foo', function () { return false; });
@@ -996,19 +934,15 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => 'normalized'], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
     public function testSetNormalizerFailsIfUnknownOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
         $this->resolver->setNormalizer('foo', function () {});
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfSetNormalizerFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->setNormalizer('foo', function () {});
         });
@@ -1042,11 +976,9 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => 'normalized[baz]'], $resolved);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testValidateTypeBeforeNormalization()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 'bar');
 
         $this->resolver->setAllowedTypes('foo', 'int');
@@ -1058,11 +990,9 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testValidateValueBeforeNormalization()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
         $this->resolver->setDefault('foo', 'bar');
 
         $this->resolver->setAllowedValues('foo', 'baz');
@@ -1112,11 +1042,9 @@ class OptionsResolverTest extends TestCase
         ], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     */
     public function testFailIfCyclicDependencyBetweenNormalizers()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\OptionDefinitionException');
         $this->resolver->setDefault('norm1', 'bar');
         $this->resolver->setDefault('norm2', 'baz');
 
@@ -1131,11 +1059,9 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     */
     public function testFailIfCyclicDependencyBetweenNormalizerAndLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\OptionDefinitionException');
         $this->resolver->setDefault('lazy', function (Options $options) {
             $options['norm'];
         });
@@ -1253,11 +1179,9 @@ class OptionsResolverTest extends TestCase
         ], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfSetDefaultsFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->setDefaults(['two' => '2']);
         });
@@ -1334,11 +1258,9 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfRemoveFromLazyOption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->remove('bar');
         });
@@ -1410,11 +1332,9 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $this->resolver->resolve());
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testFailIfClearFromLazyption()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', function (Options $options) {
             $options->clear();
         });
@@ -1469,50 +1389,40 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve(['default2' => 42, 'required' => 'value']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testArrayAccessGetFailsOutsideResolve()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('default', 0);
 
         $this->resolver['default'];
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testArrayAccessExistsFailsOutsideResolve()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('default', 0);
 
         isset($this->resolver['default']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testArrayAccessSetNotSupported()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver['default'] = 0;
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
     public function testArrayAccessUnsetNotSupported()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('default', 0);
 
         unset($this->resolver['default']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @expectedExceptionMessage The option "undefined" does not exist. Defined options are: "foo", "lazy".
-     */
     public function testFailIfGetNonExisting()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoSuchOptionException');
+        $this->expectExceptionMessage('The option "undefined" does not exist. Defined options are: "foo", "lazy".');
         $this->resolver->setDefault('foo', 'bar');
 
         $this->resolver->setDefault('lazy', function (Options $options) {
@@ -1522,12 +1432,10 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @expectedExceptionMessage The optional option "defined" has no value set. You should make sure it is set with "isset" before reading it.
-     */
     public function testFailIfGetDefinedButUnset()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoSuchOptionException');
+        $this->expectExceptionMessage('The optional option "defined" has no value set. You should make sure it is set with "isset" before reading it.');
         $this->resolver->setDefined('defined');
 
         $this->resolver->setDefault('lazy', function (Options $options) {
@@ -1537,11 +1445,9 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     */
     public function testFailIfCyclicDependency()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\OptionDefinitionException');
         $this->resolver->setDefault('lazy1', function (Options $options) {
             $options['lazy2'];
         });
@@ -1571,11 +1477,10 @@ class OptionsResolverTest extends TestCase
      * In resolve() we count the options that are actually set (which may be
      * only a subset of the defined options). Outside of resolve(), it's not
      * clear what is counted.
-     *
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
      */
     public function testCountFailsOutsideResolve()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\AccessException');
         $this->resolver->setDefault('foo', 0);
         $this->resolver->setRequired('bar');
         $this->resolver->setDefined('bar');
@@ -1630,12 +1535,10 @@ class OptionsResolverTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "float[][][][]", but one of the elements is of type "integer[][][][]".
-     */
     public function testNestedArraysException()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "float[][][][]", but one of the elements is of type "integer[][][][]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'float[][][][]');
 
@@ -1650,12 +1553,10 @@ class OptionsResolverTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean[][]".
-     */
     public function testNestedArrayException1()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean[][]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[][]');
         $this->resolver->resolve([
@@ -1665,12 +1566,10 @@ class OptionsResolverTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean[][]".
-     */
     public function testNestedArrayException2()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean[][]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[][]');
         $this->resolver->resolve([
@@ -1680,12 +1579,10 @@ class OptionsResolverTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "string[][]".
-     */
     public function testNestedArrayException3()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "string[][]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'string[][][]');
         $this->resolver->resolve([
@@ -1695,12 +1592,10 @@ class OptionsResolverTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "integer[][][]".
-     */
     public function testNestedArrayException4()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "integer[][][]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'string[][][]');
         $this->resolver->resolve([
@@ -1711,12 +1606,10 @@ class OptionsResolverTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "string[]", but one of the elements is of type "array[]".
-     */
     public function testNestedArrayException5()
     {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[]", but one of the elements is of type "array[]".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'string[]');
         $this->resolver->resolve([

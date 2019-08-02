@@ -12,12 +12,15 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 
 class ChainUserProviderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testLoadUserByUsername()
     {
         $provider1 = $this->getProvider();
@@ -40,11 +43,9 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->loadUserByUsername('foo'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
     public function testLoadUserByUsernameThrowsUsernameNotFoundException()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
@@ -105,11 +106,9 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UnsupportedUserException
-     */
     public function testRefreshUserThrowsUnsupportedUserException()
     {
+        $this->expectException('Symfony\Component\Security\Core\Exception\UnsupportedUserException');
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())

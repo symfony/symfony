@@ -11,12 +11,15 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Loader;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 
 class FilesystemLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testGetSourceContext()
     {
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
@@ -51,11 +54,9 @@ class FilesystemLoaderTest extends TestCase
         $this->assertTrue($loader->exists($template));
     }
 
-    /**
-     * @expectedException \Twig\Error\LoaderError
-     */
     public function testTwigErrorIfLocatorThrowsInvalid()
     {
+        $this->expectException('Twig\Error\LoaderError');
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $parser
             ->expects($this->once())
@@ -75,11 +76,9 @@ class FilesystemLoaderTest extends TestCase
         $loader->getCacheKey('name.format.engine');
     }
 
-    /**
-     * @expectedException \Twig\Error\LoaderError
-     */
     public function testTwigErrorIfLocatorReturnsFalse()
     {
+        $this->expectException('Twig\Error\LoaderError');
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $parser
             ->expects($this->once())
@@ -99,12 +98,10 @@ class FilesystemLoaderTest extends TestCase
         $loader->getCacheKey('name.format.engine');
     }
 
-    /**
-     * @expectedException \Twig\Error\LoaderError
-     * @expectedExceptionMessageRegExp /Unable to find template "name\.format\.engine" \(looked into: .*Tests.Loader.\.\..DependencyInjection.Fixtures.Resources.views\)/
-     */
     public function testTwigErrorIfTemplateDoesNotExist()
     {
+        $this->expectException('Twig\Error\LoaderError');
+        $this->expectExceptionMessageRegExp('/Unable to find template "name\.format\.engine" \(looked into: .*Tests.Loader.\.\..DependencyInjection.Fixtures.Resources.views\)/');
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
 

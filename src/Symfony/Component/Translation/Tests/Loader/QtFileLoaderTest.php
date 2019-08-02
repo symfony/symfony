@@ -31,31 +31,25 @@ class QtFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
-     */
     public function testLoadNonExistingResource()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\NotFoundResourceException');
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.ts';
         $loader->load($resource, 'en', 'domain1');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
-     */
     public function testLoadNonLocalResource()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
         $loader = new QtFileLoader();
         $resource = 'http://domain1.com/resources.ts';
         $loader->load($resource, 'en', 'domain1');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
-     */
     public function testLoadInvalidResource()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/invalid-xml-resources.xlf';
         $loader->load($resource, 'en', 'domain1');

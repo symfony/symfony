@@ -93,11 +93,9 @@ class ControllerResolverTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', $controller);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetControllerOnObjectWithoutInvokeMethod()
     {
+        $this->expectException('InvalidArgumentException');
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
@@ -233,11 +231,11 @@ class ControllerResolverTest extends TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
      * @group legacy
      */
     public function testIfExceptionIsThrownWhenMissingAnArgument()
     {
+        $this->expectException('RuntimeException');
         $resolver = new ControllerResolver();
         $request = Request::create('/');
 

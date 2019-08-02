@@ -154,10 +154,10 @@ class PhpDumperTest extends TestCase
 
     /**
      * @dataProvider provideInvalidParameters
-     * @expectedException \InvalidArgumentException
      */
     public function testExportParameters($parameters)
     {
+        $this->expectException('InvalidArgumentException');
         $container = new ContainerBuilder(new ParameterBag($parameters));
         $container->compile();
         $dumper = new PhpDumper($container);
@@ -288,11 +288,11 @@ class PhpDumperTest extends TestCase
 
     /**
      * @dataProvider provideInvalidFactories
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot dump definition
      */
     public function testInvalidFactories($factory)
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Cannot dump definition');
         $container = new ContainerBuilder();
         $def = new Definition('stdClass');
         $def->setPublic(true);
@@ -452,12 +452,10 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(__FILE__, $container->getParameter('random'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
-     * @expectedExceptionMessage Environment variables "FOO" are never used. Please, check your container's configuration.
-     */
     public function testUnusedEnvParameter()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\EnvParameterException');
+        $this->expectExceptionMessage('Environment variables "FOO" are never used. Please, check your container\'s configuration.');
         $container = new ContainerBuilder();
         $container->getParameter('env(FOO)');
         $container->compile();
@@ -465,12 +463,10 @@ class PhpDumperTest extends TestCase
         $dumper->dump();
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException
-     * @expectedExceptionMessage Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").
-     */
     public function testCircularDynamicEnv()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException');
+        $this->expectExceptionMessage('Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").');
         $container = new ContainerBuilder();
         $container->setParameter('foo', '%bar%');
         $container->setParameter('bar', '%env(resolve:DUMMY_ENV_VAR)%');

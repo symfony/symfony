@@ -12,11 +12,14 @@
 namespace Symfony\Component\DependencyInjection\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ExtensionTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     /**
      * @dataProvider getResolvedEnabledFixtures
      */
@@ -34,12 +37,10 @@ class ExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The config array has no 'enabled' key.
-     */
     public function testIsConfigEnabledOnNonEnableableConfig()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage('The config array has no \'enabled\' key.');
         $extension = new EnableableExtension();
 
         $extension->isConfigEnabled(new ContainerBuilder(), []);

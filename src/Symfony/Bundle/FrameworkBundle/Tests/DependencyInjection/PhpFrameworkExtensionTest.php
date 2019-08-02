@@ -11,23 +11,24 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 {
+    use ForwardCompatTestTrait;
+
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
         $loader->load($file.'.php');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAssetsCannotHavePathAndUrl()
     {
+        $this->expectException('LogicException');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -38,11 +39,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAssetPackageCannotHavePathAndUrl()
     {
+        $this->expectException('LogicException');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [

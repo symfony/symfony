@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -21,6 +22,8 @@ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 
 class AddConstraintValidatorsPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testThatConstraintValidatorServicesAreProcessed()
     {
         $container = new ContainerBuilder();
@@ -43,12 +46,10 @@ class AddConstraintValidatorsPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $validatorFactory->getArgument(0)));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.
-     */
     public function testAbstractConstraintValidator()
     {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.');
         $container = new ContainerBuilder();
         $container->register('validator.validator_factory')
             ->addArgument([]);

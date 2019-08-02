@@ -107,10 +107,10 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider getTestInvalidSessionName
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testInvalidSessionName($sessionName)
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $processor = new Processor();
         $processor->processConfiguration(
             new Configuration(true),
@@ -163,10 +163,10 @@ class ConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testInvalidTypeTrustedProxies()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $processor = new Processor();
         $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, [
@@ -179,10 +179,10 @@ class ConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testInvalidValueTrustedProxies()
     {
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $processor = new Processor();
         $configuration = new Configuration(true);
 

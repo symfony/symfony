@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
 
 class PasswordEncoder extends BasePasswordEncoder
@@ -27,6 +28,8 @@ class PasswordEncoder extends BasePasswordEncoder
 
 class BasePasswordEncoderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testComparePassword()
     {
         $this->assertTrue($this->invokeComparePasswords('password', 'password'));
@@ -46,11 +49,9 @@ class BasePasswordEncoderTest extends TestCase
         $this->assertEquals('password', $this->invokeMergePasswordAndSalt('password', ''));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testMergePasswordAndSaltWithException()
     {
+        $this->expectException('InvalidArgumentException');
         $this->invokeMergePasswordAndSalt('password', '{foo}');
     }
 

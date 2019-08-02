@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Finder\Tests;
 
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Finder\Finder;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testCreate()
     {
         $this->assertInstanceOf('Symfony\Component\Finder\Finder', Finder::create());
@@ -311,11 +314,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInWithNonExistentDirectory()
     {
+        $this->expectException('InvalidArgumentException');
         $finder = new Finder();
         $finder->in('foobar');
     }
@@ -328,11 +329,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures(['A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy']), $finder);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInWithNonDirectoryGlob()
     {
+        $this->expectException('InvalidArgumentException');
         $finder = new Finder();
         $finder->in(__DIR__.'/Fixtures/A/a*');
     }
@@ -349,11 +348,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures(['A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy']), $finder);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetIteratorWithoutIn()
     {
+        $this->expectException('LogicException');
         $finder = Finder::create();
         $finder->getIterator();
     }
@@ -481,11 +478,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertCount($i, $files);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testCountWithoutIn()
     {
+        $this->expectException('LogicException');
         $finder = Finder::create()->files();
         \count($finder);
     }
@@ -710,7 +705,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 $this->fail('Finder should throw an exception when opening a non-readable directory.');
             } catch (\Exception $e) {
                 $expectedExceptionClass = 'Symfony\\Component\\Finder\\Exception\\AccessDeniedException';
-                if ($e instanceof \PHPUnit_Framework_ExpectationFailedException) {
+                if ($e instanceof \PHPUnit\Framework\ExpectationFailedException) {
                     $this->fail(sprintf("Expected exception:\n%s\nGot:\n%s\nWith comparison failure:\n%s", $expectedExceptionClass, 'PHPUnit_Framework_ExpectationFailedException', $e->getComparisonFailure()->getExpectedAsString()));
                 }
 

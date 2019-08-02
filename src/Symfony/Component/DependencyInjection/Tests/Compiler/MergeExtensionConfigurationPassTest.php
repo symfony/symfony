@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
@@ -23,6 +24,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class MergeExtensionConfigurationPassTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testExpressionLanguageProviderForwarding()
     {
         $tmpProviders = [];
@@ -102,12 +105,10 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertSame(['BAZ' => 1, 'FOO' => 0], $container->getEnvCounters());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Using a cast in "env(int:FOO)" is incompatible with resolution at compile time in "Symfony\Component\DependencyInjection\Tests\Compiler\BarExtension". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.
-     */
     public function testProcessedEnvsAreIncompatibleWithResolve()
     {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Using a cast in "env(int:FOO)" is incompatible with resolution at compile time in "Symfony\Component\DependencyInjection\Tests\Compiler\BarExtension". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.');
         $container = new ContainerBuilder();
         $container->registerExtension(new BarExtension());
         $container->prependExtensionConfig('bar', []);

@@ -12,11 +12,14 @@
 namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Loader\PoFileLoader;
 
 class PoFileLoaderTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testLoad()
     {
         $loader = new PoFileLoader();
@@ -53,11 +56,9 @@ class PoFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
-     */
     public function testLoadNonExistingResource()
     {
+        $this->expectException('Symfony\Component\Translation\Exception\NotFoundResourceException');
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.po';
         $loader->load($resource, 'en', 'domain1');

@@ -12,12 +12,15 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 
 class EsiTest extends TestCase
 {
+    use ForwardCompatTestTrait;
+
     public function testHasSurrogateEsiCapability()
     {
         $esi = new Esi();
@@ -153,11 +156,9 @@ class EsiTest extends TestCase
         $this->assertEquals('<?php echo "<?"; ?>php <?php echo "<?"; ?> <?php echo "<%"; ?> <?php echo "<s"; ?>cript language=php>', $response->getContent());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testProcessWhenNoSrcInAnEsi()
     {
+        $this->expectException('RuntimeException');
         $esi = new Esi();
 
         $request = Request::create('/');
@@ -193,11 +194,9 @@ class EsiTest extends TestCase
         $this->assertEquals('foo', $esi->handle($cache, '/', '/alt', true));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testHandleWhenResponseIsNot200()
     {
+        $this->expectException('RuntimeException');
         $esi = new Esi();
         $response = new Response('foo');
         $response->setStatusCode(404);

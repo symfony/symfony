@@ -68,11 +68,9 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->serializer->serialize($arr, 'json'), 'Context should not be persistent');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     */
     public function testEncodeNotUtf8WithoutPartialOnError()
     {
+        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $arr = [
             'utf8' => 'Hello World!',
             'notUtf8' => "\xb0\xd0\xb5\xd0",

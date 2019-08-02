@@ -49,11 +49,9 @@ class PhpMatcherDumperTest extends TestCase
         @unlink($this->dumpPath);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
     {
+        $this->expectException('LogicException');
         $collection = new RouteCollection();
         $collection->add('secure', new Route(
             '/secure',

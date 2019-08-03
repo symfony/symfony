@@ -2184,7 +2184,7 @@ YAML;
             [
                 'parameters' => [
                     'abc' => implode(PHP_EOL, ['one', 'two', 'three', 'four', 'five']),
-                ]
+                ],
             ],
             $this->parser->parse($yaml)
         );

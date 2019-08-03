@@ -55,6 +55,7 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('The "propertyPath" option of the "Symfony\Component\Validator\Constraints\PositiveOrZero" constraint cannot be set.');
+
         return new PositiveOrZero(['propertyPath' => 'field']);
     }
 
@@ -62,6 +63,7 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('The "value" option of the "Symfony\Component\Validator\Constraints\PositiveOrZero" constraint cannot be set.');
+
         return new PositiveOrZero(['value' => 0]);
     }
 

@@ -13,7 +13,6 @@ namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
@@ -786,7 +785,6 @@ EOF
     }
 
     /**
-     *
      * > It is an error for two equal keys to appear in the same mapping node.
      * > In such a case the YAML processor may continue, ignoring the second
      * > "key: value" pair and issuing an appropriate warning. This strategy

@@ -53,6 +53,7 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('The "propertyPath" option of the "Symfony\Component\Validator\Constraints\NegativeOrZero" constraint cannot be set.');
+
         return new NegativeOrZero(['propertyPath' => 'field']);
     }
 
@@ -60,6 +61,7 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('The "value" option of the "Symfony\Component\Validator\Constraints\NegativeOrZero" constraint cannot be set.');
+
         return new NegativeOrZero(['value' => 0]);
     }
 

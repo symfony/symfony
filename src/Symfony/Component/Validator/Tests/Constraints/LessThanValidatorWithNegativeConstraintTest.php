@@ -53,6 +53,7 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('The "propertyPath" option of the "Symfony\Component\Validator\Constraints\Negative" constraint cannot be set.');
+
         return new Negative(['propertyPath' => 'field']);
     }
 
@@ -60,6 +61,7 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('The "value" option of the "Symfony\Component\Validator\Constraints\Negative" constraint cannot be set.');
+
         return new Negative(['value' => 0]);
     }
 

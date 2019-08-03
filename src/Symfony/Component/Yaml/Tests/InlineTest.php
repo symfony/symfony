@@ -656,7 +656,6 @@ class InlineTest extends TestCase
     }
 
     /**
-     *
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
     public function testImplicitStringCastingOfMappingKeysIsDeprecated($yaml, $expected)

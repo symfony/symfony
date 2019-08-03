@@ -12,15 +12,12 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
 class ChainEncoderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const FORMAT_1 = 'format1';
     const FORMAT_2 = 'format2';
     const FORMAT_3 = 'format3';
@@ -29,7 +26,7 @@ class ChainEncoderTest extends TestCase
     private $encoder1;
     private $encoder2;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->encoder1 = $this
             ->getMockBuilder('Symfony\Component\Serializer\Encoder\EncoderInterface')

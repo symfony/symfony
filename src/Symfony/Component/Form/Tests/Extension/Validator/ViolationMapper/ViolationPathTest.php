@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
  */
 class ViolationPathTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function providePaths()
     {
         return [

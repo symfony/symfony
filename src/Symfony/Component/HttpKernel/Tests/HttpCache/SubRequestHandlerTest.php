@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\SubRequestHandler;
@@ -20,16 +19,14 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class SubRequestHandlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private static $globalState;
 
-    private function doSetUp()
+    protected function setUp()
     {
         self::$globalState = $this->getGlobalState();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         Request::setTrustedProxies(self::$globalState[0], self::$globalState[1]);
     }

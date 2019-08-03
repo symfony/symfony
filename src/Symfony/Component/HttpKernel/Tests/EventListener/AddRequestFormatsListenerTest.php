@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener;
@@ -25,19 +24,17 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class AddRequestFormatsListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var AddRequestFormatsListener
      */
     private $listener;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->listener = new AddRequestFormatsListener(['csv' => ['text/csv', 'text/plain']]);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->listener = null;
     }

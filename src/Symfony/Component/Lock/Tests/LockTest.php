@@ -13,7 +13,6 @@ namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
@@ -24,8 +23,6 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class LockTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testAcquireNoBlocking()
     {
         $key = new Key(uniqid(__METHOD__, true));

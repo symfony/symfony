@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinderInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplatePathsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
@@ -25,8 +24,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class TemplatePathsCacheWarmerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /** @var Filesystem */
     private $filesystem;
 
@@ -41,7 +38,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
 
     private $tmpDir;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->templateFinder = $this
             ->getMockBuilder(TemplateFinderInterface::class)
@@ -62,7 +59,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
         $this->filesystem->mkdir($this->tmpDir);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->filesystem->remove($this->tmpDir);
     }

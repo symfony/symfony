@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -25,8 +24,6 @@ use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 
 class AuthenticationProviderManagerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testAuthenticateWithoutProviders()
     {
         $this->expectException('InvalidArgumentException');

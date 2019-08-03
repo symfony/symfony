@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateFilenameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -21,16 +20,14 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
  */
 class TemplateFilenameParserTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $parser;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->parser = new TemplateFilenameParser();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->parser = null;
     }

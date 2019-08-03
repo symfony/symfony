@@ -12,22 +12,19 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 class ConstraintViolationListTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $list;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->list = new ConstraintViolationList();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->list = null;
     }

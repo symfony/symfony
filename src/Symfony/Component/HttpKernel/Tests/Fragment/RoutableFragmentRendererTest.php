@@ -12,14 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 class RoutableFragmentRendererTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getGenerateFragmentUriData
      */

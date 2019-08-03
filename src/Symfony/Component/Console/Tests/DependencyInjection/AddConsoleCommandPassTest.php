@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
@@ -25,8 +24,6 @@ use Symfony\Component\DependencyInjection\TypedReference;
 
 class AddConsoleCommandPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider visibilityProvider
      */

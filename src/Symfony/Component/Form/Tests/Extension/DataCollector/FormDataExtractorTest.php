@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
@@ -28,7 +27,6 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
  */
 class FormDataExtractorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
     use VarDumperTestTrait;
 
     /**
@@ -46,7 +44,7 @@ class FormDataExtractorTest extends TestCase
      */
     private $factory;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->dataExtractor = new FormDataExtractor();
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();

@@ -13,21 +13,18 @@ namespace Symfony\Component\OptionsResolver\Tests;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OptionsResolverTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var OptionsResolver
      */
     private $resolver;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->resolver = new OptionsResolver();
     }

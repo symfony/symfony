@@ -12,14 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ExtensionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getResolvedEnabledFixtures
      */

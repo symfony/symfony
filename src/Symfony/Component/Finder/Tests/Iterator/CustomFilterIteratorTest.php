@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 
 class CustomFilterIteratorTest extends IteratorTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testWithInvalidFilter()
     {
         $this->expectException('InvalidArgumentException');

@@ -12,13 +12,10 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\IntegerNode;
 
 class IntegerNodeTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getValidValues
      */

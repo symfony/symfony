@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -19,8 +18,6 @@ use Symfony\Contracts\Service\Test\ServiceLocatorTest as BaseServiceLocatorTest;
 
 class ServiceLocatorTest extends BaseServiceLocatorTest
 {
-    use ForwardCompatTestTrait;
-
     public function getServiceLocator(array $factories)
     {
         return new ServiceLocator($factories);

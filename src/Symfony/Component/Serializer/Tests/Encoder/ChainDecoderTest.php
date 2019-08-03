@@ -12,13 +12,10 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
 
 class ChainDecoderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const FORMAT_1 = 'format1';
     const FORMAT_2 = 'format2';
     const FORMAT_3 = 'format3';
@@ -27,7 +24,7 @@ class ChainDecoderTest extends TestCase
     private $decoder1;
     private $decoder2;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->decoder1 = $this
             ->getMockBuilder('Symfony\Component\Serializer\Encoder\DecoderInterface')

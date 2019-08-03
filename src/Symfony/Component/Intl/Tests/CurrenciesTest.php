@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Currencies;
 
 /**
@@ -19,8 +18,6 @@ use Symfony\Component\Intl\Currencies;
  */
 class CurrenciesTest extends ResourceBundleTestCase
 {
-    use ForwardCompatTestTrait;
-
     // The below arrays document the state of the ICU data bundled with this package.
 
     private static $currencies = [

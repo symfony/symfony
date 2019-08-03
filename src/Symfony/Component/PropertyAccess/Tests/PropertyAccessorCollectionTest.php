@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
-
 class PropertyAccessorCollectionTest_Car
 {
     private $axes;
@@ -102,8 +100,6 @@ class PropertyAccessorCollectionTest_CarStructure
 
 abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest
 {
-    use ForwardCompatTestTrait;
-
     public function testSetValueCallsAdderAndRemoverForCollections()
     {
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth']);

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 
@@ -28,11 +27,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
  */
 class PhpBridgeSessionStorageTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $savePath;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->iniSet('session.save_handler', 'files');
         $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sftest');
@@ -41,7 +38,7 @@ class PhpBridgeSessionStorageTest extends TestCase
         }
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         session_write_close();
         array_map('unlink', glob($this->savePath.'/*'));

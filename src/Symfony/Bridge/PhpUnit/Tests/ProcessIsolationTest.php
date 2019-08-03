@@ -3,7 +3,6 @@
 namespace Symfony\Bridge\PhpUnit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * Don't remove this test case, it tests the legacy group.
@@ -14,8 +13,6 @@ use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
  */
 class ProcessIsolationTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @expectedDeprecation Test abc
      */

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
 
@@ -21,8 +20,6 @@ use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
  */
 class JsonBundleWriterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var JsonBundleWriter
      */
@@ -35,7 +32,7 @@ class JsonBundleWriterTest extends TestCase
      */
     private $filesystem;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->writer = new JsonBundleWriter();
         $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.mt_rand(1000, 9999);
@@ -44,7 +41,7 @@ class JsonBundleWriterTest extends TestCase
         $this->filesystem->mkdir($this->directory);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->filesystem->remove($this->directory);
     }

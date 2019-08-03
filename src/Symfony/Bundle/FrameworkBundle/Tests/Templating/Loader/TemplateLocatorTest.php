@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Loader;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -21,8 +20,6 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
  */
 class TemplateLocatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLocateATemplate()
     {
         $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');

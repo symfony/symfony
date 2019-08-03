@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -22,11 +21,9 @@ use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
  */
 class TemplateNameParserTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $parser;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel
@@ -43,7 +40,7 @@ class TemplateNameParserTest extends TestCase
         $this->parser = new TemplateNameParser($kernel);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->parser = null;
     }

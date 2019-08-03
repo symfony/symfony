@@ -12,13 +12,10 @@
 namespace Symfony\Component\HttpKernel\Tests\ControllerMetadata;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 class ArgumentMetadataTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testWithBcLayerWithDefault()
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value');

@@ -11,14 +11,11 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 class PredisRedisClusterAdapterTest extends AbstractRedisAdapterTest
 {
-    use ForwardCompatTestTrait;
-
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         if (!$hosts = getenv('REDIS_CLUSTER_HOSTS')) {
             self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
@@ -27,7 +24,7 @@ class PredisRedisClusterAdapterTest extends AbstractRedisAdapterTest
         self::$redis = RedisAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['class' => \Predis\Client::class, 'redis_cluster' => true]);
     }
 
-    private static function doTearDownAfterClass()
+    public static function tearDownAfterClass()
     {
         self::$redis = null;
     }

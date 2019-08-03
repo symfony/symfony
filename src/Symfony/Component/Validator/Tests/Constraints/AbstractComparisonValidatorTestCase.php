@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -42,8 +41,6 @@ class ComparisonTest_Class
  */
 abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected static function addPhp5Dot5Comparisons(array $comparisons)
     {
         $result = $comparisons;

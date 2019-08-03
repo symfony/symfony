@@ -11,15 +11,12 @@
 namespace Symfony\Component\Ldap\Tests\Adapter\ExtLdap;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Connection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\EntryManager;
 use Symfony\Component\Ldap\Entry;
 
 class EntryManagerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testMove()
     {
         $this->expectException('Symfony\Component\Ldap\Exception\LdapException');

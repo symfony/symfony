@@ -11,28 +11,25 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTypeTest extends BaseTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 
     private $defaultTimezone;
     private $defaultLocale;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->defaultTimezone = date_default_timezone_get();
         $this->defaultLocale = \Locale::getDefault();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         date_default_timezone_set($this->defaultTimezone);
         \Locale::setDefault($this->defaultLocale);

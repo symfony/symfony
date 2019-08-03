@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -23,8 +22,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\JsonSerializableDummy;
  */
 class JsonSerializableNormalizerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var JsonSerializableNormalizer
      */
@@ -35,7 +32,7 @@ class JsonSerializableNormalizerTest extends TestCase
      */
     private $serializer;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->createNormalizer();
     }
@@ -59,7 +56,7 @@ class JsonSerializableNormalizerTest extends TestCase
             ->expects($this->once())
             ->method('normalize')
             ->willReturnCallback(function ($data) {
-                $this->assertArraySubset(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $data);
+                $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], array_diff_key($data, ['qux' => '']));
 
                 return 'string_object';
             })

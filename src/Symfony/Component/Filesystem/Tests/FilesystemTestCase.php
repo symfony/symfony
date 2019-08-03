@@ -12,13 +12,10 @@
 namespace Symfony\Component\Filesystem\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Filesystem\Filesystem;
 
 class FilesystemTestCase extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $umask;
 
     protected $longPathNamesWindows = [];
@@ -43,7 +40,7 @@ class FilesystemTestCase extends TestCase
      */
     private static $symlinkOnWindows = null;
 
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             self::$linkOnWindows = true;
@@ -72,7 +69,7 @@ class FilesystemTestCase extends TestCase
         }
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
@@ -81,7 +78,7 @@ class FilesystemTestCase extends TestCase
         $this->workspace = realpath($this->workspace);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         if (!empty($this->longPathNamesWindows)) {
             foreach ($this->longPathNamesWindows as $path) {

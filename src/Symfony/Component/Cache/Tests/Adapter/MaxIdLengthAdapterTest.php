@@ -12,13 +12,10 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 class MaxIdLengthAdapterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLongKey()
     {
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -21,8 +20,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class ImageValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $context;
 
     /**
@@ -42,7 +39,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         return new ImageValidator();
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

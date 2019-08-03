@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -22,8 +21,6 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class HttpUtilsTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCreateRedirectResponseWithPath()
     {
         $utils = new HttpUtils($this->getUrlGenerator());

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
  */
 class ProcessFailedExceptionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * tests ProcessFailedException throws exception if the process was successful.
      */

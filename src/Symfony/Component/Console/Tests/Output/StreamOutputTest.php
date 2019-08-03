@@ -12,22 +12,19 @@
 namespace Symfony\Component\Console\Tests\Output;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class StreamOutputTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $stream;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->stream = fopen('php://memory', 'a', false);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->stream = null;
     }

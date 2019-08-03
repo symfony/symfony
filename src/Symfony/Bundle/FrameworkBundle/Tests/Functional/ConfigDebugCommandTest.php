@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -22,11 +21,9 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class ConfigDebugCommandTest extends AbstractWebTestCase
 {
-    use ForwardCompatTestTrait;
-
     private $application;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $kernel = static::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);

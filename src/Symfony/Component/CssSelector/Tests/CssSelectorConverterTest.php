@@ -12,13 +12,10 @@
 namespace Symfony\Component\CssSelector\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 class CssSelectorConverterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCssToXPath()
     {
         $converter = new CssSelectorConverter();

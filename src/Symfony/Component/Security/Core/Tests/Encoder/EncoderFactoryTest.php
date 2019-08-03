@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
@@ -21,8 +20,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class EncoderFactoryTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetEncoderWithMessageDigestEncoder()
     {
         $factory = new EncoderFactory(['Symfony\Component\Security\Core\User\UserInterface' => [

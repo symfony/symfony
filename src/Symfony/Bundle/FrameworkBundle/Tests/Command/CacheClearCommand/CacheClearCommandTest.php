@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture\TestAppKernel;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -24,21 +23,19 @@ use Symfony\Component\Finder\Finder;
 
 class CacheClearCommandTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /** @var TestAppKernel */
     private $kernel;
     /** @var Filesystem */
     private $fs;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->fs = new Filesystem();
         $this->kernel = new TestAppKernel('test', true);
         $this->fs->mkdir($this->kernel->getProjectDir());
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->fs->remove($this->kernel->getProjectDir());
     }

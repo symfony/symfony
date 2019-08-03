@@ -12,15 +12,12 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Ssi;
 
 class SsiTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testHasSurrogateSsiCapability()
     {
         $ssi = new Ssi();

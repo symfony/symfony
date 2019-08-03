@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -23,8 +22,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class AddSecurityVotersPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testNoVoters()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');

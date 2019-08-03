@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
@@ -27,8 +26,6 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class YamlFileLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var YamlFileLoader
      */
@@ -38,7 +35,7 @@ class YamlFileLoaderTest extends TestCase
      */
     private $metadata;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->loader = new YamlFileLoader(__DIR__.'/../../Fixtures/serialization.yml');
         $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');

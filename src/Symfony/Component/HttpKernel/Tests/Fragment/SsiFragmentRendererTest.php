@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\SsiFragmentRenderer;
@@ -21,8 +20,6 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 class SsiFragmentRendererTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRenderFallbackToInlineStrategyIfSsiNotSupported()
     {
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy(true));

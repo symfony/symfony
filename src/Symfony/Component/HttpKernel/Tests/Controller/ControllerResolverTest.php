@@ -13,14 +13,11 @@ namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 
 class ControllerResolverTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetControllerWithoutControllerParameter()
     {
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();

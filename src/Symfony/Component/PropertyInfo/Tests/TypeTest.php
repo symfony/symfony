@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class TypeTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstruct()
     {
         $type = new Type('object', true, 'ArrayObject', true, new Type('int'), new Type('string'));

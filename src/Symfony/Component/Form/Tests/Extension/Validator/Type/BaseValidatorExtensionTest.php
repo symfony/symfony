@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
@@ -21,8 +20,6 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 abstract class BaseValidatorExtensionTest extends TypeTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testValidationGroupNullByDefault()
     {
         $form = $this->createForm();

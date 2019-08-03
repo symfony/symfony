@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
@@ -23,12 +22,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class WorkflowGuardListenerPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $container;
     private $compilerPass;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->container = new ContainerBuilder();
         $this->compilerPass = new WorkflowGuardListenerPass();

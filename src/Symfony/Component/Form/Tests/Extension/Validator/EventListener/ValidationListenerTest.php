@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
@@ -33,8 +32,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidationListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var EventDispatcherInterface
      */
@@ -61,7 +58,7 @@ class ValidationListenerTest extends TestCase
 
     private $params;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();

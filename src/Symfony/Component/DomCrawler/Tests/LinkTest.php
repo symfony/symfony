@@ -12,13 +12,10 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DomCrawler\Link;
 
 class LinkTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructorWithANonATag()
     {
         $this->expectException('LogicException');

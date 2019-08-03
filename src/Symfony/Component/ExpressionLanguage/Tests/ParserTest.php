@@ -12,15 +12,12 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Node;
 use Symfony\Component\ExpressionLanguage\Parser;
 
 class ParserTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testParseWithInvalidName()
     {
         $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');

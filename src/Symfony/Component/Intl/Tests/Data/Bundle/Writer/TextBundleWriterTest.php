@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\TextBundleWriter;
 
@@ -23,8 +22,6 @@ use Symfony\Component\Intl\Data\Bundle\Writer\TextBundleWriter;
  */
 class TextBundleWriterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var TextBundleWriter
      */
@@ -37,7 +34,7 @@ class TextBundleWriterTest extends TestCase
      */
     private $filesystem;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->writer = new TextBundleWriter();
         $this->directory = sys_get_temp_dir().'/TextBundleWriterTest/'.mt_rand(1000, 9999);
@@ -46,7 +43,7 @@ class TextBundleWriterTest extends TestCase
         $this->filesystem->mkdir($this->directory);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->filesystem->remove($this->directory);
     }

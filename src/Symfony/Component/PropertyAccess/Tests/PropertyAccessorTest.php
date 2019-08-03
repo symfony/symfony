@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -32,14 +31,12 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 
 class PropertyAccessorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var PropertyAccessor
      */
     private $propertyAccessor;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->propertyAccessor = new PropertyAccessor();
     }

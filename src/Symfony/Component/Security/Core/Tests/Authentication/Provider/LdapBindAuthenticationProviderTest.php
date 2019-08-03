@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
@@ -29,8 +28,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class LdapBindAuthenticationProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testEmptyPasswordShouldThrowAnException()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');

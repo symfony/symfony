@@ -11,15 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 {
-    use ForwardCompatTestTrait;
-
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));

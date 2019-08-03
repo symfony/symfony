@@ -12,13 +12,10 @@
 namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 
 class FileLocatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getIsAbsolutePathTests
      */

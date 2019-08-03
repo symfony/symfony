@@ -12,7 +12,6 @@
 namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
@@ -20,11 +19,9 @@ use Symfony\Component\Process\ExecutableFinder;
  */
 class ExecutableFinderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $path;
 
-    private function doTearDown()
+    protected function tearDown()
     {
         if ($this->path) {
             // Restore path if it was changed.

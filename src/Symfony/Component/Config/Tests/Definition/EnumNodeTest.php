@@ -12,13 +12,10 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\EnumNode;
 
 class EnumNodeTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testFinalizeValue()
     {
         $node = new EnumNode('foo', null, ['foo', 'bar']);

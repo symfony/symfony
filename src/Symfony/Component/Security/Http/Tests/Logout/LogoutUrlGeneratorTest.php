@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Logout;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -25,14 +24,12 @@ use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
  */
 class LogoutUrlGeneratorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /** @var TokenStorage */
     private $tokenStorage;
     /** @var LogoutUrlGenerator */
     private $generator;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
         $request = $this->getMockBuilder(Request::class)->getMock();

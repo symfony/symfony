@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -20,12 +19,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DataCollectorTranslatorPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $container;
     private $dataCollectorTranslatorPass;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->container = new ContainerBuilder();
         $this->dataCollectorTranslatorPass = new DataCollectorTranslatorPass();

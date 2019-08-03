@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,8 +25,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class InlineFragmentRendererTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRender()
     {
         $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));

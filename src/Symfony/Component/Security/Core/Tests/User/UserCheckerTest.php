@@ -12,14 +12,11 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserChecker;
 
 class UserCheckerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCheckPostAuthNotAdvancedUserInterface()
     {
         $checker = new UserChecker();

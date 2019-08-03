@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Exception\AccountExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -21,8 +20,6 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class UserAuthenticationProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSupports()
     {
         $provider = $this->getProvider();

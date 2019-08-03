@@ -3,15 +3,12 @@
 namespace Symfony\Component\Workflow\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Validator\StateMachineValidator;
 
 class StateMachineValidatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testWithMultipleTransitionWithSameNameShareInput()
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');

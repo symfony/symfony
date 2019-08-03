@@ -3,7 +3,6 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
@@ -19,7 +18,6 @@ use Symfony\Component\Workflow\Workflow;
 
 class WorkflowTest extends TestCase
 {
-    use ForwardCompatTestTrait;
     use WorkflowBuilderTrait;
 
     public function testGetMarkingWithInvalidStoreReturn()

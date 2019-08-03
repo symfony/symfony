@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
@@ -22,8 +21,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructThrowsOnNonSymfonyNorPsr11Container()
     {
         $this->expectException('LogicException');

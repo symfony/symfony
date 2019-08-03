@@ -12,15 +12,12 @@
 namespace Symfony\Component\Form\Tests\ChoiceList;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class AbstractChoiceListTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var \Symfony\Component\Form\ChoiceList\ChoiceListInterface
      */
@@ -106,7 +103,7 @@ abstract class AbstractChoiceListTest extends TestCase
      */
     protected $key4;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

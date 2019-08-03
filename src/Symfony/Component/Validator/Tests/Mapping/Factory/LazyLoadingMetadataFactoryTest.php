@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Factory;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
@@ -21,8 +20,6 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
 class LazyLoadingMetadataFactoryTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const CLASS_NAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENT_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
     const INTERFACE_A_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA';

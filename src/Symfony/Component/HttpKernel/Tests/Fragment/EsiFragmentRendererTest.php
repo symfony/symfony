@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
@@ -21,8 +20,6 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 class EsiFragmentRendererTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRenderFallbackToInlineStrategyIfEsiNotSupported()
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true));

@@ -11,26 +11,23 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 abstract class AbstractWebTestCase extends BaseWebTestCase
 {
-    use ForwardCompatTestTrait;
-
     public static function assertRedirect($response, $location)
     {
         self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.$response->getStatusCode());
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         static::deleteTmpDir();
     }
 
-    private static function doTearDownAfterClass()
+    public static function tearDownAfterClass()
     {
         static::deleteTmpDir();
     }

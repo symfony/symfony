@@ -11,16 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class IntegerTypeTest extends BaseTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\IntegerType';
 
-    private function doSetUp()
+    protected function setUp()
     {
         IntlTestHelper::requireIntl($this, false);
 

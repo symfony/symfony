@@ -11,16 +11,13 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Traits\RedisProxy;
 
 class RedisAdapterTest extends AbstractRedisAdapterTest
 {
-    use ForwardCompatTestTrait;
-
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         parent::setupBeforeClass();
         self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'), ['lazy' => true]);

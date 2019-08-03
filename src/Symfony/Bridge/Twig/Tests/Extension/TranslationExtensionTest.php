@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
@@ -21,8 +20,6 @@ use Twig\Loader\ArrayLoader as TwigArrayLoader;
 
 class TranslationExtensionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testEscaping()
     {
         $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(['value' => 12, 'msg' => 'approx.']);

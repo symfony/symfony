@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -21,8 +20,6 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class AllTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRejectNonConstraints()
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');

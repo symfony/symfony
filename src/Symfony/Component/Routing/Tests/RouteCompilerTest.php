@@ -12,14 +12,11 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCompiler;
 
 class RouteCompilerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider provideCompileData
      */

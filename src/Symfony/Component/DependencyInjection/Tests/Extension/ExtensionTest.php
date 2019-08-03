@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\InvalidConfig\InvalidConfigExtension;
@@ -22,8 +21,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\ValidConfig\V
 
 class ExtensionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getResolvedEnabledFixtures
      */

@@ -12,14 +12,11 @@
 namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\GlobResource;
 
 class GlobResourceTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private function doTearDown()
+    protected function tearDown()
     {
         $dir = \dirname(__DIR__).'/Fixtures';
         @rmdir($dir.'/TmpGlob');

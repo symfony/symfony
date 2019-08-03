@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 
@@ -21,8 +20,6 @@ use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
  */
 class NumberFormatterTest extends AbstractNumberFormatterTest
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructorWithUnsupportedLocale()
     {
         $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');

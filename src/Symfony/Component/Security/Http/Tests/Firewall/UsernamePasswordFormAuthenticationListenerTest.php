@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Tests\Http\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -27,8 +26,6 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 class UsernamePasswordFormAuthenticationListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getUsernameForLength
      */

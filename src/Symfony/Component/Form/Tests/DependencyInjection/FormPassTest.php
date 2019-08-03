@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,8 +28,6 @@ use Symfony\Component\Form\FormRegistry;
  */
 class FormPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testDoNothingIfFormExtensionNotLoaded()
     {
         $container = $this->createContainerBuilder();

@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -20,8 +19,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 
 class ResolveClassPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider provideValidClassId
      */

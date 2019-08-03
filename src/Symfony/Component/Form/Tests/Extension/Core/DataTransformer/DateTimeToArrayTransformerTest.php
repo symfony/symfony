@@ -12,13 +12,10 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 
 class DateTimeToArrayTransformerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testTransform()
     {
         $transformer = new DateTimeToArrayTransformer('UTC', 'UTC');

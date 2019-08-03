@@ -12,22 +12,19 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\FormEvent;
 
 abstract class MergeCollectionListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $form;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->form = $this->getForm('axes');
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->form = null;
     }

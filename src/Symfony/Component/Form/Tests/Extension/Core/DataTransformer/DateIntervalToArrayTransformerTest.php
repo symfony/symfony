@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToArrayTransformer;
@@ -21,8 +20,6 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToArrayTra
  */
 class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testTransform()
     {
         $transformer = new DateIntervalToArrayTransformer();

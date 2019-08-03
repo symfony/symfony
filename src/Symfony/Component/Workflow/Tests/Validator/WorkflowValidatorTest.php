@@ -3,7 +3,6 @@
 namespace Symfony\Component\Workflow\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
 use Symfony\Component\Workflow\Transition;
@@ -11,7 +10,6 @@ use Symfony\Component\Workflow\Validator\WorkflowValidator;
 
 class WorkflowValidatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
     use WorkflowBuilderTrait;
 
     public function testWorkflowWithInvalidNames()

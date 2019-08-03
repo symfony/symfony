@@ -12,14 +12,11 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\Firewall\AccessListener;
 
 class AccessListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');

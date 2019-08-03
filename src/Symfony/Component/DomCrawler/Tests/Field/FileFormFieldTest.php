@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Field;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 
 class FileFormFieldTest extends FormFieldTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testInitialize()
     {
         $node = $this->createNode('input', '', ['type' => 'file']);

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
@@ -20,8 +19,6 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
  */
 class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $skippedTests = [
         'testGetItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testGetItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
@@ -33,12 +30,12 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
 
     protected static $file;
 
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$file = sys_get_temp_dir().'/symfony-cache/php-array-adapter-test.php';
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');

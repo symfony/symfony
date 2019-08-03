@@ -12,13 +12,10 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
 class MessageDigestPasswordEncoderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testIsPasswordValid()
     {
         $encoder = new MessageDigestPasswordEncoder('sha256', false, 1);

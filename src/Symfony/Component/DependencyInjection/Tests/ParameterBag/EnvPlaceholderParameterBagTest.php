@@ -12,13 +12,10 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
 class EnvPlaceholderParameterBagTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');

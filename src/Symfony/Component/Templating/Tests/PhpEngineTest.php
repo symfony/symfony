@@ -12,7 +12,6 @@
 namespace Symfony\Component\Templating\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\PhpEngine;
@@ -23,16 +22,14 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class PhpEngineTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $loader;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->loader = new ProjectTemplateLoader();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->loader = null;
     }

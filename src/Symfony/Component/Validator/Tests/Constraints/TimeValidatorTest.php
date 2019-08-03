@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class TimeValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected function createValidator()
     {
         return new TimeValidator();

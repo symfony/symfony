@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -23,8 +22,6 @@ use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     abstract protected function getLoader(ContainerBuilder $container);
 
     abstract protected function getFileExtension();

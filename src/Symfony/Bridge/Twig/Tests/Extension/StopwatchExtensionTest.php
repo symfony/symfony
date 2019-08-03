@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\StopwatchExtension;
 use Twig\Environment;
 use Twig\Error\RuntimeError;
@@ -20,8 +19,6 @@ use Twig\Loader\ArrayLoader;
 
 class StopwatchExtensionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testFailIfStoppingWrongEvent()
     {
         $this->expectException('Twig\Error\SyntaxError');

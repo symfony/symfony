@@ -12,14 +12,11 @@
 namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Loader\PoFileLoader;
 
 class PoFileLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLoad()
     {
         $loader = new PoFileLoader();

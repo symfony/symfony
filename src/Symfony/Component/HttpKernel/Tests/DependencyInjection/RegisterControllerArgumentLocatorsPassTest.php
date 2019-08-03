@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -26,8 +25,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentL
 
 class RegisterControllerArgumentLocatorsPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testInvalidClass()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');

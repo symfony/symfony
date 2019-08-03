@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Flash;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBag;
 
 /**
@@ -22,8 +21,6 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBa
  */
 class AutoExpireFlashBagTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var \Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag
      */
@@ -31,7 +28,7 @@ class AutoExpireFlashBagTest extends TestCase
 
     protected $array = [];
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->bag = new FlashBag();
@@ -39,7 +36,7 @@ class AutoExpireFlashBagTest extends TestCase
         $this->bag->initialize($this->array);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->bag = null;
         parent::tearDown();

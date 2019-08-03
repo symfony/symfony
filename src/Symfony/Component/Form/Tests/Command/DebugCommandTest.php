@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -26,8 +25,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DebugCommandTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testDebugDefaults()
     {
         $tester = $this->createCommandTester();

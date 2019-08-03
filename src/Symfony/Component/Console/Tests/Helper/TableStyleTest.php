@@ -12,13 +12,10 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Helper\TableStyle;
 
 class TableStyleTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSetPadTypeWithInvalidType()
     {
         $this->expectException('InvalidArgumentException');

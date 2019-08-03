@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -25,8 +24,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class ConfigurationTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testDefaultConfig()
     {
         $processor = new Processor();

@@ -74,6 +74,9 @@ abstract class AbstractStream
             if ($metas['timed_out']) {
                 throw new TransportException(sprintf('Connection to "%s" timed out.', $this->getReadConnectionDescription()));
             }
+            if ($metas['eof']) {
+                throw new TransportException(sprintf('Connection to "%s" has been closed unexpectedly.', $this->getReadConnectionDescription()));
+            }
         }
 
         return $line;

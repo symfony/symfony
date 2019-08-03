@@ -12,7 +12,6 @@
 namespace Symfony\Component\Debug\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -36,8 +35,6 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
  */
 class FlattenExceptionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testStatusCode()
     {
         $flattened = FlattenException::create(new \RuntimeException(), 403);

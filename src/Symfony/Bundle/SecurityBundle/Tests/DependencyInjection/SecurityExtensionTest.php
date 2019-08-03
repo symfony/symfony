@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -25,8 +24,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class SecurityExtensionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testInvalidCheckPath()
     {
         $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');

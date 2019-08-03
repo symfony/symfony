@@ -12,13 +12,10 @@
 namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\CacheItem;
 
 class CacheItemTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testValidKey()
     {
         $this->assertSame('foo', CacheItem::validateKey('foo'));

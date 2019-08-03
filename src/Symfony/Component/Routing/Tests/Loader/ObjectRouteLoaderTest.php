@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\TestObjectRouteLoader;
@@ -22,8 +21,6 @@ use Symfony\Component\Routing\Tests\Fixtures\TestObjectRouteLoader;
  */
 class ObjectRouteLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @expectedDeprecation Referencing service route loaders with a single colon is deprecated since Symfony 4.1. Use my_route_provider_service::loadRoutes instead.
      */

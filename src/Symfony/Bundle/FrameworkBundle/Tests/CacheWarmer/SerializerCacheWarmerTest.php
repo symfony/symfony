@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
@@ -22,8 +21,6 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 
 class SerializerCacheWarmerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testWarmUp()
     {
         if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {

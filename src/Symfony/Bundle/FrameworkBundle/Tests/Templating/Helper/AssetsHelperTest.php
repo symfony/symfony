@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
@@ -23,11 +22,9 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
  */
 class AssetsHelperTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $helper;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $fooPackage = new Package(new StaticVersionStrategy('42', '%s?v=%s'));
         $barPackage = new Package(new StaticVersionStrategy('22', '%s?%s'));

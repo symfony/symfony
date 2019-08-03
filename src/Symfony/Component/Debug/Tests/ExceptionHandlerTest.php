@@ -12,7 +12,6 @@
 namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -25,14 +24,12 @@ require_once __DIR__.'/HeaderMock.php';
  */
 class ExceptionHandlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         testHeader();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         testHeader();
     }

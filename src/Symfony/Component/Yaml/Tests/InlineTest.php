@@ -12,7 +12,6 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -20,9 +19,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         Inline::initialize(0, 0);
     }

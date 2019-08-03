@@ -11,14 +11,11 @@
 
 namespace Symfony\Component\Intl\Tests\DateFormatter;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructor()
     {
         $formatter = new IntlDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, 'y-M-d');

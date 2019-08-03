@@ -12,7 +12,6 @@
 namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -20,8 +19,6 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 class RegisterListenersPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * Tests that event subscribers not implementing EventSubscriberInterface
      * trigger an exception.

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\SimpleAuthenticationProvider;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
@@ -23,8 +22,6 @@ use Symfony\Component\Security\Core\User\UserChecker;
  */
 class SimpleAuthenticationProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testAuthenticateWhenPreChecksFails()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\DisabledException');

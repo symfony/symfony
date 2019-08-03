@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -24,11 +23,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 class SessionHelperTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $requestStack;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $request = new Request();
 
@@ -42,7 +39,7 @@ class SessionHelperTest extends TestCase
         $this->requestStack->push($request);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->requestStack = null;
     }

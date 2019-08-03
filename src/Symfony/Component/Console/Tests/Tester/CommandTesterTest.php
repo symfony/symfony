@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\Tester;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -25,12 +24,10 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTesterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $command;
     protected $tester;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->command = new Command('foo');
         $this->command->addArgument('command');
@@ -41,7 +38,7 @@ class CommandTesterTest extends TestCase
         $this->tester->execute(['foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->command = null;
         $this->tester = null;

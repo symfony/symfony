@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\SkippedTestError;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
@@ -21,13 +20,12 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
-    use ForwardCompatTestTrait;
     use VersionAwareTest;
 
     protected $csrfTokenManager;
     protected $testableFeatures = [];
 
-    private function doSetUp()
+    protected function setUp()
     {
         if (!\extension_loaded('intl')) {
             $this->markTestSkipped('Extension intl is required.');
@@ -47,7 +45,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         ];
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->csrfTokenManager = null;
 

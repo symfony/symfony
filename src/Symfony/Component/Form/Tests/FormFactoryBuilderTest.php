@@ -12,19 +12,16 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 
 class FormFactoryBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $registry;
     private $guesser;
     private $type;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $factory = new \ReflectionClass('Symfony\Component\Form\FormFactory');
         $this->registry = $factory->getProperty('registry');

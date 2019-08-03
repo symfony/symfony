@@ -12,13 +12,10 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Route;
 
 class RouteTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructor()
     {
         $route = new Route('/{foo}', ['foo' => 'bar'], ['foo' => '\d+'], ['foo' => 'bar'], '{locale}.example.com');

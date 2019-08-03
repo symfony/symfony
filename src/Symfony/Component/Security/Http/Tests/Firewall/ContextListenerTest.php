@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,8 +36,6 @@ use Symfony\Component\Security\Http\Firewall\ContextListener;
 
 class ContextListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testItRequiresContextKey()
     {
         $this->expectException('InvalidArgumentException');

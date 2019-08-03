@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,8 +29,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class HttpKernelTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrue()
     {
         $this->expectException('RuntimeException');

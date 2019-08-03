@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Ldap\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Query;
@@ -25,8 +24,6 @@ use Symfony\Component\Ldap\LdapInterface;
  */
 class AdapterTest extends LdapTestCase
 {
-    use ForwardCompatTestTrait;
-
     const PAGINATION_REQUIRED_CONFIG = [
         'options' => [
             'protocol_version' => 3,

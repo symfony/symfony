@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\FormConfigBuilder;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\Form\FormConfigBuilder;
  */
 class FormConfigTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function getHtml4Ids()
     {
         return [

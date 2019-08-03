@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,11 +21,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RequestHelperTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $requestStack;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->requestStack = new RequestStack();
         $request = new Request();

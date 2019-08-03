@@ -11,12 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
-
 class UrlTypeTest extends TextTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
 
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()

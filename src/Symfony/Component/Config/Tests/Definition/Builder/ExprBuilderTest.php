@@ -12,13 +12,10 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class ExprBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testAlwaysExpression()
     {
         $test = $this->getTestBuilder()

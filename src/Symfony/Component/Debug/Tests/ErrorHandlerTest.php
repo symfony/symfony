@@ -14,7 +14,6 @@ namespace Symfony\Component\Debug\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
@@ -31,8 +30,6 @@ use Symfony\Component\Debug\Tests\Fixtures\LoggerThatSetAnErrorHandler;
  */
 class ErrorHandlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRegister()
     {
         $handler = ErrorHandler::register();

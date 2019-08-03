@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
@@ -25,8 +24,6 @@ use Symfony\Component\Security\Core\User\LdapUserProvider;
  */
 class LdapUserProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLoadUserByUsernameFailsIfCantConnectToLdap()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');

@@ -12,22 +12,19 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyToLocalizedStringTransformerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $previousLocale;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->previousLocale = setlocale(LC_ALL, '0');
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         setlocale(LC_ALL, $this->previousLocale);
     }

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPass;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -25,11 +24,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CachePoolPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $cachePoolPass;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->cachePoolPass = new CachePoolPass();
     }

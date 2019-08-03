@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -30,8 +29,6 @@ use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
  */
 class UserPasswordEncoderCommandTest extends AbstractWebTestCase
 {
-    use ForwardCompatTestTrait;
-
     /** @var CommandTester */
     private $passwordEncoderCommandTester;
 
@@ -289,7 +286,7 @@ EOTXT
         ], ['interactive' => false]);
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode']);
@@ -302,7 +299,7 @@ EOTXT
         $this->passwordEncoderCommandTester = new CommandTester($passwordEncoderCommand);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->passwordEncoderCommandTester = null;
     }

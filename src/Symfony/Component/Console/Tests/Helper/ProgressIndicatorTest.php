@@ -3,7 +3,6 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\StreamOutput;
 
@@ -12,8 +11,6 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class ProgressIndicatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testDefaultIndicator()
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream());

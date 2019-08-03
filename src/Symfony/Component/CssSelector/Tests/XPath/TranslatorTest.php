@@ -12,7 +12,6 @@
 namespace Symfony\Component\CssSelector\Tests\XPath;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\CssSelector\Node\ElementNode;
 use Symfony\Component\CssSelector\Node\FunctionNode;
 use Symfony\Component\CssSelector\Parser\Parser;
@@ -22,8 +21,6 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 
 class TranslatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /** @dataProvider getXpathLiteralTestData */
     public function testXpathLiteral($value, $literal)
     {

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -28,8 +27,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SwitchUserListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $tokenStorage;
 
     private $userProvider;
@@ -42,7 +39,7 @@ class SwitchUserListenerTest extends TestCase
 
     private $event;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->tokenStorage = new TokenStorage();
         $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();

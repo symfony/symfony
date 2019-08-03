@@ -12,13 +12,10 @@
 namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 
 class JsonManifestVersionStrategyTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetVersion()
     {
         $strategy = $this->createStrategy('manifest-valid.json');

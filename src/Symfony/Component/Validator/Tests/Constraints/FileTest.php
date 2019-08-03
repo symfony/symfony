@@ -12,14 +12,11 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class FileTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider provideValidSizes
      */

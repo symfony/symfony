@@ -11,15 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ButtonTypeTest extends BaseTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ButtonType';
 
     public function testCreateButtonInstances()

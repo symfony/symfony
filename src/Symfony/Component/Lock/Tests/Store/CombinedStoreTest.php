@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
@@ -26,7 +25,6 @@ use Symfony\Component\Lock\Strategy\UnanimousStrategy;
  */
 class CombinedStoreTest extends AbstractStoreTest
 {
-    use ForwardCompatTestTrait;
     use ExpiringStoreTestTrait;
 
     /**
@@ -61,7 +59,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /** @var CombinedStore */
     private $store;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->strategy = $this->getMockBuilder(StrategyInterface::class)->getMock();
         $this->store1 = $this->createMock(BlockingStoreInterface::class);

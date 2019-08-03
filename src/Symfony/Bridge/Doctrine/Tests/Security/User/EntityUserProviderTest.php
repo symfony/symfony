@@ -16,12 +16,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class EntityUserProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testRefreshUserGetsUserByPrimaryKey()
     {
         $em = DoctrineTestHelper::createTestEntityManager();

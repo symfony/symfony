@@ -12,7 +12,6 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Translation\MessageSelector;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\Translation\MessageSelector;
  */
 class MessageSelectorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getChooseTests
      */

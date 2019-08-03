@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 
 /**
@@ -22,8 +21,6 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
  */
 class BCryptPasswordEncoderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const PASSWORD = 'password';
     const VALID_COST = '04';
 

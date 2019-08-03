@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -21,8 +20,6 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class NoTemplatingEntryTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function test()
     {
         $kernel = new NoTemplatingEntryKernel('dev', true);
@@ -33,12 +30,12 @@ class NoTemplatingEntryTest extends TestCase
         $this->assertContains('{ a: b }', $content);
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->deleteTempDir();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->deleteTempDir();
     }

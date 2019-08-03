@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
 /**
@@ -25,8 +24,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  */
 class SessionHandlerProxyTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var \PHPUnit\Framework\MockObject\Matcher
      */
@@ -37,13 +34,13 @@ class SessionHandlerProxyTest extends TestCase
      */
     private $proxy;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->mock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
         $this->proxy = new SessionHandlerProxy($this->mock);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->mock = null;
         $this->proxy = null;

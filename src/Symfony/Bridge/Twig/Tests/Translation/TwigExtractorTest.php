@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Tests\Translation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -23,8 +22,6 @@ use Twig\Loader\ArrayLoader;
 
 class TwigExtractorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getExtractData
      */

@@ -12,19 +12,16 @@
 namespace Symfony\Component\Templating\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Templating\Loader\ChainLoader;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\TemplateReference;
 
 class ChainLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $loader1;
     protected $loader2;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $fixturesPath = realpath(__DIR__.'/../Fixtures/');
         $this->loader1 = new FilesystemLoader($fixturesPath.'/null/%name%');

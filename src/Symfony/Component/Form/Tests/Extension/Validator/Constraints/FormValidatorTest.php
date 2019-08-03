@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\CallbackTransformer;
@@ -39,8 +38,6 @@ use Symfony\Component\Validator\Validation;
  */
 class FormValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var EventDispatcherInterface
      */
@@ -51,7 +48,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
      */
     private $factory;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->dispatcher = new EventDispatcher();
         $this->factory = (new FormFactoryBuilder())->getFormFactory();

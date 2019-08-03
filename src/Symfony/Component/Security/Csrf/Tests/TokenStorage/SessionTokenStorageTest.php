@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
@@ -22,8 +21,6 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
  */
 class SessionTokenStorageTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const SESSION_NAMESPACE = 'foobar';
 
     /**
@@ -36,7 +33,7 @@ class SessionTokenStorageTest extends TestCase
      */
     private $storage;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->storage = new SessionTokenStorage($this->session, self::SESSION_NAMESPACE);

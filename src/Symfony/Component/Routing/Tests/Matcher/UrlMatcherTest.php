@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Matcher;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -22,8 +21,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlMatcherTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testNoMethodSoAllowed()
     {
         $coll = new RouteCollection();

@@ -12,13 +12,10 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class MessageCatalogueTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetLocale()
     {
         $catalogue = new MessageCatalogue('en');

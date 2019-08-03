@@ -12,13 +12,10 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class PropertyPathTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testToString()
     {
         $path = new PropertyPath('reference.traversable[index].property');

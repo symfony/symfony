@@ -12,14 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\AutoAliasServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AutoAliasServicePassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testProcessWithMissingParameter()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException');

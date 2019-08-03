@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Psr\SimpleCache\CacheInterface;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\Cache\Simple\ChainCache;
@@ -24,8 +23,6 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
  */
 class ChainCacheTest extends CacheTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function createSimpleCache($defaultLifetime = 0)
     {
         return new ChainCache([new ArrayCache($defaultLifetime), new FilesystemCache('', $defaultLifetime)], $defaultLifetime);

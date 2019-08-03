@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -20,8 +19,6 @@ use Symfony\Component\Form\FormView;
 
 class FormDataCollectorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -67,7 +64,7 @@ class FormDataCollectorTest extends TestCase
      */
     private $childView;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->dataExtractor = $this->getMockBuilder('Symfony\Component\Form\Extension\DataCollector\FormDataExtractorInterface')->getMock();
         $this->dataCollector = new FormDataCollector($this->dataExtractor);

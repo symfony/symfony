@@ -11,16 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\FormError;
 
 class DateTimeTypeTest extends BaseTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
 
-    private function doSetUp()
+    protected function setUp()
     {
         \Locale::setDefault('en');
 

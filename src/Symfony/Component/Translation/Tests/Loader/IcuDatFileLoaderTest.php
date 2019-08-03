@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
 
@@ -20,8 +19,6 @@ use Symfony\Component\Translation\Loader\IcuDatFileLoader;
  */
 class IcuDatFileLoaderTest extends LocalizedTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLoadInvalidResource()
     {
         $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');

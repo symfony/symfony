@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
@@ -27,14 +26,12 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class ReflectionExtractorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var ReflectionExtractor
      */
     private $extractor;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->extractor = new ReflectionExtractor();
     }

@@ -13,7 +13,6 @@ namespace Symfony\Component\Debug\Tests\FatalErrorHandler;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Debug\DebugClassLoader;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
@@ -23,9 +22,7 @@ use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
  */
 class ClassNotFoundFatalErrorHandlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         foreach (spl_autoload_functions() as $function) {
             if (!\is_array($function)) {

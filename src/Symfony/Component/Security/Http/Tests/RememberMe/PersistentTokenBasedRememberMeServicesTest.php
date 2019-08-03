@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,9 +25,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class PersistentTokenBasedRememberMeServicesTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         try {
             random_bytes(1);

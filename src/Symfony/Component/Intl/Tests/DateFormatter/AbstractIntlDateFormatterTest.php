@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\DateFormatter;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Intl;
@@ -25,9 +24,7 @@ use Symfony\Component\Intl\Util\IcuVersion;
  */
 abstract class AbstractIntlDateFormatterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         \Locale::setDefault('en');
     }

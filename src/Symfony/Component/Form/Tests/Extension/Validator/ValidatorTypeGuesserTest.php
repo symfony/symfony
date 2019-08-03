@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
@@ -34,8 +33,6 @@ use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
  */
 class ValidatorTypeGuesserTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const TEST_CLASS = 'Symfony\Component\Form\Tests\Extension\Validator\ValidatorTypeGuesserTest_TestClass';
 
     const TEST_PROPERTY = 'property';
@@ -55,7 +52,7 @@ class ValidatorTypeGuesserTest extends TestCase
      */
     private $metadataFactory;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->metadata = new ClassMetadata(self::TEST_CLASS);
         $this->metadataFactory = new FakeMetadataFactory();

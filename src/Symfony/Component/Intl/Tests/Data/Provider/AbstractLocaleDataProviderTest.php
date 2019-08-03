@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Provider;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
 use Symfony\Component\Intl\Intl;
 
@@ -22,14 +21,12 @@ use Symfony\Component\Intl\Intl;
  */
 abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var LocaleDataProvider
      */
     protected $dataProvider;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

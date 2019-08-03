@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\FragmentListener;
@@ -21,8 +20,6 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 class FragmentListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testOnlyTriggeredOnFragmentRoute()
     {
         $request = Request::create('http://example.com/foo?_path=foo%3Dbar%26_controller%3Dfoo');

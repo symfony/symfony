@@ -12,14 +12,11 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 class ScalarNodeTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getValidValues
      */

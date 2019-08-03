@@ -12,13 +12,10 @@
 namespace Symfony\Component\Routing\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Annotation\Route;
 
 class RouteTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testInvalidRouteParameter()
     {
         $this->expectException('BadMethodCallException');

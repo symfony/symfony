@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,8 +25,6 @@ require_once __DIR__.'/../Fixtures/includes/classes.php';
 
 class ServiceLocatorTagPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testNoServices()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');

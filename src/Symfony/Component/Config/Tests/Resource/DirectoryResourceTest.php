@@ -12,16 +12,13 @@
 namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\DirectoryResource;
 
 class DirectoryResourceTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $directory;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->directory = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
@@ -30,7 +27,7 @@ class DirectoryResourceTest extends TestCase
         touch($this->directory.'/tmp.xml');
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         if (!is_dir($this->directory)) {
             return;

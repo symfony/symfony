@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\Data\Util;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Data\Util\RingBuffer;
 
 /**
@@ -20,14 +19,12 @@ use Symfony\Component\Intl\Data\Util\RingBuffer;
  */
 class RingBufferTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var RingBuffer
      */
     private $buffer;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->buffer = new RingBuffer(2);
     }

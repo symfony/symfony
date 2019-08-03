@@ -12,13 +12,10 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 
 class BooleanNodeDefinitionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCannotBeEmptyThrowsAnException()
     {
         $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');

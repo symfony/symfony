@@ -12,13 +12,10 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 
 class BooleanToStringTransformerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const TRUE_VALUE = '1';
 
     /**
@@ -26,12 +23,12 @@ class BooleanToStringTransformerTest extends TestCase
      */
     protected $transformer;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->transformer = new BooleanToStringTransformer(self::TRUE_VALUE);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->transformer = null;
     }

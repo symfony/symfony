@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by tweichart at 2019-08-02T08:06:15Z
+
+@nicolas-grekas I'm not entirely sure about the PR going into master, I just want to add the polyfills so I can start on replacing the `assertString` calls with string haystacks... which branches does this commit need to be added to or is master sufficient?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-02T16:22:21Z
+
+Thank you @tweichart
+I didn't reply because I was on #32887, which is now merged and should help move forward.
+So, now on, what I wrote in #32844:
+1. make this PR target 4.4
+2. open a PR against branch 3.4 with the fix applied, and with the `SYMFONY_PHPUNIT_BRIDGE_PR` set to the number of this very PR in `.travis.yaml`
+3. we'll merge 1. once things are validated, and you'll have to revert the change on `.travis.yaml` before we merge 2.

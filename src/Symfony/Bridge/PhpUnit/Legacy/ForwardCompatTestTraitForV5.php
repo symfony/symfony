@@ -87,7 +87,7 @@ trait ForwardCompatTestTraitForV5
     }
 
     /**
-     * @param string $originalClassName
+     * @param string|string[] $originalClassName
      *
      * @return MockObject
      */
@@ -106,7 +106,8 @@ trait ForwardCompatTestTraitForV5
     }
 
     /**
-     * @param string $originalClassName
+     * @param string|string[] $originalClassName
+     * @param string[]        $methods
      *
      * @return MockObject
      */
@@ -233,6 +234,54 @@ trait ForwardCompatTestTraitForV5
     public static function assertIsIterable($actual, $message = '')
     {
         static::assertInternalType('iterable', $actual, $message);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertFinite($actual, $message = '')
+    {
+        if (\is_callable('parent::assertFinite')) {
+            parent::assertFinite($actual, $message);
+
+            return;
+        }
+        static::assertInternalType('float', $actual, $message);
+        static::assertTrue(is_finite($actual), $message ? $message : "Failed asserting that $actual is finite.");
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertInfinite($actual, $message = '')
+    {
+        if (\is_callable('parent::assertInfinite')) {
+            parent::assertInfinite($actual, $message);
+
+            return;
+        }
+        static::assertInternalType('float', $actual, $message);
+        static::assertTrue(is_infinite($actual), $message ? $message : "Failed asserting that $actual is infinite.");
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertNan($actual, $message = '')
+    {
+        if (\is_callable('parent::assertNan')) {
+            parent::assertNan($actual, $message);
+
+            return;
+        }
+        static::assertInternalType('float', $actual, $message);
+        static::assertTrue(is_nan($actual), $message ? $message : "Failed asserting that $actual is nan.");
     }
 
     /**

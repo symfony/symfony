@@ -171,6 +171,7 @@ class ApplicationTest extends TestCase
         };
 
         $application = new Application();
+        $application->setAutoExit(false);
         $application
             ->register('test-foo')
             ->setAliases(['test'])

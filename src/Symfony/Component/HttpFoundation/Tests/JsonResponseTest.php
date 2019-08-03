@@ -12,14 +12,11 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class JsonResponseTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
@@ -24,8 +23,6 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
  */
 class SerializerPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testThrowExceptionWhenNoNormalizers()
     {
         $this->expectException('RuntimeException');

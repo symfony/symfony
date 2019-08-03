@@ -3,14 +3,11 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Transition;
 
 class DefinitionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testAddPlaces()
     {
         $places = range('a', 'e');

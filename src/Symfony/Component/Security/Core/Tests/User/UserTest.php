@@ -12,13 +12,10 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\User\User;
 
 class UserTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructorException()
     {
         $this->expectException('InvalidArgumentException');

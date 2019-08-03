@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
@@ -34,8 +33,6 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
  */
 class AutowirePassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();

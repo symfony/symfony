@@ -12,14 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 class ChildDefinitionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructor()
     {
         $def = new ChildDefinition('foo');

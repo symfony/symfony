@@ -12,7 +12,6 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
 /**
@@ -22,8 +21,6 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
  */
 class ExpressionFunctionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testFunctionDoesNotExist()
     {
         $this->expectException('InvalidArgumentException');

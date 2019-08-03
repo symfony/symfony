@@ -12,15 +12,12 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Loader\ObjectRouteLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class ObjectRouteLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLoadCallsServiceAndReturnsCollection()
     {
         $loader = new ObjectRouteLoaderForTest();

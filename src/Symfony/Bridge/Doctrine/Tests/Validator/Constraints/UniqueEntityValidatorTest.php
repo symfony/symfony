@@ -32,7 +32,6 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -40,8 +39,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     const EM_NAME = 'foo';
 
     /**
@@ -61,7 +58,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected $repositoryFactory;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->repositoryFactory = new TestRepositoryFactory();
 

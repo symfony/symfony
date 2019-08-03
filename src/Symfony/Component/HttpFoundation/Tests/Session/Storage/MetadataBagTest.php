@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
 /**
@@ -22,8 +21,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
  */
 class MetadataBagTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var MetadataBag
      */
@@ -31,7 +28,7 @@ class MetadataBagTest extends TestCase
 
     protected $array = [];
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->bag = new MetadataBag();
@@ -39,7 +36,7 @@ class MetadataBagTest extends TestCase
         $this->bag->initialize($this->array);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->array = [];
         $this->bag = null;

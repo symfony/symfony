@@ -12,15 +12,12 @@
 namespace Symfony\Component\Asset\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class UrlPackageTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getConfigs
      */

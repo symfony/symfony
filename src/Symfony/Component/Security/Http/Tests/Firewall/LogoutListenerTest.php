@@ -12,15 +12,12 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 class LogoutListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testHandleUnmatchedPath()
     {
         list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener();

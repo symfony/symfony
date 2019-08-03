@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
@@ -24,8 +23,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class MergeExtensionConfigurationPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testExpressionLanguageProviderForwarding()
     {
         $tmpProviders = [];

@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LengthValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LengthValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected function createValidator()
     {
         return new LengthValidator();

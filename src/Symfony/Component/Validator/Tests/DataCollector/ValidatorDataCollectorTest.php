@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\DataCollector\ValidatorDataCollector;
@@ -21,8 +20,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidatorDataCollectorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCollectsValidatorCalls()
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);

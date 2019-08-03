@@ -12,13 +12,10 @@
 namespace Symfony\Component\Config\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Loader\Loader;
 
 class LoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetSetResolver()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();

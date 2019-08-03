@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionAbsentBundle\ExtensionAbsentBundle;
@@ -22,8 +21,6 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Extension
 
 class BundleTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetContainerExtension()
     {
         $bundle = new ExtensionPresentBundle();

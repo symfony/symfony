@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -21,8 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class GuardAuthenticationFactoryTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getValidConfigurationTests
      */

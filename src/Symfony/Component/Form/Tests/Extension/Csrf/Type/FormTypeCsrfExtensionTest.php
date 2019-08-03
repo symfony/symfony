@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -31,8 +30,6 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 
 class FormTypeCsrfExtensionTest extends TypeTestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -43,7 +40,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
      */
     protected $translator;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->tokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
@@ -51,7 +48,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->tokenManager = null;
         $this->translator = null;

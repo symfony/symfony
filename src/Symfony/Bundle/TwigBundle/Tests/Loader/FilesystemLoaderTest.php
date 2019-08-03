@@ -11,15 +11,12 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Loader;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 
 class FilesystemLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetSourceContext()
     {
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();

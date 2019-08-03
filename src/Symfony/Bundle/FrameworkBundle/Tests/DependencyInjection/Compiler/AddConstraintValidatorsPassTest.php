@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,8 +24,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class AddConstraintValidatorsPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testThatConstraintValidatorServicesAreProcessed()
     {
         $container = new ContainerBuilder();

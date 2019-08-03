@@ -12,13 +12,10 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructor()
     {
         $crawler = new Crawler();

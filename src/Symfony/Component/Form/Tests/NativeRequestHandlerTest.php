@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\NativeRequestHandler;
 
 /**
@@ -19,16 +18,14 @@ use Symfony\Component\Form\NativeRequestHandler;
  */
 class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 {
-    use ForwardCompatTestTrait;
-
     private static $serverBackup;
 
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$serverBackup = $_SERVER;
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -41,7 +38,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         ];
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         parent::tearDown();
 

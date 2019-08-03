@@ -12,7 +12,6 @@
 namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\Process\ProcessBuilder;
  */
 class ProcessBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testInheritEnvironmentVars()
     {
         $proc = ProcessBuilder::create()

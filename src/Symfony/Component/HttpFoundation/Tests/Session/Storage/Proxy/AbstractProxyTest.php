@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
@@ -23,19 +22,17 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  */
 class AbstractProxyTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var AbstractProxy
      */
     protected $proxy;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->proxy = $this->getMockForAbstractClass(AbstractProxy::class);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->proxy = null;
     }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Bridge\PhpUnit\DnsMock;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -22,8 +21,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class EmailValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected function createValidator()
     {
         return new EmailValidator(false);

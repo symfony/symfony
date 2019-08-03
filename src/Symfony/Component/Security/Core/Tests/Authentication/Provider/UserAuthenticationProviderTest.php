@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Exception\AccountExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
@@ -22,8 +21,6 @@ use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
 class UserAuthenticationProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSupports()
     {
         $provider = $this->getProvider();

@@ -12,14 +12,11 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Cache;
 
 use Doctrine\Common\Cache\ArrayCache;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
 
 class DoctrineCacheTest extends AbstractCacheTest
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         $this->cache = new DoctrineCache(new ArrayCache());
     }

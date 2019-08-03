@@ -14,7 +14,6 @@ namespace Symfony\Component\Console\Tests\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,8 +27,6 @@ use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
  */
 class ConsoleLoggerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var DummyOutput
      */

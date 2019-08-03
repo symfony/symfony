@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -24,8 +23,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TraceableValidatorTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testValidate()
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);

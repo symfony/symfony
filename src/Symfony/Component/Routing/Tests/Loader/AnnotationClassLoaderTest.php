@@ -11,17 +11,14 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
-    use ForwardCompatTestTrait;
-
     protected $loader;
     private $reader;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

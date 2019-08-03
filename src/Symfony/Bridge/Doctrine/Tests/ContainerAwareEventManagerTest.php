@@ -13,17 +13,14 @@ namespace Symfony\Bridge\Doctrine\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $container;
     private $evm;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->container = new Container();
         $this->evm = new ContainerAwareEventManager($this->container);

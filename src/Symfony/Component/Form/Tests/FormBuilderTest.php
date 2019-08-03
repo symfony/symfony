@@ -12,27 +12,24 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\SubmitButtonBuilder;
 
 class FormBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $dispatcher;
     private $factory;
     private $builder;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->dispatcher = null;
         $this->factory = null;

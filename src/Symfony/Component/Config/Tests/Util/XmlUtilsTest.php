@@ -12,13 +12,10 @@
 namespace Symfony\Component\Config\Tests\Util;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Util\XmlUtils;
 
 class XmlUtilsTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testLoadFile()
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';

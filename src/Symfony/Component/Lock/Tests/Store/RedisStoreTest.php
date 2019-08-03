@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -20,9 +19,7 @@ use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
  */
 class RedisStoreTest extends AbstractRedisStoreTest
 {
-    use ForwardCompatTestTrait;
-
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         if (!@((new \Redis())->connect(getenv('REDIS_HOST')))) {
             $e = error_get_last();

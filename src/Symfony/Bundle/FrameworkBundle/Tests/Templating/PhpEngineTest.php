@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -24,8 +23,6 @@ use Symfony\Component\Templating\TemplateNameParser;
 
 class PhpEngineTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testEvaluateAddsAppGlobal()
     {
         $container = $this->getContainer();

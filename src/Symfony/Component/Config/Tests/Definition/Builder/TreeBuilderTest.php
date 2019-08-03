@@ -12,14 +12,11 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder as CustomNodeBuilder;
 
 class TreeBuilderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testUsingACustomNodeBuilder()
     {
         $builder = new TreeBuilder();

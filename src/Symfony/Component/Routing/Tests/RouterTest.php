@@ -12,20 +12,17 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router;
 
 class RouterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $router = null;
 
     private $loader = null;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $this->router = new Router($this->loader, 'routing.yml');

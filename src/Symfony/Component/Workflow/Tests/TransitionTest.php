@@ -3,13 +3,10 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Workflow\Transition;
 
 class TransitionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testValidateName()
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');

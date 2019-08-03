@@ -11,18 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyTypeTest extends BaseTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\MoneyType';
 
     private $defaultLocale;
 
-    private function doSetUp()
+    protected function setUp()
     {
         // we test against different locales, so we need the full
         // implementation
@@ -33,7 +30,7 @@ class MoneyTypeTest extends BaseTypeTest
         $this->defaultLocale = \Locale::getDefault();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         parent::tearDown();
 

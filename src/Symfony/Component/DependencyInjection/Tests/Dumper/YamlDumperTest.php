@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -25,11 +24,9 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlDumperTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected static $fixturesPath;
 
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }

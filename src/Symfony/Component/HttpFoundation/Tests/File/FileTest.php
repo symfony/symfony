@@ -12,14 +12,11 @@
 namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 class FileTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $file;
 
     public function testGetMimeTypeUsesMimeTypeGuessers()

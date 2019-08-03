@@ -12,7 +12,6 @@
 namespace Symfony\Component\ClassLoader\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\ClassLoader\Tests\Fixtures\DeclaredClass;
 use Symfony\Component\ClassLoader\Tests\Fixtures\WarmedClass;
@@ -27,8 +26,6 @@ require_once __DIR__.'/Fixtures/ClassesWithParents/A.php';
  */
 class ClassCollectionLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testTraitDependencies()
     {
         require_once __DIR__.'/Fixtures/deps/traits.php';

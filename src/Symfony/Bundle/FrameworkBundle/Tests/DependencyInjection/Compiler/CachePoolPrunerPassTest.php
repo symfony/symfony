@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPrunerPass;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
@@ -22,8 +21,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CachePoolPrunerPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCompilerPassReplacesCommandArgument()
     {
         $container = new ContainerBuilder();

@@ -12,13 +12,10 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Translation\Interval;
 
 class IntervalTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @dataProvider getTests
      */

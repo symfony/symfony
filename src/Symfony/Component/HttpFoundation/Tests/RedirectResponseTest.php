@@ -12,13 +12,10 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class RedirectResponseTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGenerateMetaRedirect()
     {
         $response = new RedirectResponse('foo.bar');

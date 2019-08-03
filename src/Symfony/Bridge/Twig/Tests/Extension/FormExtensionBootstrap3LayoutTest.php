@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
@@ -23,7 +22,6 @@ use Twig\Environment;
 
 class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
 {
-    use ForwardCompatTestTrait;
     use RuntimeLoaderProvider;
 
     /**
@@ -31,7 +29,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
      */
     private $renderer;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

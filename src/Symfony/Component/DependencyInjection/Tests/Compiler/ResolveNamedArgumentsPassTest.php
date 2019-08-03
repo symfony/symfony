@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -27,8 +26,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
  */
 class ResolveNamedArgumentsPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();

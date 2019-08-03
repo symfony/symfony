@@ -12,21 +12,18 @@
 namespace Symfony\Component\HttpKernel\Tests\CacheWarmer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
 class CacheWarmerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected static $cacheFile;
 
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$cacheFile = tempnam(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
     }
 
-    private static function doTearDownAfterClass()
+    public static function tearDownAfterClass()
     {
         @unlink(self::$cacheFile);
     }

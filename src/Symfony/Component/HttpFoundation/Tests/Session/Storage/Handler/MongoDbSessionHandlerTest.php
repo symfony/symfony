@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
 
 /**
@@ -22,8 +21,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
  */
 class MongoDbSessionHandlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -31,7 +28,7 @@ class MongoDbSessionHandlerTest extends TestCase
     private $storage;
     public $options;
 
-    private function doSetUp()
+    protected function setUp()
     {
         parent::setUp();
 

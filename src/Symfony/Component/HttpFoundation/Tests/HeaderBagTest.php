@@ -12,13 +12,10 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class HeaderBagTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructor()
     {
         $bag = new HeaderBag(['foo' => 'bar']);

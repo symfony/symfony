@@ -11,12 +11,9 @@
 
 namespace Symfony\Component\Intl\Tests\Locale;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class LocaleTest extends AbstractLocaleTest
 {
-    use ForwardCompatTestTrait;
-
     public function testAcceptFromHttp()
     {
         $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');

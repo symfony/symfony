@@ -12,17 +12,14 @@
 namespace Symfony\Component\Templating\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\TemplateReference;
 
 class FilesystemLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected static $fixturesPath;
 
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }

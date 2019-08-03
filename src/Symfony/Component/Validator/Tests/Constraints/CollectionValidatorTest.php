@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\CollectionValidator;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -22,8 +21,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     protected function createValidator()
     {
         return new CollectionValidator();

@@ -13,7 +13,6 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
@@ -23,14 +22,12 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class AnnotationLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var AnnotationLoader
      */
     private $loader;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->loader = new AnnotationLoader(new AnnotationReader());
     }

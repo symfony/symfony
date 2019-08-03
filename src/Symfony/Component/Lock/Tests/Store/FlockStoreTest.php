@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\FlockStore;
 
@@ -20,7 +19,6 @@ use Symfony\Component\Lock\Store\FlockStore;
  */
 class FlockStoreTest extends AbstractStoreTest
 {
-    use ForwardCompatTestTrait;
     use BlockingStoreTestTrait;
 
     /**

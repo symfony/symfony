@@ -12,13 +12,10 @@
 namespace Symfony\Component\Security\Http\Tests\Session;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 class SessionAuthenticationStrategyTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSessionIsNotChanged()
     {
         $request = $this->getRequest();

@@ -12,15 +12,12 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeAuthenticationProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSupports()
     {
         $provider = $this->getProvider();

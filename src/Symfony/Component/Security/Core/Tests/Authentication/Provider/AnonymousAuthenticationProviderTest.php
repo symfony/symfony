@@ -12,13 +12,10 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider;
 
 class AnonymousAuthenticationProviderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testSupports()
     {
         $provider = $this->getProvider('foo');

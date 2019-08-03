@@ -11,12 +11,9 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class PropertyAccessorCollectionTest_Car
 {
-    use ForwardCompatTestTrait;
-
     private $axes;
 
     public function __construct($axes = null)

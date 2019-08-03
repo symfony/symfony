@@ -12,7 +12,6 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class EventTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var \Symfony\Component\EventDispatcher\Event
      */
@@ -31,7 +28,7 @@ class EventTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    private function doSetUp()
+    protected function setUp()
     {
         $this->event = new Event();
     }
@@ -40,7 +37,7 @@ class EventTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->event = null;
     }

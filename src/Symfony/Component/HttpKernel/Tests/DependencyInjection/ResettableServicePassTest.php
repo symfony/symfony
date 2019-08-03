@@ -3,7 +3,6 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,8 +14,6 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class ResettableServicePassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCompilerPass()
     {
         $container = new ContainerBuilder();

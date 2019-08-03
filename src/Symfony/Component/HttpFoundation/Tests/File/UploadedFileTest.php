@@ -12,14 +12,11 @@
 namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadedFileTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         if (!ini_get('file_uploads')) {
             $this->markTestSkipped('file_uploads is disabled in php.ini');

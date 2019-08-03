@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
 
 /**
@@ -21,14 +20,12 @@ use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
  */
 class IntlBundleReaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var IntlBundleReader
      */
     private $reader;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->reader = new IntlBundleReader();
     }

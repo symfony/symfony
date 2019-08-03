@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\DateFormatter\Verification;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 use Symfony\Component\Intl\Tests\DateFormatter\AbstractIntlDateFormatterTest;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -24,9 +23,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
-    use ForwardCompatTestTrait;
-
-    private function doSetUp()
+    protected function setUp()
     {
         IntlTestHelper::requireFullIntl($this, false);
 

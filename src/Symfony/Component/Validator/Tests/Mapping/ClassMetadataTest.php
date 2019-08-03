@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -22,8 +21,6 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class ClassMetadataTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
     const PROVIDERCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity';
@@ -31,12 +28,12 @@ class ClassMetadataTest extends TestCase
 
     protected $metadata;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->metadata = null;
     }

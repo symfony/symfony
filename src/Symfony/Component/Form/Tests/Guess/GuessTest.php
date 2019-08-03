@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Guess;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\Guess\Guess;
 
 class TestGuess extends Guess
@@ -21,8 +20,6 @@ class TestGuess extends Guess
 
 class GuessTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetBestGuessReturnsGuessWithHighestConfidence()
     {
         $guess1 = new TestGuess(Guess::MEDIUM_CONFIDENCE);

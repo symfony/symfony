@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * @author Stepan Anchugov <kixxx1@gmail.com>
  */
 class BirthdayTypeTest extends DateTypeTest
 {
-    use ForwardCompatTestTrait;
-
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\BirthdayType';
 
     public function testSetInvalidYearsOption()

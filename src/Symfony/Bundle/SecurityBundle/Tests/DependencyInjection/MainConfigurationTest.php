@@ -12,14 +12,11 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 
 class MainConfigurationTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * The minimal, required config needed to not have any required validation
      * issues.

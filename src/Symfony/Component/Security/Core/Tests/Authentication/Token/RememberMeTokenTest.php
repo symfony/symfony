@@ -12,14 +12,11 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeTokenTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructor()
     {
         $user = $this->getUser();

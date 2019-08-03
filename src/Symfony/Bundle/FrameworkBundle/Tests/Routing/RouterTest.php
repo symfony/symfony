@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\Routing\Route;
@@ -20,8 +19,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGenerateWithServiceParam()
     {
         $routes = new RouteCollection();

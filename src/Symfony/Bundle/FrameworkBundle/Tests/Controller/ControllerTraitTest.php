@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -32,8 +31,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class ControllerTraitTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     abstract protected function createController();
 
     public function testForward()

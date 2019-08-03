@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
@@ -22,8 +21,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CheckCircularReferencesPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testProcess()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');

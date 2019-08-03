@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
@@ -29,8 +28,6 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class ResolveBindingsPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();

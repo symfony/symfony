@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Guard\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -29,8 +28,6 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
  */
 class GuardAuthenticationListenerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $authenticationManager;
     private $guardAuthenticatorHandler;
     private $event;
@@ -421,7 +418,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')
             ->disableOriginalConstructor()
@@ -446,7 +443,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $this->rememberMeServices = $this->getMockBuilder('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface')->getMock();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->authenticationManager = null;
         $this->guardAuthenticatorHandler = null;

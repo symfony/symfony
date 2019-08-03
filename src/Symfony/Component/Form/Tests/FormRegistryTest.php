@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\ResolvedFormType;
@@ -32,8 +31,6 @@ use Symfony\Component\Form\Tests\Fixtures\TestExtension;
  */
 class FormRegistryTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var FormRegistry
      */
@@ -64,7 +61,7 @@ class FormRegistryTest extends TestCase
      */
     private $extension2;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->resolvedTypeFactory = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeFactory')->getMock();
         $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();

@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 /**
  * Test class for Filesystem.
  */
 class FilesystemTest extends FilesystemTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCopyCreatesNewFile()
     {
         $sourceFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_source_file';

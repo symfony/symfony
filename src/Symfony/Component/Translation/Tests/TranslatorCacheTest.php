@@ -12,7 +12,6 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -21,17 +20,15 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorCacheTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $tmpDir;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->tmpDir = sys_get_temp_dir().'/sf2_translation';
         $this->deleteTmpDir();
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->deleteTmpDir();
     }

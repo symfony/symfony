@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Validator\Constraint;
@@ -24,8 +23,6 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class ConstraintValidatorFactoryTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetInstanceCreatesValidator()
     {
         $factory = new ConstraintValidatorFactory(new Container());

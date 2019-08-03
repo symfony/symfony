@@ -12,25 +12,22 @@
 namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 
 class FileExistenceResourceTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $resource;
     protected $file;
     protected $time;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->file = realpath(sys_get_temp_dir()).'/tmp.xml';
         $this->time = time();
         $this->resource = new FileExistenceResource($this->file);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         if (file_exists($this->file)) {
             unlink($this->file);

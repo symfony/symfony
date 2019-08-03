@@ -12,13 +12,10 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Definition;
 
 class DefinitionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructor()
     {
         $def = new Definition('stdClass');

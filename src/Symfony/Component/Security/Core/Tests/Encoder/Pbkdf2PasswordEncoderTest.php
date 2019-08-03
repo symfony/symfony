@@ -12,13 +12,10 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
 
 class Pbkdf2PasswordEncoderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testIsPasswordValid()
     {
         $encoder = new Pbkdf2PasswordEncoder('sha256', false, 1, 40);

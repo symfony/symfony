@@ -12,19 +12,16 @@
 namespace Symfony\Component\Console\Tests\Tester;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 class ApplicationTesterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected $application;
     protected $tester;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->application = new Application();
         $this->application->setAutoExit(false);
@@ -37,7 +34,7 @@ class ApplicationTesterTest extends TestCase
         $this->tester->run(['command' => 'foo', 'foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->application = null;
         $this->tester = null;

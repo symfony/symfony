@@ -12,15 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\DependencyInjection\Compiler\DefinitionErrorExceptionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 class DefinitionErrorExceptionPassTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testThrowsException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');

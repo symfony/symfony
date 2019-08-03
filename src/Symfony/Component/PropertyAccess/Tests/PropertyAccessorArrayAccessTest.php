@@ -12,20 +12,17 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 abstract class PropertyAccessorArrayAccessTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var PropertyAccessor
      */
     protected $propertyAccessor;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->propertyAccessor = new PropertyAccessor();
     }

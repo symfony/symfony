@@ -12,15 +12,12 @@
 namespace Symfony\Component\Console\Tests\CommandLoader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ContainerCommandLoaderTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testHas()
     {
         $loader = new ContainerCommandLoader(new ServiceLocator([

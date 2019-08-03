@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataMapper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
@@ -24,8 +23,6 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class PropertyPathMapperTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var PropertyPathMapper
      */
@@ -41,7 +38,7 @@ class PropertyPathMapperTest extends TestCase
      */
     private $propertyAccessor;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->dispatcher = new EventDispatcher();
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();

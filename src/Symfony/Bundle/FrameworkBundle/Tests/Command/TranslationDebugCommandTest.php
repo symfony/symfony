@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -21,8 +20,6 @@ use Symfony\Component\HttpKernel;
 
 class TranslationDebugCommandTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     private $fs;
     private $translationDir;
 
@@ -110,7 +107,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
@@ -120,7 +117,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/templates');
     }
 
-    private function doTearDown()
+    protected function tearDown()
     {
         $this->fs->remove($this->translationDir);
     }

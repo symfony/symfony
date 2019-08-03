@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -43,11 +42,9 @@ require_once __DIR__.'/../Fixtures/includes/classes.php';
 
 class PhpDumperTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected static $fixturesPath;
 
-    private static function doSetUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }

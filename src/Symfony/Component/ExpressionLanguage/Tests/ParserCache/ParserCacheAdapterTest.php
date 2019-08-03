@@ -12,7 +12,6 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheAdapter;
@@ -22,8 +21,6 @@ use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheAdapter;
  */
 class ParserCacheAdapterTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetItem()
     {
         $poolMock = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface')->getMock();

@@ -11,15 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class CachePoolsTest extends AbstractWebTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testCachePools()
     {
         $this->doTestCachePools([], AdapterInterface::class);

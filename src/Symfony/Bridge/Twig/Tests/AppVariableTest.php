@@ -3,7 +3,6 @@
 namespace Symfony\Bridge\Twig\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
@@ -11,14 +10,12 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class AppVariableTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var AppVariable
      */
     protected $appVariable;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->appVariable = new AppVariable();
     }

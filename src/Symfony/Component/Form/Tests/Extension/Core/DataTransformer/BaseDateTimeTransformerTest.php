@@ -12,12 +12,9 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 
 class BaseDateTimeTransformerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testConstructFailsIfInputTimezoneIsInvalid()
     {
         $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');

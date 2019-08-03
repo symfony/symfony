@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -24,8 +23,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 {
-    use ForwardCompatTestTrait;
-
     const PASSWORD = 's3Cr3t';
     const SALT = '^S4lt$';
 
@@ -49,7 +46,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         return new UserPasswordValidator($this->tokenStorage, $this->encoderFactory);
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         $user = $this->createUser();
         $this->tokenStorage = $this->createTokenStorage($user);

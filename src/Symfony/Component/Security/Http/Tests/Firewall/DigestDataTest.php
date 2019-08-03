@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Security\Http\Firewall\DigestData;
 
 /**
@@ -20,8 +19,6 @@ use Symfony\Component\Security\Http\Firewall\DigestData;
  */
 class DigestDataTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testGetResponse()
     {
         $digestAuth = new DigestData(
@@ -166,7 +163,7 @@ class DigestDataTest extends TestCase
         $this->assertFalse($digestAuth->isNonceExpired());
     }
 
-    private function doSetUp()
+    protected function setUp()
     {
         class_exists('Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener', true);
     }

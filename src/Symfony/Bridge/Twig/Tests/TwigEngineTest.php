@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\TwigEngine;
 use Symfony\Component\Templating\TemplateReference;
 use Twig\Environment;
@@ -20,8 +19,6 @@ use Twig\Loader\ArrayLoader;
 
 class TwigEngineTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testExistsWithTemplateInstances()
     {
         $engine = $this->getTwig();

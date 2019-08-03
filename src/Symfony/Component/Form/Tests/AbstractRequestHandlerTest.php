@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Form;
@@ -27,8 +26,6 @@ use Symfony\Component\Form\RequestHandlerInterface;
  */
 abstract class AbstractRequestHandlerTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var RequestHandlerInterface
      */
@@ -43,7 +40,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected $serverParams;
 
-    private function doSetUp()
+    protected function setUp()
     {
         $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Util\ServerParams')->setMethods(['getNormalizedIniPostMaxSize', 'getContentLength'])->getMock();
         $this->requestHandler = $this->getRequestHandler();

@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +22,6 @@ use Twig\Loader\ArrayLoader;
 
 class HttpKernelExtensionTest extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testFragmentWithError()
     {
         $this->expectException('Twig\Error\RuntimeError');

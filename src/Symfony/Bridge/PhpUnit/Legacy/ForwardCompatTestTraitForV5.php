@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
+use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -51,33 +52,21 @@ trait ForwardCompatTestTraitForV5
         self::doTearDown();
     }
 
-    /**
-     * @return void
-     */
     private static function doSetUpBeforeClass()
     {
         parent::setUpBeforeClass();
     }
 
-    /**
-     * @return void
-     */
     private static function doTearDownAfterClass()
     {
         parent::tearDownAfterClass();
     }
 
-    /**
-     * @return void
-     */
     private function doSetUp()
     {
         parent::setUp();
     }
 
-    /**
-     * @return void
-     */
     private function doTearDown()
     {
         parent::tearDown();
@@ -234,6 +223,32 @@ trait ForwardCompatTestTraitForV5
     }
 
     /**
+     * @param string $needle
+     * @param string $haystack
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertStringContainsString($needle, $haystack, $message = '')
+    {
+        $constraint = new StringContains($needle, false);
+        static::assertThat($haystack, $constraint, $message);
+    }
+
+    /**
+     * @param string $needle
+     * @param string $haystack
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertStringContainsStringIgnoringCase($needle, $haystack, $message = '')
+    {
+        $constraint = new StringContains($needle, true);
+        static::assertThat($haystack, $constraint, $message);
+    }
+
+    /**
      * @param string $message
      *
      * @return void
@@ -303,6 +318,8 @@ trait ForwardCompatTestTraitForV5
     }
 
     /**
+     * @param int|string $code
+     *
      * @return void
      */
     public function expectExceptionCode($code)
@@ -315,7 +332,7 @@ trait ForwardCompatTestTraitForV5
 
         $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionCode');
         $property->setAccessible(true);
-        $property->setValue($this, $exception);
+        $property->setValue($this, $code);
     }
 
     /**
@@ -333,7 +350,7 @@ trait ForwardCompatTestTraitForV5
 
         $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessage');
         $property->setAccessible(true);
-        $property->setValue($this, $exception);
+        $property->setValue($this, $message);
     }
 
     /**
@@ -351,6 +368,6 @@ trait ForwardCompatTestTraitForV5
 
         $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessageRegExp');
         $property->setAccessible(true);
-        $property->setValue($this, $exception);
+        $property->setValue($this, $messageRegExp);
     }
 }

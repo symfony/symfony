@@ -553,6 +553,10 @@ class FrameworkExtension extends Extension
             $loader->load('messenger_debug.xml');
         }
 
+        if (class_exists(Mailer::class)) {
+            $loader->load('mailer_debug.xml');
+        }
+
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 

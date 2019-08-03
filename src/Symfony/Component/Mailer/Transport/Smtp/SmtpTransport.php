@@ -161,8 +161,11 @@ class SmtpTransport extends AbstractTransport
             }
             $this->stream->flush();
             $this->executeCommand("\r\n.\r\n", [250]);
-        } finally {
             $message->appendDebug($this->stream->getDebug());
+        } catch (TransportExceptionInterface $e) {
+            $e->appendDebug($this->stream->getDebug());
+
+            throw $e;
         }
     }
 

@@ -571,7 +571,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a callable.
      *
-     * @param string|array $callable  A callable reference
+     * @param string|array $callable A callable reference
      *
      * @throws InvalidArgumentException When errors occur
      *

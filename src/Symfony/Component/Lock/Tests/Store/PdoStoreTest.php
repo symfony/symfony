@@ -69,6 +69,7 @@ class PdoStoreTest extends AbstractStoreTest
     public function testInvalidTtlConstruct()
     {
         $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
+
         return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0.1);
     }
 }

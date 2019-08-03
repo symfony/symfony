@@ -1,5 +1,5 @@
 <table class="logs" data-filter-level="Emergency,Alert,Critical,Error,Warning,Notice,Info,Debug" data-filters>
-<?php $channelIsDefined = isset($logs[0]['channel']) ?>
+<?php $channelIsDefined = isset($logs[0]['channel']); ?>
     <thead>
         <tr>
             <th data-filter="level">Level</th>
@@ -19,20 +19,20 @@
             $severity = $log['context']['exception']['severity'] ?? false;
             $status = E_DEPRECATED === $severity || E_USER_DEPRECATED === $severity ? 'warning' : 'normal';
         } ?>
-        <tr class="status-<?= $status ?>" data-filter-level="<?= strtolower($this->escape($log['priorityName'])) ?>"<?php if ($channelIsDefined) { ?> data-filter-channel="<?= $this->escape($log['channel']) ?>"<?php } ?>
+        <tr class="status-<?= $status; ?>" data-filter-level="<?= strtolower($this->escape($log['priorityName'])); ?>"<?php if ($channelIsDefined) { ?> data-filter-channel="<?= $this->escape($log['channel']); ?>"<?php } ?>
             <td class="text-small" nowrap>
-                <span class="colored text-bold"><?= $this->escape($log['priorityName']) ?></span>
-                <span class="text-muted newline"><?= (new \DateTime($log['timestamp']))->format('H:i:s') ?></span>
+                <span class="colored text-bold"><?= $this->escape($log['priorityName']); ?></span>
+                <span class="text-muted newline"><?= (new \DateTime($log['timestamp']))->format('H:i:s'); ?></span>
             </td>
             <?php if ($channelIsDefined) { ?>
             <td class="text-small text-bold nowrap">
-                <?= $this->escape($log['channel']) ?>
+                <?= $this->escape($log['channel']); ?>
             </td>
             <?php } ?>
             <td>
-                <?= $this->formatLogMessage($log['message'], $log['context']) ?>
+                <?= $this->formatLogMessage($log['message'], $log['context']); ?>
                 <?php if ($log['context']) { ?>
-                <pre class="text-muted prewrap m-t-5"><?= json_encode($log['context'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></pre>
+                <pre class="text-muted prewrap m-t-5"><?= json_encode($log['context'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?></pre>
                 <?php } ?>
             </td>
         </tr>

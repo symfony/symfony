@@ -53,6 +53,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('The "propertyPath" option of the "Symfony\Component\Validator\Constraints\Positive" constraint cannot be set.');
+
         return new Positive(['propertyPath' => 'field']);
     }
 
@@ -60,6 +61,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     {
         $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
         $this->expectExceptionMessage('The "value" option of the "Symfony\Component\Validator\Constraints\Positive" constraint cannot be set.');
+
         return new Positive(['value' => 0]);
     }
 

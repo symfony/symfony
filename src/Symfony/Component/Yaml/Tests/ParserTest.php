@@ -2189,6 +2189,28 @@ YAML;
             $this->parser->parse($yaml)
         );
     }
+
+    public function testParseValueWithNegativeModifiers()
+    {
+        $yaml = <<<YAML
+parameters:
+    abc: |-3 # minus
+       one
+       two
+       three
+       four
+       five
+YAML;
+
+        $this->assertSame(
+            [
+                'parameters' => [
+                    'abc' => implode(PHP_EOL, ['one', 'two', 'three', 'four', 'five']),
+                ],
+            ],
+            $this->parser->parse($yaml)
+        );
+    }
 }
 
 class B

@@ -2183,7 +2183,7 @@ YAML;
         $this->assertSame(
             [
                 'parameters' => [
-                    'abc' => implode(PHP_EOL, ['one', 'two', 'three', 'four', 'five']),
+                    'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
                 ],
             ],
             $this->parser->parse($yaml)
@@ -2205,7 +2205,7 @@ YAML;
         $this->assertSame(
             [
                 'parameters' => [
-                    'abc' => implode(PHP_EOL, ['one', 'two', 'three', 'four', 'five']),
+                    'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
                 ],
             ],
             $this->parser->parse($yaml)

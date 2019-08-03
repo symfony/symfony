@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

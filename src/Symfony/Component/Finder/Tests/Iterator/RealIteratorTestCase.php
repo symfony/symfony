@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
-
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
     protected static $tmpDir;

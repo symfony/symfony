@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
-
 /**
  * Test class for Filesystem.
  */

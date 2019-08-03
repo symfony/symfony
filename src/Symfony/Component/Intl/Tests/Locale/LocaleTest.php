@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\Locale;
 
-
 class LocaleTest extends AbstractLocaleTest
 {
     public function testAcceptFromHttp()

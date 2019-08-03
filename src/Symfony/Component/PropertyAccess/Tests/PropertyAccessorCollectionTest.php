@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-
 class PropertyAccessorCollectionTest_Car
 {
     private $axes;

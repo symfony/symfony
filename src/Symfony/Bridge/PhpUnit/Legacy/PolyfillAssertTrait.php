@@ -15,106 +15,12 @@ use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\Constraint\TraversableContains;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  */
-trait ForwardCompatTestTraitForV5
+trait PolyfillAssertTrait
 {
-    /**
-     * @return void
-     */
-    public static function setUpBeforeClass()
-    {
-        self::doSetUpBeforeClass();
-    }
-
-    /**
-     * @return void
-     */
-    public static function tearDownAfterClass()
-    {
-        self::doTearDownAfterClass();
-    }
-
-    /**
-     * @return void
-     */
-    protected function setUp()
-    {
-        self::doSetUp();
-    }
-
-    /**
-     * @return void
-     */
-    protected function tearDown()
-    {
-        self::doTearDown();
-    }
-
-    private static function doSetUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-    }
-
-    private static function doTearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-    }
-
-    private function doSetUp()
-    {
-        parent::setUp();
-    }
-
-    private function doTearDown()
-    {
-        parent::tearDown();
-    }
-
-    /**
-     * @param string|string[] $originalClassName
-     *
-     * @return MockObject
-     */
-    protected function createMock($originalClassName)
-    {
-        $mock = $this->getMockBuilder($originalClassName)
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->disableArgumentCloning();
-
-        if (method_exists($mock, 'disallowMockingUnknownTypes')) {
-            $mock = $mock->disallowMockingUnknownTypes();
-        }
-
-        return $mock->getMock();
-    }
-
-    /**
-     * @param string|string[] $originalClassName
-     * @param string[]        $methods
-     *
-     * @return MockObject
-     */
-    protected function createPartialMock($originalClassName, array $methods)
-    {
-        $mock = $this->getMockBuilder($originalClassName)
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->setMethods(empty($methods) ? null : $methods);
-
-        if (method_exists($mock, 'disallowMockingUnknownTypes')) {
-            $mock = $mock->disallowMockingUnknownTypes();
-        }
-
-        return $mock->getMock();
-    }
-
     /**
      * @param float  $delta
      * @param string $message
@@ -320,12 +226,6 @@ trait ForwardCompatTestTraitForV5
      */
     public static function assertFinite($actual, $message = '')
     {
-        if (method_exists(TestCase::class, 'assertFinite')) {
-            parent::assertFinite($actual, $message);
-
-            return;
-        }
-
         static::assertInternalType('float', $actual, $message);
         static::assertTrue(is_finite($actual), $message ? $message : "Failed asserting that $actual is finite.");
     }
@@ -337,12 +237,6 @@ trait ForwardCompatTestTraitForV5
      */
     public static function assertInfinite($actual, $message = '')
     {
-        if (method_exists(TestCase::class, 'assertInfinite')) {
-            parent::assertInfinite($actual, $message);
-
-            return;
-        }
-
         static::assertInternalType('float', $actual, $message);
         static::assertTrue(is_infinite($actual), $message ? $message : "Failed asserting that $actual is infinite.");
     }
@@ -354,85 +248,7 @@ trait ForwardCompatTestTraitForV5
      */
     public static function assertNan($actual, $message = '')
     {
-        if (method_exists(TestCase::class, 'assertNan')) {
-            parent::assertNan($actual, $message);
-
-            return;
-        }
-
         static::assertInternalType('float', $actual, $message);
         static::assertTrue(is_nan($actual), $message ? $message : "Failed asserting that $actual is nan.");
-    }
-
-    /**
-     * @param string $exception
-     *
-     * @return void
-     */
-    public function expectException($exception)
-    {
-        if (method_exists(TestCase::class, 'expectException')) {
-            parent::expectException($exception);
-
-            return;
-        }
-
-        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedException');
-        $property->setAccessible(true);
-        $property->setValue($this, $exception);
-    }
-
-    /**
-     * @param int|string $code
-     *
-     * @return void
-     */
-    public function expectExceptionCode($code)
-    {
-        if (method_exists(TestCase::class, 'expectExceptionCode')) {
-            parent::expectExceptionCode($code);
-
-            return;
-        }
-
-        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionCode');
-        $property->setAccessible(true);
-        $property->setValue($this, $code);
-    }
-
-    /**
-     * @param string $message
-     *
-     * @return void
-     */
-    public function expectExceptionMessage($message)
-    {
-        if (method_exists(TestCase::class, 'expectExceptionMessage')) {
-            parent::expectExceptionMessage($message);
-
-            return;
-        }
-
-        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessage');
-        $property->setAccessible(true);
-        $property->setValue($this, $message);
-    }
-
-    /**
-     * @param string $messageRegExp
-     *
-     * @return void
-     */
-    public function expectExceptionMessageRegExp($messageRegExp)
-    {
-        if (method_exists(TestCase::class, 'expectExceptionMessageRegExp')) {
-            parent::expectExceptionMessageRegExp($messageRegExp);
-
-            return;
-        }
-
-        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessageRegExp');
-        $property->setAccessible(true);
-        $property->setValue($this, $messageRegExp);
     }
 }

@@ -14,22 +14,15 @@ namespace Symfony\Bridge\PhpUnit;
 use PHPUnit\Framework\TestCase;
 
 // A trait to provide forward compatibility with newest PHPUnit versions
-
 $r = new \ReflectionClass(TestCase::class);
-
-if (\PHP_VERSION_ID < 70000 || !$r->hasMethod('createMock') || !$r->getMethod('createMock')->hasReturnType()) {
-    trait ForwardCompatTestTrait
+if (\PHP_VERSION_ID < 70000 || !$r->getMethod('setUp')->hasReturnType()) {
+    trait SetUpTearDownTrait
     {
-        use Legacy\ForwardCompatTestTraitForV5;
-    }
-} elseif ($r->getMethod('tearDown')->hasReturnType()) {
-    trait ForwardCompatTestTrait
-    {
-        use Legacy\ForwardCompatTestTraitForV8;
+        use Legacy\SetUpTearDownTraitForV5;
     }
 } else {
-    trait ForwardCompatTestTrait
+    trait SetUpTearDownTrait
     {
-        use Legacy\ForwardCompatTestTraitForV7;
+        use Legacy\SetUpTearDownTraitForV8;
     }
 }

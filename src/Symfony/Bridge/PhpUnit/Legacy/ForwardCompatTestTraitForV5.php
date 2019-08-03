@@ -315,7 +315,7 @@ trait ForwardCompatTestTraitForV5
 
         $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionCode');
         $property->setAccessible(true);
-        $property->setValue($this, $exception);
+        $property->setValue($this, $code);
     }
 
     /**
@@ -333,7 +333,7 @@ trait ForwardCompatTestTraitForV5
 
         $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessage');
         $property->setAccessible(true);
-        $property->setValue($this, $exception);
+        $property->setValue($this, $message);
     }
 
     /**
@@ -351,6 +351,6 @@ trait ForwardCompatTestTraitForV5
 
         $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessageRegExp');
         $property->setAccessible(true);
-        $property->setValue($this, $exception);
+        $property->setValue($this, $messageRegExp);
     }
 }

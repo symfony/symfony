@@ -1043,7 +1043,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class $class extends $baseClass
 {
-    private \$parameters;
+    private \$parameters = [];
     private \$targetDirs = [];
 
     public function __construct()

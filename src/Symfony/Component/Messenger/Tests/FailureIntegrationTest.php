@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
@@ -27,7 +28,7 @@ use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
-use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -37,7 +38,7 @@ use Symfony\Component\Messenger\Worker;
 
 class FailureIntegrationTest extends TestCase
 {
-    public function testRequeMechanism()
+    public function testRequeueMechanism()
     {
         $transport1 = new DummyFailureTestSenderAndReceiver();
         $transport2 = new DummyFailureTestSenderAndReceiver();
@@ -96,6 +97,7 @@ class FailureIntegrationTest extends TestCase
             new SendMessageMiddleware($senderLocator),
             new HandleMessageMiddleware($handlerLocator),
         ]);
+        $dispatcher->addSubscriber(new AddErrorDetailsStampListener());
         $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
         $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener($failureTransport));
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
@@ -156,10 +158,10 @@ class FailureIntegrationTest extends TestCase
         /** @var SentToFailureTransportStamp $sentToFailureStamp */
         $sentToFailureStamp = $failedEnvelope->last(SentToFailureTransportStamp::class);
         $this->assertNotNull($sentToFailureStamp);
-        /** @var RedeliveryStamp $redeliveryStamp */
-        $redeliveryStamp = $failedEnvelope->last(RedeliveryStamp::class);
-        $this->assertNotNull($redeliveryStamp);
-        $this->assertSame('Failure from call 2', $redeliveryStamp->getExceptionMessage());
+        /** @var ErrorDetailsStamp $errorDetailsStamp */
+        $errorDetailsStamp = $failedEnvelope->last(ErrorDetailsStamp::class);
+        $this->assertNotNull($errorDetailsStamp);
+        $this->assertSame('Failure from call 2', $errorDetailsStamp->getExceptionMessage());
 
         /*
          * Failed message is handled, fails, and sent for a retry

@@ -76,6 +76,10 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertEmpty(iterator_to_array($receiver->get()));
     }
 
+    /**
+     * @group legacy
+     * ^ for now, deprecation errors are thrown during serialization.
+     */
     public function testRetryAndDelay()
     {
         $serializer = $this->createSerializer();

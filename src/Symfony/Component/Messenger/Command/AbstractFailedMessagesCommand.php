@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -61,7 +62,11 @@ abstract class AbstractFailedMessagesCommand extends Command
 
         /** @var SentToFailureTransportStamp|null $sentToFailureTransportStamp */
         $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
-        $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope);
+        /** @var RedeliveryStamp|null $lastRedeliveryStamp */
+        $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
+        /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
+        $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
+        $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
 
         $rows = [
             ['Class', \get_class($envelope->getMessage())],
@@ -71,14 +76,35 @@ abstract class AbstractFailedMessagesCommand extends Command
             $rows[] = ['Message Id', $id];
         }
 
-        $flattenException = null === $lastRedeliveryStampWithException ? null : $lastRedeliveryStampWithException->getFlattenException();
         if (null === $sentToFailureTransportStamp) {
             $io->warning('Message does not appear to have been sent to this transport after failing');
         } else {
+            $failedAt = '';
+            $errorMessage = '';
+            $errorCode = '';
+            $errorClass = '(unknown)';
+
+            if (null !== $lastRedeliveryStamp) {
+                $failedAt = $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s');
+            }
+
+            if (null !== $lastErrorDetailsStamp) {
+                $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
+                $errorCode = $lastErrorDetailsStamp->getExceptionCode();
+                $errorClass = $lastErrorDetailsStamp->getExceptionClass();
+            } elseif (null !== $lastRedeliveryStampWithException) {
+                // Try reading the errorMessage for messages that are still in the queue without the new ErrorDetailStamps.
+                $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
+                if (null !== $lastRedeliveryStampWithException->getFlattenException()) {
+                    $errorClass = $lastRedeliveryStampWithException->getFlattenException()->getClass();
+                }
+            }
+
             $rows = array_merge($rows, [
-                ['Failed at', null === $lastRedeliveryStampWithException ? '' : $lastRedeliveryStampWithException->getRedeliveredAt()->format('Y-m-d H:i:s')],
-                ['Error', null === $lastRedeliveryStampWithException ? '' : $lastRedeliveryStampWithException->getExceptionMessage()],
-                ['Error Class', null === $flattenException ? '(unknown)' : $flattenException->getClass()],
+                ['Failed at', $failedAt],
+                ['Error', $errorMessage],
+                ['Error Code', $errorCode],
+                ['Error Class', $errorClass],
                 ['Transport', $sentToFailureTransportStamp->getOriginalReceiverName()],
             ]);
         }
@@ -98,6 +124,12 @@ abstract class AbstractFailedMessagesCommand extends Command
             $dump = new Dumper($io);
             $io->writeln($dump($envelope->getMessage()));
             $io->title('Exception:');
+            $flattenException = null;
+            if (null !== $lastErrorDetailsStamp) {
+                $flattenException = $lastErrorDetailsStamp->getFlattenException();
+            } elseif (null !== $lastRedeliveryStampWithException) {
+                $flattenException = $lastRedeliveryStampWithException->getFlattenException();
+            }
             $io->writeln(null === $flattenException ? '(no data)' : $flattenException->getTraceAsString());
         } else {
             $io->writeln(' Re-run command with <info>-vv</info> to see more message & error details.');
@@ -122,6 +154,23 @@ abstract class AbstractFailedMessagesCommand extends Command
 
     protected function getLastRedeliveryStampWithException(Envelope $envelope): ?RedeliveryStamp
     {
+        if (null === \func_get_args()[1]) {
+            trigger_deprecation(
+                'symfony/messenger',
+                '5.2',
+                sprintf(
+                    'Using the "getLastRedeliveryStampWithException" method in the "%s" class is deprecated, use the "Envelope::last(%s)" instead.',
+                    self::class,
+                    ErrorDetailsStamp::class
+                )
+            );
+        }
+
+        // Use ErrorDetailsStamp instead if it is available
+        if (null !== $envelope->last(ErrorDetailsStamp::class)) {
+            return null;
+        }
+
         /** @var RedeliveryStamp $stamp */
         foreach (array_reverse($envelope->all(RedeliveryStamp::class)) as $stamp) {
             if (null !== $stamp->getExceptionMessage()) {

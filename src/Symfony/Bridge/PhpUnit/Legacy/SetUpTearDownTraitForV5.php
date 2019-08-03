@@ -14,44 +14,56 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 /**
  * @internal
  */
-trait ForwardCompatTestTraitForV8
+trait SetUpTearDownTraitForV5
 {
-    public static function setUpBeforeClass(): void
+    /**
+     * @return void
+     */
+    public static function setUpBeforeClass()
     {
         self::doSetUpBeforeClass();
     }
 
-    public static function tearDownAfterClass(): void
+    /**
+     * @return void
+     */
+    public static function tearDownAfterClass()
     {
         self::doTearDownAfterClass();
     }
 
-    protected function setUp(): void
+    /**
+     * @return void
+     */
+    protected function setUp()
     {
         self::doSetUp();
     }
 
-    protected function tearDown(): void
+    /**
+     * @return void
+     */
+    protected function tearDown()
     {
         self::doTearDown();
     }
 
-    private static function doSetUpBeforeClass(): void
+    private static function doSetUpBeforeClass()
     {
         parent::setUpBeforeClass();
     }
 
-    private static function doTearDownAfterClass(): void
+    private static function doTearDownAfterClass()
     {
         parent::tearDownAfterClass();
     }
 
-    private function doSetUp(): void
+    private function doSetUp()
     {
         parent::setUp();
     }
 
-    private function doTearDown(): void
+    private function doTearDown()
     {
         parent::tearDown();
     }

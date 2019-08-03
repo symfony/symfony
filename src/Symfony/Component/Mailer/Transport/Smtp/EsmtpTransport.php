@@ -38,10 +38,10 @@ class EsmtpTransport extends SmtpTransport
         parent::__construct(null, $dispatcher, $logger);
 
         $this->authenticators = [
-            new Auth\PlainAuthenticator(),
-            new Auth\LoginAuthenticator(),
-            new Auth\XOAuth2Authenticator(),
             new Auth\CramMd5Authenticator(),
+            new Auth\LoginAuthenticator(),
+            new Auth\PlainAuthenticator(),
+            new Auth\XOAuth2Authenticator(),
         ];
 
         /** @var SocketStream $stream */

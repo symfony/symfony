@@ -2198,6 +2198,4 @@ class B
     const FOO = 'foo';
     const BAR = 'bar';
     const BAZ = 'baz';
-
-    const DELTA = 3;
 }

@@ -55,15 +55,15 @@ class ContainerParametersResourceCheckerTest extends TestCase
 
     public function isFreshProvider()
     {
-        yield 'not fresh on missing parameter' => [function (\PHPUnit_Framework_MockObject_MockObject $container) {
+        yield 'not fresh on missing parameter' => [function (\PHPUnit\Framework\MockObject\MockObject $container) {
             $container->method('hasParameter')->with('locales')->willReturn(false);
         }, false];
 
-        yield 'not fresh on different value' => [function (\PHPUnit_Framework_MockObject_MockObject $container) {
+        yield 'not fresh on different value' => [function (\PHPUnit\Framework\MockObject\MockObject $container) {
             $container->method('getParameter')->with('locales')->willReturn(['nl', 'es']);
         }, false];
 
-        yield 'fresh on every identical parameters' => [function (\PHPUnit_Framework_MockObject_MockObject $container) {
+        yield 'fresh on every identical parameters' => [function (\PHPUnit\Framework\MockObject\MockObject $container) {
             $container->expects($this->exactly(2))->method('hasParameter')->willReturn(true);
             $container->expects($this->exactly(2))->method('getParameter')
                 ->withConsecutive(

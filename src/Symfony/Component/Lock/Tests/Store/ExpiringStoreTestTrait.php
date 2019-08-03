@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;

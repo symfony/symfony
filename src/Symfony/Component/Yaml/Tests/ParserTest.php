@@ -2167,6 +2167,28 @@ YAML;
 
         $this->assertSame(['parameters' => 'abc'], $this->parser->parse($yaml));
     }
+
+    public function testParseValueWithModifiers()
+    {
+        $yaml = <<<YAML
+parameters:
+    abc: |+5 # plus five spaces indent
+         one
+         two
+         three
+         four
+         five
+YAML;
+
+        $this->assertSame(
+            [
+                'parameters' => [
+                    'abc' => implode(PHP_EOL, ['one', 'two', 'three', 'four', 'five']),
+                ]
+            ],
+            $this->parser->parse($yaml)
+        );
+    }
 }
 
 class B
@@ -2176,4 +2198,6 @@ class B
     const FOO = 'foo';
     const BAR = 'bar';
     const BAZ = 'baz';
+
+    const DELTA = 3;
 }

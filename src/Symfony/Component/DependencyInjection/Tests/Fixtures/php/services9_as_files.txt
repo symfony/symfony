@@ -277,7 +277,7 @@ class ProjectServiceContainer extends Container
 {
     private $buildParameters;
     private $containerDir;
-    private $parameters;
+    private $parameters = [];
     private $targetDirs = [];
 
     public function __construct(array $buildParameters = [], $containerDir = __DIR__)

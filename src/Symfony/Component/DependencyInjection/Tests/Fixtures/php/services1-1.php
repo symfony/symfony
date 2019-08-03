@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class Container extends \Symfony\Component\DependencyInjection\Dump\AbstractContainer
 {
-    private $parameters;
+    private $parameters = [];
     private $targetDirs = [];
 
     public function __construct()

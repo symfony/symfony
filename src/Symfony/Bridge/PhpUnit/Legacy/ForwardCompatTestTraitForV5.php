@@ -19,9 +19,6 @@ use PHPUnit\Framework\TestCase;
  */
 trait ForwardCompatTestTraitForV5
 {
-    private $forwardCompatExpectedExceptionMessage = '';
-    private $forwardCompatExpectedExceptionCode = null;
-
     /**
      * @return void
      */
@@ -243,11 +240,12 @@ trait ForwardCompatTestTraitForV5
      */
     public static function assertFinite($actual, $message = '')
     {
-        if (\is_callable('parent::assertFinite')) {
+        if (method_exists(TestCase::class, 'assertFinite')) {
             parent::assertFinite($actual, $message);
 
             return;
         }
+
         static::assertInternalType('float', $actual, $message);
         static::assertTrue(is_finite($actual), $message ? $message : "Failed asserting that $actual is finite.");
     }
@@ -259,11 +257,12 @@ trait ForwardCompatTestTraitForV5
      */
     public static function assertInfinite($actual, $message = '')
     {
-        if (\is_callable('parent::assertInfinite')) {
+        if (method_exists(TestCase::class, 'assertInfinite')) {
             parent::assertInfinite($actual, $message);
 
             return;
         }
+
         static::assertInternalType('float', $actual, $message);
         static::assertTrue(is_infinite($actual), $message ? $message : "Failed asserting that $actual is infinite.");
     }
@@ -275,11 +274,12 @@ trait ForwardCompatTestTraitForV5
      */
     public static function assertNan($actual, $message = '')
     {
-        if (\is_callable('parent::assertNan')) {
+        if (method_exists(TestCase::class, 'assertNan')) {
             parent::assertNan($actual, $message);
 
             return;
         }
+
         static::assertInternalType('float', $actual, $message);
         static::assertTrue(is_nan($actual), $message ? $message : "Failed asserting that $actual is nan.");
     }
@@ -297,7 +297,9 @@ trait ForwardCompatTestTraitForV5
             return;
         }
 
-        parent::setExpectedException($exception, $this->forwardCompatExpectedExceptionMessage, $this->forwardCompatExpectedExceptionCode);
+        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedException');
+        $property->setAccessible(true);
+        $property->setValue($this, $exception);
     }
 
     /**
@@ -311,8 +313,9 @@ trait ForwardCompatTestTraitForV5
             return;
         }
 
-        $this->forwardCompatExpectedExceptionCode = $code;
-        parent::setExpectedException(parent::getExpectedException(), $this->forwardCompatExpectedExceptionMessage, $this->forwardCompatExpectedExceptionCode);
+        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionCode');
+        $property->setAccessible(true);
+        $property->setValue($this, $exception);
     }
 
     /**
@@ -328,8 +331,9 @@ trait ForwardCompatTestTraitForV5
             return;
         }
 
-        $this->forwardCompatExpectedExceptionMessage = $message;
-        parent::setExpectedException(parent::getExpectedException(), $this->forwardCompatExpectedExceptionMessage, $this->forwardCompatExpectedExceptionCode);
+        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessage');
+        $property->setAccessible(true);
+        $property->setValue($this, $exception);
     }
 
     /**
@@ -345,31 +349,8 @@ trait ForwardCompatTestTraitForV5
             return;
         }
 
-        parent::setExpectedExceptionRegExp(parent::getExpectedException(), $messageRegExp, $this->forwardCompatExpectedExceptionCode);
-    }
-
-    /**
-     * @param string $exceptionMessage
-     *
-     * @return void
-     */
-    public function setExpectedException($exceptionName, $exceptionMessage = '', $exceptionCode = null)
-    {
-        $this->forwardCompatExpectedExceptionMessage = $exceptionMessage;
-        $this->forwardCompatExpectedExceptionCode = $exceptionCode;
-
-        parent::setExpectedException($exceptionName, $exceptionMessage, $exceptionCode);
-    }
-
-    /**
-     * @param string $exceptionMessageRegExp
-     *
-     * @return void
-     */
-    public function setExpectedExceptionRegExp($exceptionName, $exceptionMessageRegExp = '', $exceptionCode = null)
-    {
-        $this->forwardCompatExpectedExceptionCode = $exceptionCode;
-
-        parent::setExpectedExceptionRegExp($exceptionName, $exceptionMessageRegExp, $exceptionCode);
+        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessageRegExp');
+        $property->setAccessible(true);
+        $property->setValue($this, $exception);
     }
 }

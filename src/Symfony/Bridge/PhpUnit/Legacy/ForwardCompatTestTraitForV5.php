@@ -87,7 +87,7 @@ trait ForwardCompatTestTraitForV5
     }
 
     /**
-     * @param string $originalClassName
+     * @param string|string[] $originalClassName
      *
      * @return MockObject
      */
@@ -106,7 +106,8 @@ trait ForwardCompatTestTraitForV5
     }
 
     /**
-     * @param string $originalClassName
+     * @param string|string[] $originalClassName
+     * @param string[]        $methods
      *
      * @return MockObject
      */

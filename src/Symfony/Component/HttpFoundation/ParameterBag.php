@@ -81,7 +81,26 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function get($key, $default = null)
     {
-        return \array_key_exists($key, $this->parameters) ? $this->parameters[$key] : $default;
+    	if(array_key_exists($key, $this->parameters)){
+    		return $this->parameters[$key];
+    	}
+		
+		if(strstr($key, ':')){
+			$parameters = $this->parameters;
+			foreach(explode(':', $key) as $segment){
+				
+				
+				if(array_key_exists($segment, $parameters)){
+					$parameters = $parameters[$segment];
+				}else{
+					return $default;
+				}
+			}
+			
+			return $parameters;
+		}
+		
+		return $default;
     }
 
     /**

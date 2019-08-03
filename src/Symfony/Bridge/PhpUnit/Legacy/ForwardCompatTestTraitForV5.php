@@ -11,7 +11,10 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
+use PHPUnit\Framework\Constraint\IsEqual;
+use PHPUnit\Framework\Constraint\LogicalNot;
 use PHPUnit\Framework\Constraint\StringContains;
+use PHPUnit\Framework\Constraint\TraversableContains;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -110,6 +113,42 @@ trait ForwardCompatTestTraitForV5
         }
 
         return $mock->getMock();
+    }
+
+    /**
+     * @param float  $delta
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertEqualsWithDelta($expected, $actual, $delta, $message = '')
+    {
+        $constraint = new IsEqual($expected, $delta);
+        static::assertThat($actual, $constraint, $message);
+    }
+
+    /**
+     * @param iterable $haystack
+     * @param string   $message
+     *
+     * @return void
+     */
+    public static function assertContainsEquals($needle, $haystack, $message = '')
+    {
+        $constraint = new TraversableContains($needle, false, false);
+        static::assertThat($haystack, $constraint, $message);
+    }
+
+    /**
+     * @param iterable $haystack
+     * @param string   $message
+     *
+     * @return void
+     */
+    public static function assertNotContainsEquals($needle, $haystack, $message = '')
+    {
+        $constraint = new LogicalNot(new TraversableContains($needle, false, false));
+        static::assertThat($haystack, $constraint, $message);
     }
 
     /**
@@ -245,6 +284,32 @@ trait ForwardCompatTestTraitForV5
     public static function assertStringContainsStringIgnoringCase($needle, $haystack, $message = '')
     {
         $constraint = new StringContains($needle, true);
+        static::assertThat($haystack, $constraint, $message);
+    }
+
+    /**
+     * @param string $needle
+     * @param string $haystack
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertStringNotContainsString($needle, $haystack, $message = '')
+    {
+        $constraint = new LogicalNot(new StringContains($needle, false));
+        static::assertThat($haystack, $constraint, $message);
+    }
+
+    /**
+     * @param string $needle
+     * @param string $haystack
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertStringNotContainsStringIgnoringCase($needle, $haystack, $message = '')
+    {
+        $constraint = new LogicalNot(new StringContains($needle, true));
         static::assertThat($haystack, $constraint, $message);
     }
 

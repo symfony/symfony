@@ -70,6 +70,6 @@ class JsonLoginTest extends AbstractWebTestCase
 
         $this->assertSame(400, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertArraySubset(['error' => ['code' => 400, 'message' => 'Bad Request']], json_decode($response->getContent(), true));
+        $this->assertSame(['error' => ['code' => 400, 'message' => 'Bad Request']], json_decode($response->getContent(), true));
     }
 }

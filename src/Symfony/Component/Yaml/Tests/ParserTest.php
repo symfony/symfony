@@ -2107,6 +2107,48 @@ YAML;
 
         $this->assertSame(['parameters' => 'abc'], $this->parser->parse($yaml));
     }
+
+    public function testParseValueWithModifiers()
+    {
+        $yaml = <<<YAML
+parameters:
+    abc: |+5 # plus five spaces indent
+         one
+         two
+         three
+         four
+         five
+YAML;
+        $this->assertSame(
+            [
+                'parameters' => [
+                    'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
+                ],
+            ],
+            $this->parser->parse($yaml)
+        );
+    }
+
+    public function testParseValueWithNegativeModifiers()
+    {
+        $yaml = <<<YAML
+parameters:
+    abc: |-3 # minus
+       one
+       two
+       three
+       four
+       five
+YAML;
+        $this->assertSame(
+            [
+                'parameters' => [
+                    'abc' => implode("\n", ['one', 'two', 'three', 'four', 'five']),
+                ],
+            ],
+            $this->parser->parse($yaml)
+        );
+    }
 }
 
 class B

@@ -12,13 +12,10 @@
 namespace Symfony\Component\Intl\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Component\Intl\Locale;
 
 abstract class ResourceBundleTestCase extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     // Include the locales statically so that the data providers are decoupled
     // from the Intl class. Otherwise tests will fail if the intl extension is
     // not loaded, because it is NOT possible to skip the execution of data
@@ -699,7 +696,7 @@ abstract class ResourceBundleTestCase extends TestCase
 
     private static $rootLocales;
 
-    private function doSetUp()
+    protected function setUp()
     {
         Locale::setDefault('en');
         Locale::setDefaultFallback('en');

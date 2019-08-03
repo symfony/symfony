@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use Symfony\Bridge\PhpUnit\ForwardCompatTestTrait;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
-    use ForwardCompatTestTrait;
-
     public function testToStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);

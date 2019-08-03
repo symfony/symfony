@@ -509,6 +509,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
 
     /**
      * @dataProvider nanRepresentationProvider
+     *
      * @see https://github.com/symfony/symfony/issues/3161
      */
     public function testReverseTransformDisallowsNaN($nan)

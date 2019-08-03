@@ -28,7 +28,6 @@ class ButtonTypeTest extends BaseTypeTest
     }
 
     /**
-     *
      * @param string $emptyData
      * @param null   $expectedData
      */

@@ -142,7 +142,7 @@ class LoggerTest extends TestCase
         if (method_exists($this, 'createPartialMock')) {
             $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         } else {
-            $dummy = $this->getMock(DummyTest::class, ['__toString']);
+            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         }
         $dummy->expects($this->atLeastOnce())
             ->method('__toString')

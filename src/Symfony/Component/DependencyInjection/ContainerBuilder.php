@@ -946,8 +946,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This methods allows for simple registration of service definition
      * with a fluid interface.
      *
-     * @param string $id         The service identifier
-     * @param string $class|null The service class
+     * @param string      $id    The service identifier
+     * @param string|null $class The service class
      *
      * @return Definition A Definition instance
      */

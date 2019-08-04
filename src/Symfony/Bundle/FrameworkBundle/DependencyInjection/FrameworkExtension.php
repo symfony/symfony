@@ -1118,6 +1118,10 @@ class FrameworkExtension extends Extension
         $translator = $container->findDefinition('translator.default');
         $translator->addMethodCall('setFallbackLocales', [$config['fallbacks'] ?: [$defaultLocale]]);
 
+        $defaultOptions = $translator->getArgument(4);
+        $defaultOptions['cache_dir'] = $config['cache_dir'];
+        $translator->setArgument(4, $defaultOptions);
+
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);
 

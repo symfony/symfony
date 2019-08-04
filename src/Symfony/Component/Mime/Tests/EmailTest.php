@@ -285,6 +285,10 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($html, $att), $e->getBody());
 
         $e = new Email();
+        $e->attach($file);
+        $this->assertEquals(new MixedPart($att), $e->getBody());
+
+        $e = new Email();
         $e->html('html content');
         $e->text('text content');
         $e->attach($file);

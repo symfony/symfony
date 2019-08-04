@@ -46,6 +46,7 @@ $container->loadFromExtension('framework', [
         'enabled' => true,
         'fallback' => 'fr',
         'paths' => ['%kernel.project_dir%/Fixtures/translations'],
+        'cache_dir' => '%kernel.cache_dir%/translations',
     ],
     'validation' => [
         'enabled' => true,

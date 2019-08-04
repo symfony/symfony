@@ -29,6 +29,16 @@ class FailoverTransportTest extends TestCase
         new FailoverTransport([]);
     }
 
+    public function testGetName()
+    {
+        $t1 = $this->createMock(TransportInterface::class);
+        $t1->expects($this->once())->method('getName')->willReturn('t1://local');
+        $t2 = $this->createMock(TransportInterface::class);
+        $t2->expects($this->once())->method('getName')->willReturn('t2://local');
+        $t = new FailoverTransport([$t1, $t2]);
+        $this->assertEquals('t1://local || t2://local', $t->getName());
+    }
+
     public function testSendFirstWork()
     {
         $t1 = $this->createMock(TransportInterface::class);

@@ -54,6 +54,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Workflow;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -683,6 +684,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
         $options = $container->getDefinition('translator.default')->getArgument(4);
 
+        $this->assertArrayHasKey('cache_dir', $options);
+        $this->assertSame($container->getParameter('kernel.cache_dir').'/translations', $options['cache_dir']);
+
         $files = array_map('realpath', $options['resource_files']['en']);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
         $this->assertContains(
@@ -737,6 +741,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals(['en', 'fr'], $calls[1][1][0]);
+    }
+
+    public function testTranslatorCacheDirDisabled()
+    {
+        $container = $this->createContainerFromFile('translator_cache_dir_disabled');
+        $options = $container->getDefinition('translator.default')->getArgument(4);
+        $this->assertNull($options['cache_dir']);
     }
 
     public function testValidation()

@@ -504,6 +504,11 @@ YAML;
         $this->expectExceptionMessage('The indentation must be greater than zero');
         new Dumper(-4);
     }
+
+    public function testDumpNullAsTilde()
+    {
+        $this->assertSame('{ foo: ~ }', $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_TILDE));
+    }
 }
 
 class A

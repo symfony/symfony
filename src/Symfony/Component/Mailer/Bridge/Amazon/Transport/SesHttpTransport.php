@@ -42,6 +42,11 @@ class SesHttpTransport extends AbstractHttpTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
+    public function getName(): string
+    {
+        return sprintf('http://%s@ses?region=%s', $this->accessKey, $this->region);
+    }
+
     protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         $date = gmdate('D, d M Y H:i:s e');

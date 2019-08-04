@@ -652,6 +652,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->booleanNode('logging')->defaultValue(false)->end()
                         ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
+                        ->scalarNode('cache_dir')->defaultValue('%kernel.cache_dir%/translations')->end()
                         ->scalarNode('default_path')
                             ->info('The default path used to load translations')
                             ->defaultValue('%kernel.project_dir%/translations')

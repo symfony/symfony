@@ -34,6 +34,11 @@ class MandrillHttpTransport extends AbstractHttpTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
+    public function getName(): string
+    {
+        return sprintf('http://mandrill');
+    }
+
     protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         $envelope = $message->getEnvelope();

@@ -36,6 +36,11 @@ class MandrillApiTransport extends AbstractApiTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
+    public function getName(): string
+    {
+        return sprintf('api://mandrill');
+    }
+
     protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
     {
         $response = $this->client->request('POST', self::ENDPOINT, [

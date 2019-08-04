@@ -6,6 +6,11 @@ CHANGELOG
 
  * Removed support for mappings inside multi-line strings.
 
+4.4.0
+-----
+
+ * Added support to dump `null` as `~` by using the `Yaml::DUMP_NULL_AS_TILDE` flag.
+
 4.3.0
 -----
 

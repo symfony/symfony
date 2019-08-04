@@ -173,6 +173,7 @@
         <xsd:attribute name="fallback" type="xsd:string" />
         <xsd:attribute name="logging" type="xsd:boolean" />
         <xsd:attribute name="formatter" type="xsd:string" />
+        <xsd:attribute name="cache-dir" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="validation">

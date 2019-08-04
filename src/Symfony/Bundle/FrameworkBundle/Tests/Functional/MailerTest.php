@@ -42,6 +42,11 @@ class MailerTest extends AbstractWebTestCase
                 $this->onDoSend = $onDoSend;
             }
 
+            public function getName(): string
+            {
+                return 'dummy://local';
+            }
+
             protected function doSend(SentMessage $message): void
             {
                 $onDoSend = $this->onDoSend;

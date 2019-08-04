@@ -225,6 +225,7 @@ class ConfigurationTest extends TestCase
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),
                 'fallbacks' => [],
+                'cache_dir' => '%kernel.cache_dir%/translations',
                 'logging' => false,
                 'formatter' => 'translator.formatter.default',
                 'paths' => [],

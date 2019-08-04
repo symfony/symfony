@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-03T12:02:49Z
+
+It looks like an edge case to me. I think that you should be explicit about the "empty" body by using `->text('')` explicitly. So, I'm 👎 for this change.
+
+---------------------------------------------------------------------------
+
+by srsbiz at 2019-08-03T12:29:21Z
+
+> I think that you should be explicit about the "empty" body by using `->text('')` explicitly.
+
+This creates first - empty part of mime message which does not work for me - one application I'm maintaining exchanges data with other service via email - and this have to be only one attachment with specific title.
+
+Currently app relies on swiftmailer, where adding attachment creates only one part - as expected.

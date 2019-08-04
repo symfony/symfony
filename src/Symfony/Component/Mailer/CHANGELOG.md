@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * [BC BREAK] `TransportInterface` has a new `getName()` method
  * [BC BREAK] Classes `AbstractApiTransport` and `AbstractHttpTransport` moved under `Transport` sub-namespace.
  * [BC BREAK] Transports depend on `Symfony\Contracts\EventDispatcher\EventDispatcherInterface`
    instead of `Symfony\Component\EventDispatcher\EventDispatcherInterface`.

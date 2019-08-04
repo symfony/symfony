@@ -74,6 +74,7 @@
         "symfony/dom-crawler": "<4.3",
         "symfony/form": "<4.3",
         "symfony/lock": "<4.4",
+        "symfony/mailer": "<4.4",
         "symfony/messenger": "<4.3",
         "symfony/property-info": "<3.4",
         "symfony/serializer": "<4.2",

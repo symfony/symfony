@@ -23,4 +23,9 @@ final class NullTransport extends AbstractTransport
     protected function doSend(SentMessage $message): void
     {
     }
+
+    public function getName(): string
+    {
+        return 'smtp://null';
+    }
 }

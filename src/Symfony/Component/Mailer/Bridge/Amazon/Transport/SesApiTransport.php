@@ -43,6 +43,11 @@ class SesApiTransport extends AbstractApiTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
+    public function getName(): string
+    {
+        return sprintf('api://%s@ses?region=%s', $this->accessKey, $this->region);
+    }
+
     protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
     {
         $date = gmdate('D, d M Y H:i:s e');

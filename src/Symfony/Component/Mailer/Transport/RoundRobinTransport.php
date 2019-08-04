@@ -56,6 +56,13 @@ class RoundRobinTransport implements TransportInterface
         throw new TransportException('All transports failed.');
     }
 
+    public function getName(): string
+    {
+        return implode(' '.$this->getNameSymbol().' ', array_map(function (TransportInterface $transport) {
+            return $transport->getName();
+        }, $this->transports));
+    }
+
     /**
      * Rotates the transport list around and returns the first instance.
      */
@@ -88,6 +95,11 @@ class RoundRobinTransport implements TransportInterface
     protected function isTransportDead(TransportInterface $transport): bool
     {
         return $this->deadTransports->contains($transport);
+    }
+
+    protected function getNameSymbol(): string
+    {
+        return '&&';
     }
 
     private function moveCursor(int $cursor): int

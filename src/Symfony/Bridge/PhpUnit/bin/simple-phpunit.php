@@ -156,12 +156,6 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     $alteredCode = preg_replace('/abstract class (?:Assert|PHPUnit_Framework_Assert)[^\{]+\{/', '$0 '.PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
     file_put_contents($alteredFile, $alteredCode);
 
-    // remove internal annotation from polyfill
-    foreach (array('PolyfillTestCaseTrait', 'PolyfillAssertTrait') as $polyfill) {
-        $traitFile = "./vendor/symfony/phpunit-bridge/Legacy/$polyfill.php";
-        file_put_contents($traitFile, str_replace(' * @internal', '', file_get_contents($traitFile)));
-    }
-
     file_put_contents('phpunit', <<<'EOPHP'
 <?php
 

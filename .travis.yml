@@ -25,9 +25,6 @@ env:
 
 matrix:
     include:
-        - php: 7.1
-        - php: 7.2
-          env: deps=high
         - php: 7.3
           env: deps=low
     fast_finish: true
@@ -77,6 +74,7 @@ before_install:
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
       find ~/.phpenv -name xdebug.ini -delete
+      export COMPONENTS=src/Symfony/Bridge/Twig
 
       nanoseconds () {
           local cmd="date"

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-03T13:07:16Z
+
+can you revert the array() => [] changes please?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2019-08-03T15:12:44Z
+
+> can you revert the array() => [] changes please?
+
+Yes, but I had an error from symfony linter
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-03T15:13:58Z
+
+> I had an error from symfony linter
+
+I know, it's just a tool, and as all tools it has its limits, this is one of them :)

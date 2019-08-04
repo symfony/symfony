@@ -362,7 +362,7 @@ class Email extends Message
      */
     public function embedFromPath(string $path, string $name = null, string $contentType = null)
     {
-        $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => true];
+        $this->attachments[] = ['path' => $path, 'name' => $name, 'content-type' => $contentType, 'inline' => false];
 
         return $this;
     }

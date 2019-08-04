@@ -17,7 +17,7 @@ use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\Constraint\TraversableContains;
 
 /**
- * @internal
+ * This trait is @internal
  */
 trait PolyfillAssertTrait
 {

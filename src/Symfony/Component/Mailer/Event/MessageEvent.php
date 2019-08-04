@@ -16,7 +16,7 @@ use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Allows the transformation of a Message.
+ * Allows the transformation of a Message and the SMTP Envelope before the email is sent.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -24,11 +24,15 @@ class MessageEvent extends Event
 {
     private $message;
     private $envelope;
+    private $transportName;
+    private $queued;
 
-    public function __construct(RawMessage $message, SmtpEnvelope $envelope)
+    public function __construct(RawMessage $message, SmtpEnvelope $envelope, string $transportName, bool $queued = false)
     {
         $this->message = $message;
         $this->envelope = $envelope;
+        $this->transportName = $transportName;
+        $this->queued = $queued;
     }
 
     public function getMessage(): RawMessage
@@ -49,5 +53,15 @@ class MessageEvent extends Event
     public function setEnvelope(SmtpEnvelope $envelope): void
     {
         $this->envelope = $envelope;
+    }
+
+    public function getTransportName(): string
+    {
+        return $this->transportName;
+    }
+
+    public function isQueued(): bool
+    {
+        return $this->queued;
     }
 }

@@ -17,7 +17,7 @@ use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\Constraint\TraversableContains;
 
 /**
- * This trait is @internal
+ * This trait is @internal.
  */
 trait PolyfillAssertTrait
 {
@@ -250,5 +250,197 @@ trait PolyfillAssertTrait
     {
         static::assertInternalType('float', $actual, $message);
         static::assertTrue(is_nan($actual), $message ? $message : "Failed asserting that $actual is nan.");
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertIsReadable($filename, $message = '')
+    {
+        static::assertInternalType('string', $filename, $message);
+        static::assertTrue(is_readable($filename), $message ? $message : "Failed asserting that $filename is readable.");
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertNotIsReadable($filename, $message = '')
+    {
+        static::assertInternalType('string', $filename, $message);
+        static::assertFalse(is_readable($filename), $message ? $message : "Failed asserting that $filename is not readable.");
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertIsWritable($filename, $message = '')
+    {
+        static::assertInternalType('string', $filename, $message);
+        static::assertTrue(is_writable($filename), $message ? $message : "Failed asserting that $filename is writable.");
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertNotIsWritable($filename, $message = '')
+    {
+        static::assertInternalType('string', $filename, $message);
+        static::assertFalse(is_writable($filename), $message ? $message : "Failed asserting that $filename is not writable.");
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertDirectoryExists($directory, $message = '')
+    {
+        static::assertInternalType('string', $directory, $message);
+        static::assertTrue(is_dir($directory), $message ? $message : "Failed asserting that $directory exists.");
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertDirectoryNotExists($directory, $message = '')
+    {
+        static::assertInternalType('string', $directory, $message);
+        static::assertFalse(is_dir($directory), $message ? $message : "Failed asserting that $directory does not exist.");
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertDirectoryIsReadable($directory, $message = '')
+    {
+        static::assertDirectoryExists($directory, $message);
+        static::assertIsReadable($directory, $message);
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertDirectoryNotIsReadable($directory, $message = '')
+    {
+        static::assertDirectoryExists($directory, $message);
+        static::assertNotIsReadable($directory, $message);
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertDirectoryIsWritable($directory, $message = '')
+    {
+        static::assertDirectoryExists($directory, $message);
+        static::assertIsWritable($directory, $message);
+    }
+
+    /**
+     * @param string $directory
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertDirectoryNotIsWritable($directory, $message = '')
+    {
+        static::assertDirectoryExists($directory, $message);
+        static::assertNotIsWritable($directory, $message);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertFileExists($filename, $message = '')
+    {
+        static::assertInternalType('string', $filename, $message);
+        static::assertTrue(file_exists($filename), $message ? $message : "Failed asserting that $filename exists.");
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertFileNotExists($filename, $message = '')
+    {
+        static::assertInternalType('string', $filename, $message);
+        static::assertFalse(file_exists($filename), $message ? $message : "Failed asserting that $filename does not exist.");
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertFileIsReadable($filename, $message = '')
+    {
+        static::assertFileExists($filename, $message);
+        static::assertIsReadable($filename, $message);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertFileNotIsReadable($filename, $message = '')
+    {
+        static::assertFileExists($filename, $message);
+        static::assertNotIsReadable($filename, $message);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertFileIsWritable($filename, $message = '')
+    {
+        static::assertFileExists($filename, $message);
+        static::assertIsWritable($filename, $message);
+    }
+
+    /**
+     * @param string $filename
+     * @param string $message
+     *
+     * @return void
+     */
+    public static function assertFileNotIsWritable($filename, $message = '')
+    {
+        static::assertFileExists($filename, $message);
+        static::assertNotIsWritable($filename, $message);
     }
 }

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-25T08:02:16Z
+
+I just tried running this and it returned `null`, with no "undefined" notice:
+```php
+$r = new Request();
+
+var_dump($r->getClientIp());
+```
+
+---------------------------------------------------------------------------
+
+by ossinkine at 2019-07-25T12:59:02Z
+
+I think the docblock contains a type that must be, but not one that can be.
+There is a lot of not null fields in Request class which will be null after `new Request()`.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-07-26T07:50:29Z
+
+No, docblock must specify type it returns
+
+---------------------------------------------------------------------------
+
+by ossinkine at 2019-07-26T07:57:22Z
+
+But now it is not so, we must be consistent. If we want the docblock to contain what the method returns, we need to add `|null` to other fields and check that the field is not null when we call the getter, but we don’t do that, it is a huge number of redundant checks.

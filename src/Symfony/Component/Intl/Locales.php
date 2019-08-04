@@ -67,7 +67,7 @@ final class Locales extends ResourceBundle
     /**
      * @return string[]
      */
-    public static function getNames($displayLocale = null)
+    public static function getNames($displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
     }

@@ -1,0 +1,197 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-07-23T06:50:34Z
+
+👍 but it has been refused by @fabpot in the past (https://github.com/symfony/symfony/pull/26717)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-07-23T06:52:09Z
+
+> 👍 but it has been refused by @fabpot in the past (#26717)
+
+Oh I didn't know that, I talked to @xabbuh before starting to work on it...
+
+To me there is technical reason (regarding the comment in the other PR). I am reading Yaml files, adding some content and dumping it again to the filesystem. Now, depending on the source, wether its using `null` or `~` the diff get s quite big and a diff/commit is a technical thing to me.
+
+Let me be more clear with an example.
+
+Adding content too this file:
+```yaml
+foo: bar
+baz: ~
+```
+
+would result in:
+```diff
+foo: bar
+- baz: ~
++ baz: null
++ lol: null
+```
+
+which is very verbose. The following would be less verbose:
+```diff
+foo: bar
+baz: ~
++ lol: ~
+```
+
+Btw. I created nearly the exact same PR like you @fancyweb  without knowing it 😄
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-23T07:04:55Z
+
+Let me explain a bit more why I think that this is not something I want: adding more options is adding more complexity (and complexity grows exponentially with more added options). Having only. One way to do something makes our code simpler, easier to understand, easier to document, and easier to use. Less decisions.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-07-23T07:11:48Z
+
+I agree with you Fabien 👍. Another option would be to rework the YAML component and create an extension point for projects.
+
+I hope you read my argument, because I was updated my post.
+
+I am not the one who decides to get this merged, but as the tilde is a common used thing in YAML, I talked to @xabbuh and he asked me to create a PR, @fancyweb created the same PR... so it looks to me that for this small option the community (at least some of them 😄 ) have a need.
+
+Another point is, that YAML is best to be human readable, but a diff changes every line including a `~` isn't readable anymore.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-23T07:18:18Z
+
+We moved away from generating `~` in favor of `null` a few years ago as people didn't understand the meaning of `~` (we probably did that with @javiereguiluz  back then).
+
+I know that this is opinionated, but if you have a look at the flow of PRs, we have a regular stream of PRs adding options. I'm the one trying to challenge them to be sure that we **really** need those new options.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-07-23T07:25:07Z
+
+>  I'm the one trying to challenge them to be sure that we really need those new options.
+
+And as I said its ok for me to challenge and not merge it. I gave all my arguments 😄 and I really like that you sometimes decide to not merge something 👍
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-07-23T08:48:18Z
+
+The reason Fabien gives here:
+
+> as people didn't understand the meaning of `~`
+
+This is one of the few things I didn't know until recently. I think an explicit NULL is far better than having a tilde. However, I also do agree with Oskar on the following:
+
+> Another option would be to rework the YAML component and create an extension point for projects.
+
+I think it's pretty great to have a sub-set of YAML functionality provided by Symfony, to which you can create a more complete implementations via 3rd party tools. Not sure how this would be done internally though, as it sounds very complex.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-07-23T08:59:22Z
+
+> I think an explicit NULL is far better than having a tilde.
+
+Thanks for your feedback @linaori, but I don't want to change the default value (so this is not an argument IMHO) and only want to have the option for people who know the `~` but currently I have really big git diffs after read/modify/dump 😢
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-07-23T09:02:30Z
+
+If complexity is an issue, should the related code be rewritten to reduce this complexity? Even if it costs a bit of performance (you don't call this run-time, hopefully). The current flag system is also limiting at some point.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-07-23T09:07:11Z
+
+No I am using it async to handle my YAML files.
+
+The proposed option is quite small and I think to rewrite it to fulfill my use-case is too much overhead, the flags are sufficient here.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-23T09:13:40Z
+
+I smell a small inconsistency here. Using the tilde seems to be a Symfony [best practise](https://github.com/symfony/recipes/blob/1d26ca40a1b5ba8be7c67a25227c836f84ce2465/symfony/framework-bundle/4.2/config/packages/framework.yaml#L9), yet the YAML dumper uses the literal `null` instead. In other words: If would parse and dump a YAML file from the recipes, all `~` would be changed to `null` and there's nothing I could do about it, correct? 😕
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-07-23T09:26:25Z
+
+> If would parse and dump a YAML file from the recipes, all ~ would be changed to null and there's nothing I could do about it, correct
+
+exactly thats my point!
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2019-07-28T13:29:16Z
+
+I think this should be added, because Symfony _interprets_ `~` as `null` already. Why not allow dumping it as `~` again, too? :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T17:51:17Z
+
+But CI needs to be green!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-07-30T17:52:44Z
+
+Sure thing Nicolas, will have a look soon 👀
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-31T12:00:30Z
+
+I asked Oskar to open this PR as I agree with the reasoning for the changes. Dumping `null` by default is good, but being able to get `~` instead allows to keep files more similar to what we use in the documentation. While I generally agree with not adding more options than necessary the impact here is rather limited and doesn't add much complexity. So 👍 from me.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-01T06:19:45Z
+
+- [x] Rebased
+- [x] CS fixed
+- [x] Docs-PR created
+- [x] CI 💚  @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-01T06:40:10Z
+
+What about changing `~` to `null` in the recipes? As I mentioned before, we had a few complaints about the meaning of `~` and decided to move to use `null` everywhere. Apparently, we forgot about this in the recipes, but that can be easily fixed (see https://github.com/symfony/recipes/pull/635 and https://github.com/symfony/recipes-contrib/pull/720).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-01T07:17:40Z
+
+> What about changing ~ to null in the recipes?
+
+That makes definitely sense, but the intent of my PR is to handle files, delivered from customers (in my project) which are using `~` instead of `null`. So this is not only Symfony related.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-01T07:48:14Z
+
+@OskarStark Of course. I just wanted to follow up and finish the discussion on the Symfony part, where we can definitely standardize on using `null` instead of `~`. I've also added a validation rule so that if one uses `~` in a recipe, we will have a validation error.
+
+For this PR, I'm `+0`.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-01T07:50:34Z
+
+> I've also added a validation rule so that if one uses ~ in a recipe, we will have a validation error.
+
+This is a nice addition. I would gladly help to fix those recipes, shall we run a `sed` command across the whole `contrib` repo?
+
+> For this PR, I'm +0.
+
+I know ;-)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-01T08:12:25Z
+
+Travis failure is unrelated

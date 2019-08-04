@@ -59,13 +59,12 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      *
-     * @param iterable                          $choices The choices
-     * @param callable|string|PropertyPath|null $value   The callable or path for
-     *                                                   generating the choice values
+     * @param callable|string|PropertyPath|null $value The callable or path for
+     *                                                 generating the choice values
      *
      * @return ChoiceListInterface The choice list
      */
-    public function createListFromChoices($choices, $value = null)
+    public function createListFromChoices(iterable $choices, $value = null)
     {
         if (\is_string($value)) {
             $value = new PropertyPath($value);

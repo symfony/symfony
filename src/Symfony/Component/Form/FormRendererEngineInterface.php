@@ -128,7 +128,6 @@ interface FormRendererEngineInterface
      *
      * @param FormView $view      The view to render
      * @param mixed    $resource  The renderer resource
-     * @param string   $blockName The name of the block to render
      * @param array    $variables The variables to pass to the template
      *
      * @return string The HTML markup

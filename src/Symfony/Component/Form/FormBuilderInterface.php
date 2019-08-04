@@ -24,11 +24,10 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * object hierarchy.
      *
      * @param string|FormBuilderInterface $child
-     * @param string|null                 $type
      *
      * @return self
      */
-    public function add($child, $type = null, array $options = []);
+    public function add($child, string $type = null, array $options = []);
 
     /**
      * Creates a form builder.
@@ -38,36 +37,30 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return self
      */
-    public function create($name, $type = null, array $options = []);
+    public function create(string $name, string $type = null, array $options = []);
 
     /**
      * Returns a child by name.
-     *
-     * @param string $name The name of the child
      *
      * @return self
      *
      * @throws Exception\InvalidArgumentException if the given child does not exist
      */
-    public function get($name);
+    public function get(string $name);
 
     /**
      * Removes the field with the given name.
      *
-     * @param string $name
-     *
      * @return self
      */
-    public function remove($name);
+    public function remove(string $name);
 
     /**
      * Returns whether a field with the given name exists.
      *
-     * @param string $name
-     *
      * @return bool
      */
-    public function has($name);
+    public function has(string $name);
 
     /**
      * Returns the children.

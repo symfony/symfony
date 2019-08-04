@@ -497,7 +497,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function submit($submittedData, $clearMissing = true)
+    public function submit($submittedData, bool $clearMissing = true)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once');
@@ -768,7 +768,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function getErrors($deep = false, $flatten = true)
+    public function getErrors(bool $deep = false, bool $flatten = true)
     {
         $errors = $this->errors;
 
@@ -831,7 +831,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function add($child, $type = null, array $options = [])
+    public function add($child, string $type = null, array $options = [])
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form');
@@ -902,7 +902,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function remove($name)
+    public function remove(string $name)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot remove children from a submitted form');
@@ -922,7 +922,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function has($name)
+    public function has(string $name)
     {
         return isset($this->children[$name]);
     }
@@ -930,7 +930,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name)
     {
         if (isset($this->children[$name])) {
             return $this->children[$name];

@@ -91,7 +91,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = [])
+    public function createBuilder(FormFactoryInterface $factory, string $name, array $options = [])
     {
         try {
             $options = $this->getOptionsResolver()->resolve($options);
@@ -198,12 +198,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * Override this method if you want to customize the builder class.
      *
-     * @param string      $name      The name of the builder
-     * @param string|null $dataClass The data class
-     *
      * @return FormBuilderInterface The new builder instance
      */
-    protected function newBuilder($name, $dataClass, FormFactoryInterface $factory, array $options)
+    protected function newBuilder(string $name, ?string $dataClass, FormFactoryInterface $factory, array $options)
     {
         if ($this->innerType instanceof ButtonTypeInterface) {
             return new ButtonBuilder($name, $options);

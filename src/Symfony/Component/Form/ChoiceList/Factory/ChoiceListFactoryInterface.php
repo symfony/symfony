@@ -31,12 +31,9 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
      *
-     * @param iterable      $choices The choices
-     * @param callable|null $value   The callable generating the choice values
-     *
      * @return ChoiceListInterface The choice list
      */
-    public function createListFromChoices($choices, $value = null);
+    public function createListFromChoices(iterable $choices, callable $value = null);
 
     /**
      * Creates a choice list that is loaded with the given loader.
@@ -45,11 +42,9 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
      *
-     * @param callable|null $value The callable generating the choice values
-     *
      * @return ChoiceListInterface The choice list
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null);
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null);
 
     /**
      * Creates a view for the given choice list.
@@ -80,11 +75,9 @@ interface ChoiceListFactoryInterface
      * @param array|callable|null $preferredChoices The preferred choices
      * @param callable|false|null $label            The callable generating the choice labels;
      *                                              pass false to discard the label
-     * @param callable|null       $index            The callable generating the view indices
-     * @param callable|null       $groupBy          The callable generating the group names
      * @param array|callable|null $attr             The callable generating the HTML attributes
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null);
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null);
 }

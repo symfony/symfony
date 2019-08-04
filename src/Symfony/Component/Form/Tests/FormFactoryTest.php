@@ -147,20 +147,6 @@ class FormFactoryTest extends TestCase
         $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', 'DATA', $options));
     }
 
-    public function testCreateNamedBuilderThrowsUnderstandableException()
-    {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-        $this->expectExceptionMessage('Expected argument of type "string", "stdClass" given');
-        $this->factory->createNamedBuilder('name', new \stdClass());
-    }
-
-    public function testCreateThrowsUnderstandableException()
-    {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-        $this->expectExceptionMessage('Expected argument of type "string", "stdClass" given');
-        $this->factory->create(new \stdClass());
-    }
-
     public function testCreateUsesBlockPrefixIfTypeGivenAsString()
     {
         $options = ['a' => '1', 'b' => '2'];

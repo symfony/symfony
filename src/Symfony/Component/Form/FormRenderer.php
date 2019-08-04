@@ -48,7 +48,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
+    public function setTheme(FormView $view, $themes, bool $useDefaultThemes = true)
     {
         $this->engine->setTheme($view, $themes, $useDefaultThemes);
     }
@@ -56,7 +56,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderCsrfToken($tokenId)
+    public function renderCsrfToken(string $tokenId)
     {
         if (null === $this->csrfTokenManager) {
             throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenManagerInterface is injected in FormRenderer::__construct().');
@@ -68,7 +68,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $blockName, array $variables = [])
+    public function renderBlock(FormView $view, string $blockName, array $variables = [])
     {
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
@@ -127,7 +127,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = [])
+    public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = [])
     {
         $renderOnlyOnce = 'row' === $blockNameSuffix || 'widget' === $blockNameSuffix;
 
@@ -280,7 +280,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function humanize($text)
+    public function humanize(string $text)
     {
         return ucfirst(strtolower(trim(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));
     }
@@ -288,7 +288,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * @internal
      */
-    public function encodeCurrency(Environment $environment, $text, $widget = '')
+    public function encodeCurrency(Environment $environment, string $text, string $widget = '')
     {
         if ('UTF-8' === $charset = $environment->getCharset()) {
             $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');

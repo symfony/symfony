@@ -19,10 +19,10 @@
         "php": "^7.2.9",
         "symfony/event-dispatcher": "^4.4|^5.0",
         "symfony/intl": "^4.4|^5.0",
-        "symfony/options-resolver": "^4.4|^5.0",
+        "symfony/options-resolver": "^5.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/property-access": "^4.4|^5.0",
+        "symfony/property-access": "^5.0",
         "symfony/service-contracts": "~1.1"
     },
     "require-dev": {

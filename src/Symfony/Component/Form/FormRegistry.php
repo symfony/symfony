@@ -67,7 +67,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getType($name)
+    public function getType(string $name)
     {
         if (!isset($this->types[$name])) {
             $type = null;
@@ -134,7 +134,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function hasType($name)
+    public function hasType(string $name)
     {
         if (isset($this->types[$name])) {
             return true;

@@ -18,9 +18,6 @@ namespace Symfony\Component\Form;
  */
 class SubmitButton extends Button implements ClickableInterface
 {
-    /**
-     * @var bool
-     */
     private $clicked = false;
 
     /**
@@ -41,7 +38,7 @@ class SubmitButton extends Button implements ClickableInterface
      *
      * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
-    public function submit($submittedData, $clearMissing = true)
+    public function submit($submittedData, bool $clearMissing = true)
     {
         if ($this->getConfig()->getDisabled()) {
             $this->clicked = false;

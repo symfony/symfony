@@ -29,7 +29,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createListFromChoices($choices, $value = null)
+    public function createListFromChoices(iterable $choices, callable $value = null)
     {
         return new ArrayChoiceList($choices, $value);
     }
@@ -37,7 +37,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
+    public function createListFromLoader(ChoiceLoaderInterface $loader, callable $value = null)
     {
         return new LazyChoiceList($loader, $value);
     }
@@ -45,7 +45,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, callable $index = null, callable $groupBy = null, $attr = null)
     {
         $preferredViews = [];
         $preferredViewsOrder = [];

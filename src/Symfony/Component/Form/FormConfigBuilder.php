@@ -129,7 +129,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addEventListener($eventName, $listener, $priority = 0)
+    public function addEventListener(string $eventName, callable $listener, int $priority = 0)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -157,7 +157,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false)
+    public function addViewTransformer(DataTransformerInterface $viewTransformer, bool $forcePrepend = false)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -189,7 +189,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addModelTransformer(DataTransformerInterface $modelTransformer, $forceAppend = false)
+    public function addModelTransformer(DataTransformerInterface $modelTransformer, bool $forceAppend = false)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -353,7 +353,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name)
     {
         return \array_key_exists($name, $this->attributes);
     }
@@ -361,7 +361,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, $default = null)
     {
         return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
@@ -448,7 +448,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function hasOption($name)
+    public function hasOption(string $name)
     {
         return \array_key_exists($name, $this->options);
     }
@@ -456,7 +456,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getOption($name, $default = null)
+    public function getOption(string $name, $default = null)
     {
         return \array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
@@ -464,7 +464,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, $value)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
@@ -506,13 +506,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDisabled($disabled)
+    public function setDisabled(bool $disabled)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->disabled = (bool) $disabled;
+        $this->disabled = $disabled;
 
         return $this;
     }
@@ -534,13 +534,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setErrorBubbling($errorBubbling)
+    public function setErrorBubbling(bool $errorBubbling)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->errorBubbling = (bool) $errorBubbling;
+        $this->errorBubbling = $errorBubbling;
 
         return $this;
     }
@@ -548,13 +548,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setRequired($required)
+    public function setRequired(bool $required)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->required = (bool) $required;
+        $this->required = $required;
 
         return $this;
     }
@@ -580,13 +580,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setMapped($mapped)
+    public function setMapped(bool $mapped)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->mapped = (bool) $mapped;
+        $this->mapped = $mapped;
 
         return $this;
     }
@@ -594,13 +594,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setByReference($byReference)
+    public function setByReference(bool $byReference)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->byReference = (bool) $byReference;
+        $this->byReference = $byReference;
 
         return $this;
     }
@@ -608,13 +608,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setInheritData($inheritData)
+    public function setInheritData(bool $inheritData)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->inheritData = (bool) $inheritData;
+        $this->inheritData = $inheritData;
 
         return $this;
     }
@@ -622,13 +622,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setCompound($compound)
+    public function setCompound(bool $compound)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->compound = (bool) $compound;
+        $this->compound = $compound;
 
         return $this;
     }
@@ -664,13 +664,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDataLocked($locked)
+    public function setDataLocked(bool $locked)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->dataLocked = (bool) $locked;
+        $this->dataLocked = $locked;
 
         return $this;
     }
@@ -692,13 +692,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAction($action)
+    public function setAction(string $action)
     {
         if ($this->locked) {
             throw new BadMethodCallException('The config builder cannot be modified anymore.');
         }
 
-        $this->action = (string) $action;
+        $this->action = $action;
 
         return $this;
     }
@@ -706,7 +706,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setMethod($method)
+    public function setMethod(string $method)
     {
         if ($this->locked) {
             throw new BadMethodCallException('The config builder cannot be modified anymore.');
@@ -734,13 +734,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAutoInitialize($initialize)
+    public function setAutoInitialize(bool $initialize)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->autoInitialize = (bool) $initialize;
+        $this->autoInitialize = $initialize;
 
         return $this;
     }

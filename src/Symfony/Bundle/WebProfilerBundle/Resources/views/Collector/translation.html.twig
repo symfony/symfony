@@ -13,7 +13,7 @@
 
         {% set text %}
             <div class="sf-toolbar-info-piece">
-                <b>Locale</b>
+                <b>Default locale</b>
                 <span class="sf-toolbar-status">
                     {{ collector.locale|default('-') }}
                 </span>
@@ -73,7 +73,7 @@
     <div class="metrics">
         <div class="metric">
             <span class="value">{{ collector.locale|default('-') }}</span>
-            <span class="label">Locale</span>
+            <span class="label">Default locale</span>
         </div>
         <div class="metric">
             <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
@@ -152,7 +152,7 @@
                     </div>
                 {% else %}
                     {% block fallback_messages %}
-                        {{ helper.render_table(messages_fallback) }}
+                        {{ helper.render_table(messages_fallback, true) }}
                     {% endblock %}
                 {% endif %}
             </div>
@@ -185,11 +185,14 @@
 
 {% endblock %}
 
-{% macro render_table(messages) %}
+{% macro render_table(messages, is_fallback) %}
     <table>
         <thead>
             <tr>
                 <th>Locale</th>
+                {% if is_fallback %}
+                    <th>Fallback locale</th>
+                {% endif %}
                 <th>Domain</th>
                 <th>Times used</th>
                 <th>Message ID</th>
@@ -200,6 +203,9 @@
         {% for message in messages %}
             <tr>
                 <td class="font-normal text-small nowrap">{{ message.locale }}</td>
+                {% if is_fallback %}
+                    <td class="font-normal text-small nowrap">{{ message.fallbackLocale|default('-') }}</td>
+                {% endif %}
                 <td class="font-normal text-small text-bold nowrap">{{ message.domain }}</td>
                 <td class="font-normal text-small nowrap">{{ message.count }}</td>
                 <td>

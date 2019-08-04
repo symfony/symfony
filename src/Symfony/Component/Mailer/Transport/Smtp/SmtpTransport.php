@@ -126,6 +126,15 @@ class SmtpTransport extends AbstractTransport
         return $message;
     }
 
+    public function getName(): string
+    {
+        if ($this->stream instanceof SocketStream) {
+            return sprintf('smtp://%s:%d', $this->stream->getHost(), $this->stream->getPort());
+        }
+
+        return sprintf('smtp://sendmail');
+    }
+
     /**
      * Runs a command against the stream, expecting the given response codes.
      *

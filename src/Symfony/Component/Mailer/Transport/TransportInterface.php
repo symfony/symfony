@@ -30,4 +30,6 @@ interface TransportInterface
      * @throws TransportExceptionInterface
      */
     public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage;
+
+    public function getName(): string;
 }

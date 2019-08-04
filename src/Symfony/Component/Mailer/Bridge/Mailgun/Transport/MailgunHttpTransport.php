@@ -40,6 +40,11 @@ class MailgunHttpTransport extends AbstractHttpTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
+    public function getName(): string
+    {
+        return sprintf('http://%s@mailgun?region=%s', $this->domain, $this->region);
+    }
+
     protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         $body = new FormDataPart([

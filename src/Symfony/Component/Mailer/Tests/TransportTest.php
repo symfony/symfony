@@ -68,6 +68,11 @@ class DummyTransport implements Transport\TransportInterface
     {
         throw new \BadMethodCallException('This method newer should be called.');
     }
+
+    public function getName(): string
+    {
+        return sprintf('dummy://local');
+    }
 }
 
 class DummyTransportFactory implements Transport\TransportFactoryInterface

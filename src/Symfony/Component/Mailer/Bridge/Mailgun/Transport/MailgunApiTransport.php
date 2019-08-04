@@ -41,6 +41,11 @@ class MailgunApiTransport extends AbstractApiTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
+    public function getName(): string
+    {
+        return sprintf('api://%s@mailgun?region=%s', $this->domain, $this->region);
+    }
+
     protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
     {
         $body = new FormDataPart($this->getPayload($email, $envelope));

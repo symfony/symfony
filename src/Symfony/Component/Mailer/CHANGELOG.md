@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * Added PHPUnit constraints
  * Added `MessageDataCollector`
  * Added `MessageEvents` and `MessageLoggerListener` to allow collecting sent emails
  * [BC BREAK] `TransportInterface` has a new `getName()` method

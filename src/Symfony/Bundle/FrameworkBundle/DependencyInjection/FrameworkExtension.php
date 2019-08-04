@@ -553,10 +553,6 @@ class FrameworkExtension extends Extension
             $loader->load('messenger_debug.xml');
         }
 
-        if (class_exists(Mailer::class)) {
-            $loader->load('mailer_debug.xml');
-        }
-
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 
@@ -1969,6 +1965,9 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('mailer.xml');
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('mailer_debug.xml');
+        }
         $loader->load('mailer_transports.xml');
         $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
 

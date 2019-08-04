@@ -74,6 +74,20 @@ abstract class AbstractMultipartPart extends AbstractPart
         yield '--'.$this->getBoundary()."--\r\n";
     }
 
+    public function asDebugString(): string
+    {
+        $str = parent::asDebugString();
+        foreach ($this->getParts() as $part) {
+            $lines = explode("\n", $part->asDebugString());
+            $str .= "\n  └ ".array_shift($lines);
+            foreach ($lines as $line) {
+                $str .= "\n  |".$line;
+            }
+        }
+
+        return $str;
+    }
+
     private function getBoundary(): string
     {
         if (null === $this->boundary) {

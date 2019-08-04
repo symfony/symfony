@@ -103,6 +103,16 @@ class DataPart extends TextPart
         return $headers;
     }
 
+    public function asDebugString(): string
+    {
+        $str = parent::asDebugString();
+        if (null !== $this->filename) {
+            $str .= ' filename: '.$this->filename;
+        }
+
+        return $str;
+    }
+
     private function generateContentId(): string
     {
         return bin2hex(random_bytes(16)).'@symfony';

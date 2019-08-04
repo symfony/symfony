@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by Raulnet at 2019-07-23T14:10:23Z
+
+> We also need to update the XSD file to allow to configure this option in XML files. Adding a test case to the `FrameworkExtensionTest` to ensure this works as expected would be good too.
+
+i updated the XSD file and add some Test. For cache_dir enable and disabled. and fix a use Deprecated
+
+Thanks for your help :)
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by Raulnet at 2019-08-01T06:42:56Z
+
+Status: Waiting feedback
+
+---------------------------------------------------------------------------
+
+by Raulnet at 2019-08-01T19:01:52Z
+
+Status: Needs review

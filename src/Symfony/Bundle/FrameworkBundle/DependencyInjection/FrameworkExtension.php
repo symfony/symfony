@@ -148,6 +148,7 @@ class FrameworkExtension extends Extension
     private $annotationsConfigEnabled = false;
     private $validatorConfigEnabled = false;
     private $messengerConfigEnabled = false;
+    private $mailerConfigEnabled = false;
 
     /**
      * Responds to the app.config configuration parameter.
@@ -343,7 +344,7 @@ class FrameworkExtension extends Extension
             $this->registerHttpClientConfiguration($config['http_client'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['mailer'])) {
+        if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
         }
 
@@ -551,6 +552,10 @@ class FrameworkExtension extends Extension
 
         if ($this->messengerConfigEnabled) {
             $loader->load('messenger_debug.xml');
+        }
+
+        if ($this->mailerConfigEnabled) {
+            $loader->load('mailer_debug.xml');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
@@ -1965,9 +1970,6 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('mailer.xml');
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('mailer_debug.xml');
-        }
         $loader->load('mailer_transports.xml');
         $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
 

@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-04T18:38:29Z
+
+<img width="605" alt="image" src="https://user-images.githubusercontent.com/47313/62427740-c92f2c00-b6f7-11e9-930c-6821dbddf4d7.png">
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-04T20:23:51Z
+
+Now with some functional tests.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-08-05T14:17:46Z
+
+The proposed asserts are nice! Thanks.
+
+I wonder if we need asserts for addresses. The mailer component allows to define email addresses in multiple ways (see https://symfony.com/doc/current/mailer.html#email-addresses). If I define some address as `Jane Smith <jane@example.com>` ... which of the following would work?
+
+```php
+$this->assertEmailHeaderSame($email, 'From', 'jane@example.com');
+$this->assertEmailHeaderSame($email, 'From', 'Jane Smith');
+$this->assertEmailHeaderSame($email, 'From', 'Jane Smith <jane@example.com>');
+```
+
+If others agree that this is confusing and also a common thing to assert, then we could add some assert for addresses which accept only a plain email address no matter how you defined the address:
+
+```php
+$this->assertEmailFromAddress($email, 'jane@example.com');
+```
+
+Related to this, what happens with multiple addresses?
+
+```php
+$this->assertEmailToAddressContains($email, 'john@example.com');
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-05T16:16:28Z
+
+@javiereguiluz Good idea. Implemented:
+
+```php
+$this->assertEmailAddressContains($email, 'To', 'fabien@symfony.com');
+$this->assertEmailAddressContains($email, 'To', 'thomas@symfony.com');
+$this->assertEmailAddressContains($email, 'Reply-To', 'me@symfony.com');
+```
+
+Works with headers that can contain only 1 or several addresses (also with named addresses).

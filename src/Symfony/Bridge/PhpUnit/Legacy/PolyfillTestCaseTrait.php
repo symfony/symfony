@@ -66,7 +66,7 @@ trait PolyfillTestCaseTrait
      */
     public function expectException($exception)
     {
-        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedException');
+        $property = new \ReflectionProperty(TestCase::class, 'expectedException');
         $property->setAccessible(true);
         $property->setValue($this, $exception);
     }
@@ -78,7 +78,7 @@ trait PolyfillTestCaseTrait
      */
     public function expectExceptionCode($code)
     {
-        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionCode');
+        $property = new \ReflectionProperty(TestCase::class, 'expectedExceptionCode');
         $property->setAccessible(true);
         $property->setValue($this, $code);
     }
@@ -90,7 +90,7 @@ trait PolyfillTestCaseTrait
      */
     public function expectExceptionMessage($message)
     {
-        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessage');
+        $property = new \ReflectionProperty(TestCase::class, 'expectedExceptionMessage');
         $property->setAccessible(true);
         $property->setValue($this, $message);
     }
@@ -102,7 +102,7 @@ trait PolyfillTestCaseTrait
      */
     public function expectExceptionMessageRegExp($messageRegExp)
     {
-        $property = new \ReflectionProperty(class_exists('PHPUnit_Framework_TestCase') ? 'PHPUnit_Framework_TestCase' : TestCase::class, 'expectedExceptionMessageRegExp');
+        $property = new \ReflectionProperty(TestCase::class, 'expectedExceptionMessageRegExp');
         $property->setAccessible(true);
         $property->setValue($this, $messageRegExp);
     }

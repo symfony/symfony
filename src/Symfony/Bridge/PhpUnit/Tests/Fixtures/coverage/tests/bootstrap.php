@@ -14,7 +14,7 @@ require __DIR__.'/../src/FooCov.php';
 
 require __DIR__.'/../../../../Legacy/CoverageListenerTrait.php';
 
-if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
+if (version_compare(\PHPUnit\Runner\Version::id(), '6.0.0', '<')) {
     require_once __DIR__.'/../../../../Legacy/CoverageListenerForV5.php';
 } elseif (version_compare(\PHPUnit\Runner\Version::id(), '7.0.0', '<')) {
     require_once __DIR__.'/../../../../Legacy/CoverageListenerForV6.php';

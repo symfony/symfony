@@ -33,7 +33,6 @@ class Inline
     private static $objectSupport = false;
     private static $objectForMap = false;
     private static $constantSupport = false;
-    private static $nullAsTilde = false;
 
     /**
      * @param int         $flags
@@ -46,7 +45,6 @@ class Inline
         self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
         self::$objectForMap = (bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags);
         self::$constantSupport = (bool) (Yaml::PARSE_CONSTANT & $flags);
-        self::$nullAsTilde = (bool) (Yaml::DUMP_NULL_AS_TILDE & $flags);
         self::$parsedFilename = $parsedFilename;
 
         if (null !== $parsedLineNumber) {

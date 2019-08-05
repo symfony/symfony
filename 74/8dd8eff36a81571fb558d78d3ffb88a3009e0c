@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-01T19:34:10Z
+
+I wonder if should we create an alias for each exception class in the ErrorHandler component?
+
+/cc @Tobion @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-01T19:42:10Z
+
+this won't solve the linked issue, as the alias will never be loaded...
+the only way is to create the alias when loading the new class
+so we could add the file you have here at the end of the real one
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-01T20:17:40Z
+
+> this won't solve the linked issue, as the alias will never be loaded...
+the only way is to create the alias when loading the new class
+so we could add the file you have here at the end of the real one
+
+That's the case when we (the HttpKernel or ErrorRenderer component) throws the new exception, but shouldn't we also cover the case when someone is throwning the old one? The lastest changes cover both cases.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-01T22:21:15Z
+
+Done!
+Thank you Nicolas :)

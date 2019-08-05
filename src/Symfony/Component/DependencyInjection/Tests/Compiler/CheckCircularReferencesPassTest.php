@@ -85,6 +85,22 @@ class CheckCircularReferencesPassTest extends TestCase
         $this->process($container);
     }
 
+    public function testProcessDetectsIndirectCircularReferenceWithConfigurator()
+    {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');
+        $container = new ContainerBuilder();
+
+        $container->register('a')->addArgument(new Reference('b'));
+
+        $container
+            ->register('b', 'stdClass')
+            ->setConfigurator([new Reference('c'), 'getInstance']);
+
+        $container->register('c')->addArgument(new Reference('a'));
+
+        $this->process($container);
+    }
+
     public function testDeepCircularReference()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');

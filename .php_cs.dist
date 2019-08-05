@@ -9,7 +9,7 @@ return PhpCsFixer\Config::create()
         '@Symfony' => true,
         '@Symfony:risky' => true,
         '@PHPUnit75Migration:risky' => true,
-        'php_unit_dedicate_assert' => ['target' => '3.5'],
+        'php_unit_dedicate_assert' => ['target' => '5.6'],
         'phpdoc_no_empty_return' => false, // triggers almost always false positive
         'array_syntax' => ['syntax' => 'short'],
         'fopen_flags' => false,

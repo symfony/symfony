@@ -124,7 +124,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         if (null === $label) {
             // If the labels are null, use the original choice key by default
             $label = (string) $key;
-        } elseif (false !== $label) {
+        } else {
             // If "choice_label" is set to false and "expanded" is true, the value false
             // should be passed on to the "label" option of the checkboxes/radio buttons
             $dynamicLabel = \call_user_func($label, $choice, $key, $value);

@@ -312,6 +312,16 @@ class ChoiceType extends AbstractType
             return $choiceTranslationDomain;
         };
 
+        $choiceLabelNormalizer = function (Options $options, $choiceLabel) {
+            if (false === $choiceLabel) {
+                return function () {
+                    return false;
+                };
+            }
+
+            return $choiceLabel;
+        };
+
         $resolver->setDefaults([
             'multiple' => false,
             'expanded' => false,
@@ -339,6 +349,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
         $resolver->setNormalizer('choices_as_values', $choicesAsValuesNormalizer);
+        $resolver->setNormalizer('choice_label', $choiceLabelNormalizer);
 
         $resolver->setAllowedTypes('choices', ['null', 'array', '\Traversable']);
         $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);

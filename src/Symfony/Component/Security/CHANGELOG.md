@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+ * The `LdapUserProvider` class has been removed, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead.
  * The `FirewallMapInterface::getListeners()` method must return an array of 3 elements.
  * Removed the `ContextListener::setLogoutOnUserChange()` method.
  * Removed the `ListenerInterface`, turn your listeners into callables instead.

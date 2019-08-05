@@ -82,7 +82,7 @@
         </service>
 
         <service id="console.command.messenger_consume_messages" class="Symfony\Component\Messenger\Command\ConsumeMessagesCommand">
-            <argument type="service" id="messenger.routable_message_bus" />
+            <argument /> <!-- Routable message bus -->
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="collection" /> <!-- Receiver names -->

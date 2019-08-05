@@ -55,6 +55,8 @@ class ConsumeMessagesCommand extends Command
         if ($routableBus instanceof ContainerInterface) {
             @trigger_error(sprintf('Passing a "%s" instance as first argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance instead.', ContainerInterface::class, __METHOD__, RoutableMessageBus::class), E_USER_DEPRECATED);
             $routableBus = new RoutableMessageBus($routableBus);
+        } elseif (!$routableBus instanceof RoutableMessageBus) {
+            throw new \TypeError(sprintf('The first argument must be an instance of "%s".', RoutableMessageBus::class));
         }
 
         if (\is_array($retryStrategyLocator)) {

@@ -53,7 +53,7 @@ final class Countries extends ResourceBundle
     }
 
     /**
-     * Get country name from alpha2 code.
+     * Gets the country name from alpha2 code.
      *
      * @throws MissingResourceException if the country code does not exists
      */
@@ -63,7 +63,7 @@ final class Countries extends ResourceBundle
     }
 
     /**
-     * Get list of country names indexed with alpha2 codes as keys.
+     * Gets the list of country names indexed with alpha2 codes as keys.
      *
      * @return string[]
      */

@@ -50,7 +50,7 @@ final class Languages extends ResourceBundle
     }
 
     /**
-     * Get language name from alpha2 code.
+     * Gets the language name from alpha2 code.
      *
      * @throws MissingResourceException if the language code does not exists
      */
@@ -60,7 +60,7 @@ final class Languages extends ResourceBundle
     }
 
     /**
-     * Get list of language names indexed with alpha2 codes as keys.
+     * Gets the list of language names indexed with alpha2 codes as keys.
      *
      * @return string[]
      */

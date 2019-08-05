@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
@@ -31,7 +32,7 @@ class AbstractNormalizerTest extends TestCase
     private $normalizer;
 
     /**
-     * @var ClassMetadataFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ClassMetadataFactoryInterface|MockObject
      */
     private $classMetadata;
 

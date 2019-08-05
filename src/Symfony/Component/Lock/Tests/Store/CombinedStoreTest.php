@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\CombinedStore;
@@ -49,11 +50,11 @@ class CombinedStoreTest extends AbstractStoreTest
         return new CombinedStore([new RedisStore($redis)], new UnanimousStrategy());
     }
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var MockObject */
     private $strategy;
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var MockObject */
     private $store1;
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var MockObject */
     private $store2;
     /** @var CombinedStore */
     private $store;

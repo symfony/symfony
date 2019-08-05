@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Simple\ArrayCache;
@@ -63,7 +64,7 @@ class ChainCacheTest extends CacheTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
+     * @return MockObject|PruneableCacheInterface
      */
     private function getPruneableMock()
     {
@@ -80,7 +81,7 @@ class ChainCacheTest extends CacheTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
+     * @return MockObject|PruneableCacheInterface
      */
     private function getFailingPruneableMock()
     {
@@ -97,7 +98,7 @@ class ChainCacheTest extends CacheTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|CacheInterface
+     * @return MockObject|CacheInterface
      */
     private function getNonPruneableMock()
     {

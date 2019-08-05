@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
@@ -160,7 +161,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
+     * @return MockObject|PruneableCacheInterface
      */
     private function getPruneableMock()
     {
@@ -177,7 +178,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
+     * @return MockObject|PruneableCacheInterface
      */
     private function getFailingPruneableMock()
     {
@@ -194,7 +195,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AdapterInterface
+     * @return MockObject|AdapterInterface
      */
     private function getNonPruneableMock()
     {

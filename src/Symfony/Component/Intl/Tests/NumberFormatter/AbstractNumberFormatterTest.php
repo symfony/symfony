@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
+use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
@@ -323,13 +324,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeCurrency($formatter, $value)
     {
-        $exceptionCode = 'PHPUnit\Framework\Error\Warning';
-
-        if (class_exists('PHPUnit_Framework_Error_Warning')) {
-            $exceptionCode = 'PHPUnit_Framework_Error_Warning';
-        }
-
-        $this->expectException($exceptionCode);
+        $this->expectException(Warning::class);
 
         $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
     }
@@ -706,13 +701,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeDefault()
     {
-        $exceptionCode = 'PHPUnit\Framework\Error\Warning';
-
-        if (class_exists('PHPUnit_Framework_Error_Warning')) {
-            $exceptionCode = 'PHPUnit_Framework_Error_Warning';
-        }
-
-        $this->expectException($exceptionCode);
+        $this->expectException(Warning::class);
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
@@ -832,13 +821,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeCurrency()
     {
-        $exceptionCode = 'PHPUnit\Framework\Error\Warning';
-
-        if (class_exists('PHPUnit_Framework_Error_Warning')) {
-            $exceptionCode = 'PHPUnit_Framework_Error_Warning';
-        }
-
-        $this->expectException($exceptionCode);
+        $this->expectException(Warning::class);
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);

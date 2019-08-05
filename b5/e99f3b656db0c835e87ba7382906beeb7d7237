@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by karser at 2019-08-05T10:17:59Z
+
+I see. Anyways I'm glad I could help you with the research part and learnt some error handling stuff. Still have one question though, why do you return a `function that returns false` in getPhpUnitErrorHandler? isn't just `false` not enough in the set_error_handler callback?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-05T10:21:24Z
+
+> why do you return a function that returns false in getPhpUnitErrorHandler? isn't just false not enough in the set_error_handler callback?
+
+the return value is used with `call_user_func`, returning `false` here would then break.
+
+---------------------------------------------------------------------------
+
+by karser at 2019-08-05T10:35:30Z
+
+Should I apply fabbot patch?
+![image](https://user-images.githubusercontent.com/1675033/62458525-d85cbb00-b785-11e9-8f0a-a3afdddefa38.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-05T10:38:10Z
+
+Nope, fabbot doesn't work for the bridge.

@@ -63,7 +63,7 @@ class LdapUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername(string $username)
     {
         try {
             $this->ldap->bind($this->searchDn, $this->searchPassword);
@@ -112,7 +112,7 @@ class LdapUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class)
     {
         return LdapUser::class === $class;
     }

@@ -382,18 +382,19 @@ class ErrorHandlerTest extends TestCase
         restore_error_handler();
     }
 
-    public function testHandleException()
+    /**
+     * @dataProvider handleExceptionProvider
+     */
+    public function testHandleException(string $expectedMessage, \Throwable $exception)
     {
         try {
             $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
             $handler = ErrorHandler::register();
 
-            $exception = new \Exception('foo');
-
-            $logArgCheck = function ($level, $message, $context) {
-                $this->assertSame('Uncaught Exception: foo', $message);
+            $logArgCheck = function ($level, $message, $context) use ($expectedMessage, $exception) {
+                $this->assertSame($expectedMessage, $message);
                 $this->assertArrayHasKey('exception', $context);
-                $this->assertInstanceOf(\Exception::class, $context['exception']);
+                $this->assertInstanceOf(\get_class($exception), $context['exception']);
             };
 
             $logger
@@ -407,7 +408,7 @@ class ErrorHandlerTest extends TestCase
             try {
                 $handler->handleException($exception);
                 $this->fail('Exception expected');
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->assertSame($exception, $e);
             }
 
@@ -420,6 +421,15 @@ class ErrorHandlerTest extends TestCase
             restore_error_handler();
             restore_exception_handler();
         }
+    }
+
+    public function handleExceptionProvider(): array
+    {
+        return [
+            ['Uncaught Exception: foo', new \Exception('foo')],
+            ['Uncaught Error: bar', new \Error('bar')],
+            ['Uncaught ccc', new \ErrorException('ccc')],
+        ];
     }
 
     public function testBootstrappingLogger()

@@ -14,7 +14,6 @@ namespace Symfony\Component\ErrorHandler;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FatalErrorException;
-use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
 use Symfony\Component\ErrorHandler\Exception\OutOfMemoryException;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
@@ -266,7 +265,7 @@ class ErrorHandler
 
         if ($flush) {
             foreach ($this->bootstrappingLogger->cleanLogs() as $log) {
-                $type = $log[2]['exception'] instanceof \ErrorException ? $log[2]['exception']->getSeverity() : E_ERROR;
+                $type = ThrowableUtils::getSeverity($log[2]['exception']);
                 if (!isset($flush[$type])) {
                     $this->bootstrappingLogger->log($log[0], $log[1], $log[2]);
                 } elseif ($this->loggers[$type][0]) {
@@ -281,7 +280,7 @@ class ErrorHandler
     /**
      * Sets a user exception handler.
      *
-     * @param callable|null $handler A handler that will be called on Exception
+     * @param callable|null $handler A handler that must support \Throwable instances that will be called on Exception
      *
      * @return callable|null The previous exception handler
      */
@@ -540,57 +539,64 @@ class ErrorHandler
     /**
      * Handles an exception by logging then forwarding it to another handler.
      *
-     * @param \Exception|\Throwable $exception An exception to handle
-     * @param array                 $error     An array as returned by error_get_last()
+     * @param array $error An array as returned by error_get_last()
      *
      * @internal
      */
-    public function handleException($exception, array $error = null)
+    public function handleException(\Throwable $exception, array $error = null)
     {
         if (null === $error) {
             self::$exitCode = 255;
         }
-        if (!$exception instanceof \Exception) {
-            $exception = new FatalThrowableError($exception);
-        }
-        $type = $exception instanceof FatalErrorException ? $exception->getSeverity() : E_ERROR;
+
+        $type = ThrowableUtils::getSeverity($exception);
         $handlerException = null;
 
-        if (($this->loggedErrors & $type) || $exception instanceof FatalThrowableError) {
+        if (($this->loggedErrors & $type) || $exception instanceof \Error) {
             if (false !== strpos($message = $exception->getMessage(), "class@anonymous\0")) {
                 $message = $this->parseAnonymousClass($message);
             }
+
             if ($exception instanceof FatalErrorException) {
-                if ($exception instanceof FatalThrowableError) {
-                    $error = [
-                        'type' => $type,
-                        'message' => $message,
-                        'file' => $exception->getFile(),
-                        'line' => $exception->getLine(),
-                    ];
-                } else {
-                    $message = 'Fatal '.$message;
-                }
+                $message = 'Fatal '.$message;
             } elseif ($exception instanceof \ErrorException) {
                 $message = 'Uncaught '.$message;
+            } elseif ($exception instanceof \Error) {
+                $error = [
+                    'type' => $type,
+                    'message' => $message,
+                    'file' => $exception->getFile(),
+                    'line' => $exception->getLine(),
+                ];
+                $message = 'Uncaught Error: '.$message;
             } else {
                 $message = 'Uncaught Exception: '.$message;
             }
         }
+
         if ($this->loggedErrors & $type) {
             try {
                 $this->loggers[$type][0]->log($this->loggers[$type][1], $message, ['exception' => $exception]);
             } catch (\Throwable $handlerException) {
             }
         }
+
+        // temporary until fatal error handlers rework
+        $originalException = $exception;
+        if (!$exception instanceof \Exception) {
+            $exception = new FatalErrorException($exception->getMessage(), $exception->getCode(), $type, $exception->getFile(), $exception->getLine(), null, true, $exception->getTrace());
+        }
+
         if ($exception instanceof FatalErrorException && !$exception instanceof OutOfMemoryException && $error) {
             foreach ($this->getFatalErrorHandlers() as $handler) {
                 if ($e = $handler->handleError($error, $exception)) {
-                    $exception = $e;
+                    $convertedException = $e;
                     break;
                 }
             }
         }
+
+        $exception = $convertedException ?? $originalException;
         $exceptionHandler = $this->exceptionHandler;
         if ((!\is_array($exceptionHandler) || !$exceptionHandler[0] instanceof self || 'sendPhpResponse' !== $exceptionHandler[1]) && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             $this->exceptionHandler = [$this, 'sendPhpResponse'];

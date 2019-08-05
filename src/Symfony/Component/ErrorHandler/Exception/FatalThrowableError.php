@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ErrorHandler\Exception;
 
+use Symfony\Component\ErrorHandler\ThrowableUtils;
+
 /**
  * Fatal Throwable Error.
  *
@@ -24,18 +26,10 @@ class FatalThrowableError extends FatalErrorException
     {
         $this->originalClassName = \get_class($e);
 
-        if ($e instanceof \ParseError) {
-            $severity = E_PARSE;
-        } elseif ($e instanceof \TypeError) {
-            $severity = E_RECOVERABLE_ERROR;
-        } else {
-            $severity = E_ERROR;
-        }
-
         \ErrorException::__construct(
             $e->getMessage(),
             $e->getCode(),
-            $severity,
+            ThrowableUtils::getSeverity($e),
             $e->getFile(),
             $e->getLine(),
             $e->getPrevious()

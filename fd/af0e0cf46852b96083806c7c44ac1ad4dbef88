@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-03T20:38:24Z
+
+<img width="1181" alt="image" src="https://user-images.githubusercontent.com/47313/62428950-6d20d380-b708-11e9-86d7-1afca180411a.png">
+<img width="476" alt="image" src="https://user-images.githubusercontent.com/47313/62428954-7e69e000-b708-11e9-8cbc-d890a6a980c0.png">
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-04T20:36:36Z
+
+I think it's finished now. It supports multiple transports and I've added a visual representation of the message parts.
+
+<img width="699" alt="image" src="https://user-images.githubusercontent.com/47313/62428937-3f3b8f00-b708-11e9-8464-a14dbb4da8cc.png">
+
+Regarding the iframe for HTML, it's not simple and I'd like to do it in a follow-up PR (or maybe someone else can work on it :)).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-05T05:48:36Z
+
+Travis failure will be fixed when 4.4 is merged to master.

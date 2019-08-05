@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\EventDispatcher\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -21,7 +22,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ImmutableEventDispatcherTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $innerDispatcher;
 

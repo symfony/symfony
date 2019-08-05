@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,12 +34,12 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 class FormTypeCsrfExtensionTest extends TypeTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     protected $tokenManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     protected $translator;
 

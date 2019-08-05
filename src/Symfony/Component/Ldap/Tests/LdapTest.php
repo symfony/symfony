@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\ConnectionInterface;
@@ -19,7 +20,7 @@ use Symfony\Component\Ldap\Ldap;
 
 class LdapTest extends TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var MockObject */
     private $adapter;
 
     /** @var Ldap */

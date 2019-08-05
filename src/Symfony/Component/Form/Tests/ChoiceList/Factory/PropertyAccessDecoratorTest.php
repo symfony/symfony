@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -21,7 +22,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class PropertyAccessDecoratorTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $decoratedFactory;
 

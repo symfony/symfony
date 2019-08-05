@@ -30,7 +30,7 @@ class ErrorChunk implements ChunkInterface
     {
         $this->offset = $offset;
         $this->error = $error;
-        $this->errorMessage = null !== $error ? $error->getMessage() : 'Reading from the response stream reached the inactivity timeout.';
+        $this->errorMessage = null !== $error ? $error->getMessage() : 'Reading from the response stream reached the idle timeout.';
     }
 
     /**

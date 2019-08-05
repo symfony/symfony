@@ -76,7 +76,7 @@ class CoverageListenerTrait
         $cache = $r->getValue();
         $cache = array_replace_recursive($cache, array(
             \get_class($test) => array(
-                'covers' => array($sutFqcn),
+                'covers' => \is_array($sutFqcn) ? $sutFqcn : array($sutFqcn),
             ),
         ));
         $r->setValue($testClass, $cache);

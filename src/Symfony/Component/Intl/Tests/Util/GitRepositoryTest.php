@@ -51,7 +51,7 @@ class GitRepositoryTest extends TestCase
         $git = GitRepository::download(self::REPO_URL, $this->targetDir);
 
         $this->assertInstanceOf(GitRepository::class, $git);
-        $this->assertTrue(is_dir($this->targetDir.'/.git'));
+        $this->assertDirectoryExists($this->targetDir.'/.git');
         $this->assertSame($this->targetDir, $git->getPath());
         $this->assertSame(self::REPO_URL, $git->getUrl());
         $this->assertRegExp('#^[0-9a-z]{40}$#', $git->getLastCommitHash());

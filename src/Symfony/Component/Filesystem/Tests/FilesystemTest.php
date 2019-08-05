@@ -153,7 +153,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
-        $this->assertTrue(is_dir($targetFileDirectory));
+        $this->assertDirectoryExists($targetFileDirectory);
         $this->assertFileExists($targetFilePath);
         $this->assertStringEqualsFile($targetFilePath, 'SOURCE FILE');
     }
@@ -185,7 +185,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->mkdir($directory);
 
-        $this->assertTrue(is_dir($directory));
+        $this->assertDirectoryExists($directory);
     }
 
     public function testMkdirCreatesDirectoriesFromArray()
@@ -197,9 +197,9 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->mkdir($directories);
 
-        $this->assertTrue(is_dir($basePath.'1'));
-        $this->assertTrue(is_dir($basePath.'2'));
-        $this->assertTrue(is_dir($basePath.'3'));
+        $this->assertDirectoryExists($basePath.'1');
+        $this->assertDirectoryExists($basePath.'2');
+        $this->assertDirectoryExists($basePath.'3');
     }
 
     public function testMkdirCreatesDirectoriesFromTraversableObject()
@@ -211,9 +211,9 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->mkdir($directories);
 
-        $this->assertTrue(is_dir($basePath.'1'));
-        $this->assertTrue(is_dir($basePath.'2'));
-        $this->assertTrue(is_dir($basePath.'3'));
+        $this->assertDirectoryExists($basePath.'1');
+        $this->assertDirectoryExists($basePath.'2');
+        $this->assertDirectoryExists($basePath.'3');
     }
 
     public function testMkdirCreatesDirectoriesFails()
@@ -347,7 +347,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // create symlink to dir using trailing forward slash
         $this->filesystem->symlink($basePath.'dir/', $basePath.'dir-link');
-        $this->assertTrue(is_dir($basePath.'dir-link'));
+        $this->assertDirectoryExists($basePath.'dir-link');
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
@@ -821,7 +821,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFalse(is_link($link));
         $this->assertFalse(is_file($link));
-        $this->assertFalse(is_dir($link));
+        $this->assertDirectoryNotExists($link);
     }
 
     public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()
@@ -1150,8 +1150,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->mirror($sourcePath, $targetPath);
 
-        $this->assertTrue(is_dir($targetPath));
-        $this->assertTrue(is_dir($targetPath.'directory'));
+        $this->assertDirectoryExists($targetPath);
+        $this->assertDirectoryExists($targetPath.'directory');
         $this->assertFileEquals($file1, $targetPath.'directory'.\DIRECTORY_SEPARATOR.'file1');
         $this->assertFileEquals($file2, $targetPath.'file2');
 
@@ -1184,7 +1184,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->mirror($sourcePath, $targetPath);
 
-        $this->assertTrue(is_dir($targetPath));
+        $this->assertDirectoryExists($targetPath);
 
         $this->filesystem->remove($sourcePath);
     }
@@ -1203,7 +1203,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->mirror($sourcePath, $targetPath);
 
-        $this->assertTrue(is_dir($targetPath));
+        $this->assertDirectoryExists($targetPath);
         $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
         $this->assertTrue(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
     }
@@ -1223,7 +1223,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->mirror($sourcePath, $targetPath);
 
-        $this->assertTrue(is_dir($targetPath));
+        $this->assertDirectoryExists($targetPath);
         $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
     }
@@ -1247,7 +1247,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->mirror($sourcePath, $targetPath);
 
-        $this->assertTrue(is_dir($targetPath));
+        $this->assertDirectoryExists($targetPath);
         $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
         $this->assertEquals('\\' === \DIRECTORY_SEPARATOR ? realpath($sourcePath.'\nested') : 'nested', readlink($targetPath.\DIRECTORY_SEPARATOR.'link1'));
@@ -1270,7 +1270,7 @@ class FilesystemTest extends FilesystemTestCase
 
         chdir($oldPath);
 
-        $this->assertTrue(is_dir($targetPath));
+        $this->assertDirectoryExists($targetPath);
         $this->assertFileExists($targetPath.'source');
         $this->assertFileExists($targetPath.'target');
     }
@@ -1295,7 +1295,7 @@ class FilesystemTest extends FilesystemTestCase
 
         chdir($oldPath);
 
-        $this->assertTrue(is_dir($targetPath));
+        $this->assertDirectoryExists($targetPath);
         $this->assertFileExists($targetPath.'source');
         $this->assertFileNotExists($targetPath.'target');
     }

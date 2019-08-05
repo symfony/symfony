@@ -42,7 +42,7 @@ class NativeFileSessionHandlerTest extends TestCase
     {
         $handler = new NativeFileSessionHandler($savePath);
         $this->assertEquals($expectedSavePath, ini_get('session.save_path'));
-        $this->assertTrue(is_dir(realpath($path)));
+        $this->assertDirectoryExists(realpath($path));
 
         rmdir($path);
     }

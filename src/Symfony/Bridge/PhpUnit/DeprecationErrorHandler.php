@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
+use PHPUnit\Framework\TestResult;
+use PHPUnit\Util\ErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 
@@ -49,6 +51,7 @@ class DeprecationErrorHandler
 
     private static $isRegistered = false;
     private static $utilPrefix;
+    private static $isAtLeastPhpUnit83;
 
     /**
      * Registers and configures the deprecation handler.
@@ -73,6 +76,7 @@ class DeprecationErrorHandler
         }
 
         self::$utilPrefix = class_exists('PHPUnit_Util_ErrorHandler') ? 'PHPUnit_Util_' : 'PHPUnit\Util\\';
+        self::$isAtLeastPhpUnit83 = method_exists('PHPUnit\Util\ErrorHandler', '__invoke');
 
         $handler = new self();
         $oldErrorHandler = set_error_handler([$handler, 'handleError']);
@@ -80,7 +84,7 @@ class DeprecationErrorHandler
         if (null !== $oldErrorHandler) {
             restore_error_handler();
 
-            if ([self::$utilPrefix.'ErrorHandler', 'handleError'] === $oldErrorHandler) {
+            if ($oldErrorHandler instanceof ErrorHandler || [self::$utilPrefix.'ErrorHandler', 'handleError'] === $oldErrorHandler) {
                 restore_error_handler();
                 self::register($mode);
             }
@@ -100,12 +104,7 @@ class DeprecationErrorHandler
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
                 }
 
-                static $autoload = true;
-
-                $ErrorHandler = class_exists('PHPUnit_Util_ErrorHandler', $autoload) ? 'PHPUnit_Util_ErrorHandler' : 'PHPUnit\Util\ErrorHandler';
-                $autoload = false;
-
-                return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
+                return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
             }
 
             $deprecations[] = [error_reporting(), $msg, $file];
@@ -122,9 +121,7 @@ class DeprecationErrorHandler
     public function handleError($type, $msg, $file, $line, $context = [])
     {
         if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || !$this->getConfiguration()->isEnabled()) {
-            $ErrorHandler = self::$utilPrefix.'ErrorHandler';
-
-            return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
+            return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
         }
 
         $deprecation = new Deprecation($msg, debug_backtrace(), $file);
@@ -317,6 +314,26 @@ class DeprecationErrorHandler
         if (!empty($notices)) {
             echo "\n";
         }
+    }
+
+    private static function getPhpUnitErrorHandler()
+    {
+        if (!self::$isAtLeastPhpUnit83) {
+            return (class_exists('PHPUnit_Util_ErrorHandler', false) ? 'PHPUnit_Util_' : 'PHPUnit\Util\\').'ErrorHandler::handleError';
+        }
+
+        foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+            if (isset($frame['object']) && $frame['object'] instanceof TestResult) {
+                return new ErrorHandler(
+                    $frame['object']->getConvertDeprecationsToExceptions(),
+                    $frame['object']->getConvertErrorsToExceptions(),
+                    $frame['object']->getConvertNoticesToExceptions(),
+                    $frame['object']->getConvertWarningsToExceptions()
+                );
+            }
+        }
+
+        return function () { return false; };
     }
 
     /**

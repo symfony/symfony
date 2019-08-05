@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Form;
@@ -20,7 +21,7 @@ use Symfony\Component\Form\FormView;
 class FormDataCollectorTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dataExtractor;
 
@@ -30,17 +31,17 @@ class FormDataCollectorTest extends TestCase
     private $dataCollector;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $factory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dataMapper;
 

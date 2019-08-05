@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -49,7 +50,7 @@ class CachePruneCommandTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|KernelInterface
+     * @return MockObject|KernelInterface
      */
     private function getKernel()
     {
@@ -75,7 +76,7 @@ class CachePruneCommandTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableInterface
+     * @return MockObject|PruneableInterface
      */
     private function getPruneableInterfaceMock()
     {

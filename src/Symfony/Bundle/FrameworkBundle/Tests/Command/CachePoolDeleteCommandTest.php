@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -83,7 +84,7 @@ class CachePoolDeleteCommandTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|KernelInterface
+     * @return MockObject|KernelInterface
      */
     private function getKernel()
     {

@@ -5,6 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
@@ -72,7 +73,7 @@ class AnnotationsCacheWarmerTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Reader
+     * @return MockObject|Reader
      */
     private function getReadOnlyReader()
     {

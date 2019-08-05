@@ -32,8 +32,7 @@ interface ChoiceListFactoryInterface
      * Null may be passed when the choice list contains the empty value.
      *
      * @param iterable      $choices The choices
-     * @param callable|null $value   The callable generating the choice
-     *                               values
+     * @param callable|null $value   The callable generating the choice values
      *
      * @return ChoiceListInterface The choice list
      */
@@ -46,9 +45,7 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as only argument.
      * Null may be passed when the choice list contains the empty value.
      *
-     * @param ChoiceLoaderInterface $loader The choice loader
-     * @param callable|null         $value  The callable generating the choice
-     *                                      values
+     * @param callable|null $value The callable generating the choice values
      *
      * @return ChoiceListInterface The choice list
      */
@@ -80,7 +77,6 @@ interface ChoiceListFactoryInterface
      * match the keys of the choices. The values should be arrays of HTML
      * attributes that should be added to the respective choice.
      *
-     * @param ChoiceListInterface $list             The choice list
      * @param array|callable|null $preferredChoices The preferred choices
      * @param callable|null       $label            The callable generating the
      *                                              choice labels

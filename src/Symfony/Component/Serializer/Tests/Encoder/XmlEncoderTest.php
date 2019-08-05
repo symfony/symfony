@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
@@ -879,7 +880,7 @@ XML;
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|NormalizerInterface
+     * @return MockObject|NormalizerInterface
      */
     private function createMockDateTimeNormalizer()
     {

@@ -63,6 +63,7 @@ class DotenvTest extends TestCase
     public function getEnvData()
     {
         putenv('LOCAL=local');
+        $_ENV['LOCAL'] = 'local';
         $_ENV['REMOTE'] = 'remote';
 
         $tests = [
@@ -294,5 +295,21 @@ class DotenvTest extends TestCase
         $this->assertSame('bar1', getenv('BAR'));
         $this->assertSame('baz1', getenv('BAZ'));
         $this->assertSame('/var/www', getenv('DOCUMENT_ROOT'));
+    }
+
+    public function testGetVariablesValueFromEnvFirst()
+    {
+        $_ENV['APP_ENV'] = 'prod';
+        $dotenv = new Dotenv(true);
+
+        $test = "APP_ENV=dev\nTEST1=foo1_\${APP_ENV}";
+        $values = $dotenv->parse($test);
+        $this->assertSame('foo1_prod', $values['TEST1']);
+
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $test = "APP_ENV=dev\nTEST2=foo2_\$(php -r 'echo \$_SERVER[\"APP_ENV\"];')";
+            $values = $dotenv->parse($test);
+            $this->assertSame('foo2_prod', $values['TEST2']);
+        }
     }
 }

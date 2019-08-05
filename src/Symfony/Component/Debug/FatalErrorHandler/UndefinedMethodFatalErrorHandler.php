@@ -14,14 +14,14 @@ namespace Symfony\Component\Debug\FatalErrorHandler;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\UndefinedMethodException;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', UndefinedMethodFatalErrorHandler::class, \Symfony\Component\ErrorHandler\FatalErrorHandler\UndefinedMethodFatalErrorHandler::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', UndefinedMethodFatalErrorHandler::class, \Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedMethodErrorEnhancer::class), E_USER_DEPRECATED);
 
 /**
  * ErrorHandler for undefined methods.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\FatalErrorHandler\UndefinedMethodFatalErrorHandler instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedMethodErrorEnhancer instead.
  */
 class UndefinedMethodFatalErrorHandler implements FatalErrorHandlerInterface
 {

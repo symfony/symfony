@@ -9,45 +9,45 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorHandler\FatalErrorHandler;
+namespace Symfony\Component\ErrorHandler\ErrorEnhancer;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 use Symfony\Component\ClassLoader\ClassLoader as SymfonyClassLoader;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
-use Symfony\Component\ErrorHandler\Exception\ClassNotFoundException;
-use Symfony\Component\ErrorHandler\Exception\FatalErrorException;
+use Symfony\Component\ErrorHandler\Error\ClassNotFoundError;
+use Symfony\Component\ErrorHandler\Error\FatalError;
 
 /**
- * ErrorHandler for classes that do not exist.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
+class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function handleError(array $error, FatalErrorException $exception)
+    public function enhance(\Throwable $error): ?\Throwable
     {
-        $messageLen = \strlen($error['message']);
+        // Some specific versions of PHP produce a fatal error when extending a not found class.
+        $message = !$error instanceof FatalError ? $error->getMessage() : $error->getError()['message'];
+        $messageLen = \strlen($message);
         $notFoundSuffix = '\' not found';
         $notFoundSuffixLen = \strlen($notFoundSuffix);
         if ($notFoundSuffixLen > $messageLen) {
             return null;
         }
 
-        if (0 !== substr_compare($error['message'], $notFoundSuffix, -$notFoundSuffixLen)) {
+        if (0 !== substr_compare($message, $notFoundSuffix, -$notFoundSuffixLen)) {
             return null;
         }
 
         foreach (['class', 'interface', 'trait'] as $typeName) {
             $prefix = ucfirst($typeName).' \'';
             $prefixLen = \strlen($prefix);
-            if (0 !== strpos($error['message'], $prefix)) {
+            if (0 !== strpos($message, $prefix)) {
                 continue;
             }
 
-            $fullyQualifiedClassName = substr($error['message'], $prefixLen, -$notFoundSuffixLen);
+            $fullyQualifiedClassName = substr($message, $prefixLen, -$notFoundSuffixLen);
             if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedClassName, '\\')) {
                 $className = substr($fullyQualifiedClassName, $namespaceSeparatorIndex + 1);
                 $namespacePrefix = substr($fullyQualifiedClassName, 0, $namespaceSeparatorIndex);
@@ -69,8 +69,10 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             }
             $message .= "\nDid you forget a \"use\" statement".$tail;
 
-            return new ClassNotFoundException($message, $exception);
+            return new ClassNotFoundError($message, $error);
         }
+
+        return null;
     }
 
     /**
@@ -81,7 +83,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
      *
      * @param string $class A class name (without its namespace)
      *
-     * @return array An array of possible fully qualified class names
+     * Returns an array of possible fully qualified class names
      */
     private function getClassCandidates(string $class): array
     {

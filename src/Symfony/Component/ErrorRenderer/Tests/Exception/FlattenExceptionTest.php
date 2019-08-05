@@ -12,7 +12,7 @@
 namespace Symfony\Component\ErrorRenderer\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
+use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -132,7 +132,7 @@ class FlattenExceptionTest extends TestCase
 
     public function testWrappedThrowable()
     {
-        $exception = new FatalThrowableError(new \DivisionByZeroError('Ouch', 42));
+        $exception = new ErrorException(new \DivisionByZeroError('Ouch', 42));
         $flattened = FlattenException::createFromThrowable($exception);
 
         $this->assertSame('Ouch', $flattened->getMessage(), 'The message is copied from the original error.');

@@ -49,7 +49,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
             'command' => 'security:encode-password',
         ], ['interactive' => false]);
 
-        $this->assertContains('[ERROR] The password must not be empty.', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringContainsString('[ERROR] The password must not be empty.', $this->passwordEncoderCommandTester->getDisplay());
         $this->assertEquals($statusCode, 1);
     }
 
@@ -62,7 +62,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordEncoderCommandTester->getDisplay();
-        $this->assertContains('Password encoding succeeded', $output);
+        $this->assertStringContainsString('Password encoding succeeded', $output);
 
         $encoder = new BCryptPasswordEncoder(17);
         preg_match('# Encoded password\s{1,}([\w+\/$.]+={0,2})\s+#', $output, $matches);
@@ -83,7 +83,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordEncoderCommandTester->getDisplay();
-        $this->assertContains('Password encoding succeeded', $output);
+        $this->assertStringContainsString('Password encoding succeeded', $output);
 
         $encoder = new Argon2iPasswordEncoder();
         preg_match('#  Encoded password\s+(\$argon2id?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
@@ -100,7 +100,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordEncoderCommandTester->getDisplay();
-        $this->assertContains('Password encoding succeeded', $output);
+        $this->assertStringContainsString('Password encoding succeeded', $output);
 
         $encoder = new Pbkdf2PasswordEncoder('sha512', true, 1000);
         preg_match('# Encoded password\s{1,}([\w+\/]+={0,2})\s+#', $output, $matches);
@@ -119,9 +119,9 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
             ], ['interactive' => false]
         );
 
-        $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
-        $this->assertContains(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
-        $this->assertContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringContainsString('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringContainsString(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringContainsString(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testEncodePasswordEmptySaltOutput()
@@ -133,9 +133,9 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
             '--empty-salt' => true,
         ]);
 
-        $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
-        $this->assertContains(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
-        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringContainsString('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringContainsString(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringNotContainsString(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testEncodePasswordBcryptOutput()
@@ -146,7 +146,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
             'user-class' => 'Custom\Class\Bcrypt\User',
         ], ['interactive' => false]);
 
-        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringNotContainsString(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testEncodePasswordArgon2iOutput()
@@ -162,7 +162,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
             'user-class' => 'Custom\Class\Argon2i\User',
         ], ['interactive' => false]);
 
-        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringNotContainsString(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testEncodePasswordNoConfigForGivenUserClass()
@@ -185,7 +185,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
             'password' => 'password',
         ], ['decorated' => false]);
 
-        $this->assertContains(<<<EOTXT
+        $this->assertStringContainsString(<<<EOTXT
  For which user class would you like to encode a password? [Custom\Class\Bcrypt\User]:
   [0] Custom\Class\Bcrypt\User
   [1] Custom\Class\Pbkdf2\User
@@ -202,7 +202,7 @@ EOTXT
             'password' => 'password',
         ], ['interactive' => false]);
 
-        $this->assertContains('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringContainsString('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testThrowsExceptionOnNoConfiguredEncoders()
@@ -240,7 +240,7 @@ EOTXT
             'password' => 'password',
         ], ['interactive' => false]);
 
-        $this->assertContains('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $tester->getDisplay());
+        $this->assertStringContainsString('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $tester->getDisplay());
     }
 
     protected function setUp()

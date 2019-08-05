@@ -239,7 +239,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester = new CommandTester($application->find('debug:translation'));
         $tester->execute(['locale' => 'en']);
 
-        $this->assertContains('No defined or extracted', $tester->getDisplay());
+        $this->assertStringContainsString('No defined or extracted', $tester->getDisplay());
     }
 
     private function getBundle($path)

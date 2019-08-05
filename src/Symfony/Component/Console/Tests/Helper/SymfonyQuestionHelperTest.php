@@ -161,6 +161,6 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
     {
         rewind($output->getStream());
         $stream = stream_get_contents($output->getStream());
-        $this->assertContains($expected, $stream);
+        $this->assertStringContainsString($expected, $stream);
     }
 }

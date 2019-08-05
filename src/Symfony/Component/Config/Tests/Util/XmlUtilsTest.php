@@ -24,28 +24,28 @@ class XmlUtilsTest extends TestCase
             XmlUtils::loadFile($fixtures.'invalid.xml');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertContains('ERROR 77', $e->getMessage());
+            $this->assertStringContainsString('ERROR 77', $e->getMessage());
         }
 
         try {
             XmlUtils::loadFile($fixtures.'document_type.xml');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertContains('Document types are not allowed', $e->getMessage());
+            $this->assertStringContainsString('Document types are not allowed', $e->getMessage());
         }
 
         try {
             XmlUtils::loadFile($fixtures.'invalid_schema.xml', $fixtures.'schema.xsd');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertContains('ERROR 1845', $e->getMessage());
+            $this->assertStringContainsString('ERROR 1845', $e->getMessage());
         }
 
         try {
             XmlUtils::loadFile($fixtures.'invalid_schema.xml', 'invalid_callback_or_file');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertContains('XSD file or callable', $e->getMessage());
+            $this->assertStringContainsString('XSD file or callable', $e->getMessage());
         }
 
         $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();

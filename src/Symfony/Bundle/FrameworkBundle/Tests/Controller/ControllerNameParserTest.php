@@ -127,9 +127,9 @@ class ControllerNameParserTest extends TestCase
 
             if (false === $suggestedBundleName) {
                 // make sure we don't have a suggestion
-                $this->assertNotContains('Did you mean', $e->getMessage());
+                $this->assertStringNotContainsString('Did you mean', $e->getMessage());
             } else {
-                $this->assertContains(sprintf('Did you mean "%s"', $suggestedBundleName), $e->getMessage());
+                $this->assertStringContainsString(sprintf('Did you mean "%s"', $suggestedBundleName), $e->getMessage());
             }
         }
     }

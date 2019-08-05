@@ -29,7 +29,7 @@ class RouterMatchCommandTest extends TestCase
         $ret = $tester->execute(['path_info' => '/foo', 'foo'], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('Route Name   | foo', $tester->getDisplay());
+        $this->assertStringContainsString('Route Name   | foo', $tester->getDisplay());
     }
 
     public function testWithNotMatchPath()
@@ -38,7 +38,7 @@ class RouterMatchCommandTest extends TestCase
         $ret = $tester->execute(['path_info' => '/test', 'foo'], ['decorated' => false]);
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of failure');
-        $this->assertContains('None of the routes match the path "/test"', $tester->getDisplay());
+        $this->assertStringContainsString('None of the routes match the path "/test"', $tester->getDisplay());
     }
 
     /**
@@ -56,7 +56,7 @@ class RouterMatchCommandTest extends TestCase
 
         $tester->execute(['path_info' => '/']);
 
-        $this->assertContains('None of the routes match the path "/"', $tester->getDisplay());
+        $this->assertStringContainsString('None of the routes match the path "/"', $tester->getDisplay());
     }
 
     /**

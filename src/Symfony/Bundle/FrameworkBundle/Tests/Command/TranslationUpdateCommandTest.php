@@ -231,7 +231,7 @@ class TranslationUpdateCommandTest extends TestCase
         $tester = new CommandTester($application->find('translation:update'));
         $tester->execute(['locale' => 'en']);
 
-        $this->assertContains('You must choose one of --force or --dump-messages', $tester->getDisplay());
+        $this->assertStringContainsString('You must choose one of --force or --dump-messages', $tester->getDisplay());
     }
 
     private function getBundle($path)

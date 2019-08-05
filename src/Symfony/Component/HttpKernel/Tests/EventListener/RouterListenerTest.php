@@ -204,7 +204,7 @@ class RouterListenerTest extends TestCase
         $request = Request::create('http://localhost/');
         $response = $kernel->handle($request);
         $this->assertSame(404, $response->getStatusCode());
-        $this->assertContains('Welcome', $response->getContent());
+        $this->assertStringContainsString('Welcome', $response->getContent());
     }
 
     public function testRequestWithBadHost()

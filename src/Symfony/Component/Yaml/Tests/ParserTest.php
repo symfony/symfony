@@ -45,10 +45,6 @@ class ParserTest extends TestCase
                 if (E_USER_DEPRECATED !== $type) {
                     restore_error_handler();
 
-                    if (class_exists('PHPUnit_Util_ErrorHandler')) {
-                        return \call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', \func_get_args());
-                    }
-
                     return \call_user_func_array('PHPUnit\Util\ErrorHandler::handleError', \func_get_args());
                 }
 

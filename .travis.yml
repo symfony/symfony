@@ -209,6 +209,7 @@ install:
           git checkout -q FETCH_HEAD -- src/Symfony/Bridge/PhpUnit
           SYMFONY_VERSION=$(cat src/Symfony/Bridge/PhpUnit/composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*')
           sed -i 's/"symfony\/phpunit-bridge": ".*"/"symfony\/phpunit-bridge": "'$SYMFONY_VERSION'.x@dev"/' composer.json
+          rm -rf .phpunit
       fi
 
     - |

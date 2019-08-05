@@ -79,9 +79,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param string|FormBuilderInterface $child
-     * @param string|FormTypeInterface    $type
-     *
      * @throws BadMethodCallException
      */
     public function add($child, $type = null, array $options = [])
@@ -93,10 +90,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * Unsupported method.
      *
      * This method should not be invoked.
-     *
-     * @param string                   $name
-     * @param string|FormTypeInterface $type
-     * @param array                    $options
      *
      * @throws BadMethodCallException
      */

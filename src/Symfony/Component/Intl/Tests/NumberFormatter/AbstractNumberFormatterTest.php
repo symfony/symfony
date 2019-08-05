@@ -806,7 +806,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $parsedValue = $formatter->parse($value, NumberFormatter::TYPE_DOUBLE);
-        $this->assertEquals($expectedValue, $parsedValue, '', 0.001);
+        $this->assertEqualsWithDelta($expectedValue, $parsedValue, 0.001);
     }
 
     public function parseTypeDoubleProvider()

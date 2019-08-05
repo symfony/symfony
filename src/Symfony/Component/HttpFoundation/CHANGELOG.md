@@ -6,6 +6,7 @@ CHANGELOG
 
  * passing arguments to `Request::isMethodSafe()` is deprecated.
  * `ApacheRequest` is deprecated, use the `Request` class instead.
+ * added `setTrustedHeaderName()` method to the `Request` class.
 
 4.3.0
 -----

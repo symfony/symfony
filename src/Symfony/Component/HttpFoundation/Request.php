@@ -611,6 +611,23 @@ class Request
     }
 
     /**
+     * Sets the name for trusted headers.
+     *
+     * @param int    $type  A bit field like Request::HEADER_*, to set which headers to trust from your proxies
+     * @param string $value The header name
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function setTrustedHeaderName(int $type, string $value): void
+    {
+        if (!isset(self::$trustedHeaders[$type])) {
+            throw new \InvalidArgumentException(sprintf('Unable to set the trusted header name for type "%s".', $type));
+        }
+
+        self::$trustedHeaders[$type] = $value;
+    }
+
+    /**
      * Gets the list of trusted host patterns.
      *
      * @return array An array of trusted host patterns

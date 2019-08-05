@@ -2325,6 +2325,20 @@ class RequestTest extends TestCase
 
         $this->assertSame(80, $request->getPort());
     }
+
+    public function testSetTrustedHeaderName()
+    {
+        $request = Request::create('http://example.com/');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $request->headers->set('X_CUSTOM_FORWARDED_PORT', '8888');
+
+        $this->assertSame(80, $request->getPort());
+
+        $request::setTrustedHeaderName(Request::HEADER_X_FORWARDED_PORT, 'X_CUSTOM_FORWARDED_PORT');
+        Request::setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_PORT);
+
+        $this->assertSame(8888, $request->getPort());
+    }
 }
 
 class RequestContentProxy extends Request

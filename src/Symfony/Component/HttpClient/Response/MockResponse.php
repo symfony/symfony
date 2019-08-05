@@ -37,7 +37,7 @@ class MockResponse implements ResponseInterface
 
     /**
      * @param string|string[]|iterable $body The response body as a string or an iterable of strings,
-     *                                       yielding an empty string simulates a timeout,
+     *                                       yielding an empty string simulates an idle timeout,
      *                                       exceptions are turned to TransportException
      *
      * @see ResponseInterface::getInfo() for possible info, e.g. "response_headers"
@@ -277,7 +277,7 @@ class MockResponse implements ResponseInterface
         if (!\is_string($body)) {
             foreach ($body as $chunk) {
                 if ('' === $chunk = (string) $chunk) {
-                    // simulate a timeout
+                    // simulate an idle timeout
                     $response->body[] = new ErrorChunk($offset);
                 } else {
                     $response->body[] = $chunk;

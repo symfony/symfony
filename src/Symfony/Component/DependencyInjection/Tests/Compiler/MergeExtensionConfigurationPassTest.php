@@ -85,7 +85,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertContains(new FileResource(__FILE__), $container->getResources(), '', false, false);
+        $this->assertContainsEquals(new FileResource(__FILE__), $container->getResources());
     }
 
     public function testOverriddenEnvsAreMerged()

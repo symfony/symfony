@@ -848,8 +848,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
             $child = (string) $child;
 
-            if (null !== $type && !\is_string($type) && !$type instanceof FormTypeInterface) {
-                throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
+            if (null !== $type && !\is_string($type)) {
+                throw new UnexpectedTypeException($type, 'string or null');
             }
 
             // Never initialize child forms automatically

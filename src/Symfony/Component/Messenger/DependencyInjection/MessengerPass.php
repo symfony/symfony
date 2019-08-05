@@ -251,14 +251,19 @@ class MessengerPass implements CompilerPassInterface
             $buses[$busId] = new Reference($busId);
         }
 
-        if ($container->hasDefinition('messenger.routable_message_bus')) {
+        if ($hasRoutableMessageBus = $container->hasDefinition('messenger.routable_message_bus')) {
             $container->getDefinition('messenger.routable_message_bus')
                 ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses));
         }
 
         if ($container->hasDefinition('console.command.messenger_consume_messages')) {
-            $container->getDefinition('console.command.messenger_consume_messages')
-                ->replaceArgument(3, array_values($receiverNames));
+            $consumeCommandDefinition = $container->getDefinition('console.command.messenger_consume_messages');
+
+            if ($hasRoutableMessageBus) {
+                $consumeCommandDefinition->replaceArgument(0, new Reference('messenger.routable_message_bus'));
+            }
+
+            $consumeCommandDefinition->replaceArgument(3, array_values($receiverNames));
         }
 
         if ($container->hasDefinition('console.command.messenger_setup_transports')) {

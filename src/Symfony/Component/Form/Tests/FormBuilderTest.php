@@ -120,13 +120,6 @@ class FormBuilderTest extends TestCase
         $this->assertSame(['foo', 'bar', 'baz'], array_keys($children));
     }
 
-    public function testAddFormType()
-    {
-        $this->assertFalse($this->builder->has('foo'));
-        $this->builder->add('foo', $this->getMockBuilder('Symfony\Component\Form\FormTypeInterface')->getMock());
-        $this->assertTrue($this->builder->has('foo'));
-    }
-
     public function testRemove()
     {
         $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');

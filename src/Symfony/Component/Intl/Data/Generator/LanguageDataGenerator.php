@@ -205,6 +205,8 @@ class LanguageDataGenerator extends AbstractDataGenerator
             }
         }
 
+        asort($alpha2ToAlpha3);
+
         return $alpha2ToAlpha3;
     }
 }

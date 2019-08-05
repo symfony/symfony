@@ -170,7 +170,7 @@
             <deprecated>The "%service_id%" service is deprecated since Symfony 4.1.</deprecated>
         </service>
 
-        <service id="security.user.provider.ldap" class="Symfony\Component\Security\Core\User\LdapUserProvider" abstract="true">
+        <service id="security.user.provider.ldap" class="Symfony\Component\Ldap\Security\LdapUserProvider" abstract="true">
             <argument /> <!-- security.ldap.ldap -->
             <argument /> <!-- base dn -->
             <argument /> <!-- search dn -->

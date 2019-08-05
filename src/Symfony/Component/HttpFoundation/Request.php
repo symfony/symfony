@@ -795,7 +795,11 @@ class Request
      * being the original client, and each successive proxy that passed the request
      * adding the IP address where it received the request from.
      *
-     * @return string|null The client IP address
+     * If your reverse proxy uses a different header name than "X-Forwarded-For",
+     * ("Client-Ip" for instance), configure it via the $trustedHeaderSet
+     * argument of the Request::setTrustedProxies() method instead.
+     *
+     * @return string The client IP address
      *
      * @see getClientIps()
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For

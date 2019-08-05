@@ -31,7 +31,8 @@
     },
     "conflict": {
         "symfony/event-dispatcher": "<4.4",
-        "symfony/security-guard": "<4.4"
+        "symfony/security-guard": "<4.4",
+        "symfony/ldap": "<4.4"
     },
     "suggest": {
         "psr/container-implementation": "To instantiate the Security class",

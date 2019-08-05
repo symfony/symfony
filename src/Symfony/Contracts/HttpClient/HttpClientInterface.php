@@ -52,7 +52,7 @@ interface HttpClientInterface
         'resolve' => [],        // string[] - a map of host to IP address that SHOULD replace DNS resolution
         'proxy' => null,        // string - by default, the proxy-related env vars handled by curl SHOULD be honored
         'no_proxy' => null,     // string - a comma separated list of hosts that do not require a proxy to be reached
-        'timeout' => null,      // float - the inactivity timeout - defaults to ini_get('default_socket_timeout')
+        'timeout' => null,      // float - the idle timeout - defaults to ini_get('default_socket_timeout')
         'bindto' => '0',        // string - the interface or the local socket to bind to
         'verify_peer' => true,  // see https://php.net/context.ssl for the following options
         'verify_host' => true,
@@ -85,7 +85,7 @@ interface HttpClientInterface
      * Yields responses chunk by chunk as they complete.
      *
      * @param ResponseInterface|ResponseInterface[]|iterable $responses One or more responses created by the current HTTP client
-     * @param float|null                                     $timeout   The inactivity timeout before exiting the iterator
+     * @param float|null                                     $timeout   The idle timeout before yielding timeout chunks
      */
     public function stream($responses, float $timeout = null): ResponseStreamInterface;
 }

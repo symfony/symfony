@@ -1481,7 +1481,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('A comma separated list of hosts that do not require a proxy to be reached.')
                                     ->end()
                                     ->floatNode('timeout')
-                                        ->info('Defaults to "default_socket_timeout" ini parameter.')
+                                        ->info('The idle timeout, defaults to the "default_socket_timeout" ini parameter.')
                                     ->end()
                                     ->scalarNode('bindto')
                                         ->info('A network interface name, IP address, a host name or a UNIX socket to bind to.')

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -28,7 +29,7 @@ class JsonSerializableNormalizerTest extends TestCase
     private $normalizer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SerializerInterface
+     * @var MockObject|SerializerInterface
      */
     private $serializer;
 

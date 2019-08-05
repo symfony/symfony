@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
@@ -25,37 +26,37 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ResolvedFormTypeTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $factory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $dataMapper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeInterface
+     * @var MockObject|FormTypeInterface
      */
     private $parentType;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeInterface
+     * @var MockObject|FormTypeInterface
      */
     private $type;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeExtensionInterface
+     * @var MockObject|FormTypeExtensionInterface
      */
     private $extension1;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeExtensionInterface
+     * @var MockObject|FormTypeExtensionInterface
      */
     private $extension2;
 
@@ -359,7 +360,7 @@ class ResolvedFormTypeTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType')
     {
@@ -367,7 +368,7 @@ class ResolvedFormTypeTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     private function getMockFormTypeExtension()
     {
@@ -375,7 +376,7 @@ class ResolvedFormTypeTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     private function getMockFormFactory()
     {

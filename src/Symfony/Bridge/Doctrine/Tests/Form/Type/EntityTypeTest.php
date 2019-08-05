@@ -16,6 +16,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -53,7 +54,7 @@ class EntityTypeTest extends BaseTypeTest
     private $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var MockObject|ManagerRegistry
      */
     private $emRegistry;
 

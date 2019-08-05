@@ -15,6 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Tests\Encoder\TestPasswordEncoderInterface;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class DaoAuthenticationProviderTest extends TestCase
 {
@@ -247,6 +251,44 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->invoke($provider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(), $token);
     }
 
+    public function testPasswordUpgrades()
+    {
+        $user = new User('user', 'pwd');
+
+        $encoder = $this->getMockBuilder(TestPasswordEncoderInterface::class)->getMock();
+        $encoder->expects($this->once())
+                ->method('isPasswordValid')
+                ->willReturn(true)
+        ;
+        $encoder->expects($this->once())
+                ->method('encodePassword')
+                ->willReturn('foobar')
+        ;
+        $encoder->expects($this->once())
+                ->method('needsRehash')
+                ->willReturn(true)
+        ;
+
+        $provider = $this->getProvider(null, null, $encoder);
+
+        $userProvider = ((array) $provider)[sprintf("\0%s\0userProvider", DaoAuthenticationProvider::class)];
+        $userProvider->expects($this->once())
+            ->method('upgradePassword')
+            ->with($user, 'foobar')
+        ;
+
+        $method = new \ReflectionMethod($provider, 'checkAuthentication');
+        $method->setAccessible(true);
+
+        $token = $this->getSupportedToken();
+        $token->expects($this->once())
+              ->method('getCredentials')
+              ->willReturn('foo')
+        ;
+
+        $method->invoke($provider, $user, $token);
+    }
+
     protected function getSupportedToken()
     {
         $mock = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Authentication\\Token\\UsernamePasswordToken')->setMethods(['getCredentials', 'getUser', 'getProviderKey'])->disableOriginalConstructor()->getMock();
@@ -261,7 +303,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
     protected function getProvider($user = null, $userChecker = null, $passwordEncoder = null)
     {
-        $userProvider = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface')->getMock();
+        $userProvider = $this->getMockBuilder([UserProviderInterface::class, PasswordUpgraderInterface::class])->getMock();
         if (null !== $user) {
             $userProvider->expects($this->once())
                          ->method('loadUserByUsername')

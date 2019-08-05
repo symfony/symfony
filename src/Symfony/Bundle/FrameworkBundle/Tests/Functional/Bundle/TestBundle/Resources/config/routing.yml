@@ -52,3 +52,7 @@ fragment_inlined:
 array_controller:
     path:     /array_controller
     defaults: { _controller: [ArrayController, someAction] }
+
+send_email:
+    path:     /send_email
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::indexAction }

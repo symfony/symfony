@@ -10,6 +10,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * added support for the Mailer component
  * added button to clear the ajax request tab
  * deprecated the `ExceptionController::templateExists()` method
  * deprecated the `TemplateManager::templateExists()` method

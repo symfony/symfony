@@ -176,7 +176,7 @@ class IntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string.
      *
-     * @param int|\DateTime $timestamp The timestamp to format
+     * @param int|\DateTimeInterface $timestamp The timestamp to format
      *
      * @return string|bool The formatted value or false if formatting failed
      *
@@ -195,7 +195,7 @@ class IntlDateFormatter
 
         // behave like the intl extension
         $argumentError = null;
-        if (!\is_int($timestamp) && !$timestamp instanceof \DateTime) {
+        if (!\is_int($timestamp) && !$timestamp instanceof \DateTimeInterface) {
             $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
         }
 
@@ -207,7 +207,7 @@ class IntlDateFormatter
             return false;
         }
 
-        if ($timestamp instanceof \DateTime) {
+        if ($timestamp instanceof \DateTimeInterface) {
             $timestamp = $timestamp->getTimestamp();
         }
 

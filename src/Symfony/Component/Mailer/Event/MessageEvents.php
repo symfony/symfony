@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Event;
 
+use Symfony\Component\Mime\RawMessage;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -47,5 +49,19 @@ class MessageEvents
         }
 
         return $events;
+    }
+
+    /**
+     * @return RawMessage[]
+     */
+    public function getMessages(string $name = null): array
+    {
+        $events = $this->getEvents($name);
+        $messages = [];
+        foreach ($events as $event) {
+            $messages[] = $event->getMessage();
+        }
+
+        return $messages;
     }
 }

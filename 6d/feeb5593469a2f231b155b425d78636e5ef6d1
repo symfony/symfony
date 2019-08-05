@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-08-05T10:20:51Z
+
+@Tobion , I reverted all controversial changes.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-08-05T13:47:49Z
+
+@nicolas-grekas , done.
+Also removed to useless phpdoc types in `ChoiceListFactoryInterface`

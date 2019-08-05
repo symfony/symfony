@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
-if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
+if (version_compare(\PHPUnit\Runner\Version::id(), '6.0.0', '<')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\CoverageListenerForV5', 'Symfony\Bridge\PhpUnit\CoverageListener');
 } elseif (version_compare(\PHPUnit\Runner\Version::id(), '7.0.0', '<')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\CoverageListenerForV6', 'Symfony\Bridge\PhpUnit\CoverageListener');

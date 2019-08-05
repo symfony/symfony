@@ -13,10 +13,12 @@ namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\ExceptionInterface;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -27,7 +29,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * @author Charles Sarrazin <charles@sarraz.in>
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class LdapUserProvider implements UserProviderInterface
+class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
     private $ldap;
     private $baseDn;
@@ -107,6 +109,30 @@ class LdapUserProvider implements UserProviderInterface
         }
 
         return new LdapUser($user->getEntry(), $user->getUsername(), $user->getPassword(), $user->getRoles());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    {
+        if (!$user instanceof LdapUser) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
+        }
+
+        if (null === $this->passwordAttribute) {
+            return;
+        }
+
+        try {
+            if ($user->isEqualTo($this->loadUserByUsername($user->getUsername()))) {
+                $user->getEntry()->setAttribute($this->passwordAttribute, [$newEncodedPassword]);
+                $this->ldap->getEntryManager()->update($user->getEntry());
+                $user->setPassword($newEncodedPassword);
+            }
+        } catch (ExceptionInterface $e) {
+            // ignore failed password upgrades
+        }
     }
 
     /**

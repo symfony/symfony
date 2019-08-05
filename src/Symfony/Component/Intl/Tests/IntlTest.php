@@ -41,6 +41,6 @@ class IntlTest extends TestCase
 
     public function testGetDataDirectoryReturnsThePathToIcuData()
     {
-        $this->assertTrue(is_dir(Intl::getDataDirectory()));
+        $this->assertDirectoryExists(Intl::getDataDirectory());
     }
 }

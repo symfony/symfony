@@ -54,7 +54,6 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Workflow;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class FrameworkExtensionTest extends TestCase
 {

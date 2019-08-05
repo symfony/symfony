@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 class EntityUserProviderTest extends TestCase
 {
@@ -174,6 +175,23 @@ class EntityUserProviderTest extends TestCase
         );
 
         $provider->loadUserByUsername('name');
+    }
+
+    public function testPasswordUpgrades()
+    {
+        $user = new User(1, 1, 'user1');
+
+        $repository = $this->getMockBuilder(PasswordUpgraderInterface::class)->getMock();
+        $repository->expects($this->once())
+            ->method('upgradePassword')
+            ->with($user, 'foobar');
+
+        $provider = new EntityUserProvider(
+            $this->getManager($this->getObjectManager($repository)),
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
+        );
+
+        $provider->upgradePassword($user, 'foobar');
     }
 
     private function getManager($em, $name = null)

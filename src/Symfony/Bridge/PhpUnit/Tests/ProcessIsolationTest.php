@@ -24,8 +24,7 @@ class ProcessIsolationTest extends TestCase
 
     public function testCallingOtherErrorHandler()
     {
-        $class = class_exists('PHPUnit\Framework\Exception') ? 'PHPUnit\Framework\Exception' : 'PHPUnit_Framework_Exception';
-        $this->expectException($class);
+        $this->expectException('PHPUnit\Framework\Exception');
         $this->expectExceptionMessage('Test that PHPUnit\'s error handler fires.');
 
         trigger_error('Test that PHPUnit\'s error handler fires.', E_USER_WARNING);

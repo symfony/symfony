@@ -29,6 +29,7 @@
             <argument /> <!-- User Provider -->
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- User Checker -->
+            <argument type="service" id="security.password_encoder" />
         </service>
 
         <service id="security.authentication.listener.guard"

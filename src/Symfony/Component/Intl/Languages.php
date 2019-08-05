@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 final class Languages extends ResourceBundle
 {
     /**
-     * Returns all available languages.
+     * Returns all available languages as two-letter codes.
      *
      * Languages are returned as lowercase ISO 639-1 two-letter language codes.
      * For languages that don't have a two-letter code, the ISO 639-2
@@ -31,7 +31,7 @@ final class Languages extends ResourceBundle
      * A full table of ISO 639 language codes can be found here:
      * http://www-01.sil.org/iso639-3/codes.asp
      *
-     * @return string[] an array of canonical ISO 639 language codes
+     * @return string[] an array of canonical ISO 639-1 language codes
      */
     public static function getLanguageCodes(): array
     {
@@ -50,6 +50,8 @@ final class Languages extends ResourceBundle
     }
 
     /**
+     * Gets the language name from alpha2 code.
+     *
      * @throws MissingResourceException if the language code does not exists
      */
     public static function getName(string $language, string $displayLocale = null): string
@@ -58,6 +60,8 @@ final class Languages extends ResourceBundle
     }
 
     /**
+     * Gets the list of language names indexed with alpha2 codes as keys.
+     *
      * @return string[]
      */
     public static function getNames(string $displayLocale = null): array
@@ -66,7 +70,7 @@ final class Languages extends ResourceBundle
     }
 
     /**
-     * Returns the ISO 639-2 three-letter code of a language.
+     * Returns the ISO 639-2 three-letter code of a language, given a two-letter code.
      *
      * @throws MissingResourceException if the language has no corresponding three-letter code
      */

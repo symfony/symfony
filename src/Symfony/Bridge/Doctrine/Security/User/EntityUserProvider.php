@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Security\User;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -25,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class EntityUserProvider implements UserProviderInterface
+class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
     private $registry;
     private $managerName;
@@ -105,6 +106,22 @@ class EntityUserProvider implements UserProviderInterface
     public function supportsClass(string $class)
     {
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    {
+        $class = $this->getClass();
+        if (!$user instanceof $class) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
+        }
+
+        $repository = $this->getRepository();
+        if ($repository instanceof PasswordUpgraderInterface) {
+            $repository->upgradePassword($user, $newEncodedPassword);
+        }
     }
 
     private function getObjectManager()

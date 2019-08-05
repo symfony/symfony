@@ -8,6 +8,7 @@
         <service id="mailer.mailer" class="Symfony\Component\Mailer\Mailer">
             <argument type="service" id="mailer.default_transport" />
             <argument type="service" id="messenger.default_bus" on-invalid="ignore" />
+            <argument type="service" id="event_dispatcher" on-invalid="ignore" />
         </service>
         <service id="mailer" alias="mailer.mailer" />
         <service id="Symfony\Component\Mailer\MailerInterface" alias="mailer.mailer" />

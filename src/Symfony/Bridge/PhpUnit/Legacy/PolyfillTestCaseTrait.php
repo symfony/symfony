@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * This trait is @internal
+ * This trait is @internal.
  */
 trait PolyfillTestCaseTrait
 {

@@ -31,13 +31,16 @@ final class Countries extends ResourceBundle
      *
      * This list only contains "officially assigned ISO 3166-1 alpha-2" country codes.
      *
-     * @return string[] an array of canonical ISO 3166 country codes
+     * @return string[] an array of canonical ISO 3166 alpha-2 country codes
      */
     public static function getCountryCodes(): array
     {
         return self::readEntry(['Regions'], 'meta');
     }
 
+    /**
+     * @param string $country Alpha2 country code
+     */
     public static function exists(string $country): bool
     {
         try {
@@ -50,6 +53,8 @@ final class Countries extends ResourceBundle
     }
 
     /**
+     * Gets the country name from alpha2 code.
+     *
      * @throws MissingResourceException if the country code does not exists
      */
     public static function getName(string $country, string $displayLocale = null): string
@@ -58,9 +63,11 @@ final class Countries extends ResourceBundle
     }
 
     /**
+     * Gets the list of country names indexed with alpha2 codes as keys.
+     *
      * @return string[]
      */
-    public static function getNames($displayLocale = null)
+    public static function getNames($displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
     }

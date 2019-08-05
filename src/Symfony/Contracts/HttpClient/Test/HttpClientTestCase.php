@@ -580,7 +580,7 @@ abstract class HttpClientTestCase extends TestCase
 
         $response = null;
         $this->expectException(TransportExceptionInterface::class);
-        $client->request('GET', 'http://symfony.com:8057/', ['timeout' => 3]);
+        $client->request('GET', 'http://symfony.com:8057/', ['timeout' => 1]);
     }
 
     public function testTimeoutOnAccess()
@@ -643,7 +643,6 @@ abstract class HttpClientTestCase extends TestCase
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
-        $downloaded = 0;
         $start = microtime(true);
         $client->request('GET', 'http://localhost:8057/timeout-long');
         $client = null;

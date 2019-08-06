@@ -19,7 +19,6 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
         'PHPUnit_Framework_BaseTestListener', // override PhpUnit's ForwardCompat child class
 
         'PHPUnit_Framework_Constraint',
-        'PHPUnit_Framework_Constraint_And',
         'PHPUnit_Framework_Constraint_ArrayHasKey',
         'PHPUnit_Framework_Constraint_ArraySubset',
         'PHPUnit_Framework_Constraint_Attribute',
@@ -47,9 +46,7 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
         'PHPUnit_Framework_Constraint_JsonMatches',
         'PHPUnit_Framework_Constraint_JsonMatches_ErrorMessageProvider',
         'PHPUnit_Framework_Constraint_LessThan',
-        'PHPUnit_Framework_Constraint_Not',
         'PHPUnit_Framework_Constraint_ObjectHasAttribute',
-        'PHPUnit_Framework_Constraint_Or',
         'PHPUnit_Framework_Constraint_PCREMatch',
         'PHPUnit_Framework_Constraint_SameSize',
         'PHPUnit_Framework_Constraint_StringContains',
@@ -58,7 +55,6 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
         'PHPUnit_Framework_Constraint_StringStartsWith',
         'PHPUnit_Framework_Constraint_TraversableContains',
         'PHPUnit_Framework_Constraint_TraversableContainsOnly',
-        'PHPUnit_Framework_Constraint_Xor',
 
         'PHPUnit_Framework_Error',
         'PHPUnit_Framework_Error_Deprecated',
@@ -97,8 +93,13 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
         'PHPUnit_Util_XML',
     ];
     foreach ($classes as $class) {
-        class_alias($class, '\\'.strtr($class, '_', '\\'), true);
+        class_alias($class, '\\'.strtr($class, '_', '\\'));
     }
+
+    class_alias('PHPUnit_Framework_Constraint_And', 'PHPUnit\Framework\Constraint\LogicalAnd');
+    class_alias('PHPUnit_Framework_Constraint_Not', 'PHPUnit\Framework\Constraint\LogicalNot');
+    class_alias('PHPUnit_Framework_Constraint_Or', 'PHPUnit\Framework\Constraint\LogicalOr');
+    class_alias('PHPUnit_Framework_Constraint_Xor', 'PHPUnit\Framework\Constraint\LogicalXor');
 }
 
 // Detect if we need to serialize deprecations to a file.

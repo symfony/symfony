@@ -5,10 +5,6 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="mailer.logger_message_listener" class="Symfony\Component\Mailer\EventListener\MessageLoggerListener">
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
        <service id="mailer.data_collector" class="Symfony\Component\Mailer\DataCollector\MessageDataCollector">
             <argument type="service" id="mailer.logger_message_listener" />
             <tag name="data_collector" template="@WebProfiler/Collector/mailer.html.twig" id="mailer" />

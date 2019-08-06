@@ -211,8 +211,8 @@ class UserAuthenticationProviderTest extends TestCase
 
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $authToken);
         $this->assertSame($user, $authToken->getUser());
-        $this->assertContains('ROLE_FOO', $authToken->getRoleNames(), '', false, false);
-        $this->assertContains($switchUserRole, $authToken->getRoles(), '', false, false);
+        $this->assertContains('ROLE_FOO', $authToken->getRoleNames());
+        $this->assertContains($switchUserRole, $authToken->getRoles());
         $this->assertEquals('foo', $authToken->getCredentials());
         $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
     }
@@ -240,7 +240,7 @@ class UserAuthenticationProviderTest extends TestCase
         $this->assertInstanceOf(SwitchUserToken::class, $authToken);
         $this->assertSame($originalToken, $authToken->getOriginalToken());
         $this->assertSame($user, $authToken->getUser());
-        $this->assertContains('ROLE_FOO', $authToken->getRoleNames(), '', false, false);
+        $this->assertContains('ROLE_FOO', $authToken->getRoleNames());
         $this->assertEquals('foo', $authToken->getCredentials());
         $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
     }

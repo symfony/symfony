@@ -41,7 +41,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
         $this->assertCount(1, $placeholderForVariable);
         $this->assertIsString($placeholder);
-        $this->assertContains($envVariableName, $placeholder);
+        $this->assertStringContainsString($envVariableName, $placeholder);
     }
 
     public function testMergeWhereFirstBagIsEmptyWillWork()
@@ -64,7 +64,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
         $this->assertCount(1, $placeholderForVariable);
         $this->assertIsString($placeholder);
-        $this->assertContains($envVariableName, $placeholder);
+        $this->assertStringContainsString($envVariableName, $placeholder);
     }
 
     public function testMergeWherePlaceholderOnlyExistsInSecond()

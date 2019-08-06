@@ -23,8 +23,8 @@ class TimezoneTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
 
-        $this->assertContains(new ChoiceView('Africa/Kinshasa', 'Africa/Kinshasa', 'Africa / Kinshasa'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('America/New_York', 'America/New_York', 'America / New York'), $choices, '', false, false);
+        $this->assertContainsEquals(new ChoiceView('Africa/Kinshasa', 'Africa/Kinshasa', 'Africa / Kinshasa'), $choices);
+        $this->assertContainsEquals(new ChoiceView('America/New_York', 'America/New_York', 'America / New York'), $choices);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -69,7 +69,7 @@ class TimezoneTypeTest extends BaseTypeTest
         $form->submit('Europe/Saratov');
 
         $this->assertEquals(new \DateTimeZone('Europe/Saratov'), $form->getData());
-        $this->assertContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
+        $this->assertStringContainsString('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
     }
 
     /**
@@ -81,7 +81,7 @@ class TimezoneTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE, null, ['regions' => \DateTimeZone::EUROPE])
             ->createView()->vars['choices'];
 
-        $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Europe / Amsterdam'), $choices, '', false, false);
+        $this->assertContainsEquals(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Europe / Amsterdam'), $choices);
     }
 
     /**
@@ -170,8 +170,8 @@ class TimezoneTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE, null, ['intl' => true])
             ->createView()->vars['choices'];
 
-        $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Central European Time (Amsterdam)'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('Etc/UTC', 'Etc/UTC', 'Coordinated Universal Time'), $choices, '', false, false);
+        $this->assertContainsEquals(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Central European Time (Amsterdam)'), $choices);
+        $this->assertContainsEquals(new ChoiceView('Etc/UTC', 'Etc/UTC', 'Coordinated Universal Time'), $choices);
     }
 
     /**
@@ -186,8 +186,8 @@ class TimezoneTypeTest extends BaseTypeTest
             ])
             ->createView()->vars['choices'];
 
-        $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'за центральноєвропейським часом (Амстердам)'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('Etc/UTC', 'Etc/UTC', 'за всесвітнім координованим часом'), $choices, '', false, false);
+        $this->assertContainsEquals(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'за центральноєвропейським часом (Амстердам)'), $choices);
+        $this->assertContainsEquals(new ChoiceView('Etc/UTC', 'Etc/UTC', 'за всесвітнім координованим часом'), $choices);
     }
 
     public function testChoiceTranslationLocaleOptionWithoutIntl()

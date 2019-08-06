@@ -187,8 +187,8 @@ abstract class ControllerTraitTest extends TestCase
         if ($response->headers->get('content-type')) {
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileAsInline()
@@ -203,8 +203,8 @@ abstract class ControllerTraitTest extends TestCase
         if ($response->headers->get('content-type')) {
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
-        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileWithOwnFileName()
@@ -220,8 +220,8 @@ abstract class ControllerTraitTest extends TestCase
         if ($response->headers->get('content-type')) {
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertContains($fileName, $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertStringContainsString($fileName, $response->headers->get('content-disposition'));
     }
 
     public function testFileWithOwnFileNameAsInline()
@@ -237,8 +237,8 @@ abstract class ControllerTraitTest extends TestCase
         if ($response->headers->get('content-type')) {
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
-        $this->assertContains($fileName, $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
+        $this->assertStringContainsString($fileName, $response->headers->get('content-disposition'));
     }
 
     public function testFileFromPath()
@@ -253,8 +253,8 @@ abstract class ControllerTraitTest extends TestCase
         if ($response->headers->get('content-type')) {
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileFromPathWithCustomizedFileName()
@@ -269,8 +269,8 @@ abstract class ControllerTraitTest extends TestCase
         if ($response->headers->get('content-type')) {
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
-        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertContains('test.php', $response->headers->get('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertStringContainsString('test.php', $response->headers->get('content-disposition'));
     }
 
     public function testFileWhichDoesNotExist()

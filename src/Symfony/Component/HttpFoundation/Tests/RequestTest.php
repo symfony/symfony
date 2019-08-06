@@ -1656,14 +1656,14 @@ class RequestTest extends TestCase
 
         $asString = (string) $request;
 
-        $this->assertContains('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $asString);
-        $this->assertContains('Cookie: Foo=Bar', $asString);
+        $this->assertStringContainsString('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $asString);
+        $this->assertStringContainsString('Cookie: Foo=Bar', $asString);
 
         $request->cookies->set('Another', 'Cookie');
 
         $asString = (string) $request;
 
-        $this->assertContains('Cookie: Foo=Bar; Another=Cookie', $asString);
+        $this->assertStringContainsString('Cookie: Foo=Bar; Another=Cookie', $asString);
     }
 
     public function testIsMethod()

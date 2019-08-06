@@ -184,7 +184,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['test']);
-        $this->assertContains('It works!', $tester->getDisplay(true));
+        $this->assertStringContainsString('It works!', $tester->getDisplay(true));
     }
 
     public function testAdd()
@@ -753,7 +753,7 @@ class ApplicationTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exception');
 
         $tester->run(['command' => 'foo'], ['decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE, 'capture_stderr_separately' => true]);
-        $this->assertContains('Exception trace', $tester->getErrorOutput(), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
+        $this->assertStringContainsString('Exception trace', $tester->getErrorOutput(), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
 
         $tester->run(['command' => 'list', '--foo' => true], ['decorated' => false, 'capture_stderr_separately' => true]);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $tester->getErrorOutput(true), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
@@ -890,7 +890,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(['command' => 'foo'], ['decorated' => false]);
-        $this->assertContains('Dummy type "@anonymous" is invalid.', $tester->getDisplay(true));
+        $this->assertStringContainsString('Dummy type "@anonymous" is invalid.', $tester->getDisplay(true));
     }
 
     public function testRun()
@@ -1315,7 +1315,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foo']);
-        $this->assertContains('before.foo.error.after.', $tester->getDisplay());
+        $this->assertStringContainsString('before.foo.error.after.', $tester->getDisplay());
     }
 
     public function testRunDispatchesAllEventsWithExceptionInListener()
@@ -1335,7 +1335,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foo']);
-        $this->assertContains('before.error.after.', $tester->getDisplay());
+        $this->assertStringContainsString('before.error.after.', $tester->getDisplay());
     }
 
     public function testRunWithError()
@@ -1383,7 +1383,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foo']);
-        $this->assertContains('before.error.silenced.after.', $tester->getDisplay());
+        $this->assertStringContainsString('before.error.silenced.after.', $tester->getDisplay());
         $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $tester->getStatusCode());
     }
 
@@ -1402,7 +1402,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'unknown']);
-        $this->assertContains('silenced command not found', $tester->getDisplay());
+        $this->assertStringContainsString('silenced command not found', $tester->getDisplay());
         $this->assertEquals(1, $tester->getStatusCode());
     }
 
@@ -1444,7 +1444,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'dym']);
-        $this->assertContains('before.dym.error.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
+        $this->assertStringContainsString('before.dym.error.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
     }
 
     public function testRunDispatchesAllEventsWithError()
@@ -1461,7 +1461,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'dym']);
-        $this->assertContains('before.dym.error.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
+        $this->assertStringContainsString('before.dym.error.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
     }
 
     public function testRunWithErrorFailingStatusCode()
@@ -1493,7 +1493,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $exitCode = $tester->run(['command' => 'foo']);
-        $this->assertContains('before.after.', $tester->getDisplay());
+        $this->assertStringContainsString('before.after.', $tester->getDisplay());
         $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $exitCode);
     }
 
@@ -1603,10 +1603,10 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run([]);
-        $this->assertContains('called', $tester->getDisplay());
+        $this->assertStringContainsString('called', $tester->getDisplay());
 
         $tester->run(['--help' => true]);
-        $this->assertContains('The foo:bar command', $tester->getDisplay());
+        $this->assertStringContainsString('The foo:bar command', $tester->getDisplay());
     }
 
     /**

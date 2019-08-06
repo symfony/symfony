@@ -52,6 +52,7 @@ return PhpCsFixer\Config::create()
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Resources/views/translation.html.php')
             // explicit trigger_error tests
             ->notPath('Symfony/Component/Debug/Tests/DebugClassLoaderTest.php')
+            ->notPath('Symfony/Component/ErrorHandler/Tests/DebugClassLoaderTest.php')
             // invalid annotations on purpose
             ->notPath('Symfony/Component/DependencyInjection/Tests/Fixtures/includes/autowiring_classes.php')
     )

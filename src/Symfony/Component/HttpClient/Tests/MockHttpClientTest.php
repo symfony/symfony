@@ -123,6 +123,19 @@ class MockHttpClientTest extends HttpClientTestCase
                 $body = ['<1>', '', '<2>'];
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
+
+            case 'testMaxDuration':
+                $mock = $this->getMockBuilder(ResponseInterface::class)->getMock();
+                $mock->expects($this->any())
+                    ->method('getContent')
+                    ->willReturnCallback(static function (): void {
+                        usleep(100000);
+
+                        throw new TransportException('Max duration was reached.');
+                    });
+
+                $responses[] = $mock;
+                break;
         }
 
         return new MockHttpClient($responses);

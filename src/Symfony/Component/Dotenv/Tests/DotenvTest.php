@@ -48,6 +48,9 @@ class DotenvTest extends TestCase
             ['FOO!', "Missing = in the environment variable declaration in \".env\" at line 1.\n...FOO!...\n     ^ line 1 offset 3"],
             ['FOO=$(echo foo', "Missing closing parenthesis. in \".env\" at line 1.\n...FOO=$(echo foo...\n                ^ line 1 offset 14"],
             ['FOO=$(echo foo'."\n", "Missing closing parenthesis. in \".env\" at line 1.\n...FOO=$(echo foo\\n...\n                ^ line 1 offset 14"],
+            ["FOO=\nBAR=\${FOO:-\'a{a}a}", "Unsupported character \"'\" found in the default value of variable \"\$FOO\". in \".env\" at line 2.\n...\\nBAR=\${FOO:-\'a{a}a}...\n                       ^ line 2 offset 24"],
+            ["FOO=\nBAR=\${FOO:-a\$a}", "Unsupported character \"\$\" found in the default value of variable \"\$FOO\". in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\$a}...\n                       ^ line 2 offset 20"],
+            ["FOO=\nBAR=\${FOO:-a\"a}", "Unclosed braces on variable expansion in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\"a}...\n                    ^ line 2 offset 17"],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {
@@ -159,6 +162,10 @@ class DotenvTest extends TestCase
             ['BAR=$REMOTE', ['BAR' => 'remote']],
             ['BAR=$SERVERVAR', ['BAR' => 'servervar']],
             ['FOO=$NOTDEFINED', ['FOO' => '']],
+            ["FOO=BAR\nBAR=\${FOO:-TEST}", ['FOO' => 'BAR', 'BAR' => 'BAR']],
+            ["FOO=BAR\nBAR=\${NOTDEFINED:-TEST}", ['FOO' => 'BAR', 'BAR' => 'TEST']],
+            ["FOO=\nBAR=\${FOO:-TEST}", ['FOO' => '', 'BAR' => 'TEST']],
+            ["FOO=\nBAR=\$FOO:-TEST}", ['FOO' => '', 'BAR' => 'TEST}']],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {

@@ -31,11 +31,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     private $data = [];
     private $usageIndex = 0;
 
-    /**
-     * @param SessionStorageInterface $storage    A SessionStorageInterface instance
-     * @param AttributeBagInterface   $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
-     * @param FlashBagInterface       $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
-     */
     public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         $this->storage = $storage ?: new NativeSessionStorage();

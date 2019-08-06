@@ -127,10 +127,8 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      *
      * @see https://bugs.php.net/bug.php?id=53710
      * @see https://bugs.php.net/bug.php?id=60926
-     *
-     * @return array
      */
-    private function findAndSortTags(string $tagName, ContainerBuilder $container)
+    private function findAndSortTags(string $tagName, ContainerBuilder $container): array
     {
         $sortedTags = [];
 

@@ -390,7 +390,7 @@ class XmlDescriptor extends Descriptor
     /**
      * @return \DOMNode[]
      */
-    private function getArgumentNodes(array $arguments, \DOMDocument $dom)
+    private function getArgumentNodes(array $arguments, \DOMDocument $dom): array
     {
         $nodes = [];
 

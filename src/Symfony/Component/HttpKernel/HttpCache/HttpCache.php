@@ -635,10 +635,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Checks if the Request includes authorization or other sensitive information
      * that should cause the Response to be considered private by default.
-     *
-     * @return bool true if the Request is private, false otherwise
      */
-    private function isPrivateRequest(Request $request)
+    private function isPrivateRequest(Request $request): bool
     {
         foreach ($this->options['private_headers'] as $key) {
             $key = strtolower(str_replace('HTTP_', '', $key));

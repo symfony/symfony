@@ -256,7 +256,7 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    private function sortPasses(array $passes)
+    private function sortPasses(array $passes): array
     {
         if (0 === \count($passes)) {
             return [];

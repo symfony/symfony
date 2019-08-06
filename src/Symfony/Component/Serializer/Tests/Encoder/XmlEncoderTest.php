@@ -867,10 +867,7 @@ XML;
         $this->assertEquals($expected, $encoder->encode($data, 'xml'));
     }
 
-    /**
-     * @return XmlEncoder
-     */
-    private function createXmlEncoderWithDateTimeNormalizer()
+    private function createXmlEncoderWithDateTimeNormalizer(): XmlEncoder
     {
         $encoder = new XmlEncoder();
         $serializer = new Serializer([$this->createMockDateTimeNormalizer()], ['xml' => new XmlEncoder()]);
@@ -901,20 +898,14 @@ XML;
         return $mock;
     }
 
-    /**
-     * @return string
-     */
-    private function createXmlWithDateTime()
+    private function createXmlWithDateTime(): string
     {
         return sprintf('<?xml version="1.0"?>
 <response><dateTime>%s</dateTime></response>
 ', $this->exampleDateTimeString);
     }
 
-    /**
-     * @return string
-     */
-    private function createXmlWithDateTimeField()
+    private function createXmlWithDateTimeField(): string
     {
         return sprintf('<?xml version="1.0"?>
 <response><foo dateTime="%s"/></response>

@@ -106,12 +106,10 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads the YAML class descriptions from the given file.
      *
-     * @return array The class descriptions
-     *
      * @throws \InvalidArgumentException If the file could not be loaded or did
      *                                   not contain a YAML array
      */
-    private function parseFile(string $path)
+    private function parseFile(string $path): array
     {
         try {
             $classes = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);

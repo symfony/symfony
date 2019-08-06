@@ -370,7 +370,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return int The final number of removed items
      */
-    private function dumpChildren(DumperInterface $dumper, Cursor $parentCursor, array &$refs, array $children, int $hashCut, int $hashType, bool $dumpKeys)
+    private function dumpChildren(DumperInterface $dumper, Cursor $parentCursor, array &$refs, array $children, int $hashCut, int $hashType, bool $dumpKeys): int
     {
         $cursor = clone $parentCursor;
         ++$cursor->depth;

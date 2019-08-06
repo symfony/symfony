@@ -505,7 +505,7 @@ class DebugClassLoader
      *
      * @return string[]
      */
-    private function getOwnInterfaces(string $class, ?string $parent)
+    private function getOwnInterfaces(string $class, ?string $parent): array
     {
         $ownInterfaces = class_implements($class, false);
 

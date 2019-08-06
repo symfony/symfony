@@ -109,10 +109,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
     /**
      * Retrieves roles from user and appends SwitchUserRole if original token contained one.
-     *
-     * @return array The user roles
      */
-    private function getRoles(UserInterface $user, TokenInterface $token)
+    private function getRoles(UserInterface $user, TokenInterface $token): array
     {
         $roles = $user->getRoles();
 

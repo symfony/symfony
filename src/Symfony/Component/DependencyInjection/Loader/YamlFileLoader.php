@@ -653,11 +653,9 @@ class YamlFileLoader extends FileLoader
     /**
      * Validates a YAML file.
      *
-     * @return array
-     *
      * @throws InvalidArgumentException When service file is not valid
      */
-    private function validate($content, string $file)
+    private function validate($content, string $file): ?array
     {
         if (null === $content) {
             return $content;

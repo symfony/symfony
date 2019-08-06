@@ -294,11 +294,9 @@ class Filesystem
     /**
      * Tells whether a file exists and is readable.
      *
-     * @return bool
-     *
      * @throws IOException When windows path is longer than 258 characters
      */
-    private function isReadable(string $filename)
+    private function isReadable(string $filename): bool
     {
         $maxPathLength = PHP_MAXPATHLEN - 2;
 

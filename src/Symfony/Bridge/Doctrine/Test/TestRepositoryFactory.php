@@ -47,10 +47,7 @@ final class TestRepositoryFactory implements RepositoryFactory
         $this->repositoryList[$repositoryHash] = $repository;
     }
 
-    /**
-     * @return ObjectRepository
-     */
-    private function createRepository(EntityManagerInterface $entityManager, string $entityName)
+    private function createRepository(EntityManagerInterface $entityManager, string $entityName): ObjectRepository
     {
         /* @var $metadata ClassMetadata */
         $metadata = $entityManager->getClassMetadata($entityName);

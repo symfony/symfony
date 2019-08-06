@@ -187,12 +187,13 @@ class ProfilerControllerTest extends TestCase
         ];
     }
 
-    private function createController($profiler, $twig, $withCSP)
+    private function createController($profiler, $twig, $withCSP): ProfilerController
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
 
         if ($withCSP) {
             $nonceGenerator = $this->getMockBuilder('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator')->getMock();
+            $nonceGenerator->method('generate')->willReturn('dummy_nonce');
 
             return new ProfilerController($urlGenerator, $profiler, $twig, [], new ContentSecurityPolicyHandler($nonceGenerator));
         }

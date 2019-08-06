@@ -245,7 +245,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * @return string[]
      */
-    private function extractHeaders(array $data)
+    private function extractHeaders(array $data): array
     {
         $headers = [];
         $flippedHeaders = [];

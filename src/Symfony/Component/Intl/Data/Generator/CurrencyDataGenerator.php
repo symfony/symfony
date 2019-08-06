@@ -130,10 +130,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         return $data;
     }
 
-    /**
-     * @return array
-     */
-    private function generateSymbolNamePairs(ArrayAccessibleResourceBundle $rootBundle)
+    private function generateSymbolNamePairs(ArrayAccessibleResourceBundle $rootBundle): array
     {
         $symbolNamePairs = iterator_to_array($rootBundle['Currencies']);
 
@@ -143,14 +140,14 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         return $symbolNamePairs;
     }
 
-    private function generateCurrencyMeta(ArrayAccessibleResourceBundle $supplementalDataBundle)
+    private function generateCurrencyMeta(ArrayAccessibleResourceBundle $supplementalDataBundle): array
     {
         // The metadata is already de-duplicated. It contains one key "DEFAULT"
         // which is used for currencies that don't have dedicated entries.
         return iterator_to_array($supplementalDataBundle['CurrencyMeta']);
     }
 
-    private function generateAlpha3ToNumericMapping(ArrayAccessibleResourceBundle $numericCodesBundle, array $currencyCodes)
+    private function generateAlpha3ToNumericMapping(ArrayAccessibleResourceBundle $numericCodesBundle, array $currencyCodes): array
     {
         $alpha3ToNumericMapping = iterator_to_array($numericCodesBundle['codeMap']);
 
@@ -162,7 +159,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         return $alpha3ToNumericMapping;
     }
 
-    private function generateNumericToAlpha3Mapping(array $alpha3ToNumericMapping)
+    private function generateNumericToAlpha3Mapping(array $alpha3ToNumericMapping): array
     {
         $numericToAlpha3Mapping = [];
 

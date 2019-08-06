@@ -434,11 +434,9 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Builds a PDO DSN from a URL-like connection string.
      *
-     * @return string
-     *
      * @todo implement missing support for oci DSN (which look totally different from other PDO ones)
      */
-    private function buildDsnFromUrl(string $dsnOrUrl)
+    private function buildDsnFromUrl(string $dsnOrUrl): string
     {
         // (pdo_)?sqlite3?:///... => (pdo_)?sqlite3?://localhost/... or else the URL will be invalid
         $url = preg_replace('#^((?:pdo_)?sqlite3?):///#', '$1://localhost/', $dsnOrUrl);
@@ -672,7 +670,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *       - for oci using DBMS_LOCK.REQUEST
      *       - for sqlsrv using sp_getapplock with LockOwner = Session
      */
-    private function doAdvisoryLock(string $sessionId)
+    private function doAdvisoryLock(string $sessionId): \PDOStatement
     {
         switch ($this->driver) {
             case 'mysql':
@@ -770,10 +768,8 @@ class PdoSessionHandler extends AbstractSessionHandler
 
     /**
      * Returns an insert statement supported by the database for writing session data.
-     *
-     * @return \PDOStatement The insert statement
      */
-    private function getInsertStatement(string $sessionId, string $sessionData, int $maxlifetime)
+    private function getInsertStatement(string $sessionId, string $sessionData, int $maxlifetime): \PDOStatement
     {
         switch ($this->driver) {
             case 'oci':
@@ -799,10 +795,8 @@ class PdoSessionHandler extends AbstractSessionHandler
 
     /**
      * Returns an update statement supported by the database for writing session data.
-     *
-     * @return \PDOStatement The update statement
      */
-    private function getUpdateStatement(string $sessionId, string $sessionData, int $maxlifetime)
+    private function getUpdateStatement(string $sessionId, string $sessionData, int $maxlifetime): \PDOStatement
     {
         switch ($this->driver) {
             case 'oci':

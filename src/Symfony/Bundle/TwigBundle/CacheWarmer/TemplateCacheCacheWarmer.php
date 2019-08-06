@@ -102,10 +102,8 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
 
     /**
      * Find templates in the given directory.
-     *
-     * @return array An array of templates
      */
-    private function findTemplatesInFolder(?string $namespace, string $dir)
+    private function findTemplatesInFolder(?string $namespace, string $dir): array
     {
         if (!is_dir($dir)) {
             return [];

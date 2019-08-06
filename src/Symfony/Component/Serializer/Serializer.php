@@ -216,10 +216,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      * @param mixed  $data    Data to get the serializer for
      * @param string $format  Format name, present to give the option to normalizers to act differently based on formats
      * @param array  $context Options available to the normalizer
-     *
-     * @return NormalizerInterface|null
      */
-    private function getNormalizer($data, ?string $format, array $context)
+    private function getNormalizer($data, ?string $format, array $context): ?NormalizerInterface
     {
         if ($this->cachedNormalizers !== $this->normalizers) {
             $this->cachedNormalizers = $this->normalizers;
@@ -261,10 +259,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      * @param string $class   The expected class to instantiate
      * @param string $format  Format name, present to give the option to normalizers to act differently based on formats
      * @param array  $context Options available to the denormalizer
-     *
-     * @return DenormalizerInterface|null
      */
-    private function getDenormalizer($data, string $class, ?string $format, array $context)
+    private function getDenormalizer($data, string $class, ?string $format, array $context): ?DenormalizerInterface
     {
         if ($this->cachedNormalizers !== $this->normalizers) {
             $this->cachedNormalizers = $this->normalizers;

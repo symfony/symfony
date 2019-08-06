@@ -384,26 +384,17 @@ class ResolvedFormTypeTest extends TestCase
         ];
     }
 
-    /**
-     * @return MockObject
-     */
-    private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType')
+    private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType'): MockObject
     {
         return $this->getMockBuilder($typeClass)->setMethods(['getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
 
-    /**
-     * @return MockObject
-     */
-    private function getMockFormTypeExtension()
+    private function getMockFormTypeExtension(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\AbstractTypeExtension')->setMethods(['getExtendedType', 'configureOptions', 'finishView', 'buildView', 'buildForm'])->getMock();
     }
 
-    /**
-     * @return MockObject
-     */
-    private function getMockFormFactory()
+    private function getMockFormFactory(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
     }

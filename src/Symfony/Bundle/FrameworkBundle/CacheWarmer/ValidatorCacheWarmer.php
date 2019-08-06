@@ -89,7 +89,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
      *
      * @return XmlFileLoader[]|YamlFileLoader[]
      */
-    private function extractSupportedLoaders(array $loaders)
+    private function extractSupportedLoaders(array $loaders): array
     {
         $supportedLoaders = [];
 

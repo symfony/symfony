@@ -15,6 +15,11 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
+use Symfony\Component\Templating\Loader\Loader;
+use Symfony\Component\Templating\Storage\StringStorage;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * @group legacy
@@ -42,18 +47,12 @@ class TimedPhpEngineTest extends TestCase
         $engine->render('index.php');
     }
 
-    /**
-     * @return Container
-     */
-    private function getContainer()
+    private function getContainer(): Container
     {
         return $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')->getMock();
     }
 
-    /**
-     * @return \Symfony\Component\Templating\TemplateNameParserInterface
-     */
-    private function getTemplateNameParser()
+    private function getTemplateNameParser(): TemplateNameParserInterface
     {
         $templateReference = $this->getMockBuilder('Symfony\Component\Templating\TemplateReferenceInterface')->getMock();
         $templateNameParser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
@@ -64,20 +63,14 @@ class TimedPhpEngineTest extends TestCase
         return $templateNameParser;
     }
 
-    /**
-     * @return GlobalVariables
-     */
-    private function getGlobalVariables()
+    private function getGlobalVariables(): GlobalVariables
     {
         return $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables')
             ->disableOriginalConstructor()
             ->getMock();
     }
 
-    /**
-     * @return \Symfony\Component\Templating\Storage\StringStorage
-     */
-    private function getStorage()
+    private function getStorage(): StringStorage
     {
         return $this->getMockBuilder('Symfony\Component\Templating\Storage\StringStorage')
             ->disableOriginalConstructor()
@@ -85,11 +78,9 @@ class TimedPhpEngineTest extends TestCase
     }
 
     /**
-     * @param \Symfony\Component\Templating\Storage\StringStorage $storage
-     *
-     * @return \Symfony\Component\Templating\Loader\Loader
+     * @param StringStorage $storage
      */
-    private function getLoader($storage)
+    private function getLoader($storage): Loader
     {
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
         $loader->expects($this->once())
@@ -99,20 +90,14 @@ class TimedPhpEngineTest extends TestCase
         return $loader;
     }
 
-    /**
-     * @return \Symfony\Component\Stopwatch\StopwatchEvent
-     */
-    private function getStopwatchEvent()
+    private function getStopwatchEvent(): StopwatchEvent
     {
         return $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
             ->disableOriginalConstructor()
             ->getMock();
     }
 
-    /**
-     * @return \Symfony\Component\Stopwatch\Stopwatch
-     */
-    private function getStopwatch()
+    private function getStopwatch(): Stopwatch
     {
         return $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')->getMock();
     }

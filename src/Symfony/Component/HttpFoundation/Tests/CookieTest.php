@@ -119,7 +119,7 @@ class CookieTest extends TestCase
         $cookie = new Cookie('foo', 'bar', $value);
         $expire = strtotime($value);
 
-        $this->assertEquals($expire, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date', 1);
+        $this->assertEqualsWithDelta($expire, $cookie->getExpiresTime(), 1, '->getExpiresTime() returns the expire date');
     }
 
     public function testGetDomain()

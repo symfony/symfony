@@ -19,7 +19,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
-use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
 
 /**
@@ -27,7 +26,7 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class CombinedStore implements StoreInterface, LoggerAwareInterface
+class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
     use ExpiringStoreTrait;

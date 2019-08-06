@@ -18,7 +18,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\PersistingStoreInterface;
-use Symfony\Component\Lock\StoreInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -42,22 +41,6 @@ class LockTest extends TestCase
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
-        $lock = new Lock($key, $store);
-
-        $store
-            ->expects($this->once())
-            ->method('save');
-
-        $this->assertTrue($lock->acquire(false));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testPassingOldStoreInterface()
-    {
-        $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
         $lock = new Lock($key, $store);
 
         $store

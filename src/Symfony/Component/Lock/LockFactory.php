@@ -11,14 +11,29 @@
 
 namespace Symfony\Component\Lock;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
+
 /**
  * Factory provides method to create locks.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-class LockFactory extends Factory
+class LockFactory implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
+    private $store;
+
+    public function __construct(PersistingStoreInterface $store)
+    {
+        $this->store = $store;
+
+        $this->logger = new NullLogger();
+    }
+
     /**
      * Creates a lock for the given resource.
      *
@@ -26,8 +41,11 @@ class LockFactory extends Factory
      * @param float|null $ttl         Maximum expected lock duration in seconds
      * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
-    public function createLock($resource, $ttl = 300.0, $autoRelease = true): Lock
+    public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): Lock
     {
-        return parent::createLock($resource, $ttl, $autoRelease);
+        $lock = new Lock(new Key($resource), $this->store, $ttl, $autoRelease);
+        $lock->setLogger($this->logger);
+
+        return $lock;
     }
 }

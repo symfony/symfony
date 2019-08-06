@@ -12,6 +12,8 @@ CHANGELOG
  * Made all dispatched worker event classes final.
  * Added support for `from_transport` attribute on `messenger.message_handler` tag.
  * Added support for passing `dbindex` as a query parameter to the redis transport DSN.
+ * [BC BREAK] `WorkerMessageHandledEvent` is now dispatched on each handled message instead of only successful one.
+ * Added `WorkerMessageHandledSuccessfullyEvent` dispatched for each successful message.
 
 4.3.0
 -----

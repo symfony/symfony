@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledSuccessfullyEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -226,10 +227,11 @@ class WorkerTest extends TestCase
 
         $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
 
-        $eventDispatcher->expects($this->exactly(3))
+        $eventDispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->withConsecutive(
                 [$this->isInstanceOf(WorkerMessageReceivedEvent::class)],
+                [$this->isInstanceOf(WorkerMessageHandledSuccessfullyEvent::class)],
                 [$this->isInstanceOf(WorkerMessageHandledEvent::class)],
                 [$this->isInstanceOf(WorkerStoppedEvent::class)]
             );
@@ -254,11 +256,12 @@ class WorkerTest extends TestCase
 
         $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
 
-        $eventDispatcher->expects($this->exactly(3))
+        $eventDispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->withConsecutive(
                 [$this->isInstanceOf(WorkerMessageReceivedEvent::class)],
                 [$this->isInstanceOf(WorkerMessageFailedEvent::class)],
+                [$this->isInstanceOf(WorkerMessageHandledEvent::class)],
                 [$this->isInstanceOf(WorkerStoppedEvent::class)]
             );
 

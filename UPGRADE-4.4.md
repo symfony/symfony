@@ -168,6 +168,8 @@ Messenger
 
  * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
    pass a `RoutableMessageBus`  instance instead.
+ * `WorkerMessageHandledEvent` is now dispatched on each handled message instead of only successful one. Use `WorkerMessageHandledSuccessfullyEvent`
+   to get the same behavior as before.
 
 Mime
 ----

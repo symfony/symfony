@@ -12,10 +12,10 @@
 namespace Symfony\Component\Messenger\Event;
 
 /**
- * Dispatched after a message was received from a transport and handled.
+ * Dispatched after a message was received from a transport and successfully handled.
  *
  * The event name is the class name.
  */
-final class WorkerMessageHandledEvent extends AbstractWorkerMessageEvent
+class WorkerMessageHandledSuccessfullyEvent extends AbstractWorkerMessageEvent
 {
 }

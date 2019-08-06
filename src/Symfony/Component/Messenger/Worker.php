@@ -16,6 +16,7 @@ use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledSuccessfullyEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -91,6 +92,7 @@ class Worker implements WorkerInterface
                     $envelopeHandled = true;
 
                     $this->handleMessage($envelope, $receiver, $transportName, $this->retryStrategies[$transportName] ?? null);
+                    $this->dispatchEvent(new WorkerMessageHandledEvent($envelope, $transportName));
                     $onHandled($envelope);
 
                     if ($this->shouldStop) {
@@ -170,7 +172,7 @@ class Worker implements WorkerInterface
             return;
         }
 
-        $this->dispatchEvent(new WorkerMessageHandledEvent($envelope, $transportName));
+        $this->dispatchEvent(new WorkerMessageHandledSuccessfullyEvent($envelope, $transportName));
 
         if (null !== $this->logger) {
             $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);

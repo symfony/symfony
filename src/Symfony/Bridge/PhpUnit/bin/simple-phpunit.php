@@ -10,7 +10,7 @@
  */
 
 // Please update when phpunit needs to be reinstalled with fresh deps:
-// Cache-Id-Version: 2019-07-04 18:00 UTC
+// https://github.com/symfony/phpunit-bridge/commit/6ce862d9166ac77f611cc97789e91cb4f51f0021
 
 error_reporting(-1);
 

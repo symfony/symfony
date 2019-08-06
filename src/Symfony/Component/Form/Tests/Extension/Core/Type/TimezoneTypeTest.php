@@ -69,7 +69,7 @@ class TimezoneTypeTest extends BaseTypeTest
         $form->submit('Europe/Saratov');
 
         $this->assertEquals(new \DateTimeZone('Europe/Saratov'), $form->getData());
-        $this->assertStringContainsString('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
+        $this->assertContainsEquals('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
     }
 
     /**

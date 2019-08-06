@@ -22,10 +22,6 @@ class ParsedExpression extends Expression
 {
     private $nodes;
 
-    /**
-     * @param string $expression An expression
-     * @param Node   $nodes      A Node representing the expression
-     */
     public function __construct(string $expression, Node $nodes)
     {
         parent::__construct($expression);

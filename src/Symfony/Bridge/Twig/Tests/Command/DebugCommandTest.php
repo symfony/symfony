@@ -27,7 +27,7 @@ class DebugCommandTest extends TestCase
         $ret = $tester->execute([], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('Functions', trim($tester->getDisplay()));
+        $this->assertStringContainsString('Functions', trim($tester->getDisplay()));
     }
 
     public function testFilterAndJsonFormatOptions()
@@ -258,7 +258,7 @@ TXT
         $ret = $tester->execute(['name' => 'base.html.twig'], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('[OK]', $tester->getDisplay());
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
     public function testWithGlobals()
@@ -267,7 +267,7 @@ TXT
         $tester = $this->createCommandTester([], [], null, null, false, ['message' => $message]);
         $tester->execute([], ['decorated' => true]);
         $display = $tester->getDisplay();
-        $this->assertContains(json_encode($message), $display);
+        $this->assertStringContainsString(json_encode($message), $display);
     }
 
     public function testWithGlobalsJson()

@@ -52,8 +52,7 @@ final class ProgressBar
     private static $formats;
 
     /**
-     * @param OutputInterface $output An OutputInterface instance
-     * @param int             $max    Maximum steps (0 if unknown)
+     * @param int $max Maximum steps (0 if unknown)
      */
     public function __construct(OutputInterface $output, int $max = 0, float $minSecondsBetweenRedraws = 0.1)
     {

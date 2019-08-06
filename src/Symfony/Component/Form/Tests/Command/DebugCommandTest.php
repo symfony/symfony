@@ -31,7 +31,7 @@ class DebugCommandTest extends TestCase
         $ret = $tester->execute([], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('Built-in form types', $tester->getDisplay());
+        $this->assertStringContainsString('Built-in form types', $tester->getDisplay());
     }
 
     public function testDebugDeprecatedDefaults()
@@ -58,7 +58,7 @@ TXT
         $ret = $tester->execute(['class' => 'FormType'], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")', $tester->getDisplay());
+        $this->assertStringContainsString('Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")', $tester->getDisplay());
     }
 
     public function testDebugDateTimeType()
@@ -76,7 +76,7 @@ TXT
         $ret = $tester->execute(['class' => 'FormType', 'option' => 'method'], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('Symfony\Component\Form\Extension\Core\Type\FormType (method)', $tester->getDisplay());
+        $this->assertStringContainsString('Symfony\Component\Form\Extension\Core\Type\FormType (method)', $tester->getDisplay());
     }
 
     public function testDebugSingleFormTypeNotFound()

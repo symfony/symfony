@@ -934,9 +934,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertCount(3, $calls[4][1][0]);
-        $this->assertContains('foo.yml', $calls[4][1][0][0]);
-        $this->assertContains('validation.yml', $calls[4][1][0][1]);
-        $this->assertContains('validation.yaml', $calls[4][1][0][2]);
+        $this->assertStringContainsString('foo.yml', $calls[4][1][0][0]);
+        $this->assertStringContainsString('validation.yml', $calls[4][1][0][1]);
+        $this->assertStringContainsString('validation.yaml', $calls[4][1][0][2]);
     }
 
     public function testValidationAutoMapping()

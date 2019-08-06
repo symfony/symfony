@@ -93,11 +93,8 @@ class Router implements RouterInterface, RequestMatcherInterface
     private $expressionLanguageProviders = [];
 
     /**
-     * @param LoaderInterface $loader   A LoaderInterface instance
-     * @param mixed           $resource The main resource to load
-     * @param array           $options  An array of options
-     * @param RequestContext  $context  The context
-     * @param LoggerInterface $logger   A logger instance
+     * @param mixed $resource The main resource to load
+     * @param array $options  An array of options
      */
     public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {

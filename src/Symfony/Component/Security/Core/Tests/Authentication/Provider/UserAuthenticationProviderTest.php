@@ -195,7 +195,7 @@ class UserAuthenticationProviderTest extends TestCase
         $this->assertInstanceOf(SwitchUserToken::class, $authToken);
         $this->assertSame($originalToken, $authToken->getOriginalToken());
         $this->assertSame($user, $authToken->getUser());
-        $this->assertContains('ROLE_FOO', $authToken->getRoleNames(), '', false, false);
+        $this->assertContains('ROLE_FOO', $authToken->getRoleNames());
         $this->assertEquals('foo', $authToken->getCredentials());
         $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
     }

@@ -2,6 +2,8 @@
 /src/Symfony/Component/Console/Logger/ConsoleLogger.php @dunglas
 # DependencyInjection
 /src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php @dunglas
+# ErrorRenderer
+/src/Symfony/Component/ErrorRenderer/* @yceruto
 # Form
 /src/Symfony/Bridge/Twig/Extension/FormExtension.php @xabbuh
 /src/Symfony/Bridge/Twig/Form/* @xabbuh
@@ -33,6 +35,8 @@
 /src/Symfony/Bridge/Doctrine/PropertyInfo/* @dunglas
 # Serializer
 /src/Symfony/Component/Serializer/* @dunglas
+# TwigBundle
+/src/Symfony/Bundle/TwigBundle/ErrorRenderer/TwigHtmlErrorRenderer.php @yceruto
 # WebLink
 /src/Symfony/Component/WebLink/* @dunglas
 # Workflow

@@ -57,8 +57,8 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--show-hidden' => true]);
-        $this->assertNotContains('public', $tester->getDisplay());
-        $this->assertNotContains('private_alias', $tester->getDisplay());
+        $this->assertStringNotContainsString('public', $tester->getDisplay());
+        $this->assertStringNotContainsString('private_alias', $tester->getDisplay());
 
         $tester->run(['command' => 'debug:container']);
         $this->assertStringContainsString('public', $tester->getDisplay());
@@ -77,7 +77,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', 'name' => $validServiceId]);
-        $this->assertNotContains('No services found', $tester->getDisplay());
+        $this->assertStringNotContainsString('No services found', $tester->getDisplay());
     }
 
     public function testDescribeEnvVars()

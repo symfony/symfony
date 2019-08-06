@@ -48,9 +48,9 @@ class LocaleTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContains(new ChoiceView('en', 'en', 'англійська'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'англійська (Велика Британія)'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'китайська (традиційна, Макао, О.А.Р Китаю)'), $choices, '', false, false);
+        $this->assertContainsEquals(new ChoiceView('en', 'en', 'англійська'), $choices);
+        $this->assertContainsEquals(new ChoiceView('en_GB', 'en_GB', 'англійська (Велика Британія)'), $choices);
+        $this->assertContainsEquals(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'китайська (традиційна, Макао, О.А.Р Китаю)'), $choices);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

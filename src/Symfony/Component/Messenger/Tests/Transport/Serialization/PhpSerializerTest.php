@@ -27,7 +27,7 @@ class PhpSerializerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Hello'));
 
         $encoded = $serializer->encode($envelope);
-        $this->assertNotContains("\0", $encoded['body'], 'Does not contain the binary characters');
+        $this->assertStringNotContainsString("\0", $encoded['body'], 'Does not contain the binary characters');
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
@@ -74,7 +74,7 @@ class PhpSerializerTest extends TestCase
         ]);
 
         $encoded = $serializer->encode($envelope);
-        $this->assertNotContains('DummyPhpSerializerNonSendableStamp', $encoded['body']);
+        $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
     }
 }
 

@@ -31,19 +31,19 @@ class AbstractTransportTest extends TestCase
 
         $start = time();
         $transport->send($message, $envelope);
-        $this->assertEquals(0, time() - $start, '', 1);
+        $this->assertEqualsWithDelta(0, time() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEquals(5, time() - $start, '', 1);
+        $this->assertEqualsWithDelta(5, time() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEquals(10, time() - $start, '', 1);
+        $this->assertEqualsWithDelta(10, time() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEquals(15, time() - $start, '', 1);
+        $this->assertEqualsWithDelta(15, time() - $start, 1);
 
         $start = time();
         $transport->setMaxPerSecond(-3);
         $transport->send($message, $envelope);
-        $this->assertEquals(0, time() - $start, '', 1);
+        $this->assertEqualsWithDelta(0, time() - $start, 1);
         $transport->send($message, $envelope);
-        $this->assertEquals(0, time() - $start, '', 1);
+        $this->assertEqualsWithDelta(0, time() - $start, 1);
     }
 }

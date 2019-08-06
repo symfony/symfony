@@ -51,11 +51,11 @@ class CountryTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContains(new ChoiceView('DE', 'DE', 'Німеччина'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('GB', 'GB', 'Велика Британія'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('US', 'US', 'Сполучені Штати'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('FR', 'FR', 'Франція'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('MY', 'MY', 'Малайзія'), $choices, '', false, false);
+        $this->assertContainsEquals(new ChoiceView('DE', 'DE', 'Німеччина'), $choices);
+        $this->assertContainsEquals(new ChoiceView('GB', 'GB', 'Велика Британія'), $choices);
+        $this->assertContainsEquals(new ChoiceView('US', 'US', 'Сполучені Штати'), $choices);
+        $this->assertContainsEquals(new ChoiceView('FR', 'FR', 'Франція'), $choices);
+        $this->assertContainsEquals(new ChoiceView('MY', 'MY', 'Малайзія'), $choices);
     }
 
     public function testUnknownCountryIsNotIncluded()

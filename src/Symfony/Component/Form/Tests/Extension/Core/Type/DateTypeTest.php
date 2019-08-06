@@ -471,6 +471,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testMonthsOption()
     {
+        \Locale::setDefault('en');
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [6, 7],
             'format' => \IntlDateFormatter::SHORT,
@@ -479,8 +480,8 @@ class DateTypeTest extends BaseTypeTest
         $view = $form->createView();
 
         $this->assertEquals([
-            new ChoiceView(6, '6', '06'),
-            new ChoiceView(7, '7', '07'),
+            new ChoiceView(6, '6', '6'),
+            new ChoiceView(7, '7', '7'),
         ], $view['month']->vars['choices']);
     }
 
@@ -544,14 +545,15 @@ class DateTypeTest extends BaseTypeTest
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
     {
+        \Locale::setDefault('en');
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'days' => [6, 7],
         ])
             ->createView();
 
         $this->assertEquals([
-            new ChoiceView(6, '6', '06'),
-            new ChoiceView(7, '7', '07'),
+            new ChoiceView(6, '6', '6'),
+            new ChoiceView(7, '7', '7'),
         ], $view['day']->vars['choices']);
     }
 

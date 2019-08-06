@@ -219,6 +219,7 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
      * @var ScriptDataProvider
      */
     protected $dataProvider;
+    private $defaultLocale;
 
     protected function setUp()
     {
@@ -228,6 +229,15 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
             $this->getDataDirectory().'/'.Intl::SCRIPT_DIR,
             $this->createEntryReader()
         );
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Locale::setDefault($this->defaultLocale);
     }
 
     abstract protected function getDataDirectory();

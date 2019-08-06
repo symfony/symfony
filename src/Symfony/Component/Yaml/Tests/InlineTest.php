@@ -132,7 +132,7 @@ class InlineTest extends TestCase
             }
 
             $this->assertEquals('1.2', Inline::dump(1.2));
-            $this->assertContains('fr', strtolower(setlocale(LC_NUMERIC, 0)));
+            $this->assertStringContainsStringIgnoringCase('fr', setlocale(LC_NUMERIC, 0));
         } finally {
             setlocale(LC_NUMERIC, $locale);
         }

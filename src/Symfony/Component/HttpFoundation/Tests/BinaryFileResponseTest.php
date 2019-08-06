@@ -261,7 +261,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->expectOutputString('');
         $response->sendContent();
 
-        $this->assertContains('README.md', $response->headers->get('X-Sendfile'));
+        $this->assertStringContainsString('README.md', $response->headers->get('X-Sendfile'));
     }
 
     public function provideXSendfileFiles()

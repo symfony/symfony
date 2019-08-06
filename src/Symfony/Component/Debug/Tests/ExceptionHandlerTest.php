@@ -39,8 +39,8 @@ class ExceptionHandlerTest extends TestCase
         $handler->sendPhpResponse(new \RuntimeException('Foo'));
         $response = ob_get_clean();
 
-        $this->assertContains('Whoops, looks like something went wrong.', $response);
-        $this->assertNotContains('<div class="trace trace-as-html">', $response);
+        $this->assertStringContainsString('Whoops, looks like something went wrong.', $response);
+        $this->assertStringNotContainsString('<div class="trace trace-as-html">', $response);
 
         $handler = new ExceptionHandler(true);
 
@@ -48,8 +48,8 @@ class ExceptionHandlerTest extends TestCase
         $handler->sendPhpResponse(new \RuntimeException('Foo'));
         $response = ob_get_clean();
 
-        $this->assertContains('Whoops, looks like something went wrong.', $response);
-        $this->assertContains('<div class="trace trace-as-html">', $response);
+        $this->assertStringContainsString('Whoops, looks like something went wrong.', $response);
+        $this->assertStringContainsString('<div class="trace trace-as-html">', $response);
     }
 
     public function testStatusCode()
@@ -60,7 +60,7 @@ class ExceptionHandlerTest extends TestCase
         $handler->sendPhpResponse(new NotFoundHttpException('Foo'));
         $response = ob_get_clean();
 
-        $this->assertContains('Sorry, the page you are looking for could not be found.', $response);
+        $this->assertStringContainsString('Sorry, the page you are looking for could not be found.', $response);
 
         $expectedHeaders = [
             ['HTTP/1.0 404', true, null],
@@ -157,7 +157,7 @@ class ExceptionHandlerTest extends TestCase
 
     private function assertThatTheExceptionWasOutput($content, $expectedClass, $expectedTitle, $expectedMessage)
     {
-        $this->assertContains(sprintf('<span class="exception_title"><abbr title="%s">%s</abbr></span>', $expectedClass, $expectedTitle), $content);
-        $this->assertContains(sprintf('<p class="break-long-words trace-message">%s</p>', $expectedMessage), $content);
+        $this->assertStringContainsString(sprintf('<span class="exception_title"><abbr title="%s">%s</abbr></span>', $expectedClass, $expectedTitle), $content);
+        $this->assertStringContainsString(sprintf('<p class="break-long-words trace-message">%s</p>', $expectedMessage), $content);
     }
 }

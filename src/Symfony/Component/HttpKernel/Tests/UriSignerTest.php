@@ -20,9 +20,9 @@ class UriSignerTest extends TestCase
     {
         $signer = new UriSigner('foobar');
 
-        $this->assertContains('?_hash=', $signer->sign('http://example.com/foo'));
-        $this->assertContains('?_hash=', $signer->sign('http://example.com/foo?foo=bar'));
-        $this->assertContains('&foo=', $signer->sign('http://example.com/foo?foo=bar'));
+        $this->assertStringContainsString('?_hash=', $signer->sign('http://example.com/foo'));
+        $this->assertStringContainsString('?_hash=', $signer->sign('http://example.com/foo?foo=bar'));
+        $this->assertStringContainsString('&foo=', $signer->sign('http://example.com/foo?foo=bar'));
     }
 
     public function testCheck()

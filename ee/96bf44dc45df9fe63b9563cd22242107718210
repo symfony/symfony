@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-16T11:38:13Z
+
+Has to be rebased when https://github.com/symfony/symfony/pull/32558 is merged and 4.4 is in master.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-16T21:10:52Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-07-18T12:02:47Z
+
+`CHANGELOG.md` should be updated
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-19T15:17:11Z
+
+PR Rebased.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-26T12:14:15Z
+
+@Simperfit This one needs a rebase.
+
+And should `LockTest::testPassingOldStoreInterface()` be removed too?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-29T06:44:24Z
+
+pr rebased
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2019-07-29T11:53:08Z
+
+Would it make sense to have `BlockingStoreInterface` extending `PersistingStoreInterface`?
+
+I cannot see any reason to make them completely separate at the moment. From a pure semantical point of view, a store is still a store even if it's a blocking store and it should have all the feature of a regular store right no?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-07-29T15:46:57Z
+
+I agree with @B-Galati.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-29T16:28:10Z
+
+Requires rebase to add the return type in LockFactory
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-31T05:22:28Z
+
+done @jderusse
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-08-05T06:24:02Z
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-08-06T07:38:17Z
+
+@chalasr @xabbuh done

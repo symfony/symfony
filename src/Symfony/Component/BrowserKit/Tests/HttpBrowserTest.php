@@ -159,9 +159,9 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->expects($this->once())
             ->method('request')
             ->with('POST', 'http://example.com/', $this->callback(function ($options) {
-                $this->assertContains('Content-Type: multipart/form-data', implode('', $options['headers']));
+                $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
                 $this->assertInstanceOf('\Generator', $options['body']);
-                $this->assertContains('my_file', implode('', iterator_to_array($options['body'])));
+                $this->assertStringContainsString('my_file', implode('', iterator_to_array($options['body'])));
 
                 return true;
             }))

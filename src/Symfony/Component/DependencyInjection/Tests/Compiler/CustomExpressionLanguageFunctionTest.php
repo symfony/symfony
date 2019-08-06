@@ -31,6 +31,6 @@ class CustomExpressionLanguageFunctionTest extends TestCase
         $dump = new PhpDumper($container);
         $dumped = $dump->dump();
 
-        $this->assertContains('strtolower("foobar")', $dumped);
+        $this->assertStringContainsString('strtolower("foobar")', $dumped);
     }
 }

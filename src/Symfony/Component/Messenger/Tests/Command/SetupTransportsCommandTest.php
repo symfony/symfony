@@ -42,8 +42,8 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute([]);
         $display = $tester->getDisplay();
 
-        $this->assertContains('The "amqp" transport was setup successfully.', $display);
-        $this->assertContains('The "other_transport" transport does not support setup.', $display);
+        $this->assertStringContainsString('The "amqp" transport was setup successfully.', $display);
+        $this->assertStringContainsString('The "other_transport" transport does not support setup.', $display);
     }
 
     public function testReceiverNameArgument()
@@ -66,7 +66,7 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute(['transport' => 'amqp']);
         $display = $tester->getDisplay();
 
-        $this->assertContains('The "amqp" transport was setup successfully.', $display);
+        $this->assertStringContainsString('The "amqp" transport was setup successfully.', $display);
     }
 
     public function testReceiverNameArgumentNotFound()

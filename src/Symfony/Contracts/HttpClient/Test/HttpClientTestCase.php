@@ -795,7 +795,6 @@ abstract class HttpClientTestCase extends TestCase
 
         $duration = microtime(true) - $start;
 
-        $this->assertGreaterThanOrEqual(0.1, $duration);
-        $this->assertLessThan(0.2, $duration);
+        $this->assertLessThan(10, $duration);
     }
 }

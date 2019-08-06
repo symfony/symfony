@@ -482,6 +482,7 @@
         <xsd:attribute name="proxy" type="xsd:string" />
         <xsd:attribute name="no-proxy" type="xsd:string" />
         <xsd:attribute name="timeout" type="xsd:float" />
+        <xsd:attribute name="max-duration" type="xsd:float" />
         <xsd:attribute name="bindto" type="xsd:string" />
         <xsd:attribute name="verify-peer" type="xsd:boolean" />
         <xsd:attribute name="verify-host" type="xsd:boolean" />

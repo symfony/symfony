@@ -1346,6 +1346,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(['localhost' => '127.0.0.1'], $defaultOptions['resolve']);
         $this->assertSame('proxy.org', $defaultOptions['proxy']);
         $this->assertSame(3.5, $defaultOptions['timeout']);
+        $this->assertSame(10.1, $defaultOptions['max_duration']);
         $this->assertSame('127.0.0.1', $defaultOptions['bindto']);
         $this->assertTrue($defaultOptions['verify_peer']);
         $this->assertTrue($defaultOptions['verify_host']);

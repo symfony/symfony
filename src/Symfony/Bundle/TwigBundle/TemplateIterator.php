@@ -29,9 +29,8 @@ class TemplateIterator implements \IteratorAggregate
     private $defaultPath;
 
     /**
-     * @param KernelInterface $kernel      A KernelInterface instance
-     * @param array           $paths       Additional Twig paths to warm
-     * @param string|null     $defaultPath The directory where global templates can be stored
+     * @param array       $paths       Additional Twig paths to warm
+     * @param string|null $defaultPath The directory where global templates can be stored
      */
     public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null)
     {

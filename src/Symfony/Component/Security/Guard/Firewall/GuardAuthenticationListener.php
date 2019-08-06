@@ -41,11 +41,8 @@ class GuardAuthenticationListener
     private $rememberMeServices;
 
     /**
-     * @param GuardAuthenticatorHandler         $guardHandler          The Guard handler
-     * @param AuthenticationManagerInterface    $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                            $providerKey           The provider (i.e. firewall) key
-     * @param iterable|AuthenticatorInterface[] $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
-     * @param LoggerInterface                   $logger                A LoggerInterface instance
+     * @param string                            $providerKey         The provider (i.e. firewall) key
+     * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      */
     public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, $guardAuthenticators, LoggerInterface $logger = null)
     {

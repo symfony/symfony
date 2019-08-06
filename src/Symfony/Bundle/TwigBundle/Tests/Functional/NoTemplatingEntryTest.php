@@ -27,7 +27,7 @@ class NoTemplatingEntryTest extends TestCase
 
         $container = $kernel->getContainer();
         $content = $container->get('twig')->render('index.html.twig');
-        $this->assertContains('{ a: b }', $content);
+        $this->assertStringContainsString('{ a: b }', $content);
     }
 
     protected function setUp()

@@ -45,7 +45,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container']);
 
-        $this->assertContains('public', $tester->getDisplay());
+        $this->assertStringContainsString('public', $tester->getDisplay());
     }
 
     public function testPrivateAlias()

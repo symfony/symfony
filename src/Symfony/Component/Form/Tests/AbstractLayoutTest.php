@@ -2507,7 +2507,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderWidget($form->createView());
 
-        $this->assertNotContains('foo="', $html);
+        $this->assertStringNotContainsString('foo="', $html);
     }
 
     public function testButtonAttributes()
@@ -2543,7 +2543,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderWidget($form->createView());
 
-        $this->assertNotContains('foo="', $html);
+        $this->assertStringNotContainsString('foo="', $html);
     }
 
     public function testTextareaWithWhitespaceOnlyContentRetainsValue()
@@ -2552,7 +2552,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderWidget($form->createView());
 
-        $this->assertContains('>  </textarea>', $html);
+        $this->assertStringContainsString('>  </textarea>', $html);
     }
 
     public function testTextareaWithWhitespaceOnlyContentRetainsValueWhenRenderingForm()
@@ -2563,7 +2563,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $html = $this->renderForm($form->createView());
 
-        $this->assertContains('>  </textarea>', $html);
+        $this->assertStringContainsString('>  </textarea>', $html);
     }
 
     public function testWidgetContainerAttributeHiddenIfFalse()
@@ -2575,7 +2575,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $html = $this->renderWidget($form->createView());
 
         // no foo
-        $this->assertNotContains('foo="', $html);
+        $this->assertStringNotContainsString('foo="', $html);
     }
 
     public function testTranslatedAttributes()

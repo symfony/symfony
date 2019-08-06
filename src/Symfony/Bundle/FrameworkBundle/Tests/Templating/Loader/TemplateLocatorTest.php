@@ -72,7 +72,7 @@ class TemplateLocatorTest extends TestCase
             $locator->locate($template);
             $this->fail('->locate() should throw an exception when the file is not found.');
         } catch (\InvalidArgumentException $e) {
-            $this->assertContains(
+            $this->assertStringContainsString(
                 $errorMessage,
                 $e->getMessage(),
                 'TemplateLocator exception should propagate the FileLocator exception message'

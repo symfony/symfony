@@ -167,9 +167,9 @@ class ApplicationTest extends TestCase
         $output = $tester->getDisplay();
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertContains('Some commands could not be registered:', $output);
-        $this->assertContains('throwing', $output);
-        $this->assertContains('fine', $output);
+        $this->assertStringContainsString('Some commands could not be registered:', $output);
+        $this->assertStringContainsString('throwing', $output);
+        $this->assertStringContainsString('fine', $output);
     }
 
     public function testRegistrationErrorsAreDisplayedOnCommandNotFound()
@@ -195,8 +195,8 @@ class ApplicationTest extends TestCase
         $output = $tester->getDisplay();
 
         $this->assertSame(1, $tester->getStatusCode());
-        $this->assertContains('Some commands could not be registered:', $output);
-        $this->assertContains('Command "fine" is not defined.', $output);
+        $this->assertStringContainsString('Some commands could not be registered:', $output);
+        $this->assertStringContainsString('Command "fine" is not defined.', $output);
     }
 
     public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd()

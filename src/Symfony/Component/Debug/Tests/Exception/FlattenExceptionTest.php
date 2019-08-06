@@ -305,7 +305,7 @@ class FlattenExceptionTest extends TestCase
 
         $flattened = FlattenException::create($exception);
         $trace = $flattened->getTrace();
-        $this->assertContains('*DEEP NESTED ARRAY*', serialize($trace));
+        $this->assertStringContainsString('*DEEP NESTED ARRAY*', serialize($trace));
     }
 
     public function testTooBigArray()
@@ -329,8 +329,8 @@ class FlattenExceptionTest extends TestCase
 
         $serializeTrace = serialize($trace);
 
-        $this->assertContains('*SKIPPED over 10000 entries*', $serializeTrace);
-        $this->assertNotContains('*value1*', $serializeTrace);
+        $this->assertStringContainsString('*SKIPPED over 10000 entries*', $serializeTrace);
+        $this->assertStringNotContainsString('*value1*', $serializeTrace);
     }
 
     public function testAnonymousClass()

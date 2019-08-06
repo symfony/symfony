@@ -601,7 +601,7 @@ class ResponseTest extends ResponseTestCase
             $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->setCache() throws an InvalidArgumentException if an option is not supported');
-            $this->assertContains('"wrong option"', $e->getMessage());
+            $this->assertStringContainsString('"wrong option"', $e->getMessage());
         }
 
         $options = ['etag' => '"whatever"'];
@@ -654,7 +654,7 @@ class ResponseTest extends ResponseTestCase
         ob_start();
         $response->sendContent();
         $string = ob_get_clean();
-        $this->assertContains('test response rendering', $string);
+        $this->assertStringContainsString('test response rendering', $string);
     }
 
     public function testSetPublic()

@@ -75,7 +75,11 @@ class SendmailTransport extends AbstractTransport
 
     public function getName(): string
     {
-        return $this->transport->getName();
+        if ($this->transport) {
+            return $this->transport->getName();
+        }
+
+        return 'smtp://sendmail';
     }
 
     protected function doSend(SentMessage $message): void

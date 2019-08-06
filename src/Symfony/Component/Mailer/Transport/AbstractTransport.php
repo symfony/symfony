@@ -39,8 +39,6 @@ abstract class AbstractTransport implements TransportInterface
         $this->logger = $logger ?: new NullLogger();
     }
 
-    abstract public function getName(): string;
-
     /**
      * Sets the maximum number of messages to send per second (0 to disable).
      */

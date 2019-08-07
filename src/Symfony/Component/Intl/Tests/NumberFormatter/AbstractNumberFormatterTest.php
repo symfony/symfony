@@ -36,7 +36,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     {
         return [
             [100, 'ALL', '100'],
-            [100, 'BRL', '100.00'],
+            [100, 'BRL', '100'],
             [100, 'CRC', '100'],
             [100, 'JPY', '100'],
             [100, 'CHF', '100'],

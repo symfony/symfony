@@ -18,6 +18,22 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LanguageValidatorTest extends ConstraintValidatorTestCase
 {
+    private $defaultLocale;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Locale::setDefault($this->defaultLocale);
+    }
+
     protected function createValidator()
     {
         return new LanguageValidator();

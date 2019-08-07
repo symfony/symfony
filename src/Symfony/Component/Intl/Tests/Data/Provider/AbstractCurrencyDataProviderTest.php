@@ -589,6 +589,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      * @var CurrencyDataProvider
      */
     protected $dataProvider;
+    private $defaultLocale;
 
     protected function setUp()
     {
@@ -598,6 +599,15 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
             $this->getDataDirectory().'/'.Intl::CURRENCY_DIR,
             $this->createEntryReader()
         );
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Locale::setDefault($this->defaultLocale);
     }
 
     abstract protected function getDataDirectory();

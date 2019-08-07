@@ -283,6 +283,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
      * @var RegionDataProvider
      */
     protected $dataProvider;
+    private $defaultLocale;
 
     protected function setUp()
     {
@@ -292,6 +293,15 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
             $this->getDataDirectory().'/'.Intl::REGION_DIR,
             $this->createEntryReader()
         );
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Locale::setDefault($this->defaultLocale);
     }
 
     abstract protected function getDataDirectory();

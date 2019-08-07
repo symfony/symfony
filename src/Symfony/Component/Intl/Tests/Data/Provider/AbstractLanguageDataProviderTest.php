@@ -830,6 +830,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
      * @var LanguageDataProvider
      */
     protected $dataProvider;
+    private $defaultLocale;
 
     protected function setUp()
     {
@@ -839,6 +840,15 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
             $this->getDataDirectory().'/'.Intl::LANGUAGE_DIR,
             $this->createEntryReader()
         );
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Locale::setDefault($this->defaultLocale);
     }
 
     abstract protected function getDataDirectory();

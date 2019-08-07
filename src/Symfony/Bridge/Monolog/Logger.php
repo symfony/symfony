@@ -113,5 +113,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
                 return $handler;
             }
         }
+
+        return null;
     }
 }

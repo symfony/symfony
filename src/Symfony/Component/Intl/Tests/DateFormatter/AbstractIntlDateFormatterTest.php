@@ -24,9 +24,21 @@ use Symfony\Component\Intl\Util\IcuVersion;
  */
 abstract class AbstractIntlDateFormatterTest extends TestCase
 {
+    private $defaultLocale;
+
     protected function setUp()
     {
+        parent::setUp();
+
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Locale::setDefault($this->defaultLocale);
     }
 
     /**

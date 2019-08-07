@@ -459,7 +459,7 @@ class ErrorHandler
         }
 
         if ($throw) {
-            if (E_USER_ERROR & $type) {
+            if (\PHP_VERSION_ID < 70400 && E_USER_ERROR & $type) {
                 for ($i = 1; isset($backtrace[$i]); ++$i) {
                     if (isset($backtrace[$i]['function'], $backtrace[$i]['type'], $backtrace[$i - 1]['function'])
                         && '__toString' === $backtrace[$i]['function']

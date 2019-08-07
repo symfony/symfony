@@ -58,7 +58,7 @@ content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"
         $handler->sendPhpResponse(new \RuntimeException($htmlWithXss));
         $response = ob_get_clean();
 
-        $this->assertContains(sprintf('<h1 class="break-long-words exception-message">%s</h1>', htmlspecialchars($htmlWithXss, ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')), $response);
+        $this->assertStringContainsString(sprintf('<h1 class="break-long-words exception-message">%s</h1>', htmlspecialchars($htmlWithXss, ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')), $response);
     }
 
     public function testStatusCode()

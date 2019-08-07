@@ -72,7 +72,7 @@ TXT
         $tester->execute(['class' => 'DateTime'], ['decorated' => false, 'interactive' => false]);
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
-        $this->assertContains('Symfony\Component\Form\Extension\Core\Type\DateTimeType (Block prefix: "datetime")', $tester->getDisplay());
+        $this->assertStringContainsString('Symfony\Component\Form\Extension\Core\Type\DateTimeType (Block prefix: "datetime")', $tester->getDisplay());
     }
 
     public function testDebugFormTypeOption()

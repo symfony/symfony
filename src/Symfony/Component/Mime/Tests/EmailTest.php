@@ -330,7 +330,7 @@ class EmailTest extends TestCase
         $this->assertCount(2, $parts = $related[0]->getParts());
         $this->assertInstanceOf(AlternativePart::class, $parts[0]);
         $generatedHtml = $parts[0]->getParts()[1];
-        $this->assertContains('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
+        $this->assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
 
         $content = 'html content <img src="cid:test.gif">';
         $r = fopen('php://memory', 'r+', false);

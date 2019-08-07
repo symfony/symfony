@@ -188,7 +188,7 @@ class LdapManagerTest extends LdapTestCase
         $newEntry = $result[0];
         $originalCN = $entry->getAttribute('cn')[0];
 
-        $this->assertContains($originalCN, $newEntry->getAttribute('cn'));
+        $this->assertStringContainsString($originalCN, $newEntry->getAttribute('cn'));
 
         $entryManager->rename($newEntry, 'cn='.$originalCN);
 
@@ -357,6 +357,6 @@ class LdapManagerTest extends LdapTestCase
 
         $result = $this->executeSearchQuery(1);
         $movedEntry = $result[0];
-        $this->assertContains('ou=Ldap', $movedEntry->getDn());
+        $this->assertStringContainsString('ou=Ldap', $movedEntry->getDn());
     }
 }

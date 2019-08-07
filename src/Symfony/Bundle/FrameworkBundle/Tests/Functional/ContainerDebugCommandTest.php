@@ -61,8 +61,8 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertNotContains('private_alias', $tester->getDisplay());
 
         $tester->run(['command' => 'debug:container']);
-        $this->assertContains('public', $tester->getDisplay());
-        $this->assertContains('private_alias', $tester->getDisplay());
+        $this->assertStringContainsString('public', $tester->getDisplay());
+        $this->assertStringContainsString('private_alias', $tester->getDisplay());
     }
 
     /**
@@ -130,7 +130,7 @@ TXT
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-var' => 'js'], ['decorated' => false]);
 
-        $this->assertContains(file_get_contents(__DIR__.'/Fixtures/describe_env_vars.txt'), $tester->getDisplay(true));
+        $this->assertStringContainsString(file_get_contents(__DIR__.'/Fixtures/describe_env_vars.txt'), $tester->getDisplay(true));
     }
 
     public function provideIgnoreBackslashWhenFindingService()

@@ -244,7 +244,7 @@ class TransportTest extends TestCase
         $this->assertInstanceOf(Amazon\Smtp\SesTransport::class, $transport);
         $this->assertEquals('u$er', $transport->getUsername());
         $this->assertEquals('pa$s', $transport->getPassword());
-        $this->assertContains('.sun.', $transport->getStream()->getHost());
+        $this->assertStringContainsString('.sun.', $transport->getStream()->getHost());
         $this->assertProperties($transport, $dispatcher, $logger);
 
         $client = $this->createMock(HttpClientInterface::class);

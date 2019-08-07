@@ -33,13 +33,13 @@ class TranslationDebugCommandTest extends AbstractWebTestCase
         $ret = $tester->execute(['locale' => 'en']);
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('missing    messages     hello_from_construct_arg_service', $tester->getDisplay());
-        $this->assertContains('missing    messages     hello_from_subscriber_service', $tester->getDisplay());
-        $this->assertContains('missing    messages     hello_from_property_service', $tester->getDisplay());
-        $this->assertContains('missing    messages     hello_from_method_calls_service', $tester->getDisplay());
-        $this->assertContains('missing    messages     hello_from_controller', $tester->getDisplay());
-        $this->assertContains('unused     validators   This value should be blank.', $tester->getDisplay());
-        $this->assertContains('unused     security     Invalid CSRF token.', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_construct_arg_service', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_subscriber_service', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_property_service', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_method_calls_service', $tester->getDisplay());
+        $this->assertStringContainsString('missing    messages     hello_from_controller', $tester->getDisplay());
+        $this->assertStringContainsString('unused     validators   This value should be blank.', $tester->getDisplay());
+        $this->assertStringContainsString('unused     security     Invalid CSRF token.', $tester->getDisplay());
     }
 
     private function createCommandTester(): CommandTester

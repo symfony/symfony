@@ -49,5 +49,5 @@ interface PersistingStoreInterface
      *
      * @throws LockConflictedException
      */
-    public function putOffExpiration(Key $key, $ttl);
+    public function putOffExpiration(Key $key, float $ttl);
 }

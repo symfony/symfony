@@ -114,7 +114,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function refresh($ttl = null)
+    public function refresh(float $ttl = null)
     {
         if (null === $ttl) {
             $ttl = $this->ttl;

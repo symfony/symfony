@@ -106,7 +106,7 @@ class FlockStore implements BlockingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, the flock locks forever.
     }

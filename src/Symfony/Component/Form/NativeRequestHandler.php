@@ -192,7 +192,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      * This method is identical to {@link \Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
      * and should be kept as such in order to port fixes quickly and easily.
      *
-     * @return array
+     * @return mixed
      */
     private static function fixPhpFilesArray($data)
     {
@@ -228,9 +228,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * Sets empty uploaded files to NULL in the given uploaded files array.
      *
-     * @param mixed $data The file upload data
-     *
-     * @return array|null Returns the stripped upload data
+     * @return mixed Returns the stripped upload data
      */
     private static function stripEmptyFiles($data)
     {

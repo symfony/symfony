@@ -344,7 +344,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 'csrf_token_id' => $firewall['logout']['csrf_token_id'],
                 'logout_path' => $firewall['logout']['path'],
             ]);
-
+            if ($container->has('security.authentication.rememberme.services.persistent'.$id)) {
+                $logoutListener->replaceArgument(7, 'security.authentication.rememberme.services.persistent'.$id);
+            }
+            if ($container->has('security.authentication.rememberme.services.simplehash'.$id)) {
+                $logoutListener->replaceArgument(7, 'security.authentication.rememberme.services.simplehash'.$id);
+            }
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
                 $logoutSuccessHandlerId = $firewall['logout']['success_handler'];

@@ -41,9 +41,9 @@ class RememberMeFactory implements SecurityFactoryInterface
             ->addArgument($config['secret'])
             ->addArgument($id)
         ;
-
+        $hasTokenProvider = isset($config['token_provider']);
         // remember me services
-        if (isset($config['token_provider'])) {
+        if ($hasTokenProvider) {
             $templateId = 'security.authentication.rememberme.services.persistent';
             $rememberMeServicesId = $templateId.'.'.$id;
         } else {
@@ -62,7 +62,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         $rememberMeServices->replaceArgument(1, $config['secret']);
         $rememberMeServices->replaceArgument(2, $id);
 
-        if (isset($config['token_provider'])) {
+        if ($hasTokenProvider) {
             $rememberMeServices->addMethodCall('setTokenProvider', [
                 new Reference($config['token_provider']),
             ]);

@@ -74,8 +74,6 @@ class BasicAuthenticationListenerTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
-
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $tokenStorage
             ->expects($this->any())

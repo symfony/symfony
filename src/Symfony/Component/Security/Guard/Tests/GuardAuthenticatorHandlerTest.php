@@ -85,13 +85,6 @@ class GuardAuthenticatorHandlerTest extends TestCase
      */
     public function testHandleAuthenticationClearsToken($tokenClass, $tokenProviderKey, $actualProviderKey)
     {
-        $token = $this->getMockBuilder($tokenClass)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $token->expects($this->any())
-            ->method('getProviderKey')
-            ->willReturn($tokenProviderKey);
-
         $this->tokenStorage->expects($this->never())
             ->method('setToken')
             ->with(null);

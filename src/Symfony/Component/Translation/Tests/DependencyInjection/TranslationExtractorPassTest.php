@@ -50,13 +50,10 @@ class TranslationExtractorPassTest extends TestCase
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
         $this->expectExceptionMessage('The alias for the tag "translation.extractor" of service "foo.id" must be set.');
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->disableOriginalConstructor()->getMock();
         $container = new ContainerBuilder();
         $container->register('translation.extractor');
         $container->register('foo.id')
             ->addTag('translation.extractor', []);
-
-        $definition->expects($this->never())->method('addMethodCall');
 
         $translationDumperPass = new TranslationExtractorPass();
         $translationDumperPass->process($container);

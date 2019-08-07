@@ -175,6 +175,14 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($configuration->shouldDisplayStackTrace('interesting'));
     }
 
+    public function testItCanTellWhetherToDisplayAStackTraceFromRegExOption()
+    {
+        $configuration = Configuration::fromUrlEncodedString('regex=/^interesting/');
+
+        $this->assertFalse($configuration->shouldDisplayStackTrace('uninteresting'));
+        $this->assertTrue($configuration->shouldDisplayStackTrace('interesting'));
+    }
+
     public function testItCanBeDisabled()
     {
         $configuration = Configuration::fromUrlEncodedString('disabled');

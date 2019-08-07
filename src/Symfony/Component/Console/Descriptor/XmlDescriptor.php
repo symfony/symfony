@@ -176,8 +176,6 @@ class XmlDescriptor extends Descriptor
 
     /**
      * Writes DOM document.
-     *
-     * @return \DOMDocument|string
      */
     private function writeDocument(\DOMDocument $dom)
     {

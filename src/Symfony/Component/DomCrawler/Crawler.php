@@ -308,7 +308,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns a node given its position in the node list.
      *
-     * @return self
+     * @return static
      */
     public function eq(int $position)
     {
@@ -348,7 +348,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Slices the list of nodes by $offset and $length.
      *
-     * @return self
+     * @return static
      */
     public function slice(int $offset = 0, int $length = null)
     {
@@ -362,7 +362,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param \Closure $closure An anonymous function
      *
-     * @return self
+     * @return static
      */
     public function reduce(\Closure $closure)
     {
@@ -379,7 +379,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the first node of the current selection.
      *
-     * @return self
+     * @return static
      */
     public function first()
     {
@@ -389,7 +389,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the last node of the current selection.
      *
-     * @return self
+     * @return static
      */
     public function last()
     {
@@ -399,7 +399,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the siblings nodes of the current selection.
      *
-     * @return self
+     * @return static
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -415,7 +415,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the next siblings nodes of the current selection.
      *
-     * @return self
+     * @return static
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -431,7 +431,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the previous sibling nodes of the current selection.
      *
-     * @return self
+     * @return static
      *
      * @throws \InvalidArgumentException
      */
@@ -447,7 +447,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the parents nodes of the current selection.
      *
-     * @return self
+     * @return static
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -472,7 +472,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the children nodes of the current selection.
      *
-     * @return self
+     * @return static
      *
      * @throws \InvalidArgumentException When current node is empty
      * @throws \RuntimeException         If the CssSelector Component is not available and $selector is provided
@@ -655,7 +655,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * This means that a child selector "div" or "./div" will match only
      * the div elements of the current crawler, not their children.
      *
-     * @return self
+     * @return static
      */
     public function filterXPath(string $xpath)
     {
@@ -674,7 +674,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * This method only works if you have installed the CssSelector Symfony Component.
      *
-     * @return self
+     * @return static
      *
      * @throws \RuntimeException if the CssSelector Component is not available
      */
@@ -689,7 +689,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Selects links by name or alt value for clickable images.
      *
-     * @return self
+     * @return static
      */
     public function selectLink(string $value)
     {
@@ -701,7 +701,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Selects images by alt value.
      *
-     * @return self A new instance of Crawler with the filtered list of nodes
+     * @return static A new instance of Crawler with the filtered list of nodes
      */
     public function selectImage(string $value)
     {
@@ -713,7 +713,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Selects a button by name or alt value for images.
      *
-     * @return self
+     * @return static
      */
     public function selectButton(string $value)
     {
@@ -897,7 +897,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * The XPath expression should already be processed to apply it in the context of each node.
      *
-     * @return self
+     * @return static
      */
     private function filterRelativeXPath(string $xpath)
     {

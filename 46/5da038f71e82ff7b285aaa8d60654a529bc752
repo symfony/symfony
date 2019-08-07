@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2019-08-06T15:02:05Z
+
+Hum, it seems that this PR actually brokes tests...
+
+![Sélection_999(107)](https://user-images.githubusercontent.com/2103975/62551223-e6850700-b86b-11e9-8410-f65872949246.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-06T15:04:57Z
+
+Would using `0` break in the same way?
+
+---------------------------------------------------------------------------
+
+by Kocal at 2019-08-06T15:06:22Z
+
+I don't have the time for now, I will check it out this evening.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2019-08-06T19:39:20Z
+
+Huh, so `$active = null`, `$active = 0` and `$active` make tests for HttpClient timeout...
+
+I don't understand why. It's a variable declared in a reference so it should be ok... Maybe because of a weird PHP configuration, it fails?
+We really need to find a way to easily reproduce the issue and find a better fix than this... :/

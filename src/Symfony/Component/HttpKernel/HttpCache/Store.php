@@ -342,13 +342,13 @@ class Store implements StoreInterface
     /**
      * Loads data for the given key.
      *
-     * @return string The data associated with the key
+     * @return string|null The data associated with the key
      */
     private function load(string $key)
     {
         $path = $this->getPath($key);
 
-        return file_exists($path) ? file_get_contents($path) : false;
+        return file_exists($path) ? file_get_contents($path) : null;
     }
 
     /**

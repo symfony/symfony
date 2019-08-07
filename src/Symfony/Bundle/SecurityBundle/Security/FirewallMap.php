@@ -135,14 +135,14 @@ class _FirewallMap
         $context = $this->getFirewallContext($request);
 
         if (null === $context) {
-            return;
+            return null;
         }
 
         return $context->getConfig();
     }
 
     /**
-     * @return FirewallContext
+     * @return FirewallContext|null
      */
     private function getFirewallContext(Request $request)
     {
@@ -164,5 +164,7 @@ class _FirewallMap
                 return $this->container->get($contextId);
             }
         }
+
+        return null;
     }
 }

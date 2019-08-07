@@ -17,7 +17,6 @@ use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-use Symfony\Contracts\HttpClient\Test\HttpClientTestCase;
 
 class MockHttpClientTest extends HttpClientTestCase
 {

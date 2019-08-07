@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-07T11:40:16Z
+
+It should not have been removed, that's the issue.
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2019-08-07T11:42:36Z
+
+Before there was only one depreciation note.
+So instead of removing the call, I put it back empty ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-07T11:43:09Z
+
+yes please

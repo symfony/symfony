@@ -93,6 +93,10 @@ abstract class DataCollector implements DataCollectorInterface
         return ['data'];
     }
 
+    public function __wakeup()
+    {
+    }
+
     /**
      * @internal to prevent implementing \Serializable
      */

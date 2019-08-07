@@ -285,6 +285,10 @@ class ErrorHandlerTest extends TestCase
 
     public function testHandleUserError()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            $this->markTestSkipped('PHP 7.4 allows __toString to throw exceptions');
+        }
+
         try {
             $handler = ErrorHandler::register();
             $handler->throwAt(0, true);

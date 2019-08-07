@@ -52,7 +52,6 @@ Exception {
       › }
     }
     %s%eTests%eCaster%eExceptionCasterTest.php:40 { …}
-    Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->testDefaultSettings() {}
 %A
 EODUMP;
 
@@ -71,8 +70,7 @@ EODUMP;
     ›     return new \Exception(''.$msg);
     › }
   }
-  %s%eTests%eCaster%eExceptionCasterTest.php:65 { …}
-  Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->testSeek() {}
+  %s%eTests%eCaster%eExceptionCasterTest.php:64 { …}
 %A
 EODUMP;
 
@@ -96,8 +94,7 @@ Exception {
       ›     return new \Exception(''.$msg);
       › }
     }
-    %s%eTests%eCaster%eExceptionCasterTest.php:84 { …}
-    Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->testNoArgs() {}
+    %s%eTests%eCaster%eExceptionCasterTest.php:82 { …}
 %A
 EODUMP;
 

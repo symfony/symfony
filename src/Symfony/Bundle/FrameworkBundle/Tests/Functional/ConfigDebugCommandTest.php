@@ -71,7 +71,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $tester->execute(['name' => 'FrameworkBundle']);
 
-        $this->assertContains("cookie_httponly: '%env(bool:COOKIE_HTTPONLY)%'", $tester->getDisplay());
+        $this->assertStringContainsString("cookie_httponly: '%env(bool:COOKIE_HTTPONLY)%'", $tester->getDisplay());
     }
 
     /**

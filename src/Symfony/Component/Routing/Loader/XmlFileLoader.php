@@ -331,7 +331,7 @@ class XmlFileLoader extends FileLoader
     private function parseDefaultsConfig(\DOMElement $element, string $path)
     {
         if ($this->isElementValueNull($element)) {
-            return;
+            return null;
         }
 
         // Check for existing element nodes in the default element. There can
@@ -365,7 +365,7 @@ class XmlFileLoader extends FileLoader
     private function parseDefaultNode(\DOMElement $node, string $path)
     {
         if ($this->isElementValueNull($node)) {
-            return;
+            return null;
         }
 
         switch ($node->localName) {

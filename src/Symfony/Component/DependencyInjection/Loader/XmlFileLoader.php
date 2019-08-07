@@ -208,7 +208,7 @@ class XmlFileLoader extends FileLoader
                 $alias->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
             }
 
-            return;
+            return null;
         }
 
         if ($this->isLoadingInstanceof) {

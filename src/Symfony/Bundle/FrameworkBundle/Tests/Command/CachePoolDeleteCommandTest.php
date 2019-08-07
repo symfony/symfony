@@ -45,7 +45,7 @@ class CachePoolDeleteCommandTest extends TestCase
         $tester = $this->getCommandTester($this->getKernel());
         $tester->execute(['pool' => 'foo', 'key' => 'bar']);
 
-        $this->assertContains('[OK] Cache item "bar" was successfully deleted.', $tester->getDisplay());
+        $this->assertStringContainsString('[OK] Cache item "bar" was successfully deleted.', $tester->getDisplay());
     }
 
     public function testCommandWithInValidKey()
@@ -62,7 +62,7 @@ class CachePoolDeleteCommandTest extends TestCase
         $tester = $this->getCommandTester($this->getKernel());
         $tester->execute(['pool' => 'foo', 'key' => 'bar']);
 
-        $this->assertContains('[NOTE] Cache item "bar" does not exist in cache pool "foo".', $tester->getDisplay());
+        $this->assertStringContainsString('[NOTE] Cache item "bar" does not exist in cache pool "foo".', $tester->getDisplay());
     }
 
     public function testCommandDeleteFailed()

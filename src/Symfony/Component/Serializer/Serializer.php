@@ -250,6 +250,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 return $normalizer;
             }
         }
+
+        return null;
     }
 
     /**
@@ -291,6 +293,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 return $normalizer;
             }
         }
+
+        return null;
     }
 
     /**

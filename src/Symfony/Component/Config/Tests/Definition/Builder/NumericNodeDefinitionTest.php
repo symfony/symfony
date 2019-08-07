@@ -14,7 +14,6 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\FloatNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition as NumericNodeDefinition;
 
 class NumericNodeDefinitionTest extends TestCase
 {
@@ -22,7 +21,7 @@ class NumericNodeDefinitionTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('You cannot define a min(4) as you already have a max(3)');
-        $def = new NumericNodeDefinition('foo');
+        $def = new IntegerNodeDefinition('foo');
         $def->max(3)->min(4);
     }
 
@@ -30,7 +29,7 @@ class NumericNodeDefinitionTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('You cannot define a max(2) as you already have a min(3)');
-        $node = new NumericNodeDefinition('foo');
+        $node = new IntegerNodeDefinition('foo');
         $node->min(3)->max(2);
     }
 
@@ -84,7 +83,7 @@ class NumericNodeDefinitionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');
         $this->expectExceptionMessage('->cannotBeEmpty() is not applicable to NumericNodeDefinition.');
-        $def = new NumericNodeDefinition('foo');
+        $def = new IntegerNodeDefinition('foo');
         $def->cannotBeEmpty();
     }
 }

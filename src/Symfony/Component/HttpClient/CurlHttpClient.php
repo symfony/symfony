@@ -314,6 +314,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of CurlResponse objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 
+        $active = 0;
         while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
 
         return new ResponseStream(CurlResponse::stream($responses, $timeout));
@@ -326,6 +327,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             curl_multi_setopt($this->multi->handle, CURLMOPT_PUSHFUNCTION, null);
         }
 
+        $active = 0;
         while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
 
         foreach ($this->multi->openHandles as $ch) {

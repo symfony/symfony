@@ -94,6 +94,10 @@ EOF;
             );
         }
 
+        if (version_compare(self::getProxyManagerVersion(), '2.5', '<')) {
+            $code = str_replace(' \Closure::bind(function ', ' \Closure::bind(static function ', $code);
+        }
+
         return $code;
     }
 

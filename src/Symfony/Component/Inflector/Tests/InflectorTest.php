@@ -180,7 +180,7 @@ class InflectorTest extends TestCase
             ['batch', 'batches'],
             ['beau', ['beaus', 'beaux']],
             ['bee', 'bees'],
-            ['box', ['bocies', 'boxes']],
+            ['box', 'boxes'],
             ['boy', 'boys'],
             ['bureau', ['bureaus', 'bureaux']],
             ['bus', 'buses'],

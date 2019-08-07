@@ -14,7 +14,7 @@ class LdapTestCase extends TestCase
             $this->markTestSkipped('No server is listening on LDAP_HOST:LDAP_PORT');
         }
 
-        ldap_close($h);
+        ldap_unbind($h);
 
         return [
             'host' => getenv('LDAP_HOST'),

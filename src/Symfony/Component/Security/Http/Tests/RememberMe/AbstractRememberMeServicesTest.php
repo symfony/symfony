@@ -124,7 +124,6 @@ class AbstractRememberMeServicesTest extends TestCase
         $service = $this->getService(null, ['name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null]);
         $request = new Request();
         $response = new Response();
-        $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token
             ->expects($this->once())

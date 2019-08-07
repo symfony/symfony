@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-06T12:18:22Z
+
+The list there is automatically computed so we cannot patch it like that.
+Instead, we should make the code that calls `explode()` handle the situation.
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-08-06T12:20:16Z
+
+So I better revert my changes and catch this error in the `DataPart` constructor?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-06T12:21:29Z
+
+yes please
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-06T13:18:35Z
+
+Wouldn't it be better to change the code that generates the list to exclude non valid values?
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-08-06T15:43:34Z
+
+And where are these lists generated? Should this code be changed or should a check be added on the `DataPart::fromPath` function?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-06T19:57:04Z
+
+`Resources/bin/update_mime_types.php`
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-08-07T09:52:49Z
+
+I removed the od* file extensions from the generator script.

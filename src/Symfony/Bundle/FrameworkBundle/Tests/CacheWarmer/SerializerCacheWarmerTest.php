@@ -73,7 +73,7 @@ class SerializerCacheWarmerTest extends TestCase
 
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
-        $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__), new ArrayAdapter());
+        $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__));
 
         spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
@@ -101,7 +101,7 @@ class SerializerCacheWarmerTest extends TestCase
 
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
-        $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__), new ArrayAdapter());
+        $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], tempnam(sys_get_temp_dir(), __FUNCTION__));
 
         spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {

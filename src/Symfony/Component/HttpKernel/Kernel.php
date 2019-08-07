@@ -631,8 +631,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             });
         }
 
+        $container = null;
         try {
-            $container = null;
             $container = $this->buildContainer();
             $container->compile();
         } finally {

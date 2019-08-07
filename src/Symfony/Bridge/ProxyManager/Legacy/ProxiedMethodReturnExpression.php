@@ -12,6 +12,7 @@ namespace ProxyManager\Generator\Util;
 
 use Composer\Autoload\ClassLoader;
 use ProxyManager\Version;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 if (class_exists(Version::class) && version_compare(\defined(Version::class.'::VERSION') ? Version::VERSION : Version::getVersion(), '2.5', '<')) {
     /**
@@ -51,10 +52,7 @@ if (class_exists(Version::class) && version_compare(\defined(Version::class.'::V
         if ($functionLoader instanceof ClassLoader) {
             return $functionLoader;
         }
-        if ($functionLoader instanceof \Symfony\Component\Debug\DebugClassLoader) {
-            return $getComposerClassLoader($functionLoader->getClassLoader());
-        }
-        if ($functionLoader instanceof \Symfony\Component\ErrorHandler\DebugClassLoader) {
+        if ($functionLoader instanceof DebugClassLoader) {
             return $getComposerClassLoader($functionLoader->getClassLoader());
         }
     };

@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
-use Symfony\Component\HttpClient\NativeHttpClient;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 
-class NativeHttpClientTest extends HttpClientTestCase
+abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
-    protected function getHttpClient(string $testCase): HttpClientInterface
+    public function testMaxDuration()
     {
-        return new NativeHttpClient();
+        $this->markTestSkipped('Implemented as of version 4.4');
     }
 }

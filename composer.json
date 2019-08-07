@@ -136,7 +136,8 @@
             "Symfony\\Component\\": "src/Symfony/Component/"
         },
         "classmap": [
-            "src/Symfony/Component/Intl/Resources/stubs"
+            "src/Symfony/Component/Intl/Resources/stubs",
+            "src/Symfony/Bridge/ProxyManager/Legacy/ProxiedMethodReturnExpression.php"
         ],
         "exclude-from-classmap": [
             "**/Tests/"

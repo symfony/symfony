@@ -118,7 +118,7 @@ class IntlDateFormatter
     private $timeZoneId;
 
     /**
-     * @param string                                  $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
+     * @param string|null                             $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      * @param int|null                                $datetype Type of date formatting, one of the format type constants
      * @param int|null                                $timetype Type of time formatting, one of the format type constants
      * @param \IntlTimeZone|\DateTimeZone|string|null $timezone Timezone identifier
@@ -152,7 +152,7 @@ class IntlDateFormatter
     /**
      * Static constructor.
      *
-     * @param string                                  $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
+     * @param string|null                             $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      * @param int|null                                $datetype Type of date formatting, one of the format type constants
      * @param int|null                                $timetype Type of time formatting, one of the format type constants
      * @param \IntlTimeZone|\DateTimeZone|string|null $timezone Timezone identifier

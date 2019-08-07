@@ -70,16 +70,6 @@ class FullTransformer
     }
 
     /**
-     * Return the array of Transformer objects.
-     *
-     * @return Transformer[] Associative array of Transformer objects (format char => Transformer)
-     */
-    public function getTransformers()
-    {
-        return $this->transformers;
-    }
-
-    /**
      * Format a DateTime using ICU dateformat pattern.
      *
      * @param \DateTime $dateTime A DateTime object to be used to generate the formatted value
@@ -105,7 +95,7 @@ class FullTransformer
      *
      * @throws NotImplementedException When it encounters a not implemented date character
      */
-    public function formatReplace($dateChars, $dateTime)
+    private function formatReplace($dateChars, \DateTime $dateTime)
     {
         $length = \strlen($dateChars);
 
@@ -172,7 +162,7 @@ class FullTransformer
      * @return string The reverse matching regular expression with named captures being formed by the
      *                transformer index in the $transformer array
      */
-    public function getReverseMatchingRegExp($pattern)
+    private function getReverseMatchingRegExp($pattern)
     {
         $escapedPattern = preg_quote($pattern, '/');
 
@@ -189,9 +179,8 @@ class FullTransformer
                 return $this->replaceQuoteMatch($dateChars);
             }
 
-            $transformers = $this->getTransformers();
-            if (isset($transformers[$transformerIndex])) {
-                $transformer = $transformers[$transformerIndex];
+            if (isset($this->transformers[$transformerIndex])) {
+                $transformer = $this->transformers[$transformerIndex];
                 $captureName = str_repeat($transformerIndex, $length);
 
                 return "(?P<$captureName>".$transformer->getReverseMatchingRegExp($length).')';
@@ -208,7 +197,7 @@ class FullTransformer
      *
      * @return bool true if matches, false otherwise
      */
-    public function isQuoteMatch($quoteMatch)
+    private function isQuoteMatch($quoteMatch)
     {
         return "'" === $quoteMatch[0];
     }
@@ -220,7 +209,7 @@ class FullTransformer
      *
      * @return string A string with the single quotes replaced
      */
-    public function replaceQuoteMatch($quoteMatch)
+    private function replaceQuoteMatch($quoteMatch)
     {
         if (preg_match("/^'+$/", $quoteMatch)) {
             return str_replace("''", "'", $quoteMatch);
@@ -236,7 +225,7 @@ class FullTransformer
      *
      * @return string The chars match regular expression
      */
-    protected function buildCharsMatch($specialChars)
+    private function buildCharsMatch($specialChars)
     {
         $specialCharsArray = str_split($specialChars);
 
@@ -253,7 +242,7 @@ class FullTransformer
      *
      * @return array
      */
-    protected function normalizeArray(array $data)
+    private function normalizeArray(array $data)
     {
         $ret = [];
 
@@ -280,7 +269,7 @@ class FullTransformer
      *
      * @return bool|int The calculated timestamp or false if matched date is invalid
      */
-    protected function calculateUnixTimestamp(\DateTime $dateTime, array $options)
+    private function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {
         $options = $this->getDefaultValueForOptions($options);
 

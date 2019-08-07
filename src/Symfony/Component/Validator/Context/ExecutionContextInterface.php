@@ -125,10 +125,9 @@ interface ExecutionContextInterface
     /**
      * Sets the currently validated value.
      *
-     * @param mixed                  $value        The validated value
-     * @param object|null            $object       The currently validated object
-     * @param MetadataInterface|null $metadata     The validation metadata
-     * @param string                 $propertyPath The property path to the current value
+     * @param mixed       $value        The validated value
+     * @param object|null $object       The currently validated object
+     * @param string      $propertyPath The property path to the current value
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
@@ -147,8 +146,6 @@ interface ExecutionContextInterface
 
     /**
      * Sets the currently validated constraint.
-     *
-     * @param Constraint $constraint The validated constraint
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.

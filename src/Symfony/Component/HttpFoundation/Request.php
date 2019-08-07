@@ -745,11 +745,6 @@ class Request
         return null !== $this->session;
     }
 
-    /**
-     * Sets the Session.
-     *
-     * @param SessionInterface $session The Session
-     */
     public function setSession(SessionInterface $session)
     {
         $this->session = $session;

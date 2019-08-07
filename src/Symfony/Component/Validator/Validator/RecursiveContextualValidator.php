@@ -50,13 +50,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Creates a validator for the given context.
      *
-     * @param ExecutionContextInterface           $context            The execution context
-     * @param MetadataFactoryInterface            $metadataFactory    The factory for
-     *                                                                fetching the metadata
-     *                                                                of validated objects
-     * @param ConstraintValidatorFactoryInterface $validatorFactory   The factory for creating
-     *                                                                constraint validators
-     * @param ObjectInitializerInterface[]        $objectInitializers The object initializers
+     * @param ObjectInitializerInterface[] $objectInitializers The object initializers
      */
     public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = [])
     {

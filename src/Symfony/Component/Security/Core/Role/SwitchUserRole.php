@@ -27,8 +27,7 @@ class SwitchUserRole extends Role
     private $source;
 
     /**
-     * @param string         $role   The role as a string
-     * @param TokenInterface $source The original token
+     * @param string $role The role as a string
      */
     public function __construct(string $role, TokenInterface $source)
     {

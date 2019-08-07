@@ -64,8 +64,7 @@ class ProfilerController
     /**
      * Renders a profiler panel for the given token.
      *
-     * @param Request $request The current HTTP request
-     * @param string  $token   The profiler token
+     * @param string $token The profiler token
      *
      * @return Response A Response instance
      *
@@ -110,8 +109,7 @@ class ProfilerController
     /**
      * Renders the Web Debug Toolbar.
      *
-     * @param Request $request The current HTTP Request
-     * @param string  $token   The profiler token
+     * @param string $token The profiler token
      *
      * @return Response A Response instance
      *
@@ -212,8 +210,7 @@ class ProfilerController
     /**
      * Renders the search results.
      *
-     * @param Request $request The current HTTP Request
-     * @param string  $token   The token
+     * @param string $token The token
      *
      * @return Response A Response instance
      *

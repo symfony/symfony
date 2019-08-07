@@ -23,9 +23,8 @@ interface FormFactoryInterface
      *
      * @see createBuilder()
      *
-     * @param string $type    The type of the form
-     * @param mixed  $data    The initial data
-     * @param array  $options The options
+     * @param string $type The type of the form
+     * @param mixed  $data The initial data
      *
      * @return FormInterface The form named after the type
      *
@@ -56,7 +55,6 @@ interface FormFactoryInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      * @param mixed  $data     The initial data
-     * @param array  $options  The options for the builder
      *
      * @return FormInterface The form named after the property
      *
@@ -67,9 +65,8 @@ interface FormFactoryInterface
     /**
      * Returns a form builder.
      *
-     * @param string $type    The type of the form
-     * @param mixed  $data    The initial data
-     * @param array  $options The options
+     * @param string $type The type of the form
+     * @param mixed  $data The initial data
      *
      * @return FormBuilderInterface The form builder
      *
@@ -99,7 +96,6 @@ interface FormFactoryInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      * @param mixed  $data     The initial data
-     * @param array  $options  The options for the builder
      *
      * @return FormBuilderInterface The form builder named after the property
      *

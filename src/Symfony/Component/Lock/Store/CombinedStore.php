@@ -38,8 +38,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
     private $strategy;
 
     /**
-     * @param PersistingStoreInterface[] $stores   The list of synchronized stores
-     * @param StrategyInterface          $strategy
+     * @param PersistingStoreInterface[] $stores The list of synchronized stores
      *
      * @throws InvalidArgumentException
      */

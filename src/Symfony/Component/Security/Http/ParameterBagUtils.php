@@ -29,8 +29,7 @@ final class ParameterBagUtils
      *
      * Paths like foo[bar] will be evaluated to find deeper items in nested data structures.
      *
-     * @param ParameterBag $parameters The parameter bag
-     * @param string       $path       The key
+     * @param string $path The key
      *
      * @return mixed
      *
@@ -64,8 +63,7 @@ final class ParameterBagUtils
      *
      * Paths like foo[bar] will be evaluated to find deeper items in nested data structures.
      *
-     * @param Request $request The request
-     * @param string  $path    The key
+     * @param string $path The key
      *
      * @return mixed
      *

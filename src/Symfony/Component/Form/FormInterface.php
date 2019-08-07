@@ -208,8 +208,6 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds an error to this form.
      *
-     * @param FormError $error
-     *
      * @return $this
      */
     public function addError(FormError $error);

@@ -26,9 +26,6 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
 
     private $selector;
 
-    /**
-     * @param MessageSelector|null $selector The message selector for pluralization
-     */
     public function __construct(MessageSelector $selector = null)
     {
         $this->selector = $selector;

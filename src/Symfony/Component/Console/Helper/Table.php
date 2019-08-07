@@ -102,8 +102,7 @@ class Table
     /**
      * Sets a style definition.
      *
-     * @param string     $name  The style name
-     * @param TableStyle $style A TableStyle instance
+     * @param string $name The style name
      */
     public static function setStyleDefinition($name, TableStyle $style)
     {

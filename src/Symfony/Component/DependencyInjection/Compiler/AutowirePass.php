@@ -318,7 +318,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if (!$reference->canBeAutoregistered() || isset($this->types[$type]) || isset($this->ambiguousServiceTypes[$type])) {
-            return;
+            return null;
         }
 
         if (isset($this->autowired[$type])) {
@@ -328,6 +328,8 @@ class AutowirePass extends AbstractRecursivePass
         if (!$this->strictMode) {
             return $this->createAutowiredDefinition($type);
         }
+
+        return null;
     }
 
     /**
@@ -425,7 +427,7 @@ class AutowirePass extends AbstractRecursivePass
     private function createAutowiredDefinition($type)
     {
         if (!($typeHint = $this->container->getReflectionClass($type, false)) || !$typeHint->isInstantiable()) {
-            return;
+            return null;
         }
 
         $currentId = $this->currentId;
@@ -445,7 +447,7 @@ class AutowirePass extends AbstractRecursivePass
             $this->lastFailure = $e->getMessage();
             $this->container->log($this, $this->lastFailure);
 
-            return;
+            return null;
         } finally {
             $this->throwOnAutowiringException = $originalThrowSetting;
             $this->currentId = $currentId;
@@ -518,7 +520,7 @@ class AutowirePass extends AbstractRecursivePass
         } elseif ($reference->getRequiringClass() && !$reference->canBeAutoregistered() && !$this->strictMode) {
             return ' It cannot be auto-registered because it is from a different root namespace.';
         } else {
-            return;
+            return '';
         }
 
         return sprintf(' You should maybe alias this %s to %s.', class_exists($type, false) ? 'class' : 'interface', $message);
@@ -572,5 +574,7 @@ class AutowirePass extends AbstractRecursivePass
         if ($aliases) {
             return sprintf('Try changing the type-hint%s to "%s" instead.', $extraContext, $aliases[0]);
         }
+
+        return null;
     }
 }

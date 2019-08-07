@@ -211,7 +211,7 @@ class XmlFileLoader extends FileLoader
                 $alias->setPublic($defaults['public']);
             }
 
-            return;
+            return null;
         }
 
         if ($this->isLoadingInstanceof) {

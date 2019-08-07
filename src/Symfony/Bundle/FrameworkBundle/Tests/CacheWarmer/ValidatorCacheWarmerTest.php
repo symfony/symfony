@@ -92,7 +92,7 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, tempnam(sys_get_temp_dir(), __FUNCTION__), new ArrayAdapter());
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, tempnam(sys_get_temp_dir(), __FUNCTION__));
 
         spl_autoload_register($classloader = function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
@@ -118,7 +118,7 @@ class ValidatorCacheWarmerTest extends TestCase
 
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
-        $warmer = new ValidatorCacheWarmer($validatorBuilder, tempnam(sys_get_temp_dir(), __FUNCTION__), new ArrayAdapter());
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, tempnam(sys_get_temp_dir(), __FUNCTION__));
 
         spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {

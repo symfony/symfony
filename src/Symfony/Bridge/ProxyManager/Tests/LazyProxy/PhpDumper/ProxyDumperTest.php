@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper;
 
 use PHPUnit\Framework\TestCase;
+use ProxyManager\Version;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -61,6 +62,20 @@ class ProxyDumperTest extends TestCase
                 .'\Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\ProxyDumperTest%a',
             $code
         );
+    }
+
+    public function testStaticBinding()
+    {
+        if (!class_exists(Version::class) || version_compare(\defined(Version::class.'::VERSION') ? Version::VERSION : Version::getVersion(), '2.1', '<')) {
+            $this->markTestSkipped('ProxyManager prior to version 2.1 does not support static binding');
+        }
+
+        $definition = new Definition(__CLASS__);
+        $definition->setLazy(true);
+
+        $code = $this->dumper->getProxyCode($definition);
+
+        $this->assertStringContainsString('\Closure::bind(static function (\PHPUnit\Framework\TestCase $instance) {', $code);
     }
 
     public function testDeterministicProxyCode()

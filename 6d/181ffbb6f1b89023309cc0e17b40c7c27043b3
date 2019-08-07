@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-06T07:12:56Z
+
+Thanks, we just merged #32971 which does the same on 3.4
+Can you please rebase to target 4.3? I'm sure there are more there.
+
+---------------------------------------------------------------------------
+
+by MarioBlazek at 2019-08-06T08:23:43Z
+
+@nicolas-grekas PR rebased against 4.3
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-06T12:24:52Z
+
+All the cases that fail with "mb_strpos() expects parameter 1 to be string, array given" should use assertContainsEquals instead
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-06T12:27:01Z
+
+Wait, assertContains is *not* deprecated. *Some uses* of it are. This should be more selective about those.
+
+---------------------------------------------------------------------------
+
+by MarioBlazek at 2019-08-07T05:12:42Z
+
+Thank you guys, I will update PR accordingly asap.
+
+---------------------------------------------------------------------------
+
+by MarioBlazek at 2019-08-07T07:19:58Z
+
+@nicolas-grekas @jderusse tests now pass, but build for some strange reason is hanging too long. Did you experienced something similar before?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-07T07:37:35Z
+
+@MarioBlazek tests should be back to OK with #33005
+
+---------------------------------------------------------------------------
+
+by MarioBlazek at 2019-08-07T08:17:53Z
+
+Tests are now OK, thanks @nicolas-grekas

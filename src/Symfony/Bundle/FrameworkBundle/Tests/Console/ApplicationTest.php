@@ -203,7 +203,7 @@ class ApplicationTest extends TestCase
         $this->assertSame(0, $tester->getStatusCode());
         $display = explode('Lists commands', $tester->getDisplay());
 
-        $this->assertContains(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
+        $this->assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
     }
 
     public function testSuggestingPackagesWithExactMatch()

@@ -69,7 +69,7 @@ EOF;
         );
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
-        $this->assertContains('[OK] All 0 XLIFF files contain valid syntax', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] All 0 XLIFF files contain valid syntax', trim($tester->getDisplay()));
     }
 
     /**

@@ -309,6 +309,8 @@ class AutowirePass extends AbstractRecursivePass
         if ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract()) {
             return new TypedReference($type, $type, $reference->getInvalidBehavior());
         }
+
+        return null;
     }
 
     /**
@@ -441,7 +443,7 @@ class AutowirePass extends AbstractRecursivePass
         } elseif (isset($this->types[$type])) {
             $message = sprintf('the existing "%s" service', $this->types[$type]);
         } else {
-            return;
+            return '';
         }
 
         return sprintf(' You should maybe alias this %s to %s.', class_exists($type, false) ? 'class' : 'interface', $message);
@@ -469,5 +471,7 @@ class AutowirePass extends AbstractRecursivePass
         if ($aliases) {
             return sprintf('Try changing the type-hint to "%s" instead.', $aliases[0]);
         }
+
+        return null;
     }
 }

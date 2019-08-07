@@ -132,7 +132,7 @@ class Store implements StoreInterface
         $key = $this->getCacheKey($request);
 
         if (!$entries = $this->getMetadata($key)) {
-            return;
+            return null;
         }
 
         // find a cached entry that matches the request.
@@ -146,7 +146,7 @@ class Store implements StoreInterface
         }
 
         if (null === $match) {
-            return;
+            return null;
         }
 
         $headers = $match[1];
@@ -157,6 +157,7 @@ class Store implements StoreInterface
         // TODO the metaStore referenced an entity that doesn't exist in
         // the entityStore. We definitely want to return nil but we should
         // also purge the entry from the meta-store when this is detected.
+        return null;
     }
 
     /**
@@ -178,7 +179,7 @@ class Store implements StoreInterface
         if (!$response->headers->has('X-Content-Digest')) {
             $digest = $this->generateContentDigest($response);
 
-            if (false === $this->save($digest, $response->getContent())) {
+            if (!$this->save($digest, $response->getContent())) {
                 throw new \RuntimeException('Unable to store the entity.');
             }
 
@@ -207,7 +208,7 @@ class Store implements StoreInterface
 
         array_unshift($entries, [$storedEnv, $headers]);
 
-        if (false === $this->save($key, serialize($entries))) {
+        if (!$this->save($key, serialize($entries))) {
             throw new \RuntimeException('Unable to store the metadata.');
         }
 
@@ -246,7 +247,7 @@ class Store implements StoreInterface
             }
         }
 
-        if ($modified && false === $this->save($key, serialize($entries))) {
+        if ($modified && !$this->save($key, serialize($entries))) {
             throw new \RuntimeException('Unable to store the metadata.');
         }
     }
@@ -397,6 +398,8 @@ class Store implements StoreInterface
         }
 
         @chmod($path, 0666 & ~umask());
+
+        return true;
     }
 
     public function getPath($key)

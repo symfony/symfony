@@ -446,7 +446,7 @@ abstract class HttpClientTestCase extends TestCase
 
         $body = $response->toArray();
 
-        $this->assertContains('json', $body['content-type']);
+        $this->assertStringContainsString('json', $body['content-type']);
         unset($body['content-type']);
         $this->assertSame(['foo' => 'bar', 'REQUEST_METHOD' => 'POST'], $body);
     }
@@ -705,11 +705,11 @@ abstract class HttpClientTestCase extends TestCase
         $headers = $response->getHeaders();
 
         $this->assertSame(['Accept-Encoding'], $headers['vary']);
-        $this->assertContains('gzip', $headers['content-encoding'][0]);
+        $this->assertStringContainsString('gzip', $headers['content-encoding'][0]);
 
         $body = $response->toArray();
 
-        $this->assertContains('gzip', $body['HTTP_ACCEPT_ENCODING']);
+        $this->assertStringContainsString('gzip', $body['HTTP_ACCEPT_ENCODING']);
     }
 
     public function testBaseUri()
@@ -757,7 +757,7 @@ abstract class HttpClientTestCase extends TestCase
         $headers = $response->getHeaders();
 
         $this->assertSame(['Accept-Encoding'], $headers['vary']);
-        $this->assertContains('gzip', $headers['content-encoding'][0]);
+        $this->assertStringContainsString('gzip', $headers['content-encoding'][0]);
 
         $body = $response->getContent();
         $this->assertSame("\x1F", $body[0]);

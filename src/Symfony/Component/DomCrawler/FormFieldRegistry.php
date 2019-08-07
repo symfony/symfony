@@ -55,7 +55,7 @@ class FormFieldRegistry
         $target = &$this->fields;
         while (\count($segments) > 1) {
             $path = array_shift($segments);
-            if (!\array_key_exists($path, $target)) {
+            if (!\is_array($target) || !\array_key_exists($path, $target)) {
                 return;
             }
             $target = &$target[$path];
@@ -76,7 +76,7 @@ class FormFieldRegistry
         $target = &$this->fields;
         while ($segments) {
             $path = array_shift($segments);
-            if (!\array_key_exists($path, $target)) {
+            if (!\is_array($target) || !\array_key_exists($path, $target)) {
                 throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
             }
             $target = &$target[$path];

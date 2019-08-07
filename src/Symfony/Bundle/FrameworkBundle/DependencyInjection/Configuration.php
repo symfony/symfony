@@ -223,7 +223,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                     ->beforeNormalization()
                         ->always(function ($v) {
-                            if (true === $v['enabled']) {
+                            if (\is_array($v) && true === $v['enabled']) {
                                 $workflows = $v;
                                 unset($workflows['enabled']);
 

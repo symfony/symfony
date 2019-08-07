@@ -41,8 +41,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\Debug\ErrorHandler as LegacyErrorHandler;
+use Symfony\Component\Debug\Exception\FatalThrowableError as LegacyFatalThrowableError;
+use Symfony\Component\ErrorHandler\ErrorHandler;
+use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -122,7 +124,7 @@ class Application implements ResetInterface
 
         $renderException = function ($e) use ($output) {
             if (!$e instanceof \Exception) {
-                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : (class_exists(LegacyFatalThrowableError::class) ? new LegacyFatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()));
             }
             if ($output instanceof ConsoleOutputInterface) {
                 $this->renderException($e, $output->getErrorOutput());
@@ -132,10 +134,10 @@ class Application implements ResetInterface
         };
         if ($phpHandler = set_exception_handler($renderException)) {
             restore_exception_handler();
-            if (!\is_array($phpHandler) || !$phpHandler[0] instanceof ErrorHandler) {
-                $debugHandler = true;
-            } elseif ($debugHandler = $phpHandler[0]->setExceptionHandler($renderException)) {
-                $phpHandler[0]->setExceptionHandler($debugHandler);
+            if (!\is_array($phpHandler) || (!$phpHandler[0] instanceof ErrorHandler && !$phpHandler[0] instanceof LegacyErrorHandler)) {
+                $errorHandler = true;
+            } elseif ($errorHandler = $phpHandler[0]->setExceptionHandler($renderException)) {
+                $phpHandler[0]->setExceptionHandler($errorHandler);
             }
         }
 
@@ -167,7 +169,7 @@ class Application implements ResetInterface
                     restore_exception_handler();
                 }
                 restore_exception_handler();
-            } elseif (!$debugHandler) {
+            } elseif (!$errorHandler) {
                 $finalHandler = $phpHandler[0]->setExceptionHandler(null);
                 if ($finalHandler !== $renderException) {
                     $phpHandler[0]->setExceptionHandler($finalHandler);

@@ -31,8 +31,8 @@ class CachePoolListCommandTest extends AbstractWebTestCase
         $tester->execute([]);
 
         $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:list exits with 0 in case of success');
-        $this->assertContains('cache.app', $tester->getDisplay());
-        $this->assertContains('cache.system', $tester->getDisplay());
+        $this->assertStringContainsString('cache.app', $tester->getDisplay());
+        $this->assertStringContainsString('cache.system', $tester->getDisplay());
     }
 
     public function testEmptyList()

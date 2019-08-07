@@ -45,7 +45,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
 
-        $this->assertContains(sprintf(<<<EOF
+        $this->assertStringContainsString(sprintf(<<<EOF
  ------------- --------------------- 
   Class         stdClass             
   Message Id    15                   

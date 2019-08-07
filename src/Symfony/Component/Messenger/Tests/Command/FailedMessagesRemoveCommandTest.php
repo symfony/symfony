@@ -32,6 +32,6 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => 20, '--force' => true]);
 
-        $this->assertContains('Message removed.', $tester->getDisplay());
+        $this->assertStringContainsString('Message removed.', $tester->getDisplay());
     }
 }

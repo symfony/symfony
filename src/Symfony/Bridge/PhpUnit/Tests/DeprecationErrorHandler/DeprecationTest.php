@@ -46,8 +46,8 @@ class DeprecationTest extends TestCase
     public function testItCanBeConvertedToAString()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
-        $this->assertContains('💩', $deprecation->toString());
-        $this->assertContains(__FUNCTION__, $deprecation->toString());
+        $this->assertStringContainsString('💩', $deprecation->toString());
+        $this->assertStringContainsString(__FUNCTION__, $deprecation->toString());
     }
 
     public function testItRulesOutFilesOutsideVendorsAsIndirect()

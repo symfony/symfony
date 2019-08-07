@@ -44,6 +44,6 @@ class FailedMessagesRetryCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['id' => [10, 12]]);
 
-        $this->assertContains('[OK]', $tester->getDisplay());
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 }

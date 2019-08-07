@@ -34,9 +34,9 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $display = $tester->getDisplay();
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('routerdebug_test', $display);
-        $this->assertContains('/test', $display);
-        $this->assertContains('/session', $display);
+        $this->assertStringContainsString('routerdebug_test', $display);
+        $this->assertStringContainsString('/test', $display);
+        $this->assertStringContainsString('/session', $display);
     }
 
     public function testDumpOneRoute()
@@ -45,8 +45,8 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $ret = $tester->execute(['name' => 'routerdebug_session_welcome']);
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('routerdebug_session_welcome', $tester->getDisplay());
-        $this->assertContains('/session', $tester->getDisplay());
+        $this->assertStringContainsString('routerdebug_session_welcome', $tester->getDisplay());
+        $this->assertStringContainsString('/session', $tester->getDisplay());
     }
 
     public function testSearchMultipleRoutes()
@@ -56,9 +56,9 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $ret = $tester->execute(['name' => 'routerdebug'], ['interactive' => true]);
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('Select one of the matching routes:', $tester->getDisplay());
-        $this->assertContains('routerdebug_test', $tester->getDisplay());
-        $this->assertContains('/test', $tester->getDisplay());
+        $this->assertStringContainsString('Select one of the matching routes:', $tester->getDisplay());
+        $this->assertStringContainsString('routerdebug_test', $tester->getDisplay());
+        $this->assertStringContainsString('/test', $tester->getDisplay());
     }
 
     public function testSearchWithThrow()

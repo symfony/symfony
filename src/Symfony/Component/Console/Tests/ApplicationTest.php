@@ -506,9 +506,9 @@ class ApplicationTest extends TestCase
         $tester->setInputs(['y']);
         $tester->run(['command' => 'foos'], ['decorated' => false]);
         $display = trim($tester->getDisplay(true));
-        $this->assertContains('Command "foos" is not defined', $display);
-        $this->assertContains('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
-        $this->assertContains('called', $display);
+        $this->assertStringContainsString('Command "foos" is not defined', $display);
+        $this->assertStringContainsString('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
+        $this->assertStringContainsString('called', $display);
     }
 
     public function testDontRunAlternativeCommandName()
@@ -521,8 +521,8 @@ class ApplicationTest extends TestCase
         $exitCode = $tester->run(['command' => 'foos'], ['decorated' => false]);
         $this->assertSame(1, $exitCode);
         $display = trim($tester->getDisplay(true));
-        $this->assertContains('Command "foos" is not defined', $display);
-        $this->assertContains('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
+        $this->assertStringContainsString('Command "foos" is not defined', $display);
+        $this->assertStringContainsString('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
     }
 
     public function provideInvalidCommandNamesSingle()
@@ -854,7 +854,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(['command' => 'foo'], ['decorated' => false]);
-        $this->assertContains('[InvalidArgumentException@anonymous]', $tester->getDisplay(true));
+        $this->assertStringContainsString('[InvalidArgumentException@anonymous]', $tester->getDisplay(true));
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -865,7 +865,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(['command' => 'foo'], ['decorated' => false]);
-        $this->assertContains('Dummy type "@anonymous" is invalid.', $tester->getDisplay(true));
+        $this->assertStringContainsString('Dummy type "@anonymous" is invalid.', $tester->getDisplay(true));
     }
 
     public function testRenderExceptionStackTraceContainsRootException()
@@ -879,7 +879,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(['command' => 'foo'], ['decorated' => false]);
-        $this->assertContains('[InvalidArgumentException@anonymous]', $tester->getDisplay(true));
+        $this->assertStringContainsString('[InvalidArgumentException@anonymous]', $tester->getDisplay(true));
 
         $application = new Application();
         $application->setAutoExit(false);

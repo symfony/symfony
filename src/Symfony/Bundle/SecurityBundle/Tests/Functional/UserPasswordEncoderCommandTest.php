@@ -62,7 +62,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordEncoderCommandTester->getDisplay();
-        $this->assertContains('Password encoding succeeded', $output);
+        $this->assertStringContainsString('Password encoding succeeded', $output);
 
         $encoder = new NativePasswordEncoder();
         preg_match('# Encoded password\s{1,}([\w+\/$.,=]+={0,2})\s+#', $output, $matches);
@@ -83,7 +83,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         ], ['interactive' => false]);
 
         $output = $this->passwordEncoderCommandTester->getDisplay();
-        $this->assertContains('Password encoding succeeded', $output);
+        $this->assertStringContainsString('Password encoding succeeded', $output);
 
         preg_match('#  Encoded password\s+(\$?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];

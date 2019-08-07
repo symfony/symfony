@@ -15,6 +15,11 @@ use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCa
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
+    public function testMaxDuration()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
+
     public function testToStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);

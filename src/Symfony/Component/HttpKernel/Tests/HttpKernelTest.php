@@ -218,7 +218,7 @@ class HttpKernelTest extends TestCase
 
             // `file` index the array starting at 0, and __FILE__ starts at 1
             $line = file($first['file'])[$first['line'] - 2];
-            $this->assertContains('// call controller', $line);
+            $this->assertStringContainsString('// call controller', $line);
         }
     }
 

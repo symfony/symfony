@@ -1509,6 +1509,22 @@ class FilesystemTest extends FilesystemTestCase
         @unlink($filename);
     }
 
+    public function testTempnamWithSuffix()
+    {
+        $dirname = $this->workspace;
+        $filename = $this->filesystem->tempnam($dirname, 'foo', '.bar');
+        $this->assertStringEndsWith('.bar', $filename);
+        $this->assertFileExists($filename);
+    }
+
+    public function testTempnamWithSuffix0()
+    {
+        $dirname = $this->workspace;
+        $filename = $this->filesystem->tempnam($dirname, 'foo', '0');
+        $this->assertStringEndsWith('0', $filename);
+        $this->assertFileExists($filename);
+    }
+
     public function testDumpFile()
     {
         $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';

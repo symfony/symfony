@@ -81,7 +81,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertFalse(class_exists($annotatedClass = 'C\C\C', false));
 
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([$annotatedClass], true)));
-        $warmer = new AnnotationsCacheWarmer(new AnnotationReader(), tempnam($this->cacheDir, __FUNCTION__), new ArrayAdapter());
+        $warmer = new AnnotationsCacheWarmer(new AnnotationReader(), tempnam($this->cacheDir, __FUNCTION__));
 
         spl_autoload_register($classLoader = function ($class) use ($annotatedClass) {
             if ($class === $annotatedClass) {
@@ -106,7 +106,7 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertFalse(class_exists($annotatedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_AnnotationsCacheWarmerTest', false));
 
         file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([$annotatedClass], true)));
-        $warmer = new AnnotationsCacheWarmer(new AnnotationReader(), tempnam($this->cacheDir, __FUNCTION__), new ArrayAdapter());
+        $warmer = new AnnotationsCacheWarmer(new AnnotationReader(), tempnam($this->cacheDir, __FUNCTION__));
 
         spl_autoload_register($classLoader = function ($class) use ($annotatedClass) {
             if ($class === $annotatedClass) {

@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-12T12:13:05Z
+
+I'm not sure we need to work around since the new behavior has been reverted on <7.4
+See #32395
+For 7.4, there are more places that need to be changed, and I'd like we really understand the best way to fix the root issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-12T12:28:00Z
+
+Hmm, this is different and discussed in https://bugs.php.net/74372
+@nikic can we consider fixing the BC break by having the new behavior only for child classes of `Error` and let `Exception` behave as before?
+
+---------------------------------------------------------------------------
+
+by nikic at 2019-07-12T12:55:21Z
+
+@nicolas-grekas I don't think introducing an Error/Exception distinction here makes sense. If you want to ignore exceptions, please ignore them explicitly.
+
+We could revert from 7.3 and introduce in a later version, but given that we're at 7.3.8 already and this change is explicitly called out in the migration guide, I'm not sure doing that is a good idea. You'll have to deal with it at some point in either case...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-12T13:33:23Z
+
+@nikic thanks for the feedback, OK.
+
+@fancyweb ~I think the patch should be only this one:~
+<details>
+
+```diff
+--- a/src/Symfony/Component/Config/Resource/ClassExistenceResource.php
++++ b/src/Symfony/Component/Config/Resource/ClassExistenceResource.php
+@@ -76,11 +76,12 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
+
+             try {
+                 $exists = class_exists($this->resource) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
+-            } catch (\ReflectionException $e) {
++            } catch (\Throwable $e) {
+                 if (0 >= $timestamp) {
+                     unset(self::$existsCache[1][$this->resource]);
+                     throw $e;
+                 }
++                $exists = class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
+             } finally {
+                 self::$autoloadedClass = $autoloadedClass;
+                 if (!--self::$autoloadLevel) {
+```
+
+</details>
+
+~The other places should not be changed (according to my current understanding at least.)~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-12T13:58:06Z
+
+OK, I missed the `} catch (\ReflectionException $e) {` in warmers, I understand how the issue propagates here. We should factorize this logic now, inside throwOnRequiredClass I believe.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-07-12T15:41:46Z
+
+@nicolas-grekas Just pushed all tests + a deduplication of the code. I don't think it was what you wanted so I'm waiting for your feedback 😁
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-15T17:19:07Z
+
+`ClassExistenceResource::isFresh()` is also affected + any direct user of `PhpArrayAdapter::throwOnRequiredClass()` would too.
+The plan could be:
+- factorize in `ClassExistenceResource`
+- find a way to use `ClassExistenceResource` instead of `PhpArrayAdapter` in `FrameworkBundle`
+- don't patch `PhpArrayAdapter` but deprecate its `throwOnRequiredClass()` in 4.4
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-07-16T10:35:14Z
+
+@nicolas-grekas
+
+> factorize in ClassExistenceResource
+
+Done.
+
+> find a way to use ClassExistenceResource instead of PhpArrayAdapter in FrameworkBundle
+
+`symfony/config` is a requirement of the `FrameworkBundle` so it's alright.
+
+> don't patch PhpArrayAdapter but deprecate its throwOnRequiredClass() in 4.4
+
+Actually this method was introduced directly as `@internal`, so I just removed it.

@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -52,16 +53,17 @@ class ExceptionListenerTest extends TestCase
     public function testHandleWithoutLogger($event, $event2)
     {
         $this->iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $l = new ExceptionListener('foo');
         $l->logKernelException($event);
-        $l->onKernelException($event);
+        $l->onKernelException($event, 'kernelException', $eventDispatcher);
 
         $this->assertEquals(new Response('foo'), $event->getResponse());
 
         try {
             $l->logKernelException($event2);
-            $l->onKernelException($event2);
+            $l->onKernelException($event2, 'kernelException', $eventDispatcher);
             $this->fail('RuntimeException expected');
         } catch (\RuntimeException $e) {
             $this->assertSame('bar', $e->getMessage());
@@ -75,16 +77,17 @@ class ExceptionListenerTest extends TestCase
     public function testHandleWithLogger($event, $event2)
     {
         $logger = new TestLogger();
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $l = new ExceptionListener('foo', $logger);
         $l->logKernelException($event);
-        $l->onKernelException($event);
+        $l->onKernelException($event, 'kernelException', $eventDispatcher);
 
         $this->assertEquals(new Response('foo'), $event->getResponse());
 
         try {
             $l->logKernelException($event2);
-            $l->onKernelException($event2);
+            $l->onKernelException($event2, 'kernelException', $eventDispatcher);
             $this->fail('RuntimeException expected');
         } catch (\RuntimeException $e) {
             $this->assertSame('bar', $e->getMessage());
@@ -124,7 +127,7 @@ class ExceptionListenerTest extends TestCase
         $request->setRequestFormat('xml');
 
         $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
-        $listener->onKernelException($event);
+        $listener->onKernelException($event, 'kernelException', $this->createMock(EventDispatcherInterface::class));
 
         $response = $event->getResponse();
         $this->assertEquals('xml', $response->getContent());

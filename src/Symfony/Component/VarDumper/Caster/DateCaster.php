@@ -83,7 +83,7 @@ class DateCaster
     public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, $isNested, $filter)
     {
         $dates = [];
-        if (\PHP_VERSION_ID >= 70107) { // see https://bugs.php.net/bug.php?id=74639
+        if (\PHP_VERSION_ID >= 70107) { // see https://bugs.php.net/74639
             foreach (clone $p as $i => $d) {
                 if (self::PERIOD_LIMIT === $i) {
                     $now = new \DateTimeImmutable();

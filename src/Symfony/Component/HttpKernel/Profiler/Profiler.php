@@ -128,7 +128,7 @@ class Profiler implements ResetInterface
      *
      * @return array An array of tokens
      *
-     * @see http://php.net/manual/en/datetime.formats.php for the supported date/time formats
+     * @see https://php.net/datetime.formats for the supported date/time formats
      */
     public function find($ip, $url, $limit, $method, $start, $end, $statusCode = null)
     {

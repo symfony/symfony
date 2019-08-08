@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Exception\BadMethodCallException;
 /**
  * Work-around for a bug in PHP's \ResourceBundle implementation.
  *
- * More information can be found on https://bugs.php.net/bug.php?id=64356.
+ * More information can be found on https://bugs.php.net/64356.
  * This class can be removed once that bug is fixed.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>

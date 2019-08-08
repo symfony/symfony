@@ -1001,10 +1001,8 @@ class Application implements ResetInterface
 
     /**
      * Returns abbreviated suggestions in string format.
-     *
-     * @return string A formatted string of abbreviated suggestions
      */
-    private function getAbbreviationSuggestions(array $abbrevs)
+    private function getAbbreviationSuggestions(array $abbrevs): string
     {
         return '    '.implode("\n    ", $abbrevs);
     }
@@ -1030,7 +1028,7 @@ class Application implements ResetInterface
      *
      * @return string[] A sorted array of similar string
      */
-    private function findAlternatives(string $name, iterable $collection)
+    private function findAlternatives(string $name, iterable $collection): array
     {
         $threshold = 1e3;
         $alternatives = [];
@@ -1140,7 +1138,7 @@ class Application implements ResetInterface
      *
      * @return string[] The namespaces of the command
      */
-    private function extractAllNamespaces(string $name)
+    private function extractAllNamespaces(string $name): array
     {
         // -1 as third argument is needed to skip the command short name when exploding
         $parts = explode(':', $name, -1);

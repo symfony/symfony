@@ -9,8 +9,9 @@ Cache
 Debug
 -----
 
- * Deprecated `FlattenException`, use the `FlattenException` of the `ErrorRenderer` component
- * Deprecated the whole component in favor of `ErrorHandler` component
+ * Deprecated the `Debug` class, use the one from the `ErrorRenderer` component instead
+ * Deprecated the `FlattenException` class, use the one from the `ErrorRenderer` component instead
+ * Deprecated the component in favor of the `ErrorHandler` component
 
 DependencyInjection
 -------------------

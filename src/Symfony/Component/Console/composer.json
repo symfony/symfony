@@ -42,6 +42,7 @@
     "conflict": {
         "symfony/dependency-injection": "<4.4",
         "symfony/event-dispatcher": "<4.4",
+        "symfony/lock": "<4.4",
         "symfony/process": "<4.4"
     },
     "autoload": {

@@ -140,10 +140,7 @@ EOF;
         $this->assertEquals($expected, $command->getHelp());
     }
 
-    /**
-     * @return string Path to the new file
-     */
-    private function createFile($sourceContent = 'note', $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf')
+    private function createFile($sourceContent = 'note', $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf'): string
     {
         $xliffContent = <<<XLIFF
 <?xml version="1.0"?>
@@ -167,10 +164,7 @@ XLIFF;
         return $filename;
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester($requireStrictFileNames = true, $application = null)
+    private function createCommandTester($requireStrictFileNames = true, $application = null): CommandTester
     {
         if (!$application) {
             $application = new Application();

@@ -54,10 +54,8 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
      *
      * @param array $patterns The class patterns to expand
      * @param array $classes  The existing classes to match against the patterns
-     *
-     * @return array A list of classes derived from the patterns
      */
-    private function expandClasses(array $patterns, array $classes)
+    private function expandClasses(array $patterns, array $classes): array
     {
         $expanded = [];
 

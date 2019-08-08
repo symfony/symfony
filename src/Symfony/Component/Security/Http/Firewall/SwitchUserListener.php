@@ -108,9 +108,7 @@ class SwitchUserListener
     }
 
     /**
-     * Attempts to switch to another user.
-     *
-     * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
+     * Attempts to switch to another user and returns the new token if successfully switched.
      *
      * @throws \LogicException
      * @throws AccessDeniedException
@@ -158,9 +156,7 @@ class SwitchUserListener
     }
 
     /**
-     * Attempts to exit from an already switched user.
-     *
-     * @return TokenInterface The original TokenInterface instance
+     * Attempts to exit from an already switched user and returns the original token.
      *
      * @throws AuthenticationCredentialsNotFoundException
      */

@@ -40,8 +40,7 @@ class LogoutListener
     private $csrfTokenManager;
 
     /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param array                 $options      An array of options to process a logout attempt
+     * @param array $options An array of options to process a logout attempt
      */
     public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = [], CsrfTokenManagerInterface $csrfTokenManager = null)
     {

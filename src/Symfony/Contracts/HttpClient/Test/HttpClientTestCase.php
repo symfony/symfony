@@ -583,6 +583,16 @@ abstract class HttpClientTestCase extends TestCase
         $client->request('GET', 'http://symfony.com:8057/', ['timeout' => 1]);
     }
 
+    public function testNotATimeout()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header', [
+            'timeout' => 0.5,
+        ]);
+        usleep(510000);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testTimeoutOnAccess()
     {
         $client = $this->getHttpClient(__FUNCTION__);

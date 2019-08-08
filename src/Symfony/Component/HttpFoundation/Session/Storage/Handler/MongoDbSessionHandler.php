@@ -171,10 +171,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         return $dbData[$this->options['data_field']]->getData();
     }
 
-    /**
-     * @return \MongoDB\Collection
-     */
-    private function getCollection()
+    private function getCollection(): \MongoDB\Collection
     {
         if (null === $this->collection) {
             $this->collection = $this->mongo->selectCollection($this->options['database'], $this->options['collection']);

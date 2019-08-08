@@ -146,10 +146,8 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Get service defaults.
-     *
-     * @return array
      */
-    private function getServiceDefaults(\DOMDocument $xml, string $file)
+    private function getServiceDefaults(\DOMDocument $xml, string $file): array
     {
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
@@ -189,10 +187,8 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses an individual Definition.
-     *
-     * @return Definition|null
      */
-    private function parseDefinition(\DOMElement $service, string $file, array $defaults)
+    private function parseDefinition(\DOMElement $service, string $file, array $defaults): ?Definition
     {
         if ($alias = $service->getAttribute('alias')) {
             $this->validateAlias($service, $file);
@@ -377,11 +373,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a XML file to a \DOMDocument.
      *
-     * @return \DOMDocument
-     *
      * @throws InvalidArgumentException When loading of XML file returns error
      */
-    private function parseFileToDOM(string $file)
+    private function parseFileToDOM(string $file): \DOMDocument
     {
         try {
             $dom = XmlUtils::loadFile($file, [$this, 'validateSchema']);
@@ -546,7 +540,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return \DOMElement[]
      */
-    private function getChildren(\DOMNode $node, string $name)
+    private function getChildren(\DOMNode $node, string $name): array
     {
         $children = [];
         foreach ($node->childNodes as $child) {

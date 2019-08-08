@@ -40,11 +40,9 @@ class StringInput extends ArgvInput
     /**
      * Tokenizes a string.
      *
-     * @return array An array of tokens
-     *
      * @throws InvalidArgumentException When unable to parse input (should never happen)
      */
-    private function tokenize(string $input)
+    private function tokenize(string $input): array
     {
         $tokens = [];
         $length = \strlen($input);

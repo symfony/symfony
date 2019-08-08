@@ -80,10 +80,8 @@ class EntityType extends DoctrineType
 
     /**
      * Converts a query parameter to an array.
-     *
-     * @return array The array representation of the parameter
      */
-    private function parameterToArray(Parameter $parameter)
+    private function parameterToArray(Parameter $parameter): array
     {
         return [$parameter->getName(), $parameter->getType(), $parameter->getValue()];
     }

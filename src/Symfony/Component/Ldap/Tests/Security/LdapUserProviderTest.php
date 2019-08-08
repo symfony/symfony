@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Ldap\Tests\Security\User;
+namespace Symfony\Component\Ldap\Tests\Security;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
@@ -21,7 +21,6 @@ use Symfony\Component\Ldap\Security\LdapUser;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
 
 /**
- * @group legacy
  * @requires extension ldap
  */
 class LdapUserProviderTest extends TestCase

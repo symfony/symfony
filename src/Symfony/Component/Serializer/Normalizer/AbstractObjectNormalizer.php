@@ -449,7 +449,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * @return Type[]|null
      */
-    private function getTypes(string $currentClass, string $attribute)
+    private function getTypes(string $currentClass, string $attribute): ?array
     {
         if (null === $this->propertyTypeExtractor) {
             return null;

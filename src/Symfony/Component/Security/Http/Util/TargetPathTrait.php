@@ -30,10 +30,8 @@ trait TargetPathTrait
 
     /**
      * Returns the URL (if any) the user visited that forced them to login.
-     *
-     * @return string|null
      */
-    private function getTargetPath(SessionInterface $session, string $providerKey)
+    private function getTargetPath(SessionInterface $session, string $providerKey): ?string
     {
         return $session->get('_security.'.$providerKey.'.target_path');
     }

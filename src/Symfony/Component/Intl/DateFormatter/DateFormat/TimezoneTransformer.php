@@ -102,7 +102,7 @@ class TimezoneTransformer extends Transformer
         if (preg_match('/GMT(?P<signal>[+-])(?P<hours>\d{2}):?(?P<minutes>\d{2})/', $formattedTimeZone, $matches)) {
             $hours = (int) $matches['hours'];
             $minutes = (int) $matches['minutes'];
-            $signal = '-' == $matches['signal'] ? '+' : '-';
+            $signal = '-' === $matches['signal'] ? '+' : '-';
 
             if (0 < $minutes) {
                 throw new NotImplementedException(sprintf('It is not possible to use a GMT time zone with minutes offset different than zero (0). GMT time zone tried: %s.', $formattedTimeZone));

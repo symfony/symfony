@@ -73,8 +73,6 @@ class ProgressIndicator
 
     /**
      * Starts the indicator output.
-     *
-     * @param $message
      */
     public function start(string $message)
     {

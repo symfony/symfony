@@ -152,7 +152,7 @@ class PdoStore implements PersistingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         if ($ttl < 1) {
             throw new InvalidTtlException(sprintf('%s() expects a TTL greater or equals to 1 second. Got %s.', __METHOD__, $ttl));

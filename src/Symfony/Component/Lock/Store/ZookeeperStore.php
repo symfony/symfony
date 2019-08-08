@@ -84,7 +84,7 @@ class ZookeeperStore implements PersistingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         // do nothing, zookeeper locks forever.
     }

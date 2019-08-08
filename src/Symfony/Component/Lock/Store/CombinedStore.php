@@ -93,7 +93,7 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         $successCount = 0;
         $failureCount = 0;

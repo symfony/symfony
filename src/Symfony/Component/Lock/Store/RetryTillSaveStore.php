@@ -79,7 +79,7 @@ class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, float $ttl)
     {
         $this->decorated->putOffExpiration($key, $ttl);
     }

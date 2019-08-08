@@ -17,6 +17,7 @@ CHANGELOG
  * [BC BREAK] Removed `$senderClassOrAlias` argument from `RedeliveryStamp::__construct`.
  * [BC BREAK] Removed `UnknownSenderException`.
  * The component is not marked as `@experimental` anymore.
+ * Marked the `MessengerDataCollector` class as `@final`.
 
 4.3.0
 -----

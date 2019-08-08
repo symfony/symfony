@@ -19,6 +19,8 @@ use Symfony\Component\VarDumper\Caster\LinkStub;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class ConfigDataCollector extends DataCollector implements LateDataCollectorInterface
 {

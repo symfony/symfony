@@ -207,11 +207,15 @@ class Application extends BaseApplication
         (new SymfonyStyle($input, $output))->warning('Some commands could not be registered:');
 
         foreach ($this->registrationErrors as $error) {
-            if (!$error instanceof \Exception) {
-                $error = new ErrorException($error);
-            }
+            if (method_exists($this, 'doRenderThrowable')) {
+                $this->doRenderThrowable($error, $output);
+            } else {
+                if (!$error instanceof \Exception) {
+                    $error = new ErrorException($error);
+                }
 
-            $this->doRenderException($error, $output);
+                $this->doRenderException($error, $output);
+            }
         }
     }
 }

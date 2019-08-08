@@ -11,6 +11,7 @@ CHANGELOG
  * added `DeflateMarshaller` to compress serialized values
  * removed support for phpredis 4 `compression`
  * [BC BREAK] `RedisTagAwareAdapter` is not compatible with `RedisCluster` from `Predis` anymore, use `phpredis` instead
+ * Marked the `CacheDataCollector` class as `@final`.
 
 4.3.0
 -----

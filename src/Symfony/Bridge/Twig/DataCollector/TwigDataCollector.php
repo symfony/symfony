@@ -25,6 +25,8 @@ use Twig\Profiler\Profile;
  * TwigDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class TwigDataCollector extends DataCollector implements LateDataCollectorInterface
 {

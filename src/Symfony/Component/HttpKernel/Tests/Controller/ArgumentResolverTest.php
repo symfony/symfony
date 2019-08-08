@@ -292,31 +292,31 @@ class ArgumentResolverTest extends TestCase
     {
     }
 
-    protected function controllerWithFooAndDefaultBar($foo, $bar = null)
+    public function controllerWithFooAndDefaultBar($foo, $bar = null)
     {
     }
 
-    protected function controllerWithFooBarFoobar($foo, $bar, $foobar)
+    public function controllerWithFooBarFoobar($foo, $bar, $foobar)
     {
     }
 
-    protected function controllerWithRequest(Request $request)
+    public function controllerWithRequest(Request $request)
     {
     }
 
-    protected function controllerWithExtendingRequest(ExtendingRequest $request)
+    public function controllerWithExtendingRequest(ExtendingRequest $request)
     {
     }
 
-    protected function controllerWithSession(Session $session)
+    public function controllerWithSession(Session $session)
     {
     }
 
-    protected function controllerWithSessionInterface(SessionInterface $session)
+    public function controllerWithSessionInterface(SessionInterface $session)
     {
     }
 
-    protected function controllerWithExtendingSession(ExtendingSession $session)
+    public function controllerWithExtendingSession(ExtendingSession $session)
     {
     }
 }

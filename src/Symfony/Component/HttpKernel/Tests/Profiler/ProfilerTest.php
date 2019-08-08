@@ -28,6 +28,7 @@ class ProfilerTest extends TestCase
     {
         $request = new Request();
         $request->query->set('foo', 'bar');
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
         $response = new Response('', 204);
         $collector = new RequestDataCollector();
 

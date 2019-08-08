@@ -37,11 +37,9 @@ class UriSigner
      * The given URI is signed by adding the query string parameter
      * which value depends on the URI and the secret.
      *
-     * @param string $uri A URI to sign
-     *
      * @return string The signed URI
      */
-    public function sign($uri)
+    public function sign(string $uri)
     {
         $url = parse_url($uri);
         if (isset($url['query'])) {
@@ -59,11 +57,9 @@ class UriSigner
     /**
      * Checks that a URI contains the correct hash.
      *
-     * @param string $uri A signed URI
-     *
      * @return bool True if the URI is signed correctly, false otherwise
      */
-    public function check($uri)
+    public function check(string $uri)
     {
         $url = parse_url($uri);
         if (isset($url['query'])) {

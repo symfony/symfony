@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Intl\Data\Bundle\Writer;
 
-use Symfony\Component\Intl\Exception\UnexpectedTypeException;
-
 /**
  * Writes .txt resource bundles.
  *
@@ -183,16 +181,9 @@ class TextBundleWriter implements BundleWriterInterface
      * Writes a "table" node.
      *
      * @param resource $file The file handle to write to
-     *
-     * @throws UnexpectedTypeException when $value is not an array and not a
-     *                                 \Traversable instance
      */
     private function writeTable($file, iterable $value, int $indentation, bool $fallback = true)
     {
-        if (!\is_array($value) && !$value instanceof \Traversable) {
-            throw new UnexpectedTypeException($value, 'array or \Traversable');
-        }
-
         if (!$fallback) {
             fwrite($file, ':table(nofallback)');
         }

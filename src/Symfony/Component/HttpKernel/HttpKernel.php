@@ -174,8 +174,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Filters a response object.
      *
-     * @param Request $request An error message in case the response is not a Response object
-     * @param int     $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
+     * @param int $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @throws \RuntimeException if the passed object is not a Response instance
      */
@@ -206,8 +205,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Handles an exception by trying to convert it to a Response.
      *
-     * @param \Exception $e    An \Exception instance
-     * @param int        $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
+     * @param int $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @throws \Exception
      */

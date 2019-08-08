@@ -21,11 +21,10 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 abstract class WebTestCase extends KernelTestCase
 {
-    use ForwardCompatTestTrait;
     use WebTestAssertionsTrait;
     use MailerAssertionsTrait;
 
-    private function doTearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         self::getClient(null);

@@ -58,7 +58,7 @@ class HttpUtils
      *
      * @return RedirectResponse A RedirectResponse instance
      */
-    public function createRedirectResponse(Request $request, $path, $status = 302)
+    public function createRedirectResponse(Request $request, string $path, int $status = 302)
     {
         if (null !== $this->secureDomainRegexp && 'https' === $this->urlMatcher->getContext()->getScheme() && preg_match('#^https?:[/\\\\]{2,}+[^/]++#i', $path, $host) && !preg_match(sprintf($this->secureDomainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
             $path = '/';
@@ -77,7 +77,7 @@ class HttpUtils
      *
      * @return Request A Request instance
      */
-    public function createRequest(Request $request, $path)
+    public function createRequest(Request $request, string $path)
     {
         $newRequest = Request::create($this->generateUri($request, $path), 'get', [], $request->cookies->all(), [], $request->server->all());
 
@@ -115,7 +115,7 @@ class HttpUtils
      *
      * @return bool true if the path is the same as the one from the Request, false otherwise
      */
-    public function checkRequestPath(Request $request, $path)
+    public function checkRequestPath(Request $request, string $path)
     {
         if ('/' !== $path[0]) {
             try {
@@ -146,7 +146,7 @@ class HttpUtils
      *
      * @throws \LogicException
      */
-    public function generateUri(Request $request, $path)
+    public function generateUri(Request $request, string $path)
     {
         if (0 === strpos($path, 'http') || !$path) {
             return $path;

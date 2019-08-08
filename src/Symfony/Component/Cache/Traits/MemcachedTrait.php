@@ -117,7 +117,7 @@ trait MemcachedTrait
                 }
                 $params += [
                     'host' => isset($params['host']) ? $params['host'] : $params['path'],
-                    'port' => isset($params['host']) ? 11211 : null,
+                    'port' => isset($params['port']) ? 11211 : null,
                     'weight' => 0,
                 ];
                 if (isset($params['query'])) {

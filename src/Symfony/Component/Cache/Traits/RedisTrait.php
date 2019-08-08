@@ -99,7 +99,7 @@ trait RedisTrait
         }
         $params += [
             'host' => isset($params['host']) ? $params['host'] : $params['path'],
-            'port' => isset($params['host']) ? 6379 : null,
+            'port' => isset($params['port']) ? 6379 : null,
             'dbindex' => 0,
         ];
         if (isset($params['query'])) {

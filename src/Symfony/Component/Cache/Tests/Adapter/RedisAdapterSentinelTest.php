@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
 {
-    public static function setupBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!class_exists('Predis\Client')) {
             self::markTestSkipped('The Predis\Client class is required.');

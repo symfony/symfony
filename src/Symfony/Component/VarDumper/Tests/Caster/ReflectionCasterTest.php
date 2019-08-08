@@ -89,7 +89,7 @@ EOTXT
         }
         $var = [
             (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
-            (new \ReflectionMethod(__CLASS__, 'tearDownAfterClass'))->getClosure(),
+            (new \ReflectionMethod(__CLASS__, 'stub'))->getClosure(),
         ];
 
         $this->assertDumpMatchesFormat(
@@ -100,8 +100,9 @@ array:2 [
     file: "%sReflectionCasterTest.php"
     line: "%d to %d"
   }
-  1 => %sTestCase::tearDownAfterClass() {
-    file: "%sTestCase.php"
+  1 => Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest::stub(): void {
+    returnType: "void"
+    file: "%sReflectionCasterTest.php"
     line: "%d to %d"
   }
 ]
@@ -243,6 +244,10 @@ Generator {
 }
 EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $generator);
+    }
+
+    public static function stub(): void
+    {
     }
 }
 

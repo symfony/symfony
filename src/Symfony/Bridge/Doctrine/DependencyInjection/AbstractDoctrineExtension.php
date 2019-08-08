@@ -171,8 +171,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
-     * @param array            $objectManager
-     * @param ContainerBuilder $container     A ContainerBuilder instance
+     * @param array $objectManager
      */
     protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
     {
@@ -251,8 +250,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Detects what metadata driver to use for the supplied directory.
      *
-     * @param string           $dir       A directory path
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param string $dir A directory path
      *
      * @return string|null A metadata driver short name, if one can be detected
      */
@@ -285,9 +283,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a configured object manager metadata, query or result cache driver.
      *
-     * @param array            $objectManager A configured object manager
-     * @param ContainerBuilder $container     A ContainerBuilder instance
-     * @param string           $cacheName
+     * @param array  $objectManager A configured object manager
+     * @param string $cacheName
      *
      * @throws \InvalidArgumentException in case of unknown driver type
      */
@@ -299,10 +296,9 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a cache driver.
      *
-     * @param string           $cacheName         The cache driver name
-     * @param string           $objectManagerName The object manager name
-     * @param array            $cacheDriver       The cache driver mapping
-     * @param ContainerBuilder $container         The ContainerBuilder instance
+     * @param string $cacheName         The cache driver name
+     * @param string $objectManagerName The object manager name
+     * @param array  $cacheDriver       The cache driver mapping
      *
      * @return string
      *

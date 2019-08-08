@@ -267,8 +267,6 @@ class Route implements \Serializable
      *
      * This method implements a fluent interface.
      *
-     * @param array $options The options
-     *
      * @return $this
      */
     public function setOptions(array $options)
@@ -284,8 +282,6 @@ class Route implements \Serializable
      * Adds options.
      *
      * This method implements a fluent interface.
-     *
-     * @param array $options The options
      *
      * @return $this
      */

@@ -51,8 +51,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     /**
      * Sets a violation at a given offset.
      *
-     * @param int                          $offset    The violation offset
-     * @param ConstraintViolationInterface $violation The violation
+     * @param int $offset The violation offset
      */
     public function set($offset, ConstraintViolationInterface $violation);
 

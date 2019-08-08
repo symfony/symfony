@@ -33,7 +33,6 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
      * instance of InlineFragmentRenderer.
      *
      * @param FragmentRendererInterface $inlineStrategy The inline strategy to use when the surrogate is not supported
-     * @param UriSigner                 $signer
      */
     public function __construct(SurrogateInterface $surrogate = null, FragmentRendererInterface $inlineStrategy, UriSigner $signer = null)
     {

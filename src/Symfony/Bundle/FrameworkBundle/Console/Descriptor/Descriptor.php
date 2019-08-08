@@ -133,7 +133,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Definition|Alias|object $service
      * @param array                   $options
-     * @param ContainerBuilder|null   $builder
      */
     abstract protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null);
 
@@ -224,8 +223,7 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param string           $serviceId
+     * @param string $serviceId
      *
      * @return mixed
      */
@@ -249,8 +247,7 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param bool             $showHidden
+     * @param bool $showHidden
      *
      * @return array
      */

@@ -318,9 +318,8 @@ class CliDumper extends AbstractDumper
     /**
      * Dumps an ellipsis for cut children.
      *
-     * @param Cursor $cursor   The Cursor position in the dump
-     * @param bool   $hasChild When the dump of the hash has child item
-     * @param int    $cut      The number of items the hash has been cut by
+     * @param bool $hasChild When the dump of the hash has child item
+     * @param int  $cut      The number of items the hash has been cut by
      */
     protected function dumpEllipsis(Cursor $cursor, $hasChild, $cut)
     {
@@ -337,8 +336,6 @@ class CliDumper extends AbstractDumper
 
     /**
      * Dumps a key in a hash structure.
-     *
-     * @param Cursor $cursor The Cursor position in the dump
      */
     protected function dumpKey(Cursor $cursor)
     {

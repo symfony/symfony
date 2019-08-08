@@ -35,9 +35,8 @@ class RetryTillSaveStore implements BlockingStoreInterface, StoreInterface, Logg
     private $retryCount;
 
     /**
-     * @param PersistingStoreInterface $decorated  The decorated PersistingStoreInterface
-     * @param int                      $retrySleep Duration in ms between 2 retry
-     * @param int                      $retryCount Maximum amount of retry
+     * @param int $retrySleep Duration in ms between 2 retry
+     * @param int $retryCount Maximum amount of retry
      */
     public function __construct(PersistingStoreInterface $decorated, int $retrySleep = 100, int $retryCount = PHP_INT_MAX)
     {

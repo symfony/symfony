@@ -47,7 +47,6 @@ class FormHelper extends Helper
      *
      * The theme format is "<Bundle>:<Controller>".
      *
-     * @param FormView     $view             A FormView instance
      * @param string|array $themes           A theme or an array of theme
      * @param bool         $useDefaultThemes If true, will use default themes defined in the renderer
      */
@@ -75,8 +74,7 @@ class FormHelper extends Helper
      * form individually. You can also create a custom form theme to adapt
      * the look of the form.
      *
-     * @param FormView $view      The view for which to render the form
-     * @param array    $variables Additional variables passed to the template
+     * @param array $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
@@ -92,8 +90,7 @@ class FormHelper extends Helper
      *
      *     <?php echo $view['form']->start($form) ?>>
      *
-     * @param FormView $view      The view for which to render the start tag
-     * @param array    $variables Additional variables passed to the template
+     * @param array $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
@@ -109,8 +106,7 @@ class FormHelper extends Helper
      *
      *     <?php echo $view['form']->end($form) ?>>
      *
-     * @param FormView $view      The view for which to render the end tag
-     * @param array    $variables Additional variables passed to the template
+     * @param array $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
@@ -132,8 +128,7 @@ class FormHelper extends Helper
      *
      *     <?php echo $view['form']->widget($form, ['separator' => '+++++']) ?>
      *
-     * @param FormView $view      The view for which to render the widget
-     * @param array    $variables Additional variables passed to the template
+     * @param array $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
@@ -145,8 +140,7 @@ class FormHelper extends Helper
     /**
      * Renders the entire form field "row".
      *
-     * @param FormView $view      The view for which to render the row
-     * @param array    $variables Additional variables passed to the template
+     * @param array $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
@@ -158,9 +152,8 @@ class FormHelper extends Helper
     /**
      * Renders the label of the given view.
      *
-     * @param FormView $view      The view for which to render the label
-     * @param string   $label     The label
-     * @param array    $variables Additional variables passed to the template
+     * @param string $label     The label
+     * @param array  $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
@@ -175,8 +168,6 @@ class FormHelper extends Helper
 
     /**
      * Renders the help of the given view.
-     *
-     * @param FormView $view The parent view
      *
      * @return string The HTML markup
      */
@@ -198,8 +189,7 @@ class FormHelper extends Helper
     /**
      * Renders views which have not already been rendered.
      *
-     * @param FormView $view      The parent view
-     * @param array    $variables An array of variables
+     * @param array $variables An array of variables
      *
      * @return string The HTML markup
      */
@@ -211,9 +201,8 @@ class FormHelper extends Helper
     /**
      * Renders a block of the template.
      *
-     * @param FormView $view      The view for determining the used themes
-     * @param string   $blockName The name of the block to render
-     * @param array    $variables The variable to pass to the template
+     * @param string $blockName The name of the block to render
+     * @param array  $variables The variable to pass to the template
      *
      * @return string The HTML markup
      */

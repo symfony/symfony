@@ -29,9 +29,6 @@ class RoutableMessageBus implements MessageBusInterface
     private $busLocator;
     private $fallbackBus;
 
-    /**
-     * @param ContainerInterface $busLocator A locator full of MessageBusInterface objects
-     */
     public function __construct(ContainerInterface $busLocator, MessageBusInterface $fallbackBus = null)
     {
         $this->busLocator = $busLocator;

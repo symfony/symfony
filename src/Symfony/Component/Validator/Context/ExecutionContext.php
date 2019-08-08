@@ -130,7 +130,6 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * Creates a new execution context.
      *
-     * @param ValidatorInterface  $validator         The validator
      * @param mixed               $root              The root value of the
      *                                               validated object graph
      * @param TranslatorInterface $translator        The translator

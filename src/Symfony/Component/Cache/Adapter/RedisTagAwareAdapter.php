@@ -71,7 +71,6 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient     The redis client
      * @param string                                          $namespace       The default namespace
      * @param int                                             $defaultLifetime The default lifetime
-     * @param MarshallerInterface|null                        $marshaller
      *
      * @throws \Symfony\Component\Cache\Exception\LogicException If phpredis with version lower than 3.1.3.
      */

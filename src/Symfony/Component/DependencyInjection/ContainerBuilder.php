@@ -446,9 +446,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds a compiler pass.
      *
-     * @param CompilerPassInterface $pass     A compiler pass
-     * @param string                $type     The type of compiler pass
-     * @param int                   $priority Used to sort the passes
+     * @param string $type     The type of compiler pass
+     * @param int    $priority Used to sort the passes
      *
      * @return $this
      */
@@ -974,8 +973,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service definition.
      *
-     * @param string     $id         The service identifier
-     * @param Definition $definition A Definition instance
+     * @param string $id The service identifier
      *
      * @return Definition the service definition
      *

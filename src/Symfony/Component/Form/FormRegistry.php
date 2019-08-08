@@ -48,8 +48,7 @@ class FormRegistry implements FormRegistryInterface
     private $checkedTypes = [];
 
     /**
-     * @param FormExtensionInterface[]         $extensions          An array of FormExtensionInterface
-     * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types
+     * @param FormExtensionInterface[] $extensions An array of FormExtensionInterface
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
      */

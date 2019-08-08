@@ -50,11 +50,6 @@ interface FormTypeExtensionInterface
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 
-    /**
-     * Configures the options for this type.
-     *
-     * @param OptionsResolver $resolver The resolver for the options
-     */
     public function configureOptions(OptionsResolver $resolver);
 
     /**

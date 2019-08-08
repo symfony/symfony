@@ -44,8 +44,7 @@ class ArgvInput extends Input
     private $parsed;
 
     /**
-     * @param array|null           $argv       An array of parameters from the CLI (in the argv format)
-     * @param InputDefinition|null $definition A InputDefinition instance
+     * @param array|null $argv An array of parameters from the CLI (in the argv format)
      */
     public function __construct(array $argv = null, InputDefinition $definition = null)
     {

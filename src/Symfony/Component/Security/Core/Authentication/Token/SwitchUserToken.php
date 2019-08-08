@@ -21,11 +21,10 @@ class SwitchUserToken extends UsernamePasswordToken
     private $originalToken;
 
     /**
-     * @param string|object  $user          The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
-     * @param mixed          $credentials   This usually is the password of the user
-     * @param string         $providerKey   The provider key
-     * @param string[]       $roles         An array of roles
-     * @param TokenInterface $originalToken The token of the user who switched to the current user
+     * @param string|object $user        The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
+     * @param mixed         $credentials This usually is the password of the user
+     * @param string        $providerKey The provider key
+     * @param string[]      $roles       An array of roles
      *
      * @throws \InvalidArgumentException
      */

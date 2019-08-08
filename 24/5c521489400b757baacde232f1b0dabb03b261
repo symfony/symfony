@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-08T05:58:19Z
+
+composer.json needs to be updated too, to remove the classmap entry
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-08-08T06:28:04Z
+
+@chalasr Line 137 in Console Application.php -> ` && !$phpHandler[0] instanceof LegacyErrorHandler`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-08-08T06:55:56Z
+
+@fancyweb fixed, thank you.
+
+@nicolas-grekas if you mean the one added by https://github.com/symfony/symfony/pull/32873#discussion_r309880549, it was reverted there
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-08-08T07:07:52Z
+
+Removed the `ProxiedMethodReturnExpression` classmap entry

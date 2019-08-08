@@ -364,7 +364,7 @@ class NumberFormatter
         }
 
         // Only the default type is supported.
-        if (self::TYPE_DEFAULT != $type) {
+        if (self::TYPE_DEFAULT !== $type) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'type', $type, 'Only TYPE_DEFAULT is supported');
         }
 

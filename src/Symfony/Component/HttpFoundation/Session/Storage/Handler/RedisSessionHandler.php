@@ -35,7 +35,6 @@ class RedisSessionHandler extends AbstractSessionHandler
      *  * prefix: The prefix to use for the keys in order to avoid collision on the Redis server.
      *
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|RedisProxy $redis
-     * @param array                                                      $options An associative array of options
      *
      * @throws \InvalidArgumentException When unsupported client or options are passed
      */

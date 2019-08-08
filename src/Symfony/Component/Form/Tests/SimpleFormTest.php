@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Form\Tests\Fixtures\FixedFilterListener;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -1096,7 +1097,7 @@ class SimpleFormTest extends AbstractFormTest
         $form->setData('foo');
     }
 
-    protected function createForm()
+    protected function createForm(): FormInterface
     {
         return $this->getBuilder()->getForm();
     }

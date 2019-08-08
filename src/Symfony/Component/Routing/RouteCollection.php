@@ -239,8 +239,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds options to all routes.
      *
      * An existing option value under the same name in a route will be overridden.
-     *
-     * @param array $options An array of options
      */
     public function addOptions(array $options)
     {

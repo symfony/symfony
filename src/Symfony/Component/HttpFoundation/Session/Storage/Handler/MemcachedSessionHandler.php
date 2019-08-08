@@ -41,7 +41,6 @@ class MemcachedSessionHandler extends AbstractSessionHandler
      *  * expiretime: The time to live in seconds.
      *
      * @param \Memcached $memcached A \Memcached instance
-     * @param array      $options   An associative array of Memcached options
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */

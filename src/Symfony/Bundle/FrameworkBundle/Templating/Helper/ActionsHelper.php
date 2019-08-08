@@ -36,8 +36,7 @@ class ActionsHelper extends Helper
     /**
      * Returns the fragment content for a given URI.
      *
-     * @param string $uri     A URI
-     * @param array  $options An array of options
+     * @param string $uri
      *
      * @return string The fragment content
      *

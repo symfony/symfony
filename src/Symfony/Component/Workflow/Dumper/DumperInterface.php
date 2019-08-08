@@ -25,8 +25,6 @@ interface DumperInterface
     /**
      * Dumps a workflow definition.
      *
-     * @param array $options An array of options
-     *
      * @return string The representation of the workflow
      */
     public function dump(Definition $definition, Marking $marking = null, array $options = []);

@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
 
 abstract class AbstractFormTest extends TestCase
 {
@@ -30,7 +31,7 @@ abstract class AbstractFormTest extends TestCase
     protected $factory;
 
     /**
-     * @var \Symfony\Component\Form\FormInterface
+     * @var FormInterface
      */
     protected $form;
 
@@ -48,43 +49,24 @@ abstract class AbstractFormTest extends TestCase
         $this->form = null;
     }
 
-    /**
-     * @return \Symfony\Component\Form\FormInterface
-     */
-    abstract protected function createForm();
+    abstract protected function createForm(): FormInterface;
 
-    /**
-     * @param string      $name
-     * @param string|null $dataClass
-     * @param array       $options
-     *
-     * @return FormBuilder
-     */
-    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null, array $options = [])
+    protected function getBuilder(?string $name = 'name', EventDispatcherInterface $dispatcher = null, string $dataClass = null, array $options = []): FormBuilder
     {
         return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory, $options);
     }
 
-    /**
-     * @return MockObject
-     */
-    protected function getDataMapper()
+    protected function getDataMapper(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
     }
 
-    /**
-     * @return MockObject
-     */
-    protected function getDataTransformer()
+    protected function getDataTransformer(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\DataTransformerInterface')->getMock();
     }
 
-    /**
-     * @return MockObject
-     */
-    protected function getFormValidator()
+    protected function getFormValidator(): MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormValidatorInterface')->getMock();
     }

@@ -18,6 +18,45 @@ use Symfony\Component\Mime\Part\TextPart;
 
 class FormDataPartTest extends TestCase
 {
+    public function testConstructorWithMultidimensionalParams()
+    {
+        $r = new \ReflectionProperty(TextPart::class, 'encoding');
+        $r->setAccessible(true);
+
+        $b = new TextPart('content');
+        $c = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
+        $f = new FormDataPart([
+            'foo' => [
+                $content =
+                    'very very long content that will not be cut even if the length i way more than 76 characters, ok?',
+                $content,
+            ],
+            'bar' => [
+                clone $b,
+                clone $b,
+            ],
+            'baz' => [
+                clone $c,
+                clone $c,
+            ],
+        ]);
+
+        $t = new TextPart($content, 'utf-8', 'plain', '8bit');
+        $t->setDisposition('form-data');
+        $t->setName('foo');
+        $t->getHeaders()->setMaxLineLength(PHP_INT_MAX);
+        $b->setDisposition('form-data');
+        $b->setName('bar');
+        $b->getHeaders()->setMaxLineLength(PHP_INT_MAX);
+        $r->setValue($b, '8bit');
+        $c->setDisposition('form-data');
+        $c->setName('baz');
+        $c->getHeaders()->setMaxLineLength(PHP_INT_MAX);
+        $r->setValue($c, '8bit');
+
+        $this->assertEquals([$t, $t, $b, $b, $c, $c], $f->getParts());
+    }
+
     public function testConstructor()
     {
         $r = new \ReflectionProperty(TextPart::class, 'encoding');

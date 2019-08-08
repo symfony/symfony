@@ -67,7 +67,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function acquire($blocking = false): ?bool
+    public function acquire($blocking = false): bool
     {
         try {
             if ($blocking) {

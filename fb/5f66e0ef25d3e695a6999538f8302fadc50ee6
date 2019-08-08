@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-08-08T06:49:18Z
+
+@xabbuh I just see that the test class namespace is wrong also, The `User` subnamespace+subdir needs to be removed, could you please fix it here?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-08-08T06:52:18Z
+
+@chalasr good catch, fixed

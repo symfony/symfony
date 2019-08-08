@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Warning;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
@@ -378,13 +377,13 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
+    /**
+     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
+     */
     public function testParentClassNotFoundThrowsException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');
         $this->expectExceptionMessage('Cannot autowire service "a": argument "$r" of method "Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass" but this class is missing a parent class (Class Symfony\Bug\NotExistClass not found).');
-        if (\PHP_VERSION_ID >= 70400) {
-            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
-        }
 
         $container = new ContainerBuilder();
 
@@ -692,12 +691,11 @@ class AutowirePassTest extends TestCase
         ];
     }
 
+    /**
+     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
+     */
     public function testIgnoreServiceWithClassNotExisting()
     {
-        if (\PHP_VERSION_ID >= 70400) {
-            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
-        }
-
         $container = new ContainerBuilder();
 
         $container->register('class_not_exist', __NAMESPACE__.'\OptionalServiceClass');
@@ -894,13 +892,13 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
+    /**
+     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
+     */
     public function testExceptionWhenAliasDoesNotExist()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');
         $this->expectExceptionMessage('Cannot autowire service "j": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\J::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\I" but no such service exists. You should maybe alias this class to one of these existing services: "i", "i2".');
-        if (\PHP_VERSION_ID >= 70400) {
-            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
-        }
 
         $container = new ContainerBuilder();
 

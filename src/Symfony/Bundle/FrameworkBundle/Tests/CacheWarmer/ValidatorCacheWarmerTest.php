@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
-use PHPUnit\Framework\Warning;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -22,12 +21,11 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 class ValidatorCacheWarmerTest extends TestCase
 {
+    /**
+     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
+     */
     public function testWarmUp()
     {
-        if (\PHP_VERSION_ID >= 70400) {
-            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
-        }
-
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');

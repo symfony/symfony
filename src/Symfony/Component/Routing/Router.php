@@ -97,7 +97,6 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     /**
      * @param mixed $resource The main resource to load
-     * @param array $options  An array of options
      */
     public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {
@@ -123,8 +122,6 @@ class Router implements RouterInterface, RequestMatcherInterface
      *   * resource_type:          Type hint for the main resource (optional)
      *   * strict_requirements:    Configure strict requirement checking for generators
      *                             implementing ConfigurableRequirementsInterface (default is true)
-     *
-     * @param array $options An array of options
      *
      * @throws \InvalidArgumentException When unsupported option is provided
      */

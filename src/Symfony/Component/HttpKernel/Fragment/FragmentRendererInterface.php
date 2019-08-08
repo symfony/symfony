@@ -25,8 +25,7 @@ interface FragmentRendererInterface
     /**
      * Renders a URI and returns the Response content.
      *
-     * @param string|ControllerReference $uri     A URI as a string or a ControllerReference instance
-     * @param array                      $options An array of options
+     * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
      *
      * @return Response A Response instance
      */

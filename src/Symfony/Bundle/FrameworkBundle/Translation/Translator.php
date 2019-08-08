@@ -65,10 +65,6 @@ class Translator extends BaseTranslator implements WarmableInterface
      *   * debug:     Whether to enable debugging or not (false by default)
      *   * resource_files: List of translation resources available grouped by locale.
      *
-     * @param string $defaultLocale
-     * @param array  $loaderIds     An array of loader Ids
-     * @param array  $options       An array of options
-     *
      * @throws InvalidArgumentException
      */
     public function __construct(ContainerInterface $container, MessageFormatterInterface $formatter, string $defaultLocale, array $loaderIds = [], array $options = [])

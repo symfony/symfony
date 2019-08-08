@@ -1520,14 +1520,8 @@ EOTXT;
     }
 
     /**
-     * @param string      $commandline
-     * @param string|null $cwd
-     * @param array|null  $env
-     * @param string|null $input
-     * @param int         $timeout
-     * @param array       $options
-     *
-     * @return Process
+     * @param string|array $commandline
+     * @param mixed        $input
      */
     private function getProcess($commandline, string $cwd = null, array $env = null, $input = null, ?int $timeout = 60): Process
     {

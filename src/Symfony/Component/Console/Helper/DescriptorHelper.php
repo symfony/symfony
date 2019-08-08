@@ -49,7 +49,6 @@ class DescriptorHelper extends Helper
      * * raw_text: boolean, sets output type as raw
      *
      * @param object $object
-     * @param array  $options
      *
      * @throws InvalidArgumentException when the given format is not supported
      */

@@ -192,7 +192,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         if (!$this->denormalizers) {
-            throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
+            throw new LogicException('You must register at least one denormalizer to be able to denormalize objects.');
         }
 
         if ($normalizer = $this->getDenormalizer($data, $type, $format, $context)) {

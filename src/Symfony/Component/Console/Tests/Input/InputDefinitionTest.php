@@ -25,7 +25,7 @@ class InputDefinitionTest extends TestCase
     protected $foo1;
     protected $foo2;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$fixtures = __DIR__.'/../Fixtures/';
     }

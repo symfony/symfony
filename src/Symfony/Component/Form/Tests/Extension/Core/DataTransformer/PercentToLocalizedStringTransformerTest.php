@@ -19,13 +19,13 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 {
     private $defaultLocale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);
     }

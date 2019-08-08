@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Simple\RedisCache;
  */
 class RedisCacheTest extends AbstractRedisCacheTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setupBeforeClass();
         self::$redis = RedisCache::createConnection('redis://'.getenv('REDIS_HOST'));

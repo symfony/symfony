@@ -29,7 +29,7 @@ class LogoutUrlGeneratorTest extends TestCase
     /** @var LogoutUrlGenerator */
     private $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
         $request = $this->getMockBuilder(Request::class)->getMock();

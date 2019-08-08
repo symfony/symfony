@@ -31,7 +31,7 @@ class TwigLoaderPassTest extends TestCase
      */
     private $pass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ContainerBuilder();
         $this->builder->register('twig');

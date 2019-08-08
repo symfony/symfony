@@ -26,7 +26,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     private $session;
     private $exception;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->httpKernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $this->httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();

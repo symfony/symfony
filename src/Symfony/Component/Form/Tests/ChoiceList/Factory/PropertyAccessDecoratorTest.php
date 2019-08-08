@@ -31,7 +31,7 @@ class PropertyAccessDecoratorTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->decoratedFactory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
         $this->factory = new PropertyAccessDecorator($this->decoratedFactory);

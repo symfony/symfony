@@ -82,7 +82,7 @@ class ProfilerTest extends TestCase
         $this->assertCount(0, $profiler->find(null, null, null, null, null, null, '204'));
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmp = tempnam(sys_get_temp_dir(), 'sf_profiler');
         if (file_exists($this->tmp)) {
@@ -93,7 +93,7 @@ class ProfilerTest extends TestCase
         $this->storage->purge();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (null !== $this->storage) {
             $this->storage->purge();

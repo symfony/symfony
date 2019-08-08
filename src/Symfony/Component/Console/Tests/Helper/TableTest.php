@@ -24,12 +24,12 @@ class TableTest extends TestCase
 {
     protected $stream;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->stream = fopen('php://memory', 'r+');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         fclose($this->stream);
         $this->stream = null;

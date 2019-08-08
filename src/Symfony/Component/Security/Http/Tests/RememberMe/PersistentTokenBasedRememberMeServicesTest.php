@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class PersistentTokenBasedRememberMeServicesTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         try {
             random_bytes(1);

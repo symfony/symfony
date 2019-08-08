@@ -153,7 +153,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $handler->authenticateWithToken($this->token, $this->request, 'some_provider_key');
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
@@ -163,7 +163,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->tokenStorage = null;
         $this->dispatcher = null;

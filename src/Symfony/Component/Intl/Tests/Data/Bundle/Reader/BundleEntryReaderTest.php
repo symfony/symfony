@@ -62,7 +62,7 @@ class BundleEntryReaderTest extends TestCase
         'Foo' => 'Bar',
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->readerImpl = $this->getMockBuilder('Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface')->getMock();
         $this->reader = new BundleEntryReader($this->readerImpl);

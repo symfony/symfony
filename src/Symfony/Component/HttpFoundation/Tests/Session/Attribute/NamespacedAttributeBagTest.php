@@ -28,7 +28,7 @@ class NamespacedAttributeBagTest extends TestCase
      */
     private $bag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->array = [
             'hello' => 'world',
@@ -49,7 +49,7 @@ class NamespacedAttributeBagTest extends TestCase
         $this->bag->initialize($this->array);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->bag = null;
         $this->array = [];

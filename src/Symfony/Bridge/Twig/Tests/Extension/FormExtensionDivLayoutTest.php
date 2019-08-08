@@ -33,7 +33,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected static $supportedFeatureSetVersion = 403;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

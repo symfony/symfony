@@ -20,7 +20,7 @@ class ChoicesToValuesTransformerTest extends TestCase
     protected $transformer;
     protected $transformerWithNull;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $list = new ArrayChoiceList(['', false, 'X']);
         $listWithNull = new ArrayChoiceList(['', false, 'X', null]);
@@ -29,7 +29,7 @@ class ChoicesToValuesTransformerTest extends TestCase
         $this->transformerWithNull = new ChoicesToValuesTransformer($listWithNull);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->transformer = null;
         $this->transformerWithNull = null;

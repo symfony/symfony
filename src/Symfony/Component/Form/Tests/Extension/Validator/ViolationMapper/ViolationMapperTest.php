@@ -61,7 +61,7 @@ class ViolationMapperTest extends TestCase
      */
     private $params;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
         $this->mapper = new ViolationMapper();

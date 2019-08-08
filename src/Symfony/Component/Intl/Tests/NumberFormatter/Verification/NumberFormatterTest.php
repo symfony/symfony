@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class NumberFormatterTest extends AbstractNumberFormatterTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireFullIntl($this, '55.1');
 

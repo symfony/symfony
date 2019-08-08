@@ -24,7 +24,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
     protected static $dbFile;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!\extension_loaded('pdo_sqlite')) {
             self::markTestSkipped('Extension pdo_sqlite required.');
@@ -35,7 +35,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
         $pool = new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         @unlink(self::$dbFile);
     }

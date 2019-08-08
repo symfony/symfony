@@ -21,7 +21,7 @@ use Symfony\Contracts\Cache\CallbackInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

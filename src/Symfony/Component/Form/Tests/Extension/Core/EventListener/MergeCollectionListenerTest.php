@@ -19,12 +19,12 @@ abstract class MergeCollectionListenerTest extends TestCase
 {
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->getForm('axes');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->form = null;
     }

@@ -142,6 +142,10 @@ class FileLoaderTest extends TestCase
 
     public function testRegisterClassesWithExcludeAsArray()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
         $container = new ContainerBuilder();
         $container->setParameter('sub_dir', 'Sub');
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));

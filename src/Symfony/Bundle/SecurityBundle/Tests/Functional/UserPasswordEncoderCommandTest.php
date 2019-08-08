@@ -227,7 +227,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
             'user-class' => 'Custom\Class\Sodium\User',
         ], ['interactive' => false]);
 
-        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringNotContainsString(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testEncodePasswordNoConfigForGivenUserClass()

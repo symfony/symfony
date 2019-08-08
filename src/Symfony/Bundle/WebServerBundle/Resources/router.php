@@ -12,7 +12,7 @@
 /*
  * This file implements rewrite rules for PHP built-in web server.
  *
- * See: http://www.php.net/manual/en/features.commandline.webserver.php
+ * See: https://php.net/features.commandline.webserver
  *
  * If you have custom directory layout, then you have to write your own router
  * and pass it as a value to 'router' option of server:run command.

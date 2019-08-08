@@ -19,7 +19,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
 {
     public static function setUpBeforeClass(): void
     {
-        parent::setupBeforeClass();
+        parent::setUpBeforeClass();
         self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'), ['lazy' => true]);
     }
 

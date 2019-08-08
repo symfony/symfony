@@ -98,12 +98,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller->getUser();
     }
 
-    /**
-     * @param $token
-     *
-     * @return Container
-     */
-    private function getContainerWithTokenStorage($token = null)
+    private function getContainerWithTokenStorage($token = null): Container
     {
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage')->getMock();
         $tokenStorage

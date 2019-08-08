@@ -251,10 +251,8 @@ class UploadedFile extends File
 
     /**
      * Returns the given size from an ini value in bytes.
-     *
-     * @return int The given size in bytes
      */
-    private static function parseFilesize($size)
+    private static function parseFilesize($size): int
     {
         if ('' === $size) {
             return 0;

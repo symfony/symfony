@@ -99,14 +99,9 @@ class FormRegistry implements FormRegistryInterface
     }
 
     /**
-     * Wraps a type into a ResolvedFormTypeInterface implementation and connects
-     * it with its parent type.
-     *
-     * @param FormTypeInterface $type The type to resolve
-     *
-     * @return ResolvedFormTypeInterface The resolved type
+     * Wraps a type into a ResolvedFormTypeInterface implementation and connects it with its parent type.
      */
-    private function resolveType(FormTypeInterface $type)
+    private function resolveType(FormTypeInterface $type): ResolvedFormTypeInterface
     {
         $typeExtensions = [];
         $parentType = $type->getParent();

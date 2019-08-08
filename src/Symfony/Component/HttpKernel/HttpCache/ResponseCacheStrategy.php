@@ -156,10 +156,8 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
      * RFC2616, Section 13.4.
      *
      * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.4
-     *
-     * @return bool
      */
-    private function willMakeFinalResponseUncacheable(Response $response)
+    private function willMakeFinalResponseUncacheable(Response $response): bool
     {
         // RFC2616: A response received with a status code of 200, 203, 300, 301 or 410
         // MAY be stored by a cache […] unless a cache-control directive prohibits caching.

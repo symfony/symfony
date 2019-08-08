@@ -72,10 +72,7 @@ EOF;
         $this->assertStringContainsString('[OK] All 0 XLIFF files contain valid syntax', trim($tester->getDisplay()));
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester($application = null)
+    private function createCommandTester($application = null): CommandTester
     {
         if (!$application) {
             $application = new BaseApplication();

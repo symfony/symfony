@@ -72,7 +72,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @return TemplateReferenceInterface[]
      */
-    private function findTemplatesInFolder(string $dir)
+    private function findTemplatesInFolder(string $dir): array
     {
         $templates = [];
 
@@ -96,7 +96,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @return TemplateReferenceInterface[]
      */
-    private function findTemplatesInBundle(BundleInterface $bundle)
+    private function findTemplatesInBundle(BundleInterface $bundle): array
     {
         $name = $bundle->getName();
         $templates = array_unique(array_merge(

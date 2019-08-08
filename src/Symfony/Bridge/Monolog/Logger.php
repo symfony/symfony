@@ -97,10 +97,8 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
 
     /**
      * Returns a DebugLoggerInterface instance if one is registered with this logger.
-     *
-     * @return DebugLoggerInterface|null A DebugLoggerInterface instance or null if none is registered
      */
-    private function getDebugLogger()
+    private function getDebugLogger(): ?DebugLoggerInterface
     {
         foreach ($this->processors as $processor) {
             if ($processor instanceof DebugLoggerInterface) {

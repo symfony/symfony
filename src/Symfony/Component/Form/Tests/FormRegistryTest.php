@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
@@ -206,6 +207,11 @@ class FormRegistryTest extends TestCase
 
     public function testHasTypeIfFQCN()
     {
+        $this->resolvedTypeFactory
+            ->expects($this->any())
+            ->method('createResolvedType')
+            ->will($this->returnValue($this->createMock(ResolvedFormTypeInterface::class)));
+
         $this->assertTrue($this->registry->hasType('Symfony\Component\Form\Tests\Fixtures\FooType'));
     }
 

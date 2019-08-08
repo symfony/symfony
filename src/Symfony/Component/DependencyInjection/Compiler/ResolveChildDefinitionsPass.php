@@ -52,11 +52,9 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
     /**
      * Resolves the definition.
      *
-     * @return Definition
-     *
      * @throws RuntimeException When the definition is invalid
      */
-    private function resolveDefinition(ChildDefinition $definition)
+    private function resolveDefinition(ChildDefinition $definition): Definition
     {
         try {
             return $this->doResolveDefinition($definition);
@@ -71,7 +69,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         }
     }
 
-    private function doResolveDefinition(ChildDefinition $definition)
+    private function doResolveDefinition(ChildDefinition $definition): Definition
     {
         if (!$this->container->has($parent = $definition->getParent())) {
             throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));

@@ -154,10 +154,8 @@ class FormDataExtractor implements FormDataExtractorInterface
 
     /**
      * Recursively builds an HTML ID for a form.
-     *
-     * @return string The HTML ID
      */
-    private function buildId(FormInterface $form)
+    private function buildId(FormInterface $form): string
     {
         $id = $form->getName();
 

@@ -91,7 +91,7 @@ class LogoutUrlGenerator
      *
      * @return string The logout URL
      */
-    private function generateLogoutUrl(?string $key, int $referenceType)
+    private function generateLogoutUrl(?string $key, int $referenceType): string
     {
         list($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager) = $this->getListener($key);
 
@@ -125,11 +125,9 @@ class LogoutUrlGenerator
     }
 
     /**
-     * @return array The logout listener found
-     *
      * @throws \InvalidArgumentException if no LogoutListener is registered for the key or could not be found automatically
      */
-    private function getListener(?string $key)
+    private function getListener(?string $key): array
     {
         if (null !== $key) {
             if (isset($this->listeners[$key])) {

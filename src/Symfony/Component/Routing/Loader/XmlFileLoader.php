@@ -253,11 +253,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses the config elements (default, requirement, option).
      *
-     * @return array An array with the defaults as first item, requirements as second and options as third
-     *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    private function parseConfigs(\DOMElement $node, string $path)
+    private function parseConfigs(\DOMElement $node, string $path): array
     {
         $defaults = [];
         $requirements = [];

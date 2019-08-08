@@ -316,10 +316,8 @@ class XmlDumper extends Dumper
 
     /**
      * Escapes arguments.
-     *
-     * @return array
      */
-    private function escape(array $arguments)
+    private function escape(array $arguments): array
     {
         $args = [];
         foreach ($arguments as $k => $v) {

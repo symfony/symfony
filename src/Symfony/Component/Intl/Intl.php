@@ -271,10 +271,8 @@ final class Intl
 
     /**
      * Returns the cached bundle entry reader.
-     *
-     * @return BundleEntryReaderInterface The bundle entry reader
      */
-    private static function getEntryReader()
+    private static function getEntryReader(): BundleEntryReaderInterface
     {
         if (null === self::$entryReader) {
             self::$entryReader = new BundleEntryReader(new BufferedBundleReader(

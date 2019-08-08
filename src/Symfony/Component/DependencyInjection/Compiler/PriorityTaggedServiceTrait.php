@@ -35,11 +35,10 @@ trait PriorityTaggedServiceTrait
      * @see https://bugs.php.net/bug.php?id=60926
      *
      * @param string|TaggedIteratorArgument $tagName
-     * @param ContainerBuilder              $container
      *
      * @return Reference[]
      */
-    private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
+    private function findAndSortTaggedServices($tagName, ContainerBuilder $container): array
     {
         $indexAttribute = $defaultIndexMethod = $needsIndexes = null;
 

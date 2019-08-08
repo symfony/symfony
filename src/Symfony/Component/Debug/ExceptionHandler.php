@@ -417,12 +417,8 @@ EOF;
 
     /**
      * Formats an array as a string.
-     *
-     * @param array $args The argument array
-     *
-     * @return string
      */
-    private function formatArgs(array $args)
+    private function formatArgs(array $args): string
     {
         $result = [];
         foreach ($args as $key => $item) {

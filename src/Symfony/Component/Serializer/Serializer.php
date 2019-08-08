@@ -276,7 +276,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
                 if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
                     $this->denormalizerCache[$format][$class][$k] = false;
-                } elseif ($normalizer->supportsDenormalization(null, $class, $format, $context)) {
+                } elseif ($normalizer->supportsDenormalization($data, $class, $format, $context)) {
                     $this->denormalizerCache[$format][$class][$k] = true;
                     break;
                 }

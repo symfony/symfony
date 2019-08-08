@@ -14,7 +14,6 @@ namespace Symfony\Component\Lock\Store;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
@@ -80,17 +79,6 @@ class ZookeeperStore implements PersistingStoreInterface
         } catch (\ZookeeperException $ex) {
             return false;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.4.
-     */
-    public function waitAndSave(Key $key)
-    {
-        @trigger_error(sprintf('%s() is deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', __METHOD__), E_USER_DEPRECATED);
-        throw new NotSupportedException();
     }
 
     /**

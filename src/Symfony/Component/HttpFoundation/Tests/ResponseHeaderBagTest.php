@@ -89,13 +89,13 @@ class ResponseHeaderBagTest extends TestCase
 
         $bag = new ResponseHeaderBag();
         $bag->set('Cache-Control', ['public', 'must-revalidate']);
-        $this->assertCount(1, $bag->get('Cache-Control', null, false));
+        $this->assertCount(1, $bag->all('Cache-Control'));
         $this->assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag();
         $bag->set('Cache-Control', 'public');
         $bag->set('Cache-Control', 'must-revalidate', false);
-        $this->assertCount(1, $bag->get('Cache-Control', null, false));
+        $this->assertCount(1, $bag->all('Cache-Control'));
         $this->assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
     }
 
@@ -166,7 +166,7 @@ class ResponseHeaderBagTest extends TestCase
             'foo=bar; path=/path/bar; domain=foo.bar; httponly; samesite=lax',
             'foo=bar; path=/path/bar; domain=bar.foo; httponly; samesite=lax',
             'foo=bar; path=/; httponly; samesite=lax',
-        ], $bag->get('set-cookie', null, false));
+        ], $bag->all('set-cookie'));
 
         $this->assertSetCookieHeader('foo=bar; path=/path/foo; domain=foo.bar; httponly; samesite=lax', $bag);
         $this->assertSetCookieHeader('foo=bar; path=/path/bar; domain=foo.bar; httponly; samesite=lax', $bag);

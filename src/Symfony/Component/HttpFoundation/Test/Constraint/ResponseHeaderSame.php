@@ -40,7 +40,7 @@ final class ResponseHeaderSame extends Constraint
      */
     protected function matches($response): bool
     {
-        return $this->expectedValue === $response->headers->get($this->headerName, null, true);
+        return $this->expectedValue === $response->headers->get($this->headerName, null);
     }
 
     /**

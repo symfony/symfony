@@ -1019,7 +1019,7 @@ class Response
      */
     public function getVary(): array
     {
-        if (!$vary = $this->headers->get('Vary', null, false)) {
+        if (!$vary = $this->headers->all('Vary')) {
             return [];
         }
 

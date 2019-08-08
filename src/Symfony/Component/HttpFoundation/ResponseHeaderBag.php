@@ -88,9 +88,16 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(string $key = null)
     {
         $headers = parent::all();
+
+        if (null !== $key) {
+            $key = str_replace('_', '-', strtolower($key));
+
+            return 'set-cookie' !== $key ? $headers[$key] ?? [] : array_map('strval', $this->getCookies());
+        }
+
         foreach ($this->getCookies() as $cookie) {
             $headers['set-cookie'][] = (string) $cookie;
         }

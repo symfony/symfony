@@ -55,7 +55,7 @@ abstract class SMimeTestCase extends TestCase
     protected function assertMessageHeaders(Message $message, RawMessage $originalMessage): void
     {
         $messageString = $message->toString();
-        self::assertNotContains('Bcc: ', $messageString, '', true);
+        self::assertStringNotContainsString('Bcc: ', $messageString, '', true);
 
         if (!$originalMessage instanceof Message) {
             return;
@@ -67,7 +67,7 @@ abstract class SMimeTestCase extends TestCase
 
         if ($originalMessage->getHeaders()->has('Subject')) {
             self::assertEquals($originalMessage->getHeaders()->get('Subject'), $message->getPreparedHeaders()->get('Subject'));
-            self::assertContains('Subject:', $messageString, '', true);
+            self::assertStringContainsString('Subject:', $messageString, '', true);
         }
     }
 }

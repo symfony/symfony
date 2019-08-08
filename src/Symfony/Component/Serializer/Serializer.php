@@ -86,7 +86,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 $normalizer->setNormalizer($this);
             }
 
-            if($normalizer instanceof NormalizerInterface) {
+            if ($normalizer instanceof NormalizerInterface) {
                 $this->normalizers[] = $normalizer;
             }
             if ($normalizer instanceof DenormalizerInterface) {

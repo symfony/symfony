@@ -35,10 +35,11 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
 
     private $renderer;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    public function doSetUp()
     {
-        parent::setUp();
-
         $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',

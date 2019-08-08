@@ -33,10 +33,11 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected static $supportedFeatureSetVersion = 304;
 
-    protected function setUp()
+    /**
+     * @before
+     */
+    public function doSetUp()
     {
-        parent::setUp();
-
         $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',

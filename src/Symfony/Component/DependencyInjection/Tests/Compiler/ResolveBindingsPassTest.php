@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Warning;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
@@ -62,13 +61,13 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
+    /**
+     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
+     */
     public function testMissingParent()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
         $this->expectExceptionMessageRegExp('/Unused binding "\$quz" in service [\s\S]+/');
-        if (\PHP_VERSION_ID >= 70400) {
-            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
-        }
 
         $container = new ContainerBuilder();
 

@@ -379,7 +379,6 @@ abstract class AbstractNumberFormatterTest extends TestCase
             [1.123, '1.1', 1, 1],
             [1.123, '1.12', 2, 2],
             [1.123, '1.123', -1, 0],
-            [1.123, '1', 'abc', 0],
         ];
     }
 
@@ -411,7 +410,6 @@ abstract class AbstractNumberFormatterTest extends TestCase
             [1000, '1000', 0, 0],
             [1000, '1,000', 1, 1],
             [1000, '1,000', 2, 1],
-            [1000, '1000', 'abc', 0],
             [1000, '1,000', -1, 1],
         ];
     }

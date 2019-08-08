@@ -40,7 +40,7 @@ class LocaleScanner
      *               {@link scanAliases()} to determine which of the locales
      *               are aliases
      */
-    public function scanLocales($sourceDir)
+    public function scanLocales(string $sourceDir)
     {
         $locales = glob($sourceDir.'/*.txt');
 
@@ -65,7 +65,7 @@ class LocaleScanner
      * @return array An array with the locale aliases as keys and the aliased
      *               locales as values
      */
-    public function scanAliases($sourceDir)
+    public function scanAliases(string $sourceDir)
     {
         $locales = $this->scanLocales($sourceDir);
         $aliases = [];

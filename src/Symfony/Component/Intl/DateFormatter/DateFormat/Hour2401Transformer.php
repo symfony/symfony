@@ -26,7 +26,7 @@ class Hour2401Transformer extends HourTransformer
     public function format(\DateTime $dateTime, int $length): string
     {
         $hourOfDay = $dateTime->format('G');
-        $hourOfDay = ('0' == $hourOfDay) ? '24' : $hourOfDay;
+        $hourOfDay = '0' === $hourOfDay ? '24' : $hourOfDay;
 
         return $this->padLeft($hourOfDay, $length);
     }
@@ -36,9 +36,9 @@ class Hour2401Transformer extends HourTransformer
      */
     public function normalizeHour(int $hour, string $marker = null): int
     {
-        if ((null === $marker && 24 === $hour) || 'AM' == $marker) {
+        if ((null === $marker && 24 === $hour) || 'AM' === $marker) {
             $hour = 0;
-        } elseif ('PM' == $marker) {
+        } elseif ('PM' === $marker) {
             $hour = 12;
         }
 

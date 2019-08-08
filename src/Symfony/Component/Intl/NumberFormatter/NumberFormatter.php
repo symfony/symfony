@@ -241,13 +241,13 @@ class NumberFormatter
     ];
 
     /**
-     * @param string $locale  The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
-     * @param int    $style   Style of the formatting, one of the format style constants.
-     *                        The only supported styles are NumberFormatter::DECIMAL
-     *                        and NumberFormatter::CURRENCY.
-     * @param string $pattern Not supported. A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
-     *                        NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
-     *                        described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
+     * @param string|null $locale  The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
+     * @param int         $style   Style of the formatting, one of the format style constants.
+     *                             The only supported styles are NumberFormatter::DECIMAL
+     *                             and NumberFormatter::CURRENCY.
+     * @param string      $pattern Not supported. A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
+     *                             NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
+     *                             described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
      * @see http://www.php.net/manual/en/numberformatter.create.php
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details

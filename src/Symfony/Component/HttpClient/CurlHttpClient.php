@@ -141,7 +141,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => 0 < $options['max_redirects'] ? $options['max_redirects'] : 0,
             CURLOPT_COOKIEFILE => '', // Keep track of cookies during redirects
-            CURLOPT_CONNECTTIMEOUT_MS => 1000 * $options['timeout'],
+            CURLOPT_TIMEOUT => 0,
             CURLOPT_PROXY => $options['proxy'],
             CURLOPT_NOPROXY => $options['no_proxy'] ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '',
             CURLOPT_SSL_VERIFYPEER => $options['verify_peer'],

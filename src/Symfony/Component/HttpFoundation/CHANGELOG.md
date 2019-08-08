@@ -6,6 +6,7 @@ CHANGELOG
 
  * passing arguments to `Request::isMethodSafe()` is deprecated.
  * `ApacheRequest` is deprecated, use the `Request` class instead.
+ * passing a third argument to `HeaderBag::get()` is deprecated, use method `all()` instead
 
 4.3.0
 -----

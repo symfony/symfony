@@ -284,6 +284,7 @@ HttpFoundation
  * The `FileinfoMimeTypeGuesser` class has been removed,
    use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
  * `ApacheRequest` has been removed, use the `Request` class instead.
+ * The third argument of the `HeaderBag::get()` method has been removed, use method `all()` instead.
 
 HttpKernel
 ----------

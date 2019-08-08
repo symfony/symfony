@@ -87,10 +87,19 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * {@inheritdoc}
+     *
+     * @param string|null $key The name of the headers to return or null to get them all
      */
-    public function all()
+    public function all(/*string $key = null*/)
     {
         $headers = parent::all();
+
+        if (1 <= \func_num_args() && null !== $key = func_get_arg(0)) {
+            $key = str_replace('_', '-', strtolower($key));
+
+            return 'set-cookie' !== $key ? $headers[$key] ?? [] : array_map('strval', $this->getCookies());
+        }
+
         foreach ($this->getCookies() as $cookie) {
             $headers['set-cookie'][] = (string) $cookie;
         }

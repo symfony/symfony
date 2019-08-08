@@ -47,7 +47,7 @@ class ExceptionListener implements EventSubscriberInterface
         $this->logException($event->getException(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
     }
 
-    public function onKernelException(ExceptionEvent $event, ?string $eventName, EventDispatcherInterface $eventDispatcher)
+    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null)
     {
         if (null === $this->controller) {
             return;

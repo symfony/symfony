@@ -30,8 +30,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class ConstraintValidatorTestCase extends TestCase
 {
-    use ForwardCompatTestTrait;
-
     /**
      * @var ExecutionContextInterface
      */
@@ -51,7 +49,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected $constraint;
     protected $defaultTimezone;
 
-    private function doSetUp()
+    protected function setUp(): void
     {
         $this->group = 'MyGroup';
         $this->metadata = null;
@@ -73,7 +71,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->setDefaultTimezone('UTC');
     }
 
-    private function doTearDown()
+    protected function tearDown(): void
     {
         $this->restoreDefaultTimezone();
     }

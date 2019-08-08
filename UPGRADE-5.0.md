@@ -54,7 +54,9 @@ Console
 Debug
 -----
 
- * Removed the component
+ * Removed the `Debug` class, use the one from the `ErrorRenderer` component instead
+ * Removed the `FlattenException` class, use the one from the `ErrorRenderer` component instead
+ * Removed the component component in favor of the `ErrorHandler` component
 
 DependencyInjection
 -------------------

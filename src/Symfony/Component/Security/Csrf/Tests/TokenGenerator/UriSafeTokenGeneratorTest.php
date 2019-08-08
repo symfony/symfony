@@ -33,17 +33,17 @@ class UriSafeTokenGeneratorTest extends TestCase
      */
     private $generator;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$bytes = base64_decode('aMf+Tct/RLn2WQ==');
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->generator = new UriSafeTokenGenerator(self::ENTROPY);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->generator = null;
     }

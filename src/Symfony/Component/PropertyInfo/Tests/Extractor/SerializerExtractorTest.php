@@ -27,7 +27,7 @@ class SerializerExtractorTest extends TestCase
      */
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $this->extractor = new SerializerExtractor($classMetadataFactory);

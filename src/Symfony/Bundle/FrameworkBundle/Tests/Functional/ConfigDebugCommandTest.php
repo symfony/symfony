@@ -23,7 +23,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 {
     private $application;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = static::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);

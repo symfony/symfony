@@ -32,7 +32,7 @@ class ProxyDumperTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dumper = new ProxyDumper();
     }
@@ -159,12 +159,12 @@ return new class
 EOPHP;
 
         $implem = preg_replace('#\n    /\*\*.*?\*/#s', '', $implem);
-        $implem = str_replace('getWrappedValueHolderValue() : ?object', 'getWrappedValueHolderValue()', $implem);
         $implem = str_replace("array(\n        \n    );", "[\n        \n    ];", $implem);
-        $this->assertStringEqualsFile(__DIR__.'/Fixtures/proxy-implem.php', $implem);
+
+        $this->assertStringMatchesFormatFile(__DIR__.'/Fixtures/proxy-implem.php', $implem);
         $this->assertStringEqualsFile(__DIR__.'/Fixtures/proxy-factory.php', $factory);
 
-        require_once __DIR__.'/Fixtures/proxy-implem.php';
+        eval(preg_replace('/^<\?php/', '', $implem));
         $factory = require __DIR__.'/Fixtures/proxy-factory.php';
 
         $foo = $factory->getFooService();

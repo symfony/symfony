@@ -39,7 +39,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         return new ImageValidator();
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

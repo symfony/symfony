@@ -218,7 +218,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         return static::$file;
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         if (static::$file) {
             fclose(static::$file);

@@ -43,7 +43,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
      */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
         $this->translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
@@ -52,7 +52,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->tokenManager = null;
         $this->translator = null;

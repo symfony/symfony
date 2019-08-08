@@ -45,7 +45,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
      */
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $reader = new AnnotationReader();
         $this->loader = new class($reader) extends AnnotationClassLoader {

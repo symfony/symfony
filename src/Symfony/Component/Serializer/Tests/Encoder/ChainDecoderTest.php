@@ -24,7 +24,7 @@ class ChainDecoderTest extends TestCase
     private $decoder1;
     private $decoder2;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->decoder1 = $this
             ->getMockBuilder('Symfony\Component\Serializer\Encoder\DecoderInterface')

@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class LocaleTest extends AbstractLocaleTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireFullIntl($this, false);
 

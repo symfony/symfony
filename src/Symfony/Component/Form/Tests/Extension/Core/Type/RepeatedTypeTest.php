@@ -22,7 +22,7 @@ class RepeatedTypeTest extends BaseTypeTest
      */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -26,7 +26,7 @@ abstract class HttpClientTestCase extends TestCase
 {
     private static $server;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         TestHttpServer::start();
     }

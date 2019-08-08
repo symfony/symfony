@@ -35,7 +35,7 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
 
     private $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

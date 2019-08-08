@@ -28,7 +28,7 @@ class ArrayDenormalizerTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')->getMock();
         $this->denormalizer = new ArrayDenormalizer();

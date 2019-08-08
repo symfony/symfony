@@ -25,7 +25,7 @@ class WorkflowGuardListenerPassTest extends TestCase
     private $container;
     private $compilerPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->compilerPass = new WorkflowGuardListenerPass();

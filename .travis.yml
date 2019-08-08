@@ -19,7 +19,6 @@ env:
     global:
         - MIN_PHP=7.2.9
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
-        - SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1
         - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
         - MESSENGER_REDIS_DSN=redis://127.0.0.1:7001/messages
 
@@ -30,6 +29,9 @@ matrix:
           env: deps=high
         - php: 7.3
           env: deps=low
+        - php: 7.4snapshot
+    allow_failures:
+    - php: 7.4snapshot
     fast_finish: true
 
 cache:

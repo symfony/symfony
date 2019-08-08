@@ -38,7 +38,7 @@ class SwitchUserListenerTest extends TestCase
 
     private $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = new TokenStorage();
         $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();

@@ -22,7 +22,7 @@ class UnanimousStrategyTest extends TestCase
     /** @var UnanimousStrategy */
     private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->strategy = new UnanimousStrategy();
     }

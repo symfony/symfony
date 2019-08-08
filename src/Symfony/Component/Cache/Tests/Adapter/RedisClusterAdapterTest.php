@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Traits\RedisClusterProxy;
 
 class RedisClusterAdapterTest extends AbstractRedisAdapterTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!class_exists('RedisCluster')) {
             self::markTestSkipped('The RedisCluster class is required.');

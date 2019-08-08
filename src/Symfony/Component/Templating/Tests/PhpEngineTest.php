@@ -24,12 +24,12 @@ class PhpEngineTest extends TestCase
 {
     protected $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new ProjectTemplateLoader();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->loader = null;
     }

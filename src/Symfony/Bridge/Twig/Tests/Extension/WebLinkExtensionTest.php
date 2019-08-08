@@ -32,7 +32,7 @@ class WebLinkExtensionTest extends TestCase
      */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->request = new Request();
 

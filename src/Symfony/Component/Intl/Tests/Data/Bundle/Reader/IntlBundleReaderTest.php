@@ -25,7 +25,7 @@ class IntlBundleReaderTest extends TestCase
      */
     private $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = new IntlBundleReader();
     }

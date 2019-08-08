@@ -21,7 +21,7 @@ class IniFileLoaderTest extends TestCase
     protected $container;
     protected $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->loader = new IniFileLoader($this->container, new FileLocator(realpath(__DIR__.'/../Fixtures/').'/ini'));

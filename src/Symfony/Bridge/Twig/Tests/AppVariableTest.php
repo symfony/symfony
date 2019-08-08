@@ -15,7 +15,7 @@ class AppVariableTest extends TestCase
      */
     protected $appVariable;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->appVariable = new AppVariable();
     }

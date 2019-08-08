@@ -161,7 +161,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
             'user-class' => 'Custom\Class\Sodium\User',
         ], ['interactive' => false]);
 
-        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringNotContainsString(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testEncodePasswordNoConfigForGivenUserClass()
@@ -220,7 +220,7 @@ EOTXT
         ], ['interactive' => false]);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode']);
@@ -233,7 +233,7 @@ EOTXT
         $this->passwordEncoderCommandTester = new CommandTester($passwordEncoderCommand);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->passwordEncoderCommandTester = null;
     }

@@ -14,7 +14,7 @@ class RegistryTest extends TestCase
 {
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new Registry();
 
@@ -23,7 +23,7 @@ class RegistryTest extends TestCase
         $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createWorkflowSupportStrategy(Subject2::class));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->registry = null;
     }

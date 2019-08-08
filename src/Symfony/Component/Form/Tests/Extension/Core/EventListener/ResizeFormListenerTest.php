@@ -26,7 +26,7 @@ class ResizeFormListenerTest extends TestCase
     private $factory;
     private $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = (new FormFactoryBuilder())->getFormFactory();
         $this->form = $this->getBuilder()
@@ -35,7 +35,7 @@ class ResizeFormListenerTest extends TestCase
             ->getForm();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->factory = null;
         $this->form = null;

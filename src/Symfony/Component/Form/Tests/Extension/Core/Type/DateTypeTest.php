@@ -22,14 +22,14 @@ class DateTypeTest extends BaseTypeTest
     private $defaultTimezone;
     private $defaultLocale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->defaultTimezone = date_default_timezone_get();
         $this->defaultLocale = \Locale::getDefault();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         date_default_timezone_set($this->defaultTimezone);
         \Locale::setDefault($this->defaultLocale);

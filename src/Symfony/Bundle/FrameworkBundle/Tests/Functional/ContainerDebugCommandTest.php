@@ -80,7 +80,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', 'name' => $validServiceId]);
-        $this->assertNotContains('No services found', $tester->getDisplay());
+        $this->assertStringNotContainsString('No services found', $tester->getDisplay());
     }
 
     public function testDescribeEnvVars()

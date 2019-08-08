@@ -87,12 +87,12 @@ class LintCommandTest extends TestCase
         return $filename;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->files = [];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

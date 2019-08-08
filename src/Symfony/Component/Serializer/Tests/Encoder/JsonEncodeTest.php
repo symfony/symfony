@@ -19,7 +19,7 @@ class JsonEncodeTest extends TestCase
 {
     private $encode;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encode = new JsonEncode();
     }

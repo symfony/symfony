@@ -19,7 +19,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         Inline::initialize(0, 0);
     }

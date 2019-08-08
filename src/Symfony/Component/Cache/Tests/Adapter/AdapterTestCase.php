@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Warning;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
@@ -21,7 +22,7 @@ use Symfony\Contracts\Cache\CallbackInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -120,7 +121,7 @@ abstract class AdapterTestCase extends CachePoolTest
             CacheItem::METADATA_EXPIRY => 9.5 + time(),
             CacheItem::METADATA_CTIME => 1000,
         ];
-        $this->assertEquals($expected, $item->getMetadata(), 'Item metadata should embed expiry and ctime.', .6);
+        $this->assertEqualsWithDelta($expected, $item->getMetadata(), .6, 'Item metadata should embed expiry and ctime.');
     }
 
     public function testDefaultLifeTime()
@@ -251,6 +252,15 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->prune();
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'qux'));
+    }
+
+    public function testSavingObject()
+    {
+        if (\PHP_VERSION_ID >= 70400) {
+            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
+        }
+
+        parent::testSavingObject();
     }
 
     public function testClearPrefix()

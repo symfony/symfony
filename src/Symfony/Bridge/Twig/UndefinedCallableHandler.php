@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Twig;
 
-use Symfony\Bundle\FullStack;
 use Twig\Error\SyntaxError;
 
 /**
@@ -57,14 +56,6 @@ class UndefinedCallableHandler
         'workflow_marked_places' => 'workflow',
     ];
 
-    private static $fullStackEnable = [
-        'form' => 'enable "framework.form"',
-        'security-core' => 'add the "SecurityBundle"',
-        'security-http' => 'add the "SecurityBundle"',
-        'web-link' => 'enable "framework.web_link"',
-        'workflow' => 'enable "framework.workflows"',
-    ];
-
     public static function onUndefinedFilter(string $name)
     {
         if (!isset(self::$filterComponents[$name])) {
@@ -85,10 +76,6 @@ class UndefinedCallableHandler
 
     private static function onUndefined($name, $type, $component)
     {
-        if (class_exists(FullStack::class) && isset(self::$fullStackEnable[$component])) {
-            throw new SyntaxError(sprintf('Did you forget to %s? Unknown %s "%s".', self::$fullStackEnable[$component], $type, $name));
-        }
-
         throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown %s "%s".', $component, $type, $name));
     }
 }

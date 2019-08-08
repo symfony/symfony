@@ -16,7 +16,6 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -762,7 +761,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $annotations = !class_exists(FullStack::class) && class_exists(Annotation::class);
+        $annotations = class_exists(Annotation::class);
 
         $this->assertCount($annotations ? 7 : 6, $calls);
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
@@ -896,7 +895,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $annotations = !class_exists(FullStack::class) && class_exists(Annotation::class);
+        $annotations = class_exists(Annotation::class);
 
         $this->assertCount($annotations ? 6 : 5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
@@ -985,7 +984,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testSerializerDisabled()
     {
         $container = $this->createContainerFromFile('default_config');
-        $this->assertSame(!class_exists(FullStack::class) && class_exists(Serializer::class), $container->has('serializer'));
+        $this->assertSame(class_exists(Serializer::class), $container->has('serializer'));
     }
 
     public function testSerializerEnabled()

@@ -23,7 +23,6 @@ use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
-use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
@@ -242,7 +241,7 @@ class FrameworkExtension extends Extension
         }
 
         if (null === $config['csrf_protection']['enabled']) {
-            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class);
+            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && interface_exists(CsrfTokenManagerInterface::class);
         }
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 

@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
-use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpClient\HttpClient;
@@ -202,7 +201,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
             ],
             'form' => [
-                'enabled' => !class_exists(FullStack::class),
+                'enabled' => true,
                 'csrf_protection' => [
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
@@ -223,7 +222,7 @@ class ConfigurationTest extends TestCase
                 'collect' => true,
             ],
             'translator' => [
-                'enabled' => !class_exists(FullStack::class),
+                'enabled' => true,
                 'fallbacks' => [],
                 'cache_dir' => '%kernel.cache_dir%/translations',
                 'logging' => false,
@@ -232,8 +231,8 @@ class ConfigurationTest extends TestCase
                 'default_path' => '%kernel.project_dir%/translations',
             ],
             'validation' => [
-                'enabled' => !class_exists(FullStack::class),
-                'enable_annotations' => !class_exists(FullStack::class),
+                'enabled' => true,
+                'enable_annotations' => true,
                 'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
                 'mapping' => [
@@ -252,8 +251,8 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ],
             'serializer' => [
-                'enabled' => !class_exists(FullStack::class),
-                'enable_annotations' => !class_exists(FullStack::class),
+                'enabled' => true,
+                'enable_annotations' => true,
                 'mapping' => ['paths' => []],
             ],
             'property_access' => [
@@ -262,7 +261,7 @@ class ConfigurationTest extends TestCase
                 'throw_exception_on_invalid_property_path' => true,
             ],
             'property_info' => [
-                'enabled' => !class_exists(FullStack::class),
+                'enabled' => true,
             ],
             'router' => [
                 'enabled' => false,
@@ -285,7 +284,7 @@ class ConfigurationTest extends TestCase
                 'formats' => [],
             ],
             'assets' => [
-                'enabled' => !class_exists(FullStack::class),
+                'enabled' => true,
                 'version_strategy' => null,
                 'version' => null,
                 'version_format' => '%%s?%%s',
@@ -312,10 +311,10 @@ class ConfigurationTest extends TestCase
                 'throw' => true,
             ],
             'web_link' => [
-                'enabled' => !class_exists(FullStack::class),
+                'enabled' => true,
             ],
             'lock' => [
-                'enabled' => !class_exists(FullStack::class),
+                'enabled' => true,
                 'resources' => [
                     'default' => [
                         class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock',
@@ -323,7 +322,7 @@ class ConfigurationTest extends TestCase
                 ],
             ],
             'messenger' => [
-                'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
+                'enabled' => interface_exists(MessageBusInterface::class),
                 'routing' => [],
                 'transports' => [],
                 'failure_transport' => null,
@@ -339,12 +338,12 @@ class ConfigurationTest extends TestCase
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
-                'enabled' => !class_exists(FullStack::class) && class_exists(HttpClient::class),
+                'enabled' => class_exists(HttpClient::class),
                 'scoped_clients' => [],
             ],
             'mailer' => [
                 'dsn' => 'smtp://null',
-                'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
+                'enabled' => class_exists(Mailer::class),
             ],
         ];
     }

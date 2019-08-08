@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Test;
 
 use PHPUnit\Framework\TestCase;
 
+@trigger_error(sprintf('The "%s" trait is deprecated since Symfony 4.3, typehint methods "setUp" and "tearDown" with ": void" instead.', ForwardCompatTestTrait::class), E_USER_DEPRECATED);
+
 // Auto-adapt to PHPUnit 8 that added a `void` return-type to the setUp/tearDown methods
 
 if ((new \ReflectionMethod(TestCase::class, 'tearDown'))->hasReturnType()) {

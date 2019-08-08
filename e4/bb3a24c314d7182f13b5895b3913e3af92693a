@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T12:10:38Z
+
+If we do this, we should do it for the whole codebase. There is no point in making it for some random files (except calling for an undefined amount of follow-ups, which we'd better not.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T16:20:57Z
+
+@Arman-Hosseini up for screening the whole codebase? We could also improve links to bug reports, e.g. `https://bugs.php.net/78175` instead of `https://bugs.php.net/bug.php?id=78175`
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-31T18:50:27Z
+
+Hi @nicolas-grekas .
+I'm ready to do that.
+Where to start?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T18:55:01Z
+
+`grep "https*://" src/` + filter the result :)
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-31T19:25:09Z
+
+@nicolas-grekas .
+Do I have to commit all the results on the branch of patch-10?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T19:29:53Z
+
+that would make sense, but do what's easiest for you of course
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-31T19:33:13Z
+
+I carefully review all the results and correct them as needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-04T15:51:40Z
+
+@Arman-Hosseini maybe you forget to push the result? We see no changes here :)
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-08-04T17:43:40Z
+
+@nicolas-grekas I am involved in a project and will be pushing it soon.
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-08-04T18:13:11Z
+
+@nicolas-grekas Do the schema links in the xml files also need to be changed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-04T18:41:14Z
+
+No need to patch xsd, this can have unwanted technical consequences.
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-08-04T19:10:32Z
+
+@nicolas-grekas  Can I change the long links that are redirected?
+For example: `http://support.microsoft.com/kb/323308` it's redirected to `https://support.microsoft.com/en-us/help/323308/internet-explorer-file-downloads-over-ssl-do-not-work-with-the-cache-c`
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-08-04T19:23:17Z
+
+@nicolas-grekas Can I remove www from a link? Even for a link that is ultimately loaded with a www address?
+For example: I use `https://zend.com/` and finally it's redirected to `https://www.zend.com/`
+
+Or even for a subdomain such as `https://en.wikipedia.com/` and finally it's redirected to `https://wikipedia.com/`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-05T05:41:31Z
+
+@Arman-Hosseini I think using the shortest URL possible is always nice (even if the URL is redirected).

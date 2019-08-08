@@ -100,7 +100,7 @@ class JsonResponse extends Response
     public function setCallback($callback = null)
     {
         if (null !== $callback) {
-            // partially taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
+            // partially taken from https://geekality.net/2011/08/03/valid-javascript-identifier/
             // partially taken from https://github.com/willdurand/JsonpCallbackValidator
             //      JsonpCallbackValidator is released under the MIT License. See https://github.com/willdurand/JsonpCallbackValidator/blob/v1.1.0/LICENSE for details.
             //      (c) William Durand <william.durand1@gmail.com>

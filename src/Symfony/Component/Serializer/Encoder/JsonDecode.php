@@ -62,7 +62,7 @@ class JsonDecode implements DecoderInterface
      *
      * @throws NotEncodableValueException
      *
-     * @see http://php.net/json_decode json_decode
+     * @see https://php.net/json_decode
      */
     public function decode($data, $format, array $context = [])
     {

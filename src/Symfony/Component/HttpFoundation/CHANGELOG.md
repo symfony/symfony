@@ -21,7 +21,7 @@ CHANGELOG
 -----
 
  * the `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument,
-   see http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html for more info,
+   see https://symfony.com/doc/current/deployment/proxies.html for more info,
  * deprecated the `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods,
  * added `File\Stream`, to be passed to `BinaryFileResponse` when the size of the served file is unknown,
    disabling `Range` and `Content-Length` handling, switching to chunked encoding instead

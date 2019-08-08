@@ -267,7 +267,7 @@ abstract class AbstractEventDispatcherTest extends TestCase
     }
 
     /**
-     * @see https://bugs.php.net/bug.php?id=62976
+     * @see https://bugs.php.net/62976
      *
      * This bug affects:
      *  - The PHP 5.3 branch for versions < 5.3.18

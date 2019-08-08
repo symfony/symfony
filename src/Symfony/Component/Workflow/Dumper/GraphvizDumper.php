@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\Marking;
 /**
  * GraphvizDumper dumps a workflow as a graphviz file.
  *
- * You can convert the generated dot file with the dot utility (http://www.graphviz.org/):
+ * You can convert the generated dot file with the dot utility (https://graphviz.org/):
  *
  *   dot -Tpng workflow.dot > workflow.png
  *

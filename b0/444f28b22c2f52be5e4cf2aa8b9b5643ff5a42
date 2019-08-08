@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-06T15:20:30Z
+
+I'll fix broken PHPDocs and inconsistent returns that I've found while working on this PR with separate PRs on lower branches, probably tomorrow.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-07T12:01:31Z
+
+can be rebased
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-07T12:05:04Z
+
+@nicolas-grekas The PR will probably conflict again once #33007 is merged, so I'll wait for that.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-07T13:00:41Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-07T14:09:34Z
+
+(tests fail)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-07T14:27:37Z
+
+Fixed.

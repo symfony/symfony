@@ -76,9 +76,6 @@ class VarExporterTest extends TestCase
      */
     public function testExport(string $testName, $value, bool $staticValueExpected = false)
     {
-        if (\PHP_VERSION_ID >= 70400 && 'datetime' === $testName) {
-            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78383.');
-        }
         if (\PHP_VERSION_ID >= 70400 && \in_array($testName, ['spl-object-storage', 'array-object-custom', 'array-iterator', 'array-object', 'final-array-iterator'])) {
             throw new Warning('PHP 7.4 breaks this test.');
         }

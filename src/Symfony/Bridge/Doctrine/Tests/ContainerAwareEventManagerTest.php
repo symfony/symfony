@@ -20,7 +20,7 @@ class ContainerAwareEventManagerTest extends TestCase
     private $container;
     private $evm;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new Container();
         $this->evm = new ContainerAwareEventManager($this->container);

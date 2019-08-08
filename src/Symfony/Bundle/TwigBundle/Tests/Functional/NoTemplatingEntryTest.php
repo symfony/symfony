@@ -30,12 +30,12 @@ class NoTemplatingEntryTest extends TestCase
         $this->assertStringContainsString('{ a: b }', $content);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deleteTempDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteTempDir();
     }

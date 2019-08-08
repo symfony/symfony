@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Psr6CacheTest extends AbstractCacheTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = new Psr6Cache(new ArrayAdapter());
     }

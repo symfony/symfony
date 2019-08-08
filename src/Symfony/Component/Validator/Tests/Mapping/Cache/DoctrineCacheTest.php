@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
 
 class DoctrineCacheTest extends AbstractCacheTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = new DoctrineCache(new ArrayCache());
     }

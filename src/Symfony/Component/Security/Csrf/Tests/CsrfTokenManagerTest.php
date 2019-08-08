@@ -210,12 +210,12 @@ class CsrfTokenManagerTest extends TestCase
         ];
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $_SERVER['HTTPS'] = 'on';
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

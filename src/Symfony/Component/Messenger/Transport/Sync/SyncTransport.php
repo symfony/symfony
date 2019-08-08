@@ -57,7 +57,7 @@ class SyncTransport implements TransportInterface
     {
         /** @var SentStamp|null $sentStamp */
         $sentStamp = $envelope->last(SentStamp::class);
-        $alias = null === $sentStamp ? 'sync' : $sentStamp->getSenderAlias() ?: $sentStamp->getSenderClass();
+        $alias = null === $sentStamp ? 'sync' : ($sentStamp->getSenderAlias() ?: $sentStamp->getSenderClass());
 
         $envelope = $envelope->with(new ReceivedStamp($alias));
 

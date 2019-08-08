@@ -28,7 +28,7 @@ class DoctrineSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'])->willReturn(15);
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'])->willReturn('15');
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);

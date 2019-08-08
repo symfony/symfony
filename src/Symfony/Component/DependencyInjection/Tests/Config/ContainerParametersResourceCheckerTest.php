@@ -29,7 +29,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
     /** @var ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resource = new ContainerParametersResource(['locales' => ['fr', 'en'], 'default_locale' => 'fr']);
         $this->container = $this->getMockBuilder(ContainerInterface::class)->getMock();

@@ -20,12 +20,12 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 {
     private static $serverBackup;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$serverBackup = $_SERVER;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +38,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         ];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

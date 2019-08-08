@@ -32,7 +32,7 @@ class AnnotationLoaderTest extends TestCase
      */
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new AnnotationLoader(new AnnotationReader());
     }

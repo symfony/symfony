@@ -43,12 +43,12 @@ class ApplicationTest extends TestCase
 
     private $colSize;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->colSize = getenv('COLUMNS');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
         putenv('SHELL_VERBOSITY');
@@ -56,7 +56,7 @@ class ApplicationTest extends TestCase
         unset($_SERVER['SHELL_VERBOSITY']);
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$fixturesPath = realpath(__DIR__.'/Fixtures/');
         require_once self::$fixturesPath.'/FooCommand.php';

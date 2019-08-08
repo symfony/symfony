@@ -19,7 +19,7 @@ class LanguageTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LanguageType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this, false);
 
@@ -50,10 +50,10 @@ class LanguageTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContains(new ChoiceView('en', 'en', 'англійська'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_US', 'en_US', 'англійська (США)'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('fr', 'fr', 'французька'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('my', 'my', 'бірманська'), $choices, '', false, false);
+        $this->assertContainsEquals(new ChoiceView('en', 'en', 'англійська'), $choices);
+        $this->assertContainsEquals(new ChoiceView('en_US', 'en_US', 'англійська (США)'), $choices);
+        $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'французька'), $choices);
+        $this->assertContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
     }
 
     public function testMultipleLanguagesIsNotIncluded()

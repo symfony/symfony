@@ -30,7 +30,7 @@ class ArgumentResolverTest extends TestCase
     /** @var ArgumentResolver */
     private static $resolver;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $factory = new ArgumentMetadataFactory();
 

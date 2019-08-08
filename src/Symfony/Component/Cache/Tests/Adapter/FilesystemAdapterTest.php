@@ -24,7 +24,7 @@ class FilesystemAdapterTest extends AdapterTestCase
         return new FilesystemAdapter('', $defaultLifetime);
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         self::rmdir(sys_get_temp_dir().'/symfony-cache');
     }

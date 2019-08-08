@@ -97,7 +97,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
         $listener($this->event);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')
             ->disableOriginalConstructor()
@@ -120,7 +120,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
         $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->authenticationManager = null;
         $this->dispatcher = null;

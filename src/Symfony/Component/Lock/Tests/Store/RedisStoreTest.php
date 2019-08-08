@@ -20,7 +20,7 @@ use Symfony\Component\Lock\Store\RedisStore;
  */
 class RedisStoreTest extends AbstractRedisStoreTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!@((new \Redis())->connect(getenv('REDIS_HOST')))) {
             $e = error_get_last();

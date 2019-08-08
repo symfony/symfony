@@ -17,7 +17,7 @@ use Symfony\Component\DomCrawler\FormFieldRegistry;
 
 class FormTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         // Ensure that the private helper class FormFieldRegistry is loaded
         class_exists('Symfony\\Component\\DomCrawler\\Form');

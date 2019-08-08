@@ -16,7 +16,7 @@ namespace Symfony\Component\Cache\Tests\Simple;
  */
 class RedisClusterCacheTest extends AbstractRedisCacheTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!class_exists('RedisCluster')) {
             self::markTestSkipped('The RedisCluster class is required.');

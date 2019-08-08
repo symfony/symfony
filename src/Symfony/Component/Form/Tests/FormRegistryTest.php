@@ -62,7 +62,7 @@ class FormRegistryTest extends TestCase
      */
     private $extension2;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolvedTypeFactory = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeFactory')->getMock();
         $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();

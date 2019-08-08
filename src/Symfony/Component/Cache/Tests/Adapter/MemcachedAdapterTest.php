@@ -23,7 +23,7 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     protected static $client;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!MemcachedAdapter::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');

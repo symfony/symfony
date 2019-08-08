@@ -37,7 +37,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
      */
     abstract protected function createRedisClient(string $host);
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -54,7 +54,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->redisClient = null;
         $this->storage = null;

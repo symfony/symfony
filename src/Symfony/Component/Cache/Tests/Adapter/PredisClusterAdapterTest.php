@@ -13,13 +13,13 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 class PredisClusterAdapterTest extends AbstractRedisAdapterTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setupBeforeClass();
         self::$redis = new \Predis\Client([['host' => getenv('REDIS_HOST')]]);
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         self::$redis = null;
     }

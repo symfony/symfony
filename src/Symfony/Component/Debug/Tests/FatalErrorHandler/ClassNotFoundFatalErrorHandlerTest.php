@@ -19,7 +19,7 @@ use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 
 class ClassNotFoundFatalErrorHandlerTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         foreach (spl_autoload_functions() as $function) {
             if (!\is_array($function)) {

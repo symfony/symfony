@@ -20,7 +20,7 @@ class FileResourceTest extends TestCase
     protected $file;
     protected $time;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->file = sys_get_temp_dir().'/tmp.xml';
         $this->time = time();
@@ -28,7 +28,7 @@ class FileResourceTest extends TestCase
         $this->resource = new FileResource($this->file);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!file_exists($this->file)) {
             return;

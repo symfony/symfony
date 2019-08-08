@@ -26,7 +26,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 {
     private $defaultLocale;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         \Locale::setDefault('en');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

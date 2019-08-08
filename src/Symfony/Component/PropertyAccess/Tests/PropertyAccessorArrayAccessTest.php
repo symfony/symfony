@@ -22,7 +22,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
      */
     protected $propertyAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->propertyAccessor = new PropertyAccessor();
     }

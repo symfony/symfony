@@ -15,12 +15,12 @@ use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
 
 class TextDescriptorTest extends AbstractDescriptorTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         putenv('COLUMNS=121');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         putenv('COLUMNS');
     }

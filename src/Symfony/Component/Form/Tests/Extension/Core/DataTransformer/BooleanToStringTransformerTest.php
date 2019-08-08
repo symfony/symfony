@@ -23,12 +23,12 @@ class BooleanToStringTransformerTest extends TestCase
      */
     protected $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new BooleanToStringTransformer(self::TRUE_VALUE);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->transformer = null;
     }

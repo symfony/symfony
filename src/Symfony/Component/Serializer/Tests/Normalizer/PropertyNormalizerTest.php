@@ -62,7 +62,7 @@ class PropertyNormalizerTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->createNormalizer();
     }

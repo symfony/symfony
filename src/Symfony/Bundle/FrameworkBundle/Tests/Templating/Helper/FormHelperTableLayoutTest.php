@@ -100,7 +100,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         ]);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->engine = null;
 

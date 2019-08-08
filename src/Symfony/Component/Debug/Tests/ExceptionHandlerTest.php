@@ -21,12 +21,12 @@ require_once __DIR__.'/HeaderMock.php';
 
 class ExceptionHandlerTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         testHeader();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         testHeader();
     }

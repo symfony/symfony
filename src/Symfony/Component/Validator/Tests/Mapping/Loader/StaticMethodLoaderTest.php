@@ -20,12 +20,12 @@ class StaticMethodLoaderTest extends TestCase
 {
     private $errorLevel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->errorLevel = error_reporting();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         error_reporting($this->errorLevel);
     }

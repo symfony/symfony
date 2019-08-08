@@ -23,7 +23,7 @@ class LexerTest extends TestCase
      */
     private $lexer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->lexer = new Lexer();
     }

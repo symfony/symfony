@@ -20,7 +20,7 @@ class JsonDecodeTest extends TestCase
     /** @var \Symfony\Component\Serializer\Encoder\JsonDecode */
     private $decode;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->decode = new JsonDecode();
     }

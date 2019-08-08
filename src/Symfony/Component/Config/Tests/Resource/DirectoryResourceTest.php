@@ -18,7 +18,7 @@ class DirectoryResourceTest extends TestCase
 {
     protected $directory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->directory = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
@@ -27,7 +27,7 @@ class DirectoryResourceTest extends TestCase
         touch($this->directory.'/tmp.xml');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!is_dir($this->directory)) {
             return;

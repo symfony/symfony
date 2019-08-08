@@ -29,7 +29,7 @@ class DataUriNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new DataUriNormalizer();
     }

@@ -22,7 +22,7 @@ class ConsensusStrategyTest extends TestCase
     /** @var ConsensusStrategy */
     private $strategy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->strategy = new ConsensusStrategy();
     }

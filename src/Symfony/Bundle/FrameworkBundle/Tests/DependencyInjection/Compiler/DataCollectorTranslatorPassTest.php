@@ -22,7 +22,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     private $container;
     private $dataCollectorTranslatorPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->dataCollectorTranslatorPass = new DataCollectorTranslatorPass();

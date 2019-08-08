@@ -28,7 +28,7 @@ class WorkflowExtensionTest extends TestCase
     private $extension;
     private $t1;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!class_exists(Workflow::class)) {
             $this->markTestSkipped('The Workflow component is needed to run tests for this extension.');

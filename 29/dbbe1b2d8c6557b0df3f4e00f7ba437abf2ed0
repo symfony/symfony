@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-23T19:27:33Z
+
+Maybe we should introduced the method firstly and then deprecate the get and remove the usage, because like this it would be hard to do both in the same PR. cc @ro0NL
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-27T07:02:48Z
+
+I'm against deprecating `get()`. It's one a those function used a lot. We can deprecate the second argument and create a new method for getting all values though.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-27T07:05:30Z
+
+So getValue becames get and we keep getValues.
+I think it's ok too because get is used everywhere in the code base and in project too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-27T07:19:40Z
+
+To be honest, I would prefer to not change anything :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-08T11:50:15Z
+
+I'd like some other opinion here @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-08T11:58:14Z
+
+I'm for keeping get() and make it always return a string (ie deprecate argument `$first`) and adding `getAll($key): array `
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-08T12:02:24Z
+
+Same opinion as @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-08T16:20:24Z
+
+PR Updated
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-08T20:04:23Z
+
+I also think we should give `set` the same treatment as `get` to be consistent and make it use real types.
+- create a `setValues` method
+- only accept string in `set`, i.e. trigger a deprecation for anything but string. this would also solve the `int` problem in https://github.com/symfony/symfony/pull/32122#discussion_r296465733
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-11T05:10:22Z
+
+@Tobion updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-17T20:26:33Z
+
+I'm for closing this PR and the related issue: we have enough open PR and this one provides very little benefit. We're just making everyone loose their time, @simperfit first (thank you btw!)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-17T20:32:20Z
+
+I think this is really important for usability and I'm highly in favor of merging it.

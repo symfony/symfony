@@ -254,12 +254,11 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertTrue($this->isPruned($cache, 'qux'));
     }
 
+    /**
+     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
+     */
     public function testSavingObject()
     {
-        if (\PHP_VERSION_ID >= 70400) {
-            throw new Warning('PHP 7.4 breaks this test, see https://bugs.php.net/78351.');
-        }
-
         parent::testSavingObject();
     }
 

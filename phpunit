@@ -8,8 +8,8 @@ if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     exit(1);
 }
 if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
-    if (\PHP_VERSION_ID >= 70400) {
-        putenv('SYMFONY_PHPUNIT_VERSION=8.2');
+    if (\PHP_VERSION_ID >= 70200) {
+        putenv('SYMFONY_PHPUNIT_VERSION=8.3');
     } elseif (\PHP_VERSION_ID >= 70000) {
         putenv('SYMFONY_PHPUNIT_VERSION=6.5');
     }

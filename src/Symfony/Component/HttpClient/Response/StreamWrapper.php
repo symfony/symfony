@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class StreamWrapper
 {
-    /** @var resource */
+    /** @var resource|string|null */
     public $context;
 
     /** @var HttpClientInterface */
@@ -103,7 +103,7 @@ class StreamWrapper
 
     public function stream_read(int $count)
     {
-        if (null !== $this->content) {
+        if (\is_resource($this->content)) {
             // Empty the internal activity list
             foreach ($this->client->stream([$this->response], 0) as $chunk) {
                 try {
@@ -127,6 +127,19 @@ class StreamWrapper
             }
         }
 
+        if (\is_string($this->content)) {
+            if (\strlen($this->content) <= $count) {
+                $data = $this->content;
+                $this->content = null;
+            } else {
+                $data = substr($this->content, 0, $count);
+                $this->content = substr($this->content, $count);
+            }
+            $this->offset += \strlen($data);
+
+            return $data;
+        }
+
         foreach ($this->client->stream([$this->response]) as $chunk) {
             try {
                 $this->eof = true;
@@ -134,6 +147,12 @@ class StreamWrapper
                 $this->eof = $chunk->isLast();
 
                 if ('' !== $data = $chunk->getContent()) {
+                    if (\strlen($data) > $count) {
+                        if (null === $this->content) {
+                            $this->content = substr($data, $count);
+                        }
+                        $data = substr($data, 0, $count);
+                    }
                     $this->offset += \strlen($data);
 
                     return $data;
@@ -155,12 +174,12 @@ class StreamWrapper
 
     public function stream_eof(): bool
     {
-        return $this->eof;
+        return $this->eof && !\is_string($this->content);
     }
 
     public function stream_seek(int $offset, int $whence = SEEK_SET): bool
     {
-        if (null === $this->content || 0 !== fseek($this->content, 0, SEEK_END)) {
+        if (!\is_resource($this->content) || 0 !== fseek($this->content, 0, SEEK_END)) {
             return false;
         }
 

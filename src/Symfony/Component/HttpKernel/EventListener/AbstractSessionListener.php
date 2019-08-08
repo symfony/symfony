@@ -106,7 +106,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
              *    the one above. But by saving the session before long-running things in the terminate event,
              *    we ensure the session is not blocked longer than needed.
              *  * When regenerating the session ID no locking is involved in PHPs session design. See
-             *    https://bugs.php.net/bug.php?id=61470 for a discussion. So in this case, the session must
+             *    https://bugs.php.net/61470 for a discussion. So in this case, the session must
              *    be saved anyway before sending the headers with the new session ID. Otherwise session
              *    data could get lost again for concurrent requests with the new ID. One result could be
              *    that you get logged out after just logging in.

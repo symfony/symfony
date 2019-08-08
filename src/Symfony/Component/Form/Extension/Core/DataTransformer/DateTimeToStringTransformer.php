@@ -54,7 +54,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
         $this->generateFormat = $this->parseFormat = $format;
 
-        // See http://php.net/manual/en/datetime.createfromformat.php
+        // See https://php.net/datetime.createfromformat
         // The character "|" in the format makes sure that the parts of a date
         // that are *not* specified in the format are reset to the corresponding
         // values from 1970-01-01 00:00:00 instead of the current time.

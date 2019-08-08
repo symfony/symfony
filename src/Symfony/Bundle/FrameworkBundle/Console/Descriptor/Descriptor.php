@@ -129,7 +129,6 @@ abstract class Descriptor implements DescriptorInterface
      * * name: name of described service
      *
      * @param Definition|Alias|object $service
-     * @param array                   $options
      */
     abstract protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null);
 
@@ -173,7 +172,6 @@ abstract class Descriptor implements DescriptorInterface
      * Describes a callable.
      *
      * @param callable $callable
-     * @param array    $options
      */
     abstract protected function describeCallable($callable, array $options = []);
 

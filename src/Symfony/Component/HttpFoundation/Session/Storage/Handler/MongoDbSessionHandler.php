@@ -56,13 +56,10 @@ class MongoDbSessionHandler extends AbstractSessionHandler
      *         { "expireAfterSeconds": 0 }
      *     )
      *
-     * More details on: http://docs.mongodb.org/manual/tutorial/expire-data/
+     * More details on: https://docs.mongodb.org/manual/tutorial/expire-data/
      *
      * If you use such an index, you can drop `gc_probability` to 0 since
      * no garbage-collection is required.
-     *
-     * @param \MongoDB\Client $mongo   A MongoDB\Client instance
-     * @param array           $options An associative array of field options
      *
      * @throws \InvalidArgumentException When "database" or "collection" not provided
      */

@@ -116,7 +116,7 @@ class Response
      * Status codes translation table.
      *
      * The list of codes is complete according to the
-     * {@link http://www.iana.org/assignments/http-status-codes/ Hypertext Transfer Protocol (HTTP) Status Code Registry}
+     * {@link https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml Hypertext Transfer Protocol (HTTP) Status Code Registry}
      * (last updated 2016-03-01).
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
@@ -985,7 +985,7 @@ class Response
      *
      * @return $this
      *
-     * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
+     * @see https://tools.ietf.org/html/rfc2616#section-10.3.5
      *
      * @final
      */
@@ -1087,7 +1087,7 @@ class Response
     /**
      * Is response invalid?
      *
-     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+     * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      *
      * @final
      */

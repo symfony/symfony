@@ -148,8 +148,8 @@ class Process implements \IteratorAggregate
 
         // on Windows, if the cwd changed via chdir(), proc_open defaults to the dir where PHP was started
         // on Gnu/Linux, PHP builds with --enable-maintainer-zts are also affected
-        // @see : https://bugs.php.net/bug.php?id=51800
-        // @see : https://bugs.php.net/bug.php?id=50524
+        // @see : https://bugs.php.net/51800
+        // @see : https://bugs.php.net/50524
         if (null === $this->cwd && (\defined('ZEND_THREAD_SAFE') || '\\' === \DIRECTORY_SEPARATOR)) {
             $this->cwd = getcwd();
         }
@@ -487,7 +487,7 @@ class Process implements \IteratorAggregate
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param int $signal A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @param int $signal A valid POSIX signal (see https://php.net/pcntl.constants)
      *
      * @return $this
      *
@@ -1446,7 +1446,7 @@ class Process implements \IteratorAggregate
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param int  $signal         A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @param int  $signal         A valid POSIX signal (see https://php.net/pcntl.constants)
      * @param bool $throwException Whether to throw exception in case signal failed
      *
      * @return bool True if the signal was sent successfully, false otherwise

@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\SubmitButtonBuilder;
@@ -190,7 +191,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testAddUsingIntegerNameAndType()
     {
-        $child = $this->getBuilder(0)->getForm();
+        $child = $this->getBuilder('0')->getForm();
 
         $this->factory->expects($this->once())
             ->method('createNamed')
@@ -1123,7 +1124,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertNull($this->form->get('bar')->getData());
     }
 
-    protected function createForm($name = 'name', $compound = true)
+    protected function createForm(string $name = 'name', bool $compound = true): FormInterface
     {
         $builder = $this->getBuilder($name);
 

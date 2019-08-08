@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by dFayet at 2019-08-08T07:40:09Z
+
+@jderusse For my culture, in which case do you get a `return null`?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-08-08T07:42:41Z
+
+@dFayet You shouldn't. That's why I removed the `?`
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-08-08T07:45:04Z
+
+I misread your commit  😅 ... have a nice day :-)

@@ -187,7 +187,6 @@ class FormValidator extends ConstraintValidator
      * Post-processes the validation groups option for a given form.
      *
      * @param string|GroupSequence|(string|GroupSequence)[]|callable $groups The validation groups
-     * @param FormInterface                                          $form   The validated form
      *
      * @return (string|GroupSequence)[] The validation groups
      */

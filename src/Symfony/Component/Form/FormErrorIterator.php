@@ -39,7 +39,6 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     private $errors;
 
     /**
-     * @param FormInterface      $form   The erroneous form
      * @param FormError[]|self[] $errors An array of form errors and instances
      *                                   of FormErrorIterator
      *

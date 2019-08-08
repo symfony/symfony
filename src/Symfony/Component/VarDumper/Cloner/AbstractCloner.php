@@ -278,7 +278,6 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Casts an object to an array representation.
      *
-     * @param Stub $stub     The Stub for the casted object
      * @param bool $isNested True if the object is nested in the dumped structure
      *
      * @return array The object casted as array
@@ -338,7 +337,6 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Casts a resource to an array representation.
      *
-     * @param Stub $stub     The Stub for the casted resource
      * @param bool $isNested True if the object is nested in the dumped structure
      *
      * @return array The resource casted as array

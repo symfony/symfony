@@ -52,10 +52,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     private $arrayMutatorPrefixes;
 
     /**
-     * @param DocBlockFactoryInterface $docBlockFactory
-     * @param string[]|null            $mutatorPrefixes
-     * @param string[]|null            $accessorPrefixes
-     * @param string[]|null            $arrayMutatorPrefixes
+     * @param string[]|null $mutatorPrefixes
+     * @param string[]|null $accessorPrefixes
+     * @param string[]|null $arrayMutatorPrefixes
      */
     public function __construct(DocBlockFactoryInterface $docBlockFactory = null, array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
     {

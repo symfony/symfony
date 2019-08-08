@@ -73,8 +73,7 @@ class HttpUtils
     /**
      * Creates a Request.
      *
-     * @param Request $request The current Request instance
-     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return Request A Request instance
      */

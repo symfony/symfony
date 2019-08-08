@@ -31,8 +31,6 @@ class DoctrineTestHelper
     /**
      * Returns an entity manager for testing.
      *
-     * @param Configuration|null $config
-     *
      * @return EntityManager
      */
     public static function createTestEntityManager(Configuration $config = null)

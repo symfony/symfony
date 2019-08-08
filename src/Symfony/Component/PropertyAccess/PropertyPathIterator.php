@@ -21,9 +21,6 @@ class PropertyPathIterator extends \ArrayIterator implements PropertyPathIterato
 {
     protected $path;
 
-    /**
-     * @param PropertyPathInterface $path The property path to traverse
-     */
     public function __construct(PropertyPathInterface $path)
     {
         parent::__construct($path->getElements());

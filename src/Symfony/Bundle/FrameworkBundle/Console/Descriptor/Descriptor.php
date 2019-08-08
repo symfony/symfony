@@ -130,7 +130,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Definition|Alias|object $service
      * @param array                   $options
-     * @param ContainerBuilder|null   $builder
      */
     abstract protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null);
 

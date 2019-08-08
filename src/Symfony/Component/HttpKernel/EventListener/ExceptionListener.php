@@ -47,11 +47,7 @@ class ExceptionListener implements EventSubscriberInterface
         $this->logException($event->getException(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
     }
 
-    /**
-     * @param string                   $eventName
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function onKernelException(ExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event, ?string $eventName, EventDispatcherInterface $eventDispatcher)
     {
         if (null === $this->controller) {
             return;
@@ -59,7 +55,6 @@ class ExceptionListener implements EventSubscriberInterface
 
         $exception = $event->getException();
         $request = $this->duplicateRequest($exception, $event->getRequest());
-        $eventDispatcher = \func_num_args() > 2 ? func_get_arg(2) : null;
 
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
@@ -122,9 +117,6 @@ class ExceptionListener implements EventSubscriberInterface
 
     /**
      * Clones the request for the exception.
-     *
-     * @param \Exception $exception The thrown exception
-     * @param Request    $request   The original request
      */
     protected function duplicateRequest(\Exception $exception, Request $request): Request
     {

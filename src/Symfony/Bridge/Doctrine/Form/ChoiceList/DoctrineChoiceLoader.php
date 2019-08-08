@@ -40,10 +40,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      * passed which optimizes the object loading for one of the Doctrine
      * mapper implementations.
      *
-     * @param ObjectManager              $manager      The object manager
-     * @param string                     $class        The class name of the loaded objects
-     * @param IdReader|null              $idReader     The reader for the object IDs
-     * @param EntityLoaderInterface|null $objectLoader The objects loader
+     * @param string $class The class name of the loaded objects
      */
     public function __construct(ObjectManager $manager, string $class, IdReader $idReader = null, EntityLoaderInterface $objectLoader = null)
     {

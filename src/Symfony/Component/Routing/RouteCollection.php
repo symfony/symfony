@@ -66,9 +66,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
         return \count($this->routes);
     }
 
-    /**
-     * Adds a route.
-     */
     public function add(string $name, Route $route)
     {
         unset($this->routes[$name]);

@@ -33,8 +33,6 @@ class VoteListener implements EventSubscriberInterface
 
     /**
      * Event dispatched by a voter during access manager decision.
-     *
-     * @param VoteEvent $event event with voter data
      */
     public function onVoterVote(VoteEvent $event)
     {

@@ -50,7 +50,6 @@ class DebugHandlersListener implements EventSubscriberInterface
 
     /**
      * @param callable|null                 $exceptionHandler A handler that will be called on Exception
-     * @param LoggerInterface|null          $logger           A PSR-3 logger
      * @param array|int                     $levels           An array map of E_* to LogLevel::* or an integer bit field of E_* constants
      * @param int|null                      $throwAt          Thrown errors in a bit field of E_* constants, or null to keep the current value
      * @param bool                          $scream           Enables/disables screaming mode, where even silenced errors are logged

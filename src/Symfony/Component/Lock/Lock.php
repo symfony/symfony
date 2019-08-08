@@ -37,10 +37,8 @@ final class Lock implements LockInterface, LoggerAwareInterface
     private $dirty = false;
 
     /**
-     * @param Key                      $key         Resource to lock
-     * @param PersistingStoreInterface $store       Store used to handle lock persistence
-     * @param float|null               $ttl         Maximum expected lock duration in seconds
-     * @param bool                     $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
+     * @param float|null $ttl         Maximum expected lock duration in seconds
+     * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
     public function __construct(Key $key, PersistingStoreInterface $store, float $ttl = null, bool $autoRelease = true)
     {

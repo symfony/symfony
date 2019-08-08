@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by tigitz at 2019-07-13T10:17:37Z
+
+I decided at first to skip type-hints on methods throwing `MethodNotImplementedException` anyway.
+
+But since https://github.com/symfony/symfony/pull/32525#pullrequestreview-261529651 was asked I've decided to be consistent through the rest of the codebase:
+https://github.com/symfony/symfony/pull/32525/commits/61576fa505b8100b63a9dc2d6c4fd1944532db20
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-27T06:40:07Z
+
+@tigitz Can you have a look at the remaining comment here? Thank you.
+
+---------------------------------------------------------------------------
+
+by tigitz at 2019-07-28T14:11:27Z
+
+@fabpot yep will do tonight :ok_hand:
+
+---------------------------------------------------------------------------
+
+by tigitz at 2019-08-03T00:25:48Z
+
+Status: Needs Review
+
+@derrabus When you have time ;)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-04T00:27:35Z
+
+It seems almost all classes in intl which are affected here are internal classes, e.g. for polyfill that are not meant to be extended. So we can add type hints in 4.4 to them because we don't need parameter variance from 7.2. What do you think @nicolas-grekas ?
+And we could add return types as well without having to worry.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-07T15:04:18Z
+
+@Tobion I was about to answer yes, but `./src/Symfony/Component/Intl/Resources/stubs/Collator.php` contains a non-internal class, which extends the internal `Collator`. As such we cannot do more in 4.4.

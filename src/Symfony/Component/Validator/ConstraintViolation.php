@@ -32,7 +32,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * Creates a new constraint violation.
      *
-     * @param string      $message         The violation message
+     * @param string      $message         The violation message as a string or a stringable object
      * @param string      $messageTemplate The raw violation message
      * @param array       $parameters      The parameters to substitute in the
      *                                     raw violation message
@@ -47,8 +47,12 @@ class ConstraintViolation implements ConstraintViolationInterface
      * @param string|null $code            The error code of the violation
      * @param mixed       $cause           The cause of the violation
      */
-    public function __construct(string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, string $code = null, Constraint $constraint = null, $cause = null)
+    public function __construct($message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, string $code = null, Constraint $constraint = null, $cause = null)
     {
+        if (!\is_string($message) && !(\is_object($message) && method_exists($message, '__toString'))) {
+            throw new \TypeError('Constraint violation message should be a string or an object which implements the __toString() method.');
+        }
+
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;
         $this->parameters = $parameters;

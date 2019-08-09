@@ -214,6 +214,7 @@ Form
    ```
 
  * The `regions` option was removed from the `TimezoneType`.
+ * Added support for PHPUnit 8. A `void` return-type was added to the `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` methods.
 
 FrameworkBundle
 ---------------
@@ -257,6 +258,7 @@ FrameworkBundle
  * Removed support for `templating` engine in `TemplateController`, use Twig instead
  * Removed `ResolveControllerNameSubscriber`.
  * Removed `routing.loader.service`.
+ * Added support for PHPUnit 8. A `void` return-type was added to the `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` method.
 
 HttpClient
 ----------
@@ -376,6 +378,7 @@ Routing
    Instead of overwriting them, use `__serialize` and `__unserialize` as extension points which are forward compatible
    with the new serialization methods in PHP 7.4.
  * Removed `ServiceRouterLoader` and `ObjectRouteLoader`.
+ * Service route loaders must be tagged with `routing.route_loader`.
 
 Security
 --------
@@ -531,6 +534,7 @@ Validator
  * The `egulias/email-validator` component is now required for using the `Email` constraint in strict mode
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
  * Changed the default value of `Length::$allowEmptyString` to `false` and made it optional
+ * Added support for PHPUnit 8. A `void` return-type was added to the `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` methods.
 
 WebProfilerBundle
 -----------------

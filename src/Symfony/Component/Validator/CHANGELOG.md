@@ -35,6 +35,8 @@ CHANGELOG
    `maxPropertyPath` options
  * added a new `notInRangeMessage` option to the `Range` constraint that will
    be used in the violation builder when both `min` and `max` are not null
+ * added ability to use stringable objects as violation messages
+ * Overriding the methods `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` without the `void` return-type is deprecated.
 
 4.3.0
 -----

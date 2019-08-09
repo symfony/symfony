@@ -30,6 +30,7 @@ CHANGELOG
  * preferred choices are repeated in the list of all choices
  * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
  * The type guesser guesses the HTML accept attribute when a mime type is configured in the File or Image constraint.
+ * Overriding the methods `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` without the `void` return-type is deprecated.
 
 4.3.0
 -----

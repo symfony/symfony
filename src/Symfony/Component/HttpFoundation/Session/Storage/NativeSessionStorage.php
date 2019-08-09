@@ -239,6 +239,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function save()
     {
+        // Store a copy so we can restore the bags in case the session was not left empty
         $session = $_SESSION;
 
         foreach ($this->bags as $bag) {
@@ -264,7 +265,11 @@ class NativeSessionStorage implements SessionStorageInterface
             session_write_close();
         } finally {
             restore_error_handler();
-            $_SESSION = $session;
+
+            // Restore only if not empty
+            if ($_SESSION) {
+                $_SESSION = $session;
+            }
         }
 
         $this->closed = true;

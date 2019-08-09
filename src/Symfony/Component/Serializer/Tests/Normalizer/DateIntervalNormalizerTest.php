@@ -29,6 +29,11 @@ class DateIntervalNormalizerTest extends TestCase
             ['P%yY%mM%dDT%hH%iM', 'P10Y2M3DT16H5M', 'P10Y2M3DT16H5M'],
             ['P%yY%mM%dDT%hH', 'P10Y2M3DT16H', 'P10Y2M3DT16H'],
             ['P%yY%mM%dD', 'P10Y2M3D', 'P10Y2M3DT0H'],
+            ['%RP%yY%mM%dD', '-P10Y2M3D', '-P10Y2M3DT0H'],
+            ['%RP%yY%mM%dD', '+P10Y2M3D', '+P10Y2M3DT0H'],
+            ['%RP%yY%mM%dD', '+P10Y2M3D', 'P10Y2M3DT0H'],
+            ['%rP%yY%mM%dD', '-P10Y2M3D', '-P10Y2M3DT0H'],
+            ['%rP%yY%mM%dD', 'P10Y2M3D', 'P10Y2M3DT0H'],
         ];
 
         return $data;
@@ -50,7 +55,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testNormalizeUsingFormatPassedInContext($format, $output, $input)
     {
-        $this->assertEquals($output, $this->normalizer->normalize(new \DateInterval($input), null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
+        $this->assertEquals($output, $this->normalizer->normalize($this->getInterval($input), null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
     }
 
     /**
@@ -59,7 +64,7 @@ class DateIntervalNormalizerTest extends TestCase
     public function testNormalizeUsingFormatPassedInConstructor($format, $output, $input)
     {
         $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
-        $this->assertEquals($output, $normalizer->normalize(new \DateInterval($input)));
+        $this->assertEquals($output, $normalizer->normalize($this->getInterval($input)));
     }
 
     public function testNormalizeInvalidObjectThrowsException()
@@ -85,7 +90,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testDenormalizeUsingFormatPassedInContext($format, $input, $output)
     {
-        $this->assertDateIntervalEquals(new \DateInterval($output), $this->normalizer->denormalize($input, \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
+        $this->assertDateIntervalEquals($this->getInterval($output), $this->normalizer->denormalize($input, \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
     }
 
     /**
@@ -94,7 +99,7 @@ class DateIntervalNormalizerTest extends TestCase
     public function testDenormalizeUsingFormatPassedInConstructor($format, $input, $output)
     {
         $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
-        $this->assertDateIntervalEquals(new \DateInterval($output), $normalizer->denormalize($input, \DateInterval::class));
+        $this->assertDateIntervalEquals($this->getInterval($output), $normalizer->denormalize($input, \DateInterval::class));
     }
 
     public function testDenormalizeExpectsString()
@@ -125,5 +130,21 @@ class DateIntervalNormalizerTest extends TestCase
     private function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
     {
         $this->assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
+    }
+
+    private function getInterval($data)
+    {
+        if ('-' === $data[0]) {
+            $interval = new \DateInterval(substr($data, 1));
+            $interval->invert = 1;
+
+            return $interval;
+        }
+
+        if ('+' === $data[0]) {
+            return new \DateInterval(substr($data, 1));
+        }
+
+        return new \DateInterval($data);
     }
 }

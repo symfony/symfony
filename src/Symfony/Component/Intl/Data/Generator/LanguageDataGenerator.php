@@ -162,11 +162,16 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
         sort($this->languageCodes);
 
+        $alpha2ToAlpha3 = $this->generateAlpha2ToAlpha3Mapping($metadataBundle);
+        $alpha3ToAlpha2 = array_flip($alpha2ToAlpha3);
+        asort($alpha3ToAlpha2);
+
         return [
             'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
             'Aliases' => array_column(iterator_to_array($metadataBundle['alias']['language']), 'replacement'),
-            'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
+            'Alpha2ToAlpha3' => $alpha2ToAlpha3,
+            'Alpha3ToAlpha2' => $alpha3ToAlpha2,
         ];
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Languages;
 
 /**
@@ -924,5 +925,67 @@ class LanguagesTest extends ResourceBundleTestCase
     {
         $this->assertTrue(Languages::exists('nl'));
         $this->assertFalse(Languages::exists('zxx'));
+    }
+
+    public function testGetAlpha3Codes()
+    {
+        $this->assertSame(self::$alpha2ToAlpha3, Languages::getAlpha3Codes());
+    }
+
+    public function testGetAlpha2Code()
+    {
+        foreach (self::$alpha2ToAlpha3 as $alpha2Code => $alpha3Code) {
+            $this->assertSame($alpha2Code, Languages::getAlpha2Code($alpha3Code));
+        }
+    }
+
+    public function testAlpha3CodeExists()
+    {
+        $this->assertTrue(Languages::alpha3CodeExists('nob'));
+        $this->assertTrue(Languages::alpha3CodeExists('nld'));
+        $this->assertFalse(Languages::alpha3CodeExists('foo'));
+        $this->assertFalse(Languages::alpha3CodeExists('zzz'));
+    }
+
+    /**
+     * @dataProvider provideLocales
+     */
+    public function testGetAlpha3Name($displayLocale)
+    {
+        $names = Languages::getNames($displayLocale);
+
+        foreach ($names as $alpha2 => $name) {
+            $alpha3 = self::$alpha2ToAlpha3[$alpha2] ?? false;
+            if ($alpha3) {
+                $this->assertSame($name, Languages::getAlpha3Name($alpha3, $displayLocale));
+            }
+        }
+    }
+
+    public function testGetAlpha3NameWithInvalidCountryCode()
+    {
+        $this->expectException(MissingResourceException::class);
+
+        Languages::getAlpha3Name('ZZZ');
+    }
+
+    /**
+     * @dataProvider provideLocales
+     */
+    public function testGetAlpha3Names($displayLocale)
+    {
+        $names = Languages::getAlpha3Names($displayLocale);
+
+        $alpha3Codes = array_keys($names);
+        sort($alpha3Codes);
+        $this->assertSame(array_values(self::$alpha2ToAlpha3), $alpha3Codes);
+
+        $alpha2Names = Languages::getNames($displayLocale);
+        foreach ($alpha2Names as $alpha2Code => $name) {
+            if (!isset(self::$alpha2ToAlpha3[$alpha2Code])) {
+                unset($alpha2Names[$alpha2Code]);
+            }
+        }
+        $this->assertSame(array_values($alpha2Names), array_values($names));
     }
 }

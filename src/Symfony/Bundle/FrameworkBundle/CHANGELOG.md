@@ -30,7 +30,9 @@ CHANGELOG
  * Added support for configuring chained cache pools
  * Deprecated booting the kernel before running `WebTestCase::createClient()`
  * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
-
+ * Not tagging service route loaders with `routing.route_loader` has been deprecated.
+ * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
+ 
 4.3.0
 -----
 

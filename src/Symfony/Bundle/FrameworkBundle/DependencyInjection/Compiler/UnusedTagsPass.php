@@ -49,6 +49,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'proxy',
         'routing.expression_language_provider',
         'routing.loader',
+        'routing.route_loader',
         'security.expression_language_provider',
         'security.remember_me_aware',
         'security.voter',

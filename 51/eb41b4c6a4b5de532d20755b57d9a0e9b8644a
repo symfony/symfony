@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-07-09T12:25:54Z
+
+@Toflar The `SessionUtils` was actually introduced in this PR: https://github.com/symfony/symfony/pull/28168
+
+The code was moved from [Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler](https://github.com/symfony/symfony/pull/28168/files#diff-d29419a0d7043fce54a98005c26a82aaL124) to the new `SessionUtils` because the same functionality was needed twice.
+
+This was just a code re-location though, functionally it did not change.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-07-09T12:28:41Z
+
+I see, so should be easy to backport. Not doing that right now, though :) Thanks for the feedback!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-10T08:47:49Z
+
+Any way to move this behind `$session->save();`?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-07-10T09:06:52Z
+
+I was thinking the same. We could, indeed for example by changing `if (null === $cookie) {` to `if (null === $cookie || isset($_COOKIE[$this->sessionName])) {` here: https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/AbstractSessionHandler.php#L127.
+
+However, I was reluctant doing that because `Session::destroy($sessionId)` would then clear a cookie of a `$sessionId` that does not match. So it kind of does something that cannot be expected from the method signature. But then again, one can never have two valid `PHPSESSID` cookies so at this point we know that nobody started the session (= it must be an invalid cookie).
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-07-10T11:32:45Z
+
+In that case we don't even need to check if a cookie was unset at all 🙃
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-07-16T08:54:25Z
+
+Anything I can do here so we can get his fixed @nicolas-grekas?
+Tbh, I would also prefer to fix it in `$session->save()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-17T18:10:13Z
+
+let's do it in `$session->save()`
+session handling is full of global side effects anyway.
+Please add a functional test also, there is some infra in place already do to so.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-07-18T08:44:14Z
+
+Updated the PR. In fact there were already tests that were wrong imho, so I adjusted those 😄
+I also noticed something strange. I have left a `TODO` comment there and commented that line of code separately. Maybe you remember why this was. I did a git blame but seems like this has been in place for ages 😄
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-07-18T09:47:41Z
+
+There we go, that's how I think it should be. Ready for a review 😄
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-07-18T13:07:19Z
+
+Failing tests unrelated.
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2019-07-31T15:38:45Z
+
+Similar to this, I've been trying to fix our listener that removes empty sessions (using 3.4) in https://github.com/elifesciences/journal/pull/1172.
+
+Since this is using `AbstractSessionHandler`, won't touch using mock storages and so functional tests using them?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-09T06:54:16Z
+
+Should probably target 3.4 as this is a bug fix.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-08-09T07:02:06Z
+
+> Regarding Symfony 3.4: Not sure how this is affected because there's not even a `SessionUtils` class so I'd prefer to leave that fix to somebody who feels more comfortable with that code base 😄
+
+I can have a look at it again but I'd still appreciate it if this would be released with the next 4.3 as it is affecting my projects and already didn't make it in the last 4.2 😊
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-09T07:05:28Z
+
+ok, I missed the comment for 3.4. Let's try to do it on 4.3 then.

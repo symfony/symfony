@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by terjebraten-certua at 2019-08-06T13:10:00Z
+
+This a continuation of https://github.com/symfony/symfony/pull/32676
+
+---------------------------------------------------------------------------
+
+by terjebraten-certua at 2019-08-08T10:13:13Z
+
+@derrabus Could you please complete your review?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-08T10:23:59Z
+
+@terjebraten-certua I'm not familiar enough with the component to approve your changes, but I would trust that @ro0NL's review has been thorough. 😃
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by terjebraten-certua at 2019-08-09T08:38:54Z
+
+@fabpot I did all the changes you requested.

@@ -89,7 +89,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testDenormalizeUsingFormatPassedInContext($format, $input, $output)
     {
-        $this->assertDateIntervalEquals($this->getInterval($input), $this->normalizer->denormalize($input, \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
+        $this->assertDateIntervalEquals($this->getInterval($output), $this->normalizer->denormalize($input, \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
     }
 
     /**
@@ -97,7 +97,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testDenormalizeUsingFormatPassedInConstructor($format, $input, $output)
     {
-        $this->assertDateIntervalEquals($this->getInterval($input), (new DateIntervalNormalizer($format))->denormalize($input, \DateInterval::class));
+        $this->assertDateIntervalEquals($this->getInterval($output), (new DateIntervalNormalizer($format))->denormalize($input, \DateInterval::class));
     }
 
     public function testDenormalizeExpectsString()

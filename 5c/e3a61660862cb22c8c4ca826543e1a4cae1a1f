@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by alexpott at 2019-04-12T20:05:45Z
+
+@michaelcullum and I talked a bit around this issue and whether or not we should be pushing for a Stringable pseudo-class in PHP - there are prior discussions - see https://externals.io/message/98424
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-13T09:05:07Z
+
+I am :-1: on making this change as it calls for breaking existing code that do not perform explicit string casts on the returned value of `getMessage()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-13T09:18:50Z
+
+What are the alternatives on your side @alexpott @mdlutz24?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2019-04-17T09:53:40Z
+
+@nicolas-grekas none of them are particularly pretty - https://www.drupal.org/project/drupal/issues/3029540 - we've explored quite a few there.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T10:07:13Z
+
+does the issue affect drupal users directly? (if not i think drupal core should just patch)
+
+e.g. https://github.com/symfony/symfony/blob/59c08eda702b4f07af9b30377ebb10cb55123797/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php#L67-L70
+
+is the issue drupal users do `add/buildViolation(t('message'))` at this point? Is it possible for drupal to provide its own `ExecutionContextInterface`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T19:28:14Z
+
+(please rebase also, on branch 4.4)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-30T19:49:00Z
+
+note in 5.0 there are more typehints that could be blocking still;
+
+https://github.com/symfony/symfony/blob/1f8f4f2011c0fa93515d3141cbbf77a1b88aeb57/src/Symfony/Component/Validator/Context/ExecutionContextInterface.php#L70
+
+https://github.com/symfony/symfony/blob/1f8f4f2011c0fa93515d3141cbbf77a1b88aeb57/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilder.php#L46
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T19:50:44Z
+
+@ro0NL thanks, then let's add `as a string or a stringable object` to all places where this would block lazy messages, in 4.4. IMHO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-08T16:31:05Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by mdlutz24 at 2019-08-08T17:21:29Z
+
+Rebased and squashed

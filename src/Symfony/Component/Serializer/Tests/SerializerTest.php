@@ -98,7 +98,7 @@ class SerializerTest extends TestCase
 
     public function testNormalizeOnDenormalizer()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException('Symfony\Component\Serializer\Exception\LogicException');
         $serializer = new Serializer([new TestDenormalizer()], []);
         $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
     }
@@ -112,7 +112,7 @@ class SerializerTest extends TestCase
 
     public function testDenormalizeOnNormalizer()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException('Symfony\Component\Serializer\Exception\LogicException');
         $serializer = new Serializer([new TestNormalizer()], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $this->assertTrue($serializer->denormalize(json_encode($data), 'stdClass', 'json'));

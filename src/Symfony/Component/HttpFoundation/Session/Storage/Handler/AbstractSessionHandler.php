@@ -124,7 +124,15 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
                 throw new \LogicException(sprintf('Session name cannot be empty, did you forget to call "parent::open()" in "%s"?.', \get_class($this)));
             }
             $cookie = SessionUtils::popSessionCookie($this->sessionName, $sessionId);
-            if (null === $cookie) {
+
+            /*
+             * We send an invalidation Set-Cookie header (zero lifetime)
+             * when either the session was started or a cookie with
+             * the session name was sent by the client (in which case
+             * we know it's invalid as a valid session cookie would've
+             * started the session).
+             */
+            if (null === $cookie || isset($_COOKIE[$this->sessionName])) {
                 if (\PHP_VERSION_ID < 70300) {
                     setcookie($this->sessionName, '', 0, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), filter_var(ini_get('session.cookie_secure'), FILTER_VALIDATE_BOOLEAN), filter_var(ini_get('session.cookie_httponly'), FILTER_VALIDATE_BOOLEAN));
                 } else {

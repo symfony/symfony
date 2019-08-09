@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-15T06:46:33Z
+
+updated
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-15T06:50:58Z
+
+I would trim only when really needed. What makes trimming neeeded in the first place?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-15T07:05:22Z
+
+@fabpot Using a leading backslash will made the `instiateController method fail because it can find the class, according to #30045 (comment), I've update this method to trim when an leading blackslash is passed and to fix this behaviour.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-15T07:10:47Z
+
+You've changed a method that deals with errors, so this looks suspicious to me.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-15T07:24:39Z
+
+Okay I've misread the whole think, was only thinking about the comment, but hey, this is the right fix and I understand why is was deprecated. So maybe the even better fix is to deprecate using backslash like in the first PR that has been closed ;).
+
+WDYT @fabpot ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-09T07:26:30Z
+
+I think I still don't get the problem. Can you explain it to me again? Perhaps with an example?
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2019-08-09T08:55:44Z
+
+IIUC, this PR fixes issues when defining routes like this:
+
+```yaml
+my_route:
+    path: /whatever
+    controller: \App\Controller\DefaultController
+```
+
+Not sure it's really common, but IMO this should be supported anyway

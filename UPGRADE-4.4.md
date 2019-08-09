@@ -84,6 +84,7 @@ Form
  * Using different values for the "model_timezone" and "view_timezone" options of the `TimeType` without configuring a
    reference date is deprecated.
  * Using `int` or `float` as data for the `NumberType` when the `input` option is set to `string` is deprecated.
+ * Overriding the methods `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` without the `void` return-type is deprecated.
 
 FrameworkBundle
 ---------------
@@ -96,7 +97,8 @@ FrameworkBundle
  * The `controller_name_converter` and `resolve_controller_name_subscriber` services have been deprecated.
  * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
  * Not tagging service route loaders with `routing.route_loader` has been deprecated.
-
+ * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
+ 
 HttpClient
 ----------
 
@@ -247,6 +249,7 @@ Validator
    when the `min` option is used.
    Set it to `true` to keep the current behavior and `false` to reject empty strings.
    In 5.0, it'll become optional and will default to `false`.
+ * Overriding the methods `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` without the `void` return-type is deprecated.
 
 WebProfilerBundle
 -----------------

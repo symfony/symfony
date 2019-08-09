@@ -18,6 +18,7 @@ CHANGELOG
  * Removed the `translator.selector` and `session.save_listener` services
  * Removed `SecurityUserValueResolver`, use `UserValueResolver` instead
  * Removed `routing.loader.service`.
+ * Service route loaders must be tagged with `routing.route_loader`. 
 
 4.4.0
 -----

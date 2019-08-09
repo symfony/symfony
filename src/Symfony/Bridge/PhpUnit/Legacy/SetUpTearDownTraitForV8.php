@@ -18,22 +18,30 @@ trait SetUpTearDownTraitForV8
 {
     public static function setUpBeforeClass(): void
     {
+        parent::setUpBeforeClass();
+
         self::doSetUpBeforeClass();
     }
 
     public static function tearDownAfterClass(): void
     {
         self::doTearDownAfterClass();
+
+        parent::tearDownAfterClass();
     }
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         self::doSetUp();
     }
 
     protected function tearDown(): void
     {
         self::doTearDown();
+
+        parent::doTearDown();
     }
 
     private static function doSetUpBeforeClass(): void

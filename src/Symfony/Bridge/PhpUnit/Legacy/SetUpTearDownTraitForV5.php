@@ -21,6 +21,8 @@ trait SetUpTearDownTraitForV5
      */
     public static function setUpBeforeClass()
     {
+        parent::setUpBeforeClass();
+
         self::doSetUpBeforeClass();
     }
 
@@ -30,6 +32,8 @@ trait SetUpTearDownTraitForV5
     public static function tearDownAfterClass()
     {
         self::doTearDownAfterClass();
+
+        parent::doTearDownAfterClass();
     }
 
     /**
@@ -37,6 +41,8 @@ trait SetUpTearDownTraitForV5
      */
     protected function setUp()
     {
+        parent::setUp();
+
         self::doSetUp();
     }
 
@@ -46,6 +52,8 @@ trait SetUpTearDownTraitForV5
     protected function tearDown()
     {
         self::doTearDown();
+
+        parent::tearDown();
     }
 
     private static function doSetUpBeforeClass()

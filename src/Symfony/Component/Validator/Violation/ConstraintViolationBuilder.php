@@ -45,9 +45,10 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     private $cause;
 
     /**
+     * @param string              $message    The error message as a string or a stringable object
      * @param TranslatorInterface $translator
      */
-    public function __construct(ConstraintViolationList $violations, Constraint $constraint, ?string $message, array $parameters, $root, string $propertyPath, $invalidValue, $translator, string $translationDomain = null)
+    public function __construct(ConstraintViolationList $violations, Constraint $constraint, $message, array $parameters, $root, string $propertyPath, $invalidValue, $translator, string $translationDomain = null)
     {
         if (null === $message) {
             @trigger_error(sprintf('Passing a null message when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);

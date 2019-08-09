@@ -20,6 +20,7 @@ CHANGELOG
    `maxPropertyPath` options
  * added a new `notInRangeMessage` option to the `Range` constraint that will
    be used in the violation builder when both `min` and `max` are not null
+ * added ability to use stringable objects as violation messages
 
 4.3.0
 -----

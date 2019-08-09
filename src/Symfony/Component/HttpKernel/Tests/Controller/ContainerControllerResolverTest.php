@@ -119,6 +119,36 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame($service, $controller);
     }
 
+    /**
+     * @dataProvider getControllers
+     */
+    public function testInstantiateControllerWhenControllerStartsWithABackslash($controller)
+    {
+        $service = new ControllerTestService('foo');
+        $class = ControllerTestService::class;
+
+        $container = $this->createMockContainer();
+        $container->expects($this->once())->method('has')->with($class)->willReturn(true);
+        $container->expects($this->once())->method('get')->with($class)->willReturn($service);
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', $controller);
+
+        $controller = $resolver->getController($request);
+
+        $this->assertInstanceOf(ControllerTestService::class, $controller[0]);
+        $this->assertSame('action', $controller[1]);
+    }
+
+    public function getControllers()
+    {
+        return [
+            ['\\'.ControllerTestService::class.'::action'],
+            ['\\'.ControllerTestService::class.':action'],
+        ];
+    }
+
     public function testExceptionWhenUsingRemovedControllerServiceWithClassNameAsName()
     {
         $this->expectException('InvalidArgumentException');

@@ -39,7 +39,7 @@ class LegacyRouteLoaderContainerTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new Container();
         $this->container->set('foo', new \stdClass());

@@ -376,6 +376,7 @@ Routing
    Instead of overwriting them, use `__serialize` and `__unserialize` as extension points which are forward compatible
    with the new serialization methods in PHP 7.4.
  * Removed `ServiceRouterLoader` and `ObjectRouteLoader`.
+ * Service route loaders must be tagged with `routing.route_loader`.
 
 Security
 --------

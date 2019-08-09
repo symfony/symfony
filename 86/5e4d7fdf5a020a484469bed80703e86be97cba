@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by alcaeus at 2019-07-10T18:46:34Z
+
+Invokable entity listeners will definitely be in DoctrineBundle 1.12, so I'm all for merging this PR for consistency 👍
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2019-07-30T21:09:07Z
+
+https://github.com/doctrine/DoctrineBundle/pull/989 has been merged - what's the status here?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-07-30T21:13:46Z
+
+I guess a review / approval would help 😄
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T14:14:35Z
+
+~With the bundle supporting this soon, I'm :-1: here:~ this adds overhead on the critical path of the dispatcher ( a call to `SplObjectHash::offsetGet()`)
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2019-07-31T14:46:34Z
+
+The idea was to support it in both kinds of listeners for consistency. Entity listeners are tracked in DoctrineBundle while this PR covers global Doctrine listeners.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T14:54:47Z
+
+I'm talking with @fancyweb on Slack, getting better insight here :)
+
+I don't think this is really a good idea, as using `__invoke` make things more cryptic. A correctly named method is better. I wouldn't like to open a class and spend more time to discover what it listens too. Yes, local conventions can help but global ones mean broader standardization. Also, having two ways to do something means we're going to have to explain it to ppl. This reasoning applies to doctrine/DoctrineBundle#989 too :)
+
+On the performance side also, please consider my argument: `SplObjectHash::offsetGet` on the critical path is not free. Using a simple+get_class could remove this objection.
+
+But that's only my first reaction, take it as a maybe hint or ignore it :)
+I won't block on this if others think this is still a desired improvement.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-07-31T15:07:32Z
+
+I just changed the implementation to not use SplObjectStorage anymore.
+
+get_class cannot be used because the same listener class can technically be used by 2 different events (one with the "__invoke" method and the other with the "eventName" method) (⚠️ but don't do it).
+
+But let's allow __invoke! It will be coherent with the DoctrineBundle + coherent with the Symfony event dispatcher component.
+
+__invoke will only be a fallback, you don't have to use it. We are not trying to force a new way to do things.
+
+> I wouldn't like to open a class and spend more time to discover what it listens too.
+
+It depends your code structure. If your listener is in a `Doctrine\Listener\LoadClassMetadata` you know what you are listening to.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-07-31T20:22:44Z
+
+I detected a fail in my implementation and had to rework it. The $methods array have now a depth of 2 to store the methods by event and by hash.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-04T15:57:26Z
+
+small rebase needed
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-08-05T12:10:03Z
+
+@nicolas-grekas ✅

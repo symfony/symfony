@@ -29,6 +29,7 @@ class ContainerAwareEventManager extends EventManager
      */
     private $listeners = [];
     private $initialized = [];
+    private $methods = [];
     private $container;
 
     public function __construct(ContainerInterface $container)
@@ -52,7 +53,7 @@ class ContainerAwareEventManager extends EventManager
         }
 
         foreach ($this->listeners[$eventName] as $hash => $listener) {
-            $listener->$eventName($eventArgs);
+            $listener->{$this->methods[$eventName][$hash]}($eventArgs);
         }
     }
 
@@ -91,12 +92,7 @@ class ContainerAwareEventManager extends EventManager
      */
     public function addEventListener($events, $listener)
     {
-        if (\is_string($listener)) {
-            $hash = '_service_'.$listener;
-        } else {
-            // Picks the hash code related to that listener
-            $hash = spl_object_hash($listener);
-        }
+        $hash = $this->getHash($listener);
 
         foreach ((array) $events as $event) {
             // Overrides listener if a previous one was associated already
@@ -105,6 +101,8 @@ class ContainerAwareEventManager extends EventManager
 
             if (\is_string($listener)) {
                 unset($this->initialized[$event]);
+            } else {
+                $this->methods[$event][$hash] = $this->getMethod($listener, $event);
             }
         }
     }
@@ -114,17 +112,16 @@ class ContainerAwareEventManager extends EventManager
      */
     public function removeEventListener($events, $listener)
     {
-        if (\is_string($listener)) {
-            $hash = '_service_'.$listener;
-        } else {
-            // Picks the hash code related to that listener
-            $hash = spl_object_hash($listener);
-        }
+        $hash = $this->getHash($listener);
 
         foreach ((array) $events as $event) {
-            // Check if actually have this listener associated
+            // Check if we actually have this listener associated
             if (isset($this->listeners[$event][$hash])) {
                 unset($this->listeners[$event][$hash]);
+            }
+
+            if (isset($this->methods[$event][$hash])) {
+                unset($this->methods[$event][$hash]);
             }
         }
     }
@@ -133,9 +130,35 @@ class ContainerAwareEventManager extends EventManager
     {
         foreach ($this->listeners[$eventName] as $hash => $listener) {
             if (\is_string($listener)) {
-                $this->listeners[$eventName][$hash] = $this->container->get($listener);
+                $this->listeners[$eventName][$hash] = $listener = $this->container->get($listener);
+
+                $this->methods[$eventName][$hash] = $this->getMethod($listener, $eventName);
             }
         }
         $this->initialized[$eventName] = true;
+    }
+
+    /**
+     * @param string|object $listener
+     */
+    private function getHash($listener): string
+    {
+        if (\is_string($listener)) {
+            return '_service_'.$listener;
+        }
+
+        return spl_object_hash($listener);
+    }
+
+    /**
+     * @param object $listener
+     */
+    private function getMethod($listener, string $event): string
+    {
+        if (!method_exists($listener, $event) && method_exists($listener, '__invoke')) {
+            return '__invoke';
+        }
+
+        return $event;
     }
 }

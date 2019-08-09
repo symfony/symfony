@@ -38,18 +38,6 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($lambda, $controller);
     }
 
-    public function testGetControllerWithStartingBackslash()
-    {
-        $resolver = $this->createControllerResolver();
-
-        $request = Request::create('/');
-        $request->attributes->set('_controller', '\\'.ControllerTest::class.'::publicAction');
-        $controller = $resolver->getController($request);
-
-        $this->assertInstanceOf(ControllerTest::class, $controller[0]);
-        $this->assertSame('publicAction', $controller[1]);
-    }
-
     public function testGetControllerWithObjectAndInvokeMethod()
     {
         $resolver = $this->createControllerResolver();
@@ -78,17 +66,6 @@ class ControllerResolverTest extends TestCase
 
         $request = Request::create('/');
         $request->attributes->set('_controller', [ControllerTest::class, 'publicAction']);
-        $controller = $resolver->getController($request);
-        $this->assertInstanceOf(ControllerTest::class, $controller[0]);
-        $this->assertSame('publicAction', $controller[1]);
-    }
-
-    public function testGetControllerWithClassAndMethodAsArrayWithBackslash()
-    {
-        $resolver = $this->createControllerResolver();
-
-        $request = Request::create('/');
-        $request->attributes->set('_controller', ['\\'.ControllerTest::class, 'publicAction']);
         $controller = $resolver->getController($request);
         $this->assertInstanceOf(ControllerTest::class, $controller[0]);
         $this->assertSame('publicAction', $controller[1]);

@@ -60,7 +60,7 @@ class CollectionConfigurator
      *
      * @return $this
      */
-    final public function prefix($prefix): object
+    final public function prefix($prefix): self
     {
         if (\is_array($prefix)) {
             if (null === $this->parentPrefixes) {

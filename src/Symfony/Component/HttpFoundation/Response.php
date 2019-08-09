@@ -418,7 +418,7 @@ class Response
      *
      * @final
      */
-    public function setProtocolVersion(string $version): object
+    public function setProtocolVersion(string $version): self
     {
         $this->version = $version;
 
@@ -447,7 +447,7 @@ class Response
      *
      * @final
      */
-    public function setStatusCode(int $code, $text = null): object
+    public function setStatusCode(int $code, $text = null): self
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {
@@ -488,7 +488,7 @@ class Response
      *
      * @final
      */
-    public function setCharset(string $charset): object
+    public function setCharset(string $charset): self
     {
         $this->charset = $charset;
 
@@ -569,7 +569,7 @@ class Response
      *
      * @final
      */
-    public function setPrivate(): object
+    public function setPrivate(): self
     {
         $this->headers->removeCacheControlDirective('public');
         $this->headers->addCacheControlDirective('private');
@@ -586,7 +586,7 @@ class Response
      *
      * @final
      */
-    public function setPublic(): object
+    public function setPublic(): self
     {
         $this->headers->addCacheControlDirective('public');
         $this->headers->removeCacheControlDirective('private');
@@ -601,7 +601,7 @@ class Response
      *
      * @final
      */
-    public function setImmutable(bool $immutable = true): object
+    public function setImmutable(bool $immutable = true): self
     {
         if ($immutable) {
             $this->headers->addCacheControlDirective('immutable');
@@ -656,7 +656,7 @@ class Response
      *
      * @final
      */
-    public function setDate(\DateTimeInterface $date): object
+    public function setDate(\DateTimeInterface $date): self
     {
         if ($date instanceof \DateTime) {
             $date = \DateTimeImmutable::createFromMutable($date);
@@ -721,7 +721,7 @@ class Response
      *
      * @final
      */
-    public function setExpires(\DateTimeInterface $date = null): object
+    public function setExpires(\DateTimeInterface $date = null): self
     {
         if (null === $date) {
             $this->headers->remove('Expires');
@@ -774,7 +774,7 @@ class Response
      *
      * @final
      */
-    public function setMaxAge(int $value): object
+    public function setMaxAge(int $value): self
     {
         $this->headers->addCacheControlDirective('max-age', $value);
 
@@ -790,7 +790,7 @@ class Response
      *
      * @final
      */
-    public function setSharedMaxAge(int $value): object
+    public function setSharedMaxAge(int $value): self
     {
         $this->setPublic();
         $this->headers->addCacheControlDirective('s-maxage', $value);
@@ -824,7 +824,7 @@ class Response
      *
      * @final
      */
-    public function setTtl(int $seconds): object
+    public function setTtl(int $seconds): self
     {
         $this->setSharedMaxAge($this->getAge() + $seconds);
 
@@ -840,7 +840,7 @@ class Response
      *
      * @final
      */
-    public function setClientTtl(int $seconds): object
+    public function setClientTtl(int $seconds): self
     {
         $this->setMaxAge($this->getAge() + $seconds);
 
@@ -868,7 +868,7 @@ class Response
      *
      * @final
      */
-    public function setLastModified(\DateTimeInterface $date = null): object
+    public function setLastModified(\DateTimeInterface $date = null): self
     {
         if (null === $date) {
             $this->headers->remove('Last-Modified');
@@ -906,7 +906,7 @@ class Response
      *
      * @final
      */
-    public function setEtag(string $etag = null, bool $weak = false): object
+    public function setEtag(string $etag = null, bool $weak = false): self
     {
         if (null === $etag) {
             $this->headers->remove('Etag');
@@ -932,7 +932,7 @@ class Response
      *
      * @final
      */
-    public function setCache(array $options): object
+    public function setCache(array $options): self
     {
         if ($diff = array_diff(array_keys($options), ['etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public', 'immutable'])) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', $diff)));
@@ -989,7 +989,7 @@ class Response
      *
      * @final
      */
-    public function setNotModified(): object
+    public function setNotModified(): self
     {
         $this->setStatusCode(304);
         $this->setContent(null);
@@ -1041,7 +1041,7 @@ class Response
      *
      * @final
      */
-    public function setVary($headers, bool $replace = true): object
+    public function setVary($headers, bool $replace = true): self
     {
         $this->headers->set('Vary', $headers, $replace);
 

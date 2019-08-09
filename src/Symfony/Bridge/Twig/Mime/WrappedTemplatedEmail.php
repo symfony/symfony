@@ -63,7 +63,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function setSubject(string $subject): object
+    public function setSubject(string $subject): self
     {
         $this->message->subject($subject);
 
@@ -78,7 +78,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function setReturnPath(string $address): object
+    public function setReturnPath(string $address): self
     {
         $this->message->returnPath($address);
 
@@ -93,7 +93,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addFrom(string $address, string $name = null): object
+    public function addFrom(string $address, string $name = null): self
     {
         $this->message->addFrom($name ? new NamedAddress($address, $name) : new Address($address));
 
@@ -111,7 +111,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addReplyTo(string $address): object
+    public function addReplyTo(string $address): self
     {
         $this->message->addReplyTo($address);
 
@@ -129,7 +129,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addTo(string $address, string $name = null): object
+    public function addTo(string $address, string $name = null): self
     {
         $this->message->addTo($name ? new NamedAddress($address, $name) : new Address($address));
 
@@ -147,7 +147,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addCc(string $address, string $name = null): object
+    public function addCc(string $address, string $name = null): self
     {
         $this->message->addCc($name ? new NamedAddress($address, $name) : new Address($address));
 
@@ -165,7 +165,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function addBcc(string $address, string $name = null): object
+    public function addBcc(string $address, string $name = null): self
     {
         $this->message->addBcc($name ? new NamedAddress($address, $name) : new Address($address));
 
@@ -183,7 +183,7 @@ final class WrappedTemplatedEmail
     /**
      * @return $this
      */
-    public function setPriority(int $priority): object
+    public function setPriority(int $priority): self
     {
         $this->message->setPriority($priority);
 

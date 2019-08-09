@@ -64,7 +64,7 @@ final class Headers
      *
      * @return $this
      */
-    public function addMailboxListHeader(string $name, array $addresses): object
+    public function addMailboxListHeader(string $name, array $addresses): self
     {
         return $this->add(new MailboxListHeader($name, Address::createArray($addresses)));
     }
@@ -74,7 +74,7 @@ final class Headers
      *
      * @return $this
      */
-    public function addMailboxHeader(string $name, $address): object
+    public function addMailboxHeader(string $name, $address): self
     {
         return $this->add(new MailboxHeader($name, Address::create($address)));
     }
@@ -84,7 +84,7 @@ final class Headers
      *
      * @return $this
      */
-    public function addIdHeader(string $name, $ids): object
+    public function addIdHeader(string $name, $ids): self
     {
         return $this->add(new IdentificationHeader($name, $ids));
     }
@@ -94,7 +94,7 @@ final class Headers
      *
      * @return $this
      */
-    public function addPathHeader(string $name, $path): object
+    public function addPathHeader(string $name, $path): self
     {
         return $this->add(new PathHeader($name, $path instanceof Address ? $path : new Address($path)));
     }
@@ -102,7 +102,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function addDateHeader(string $name, \DateTimeInterface $dateTime): object
+    public function addDateHeader(string $name, \DateTimeInterface $dateTime): self
     {
         return $this->add(new DateHeader($name, $dateTime));
     }
@@ -110,7 +110,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function addTextHeader(string $name, string $value): object
+    public function addTextHeader(string $name, string $value): self
     {
         return $this->add(new UnstructuredHeader($name, $value));
     }
@@ -118,7 +118,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function addParameterizedHeader(string $name, string $value, array $params = []): object
+    public function addParameterizedHeader(string $name, string $value, array $params = []): self
     {
         return $this->add(new ParameterizedHeader($name, $value, $params));
     }
@@ -131,7 +131,7 @@ final class Headers
     /**
      * @return $this
      */
-    public function add(HeaderInterface $header): object
+    public function add(HeaderInterface $header): self
     {
         static $map = [
             'date' => DateHeader::class,

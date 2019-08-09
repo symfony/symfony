@@ -76,7 +76,6 @@ class DeprecationErrorHandler
         }
 
         self::$utilPrefix = class_exists('PHPUnit_Util_ErrorHandler') ? 'PHPUnit_Util_' : 'PHPUnit\Util\\';
-        self::$isAtLeastPhpUnit83 = method_exists('PHPUnit\Util\ErrorHandler', '__invoke');
 
         $handler = new self();
         $oldErrorHandler = set_error_handler([$handler, 'handleError']);
@@ -318,6 +317,9 @@ class DeprecationErrorHandler
 
     private static function getPhpUnitErrorHandler()
     {
+        if (!isset(self::$isAtLeastPhpUnit83)) {
+            self::$isAtLeastPhpUnit83 = class_exists(ErrorHandler::class) && method_exists(ErrorHandler::class, '__invoke');
+        }
         if (!self::$isAtLeastPhpUnit83) {
             return (class_exists('PHPUnit_Util_ErrorHandler', false) ? 'PHPUnit_Util_' : 'PHPUnit\Util\\').'ErrorHandler::handleError';
         }

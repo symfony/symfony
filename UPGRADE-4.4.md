@@ -85,6 +85,7 @@ Form
    reference date is deprecated.
  * Using `int` or `float` as data for the `NumberType` when the `input` option is set to `string` is deprecated.
  * Overriding the methods `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` without the `void` return-type is deprecated.
+ * Deprecated passing `false` as `$label` to `ChoiceListFactoryInterface::createView`, pass a callable that returns false instead.
 
 FrameworkBundle
 ---------------

@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -350,5 +351,18 @@ class PropertyAccessDecoratorTest extends TestCase
             null, // groups
             new PropertyPath('property')
         ));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing false as $label to Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator::createView is deprecated in Symfony 4.4 and will trigger a TypeError in 5.0, pass a callable that returns false instead.
+     */
+    public function testCreateViewLabelFalseDeprecation()
+    {
+        $this->factory->createView(
+            $this->createMock(ChoiceListInterface::class),
+            null, // preferred choices
+            false // label
+        );
     }
 }

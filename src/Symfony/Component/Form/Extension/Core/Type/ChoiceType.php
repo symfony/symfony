@@ -410,7 +410,8 @@ class ChoiceType extends AbstractType
             $options['choice_label'],
             $options['choice_name'],
             $options['group_by'],
-            $options['choice_attr']
+            $options['choice_attr'],
+            false
         );
     }
 }

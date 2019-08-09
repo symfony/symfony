@@ -215,6 +215,7 @@ Form
 
  * The `regions` option was removed from the `TimezoneType`.
  * Added support for PHPUnit 8. A `void` return-type was added to the `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` methods.
+ * Passing `false` as `$label` to `ChoiceListFactoryInterface::createView` now throws a `TypeError`, pass a callable that returns false instead.
 
 FrameworkBundle
 ---------------

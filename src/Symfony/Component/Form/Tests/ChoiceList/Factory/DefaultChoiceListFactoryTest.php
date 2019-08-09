@@ -658,6 +658,19 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertFlatViewWithAttr($view);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing false as $label to Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory::createView is deprecated in Symfony 4.4 and will trigger a TypeError in 5.0, pass a callable that returns false instead.
+     */
+    public function testCreateViewLabelFalseDeprecation()
+    {
+        $this->factory->createView(
+            $this->list,
+            null, // preferred choices
+            false // label
+        );
+    }
+
     private function assertScalarListWithChoiceValues(ChoiceListInterface $list)
     {
         $this->assertSame(['a', 'b', 'c', 'd'], $list->getValues());

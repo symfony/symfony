@@ -116,8 +116,18 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/* , bool $triggerDeprecation = true */)
     {
+        $triggerDeprecation = 6 >= \func_num_args() || func_get_arg(6);
+
+        if (false === $label) {
+            if ($triggerDeprecation) {
+                @trigger_error(sprintf('Passing false as $label to %s is deprecated in Symfony 4.4 and will trigger a TypeError in 5.0, pass a callable that returns false instead.', __METHOD__), E_USER_DEPRECATED);
+            }
+
+            $label = static function () { return false; };
+        }
+
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.
         $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr]);

@@ -45,20 +45,34 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/* , bool $triggerDeprecation = true */)
     {
+        $triggerDeprecation = 6 >= \func_num_args() || func_get_arg(6);
+
+        if (false === $label) {
+            if ($triggerDeprecation) {
+                @trigger_error(sprintf('Passing false as $label to %s is deprecated in Symfony 4.4 and will trigger a TypeError in 5.0, pass a callable that returns false instead.', __METHOD__), E_USER_DEPRECATED);
+            }
+
+            $label = static function () { return false; };
+        }
+
         $preferredViews = [];
         $preferredViewsOrder = [];
         $otherViews = [];
         $choices = $list->getChoices();
         $keys = $list->getOriginalKeys();
 
-        if (!\is_callable($preferredChoices) && !empty($preferredChoices)) {
-            // make sure we have keys that reflect order
-            $preferredChoices = array_values($preferredChoices);
-            $preferredChoices = static function ($choice) use ($preferredChoices) {
-                return array_search($choice, $preferredChoices, true);
-            };
+        if (!\is_callable($preferredChoices)) {
+            if (empty($preferredChoices)) {
+                $preferredChoices = null;
+            } else {
+                // make sure we have keys that reflect order
+                $preferredChoices = array_values($preferredChoices);
+                $preferredChoices = static function ($choice) use ($preferredChoices) {
+                    return array_search($choice, $preferredChoices, true);
+                };
+            }
         }
 
         // The names are generated from an incrementing integer by default
@@ -76,7 +90,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 self::addChoiceViewsGroupedByCallable(
                     $groupBy,
                     $choice,
-                    (string) $value,
+                    $value,
                     $label,
                     $keys,
                     $index,
@@ -126,7 +140,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ChoiceListView($otherViews, $preferredViews);
     }
 
-    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
+    private static function addChoiceView($choice, string $value, ?callable $label, array $keys, &$index, $attr, ?callable $isPreferred, array &$preferredViews, array &$preferredViewsOrder, array &$otherViews)
     {
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
@@ -137,7 +151,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         if (null === $label) {
             // If the labels are null, use the original choice key by default
             $label = (string) $key;
-        } elseif (false !== $label) {
+        } else {
             // If "choice_label" is set to false and "expanded" is true, the value false
             // should be passed on to the "label" option of the checkboxes/radio buttons
             $dynamicLabel = $label($choice, $key, $value);
@@ -154,7 +168,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         );
 
         // $isPreferred may be null if no choices are preferred
-        if ($isPreferred && false !== $preferredKey = $isPreferred($choice, $key, $value)) {
+        if (null !== $isPreferred && false !== $preferredKey = $isPreferred($choice, $key, $value)) {
             $preferredViews[$nextIndex] = $view;
             $preferredViewsOrder[$nextIndex] = $preferredKey;
         }
@@ -162,7 +176,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         $otherViews[$nextIndex] = $view;
     }
 
-    private static function addChoiceViewsFromStructuredValues($values, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
+    private static function addChoiceViewsFromStructuredValues(array $values, ?callable $label, array $choices, array $keys, &$index, $attr, ?callable $isPreferred, array &$preferredViews, array &$preferredViewsOrder, array &$otherViews)
     {
         foreach ($values as $key => $value) {
             if (null === $value) {
@@ -214,7 +228,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addChoiceViewsGroupedByCallable($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
+    private static function addChoiceViewsGroupedByCallable(callable $groupBy, $choice, string $value, ?callable $label, array $keys, &$index, $attr, ?callable $isPreferred, array &$preferredViews, array &$preferredViewsOrder, array &$otherViews)
     {
         $groupLabels = $groupBy($choice, $keys[$value], $value);
 

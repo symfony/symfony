@@ -128,8 +128,18 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null/* , bool $triggerDeprecation = true */)
     {
+        $triggerDeprecation = 6 >= \func_num_args() || func_get_arg(6);
+
+        if (false === $label) {
+            if ($triggerDeprecation) {
+                @trigger_error(sprintf('Passing false as $label to %s is deprecated in Symfony 4.4 and will trigger a TypeError in 5.0, pass a callable that returns false instead.', __METHOD__), E_USER_DEPRECATED);
+            }
+
+            $label = static function () { return false; };
+        }
+
         $accessor = $this->propertyAccessor;
 
         if (\is_string($label)) {

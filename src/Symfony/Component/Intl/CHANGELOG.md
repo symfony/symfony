@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * excluded language code `root`
+ * added to both `Countries` and `Languages` the methods `getAlpha3Codes`, `getAlpha3Code`, `getAlpha2Code`, `alpha3CodeExists`, `getAlpha3Name` and `getAlpha3Names`
 
 4.3.0
 -----

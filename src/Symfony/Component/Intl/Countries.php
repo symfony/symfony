@@ -39,12 +39,44 @@ final class Countries extends ResourceBundle
     }
 
     /**
-     * @param string $country Alpha2 country code
+     * Returns all available countries (3 letters).
+     *
+     * Countries are returned as uppercase ISO 3166 three-letter country codes.
+     *
+     * This list only contains "officially assigned ISO 3166-1 alpha-3" country codes.
+     *
+     * @return string[] an array of canonical ISO 3166 alpha-3 country codes
      */
-    public static function exists(string $country): bool
+    public static function getAlpha3Codes(): array
+    {
+        return self::readEntry(['Alpha2ToAlpha3'], 'meta');
+    }
+
+    public static function getAlpha3Code(string $alpha2Code): string
+    {
+        return self::readEntry(['Alpha2ToAlpha3', $alpha2Code], 'meta');
+    }
+
+    public static function getAlpha2Code(string $alpha3Code): string
+    {
+        return self::readEntry(['Alpha3ToAlpha2', $alpha3Code], 'meta');
+    }
+
+    public static function exists(string $alpha2Code): bool
     {
         try {
-            self::readEntry(['Names', $country]);
+            self::readEntry(['Names', $alpha2Code]);
+
+            return true;
+        } catch (MissingResourceException $e) {
+            return false;
+        }
+    }
+
+    public static function alpha3CodeExists(string $alpha3Code): bool
+    {
+        try {
+            self::getAlpha2Code($alpha3Code);
 
             return true;
         } catch (MissingResourceException $e) {
@@ -53,13 +85,23 @@ final class Countries extends ResourceBundle
     }
 
     /**
-     * Gets the country name from alpha2 code.
+     * Gets the country name from its alpha2 code.
      *
-     * @throws MissingResourceException if the country code does not exists
+     * @throws MissingResourceException if the country code does not exist
      */
     public static function getName(string $country, string $displayLocale = null): string
     {
         return self::readEntry(['Names', $country], $displayLocale);
+    }
+
+    /**
+     * Gets the country name from its alpha3 code.
+     *
+     * @throws MissingResourceException if the country code does not exist
+     */
+    public static function getAlpha3Name(string $alpha3Code, string $displayLocale = null): string
+    {
+        return self::getName(self::getAlpha2Code($alpha3Code), $displayLocale);
     }
 
     /**
@@ -70,6 +112,24 @@ final class Countries extends ResourceBundle
     public static function getNames($displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
+    }
+
+    /**
+     * Gets the list of country names indexed with alpha3 codes as keys.
+     *
+     * Same as method getNames, but with alpha3 codes instead of alpha2 codes as keys.
+     *
+     * @return string[]
+     */
+    public static function getAlpha3Names($displayLocale = null): array
+    {
+        $alpha2Names = self::getNames($displayLocale);
+        $alpha3Names = [];
+        foreach ($alpha2Names as $alpha2Code => $name) {
+            $alpha3Names[self::getAlpha3Code($alpha2Code)] = $name;
+        }
+
+        return $alpha3Names;
     }
 
     protected static function getPath(): string

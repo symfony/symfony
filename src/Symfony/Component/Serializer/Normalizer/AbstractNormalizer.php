@@ -169,8 +169,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
         if (isset($this->defaultContext[self::CALLBACKS])) {
-            if (!\is_array($this->defaultContext[self::CALLBACKS])) {
-                throw new InvalidArgumentException(sprintf('The "%s" default context option must be an array of callables.', self::CALLBACKS));
+            if (!\is_array($this->defaultContext[self::CALLBACKS]) && !$this->defaultContext[self::CALLBACKS] instanceof \ArrayObject) {
+                throw new InvalidArgumentException(sprintf('The "%s" default context option must be an array or an \ArrayObject of callables.', self::CALLBACKS));
             }
 
             foreach ($this->defaultContext[self::CALLBACKS] as $attribute => $callback) {
@@ -230,7 +230,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws InvalidArgumentException if a non-callable callback is set
      */
-    public function setCallbacks(array $callbacks)
+    public function setCallbacks($callbacks)
     {
         @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "callbacks" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
 

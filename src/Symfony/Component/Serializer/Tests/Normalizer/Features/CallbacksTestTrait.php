@@ -103,6 +103,23 @@ trait CallbacksTestTrait
                 [new CallbacksObject(), new CallbacksObject()],
                 ['bar' => 2],
             ],
+            'Callbacks as ArrayObject' => [
+                new class() extends \ArrayObject {
+                    public function offsetExists($index)
+                    {
+                        return true;
+                    }
+
+                    public function offsetGet($index)
+                    {
+                        return function () use ($index) {
+                            return $index;
+                        };
+                    }
+                },
+                'baz',
+                ['bar' => 'bar'],
+            ],
         ];
     }
 

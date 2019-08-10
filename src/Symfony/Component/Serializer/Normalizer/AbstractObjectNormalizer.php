@@ -144,8 +144,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         if (isset($context[self::CALLBACKS])) {
-            if (!\is_array($context[self::CALLBACKS])) {
-                throw new InvalidArgumentException(sprintf('The "%s" context option must be an array of callables.', self::CALLBACKS));
+            if (!\is_array($context[self::CALLBACKS]) && !$context[self::CALLBACKS] instanceof \ArrayObject) {
+                throw new InvalidArgumentException(sprintf('The "%s" context option must be an array or an \ArrayObject of callables.', self::CALLBACKS));
             }
 
             foreach ($context[self::CALLBACKS] as $attribute => $callback) {

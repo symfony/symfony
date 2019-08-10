@@ -366,9 +366,9 @@ abstract class BaseNode implements NodeInterface
     /**
      * Normalizes the value before any other normalization is applied.
      *
-     * @param $value
+     * @param mixed $value
      *
-     * @return The normalized array value
+     * @return mixed The normalized array value
      */
     protected function preNormalize($value)
     {

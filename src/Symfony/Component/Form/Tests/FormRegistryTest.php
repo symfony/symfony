@@ -210,7 +210,7 @@ class FormRegistryTest extends TestCase
         $this->resolvedTypeFactory
             ->expects($this->any())
             ->method('createResolvedType')
-            ->will($this->returnValue($this->createMock(ResolvedFormTypeInterface::class)));
+            ->willReturn($this->createMock(ResolvedFormTypeInterface::class));
 
         $this->assertTrue($this->registry->hasType('Symfony\Component\Form\Tests\Fixtures\FooType'));
     }

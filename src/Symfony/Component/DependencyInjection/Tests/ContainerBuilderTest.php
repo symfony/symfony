@@ -1288,8 +1288,8 @@ class ContainerBuilderTest extends TestCase
 
     public function testNoClassFromNamespaceClassIdWithLeadingSlash()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Service definition "\Symfony\Component\DependencyInjection\Tests\FooClass" has no class, and its name looks like a FQCN but it starts with a backslash; remove the leading backslash.');
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('The definition for "\Symfony\Component\DependencyInjection\Tests\FooClass" has no class attribute, and appears to reference a class or interface. Please specify the class attribute explicitly or remove the leading backslash by renaming the service to "Symfony\Component\DependencyInjection\Tests\FooClass" to get rid of this error.');
         $container = new ContainerBuilder();
 
         $container->register('\\'.FooClass::class);

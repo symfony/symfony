@@ -28,7 +28,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
 class RegionDataGenerator extends AbstractDataGenerator
 {
     /**
-     * Source https://www.iso.org/obp/ui/#iso:pub:PUB500001:en
+     * Source: https://www.iso.org/obp/ui/#iso:pub:PUB500001:en.
      */
     private static $preferredAlpha2ToAlpha3Mapping = [
         'DE' => 'DEU',

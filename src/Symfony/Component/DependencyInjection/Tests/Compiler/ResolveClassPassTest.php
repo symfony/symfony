@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 
 class ResolveClassPassTest extends TestCase
@@ -56,6 +57,17 @@ class ResolveClassPassTest extends TestCase
         yield [\stdClass::class];
         yield ['bar'];
         yield ['\DateTime'];
+    }
+
+    public function testWontResolveClassFromClassIdWithLeadingBackslash()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Service definition "\App\Some\Service" has no class, and its name looks like a FQCN but it starts with a backslash; remove the leading backslash.');
+
+        $container = new ContainerBuilder();
+        $container->register('\App\Some\Service');
+
+        (new ResolveClassPass())->process($container);
     }
 
     public function testNonFqcnChildDefinition()

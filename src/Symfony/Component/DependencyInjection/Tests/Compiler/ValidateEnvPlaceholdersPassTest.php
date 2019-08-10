@@ -265,7 +265,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension(new ConfigurationWithArrayNodeRequiringOneElement()));
         $container->loadFromExtension('env_extension', []);
-        $container->loadFromExtension('env_extension', []);
 
         $this->doProcess($container);
 

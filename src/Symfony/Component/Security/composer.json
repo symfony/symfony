@@ -35,7 +35,7 @@
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~3.4|~4.0",
-        "symfony/validator": "~3.4|~4.0",
+        "symfony/validator": "^3.4.31|^4.3.4",
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/ldap": "~3.4|~4.0",
         "psr/log": "~1.0"

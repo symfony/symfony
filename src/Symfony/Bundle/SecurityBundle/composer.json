@@ -33,7 +33,7 @@
         "symfony/css-selector": "~3.4|~4.0",
         "symfony/dom-crawler": "~3.4|~4.0",
         "symfony/form": "~3.4|~4.0",
-        "symfony/framework-bundle": "~4.2",
+        "symfony/framework-bundle": "^4.3.4",
         "symfony/http-foundation": "~3.4|~4.0",
         "symfony/translation": "~3.4|~4.0",
         "symfony/twig-bundle": "~4.2",
@@ -50,7 +50,7 @@
         "symfony/browser-kit": "<4.2",
         "symfony/twig-bundle": "<4.2",
         "symfony/var-dumper": "<3.4",
-        "symfony/framework-bundle": "<4.2",
+        "symfony/framework-bundle": "<4.3.4",
         "symfony/console": "<3.4"
     },
     "autoload": {

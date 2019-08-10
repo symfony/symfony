@@ -18,6 +18,7 @@ env:
         - MIN_PHP=5.5.9
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/versions/5.6/bin/php
         - SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1
+        - SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
 
 matrix:
     include:

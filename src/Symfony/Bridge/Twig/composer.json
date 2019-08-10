@@ -47,7 +47,7 @@
     },
     "conflict": {
         "symfony/console": "<3.4",
-        "symfony/form": "<4.3",
+        "symfony/form": "<4.3.4",
         "symfony/http-foundation": "<4.3",
         "symfony/translation": "<4.2",
         "symfony/workflow": "<4.3"

@@ -24,7 +24,7 @@ class FileBag extends ParameterBag
     private static $fileKeys = ['error', 'name', 'size', 'tmp_name', 'type'];
 
     /**
-     * @param array $parameters An array of HTTP files
+     * @param array|UploadedFile[] $parameters An array of HTTP files
      */
     public function __construct(array $parameters = [])
     {

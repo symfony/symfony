@@ -50,15 +50,10 @@ interface AttributeBagInterface extends SessionBagInterface
     /**
      * Returns attributes.
      *
-     * @return array Attributes
+     * @return array
      */
     public function all();
 
-    /**
-     * Sets attributes.
-     *
-     * @param array $attributes Attributes
-     */
     public function replace(array $attributes);
 
     /**

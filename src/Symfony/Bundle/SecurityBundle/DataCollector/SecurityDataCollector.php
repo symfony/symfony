@@ -205,7 +205,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     public function lateCollect()
     {
-        $this->data = $this->cloneVar($this->data);
+        $this->data = $this->cloneVar($this->data, true);
     }
 
     /**

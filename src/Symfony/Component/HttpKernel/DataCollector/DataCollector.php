@@ -60,10 +60,11 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      * the VarDumper component.
      *
      * @param mixed $var
+     * @param bool  $keepType
      *
      * @return Data
      */
-    protected function cloneVar($var)
+    protected function cloneVar($var, $keepType = false)
     {
         if ($var instanceof Data) {
             return $var;
@@ -86,7 +87,17 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
             return $this->valueExporter->exportValue($var);
         }
 
-        return $this->cloner->cloneVar($var);
+        if (!$keepType) {
+            return $this->cloner->cloneVar($var);
+        }
+
+        foreach ($var as $k => &$v) {
+            if (\is_array($v) || is_a($v, \Serializable::class)) {
+                $v = $this->cloner->cloneVar($v);
+            }
+        }
+
+        return $var;
     }
 
     /**

@@ -42,7 +42,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         $this->data['locale'] = $this->translator->getLocale();
         $this->data['fallback_locales'] = $this->translator->getFallbackLocales();
 
-        $this->data = $this->cloneVar($this->data);
+        $this->data = $this->cloneVar($this->data, true);
     }
 
     /**

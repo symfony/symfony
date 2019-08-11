@@ -83,7 +83,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertFalse($collector->isImpersonated());
         $this->assertNull($collector->getImpersonatorUser());
         $this->assertNull($collector->getImpersonationExitPath());
-        $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
+        $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', (string) $collector->getTokenClass());
         $this->assertTrue($collector->supportsRoleHierarchy());
         $this->assertSame($normalizedRoles, $collector->getRoles()->getValue(true));
         $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getValue(true));

@@ -103,7 +103,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
     public function lateCollect()
     {
-        $this->data = $this->cloneVar($this->data);
+        $this->data = $this->cloneVar($this->data, true);
     }
 
     public function getApplicationName()

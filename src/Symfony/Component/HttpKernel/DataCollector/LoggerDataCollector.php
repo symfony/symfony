@@ -68,7 +68,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             $this->data = $this->computeErrorsCount($containerDeprecationLogs);
             $this->data['compiler_logs'] = $this->getContainerCompilerLogs();
             $this->data['logs'] = $this->sanitizeLogs(array_merge($this->logger->getLogs(), $containerDeprecationLogs));
-            $this->data = $this->cloneVar($this->data);
+            $this->data = $this->cloneVar($this->data, true);
         }
     }
 

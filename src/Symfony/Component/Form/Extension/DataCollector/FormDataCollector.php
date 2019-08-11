@@ -238,7 +238,9 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             }
         }
 
-        return serialize($this->cloneVar($this->data));
+        $this->data = $this->cloneVar($this->data, true);
+
+        return serialize($this->data);
     }
 
     /**

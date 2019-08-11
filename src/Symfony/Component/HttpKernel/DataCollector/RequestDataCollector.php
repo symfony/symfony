@@ -154,7 +154,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function lateCollect()
     {
-        $this->data = $this->cloneVar($this->data);
+        $this->data = $this->cloneVar($this->data, true);
     }
 
     public function reset()

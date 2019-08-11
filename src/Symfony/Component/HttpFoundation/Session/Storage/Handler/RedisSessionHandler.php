@@ -62,7 +62,7 @@ class RedisSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
-    protected function doRead($sessionId): string
+    protected function doRead(string $sessionId): string
     {
         return $this->redis->get($this->prefix.$sessionId) ?: '';
     }
@@ -70,7 +70,7 @@ class RedisSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($sessionId, $data): bool
+    protected function doWrite(string $sessionId, string $data): bool
     {
         $result = $this->redis->setEx($this->prefix.$sessionId, (int) ini_get('session.gc_maxlifetime'), $data);
 
@@ -80,7 +80,7 @@ class RedisSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
-    protected function doDestroy($sessionId): bool
+    protected function doDestroy(string $sessionId): bool
     {
         $this->redis->del($this->prefix.$sessionId);
 

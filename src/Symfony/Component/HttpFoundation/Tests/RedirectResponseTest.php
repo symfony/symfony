@@ -62,13 +62,6 @@ class RedirectResponseTest extends TestCase
         $this->assertEquals('baz.beep', $response->getTargetUrl());
     }
 
-    public function testSetTargetUrlNull()
-    {
-        $this->expectException('InvalidArgumentException');
-        $response = new RedirectResponse('foo.bar');
-        $response->setTargetUrl(null);
-    }
-
     public function testCreate()
     {
         $response = RedirectResponse::create('foo', 301);

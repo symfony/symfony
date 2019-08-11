@@ -199,13 +199,6 @@ class NativeSessionStorageTest extends TestCase
         $this->assertSame('200', ini_get('session.cache_expire'));
     }
 
-    public function testSetSaveHandlerException()
-    {
-        $this->expectException('InvalidArgumentException');
-        $storage = $this->getStorage();
-        $storage->setSaveHandler(new \stdClass());
-    }
-
     public function testSetSaveHandler()
     {
         $this->iniSet('session.save_handler', 'files');

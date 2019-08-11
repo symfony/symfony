@@ -43,7 +43,7 @@ class FileBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         if (!\is_array($value) && !$value instanceof UploadedFile) {
             throw new \InvalidArgumentException('An uploaded file must be an array or an instance of UploadedFile.');

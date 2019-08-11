@@ -164,14 +164,11 @@ class UploadedFile extends File
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory The destination folder
-     * @param string $name      The new file name
-     *
      * @return File A File object representing the new file
      *
      * @throws FileException if, for any reason, the file could not have been moved
      */
-    public function move($directory, $name = null)
+    public function move(string $directory, string $name = null)
     {
         if ($this->isValid()) {
             if ($this->test) {

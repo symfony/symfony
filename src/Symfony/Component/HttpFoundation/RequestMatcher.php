@@ -100,7 +100,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param int|null $port The port number to connect to
      */
-    public function matchPort(int $port = null)
+    public function matchPort(?int $port)
     {
         $this->port = $port;
     }

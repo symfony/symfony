@@ -1208,7 +1208,7 @@ class Response
      *
      * @final
      */
-    public static function closeOutputBuffers(int $targetLevel, bool $flush)
+    public static function closeOutputBuffers(int $targetLevel, bool $flush): void
     {
         $status = ob_get_status(true);
         $level = \count($status);
@@ -1230,7 +1230,7 @@ class Response
      *
      * @final
      */
-    protected function ensureIEOverSSLCompatibility(Request $request)
+    protected function ensureIEOverSSLCompatibility(Request $request): void
     {
         if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && 1 == preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) && true === $request->isSecure()) {
             if ((int) preg_replace('/(MSIE )(.*?);/', '$2', $match[0]) < 9) {

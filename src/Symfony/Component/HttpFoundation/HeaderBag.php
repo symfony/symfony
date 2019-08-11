@@ -21,9 +21,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
     protected $headers = [];
     protected $cacheControl = [];
 
-    /**
-     * @param array $headers An array of HTTP headers
-     */
     public function __construct(array $headers = [])
     {
         foreach ($headers as $key => $values) {
@@ -85,8 +82,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Replaces the current HTTP headers by a new set.
-     *
-     * @param array $headers An array of HTTP headers
      */
     public function replace(array $headers = [])
     {
@@ -96,8 +91,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Adds new headers the current HTTP headers set.
-     *
-     * @param array $headers An array of HTTP headers
      */
     public function add(array $headers)
     {
@@ -204,10 +197,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns the HTTP header value converted to a date.
      *
-     * @param string    $key     The parameter key
-     * @param \DateTime $default The default value
+     * @param string $key The parameter key
      *
-     * @return \DateTime|null The parsed DateTime or the default value if the header does not exist
+     * @return \DateTimeInterface|null The parsed DateTime or the default value if the header does not exist
      *
      * @throws \RuntimeException When the HTTP header is not parseable
      */

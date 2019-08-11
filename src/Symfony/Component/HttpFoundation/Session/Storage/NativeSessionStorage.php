@@ -97,7 +97,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * trans_sid_hosts, $_SERVER['HTTP_HOST']
      * trans_sid_tags, "a=href,area=href,frame=src,form="
      *
-     * @param \SessionHandlerInterface|null $handler
+     * @param AbstractProxy|\SessionHandlerInterface|null $handler
      */
     public function __construct(array $options = [], $handler = null, MetadataBag $metaBag = null)
     {
@@ -409,7 +409,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see https://php.net/sessionhandler
      * @see https://github.com/zikula/NativeSession
      *
-     * @param \SessionHandlerInterface|null $saveHandler
+     * @param AbstractProxy|\SessionHandlerInterface|null $saveHandler
      *
      * @throws \InvalidArgumentException
      */

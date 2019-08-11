@@ -36,7 +36,6 @@ class HeaderUtils
      *     HeaderUtils::split("da, en-gb;q=0.8", ",;")
      *     // => ['da'], ['en-gb', 'q=0.8']]
      *
-     * @param string $header     HTTP header value
      * @param string $separators List of characters to split on, ordered by
      *                           precedence, e.g. ",", ";=", or ",;="
      *

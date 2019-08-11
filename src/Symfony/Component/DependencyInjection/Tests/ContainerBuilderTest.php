@@ -1289,6 +1289,16 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
     }
 
+    public function testNoClassFromNamespaceDummyClassIdWithLeadingSlash()
+    {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('The definition for "\\App\\Foo" has no class attribute, and appears to reference a class or interface. Please specify the class attribute explicitly or remove the leading backslash by renaming the service to "App\\Foo" to get rid of this error.');
+        $container = new ContainerBuilder();
+
+        $container->register('\\App\\Foo');
+        $container->compile();
+    }
+
     public function testNoClassFromNonClassId()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');

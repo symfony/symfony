@@ -65,6 +65,14 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                         $id
                     ));
                 }
+                if (preg_match('/^\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)++$/', $id)) {
+                    throw new RuntimeException(sprintf(
+                        'The definition for "%s" has no class attribute, and appears to reference a class or interface. '
+                        .'Please specify the class attribute explicitly or remove the leading backslash by renaming '
+                        .'the service to "%s" to get rid of this error.',
+                        $id, substr($id, 1)
+                    ));
+                }
 
                 throw new RuntimeException(sprintf('The definition for "%s" has no class. If you intend to inject this service dynamically at runtime, please mark it as synthetic=true. If this is an abstract definition solely used by child definitions, please add abstract=true, otherwise specify a class to get rid of this error.', $id));
             }

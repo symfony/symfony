@@ -57,7 +57,7 @@ final class SessionBagProxy implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function initialize(array &$array)
+    public function initialize(array &$array): void
     {
         ++$this->usageIndex;
         $this->data[$this->bag->getStorageKey()] = &$array;

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-09T11:23:43Z
+
+Please revert all return-type changes, we're not ready to do them.

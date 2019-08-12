@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\DataCollector;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * Collects and structures information about forms.
@@ -78,7 +79,7 @@ interface FormDataCollectorInterface extends DataCollectorInterface
     /**
      * Returns all collected data.
      *
-     * @return array
+     * @return array|Data
      */
     public function getData();
 }

@@ -2150,6 +2150,38 @@ YAML;
             $this->parser->parse($yaml)
         );
     }
+
+    public function testParseValueWithUnindentedClosingQuotation()
+    {
+        $expected = ['foo' => ['bar' => 'baz ']];
+
+        // unindented closing single quote
+        $yaml = <<<YAML
+---
+foo:
+    bar: 'baz
+'
+YAML;
+        $this->assertSame($expected, $this->parser->parse($yaml));
+
+        // unindented closing double quote
+        $yaml = <<<YAML
+---
+foo:
+    bar: "baz
+"
+YAML;
+        $this->assertSame($expected, $this->parser->parse($yaml));
+
+        // correctly-indented closing double quote
+        $yaml = <<<YAML
+---
+foo:
+    bar: "baz
+    "
+YAML;
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
 }
 
 class B

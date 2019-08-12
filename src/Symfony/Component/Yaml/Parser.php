@@ -529,8 +529,8 @@ class Parser
             do {
                 $EOF = false;
 
-                // empty and comment-like lines do not influence the indentation depth
-                if ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()) {
+                // empty, quotation mark only, and comment-like lines do not influence the indentation depth
+                if ($this->isCurrentLineEmpty() || $this->isCurrentLineComment() || $this->isCurrentLineQuotationOnly()) {
                     $EOF = !$this->moveToNextLine();
 
                     if (!$EOF) {
@@ -557,7 +557,7 @@ class Parser
         $data = [];
         if ($this->getCurrentLineIndentation() >= $newIndent) {
             $data[] = substr($this->currentLine, $newIndent);
-        } elseif ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()) {
+        } elseif ($this->isCurrentLineEmpty() || $this->isCurrentLineComment() || $this->isCurrentLineQuotationOnly()) {
             $data[] = $this->currentLine;
         } else {
             $this->moveToPreviousLine();
@@ -590,7 +590,7 @@ class Parser
 
             if ($indent >= $newIndent) {
                 $data[] = substr($this->currentLine, $newIndent);
-            } elseif ($this->isCurrentLineComment()) {
+            } elseif ($this->isCurrentLineComment() || $this->isCurrentLineQuotationOnly()) {
                 $data[] = $this->currentLine;
             } elseif (0 == $indent) {
                 $this->moveToPreviousLine();
@@ -914,6 +914,18 @@ class Parser
         $ltrimmedLine = ltrim($this->currentLine, ' ');
 
         return '' !== $ltrimmedLine && '#' === $ltrimmedLine[0];
+    }
+
+    /**
+     * Returns true if the current line contains quotation mark only.
+     *
+     * @return bool Returns true if the current line contains quotation mark only, false otherwise
+     */
+    private function isCurrentLineQuotationOnly(): bool
+    {
+        $trimmedLine = trim($this->currentLine, ' ');
+
+        return strlen($trimmedLine) == 1 && '' !== $trimmedLine && ("'" === $trimmedLine[0] || '"' === $trimmedLine[0]);
     }
 
     private function isCurrentLineLastLineInDocument(): bool

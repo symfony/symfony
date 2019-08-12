@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Fig\Link\Link;
+use Psr\Link\LinkInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -172,7 +172,7 @@ class TestAbstractController extends AbstractController
         return parent::dispatchMessage($message, $stamps);
     }
 
-    public function addLink(Request $request, Link $link): void
+    public function addLink(Request $request, LinkInterface $link): void
     {
         parent::addLink($request, $link);
     }

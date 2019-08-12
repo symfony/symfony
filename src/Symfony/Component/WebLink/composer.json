@@ -15,9 +15,11 @@
             "homepage": "https://symfony.com/contributors"
         }
     ],
+    "provide": {
+        "psr/link-implementation": "1.0"
+    },
     "require": {
         "php": "^7.2.9",
-        "fig/link-util": "^1.0",
         "psr/link": "^1.0"
     },
     "suggest": {

@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

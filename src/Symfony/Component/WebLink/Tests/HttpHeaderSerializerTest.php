@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\WebLink\Tests;
 
-use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\WebLink\Link;
 
 class HttpHeaderSerializerTest extends TestCase
 {

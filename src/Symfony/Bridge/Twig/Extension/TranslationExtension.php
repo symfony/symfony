@@ -68,6 +68,8 @@ class TranslationExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @return TwigFilter[]
      */
     public function getFilters()
     {
@@ -100,6 +102,8 @@ class TranslationExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @return NodeVisitorInterface[]
      */
     public function getNodeVisitors()
     {

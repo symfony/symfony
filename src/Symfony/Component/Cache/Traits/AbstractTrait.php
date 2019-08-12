@@ -82,6 +82,8 @@ trait AbstractTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function hasItem($key)
     {
@@ -104,6 +106,8 @@ trait AbstractTrait
      * {@inheritdoc}
      *
      * @param string $prefix
+     *
+     * @return bool
      */
     public function clear(/*string $prefix = ''*/)
     {
@@ -133,6 +137,8 @@ trait AbstractTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItem($key)
     {
@@ -141,6 +147,8 @@ trait AbstractTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItems(array $keys)
     {

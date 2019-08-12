@@ -58,6 +58,8 @@ class TraceableCache implements Psr16CacheInterface, PruneableInterface, Resetta
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function has($key)
     {
@@ -71,6 +73,8 @@ class TraceableCache implements Psr16CacheInterface, PruneableInterface, Resetta
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function delete($key)
     {
@@ -84,6 +88,8 @@ class TraceableCache implements Psr16CacheInterface, PruneableInterface, Resetta
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -97,6 +103,8 @@ class TraceableCache implements Psr16CacheInterface, PruneableInterface, Resetta
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {
@@ -124,6 +132,8 @@ class TraceableCache implements Psr16CacheInterface, PruneableInterface, Resetta
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -152,6 +162,8 @@ class TraceableCache implements Psr16CacheInterface, PruneableInterface, Resetta
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear()
     {
@@ -165,6 +177,8 @@ class TraceableCache implements Psr16CacheInterface, PruneableInterface, Resetta
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {

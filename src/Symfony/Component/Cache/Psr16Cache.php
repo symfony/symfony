@@ -85,6 +85,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -108,6 +110,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function delete($key)
     {
@@ -122,6 +126,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear()
     {
@@ -130,6 +136,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -178,6 +186,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {
@@ -229,6 +239,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {
@@ -249,6 +261,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function has($key)
     {

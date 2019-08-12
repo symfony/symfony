@@ -31,6 +31,9 @@ class WorkflowExtension extends AbstractExtension
         $this->workflowRegistry = $workflowRegistry;
     }
 
+    /**
+     * @return TwigFunction[]
+     */
     public function getFunctions()
     {
         return [

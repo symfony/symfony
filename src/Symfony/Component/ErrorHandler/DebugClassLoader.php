@@ -67,6 +67,7 @@ class DebugClassLoader
     private $classLoader;
     private $isFinder;
     private $loaded = [];
+    private $compatPatch;
     private static $caseCheck;
     private static $checkedClasses = [];
     private static $final = [];
@@ -84,6 +85,7 @@ class DebugClassLoader
     {
         $this->classLoader = $classLoader;
         $this->isFinder = \is_array($classLoader) && method_exists($classLoader[0], 'findFile');
+        $this->compatPatch = getenv('SYMFONY_PATCH_TYPE_DECLARATIONS_COMPAT') ?: null;
 
         if (!isset(self::$caseCheck)) {
             $file = file_exists(__FILE__) ? __FILE__ : rtrim(realpath('.'), \DIRECTORY_SEPARATOR);
@@ -412,14 +414,18 @@ class DebugClassLoader
             }
 
             if (isset(self::$returnTypes[$class][$method->name]) && !$method->hasReturnType() && !($doc && preg_match('/\n\s+\* @return +(\S+)/', $doc))) {
-                list($returnType, $declaringClass, $declaringFile) = self::$returnTypes[$class][$method->name];
+                list($normalizedType, $returnType, $declaringClass, $declaringFile) = self::$returnTypes[$class][$method->name];
+
+                if (null !== $this->compatPatch && 0 === strpos($class, $this->compatPatch)) {
+                    self::fixReturnStatements($method, $normalizedType);
+                }
 
                 if (strncmp($ns, $declaringClass, $len)) {
-                    //if (0 === strpos($class, 'Symfony\\')) {
-                    //    self::patchMethod($method, $returnType, $declaringFile);
-                    //}
+                    if (null !== $this->compatPatch && 0 === strpos($class, $this->compatPatch)) {
+                        self::patchMethod($method, $returnType, $declaringFile);
+                    }
 
-                    $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $returnType, $class);
+                    $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $normalizedType, $class);
                 }
             }
 
@@ -429,6 +435,10 @@ class DebugClassLoader
 
             if (!$method->hasReturnType() && false !== strpos($doc, '@return') && preg_match('/\n\s+\* @return +(\S+)/', $doc, $matches)) {
                 $this->setReturnType($matches[1], $method, $parent);
+
+                if (null !== $this->compatPatch && 0 === strpos($class, $this->compatPatch)) {
+                    self::fixReturnStatements($method, self::$returnTypes[$class][$method->name][0] ?? '?');
+                }
             }
 
             $finalOrInternal = false;
@@ -456,7 +466,7 @@ class DebugClassLoader
             foreach ($matches as list(, $parameterType, $parameterName)) {
                 if (!isset($definedParameters[$parameterName])) {
                     $parameterType = trim($parameterType);
-                    self::$annotatedParameters[$class][$method->name][$parameterName] = sprintf('The "%%s::%s()" method will require a new "%s$%s" argument in the next major version of its parent class "%s", not defining it is deprecated.', $method->name, $parameterType ? $parameterType.' ' : '', $parameterName, $method->class);
+                    self::$annotatedParameters[$class][$method->name][$parameterName] = sprintf('The "%%s::%s()" method will require a new "%s$%s" argument in the next major version of its parent class "%s", not defining it is deprecated.', $method->name, $parameterType ? $parameterType.' ' : '', $parameterName, $class);
                 }
             }
         }
@@ -596,8 +606,12 @@ class DebugClassLoader
         $nullable = false;
         $typesMap = [];
         foreach (explode('|', $types) as $t) {
-            $t = $this->normalizeType($t, $method->class, $parent);
-            $typesMap[strtolower($t)] = $t;
+            $typesMap[$this->normalizeType($t, $method->class, $parent)] = $t;
+        }
+
+        if (isset($typesMap['array']) && (isset($typesMap['Traversable']) || isset($typesMap['\Traversable']))) {
+            $typesMap['iterable'] = 'array' !== $typesMap['array'] ? $typesMap['array'] : 'iterable';
+            unset($typesMap['array'], $typesMap['Traversable'], $typesMap['\Traversable']);
         }
 
         if (isset($typesMap['array']) && isset($typesMap['iterable'])) {
@@ -630,10 +644,11 @@ class DebugClassLoader
         }
 
         if ($nullable) {
-            $returnType = '?'.$returnType;
+            $normalizedType = '?'.$normalizedType;
+            $returnType .= '|null';
         }
 
-        self::$returnTypes[$method->class][$method->name] = [$returnType, $method->class, $method->getFileName()];
+        self::$returnTypes[$method->class][$method->name] = [$normalizedType, $returnType, $method->class, $method->getFileName()];
     }
 
     private function normalizeType(string $type, string $class, ?string $parent): string
@@ -677,55 +692,70 @@ class DebugClassLoader
         $patchedMethods[$file][$startLine] = true;
         $patchedMethods[$file][0] = $patchedMethods[$file][0] ?? 0;
         $startLine += $patchedMethods[$file][0] - 2;
-        $nullable = '?' === $returnType[0] ? '?' : '';
-        $returnType = ltrim($returnType, '?');
+        $returnType = explode('|', $returnType);
         $code = file($file);
 
-        if (!isset(self::BUILTIN_RETURN_TYPES[$returnType]) && ('\\' !== $returnType[0] || $p = strrpos($returnType, '\\', 1))) {
-            list($namespace, $useOffset, $useMap) = $useStatements[$file] ?? $useStatements[$file] = self::getUseStatements($file);
-
-            if ('\\' !== $returnType[0]) {
-                list($declaringNamespace, , $declaringUseMap) = $useStatements[$declaringFile] ?? $useStatements[$declaringFile] = self::getUseStatements($declaringFile);
-
-                $p = strpos($returnType, '\\', 1);
-                $alias = $p ? substr($returnType, 0, $p) : $returnType;
-
-                if (isset($declaringUseMap[$alias])) {
-                    $returnType = '\\'.$declaringUseMap[$alias].($p ? substr($returnType, $p) : '');
-                } else {
-                    $returnType = '\\'.$declaringNamespace.$returnType;
-                }
-
-                $p = strrpos($returnType, '\\', 1);
+        foreach ($returnType as $i => $type) {
+            if (preg_match('/((?:\[\])+)$/', $type, $m)) {
+                $type = substr($type, 0, -\strlen($m[1]));
+                $format = '%s'.$m[1];
+            } elseif (preg_match('/^(array|iterable)<([^,>]++)>$/', $type, $m)) {
+                $type = $m[2];
+                $format = $m[1].'<%s>';
+            } else {
+                $format = null;
             }
 
-            $alias = substr($returnType, 1 + $p);
-            $returnType = substr($returnType, 1);
+            if (isset(self::SPECIAL_RETURN_TYPES[$type]) || ('\\' === $type[0] && !$p = strrpos($type, '\\', 1))) {
+                continue;
+            }
+
+            list($namespace, $useOffset, $useMap) = $useStatements[$file] ?? $useStatements[$file] = self::getUseStatements($file);
+
+            if ('\\' !== $type[0]) {
+                list($declaringNamespace, , $declaringUseMap) = $useStatements[$declaringFile] ?? $useStatements[$declaringFile] = self::getUseStatements($declaringFile);
+
+                $p = strpos($type, '\\', 1);
+                $alias = $p ? substr($type, 0, $p) : $type;
+
+                if (isset($declaringUseMap[$alias])) {
+                    $type = '\\'.$declaringUseMap[$alias].($p ? substr($type, $p) : '');
+                } else {
+                    $type = '\\'.$declaringNamespace.$type;
+                }
+
+                $p = strrpos($type, '\\', 1);
+            }
+
+            $alias = substr($type, 1 + $p);
+            $type = substr($type, 1);
 
             if (!isset($useMap[$alias]) && (class_exists($c = $namespace.$alias) || interface_exists($c) || trait_exists($c))) {
                 $useMap[$alias] = $c;
             }
 
             if (!isset($useMap[$alias])) {
-                $useStatements[$file][2][$alias] = $returnType;
-                $code[$useOffset] = "use $returnType;\n".$code[$useOffset];
+                $useStatements[$file][2][$alias] = $type;
+                $code[$useOffset] = "use $type;\n".$code[$useOffset];
                 ++$patchedMethods[$file][0];
-            } elseif ($useMap[$alias] !== $returnType) {
+            } elseif ($useMap[$alias] !== $type) {
                 $alias .= 'FIXME';
-                $useStatements[$file][2][$alias] = $returnType;
-                $code[$useOffset] = "use $returnType as $alias;\n".$code[$useOffset];
+                $useStatements[$file][2][$alias] = $type;
+                $code[$useOffset] = "use $type as $alias;\n".$code[$useOffset];
                 ++$patchedMethods[$file][0];
             }
 
-            $returnType = $alias;
+            $returnType[$i] = null !== $format ? sprintf($format, $alias) : $alias;
         }
 
+        $returnType = implode('|', $returnType);
+
         if ($method->getDocComment()) {
-            $code[$startLine] = "     * @return $nullable$returnType\n".$code[$startLine];
+            $code[$startLine] = "     * @return $returnType\n".$code[$startLine];
         } else {
             $code[$startLine] .= <<<EOTXT
     /**
-     * @return $nullable$returnType
+     * @return $returnType
      */
 
 EOTXT;
@@ -776,5 +806,28 @@ EOTXT;
         }
 
         return [$namespace, $useOffset, $useMap];
+    }
+
+    private static function fixReturnStatements(\ReflectionMethod $method, string $returnType)
+    {
+        if (!file_exists($file = $method->getFileName())) {
+            return;
+        }
+
+        $fixedCode = $code = file($file);
+        $end = $method->getEndLine();
+        for ($i = $method->getStartLine(); $i < $end; ++$i) {
+            if ('void' === $returnType) {
+                $fixedCode[$i] = str_replace('    return null;', '    return;', $code[$i]);
+            } elseif ('mixed' === $returnType || '?' === $returnType[0]) {
+                $fixedCode[$i] = str_replace('    return;', '    return null;', $code[$i]);
+            } else {
+                $fixedCode[$i] = str_replace('    return;', "    return $returnType!?;", $code[$i]);
+            }
+        }
+
+        if ($fixedCode !== $code) {
+            file_put_contents($file, $fixedCode);
+        }
     }
 }

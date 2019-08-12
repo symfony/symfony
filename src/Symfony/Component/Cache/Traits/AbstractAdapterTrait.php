@@ -84,6 +84,8 @@ trait AbstractAdapterTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function save(CacheItemInterface $item)
     {
@@ -97,6 +99,8 @@ trait AbstractAdapterTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
     {

@@ -13,6 +13,9 @@ class ArrayCache extends CacheProvider
         return $this->doContains($id) ? $this->data[$id][0] : false;
     }
 
+    /**
+     * @return bool
+     */
     protected function doContains($id)
     {
         if (!isset($this->data[$id])) {
@@ -24,6 +27,9 @@ class ArrayCache extends CacheProvider
         return !$expiry || microtime(true) < $expiry || !$this->doDelete($id);
     }
 
+    /**
+     * @return bool
+     */
     protected function doSave($id, $data, $lifeTime = 0)
     {
         $this->data[$id] = [$data, $lifeTime ? microtime(true) + $lifeTime : false];
@@ -31,6 +37,9 @@ class ArrayCache extends CacheProvider
         return true;
     }
 
+    /**
+     * @return bool
+     */
     protected function doDelete($id)
     {
         unset($this->data[$id]);
@@ -38,6 +47,9 @@ class ArrayCache extends CacheProvider
         return true;
     }
 
+    /**
+     * @return bool
+     */
     protected function doFlush()
     {
         $this->data = [];
@@ -45,6 +57,9 @@ class ArrayCache extends CacheProvider
         return true;
     }
 
+    /**
+     * @return array|null
+     */
     protected function doGetStats()
     {
         return null;

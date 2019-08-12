@@ -87,6 +87,8 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -109,6 +111,8 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function has($key)
     {
@@ -124,6 +128,8 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function delete($key)
     {
@@ -139,6 +145,8 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {
@@ -173,6 +181,8 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -188,6 +198,8 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {

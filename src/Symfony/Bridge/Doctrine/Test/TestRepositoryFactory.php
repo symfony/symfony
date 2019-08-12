@@ -28,6 +28,8 @@ final class TestRepositoryFactory implements RepositoryFactory
 
     /**
      * {@inheritdoc}
+     *
+     * @return ObjectRepository
      */
     public function getRepository(EntityManagerInterface $entityManager, $entityName)
     {

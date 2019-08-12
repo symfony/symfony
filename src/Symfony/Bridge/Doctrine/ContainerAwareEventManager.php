@@ -39,6 +39,8 @@ class ContainerAwareEventManager extends EventManager
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function dispatchEvent($eventName, EventArgs $eventArgs = null)
     {
@@ -59,6 +61,8 @@ class ContainerAwareEventManager extends EventManager
 
     /**
      * {@inheritdoc}
+     *
+     * @return object[][]
      */
     public function getListeners($event = null)
     {
@@ -81,6 +85,8 @@ class ContainerAwareEventManager extends EventManager
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function hasListeners($event)
     {
@@ -89,6 +95,8 @@ class ContainerAwareEventManager extends EventManager
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function addEventListener($events, $listener)
     {
@@ -109,6 +117,8 @@ class ContainerAwareEventManager extends EventManager
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function removeEventListener($events, $listener)
     {

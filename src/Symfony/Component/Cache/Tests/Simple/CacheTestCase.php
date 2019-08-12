@@ -26,6 +26,9 @@ abstract class CacheTestCase extends SimpleCacheTest
         }
     }
 
+    /**
+     * @return array
+     */
     public static function validKeys()
     {
         return array_merge(parent::validKeys(), [["a\0b"]]);

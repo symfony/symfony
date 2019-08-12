@@ -36,6 +36,8 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getKey()
     {
@@ -52,6 +54,8 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function isHit()
     {
@@ -60,6 +64,8 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return static
      */
     public function set($value)
     {
@@ -70,6 +76,8 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return static
      */
     public function expiresAt($expiration)
     {
@@ -86,6 +94,8 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return static
      */
     public function expiresAfter($time)
     {

@@ -96,6 +96,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItems(array $keys)
     {
@@ -108,6 +110,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function save(CacheItemInterface $item)
     {
@@ -139,6 +143,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
     {
@@ -147,6 +153,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function commit()
     {

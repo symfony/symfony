@@ -226,7 +226,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function getData(): array
+    public function getData()
     {
         return $this->data;
     }

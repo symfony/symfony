@@ -90,7 +90,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         $classMetadatas = $this->getMetadata($class);
 
         if (!$classMetadatas) {
-            return;
+            return null;
         }
 
         /** @var ClassMetadataInfo $classMetadata */

@@ -722,7 +722,7 @@ class Process implements \IteratorAggregate
     public function getExitCodeText()
     {
         if (null === $exitcode = $this->getExitCode()) {
-            return;
+            return null;
         }
 
         return isset(self::$exitCodes[$exitcode]) ? self::$exitCodes[$exitcode] : 'Unknown error';

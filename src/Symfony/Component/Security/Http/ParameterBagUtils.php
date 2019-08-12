@@ -45,7 +45,7 @@ final class ParameterBagUtils
         $root = substr($path, 0, $pos);
 
         if (null === $value = $parameters->get($root)) {
-            return;
+            return null;
         }
 
         if (null === self::$propertyAccessor) {
@@ -55,7 +55,7 @@ final class ParameterBagUtils
         try {
             return self::$propertyAccessor->getValue($value, substr($path, $pos));
         } catch (AccessException $e) {
-            return;
+            return null;
         }
     }
 
@@ -80,7 +80,7 @@ final class ParameterBagUtils
         $root = substr($path, 0, $pos);
 
         if (null === $value = $request->get($root)) {
-            return;
+            return null;
         }
 
         if (null === self::$propertyAccessor) {
@@ -90,7 +90,7 @@ final class ParameterBagUtils
         try {
             return self::$propertyAccessor->getValue($value, substr($path, $pos));
         } catch (AccessException $e) {
-            return;
+            return null;
         }
     }
 }

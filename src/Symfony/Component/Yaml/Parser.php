@@ -925,7 +925,7 @@ class Parser
     {
         $trimmedLine = trim($this->currentLine, ' ');
 
-        return strlen($trimmedLine) == 1 && '' !== $trimmedLine && ("'" === $trimmedLine[0] || '"' === $trimmedLine[0]);
+        return 1 == \strlen($trimmedLine) && '' !== $trimmedLine && ("'" === $trimmedLine[0] || '"' === $trimmedLine[0]);
     }
 
     private function isCurrentLineLastLineInDocument(): bool

@@ -12,9 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
 use Psr\Container\ContainerInterface;
+use Psr\Link\LinkInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -33,6 +32,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
+use Symfony\Component\WebLink\GenericLinkProvider;
 
 /**
  * Common features needed in controllers.
@@ -420,7 +420,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function addLink(Request $request, Link $link)
+    protected function addLink(Request $request, LinkInterface $link)
     {
         if (!class_exists(AddLinkHeaderListener::class)) {
             throw new \LogicException('You can not use the "addLink" method if the WebLink component is not available. Try running "composer require symfony/web-link".');

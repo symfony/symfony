@@ -186,6 +186,11 @@ class Request
     protected $defaultLocale = 'en';
 
     /**
+     * @var string
+     */
+    protected $host;
+
+    /**
      * @var array
      */
     protected static $formats;
@@ -1139,6 +1144,10 @@ class Request
      */
     public function getHost()
     {
+        if (null !== $this->host) {
+            return $this->host;
+        }
+
         if ($this->isFromTrustedProxy() && $host = $this->getTrustedValues(self::HEADER_X_FORWARDED_HOST)) {
             $host = $host[0];
         } elseif (!$host = $this->headers->get('HOST')) {
@@ -1156,7 +1165,7 @@ class Request
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         if ($host && '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)) {
             if (!$this->isHostValid) {
-                return '';
+                return $this->host = '';
             }
             $this->isHostValid = false;
 
@@ -1167,26 +1176,26 @@ class Request
             // to avoid host header injection attacks, you should provide a list of trusted host patterns
 
             if (\in_array($host, self::$trustedHosts)) {
-                return $host;
+                return $this->host = $host;
             }
 
             foreach (self::$trustedHostPatterns as $pattern) {
                 if (preg_match($pattern, $host)) {
                     self::$trustedHosts[] = $host;
 
-                    return $host;
+                    return $this->host = $host;
                 }
             }
 
             if (!$this->isHostValid) {
-                return '';
+                return $this->host = '';
             }
             $this->isHostValid = false;
 
             throw new SuspiciousOperationException(sprintf('Untrusted Host "%s".', $host));
         }
 
-        return $host;
+        return $this->host = $host;
     }
 
     /**

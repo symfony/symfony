@@ -230,10 +230,7 @@ class QuestionHelper extends Helper
     /**
      * Autocompletes a question.
      *
-     * @param OutputInterface $output
-     * @param Question        $question
-     * @param resource        $inputStream
-     * @param array           $autocomplete
+     * @param resource $inputStream
      *
      * @return string
      */

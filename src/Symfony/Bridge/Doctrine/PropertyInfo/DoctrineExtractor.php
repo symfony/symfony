@@ -167,8 +167,6 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * Determines whether an association is nullable.
      *
-     * @param array $associationMapping
-     *
      * @return bool
      *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246

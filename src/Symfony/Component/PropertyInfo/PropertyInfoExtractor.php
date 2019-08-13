@@ -92,7 +92,6 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      *
      * @param iterable $extractors
      * @param string   $method
-     * @param array    $arguments
      *
      * @return mixed
      */

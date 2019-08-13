@@ -86,8 +86,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses parameters.
      *
-     * @param \DOMDocument $xml
-     * @param string       $file
+     * @param string $file
      */
     private function parseParameters(\DOMDocument $xml, $file)
     {
@@ -99,8 +98,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses imports.
      *
-     * @param \DOMDocument $xml
-     * @param string       $file
+     * @param string $file
      */
     private function parseImports(\DOMDocument $xml, $file)
     {
@@ -121,8 +119,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses multiple definitions.
      *
-     * @param \DOMDocument $xml
-     * @param string       $file
+     * @param string $file
      */
     private function parseDefinitions(\DOMDocument $xml, $file, $defaults)
     {
@@ -193,9 +190,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses an individual Definition.
      *
-     * @param \DOMElement $service
-     * @param string      $file
-     * @param array       $defaults
+     * @param string $file
      *
      * @return Definition|null
      */
@@ -394,9 +389,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Processes anonymous services.
      *
-     * @param \DOMDocument $xml
-     * @param string       $file
-     * @param array        $defaults
+     * @param string $file
+     * @param array  $defaults
      */
     private function processAnonymousServices(\DOMDocument $xml, $file, $defaults)
     {
@@ -456,10 +450,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Returns arguments as valid php types.
      *
-     * @param \DOMElement $node
-     * @param string      $name
-     * @param string      $file
-     * @param bool        $lowercase
+     * @param string $name
+     * @param string $file
+     * @param bool   $lowercase
      *
      * @return mixed
      */
@@ -546,8 +539,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Get child elements by name.
      *
-     * @param \DOMNode $node
-     * @param mixed    $name
+     * @param mixed $name
      *
      * @return \DOMElement[]
      */
@@ -565,8 +557,6 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Validates a documents XML schema.
-     *
-     * @param \DOMDocument $dom
      *
      * @return bool
      *
@@ -645,8 +635,7 @@ EOF
     /**
      * Validates an alias.
      *
-     * @param \DOMElement $alias
-     * @param string      $file
+     * @param string $file
      */
     private function validateAlias(\DOMElement $alias, $file)
     {
@@ -666,8 +655,7 @@ EOF
     /**
      * Validates an extension.
      *
-     * @param \DOMDocument $dom
-     * @param string       $file
+     * @param string $file
      *
      * @throws InvalidArgumentException When no extension is found corresponding to a tag
      */
@@ -688,8 +676,6 @@ EOF
 
     /**
      * Loads from an extension.
-     *
-     * @param \DOMDocument $xml
      */
     private function loadFromExtensions(\DOMDocument $xml)
     {

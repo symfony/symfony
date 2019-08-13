@@ -38,11 +38,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     private $unresolvedChildren = [];
 
     /**
-     * @param string                   $name
-     * @param string|null              $dataClass
-     * @param EventDispatcherInterface $dispatcher
-     * @param FormFactoryInterface     $factory
-     * @param array                    $options
+     * @param string      $name
+     * @param string|null $dataClass
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = [])
     {

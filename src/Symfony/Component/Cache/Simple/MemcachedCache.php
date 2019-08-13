@@ -20,9 +20,8 @@ class MemcachedCache extends AbstractCache
     protected $maxIdLength = 250;
 
     /**
-     * @param \Memcached $client
-     * @param string     $namespace
-     * @param int        $defaultLifetime
+     * @param string $namespace
+     * @param int    $defaultLifetime
      */
     public function __construct(\Memcached $client, $namespace = '', $defaultLifetime = 0)
     {

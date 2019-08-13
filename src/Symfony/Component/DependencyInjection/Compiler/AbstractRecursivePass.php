@@ -81,8 +81,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @param Definition $definition
-     * @param bool       $required
+     * @param bool $required
      *
      * @return \ReflectionFunctionAbstract|null
      *
@@ -137,8 +136,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @param Definition $definition
-     * @param string     $method
+     * @param string $method
      *
      * @throws RuntimeException
      *

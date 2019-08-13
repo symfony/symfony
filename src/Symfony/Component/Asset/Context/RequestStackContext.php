@@ -25,9 +25,8 @@ class RequestStackContext implements ContextInterface
     private $secure;
 
     /**
-     * @param RequestStack $requestStack
-     * @param string       $basePath
-     * @param bool         $secure
+     * @param string $basePath
+     * @param bool   $secure
      */
     public function __construct(RequestStack $requestStack, $basePath = '', $secure = false)
     {

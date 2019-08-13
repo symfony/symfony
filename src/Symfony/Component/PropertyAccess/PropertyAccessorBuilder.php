@@ -100,8 +100,6 @@ class PropertyAccessorBuilder
     /**
      * Sets a cache system.
      *
-     * @param CacheItemPoolInterface|null $cacheItemPool
-     *
      * @return PropertyAccessorBuilder The builder object
      */
     public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool = null)

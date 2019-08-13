@@ -1650,7 +1650,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Shares a given service in the container.
      *
-     * @param Definition  $definition
      * @param mixed       $service
      * @param string|null $id
      */

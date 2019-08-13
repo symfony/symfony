@@ -202,8 +202,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * operations such as {@link RequestStack::getParentRequest()} can lead to
      * weird results.
      *
-     * @param Request $request
-     * @param int     $type
+     * @param int $type
      */
     private function finishRequest(Request $request, $type)
     {

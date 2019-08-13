@@ -434,8 +434,6 @@ class TextDescriptor extends Descriptor
     }
 
     /**
-     * @param array $config
-     *
      * @return string
      */
     private function formatRouterConfig(array $config)
@@ -494,7 +492,6 @@ class TextDescriptor extends Descriptor
 
     /**
      * @param string $content
-     * @param array  $options
      */
     private function writeText($content, array $options = [])
     {

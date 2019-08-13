@@ -126,7 +126,6 @@ class RedisStore implements StoreInterface
      *
      * @param string $script
      * @param string $resource
-     * @param array  $args
      *
      * @return mixed
      */
@@ -149,8 +148,6 @@ class RedisStore implements StoreInterface
 
     /**
      * Retrieves an unique token for the given key.
-     *
-     * @param Key $key
      *
      * @return string
      */

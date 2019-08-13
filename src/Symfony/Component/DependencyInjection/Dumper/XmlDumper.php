@@ -90,9 +90,8 @@ class XmlDumper extends Dumper
     /**
      * Adds a service.
      *
-     * @param Definition  $definition
-     * @param string      $id
-     * @param \DOMElement $parent
+     * @param Definition $definition
+     * @param string     $id
      */
     private function addService($definition, $id, \DOMElement $parent)
     {
@@ -221,9 +220,7 @@ class XmlDumper extends Dumper
     /**
      * Adds a service alias.
      *
-     * @param string      $alias
-     * @param Alias       $id
-     * @param \DOMElement $parent
+     * @param string $alias
      */
     private function addServiceAlias($alias, Alias $id, \DOMElement $parent)
     {
@@ -261,10 +258,8 @@ class XmlDumper extends Dumper
     /**
      * Converts parameters.
      *
-     * @param array       $parameters
-     * @param string      $type
-     * @param \DOMElement $parent
-     * @param string      $keyAttribute
+     * @param string $type
+     * @param string $keyAttribute
      */
     private function convertParameters(array $parameters, $type, \DOMElement $parent, $keyAttribute = 'key')
     {

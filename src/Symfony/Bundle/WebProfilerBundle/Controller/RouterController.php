@@ -78,8 +78,7 @@ class RouterController
     /**
      * Returns the routing traces associated to the given request.
      *
-     * @param RequestDataCollector $request
-     * @param string               $method
+     * @param string $method
      *
      * @return array
      */

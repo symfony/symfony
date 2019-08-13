@@ -28,12 +28,10 @@ class ServiceReferenceGraphEdge
     private $byConstructor;
 
     /**
-     * @param ServiceReferenceGraphNode $sourceNode
-     * @param ServiceReferenceGraphNode $destNode
-     * @param mixed                     $value
-     * @param bool                      $lazy
-     * @param bool                      $weak
-     * @param bool                      $byConstructor
+     * @param mixed $value
+     * @param bool  $lazy
+     * @param bool  $weak
+     * @param bool  $byConstructor
      */
     public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, $value = null, $lazy = false, $weak = false, $byConstructor = false)
     {

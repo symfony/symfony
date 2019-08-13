@@ -29,8 +29,6 @@ trait MicroKernelTrait
      *
      *     $routes->import('config/routing.yml');
      *     $routes->add('/admin', 'AppBundle:Admin:dashboard', 'admin_dashboard');
-     *
-     * @param RouteCollectionBuilder $routes
      */
     abstract protected function configureRoutes(RouteCollectionBuilder $routes);
 
@@ -50,9 +48,6 @@ trait MicroKernelTrait
      * Or parameters:
      *
      *     $c->setParameter('halloween', 'lot of fun');
-     *
-     * @param ContainerBuilder $c
-     * @param LoaderInterface  $loader
      */
     abstract protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader);
 

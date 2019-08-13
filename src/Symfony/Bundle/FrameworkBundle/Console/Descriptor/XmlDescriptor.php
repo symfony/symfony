@@ -156,7 +156,6 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param Route       $route
      * @param string|null $name
      *
      * @return \DOMDocument
@@ -242,8 +241,7 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param bool             $showPrivate
+     * @param bool $showPrivate
      *
      * @return \DOMDocument
      */
@@ -266,10 +264,9 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param mixed                 $service
-     * @param string                $id
-     * @param ContainerBuilder|null $builder
-     * @param bool                  $showArguments
+     * @param mixed  $service
+     * @param string $id
+     * @param bool   $showArguments
      *
      * @return \DOMDocument
      */
@@ -294,11 +291,10 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param string|null      $tag
-     * @param bool             $showPrivate
-     * @param bool             $showArguments
-     * @param callable         $filter
+     * @param string|null $tag
+     * @param bool        $showPrivate
+     * @param bool        $showArguments
+     * @param callable    $filter
      *
      * @return \DOMDocument
      */
@@ -328,7 +324,6 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param Definition  $definition
      * @param string|null $id
      * @param bool        $omitTags
      *
@@ -452,7 +447,6 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param Alias       $alias
      * @param string|null $id
      *
      * @return \DOMDocument
@@ -490,8 +484,7 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param string|null              $event
+     * @param string|null $event
      *
      * @return \DOMDocument
      */

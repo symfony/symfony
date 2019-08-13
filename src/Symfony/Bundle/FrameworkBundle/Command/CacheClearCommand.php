@@ -42,7 +42,6 @@ class CacheClearCommand extends ContainerAwareCommand
 
     /**
      * @param CacheClearerInterface $cacheClearer
-     * @param Filesystem|null       $filesystem
      */
     public function __construct($cacheClearer = null, Filesystem $filesystem = null)
     {
@@ -267,10 +266,9 @@ EOF
     }
 
     /**
-     * @param KernelInterface $parent
-     * @param string          $namespace
-     * @param string          $parentClass
-     * @param string          $warmupDir
+     * @param string $namespace
+     * @param string $parentClass
+     * @param string $warmupDir
      *
      * @return KernelInterface
      */

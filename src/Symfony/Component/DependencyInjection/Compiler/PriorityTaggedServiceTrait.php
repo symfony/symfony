@@ -31,8 +31,7 @@ trait PriorityTaggedServiceTrait
      * @see https://bugs.php.net/53710
      * @see https://bugs.php.net/60926
      *
-     * @param string           $tagName
-     * @param ContainerBuilder $container
+     * @param string $tagName
      *
      * @return Reference[]
      */

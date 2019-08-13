@@ -1447,7 +1447,7 @@ class Request
     public function isMethodSafe()
     {
         if (\func_num_args() > 0) {
-            @trigger_error(sprintf('Passing arguments to "%s()" has been deprecated since Symfony 4.4; use "%s::isMethodCacheable() to check if the method is cacheable instead."', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing arguments to "%s()" has been deprecated since Symfony 4.4; use "%s::isMethodCacheable()" to check if the method is cacheable instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
         }
 
         return \in_array($this->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE']);

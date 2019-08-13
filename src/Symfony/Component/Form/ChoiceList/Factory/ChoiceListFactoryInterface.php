@@ -78,14 +78,11 @@ interface ChoiceListFactoryInterface
      * attributes that should be added to the respective choice.
      *
      * @param array|callable|null $preferredChoices The preferred choices
-     * @param callable|null       $label            The callable generating the
-     *                                              choice labels
-     * @param callable|null       $index            The callable generating the
-     *                                              view indices
-     * @param callable|null       $groupBy          The callable generating the
-     *                                              group names
-     * @param array|callable|null $attr             The callable generating the
-     *                                              HTML attributes
+     * @param callable|false|null $label            The callable generating the choice labels;
+     *                                              pass false to discard the label
+     * @param callable|null       $index            The callable generating the view indices
+     * @param callable|null       $groupBy          The callable generating the group names
+     * @param array|callable|null $attr             The callable generating the HTML attributes
      *
      * @return ChoiceListView The choice list view
      */

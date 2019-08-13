@@ -482,7 +482,7 @@ class Application implements ResetInterface
         if (!$command->isEnabled()) {
             $command->setApplication(null);
 
-            return;
+            return null;
         }
 
         if (null === $command->getDefinition()) {

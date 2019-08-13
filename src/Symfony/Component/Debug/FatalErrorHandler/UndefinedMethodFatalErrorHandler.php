@@ -32,7 +32,7 @@ class UndefinedMethodFatalErrorHandler implements FatalErrorHandlerInterface
     {
         preg_match('/^Call to undefined method (.*)::(.*)\(\)$/', $error['message'], $matches);
         if (!$matches) {
-            return;
+            return null;
         }
 
         $className = $matches[1];

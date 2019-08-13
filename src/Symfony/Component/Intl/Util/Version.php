@@ -83,7 +83,7 @@ class Version
         }
 
         if (!preg_match('/^'.$pattern.'/', $version, $matches)) {
-            return;
+            return null;
         }
 
         return $matches[0];

@@ -68,7 +68,7 @@ class AppVariable
     /**
      * Returns the current user.
      *
-     * @return mixed
+     * @return object|null
      *
      * @see TokenInterface::getUser()
      */
@@ -79,7 +79,7 @@ class AppVariable
         }
 
         if (!$token = $tokenStorage->getToken()) {
-            return;
+            return null;
         }
 
         $user = $token->getUser();

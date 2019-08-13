@@ -101,7 +101,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @param string $value A value as produced by PHP's date() function
      *
-     * @return \DateTime An instance of \DateTime
+     * @return \DateTime|null An instance of \DateTime
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       or could not be transformed
@@ -109,7 +109,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
     public function reverseTransform($value)
     {
         if (empty($value)) {
-            return;
+            return null;
         }
 
         if (!\is_string($value)) {

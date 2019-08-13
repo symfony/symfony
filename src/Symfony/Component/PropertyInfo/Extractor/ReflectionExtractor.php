@@ -80,7 +80,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         try {
             $reflectionClass = new \ReflectionClass($class);
         } catch (\ReflectionException $e) {
-            return;
+            return null;
         }
 
         $propertyFlags = 0;

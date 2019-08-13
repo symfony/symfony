@@ -40,7 +40,7 @@ class GlobalVariables
     public function getToken()
     {
         if (!$this->container->has('security.token_storage')) {
-            return;
+            return null;
         }
 
         return $this->container->get('security.token_storage')->getToken();

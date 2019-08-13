@@ -78,7 +78,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         /** @var $docBlock DocBlock */
         list($docBlock) = $this->getDocBlock($class, $property);
         if (!$docBlock) {
-            return;
+            return null;
         }
 
         $shortDescription = $docBlock->getSummary();
@@ -104,7 +104,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         /** @var $docBlock DocBlock */
         list($docBlock) = $this->getDocBlock($class, $property);
         if (!$docBlock) {
-            return;
+            return null;
         }
 
         $contents = $docBlock->getDescription()->render();
@@ -120,7 +120,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         /** @var $docBlock DocBlock */
         list($docBlock, $source, $prefix) = $this->getDocBlock($class, $property);
         if (!$docBlock) {
-            return;
+            return null;
         }
 
         switch ($source) {
@@ -146,7 +146,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         if (!isset($types[0])) {
-            return;
+            return null;
         }
 
         if (!\in_array($prefix, $this->arrayMutatorPrefixes)) {

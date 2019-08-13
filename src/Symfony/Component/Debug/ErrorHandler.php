@@ -446,7 +446,7 @@ class ErrorHandler
                 self::$silencedErrorCache[$id][$message] = $errorAsException;
             }
             if (null === $lightTrace) {
-                return;
+                return true;
             }
         } else {
             $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);

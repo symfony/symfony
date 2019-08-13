@@ -29,7 +29,7 @@ interface MimeTypeGuesserInterface
      *
      * @param string $path The path to the file
      *
-     * @return string The mime type or NULL, if none could be guessed
+     * @return string|null The mime type or NULL, if none could be guessed
      *
      * @throws FileNotFoundException If the file does not exist
      * @throws AccessDeniedException If the file could not be read

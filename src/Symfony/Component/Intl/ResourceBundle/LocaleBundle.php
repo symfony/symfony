@@ -43,7 +43,7 @@ class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
         try {
             return $this->getName($locale, $displayLocale);
         } catch (MissingResourceException $e) {
-            return;
+            return null;
         }
     }
 

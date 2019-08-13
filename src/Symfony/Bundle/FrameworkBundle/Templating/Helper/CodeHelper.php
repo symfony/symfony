@@ -126,7 +126,7 @@ class CodeHelper extends Helper
 
                 // Check if the file is an application/octet-stream (eg. Phar file) because highlight_file cannot parse these files
                 if ('application/octet-stream' === $finfo->file($file, FILEINFO_MIME_TYPE)) {
-                    return;
+                    return '';
                 }
             }
 

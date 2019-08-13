@@ -141,8 +141,8 @@ class Container implements ResettableContainerInterface
      * Setting a synthetic service to null resets it: has() returns false and get()
      * behaves in the same way as if the service was never created.
      *
-     * @param string $id      The service identifier
-     * @param object $service The service instance
+     * @param string      $id      The service identifier
+     * @param object|null $service The service instance
      */
     public function set($id, $service)
     {
@@ -210,7 +210,7 @@ class Container implements ResettableContainerInterface
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
      *
-     * @return object The associated service
+     * @return object|null The associated service
      *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
@@ -220,9 +220,15 @@ class Container implements ResettableContainerInterface
      */
     public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
     {
-        return $this->services[$id]
+        $service = $this->services[$id]
             ?? $this->services[$id = $this->aliases[$id] ?? $id]
             ?? ('service_container' === $id ? $this : ($this->factories[$id] ?? [$this, 'make'])($id, $invalidBehavior));
+
+        if (!\is_object($service) && null !== $service) {
+            @trigger_error(sprintf('Non-object services are deprecated since Symfony 4.4, please fix the "%s" service which is of type "%s" right now.', $id, \gettype($service)), E_USER_DEPRECATED);
+        }
+
+        return $service;
     }
 
     /**

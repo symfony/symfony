@@ -487,13 +487,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service.
      *
-     * @param string $id      The service identifier
-     * @param object $service The service instance
+     * @param string      $id      The service identifier
+     * @param object|null $service The service instance
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
     public function set($id, $service)
     {
+        if (!\is_object($service) && null !== $service) {
+            @trigger_error(sprintf('Non-object services are deprecated since Symfony 4.4, setting the "%s" service to a value of type "%s" should be avoided.', $id, \gettype($service)), E_USER_DEPRECATED);
+        }
+
         $id = (string) $id;
 
         if ($this->isCompiled() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
@@ -539,7 +543,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
      *
-     * @return object The associated service
+     * @return object|null The associated service
      *
      * @throws InvalidArgumentException          when no definitions are available
      * @throws ServiceCircularReferenceException When a circular reference is detected
@@ -554,7 +558,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return parent::get($id);
         }
 
-        return $this->doGet($id, $invalidBehavior);
+        $service = $this->doGet($id, $invalidBehavior);
+
+        if (!\is_object($service) && null !== $service) {
+            @trigger_error(sprintf('Non-object services are deprecated since Symfony 4.4, please fix the "%s" service which is of type "%s" right now.', $id, \gettype($service)), E_USER_DEPRECATED);
+        }
+
+        return $service;
     }
 
     private function doGet(string $id, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, array &$inlineServices = null, bool $isConstructorArgument = false)

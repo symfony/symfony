@@ -322,8 +322,8 @@ class ContainerBuilderTest extends TestCase
         $builder->register('bar', 'stdClass');
         $this->assertFalse($builder->hasAlias('bar'));
 
-        $builder->set('foobar', 'stdClass');
-        $builder->set('moo', 'stdClass');
+        $builder->set('foobar', new \stdClass());
+        $builder->set('moo', new \stdClass());
         $this->assertCount(2, $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
     }
 
@@ -1573,16 +1573,17 @@ class ContainerBuilderTest extends TestCase
 
     public function testScalarService()
     {
-        $c = new ContainerBuilder();
-        $c->register('foo', 'string')
-            ->setPublic(true)
+        $container = new ContainerBuilder();
+        $container->register('foo', 'string')
             ->setFactory([ScalarFactory::class, 'getSomeValue'])
         ;
+        $container->register('bar', 'stdClass')
+            ->setProperty('foo', new Reference('foo'))
+            ->setPublic(true)
+        ;
+        $container->compile();
 
-        $c->compile();
-
-        $this->assertTrue($c->has('foo'));
-        $this->assertSame('some value', $c->get('foo'));
+        $this->assertSame('some value', $container->get('bar')->foo);
     }
 
     public function testWither()

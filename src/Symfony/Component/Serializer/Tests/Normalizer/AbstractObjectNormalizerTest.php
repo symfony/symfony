@@ -198,12 +198,25 @@ class AbstractObjectNormalizerTest extends TestCase
             'allow_extra_attributes' => false,
         ]);
     }
+
+    public function testNormalizeEmptyObject()
+    {
+        $normalizer = new AbstractObjectNormalizerDummy();
+
+        // This results in objects turning into arrays in some encoders
+        $normalizedData = $normalizer->normalize(new EmptyDummy());
+        $this->assertEquals([], $normalizedData);
+
+        $normalizedData = $normalizer->normalize(new EmptyDummy(), 'any', ['preserve_empty_objects' => true]);
+        $this->assertEquals(new \ArrayObject(), $normalizedData);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 {
     protected function extractAttributes($object, $format = null, array $context = [])
     {
+        return [];
     }
 
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
@@ -231,6 +244,10 @@ class Dummy
     public $foo;
     public $bar;
     public $baz;
+}
+
+class EmptyDummy
+{
 }
 
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer

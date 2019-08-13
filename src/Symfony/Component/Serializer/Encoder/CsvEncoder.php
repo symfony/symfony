@@ -69,7 +69,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     {
         $handle = fopen('php://temp,', 'w+');
 
-        if (!\is_array($data)) {
+        if (!is_iterable($data)) {
             $data = [[$data]];
         } elseif (empty($data)) {
             $data = [[]];
@@ -210,10 +210,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * Flattens an array and generates keys including the path.
      */
-    private function flatten(array $array, array &$result, string $keySeparator, string $parentKey = '', bool $escapeFormulas = false)
+    private function flatten(iterable $array, array &$result, string $keySeparator, string $parentKey = '', bool $escapeFormulas = false)
     {
         foreach ($array as $key => $value) {
-            if (\is_array($value)) {
+            if (is_iterable($value)) {
                 $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator, $escapeFormulas);
             } else {
                 if ($escapeFormulas && \in_array(substr((string) $value, 0, 1), $this->formulasStartCharacters, true)) {
@@ -245,7 +245,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * @return string[]
      */
-    private function extractHeaders(array $data): array
+    private function extractHeaders(iterable $data): array
     {
         $headers = [];
         $flippedHeaders = [];

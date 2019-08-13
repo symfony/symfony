@@ -918,7 +918,7 @@ class FrameworkExtension extends Extension
         if (null === $config['handler_id']) {
             // If the user set a save_path without using a non-default \SessionHandler, it will silently be ignored
             if (isset($config['save_path'])) {
-                throw new LogicException('Session save path is ignored without a handler service');
+                @trigger_error('Session save path is ignored without a handler service, and deprecated since Symfony 4.4. It will throw a LogicException from Symfony 5.0.', E_USER_DEPRECATED);
             }
 
             // Set the handler class to be null
@@ -926,10 +926,6 @@ class FrameworkExtension extends Extension
             $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
         } else {
             $container->setAlias('session.handler', $config['handler_id'])->setPrivate(true);
-        }
-
-        if (!isset($config['save_path'])) {
-            $config['save_path'] = ini_get('session.save_path');
         }
 
         $container->setParameter('session.save_path', $config['save_path']);

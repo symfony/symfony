@@ -548,9 +548,12 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Session save path is ignored without a handler service, and deprecated since Symfony 4.4. It will throw a LogicException from Symfony 5.0.
+     */
     public function testNullSessionHandlerWithSavePath()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $this->createContainerFromFile('session_savepath');
     }
 

@@ -18,6 +18,8 @@ use Symfony\Component\Form\FormEvent;
  * transforms back the normalized data to the model and view data.
  *
  * It can be used to change data from the normalized representation of the data.
+ *
+ * @final since Symfony 4.4
  */
 class SubmitEvent extends FormEvent
 {

@@ -23,6 +23,8 @@ namespace Symfony\Component\HttpKernel\Event;
  * event.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class ExceptionEvent extends GetResponseForExceptionEvent
 {

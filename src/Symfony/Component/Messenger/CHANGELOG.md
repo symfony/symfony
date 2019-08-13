@@ -8,6 +8,7 @@ CHANGELOG
    pass a `RoutableMessageBus`  instance instead.
  * Added support for auto trimming of Redis streams.
  * `InMemoryTransport` handle acknowledged and rejected messages.
+ * Made all dispatched worker event classes final.
 
 4.3.0
 -----

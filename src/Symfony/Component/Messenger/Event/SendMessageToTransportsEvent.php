@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\Envelope;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-class SendMessageToTransportsEvent
+final class SendMessageToTransportsEvent
 {
     private $envelope;
 

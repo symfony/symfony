@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Envelope;
  *
  * The event name is the class name.
  */
-class WorkerMessageFailedEvent extends AbstractWorkerMessageEvent
+final class WorkerMessageFailedEvent extends AbstractWorkerMessageEvent
 {
     private $throwable;
     private $willRetry;

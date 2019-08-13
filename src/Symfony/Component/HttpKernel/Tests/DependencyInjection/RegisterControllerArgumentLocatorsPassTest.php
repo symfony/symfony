@@ -306,7 +306,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testBindScalarValueToControllerArgument($bindingKey)
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
 
         $container->register('foo', ArgumentWithoutTypeController::class)
             ->setBindings([$bindingKey => '%foo%'])
@@ -317,19 +317,13 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
 
-        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
 
-        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+        $container->compile();
 
-        // assert the locator has a someArg key
-        $arguments = $locator->getArgument(0);
-        $this->assertArrayHasKey('someArg', $arguments);
-        $this->assertInstanceOf(ServiceClosureArgument::class, $arguments['someArg']);
-        // get the Reference that someArg points to
-        $reference = $arguments['someArg']->getValues()[0];
-        // make sure this service *does* exist and returns the correct value
-        $this->assertTrue($container->has((string) $reference));
-        $this->assertSame('foo_val', $container->get((string) $reference));
+        $locator = $container->get($locatorId);
+        $this->assertSame('foo_val', $locator->get('foo::fooAction')->get('someArg'));
     }
 
     public function provideBindScalarValueToControllerArgument()

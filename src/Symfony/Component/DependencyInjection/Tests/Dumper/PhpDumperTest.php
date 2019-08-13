@@ -1282,10 +1282,12 @@ class PhpDumperTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'string')
-            ->setPublic(true)
             ->setFactory([ScalarFactory::class, 'getSomeValue'])
         ;
-
+        $container->register('bar', 'stdClass')
+            ->setProperty('foo', new Reference('foo'))
+            ->setPublic(true)
+        ;
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -1293,8 +1295,7 @@ class PhpDumperTest extends TestCase
 
         $container = new \Symfony_DI_PhpDumper_Test_Scalar_Service();
 
-        $this->assertTrue($container->has('foo'));
-        $this->assertSame('some value', $container->get('foo'));
+        $this->assertSame('some value', $container->get('bar')->foo);
     }
 
     public function testWither()

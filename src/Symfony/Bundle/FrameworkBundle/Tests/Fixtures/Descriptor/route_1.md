@@ -5,11 +5,11 @@
 - Scheme: http|https
 - Method: GET|HEAD
 - Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub
-- Defaults: 
+- Defaults:
     - `name`: Joseph
-- Requirements: 
+- Requirements:
     - `name`: [a-z]+
-- Options: 
+- Options:
     - `compiler_class`: Symfony\Component\Routing\RouteCompiler
     - `opt1`: val1
     - `opt2`: val2

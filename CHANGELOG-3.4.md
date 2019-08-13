@@ -257,7 +257,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #29355 [PropertyAccess] calculate cache keys for property setters depending on the value (xabbuh)
  * bug #29369 [DI] fix combinatorial explosion when analyzing the service graph (nicolas-grekas)
  * bug #29349 [Debug] workaround opcache bug mutating "$this" !?! (nicolas-grekas)
- 
+
 * 3.4.19 (2018-11-26)
 
  * bug #29318 [Console] Move back root exception to stack trace in verbose mode (chalasr)

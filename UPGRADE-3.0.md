@@ -595,7 +595,7 @@ UPGRADE FROM 2.x to 3.0
       }
    }
    ```
-   
+
    If the form is submitted with a different request method than `POST`, you need to configure this in the form:
 
    Before:

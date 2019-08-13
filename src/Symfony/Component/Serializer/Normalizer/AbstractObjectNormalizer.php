@@ -88,6 +88,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public const DEEP_OBJECT_TO_POPULATE = 'deep_object_to_populate';
 
+    public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
+
     private $propertyTypeExtractor;
     private $typesCache = [];
     private $attributesCache = [];
@@ -197,6 +199,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute, $format)), $class, $format, $context);
+        }
+
+        if (isset($context[self::PRESERVE_EMPTY_OBJECTS]) && !\count($data)) {
+            return new \ArrayObject();
         }
 
         return $data;

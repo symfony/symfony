@@ -4,7 +4,6 @@ CHANGELOG
 5.0.0
 -----
 
- * added the `getPublicDir()` method to `BundleInterface`.
  * removed the first and second constructor argument of `ConfigDataCollector` 
  * removed `ConfigDataCollector::getApplicationName()` 
  * removed `ConfigDataCollector::getApplicationVersion()`
@@ -27,9 +26,8 @@ CHANGELOG
 4.4.0
 -----
 
- * Implementing the `BundleInterface` without implementing the `getPublicDir()` method is deprecated.
-   This method will be added to the interface in 5.0.
  * The `DebugHandlersListener` class has been marked as `final`
+ * Added new Bundle directory convention consistent with standard skeletons
 
 4.3.0
 -----

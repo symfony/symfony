@@ -126,7 +126,7 @@ EOF
             // otherwise, both '____.locale.xlf' and 'locale.____.xlf' are allowed
             // also, the regexp matching must be case-insensitive, as defined for 'target-language' values
             // http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#target-language
-            $expectedFilenamePattern = $this->requireStrictFileNames ? sprintf('/^.*\.(?i:%s)\.xlf/', $normalizedLocale) : sprintf('/^(.*\.(?i:%s)\.xlf|(?i:%s)\..*\.xlf)/', $normalizedLocale, $normalizedLocale);
+            $expectedFilenamePattern = $this->requireStrictFileNames ? sprintf('/^.*\.(?i:%s)\.(?:xlf|xliff)/', $normalizedLocale) : sprintf('/^(?:.*\.(?i:%s)|(?i:%s)\..*)\.(?:xlf|xliff)/', $normalizedLocale, $normalizedLocale);
 
             if (0 === preg_match($expectedFilenamePattern, basename($file))) {
                 $errors[] = [

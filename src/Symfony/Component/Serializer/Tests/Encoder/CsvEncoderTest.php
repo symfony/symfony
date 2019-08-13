@@ -311,6 +311,43 @@ CSV
             ]));
     }
 
+    public function testEncodeArrayObject()
+    {
+        $value = new \ArrayObject(['foo' => 'hello', 'bar' => 'hey ho']);
+
+        $this->assertEquals(<<<'CSV'
+foo,bar
+hello,"hey ho"
+
+CSV
+            , $this->encoder->encode($value, 'csv'));
+
+        $value = new \ArrayObject();
+
+        $this->assertEquals("\n", $this->encoder->encode($value, 'csv'));
+    }
+
+    public function testEncodeNestedArrayObject()
+    {
+        $value = new \ArrayObject(['foo' => new \ArrayObject(['nested' => 'value']), 'bar' => new \ArrayObject(['another' => 'word'])]);
+
+        $this->assertEquals(<<<'CSV'
+foo.nested,bar.another
+value,word
+
+CSV
+            , $this->encoder->encode($value, 'csv'));
+    }
+
+    public function testEncodeEmptyArrayObject()
+    {
+        $value = new \ArrayObject();
+        $this->assertEquals("\n", $this->encoder->encode($value, 'csv'));
+
+        $value = ['foo' => new \ArrayObject()];
+        $this->assertEquals("\n\n", $this->encoder->encode($value, 'csv'));
+    }
+
     public function testSupportsDecoding()
     {
         $this->assertTrue($this->encoder->supportsDecoding('csv'));

@@ -192,6 +192,19 @@ class SerializerTest extends TestCase
         $this->assertEquals(json_encode($data), $result);
     }
 
+    public function testSerializeEmpty()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $data = ['foo' => new \stdClass()];
+
+        //Old buggy behaviour
+        $result = $serializer->serialize($data, 'json');
+        $this->assertEquals('{"foo":[]}', $result);
+
+        $result = $serializer->serialize($data, 'json', ['preserve_empty_objects' => true]);
+        $this->assertEquals('{"foo":{}}', $result);
+    }
+
     public function testSerializeNoEncoder()
     {
         $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');

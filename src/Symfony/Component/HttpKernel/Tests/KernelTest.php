@@ -584,7 +584,7 @@ EOF;
     {
         $bundle = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')
-            ->setMethods(['getPath', 'getPublicDir', 'getParent', 'getName'])
+            ->setMethods(['getPath', 'getParent', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -604,12 +604,6 @@ EOF;
             ->expects($this->any())
             ->method('getPath')
             ->willReturn($dir)
-        ;
-
-        $bundle
-            ->expects($this->any())
-            ->method('getPublicDir')
-            ->willReturn('Resources/public')
         ;
 
         $bundle

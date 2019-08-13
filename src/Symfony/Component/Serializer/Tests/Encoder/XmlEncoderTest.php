@@ -48,6 +48,26 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
 
+    public function testEncodeArrayObject()
+    {
+        $obj = new \ArrayObject(['foo' => 'bar']);
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><foo>bar</foo></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
+    }
+
+    public function testEncodeEmptyArrayObject()
+    {
+        $obj = new \ArrayObject();
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response/>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
+    }
+
     public function testDocTypeIsNotAllowed()
     {
         $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');

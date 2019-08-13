@@ -56,9 +56,11 @@ class TemplateIterator implements \IteratorAggregate
                 $name = substr($name, 0, -6);
             }
 
+            $bundleTemplatesDir = is_dir($bundle->getPath().'/Resources/views') ? $bundle->getPath().'/Resources/views' : $bundle->getPath().'/templates';
+
             $templates = array_merge(
                 $templates,
-                $this->findTemplatesInDirectory($bundle->getPath().'/Resources/views', $name),
+                $this->findTemplatesInDirectory($bundleTemplatesDir, $name),
                 null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name) : []
             );
         }

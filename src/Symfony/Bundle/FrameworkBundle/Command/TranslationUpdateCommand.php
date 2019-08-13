@@ -139,11 +139,12 @@ EOF
         if (null !== $input->getArgument('bundle')) {
             try {
                 $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
-                $transPaths = [$foundBundle->getPath().'/Resources/translations'];
+                $bundleDir = $foundBundle->getPath();
+                $transPaths = [is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundleDir.'/translations'];
+                $viewsPaths = [is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundleDir.'/templates'];
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath;
                 }
-                $viewsPaths = [$foundBundle->getPath().'/Resources/views'];
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath;
                 }

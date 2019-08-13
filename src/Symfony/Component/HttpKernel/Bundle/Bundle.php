@@ -133,11 +133,6 @@ abstract class Bundle implements BundleInterface
     {
     }
 
-    public function getPublicDir(): string
-    {
-        return 'Resources/public';
-    }
-
     /**
      * Returns the bundle's container extension class.
      *

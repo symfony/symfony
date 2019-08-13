@@ -113,9 +113,33 @@ HttpFoundation
 HttpKernel
 ----------
 
- * Implementing the `BundleInterface` without implementing the `getPublicDir()` method is deprecated.
-   This method will be added to the interface in 5.0.
  * The `DebugHandlersListener` class has been marked as `final`
+ * Added new Bundle directory convention consistent with standard skeletons:
+
+    ```
+    └── MyBundle/
+        ├── config/
+        ├── public/
+        ├── src/
+        │   └── MyBundle.php
+        ├── templates/
+        └── translations/
+    ```
+
+   To make this work properly, it is necessary to change the root path of the bundle:
+
+    ```php
+    class MyBundle extends Bundle
+    {
+        public function getPath(): string
+        {
+            return \dirname(__DIR__);
+        }
+    }
+    ```
+
+   As many bundles must be compatible with a range of Symfony versions, the current 
+   directory convention is not deprecated yet, but it will be in the future.
 
 Lock
 ----

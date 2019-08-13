@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-13T15:14:05Z
+
+I should probably add a check on fabbot :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-08-13T15:47:08Z
+
+@fabpot Indeed. My IDE removes quite often trailing space when I open a new PR. At least this check will be awesome.
+The command I used: `fd .md | xargs sed -i 's/^[ \t]*$//;s/[ \t]*$//'`  ([fd](https://github.com/sharkdp/fd))
+And for the syntax, I opened all files and checked by hand. My IDE highlight errror

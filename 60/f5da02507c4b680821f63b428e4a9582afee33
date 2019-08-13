@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by kaznovac at 2019-07-15T11:24:10Z
+
+should we typehint `\Symfony\Component\Form\FormTypeGuesserInterface` also?
+(asking as i looked in typehinting doctrine bridge)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-07-18T09:46:06Z
+
+I will continue to work on the issue soon. `Symfony\Component\Form\FormTypeGuesserInterface` should be typehinted in this PR, I guess.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-18T09:59:27Z
+
+> I will continue to work on the issue soon. `Symfony\Component\Form\FormTypeGuesserInterface` should be typehinted in this PR, I guess.
+
+Yes. If you also update the corresponding implementation in the doctrine bridge, remember to update the composer.json file of the bridge accordingly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T15:25:06Z
+
+Good for rebase.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-08-05T08:29:00Z
+
+@vudaltsov Can you please rebase here? :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-05T14:12:56Z
+
+Tests are failing. The $label of createView can also be `false`, see `\Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory::addChoiceView`
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-08-05T14:17:17Z
+
+@Tobion , I know that, that's exactly why I fixed it in https://github.com/symfony/symfony/pull/32935, see https://github.com/symfony/symfony/pull/32237#discussion_r310535785. I propose waiting for the merge and then I will rebase and fix and squash everything, ok?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-05T14:28:24Z
+
+Even if you know that, #32935 does not fix this completely. That is what I'm saying. https://github.com/vudaltsov/symfony/blob/360711ce4e3b83251e7fe9dac958dc4f4246c0b6/src/Symfony/Component/Form/ChoiceList/Factory/ChoiceListFactoryInterface.php#L81 can also be `false`. So the phpdocs are still wrong. Or you need to overwrite phpdocs of `\Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory::createView` and all the other implementations which should also be done in lower branches.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-05T14:29:26Z
+
+(merged up)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-08-05T14:35:39Z
+
+@Tobion , got it, thank you!
+
+I now need some time to distract from Forms before the final fight in this PR and relevant changes in other branches :)
+I hope to finish tonight or tomorrow.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-05T15:17:07Z
+
+#32955 should solve this problem.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-08T17:59:15Z
+
+up for a rebase?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-08-08T18:03:53Z
+
+@nicolas-grekas , sure, tonight I will take over https://github.com/symfony/symfony/pull/32955 and then we can safely add `?callable` to `$label`. But I will rebase this branch today as well.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-08-09T03:11:17Z
+
+@derrabus , should I revert changes to `OptionsResolverWrapper extends OptionsResolver` and `ViolationPath implements PropertyPathInterface` to avoid bumping up the versions of the required packages?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-08-09T10:24:58Z
+
+We need to update the minimum required version for the `symfony/property-access` package to 5.0.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-08-09T11:51:15Z
+
+@xabbuh , for `options-resolver` as well, right? Since we have `OptionsResolverWrapper`. Done

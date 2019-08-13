@@ -9,7 +9,7 @@ CHANGELOG
  * added support for serializing `DateInterval` objects
  * added getter for extra attributes in `ExtraAttributesException`
  * improved `CsvEncoder` to handle variable nested structures
- * CSV headers can be passed to the `CsvEncoder` via the `csv_headers` serialization context variable 
+ * CSV headers can be passed to the `CsvEncoder` via the `csv_headers` serialization context variable
  * added `$context` when checking for encoding, decoding and normalizing in `Serializer`
 
 3.3.0
@@ -70,7 +70,7 @@ CHANGELOG
 
  * added `$context` support for XMLEncoder.
  * [DEPRECATION] JsonEncode and JsonDecode where modified to throw
-   an exception if error found. No need for get*Error() functions
+   an exception if error found. No need for `get*Error()` functions
 
 2.3.0
 -----

@@ -30,7 +30,7 @@ abstract class AbstractStream
 
     private $debug = '';
 
-    public function write(string $bytes, $debug = true): void
+    public function write(string $bytes, bool $debug = true): void
     {
         if ($debug) {
             foreach (explode("\n", trim($bytes)) as $line) {

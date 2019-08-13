@@ -34,10 +34,8 @@ class InvalidConfigurationException extends Exception
 
     /**
      * Adds extra information that is suffixed to the original exception message.
-     *
-     * @param string $hint
      */
-    public function addHint($hint)
+    public function addHint(string $hint)
     {
         if (!$this->containsHints) {
             $this->message .= "\nHint: ".$hint;

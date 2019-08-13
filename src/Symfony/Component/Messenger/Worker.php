@@ -178,7 +178,7 @@ class Worker implements WorkerInterface
         $this->shouldStop = true;
     }
 
-    private function dispatchEvent($event)
+    private function dispatchEvent(object $event): void
     {
         if (null === $this->eventDispatcher) {
             return;

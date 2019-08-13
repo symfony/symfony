@@ -130,14 +130,11 @@ class Question
     /**
      * Sets values for the autocompleter.
      *
-     * @param iterable|null $values
-     *
      * @return $this
      *
-     * @throws InvalidArgumentException
      * @throws LogicException
      */
-    public function setAutocompleterValues($values)
+    public function setAutocompleterValues(?iterable $values)
     {
         if (\is_array($values)) {
             $values = $this->isAssoc($values) ? array_merge(array_keys($values), array_values($values)) : array_values($values);
@@ -150,10 +147,8 @@ class Question
             $callback = static function () use ($values, &$valueCache) {
                 return $valueCache ?? $valueCache = iterator_to_array($values, false);
             };
-        } elseif (null === $values) {
-            $callback = null;
         } else {
-            throw new InvalidArgumentException('Autocompleter values can be either an array, "null" or a "Traversable" object.');
+            $callback = null;
         }
 
         return $this->setAutocompleterCallback($callback);
@@ -212,13 +207,11 @@ class Question
      *
      * Null means an unlimited number of attempts.
      *
-     * @param int|null $attempts
-     *
      * @return $this
      *
      * @throws InvalidArgumentException in case the number of attempts is invalid
      */
-    public function setMaxAttempts($attempts)
+    public function setMaxAttempts(?int $attempts)
     {
         if (null !== $attempts && $attempts < 1) {
             throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
@@ -267,7 +260,7 @@ class Question
         return $this->normalizer;
     }
 
-    protected function isAssoc($array)
+    protected function isAssoc(array $array)
     {
         return (bool) \count(array_filter(array_keys($array), 'is_string'));
     }

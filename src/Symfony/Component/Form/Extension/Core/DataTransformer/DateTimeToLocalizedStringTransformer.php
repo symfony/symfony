@@ -158,7 +158,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @throws TransformationFailedException in case the date formatter can not be constructed
      */
-    protected function getIntlDateFormatter($ignoreTimezone = false)
+    protected function getIntlDateFormatter(bool $ignoreTimezone = false)
     {
         $dateFormat = $this->dateFormat;
         $timeFormat = $this->timeFormat;

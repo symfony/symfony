@@ -41,10 +41,8 @@ class UsernameNotFoundException extends AuthenticationException
 
     /**
      * Set the username.
-     *
-     * @param string $username
      */
-    public function setUsername($username)
+    public function setUsername(string $username)
     {
         $this->username = $username;
     }

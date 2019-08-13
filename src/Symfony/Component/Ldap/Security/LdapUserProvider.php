@@ -146,7 +146,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
      *
      * @return LdapUser
      */
-    protected function loadUser($username, Entry $entry)
+    protected function loadUser(string $username, Entry $entry)
     {
         $password = null;
         $extraFields = [];

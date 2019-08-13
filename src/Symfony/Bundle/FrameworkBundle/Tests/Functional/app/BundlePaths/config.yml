@@ -1,0 +1,11 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    translator: true
+    validation: true
+    serializer: true
+
+twig:
+    strict_variables: '%kernel.debug%'
+    exception_controller: ~

@@ -137,13 +137,7 @@ EOT
         $validAssetDirs = [];
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if (!method_exists($bundle, 'getPublicDir')) {
-                @trigger_error(sprintf('Not defining "getPublicDir()" method in the "%s" class is deprecated since Symfony 4.4 and will not be supported in 5.0.', \get_class($bundle)), E_USER_DEPRECATED);
-                $publicDir = 'Resources/public';
-            } else {
-                $publicDir = ltrim($bundle->getPublicDir(), '\\/');
-            }
-            if (!is_dir($originDir = $bundle->getPath().\DIRECTORY_SEPARATOR.$publicDir)) {
+            if (!is_dir($originDir = $bundle->getPath().'/Resources/public') && !is_dir($originDir = $bundle->getPath().'/public')) {
                 continue;
             }
 

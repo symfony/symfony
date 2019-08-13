@@ -1156,7 +1156,7 @@ class FrameworkExtension extends Extension
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            if ($container->fileExists($dir = $bundle['path'].'/Resources/translations')) {
+            if ($container->fileExists($dir = $bundle['path'].'/Resources/translations') || $container->fileExists($dir = $bundle['path'].'/translations')) {
                 $dirs[] = $dir;
             } else {
                 $nonExistingDirs[] = $dir;
@@ -1318,20 +1318,20 @@ class FrameworkExtension extends Extension
         }
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
-            $dirname = $bundle['path'];
+            $configDir = is_dir($bundle['path'].'/Resources/config') ? $bundle['path'].'/Resources/config' : $bundle['path'].'/config';
 
             if (
-                $container->fileExists($file = $dirname.'/Resources/config/validation.yaml', false) ||
-                $container->fileExists($file = $dirname.'/Resources/config/validation.yml', false)
+                $container->fileExists($file = $configDir.'/validation.yaml', false) ||
+                $container->fileExists($file = $configDir.'/validation.yml', false)
             ) {
                 $fileRecorder('yml', $file);
             }
 
-            if ($container->fileExists($file = $dirname.'/Resources/config/validation.xml', false)) {
+            if ($container->fileExists($file = $configDir.'/validation.xml', false)) {
                 $fileRecorder('xml', $file);
             }
 
-            if ($container->fileExists($dir = $dirname.'/Resources/config/validation', '/^$/')) {
+            if ($container->fileExists($dir = $configDir.'/validation', '/^$/')) {
                 $this->registerMappingFilesFromDir($dir, $fileRecorder);
             }
         }
@@ -1512,20 +1512,20 @@ class FrameworkExtension extends Extension
         };
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
-            $dirname = $bundle['path'];
+            $configDir = is_dir($bundle['path'].'/Resources/config') ? $bundle['path'].'/Resources/config' : $bundle['path'].'/config';
 
-            if ($container->fileExists($file = $dirname.'/Resources/config/serialization.xml', false)) {
+            if ($container->fileExists($file = $configDir.'/serialization.xml', false)) {
                 $fileRecorder('xml', $file);
             }
 
             if (
-                $container->fileExists($file = $dirname.'/Resources/config/serialization.yaml', false) ||
-                $container->fileExists($file = $dirname.'/Resources/config/serialization.yml', false)
+                $container->fileExists($file = $configDir.'/serialization.yaml', false) ||
+                $container->fileExists($file = $configDir.'/serialization.yml', false)
             ) {
                 $fileRecorder('yml', $file);
             }
 
-            if ($container->fileExists($dir = $dirname.'/Resources/config/serialization', '/^$/')) {
+            if ($container->fileExists($dir = $configDir.'/serialization', '/^$/')) {
                 $this->registerMappingFilesFromDir($dir, $fileRecorder);
             }
         }

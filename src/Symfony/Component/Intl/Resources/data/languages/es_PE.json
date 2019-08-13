@@ -11,9 +11,11 @@
         "pa": "punyabí",
         "ss": "siswati",
         "sw": "suajili",
-        "sw_CD": "suajili del Congo",
         "tn": "setswana",
         "wo": "wolof",
         "zgh": "tamazight marroquí estándar"
+    },
+    "LocalizedNames": {
+        "sw_CD": "suajili del Congo"
     }
 }

@@ -34,7 +34,6 @@
         "ses": "Kikoyraborosenni",
         "shu": "Kiarabu cha Chadi",
         "srn": "Kisranantongo",
-        "sw_CD": "Kiswahili cha Kongo",
         "swb": "Kikomoro",
         "syr": "Kisiria",
         "tw": "Kitwi",
@@ -42,5 +41,8 @@
         "udm": "Kiudumurti",
         "ug": "Kiuiguri",
         "zgh": "Kitamazighati Sanifu cha Moroko"
+    },
+    "LocalizedNames": {
+        "sw_CD": "Kiswahili cha Kongo"
     }
 }

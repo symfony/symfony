@@ -45,7 +45,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'ang',
         'anp',
         'ar',
-        'ar_001',
         'arc',
         'arn',
         'aro',
@@ -64,7 +63,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'awa',
         'ay',
         'az',
-        'az_Arab',
         'ba',
         'bal',
         'ban',
@@ -141,8 +139,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'dar',
         'dav',
         'de',
-        'de_AT',
-        'de_CH',
         'del',
         'den',
         'dgr',
@@ -167,23 +163,15 @@ class LanguagesTest extends ResourceBundleTestCase
         'el',
         'elx',
         'en',
-        'en_AU',
-        'en_CA',
-        'en_GB',
-        'en_US',
         'enm',
         'eo',
         'es',
-        'es_419',
-        'es_ES',
-        'es_MX',
         'esu',
         'et',
         'eu',
         'ewo',
         'ext',
         'fa',
-        'fa_AF',
         'fan',
         'fat',
         'ff',
@@ -194,8 +182,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'fo',
         'fon',
         'fr',
-        'fr_CA',
-        'fr_CH',
         'frc',
         'frm',
         'fro',
@@ -406,7 +392,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'nb',
         'nd',
         'nds',
-        'nds_NL',
         'ne',
         'new',
         'ng',
@@ -414,7 +399,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'niu',
         'njo',
         'nl',
-        'nl_BE',
         'nmg',
         'nn',
         'nnh',
@@ -462,8 +446,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'pro',
         'ps',
         'pt',
-        'pt_BR',
-        'pt_PT',
         'qu',
         'quc',
         'qug',
@@ -475,7 +457,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'rm',
         'rn',
         'ro',
-        'ro_MD',
         'rof',
         'rom',
         'rtm',
@@ -531,7 +512,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'sog',
         'sq',
         'sr',
-        'sr_ME',
         'srn',
         'srr',
         'ss',
@@ -544,7 +524,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'sux',
         'sv',
         'sw',
-        'sw_CD',
         'swb',
         'syc',
         'syr',
@@ -633,8 +612,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'zen',
         'zgh',
         'zh',
-        'zh_Hans',
-        'zh_Hant',
         'zu',
         'zun',
         'zza',
@@ -1662,6 +1639,13 @@ class LanguagesTest extends ResourceBundleTestCase
         foreach ($names as $language => $name) {
             $this->assertSame($name, Languages::getName($language, $displayLocale));
         }
+    }
+
+    public function testLocalizedGetName()
+    {
+        $this->assertSame('Australian English', Languages::getName('en_AU', 'en'));
+        $this->assertSame('Australian English', Languages::getName('en_AU_Zzzz', 'en'));
+        $this->assertSame('English', Languages::getName('en_ZZ', 'en'));
     }
 
     public function testGetNameDefaultLocale()

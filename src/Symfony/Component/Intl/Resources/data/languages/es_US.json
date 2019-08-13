@@ -35,7 +35,6 @@
         "sma": "sami meridional",
         "ss": "siswati",
         "st": "sesotho meridional",
-        "sw_CD": "swahili del Congo",
         "syr": "siriaco",
         "tet": "tetún",
         "tn": "setchwana",
@@ -44,5 +43,8 @@
         "wo": "wolof",
         "wuu": "wuu",
         "xal": "kalmyk"
+    },
+    "LocalizedNames": {
+        "sw_CD": "swahili del Congo"
     }
 }

@@ -371,7 +371,6 @@
         "nb": "Noors - Bokmål",
         "nd": "Noord-Ndebele",
         "nds": "Nedersaksisch",
-        "nds_NL": "Nederduits",
         "ne": "Nepalees",
         "new": "Newari",
         "ng": "Ndonga",
@@ -595,5 +594,8 @@
         "zu": "Zoeloe",
         "zun": "Zuni",
         "zza": "Zaza"
+    },
+    "LocalizedNames": {
+        "nds_NL": "Nederduits"
     }
 }

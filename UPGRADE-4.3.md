@@ -74,16 +74,16 @@ EventDispatcher
    ```php
    public function __construct(EventDispatcherInterface $eventDispatcher) {
        $this->eventDispatcher = $eventDispatcher;
-   }   
+   }
    ```
 
    After:
    ```php
-   public function __construct(EventDispatcherInterface $eventDispatcher) {   
+   public function __construct(EventDispatcherInterface $eventDispatcher) {
        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
    }
    ```
- 
+
  * The `Event` class has been deprecated, use `Symfony\Contracts\EventDispatcher\Event` instead
 
 Filesystem

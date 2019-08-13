@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T13:06:58Z
+
+I didn't update the changelog because I think this is not common enough to require one. Also, this doesn't prevent *private* scalar services, because those don't get through the patched methods. That's why this won't break places where we do define scalar services.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-13T13:14:31Z
+
+Can we also deprecate scalars in `Container::set()` and `ContainerBuilder::set()`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T13:23:02Z
+
+Here you are :)

@@ -39,7 +39,7 @@ interface ProfilerStorageInterface
      *
      * @param string $token A token
      *
-     * @return Profile The profile associated with token
+     * @return Profile|null The profile associated with token
      */
     public function read($token);
 

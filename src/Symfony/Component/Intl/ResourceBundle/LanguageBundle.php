@@ -62,7 +62,7 @@ class LanguageBundle extends LanguageDataProvider implements LanguageBundleInter
         try {
             return $this->getName($language, $displayLocale);
         } catch (MissingResourceException $e) {
-            return;
+            return null;
         }
     }
 
@@ -86,7 +86,7 @@ class LanguageBundle extends LanguageDataProvider implements LanguageBundleInter
         try {
             return $this->scriptProvider->getName($script, $displayLocale);
         } catch (MissingResourceException $e) {
-            return;
+            return null;
         }
     }
 

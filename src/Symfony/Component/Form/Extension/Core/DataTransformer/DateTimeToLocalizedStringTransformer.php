@@ -99,7 +99,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param string|array $value Localized date string/array
      *
-     * @return \DateTime Normalized date
+     * @return \DateTime|null Normalized date
      *
      * @throws TransformationFailedException if the given value is not a string,
      *                                       if the date could not be parsed
@@ -111,7 +111,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         }
 
         if ('' === $value) {
-            return;
+            return null;
         }
 
         // date-only patterns require parsing to be done in UTC, as midnight might not exist in the local timezone due

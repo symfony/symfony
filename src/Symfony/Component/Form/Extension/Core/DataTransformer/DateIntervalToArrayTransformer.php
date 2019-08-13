@@ -106,7 +106,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
      *
      * @param array $value Interval array
      *
-     * @return \DateInterval Normalized date interval
+     * @return \DateInterval|null Normalized date interval
      *
      * @throws UnexpectedTypeException       if the given value is not an array
      * @throws TransformationFailedException if the value could not be transformed
@@ -114,13 +114,13 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (null === $value) {
-            return;
+            return null;
         }
         if (!\is_array($value)) {
             throw new UnexpectedTypeException($value, 'array');
         }
         if ('' === implode('', $value)) {
-            return;
+            return null;
         }
         $emptyFields = [];
         foreach ($this->fields as $field) {

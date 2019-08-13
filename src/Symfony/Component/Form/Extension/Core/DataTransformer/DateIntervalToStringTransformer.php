@@ -62,7 +62,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param string $value An ISO 8601 or date string like date interval presentation
      *
-     * @return \DateInterval An instance of \DateInterval
+     * @return \DateInterval|null An instance of \DateInterval
      *
      * @throws UnexpectedTypeException       if the given value is not a string
      * @throws TransformationFailedException if the date interval could not be parsed
@@ -70,13 +70,13 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (null === $value) {
-            return;
+            return null;
         }
         if (!\is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
         if ('' === $value) {
-            return;
+            return null;
         }
         if (!$this->isISO8601($value)) {
             throw new TransformationFailedException('Non ISO 8601 date strings are not supported yet');

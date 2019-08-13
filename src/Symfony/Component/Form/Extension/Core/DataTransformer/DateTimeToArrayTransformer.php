@@ -106,7 +106,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param array $value Localized date
      *
-     * @return \DateTime Normalized date
+     * @return \DateTime|null Normalized date
      *
      * @throws TransformationFailedException If the given value is not an array,
      *                                       if the value could not be transformed
@@ -114,7 +114,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     public function reverseTransform($value)
     {
         if (null === $value) {
-            return;
+            return null;
         }
 
         if (!\is_array($value)) {
@@ -122,7 +122,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         if ('' === implode('', $value)) {
-            return;
+            return null;
         }
 
         $emptyFields = [];

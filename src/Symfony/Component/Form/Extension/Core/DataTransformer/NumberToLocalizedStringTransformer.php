@@ -148,7 +148,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if ('' === $value) {
-            return;
+            return null;
         }
 
         if (\in_array($value, ['NaN', 'NAN', 'nan'], true)) {

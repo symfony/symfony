@@ -431,7 +431,7 @@ trait ControllerTrait
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return mixed
+     * @return object|null
      *
      * @throws \LogicException If SecurityBundle is not available
      *
@@ -446,12 +446,12 @@ trait ControllerTrait
         }
 
         if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return;
+            return null;
         }
 
         if (!\is_object($user = $token->getUser())) {
             // e.g. anonymous authentication
-            return;
+            return null;
         }
 
         return $user;

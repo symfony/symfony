@@ -40,13 +40,11 @@ class Caster
     /**
      * Casts objects to arrays and adds the dynamic property prefix.
      *
-     * @param object $obj          The object to cast
-     * @param string $class        The class of the object
-     * @param bool   $hasDebugInfo Whether the __debugInfo method exists on $obj or not
+     * @param bool $hasDebugInfo Whether the __debugInfo method exists on $obj or not
      *
      * @return array The array-cast of the object, with prefixed dynamic properties
      */
-    public static function castObject($obj, $class, $hasDebugInfo = false): array
+    public static function castObject(object $obj, string $class, bool $hasDebugInfo = false): array
     {
         $a = $obj instanceof \Closure ? [] : (array) $obj;
 
@@ -110,7 +108,7 @@ class Caster
      *
      * @return array The filtered array
      */
-    public static function filter(array $a, $filter, array $listedProperties = [], &$count = 0): array
+    public static function filter(array $a, int $filter, array $listedProperties = [], ?int &$count = 0): array
     {
         $count = 0;
 
@@ -151,7 +149,7 @@ class Caster
         return $a;
     }
 
-    public static function castPhpIncompleteClass(\__PHP_Incomplete_Class $c, array $a, Stub $stub, $isNested): array
+    public static function castPhpIncompleteClass(\__PHP_Incomplete_Class $c, array $a, Stub $stub, bool $isNested): array
     {
         if (isset($a['__PHP_Incomplete_Class_Name'])) {
             $stub->class .= '('.$a['__PHP_Incomplete_Class_Name'].')';

@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ImagineCaster
 {
-    public static function castImage(ImageInterface $c, array $a, Stub $stub, $isNested)
+    public static function castImage(ImageInterface $c, array $a, Stub $stub, bool $isNested)
     {
         $imgData = $c->get('png');
         if (\strlen($imgData) > 1 * 1000 * 1000) {

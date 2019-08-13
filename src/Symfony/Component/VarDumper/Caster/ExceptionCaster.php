@@ -44,17 +44,17 @@ class ExceptionCaster
 
     private static $framesCache = [];
 
-    public static function castError(\Error $e, array $a, Stub $stub, $isNested, $filter = 0)
+    public static function castError(\Error $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {
         return self::filterExceptionArray($stub->class, $a, "\0Error\0", $filter);
     }
 
-    public static function castException(\Exception $e, array $a, Stub $stub, $isNested, $filter = 0)
+    public static function castException(\Exception $e, array $a, Stub $stub, bool $isNested, int $filter = 0)
     {
         return self::filterExceptionArray($stub->class, $a, "\0Exception\0", $filter);
     }
 
-    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, $isNested)
+    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, bool $isNested)
     {
         if (isset($a[$s = Caster::PREFIX_PROTECTED.'severity'], self::$errorTypes[$a[$s]])) {
             $a[$s] = new ConstStub(self::$errorTypes[$a[$s]], $a[$s]);
@@ -63,7 +63,7 @@ class ExceptionCaster
         return $a;
     }
 
-    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, $isNested)
+    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, bool $isNested)
     {
         $trace = Caster::PREFIX_VIRTUAL.'trace';
         $prefix = Caster::PREFIX_PROTECTED;
@@ -82,7 +82,7 @@ class ExceptionCaster
         return $a;
     }
 
-    public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, $isNested)
+    public static function castSilencedErrorContext(SilencedErrorContext $e, array $a, Stub $stub, bool $isNested)
     {
         $sPrefix = "\0".SilencedErrorContext::class."\0";
 
@@ -109,7 +109,7 @@ class ExceptionCaster
         return $a;
     }
 
-    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, $isNested)
+    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, bool $isNested)
     {
         if (!$isNested) {
             return $a;
@@ -183,7 +183,7 @@ class ExceptionCaster
         return $a;
     }
 
-    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, $isNested)
+    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, bool $isNested)
     {
         if (!$isNested) {
             return $a;
@@ -261,7 +261,7 @@ class ExceptionCaster
         return $a;
     }
 
-    private static function filterExceptionArray($xClass, array $a, $xPrefix, $filter)
+    private static function filterExceptionArray($xClass, array $a, string $xPrefix, int $filter)
     {
         if (isset($a[$xPrefix.'trace'])) {
             $trace = $a[$xPrefix.'trace'];
@@ -294,7 +294,7 @@ class ExceptionCaster
         return $a;
     }
 
-    private static function traceUnshift(&$trace, $class, $file, $line)
+    private static function traceUnshift(array &$trace, ?string $class, string $file, int $line)
     {
         if (isset($trace[0]['file'], $trace[0]['line']) && $trace[0]['file'] === $file && $trace[0]['line'] === $line) {
             return;
@@ -306,7 +306,7 @@ class ExceptionCaster
         ]);
     }
 
-    private static function extractSource($srcLines, $line, $srcContext, $title, $lang, $file = null)
+    private static function extractSource(string $srcLines, int $line, int $srcContext, ?string $title, string $lang, string $file = null)
     {
         $srcLines = explode("\n", $srcLines);
         $src = [];

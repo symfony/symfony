@@ -25,7 +25,7 @@ class SymfonyCaster
         'format' => 'getRequestFormat',
     ];
 
-    public static function castRequest(Request $request, array $a, Stub $stub, $isNested)
+    public static function castRequest(Request $request, array $a, Stub $stub, bool $isNested)
     {
         $clone = null;
 
@@ -41,7 +41,7 @@ class SymfonyCaster
         return $a;
     }
 
-    public static function castHttpClient($client, array $a, Stub $stub, $isNested)
+    public static function castHttpClient($client, array $a, Stub $stub, bool $isNested)
     {
         $multiKey = sprintf("\0%s\0multi", \get_class($client));
         $a[$multiKey] = new CutStub($a[$multiKey]);
@@ -49,7 +49,7 @@ class SymfonyCaster
         return $a;
     }
 
-    public static function castHttpClientResponse($response, array $a, Stub $stub, $isNested)
+    public static function castHttpClientResponse($response, array $a, Stub $stub, bool $isNested)
     {
         $stub->cut += \count($a);
         $a = [];

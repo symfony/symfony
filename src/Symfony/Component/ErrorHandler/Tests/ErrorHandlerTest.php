@@ -123,9 +123,60 @@ class ErrorHandlerTest extends TestCase
     }
 
     // dummy function to test trace in error handler.
-    private static function triggerNotice($that)
+    public static function triggerNotice($that)
     {
         $that->assertSame('', $foo.$foo.$bar);
+    }
+
+    public function testFailureCall()
+    {
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('fopen(unknown.txt): failed to open stream: No such file or directory');
+
+        ErrorHandler::call('fopen', 'unknown.txt', 'r');
+    }
+
+    public function testCallRestoreErrorHandler()
+    {
+        $prev = set_error_handler('var_dump');
+        try {
+            ErrorHandler::call('fopen', 'unknown.txt', 'r');
+            $this->fail('An \ErrorException should have been raised');
+        } catch (\ErrorException $e) {
+            $prev = set_error_handler($prev);
+            restore_error_handler();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame('var_dump', $prev);
+    }
+
+    public function testCallErrorExceptionInfo()
+    {
+        try {
+            ErrorHandler::call([self::class, 'triggerNotice'], $this);
+            $this->fail('An \ErrorException should have been raised');
+        } catch (\ErrorException $e) {
+            $trace = $e->getTrace();
+            $this->assertSame(E_NOTICE, $e->getSeverity());
+            $this->assertSame(__FILE__, $e->getFile());
+            $this->assertSame('Undefined variable: foo', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+            $this->assertSame('Symfony\Component\ErrorHandler\{closure}', $trace[0]['function']);
+            $this->assertSame(ErrorHandler::class, $trace[0]['class']);
+            $this->assertSame('triggerNotice', $trace[1]['function']);
+            $this->assertSame(__CLASS__, $trace[1]['class']);
+        }
+    }
+
+    public function testSuccessCall()
+    {
+        touch($filename = tempnam(sys_get_temp_dir(), 'sf_error_handler_'));
+
+        self::assertIsResource(ErrorHandler::call('fopen', $filename, 'r'));
+
+        unlink($filename);
     }
 
     public function testConstruct()

@@ -519,8 +519,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service.
      *
-     * @param string $id      The service identifier
-     * @param object $service The service instance
+     * @param string      $id      The service identifier
+     * @param object|null $service The service instance
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
@@ -571,7 +571,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
      *
-     * @return object The associated service
+     * @return object|null The associated service
      *
      * @throws InvalidArgumentException          when no definitions are available
      * @throws ServiceCircularReferenceException When a circular reference is detected
@@ -1104,7 +1104,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string     $id         The service identifier
      * @param bool       $tryProxy   Whether to try proxying the service with a lazy proxy
      *
-     * @return object The service described by the service definition
+     * @return mixed The service described by the service definition
      *
      * @throws RuntimeException         When the factory definition is incomplete
      * @throws RuntimeException         When the service is a synthetic service
@@ -1651,7 +1651,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Shares a given service in the container.
      *
      * @param Definition  $definition
-     * @param object      $service
+     * @param mixed       $service
      * @param string|null $id
      */
     private function shareService(Definition $definition, $service, $id, array &$inlineServices)

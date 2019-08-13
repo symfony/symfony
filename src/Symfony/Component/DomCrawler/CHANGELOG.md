@@ -5,6 +5,9 @@ CHANGELOG
 -----
 
 * Added `Form::getName()` method.
+* Added `Crawler::matches()` method.
+* Added `Crawler::closest()` method.
+* Added `Crawler::outerHtml()` method.
 
 4.3.0
 -----

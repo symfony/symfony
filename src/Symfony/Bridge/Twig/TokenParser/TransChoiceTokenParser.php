@@ -27,11 +27,7 @@ use Twig\Token;
 class TransChoiceTokenParser extends TransTokenParser
 {
     /**
-     * Parses a token and returns a node.
-     *
-     * @return Node
-     *
-     * @throws SyntaxError
+     * {@inheritdoc}
      */
     public function parse(Token $token)
     {
@@ -82,9 +78,7 @@ class TransChoiceTokenParser extends TransTokenParser
     }
 
     /**
-     * Gets the tag name associated with this token parser.
-     *
-     * @return string The tag name
+     * {@inheritdoc}
      */
     public function getTag()
     {

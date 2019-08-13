@@ -28,11 +28,7 @@ use Twig\TokenParser\AbstractTokenParser;
 class TransTokenParser extends AbstractTokenParser
 {
     /**
-     * Parses a token and returns a node.
-     *
-     * @return Node
-     *
-     * @throws SyntaxError
+     * {@inheritdoc}
      */
     public function parse(Token $token)
     {
@@ -83,9 +79,7 @@ class TransTokenParser extends AbstractTokenParser
     }
 
     /**
-     * Gets the tag name associated with this token parser.
-     *
-     * @return string The tag name
+     * {@inheritdoc}
      */
     public function getTag()
     {

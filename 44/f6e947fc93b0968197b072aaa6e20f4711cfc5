@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2018-09-05T05:37:42Z
+
+Why not following the suggestion made by @meyerbaptiste in #23019 and use an `ArrayObject` instead of the custom `EmptyObject` class?
+Also, the `NormalizerInterface` must be updated to document that returning something else than an array may be returned.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-09-05T08:46:42Z
+
+Ok, At first I was thinking `ArrayObject` is supposed to be an object representation of an `array`, but actually I see this makes sense as its more an implementation of array features but for objects.
+
+So I have basically extended encoders where needed to make sure they support encoding `ArrayObject` in general.
+
+Also changed `Normalizer` to allow returning `ArrayObject` - currently used only for empty objects, so they stay as objects. They only do this behind the context flag `array_object` for BC.
+
+I think this is now completely BC:
+- Encoders additionally support encoding `ArrayObject`
+- Normalizers only change output with `array_object` flag.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T10:16:08Z
+
+@dunglas Can you review this one again? Thank you.
+
+---------------------------------------------------------------------------
+
+by ahilles107 at 2019-02-27T17:17:18Z
+
+This was abandoned?
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2019-02-27T20:08:34Z
+
+I've love to see it merged, ill have to look at rebasing it i guess as it has some conflicts now.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2019-05-24T09:39:59Z
+
+I've rebased this on master, and made changes suggested by @dbu, I think should be good now, @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-09T07:03:12Z
+
+@mcfedr Can you take my comment into account and rebase on current 4.4? That's the last steps before merging IMO. Thank you.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2019-08-12T13:08:22Z
+
+@fabpot All done!

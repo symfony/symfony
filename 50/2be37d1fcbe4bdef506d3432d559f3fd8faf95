@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-08-12T20:51:00Z
+
+> The next step would be to add the \TypeError in master/5.0, no?
+
+Yes, I will do that in #32237

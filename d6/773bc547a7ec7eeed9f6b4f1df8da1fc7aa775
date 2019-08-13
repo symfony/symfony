@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-16T07:23:00Z
+
+In other parts of the application I think we said: `xlf` is the only valid extension for XLIFF files, so we won't add support for `xliff` extension. See for example #22440.
+
+So, in theory, we shouldn't merge this for consistency ... or we should add support for `xliff` everywhere we support `xlf`. I don't have a strong opinion about this.
+
+---------------------------------------------------------------------------
+
+by codegain at 2019-07-16T07:43:40Z
+
+My opinion is that if symfony is able to load .xliff files (which it is without any problems), it should be able to lint these .xliff files.
+
+On this line (218 on master):
+https://github.com/symfony/symfony/blob/7dee61ca1a4b397eef436151a3163b20eb15d47c/src/Symfony/Component/Translation/Command/XliffLintCommand.php#L218
+The linter explicitly loads .xlf and .xliff files.
+
+So this pull-request fixes a bug where xliff files are being loaded by the linter (removing that would be a BC break in my opinion), but can't be properly linted because of the wrong regex.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-17T18:02:18Z
+
+(should target 4.4 btw)
+
+---------------------------------------------------------------------------
+
+by codegain at 2019-07-18T15:30:26Z
+
+> (should target 4.4 btw)
+
+@nicolas-grekas Sorry, I'm unfamiliar with the GitHub branch targeting. I think I screwed this up >.<
+I think I will open a new pull-request with your requested changes.
+
+EDIT: Ok, I think I got it reversed, will check how to target 4.4
+
+---------------------------------------------------------------------------
+
+by codegain at 2019-07-22T08:58:12Z
+
+> in strict mode, I'd suggest raising an error when xliff is used
+
+@nicolas-grekas I added another error message if "xliff" is used with strict mode enabled. Could you have a look at it again?
+
+Altough that change does not resolve my issue, because I am using strict mode unintentionally and I found no "easy" way to disable it. The flag to enable strict mode is set to "true" by default in the constructor. I think there should be an option like "--no-strict-mode" to disable it via the command line.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-23T09:22:43Z
+
+@codegain but why don't you use the `xlf` extension? That's the only standard one AFAIK?
+
+---------------------------------------------------------------------------
+
+by codegain at 2019-07-23T11:24:38Z
+
+> @codegain but why don't you use the `xlf` extension? That's the only standard one AFAIK?
+
+@nicolas-grekas I am using poeditor.com for translations which only works with .xliff files and shows the error "File format unsupported" if an .xlf file is uploaded.
+
+According to a section in the specs for XLIFF 1.2 (http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html):
+> D.4. XLIFF File Extension
+> XLIFF documents use the .xlf extension. No other extension is recommended by the specification.
+
+the .xlf extension is recommeded, but not strictly required.
+
+The XLIFF 2.0 specs (http://docs.oasis-open.org/xliff/xliff-core/v2.0/xliff-core-v2.0.html) make no preference towards any file extension.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-23T11:33:35Z
+
+Did you report the issue to poeditor? That's where the real issue is to me.
+
+---------------------------------------------------------------------------
+
+by codegain at 2019-07-23T13:19:16Z
+
+@nicolas-grekas Their response:
+> Since we support only iOS xliff files, we allow imports only with the .xliff extension, because that's the one specific to iOS.
+> Uploading .xlf files may work after changing the extenstion to .xliff, but if your files are not in the same format as the iOS xliff format, data can get lost during this process.
+> We have a sample of the iOS xliff format here:
+> https://poeditor.com/localization/files/xliff
+
+I had no idea that any sort of "iOS xliff" exists, because it works perfectly fine with symfony xlf files (if I change the extension to ".xliff").
+I would like that this change makes into the XliffLintCommand, because my current workaround is to
+1. rename all files to ".xlf"
+2. run the lint:xliff command
+3. rename all files back to ".xliff"
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T16:46:44Z
+
+Thanks for the details. If everybody else is OK to seamlessly accept `.xliff` files, let's do it
+/cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by codegain at 2019-08-01T13:18:40Z
+
+> Thanks for the details. If everybody else is OK to seamlessly accept .xliff files, let's do it
+
+@nicolas-grekas @Tobion Just to clarify: Should the command now seamlessly accept .xliff files (without an additional error message) or raise an error if .xliff is used in strict mode?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-09T07:25:00Z
+
+I would accept loading both without any messages.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T07:16:25Z
+
+Thank you @codegain.

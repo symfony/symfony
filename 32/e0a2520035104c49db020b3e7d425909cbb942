@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-01T06:46:09Z
+
+As I wrote in https://github.com/symfony/symfony/issues/32453#issuecomment-516491953, I'm not sure we want to make dirs configurable. Even getPublicDir is suspicious to me.
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-08-01T07:15:04Z
+
+I think making them configurable isn't necessarily what I want, it's the confusing structure it has right now I'd like to change. Making dirs configurable is one way to do this, because it means I don't have to follow the current structure and that it provides a migration path to change the default.
+
+I very much prefer the structure as shown in the example. The fact that the non-code directory is called "Resources" (mind you, capital R) is bothering me since the start. the "views" directory isn't named correctly anymore either as it's called "templates" in Symfony.
+
+Not sure if the proposed API is a good idea, but I do think that the bundle is responsible for the exposure of certain directories.
+ - "Hey Symfony, you can find templates in this directory!"
+ - "Hey, this directory contains entities, if you use doctrine, please register this"
+ - etc.
+
+Symfony telling where everything should be feels like something we could change, though it should have sane defaults. I don't agree with the current structure being a sane default anymore due to the changes in the Symfony structure; `app/Resources` vs `bundle/Resources`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-01T07:18:04Z
+
+what if we create a single entrypoint similar like `Kernel`, e.g. `$bundle->locateResource(BundlePaths::CONFIG_DIR[, 'validator.yaml'])`
+
+with a built-in deprecation for `views` in favor of `templates`
+
+for DI extensions we should also consider injecting the config dir somehow, or access to any path for that matter
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-01T13:29:13Z
+
+> As I wrote in #32453 (comment), I'm not sure we want to make dirs configurable. Even getPublicDir is suspicious to me.
+
+I'm fine if it's not configurable, but we still want a new bundle directory structure, do you want it too?
+
+> with a built-in deprecation for views in favor of templates
+
+@ro0NL we shouldn't deprecating yet -> `... bundles must be compatible with many Symfony's versions.` at least until we're sure we can all migrate to the new structure without any compatibility issue.
+
+> for DI extensions we should also consider injecting the config dir somehow, or access to any path for that matter
+
+I'm not sure it's necessary, you can hardcode it safely there, it's in userland.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-01T13:40:02Z
+
+> we still want a new bundle directory structure, do you want it too
+
+[yes](https://github.com/orgs/symfony/projects/1#card-24681403)! that'd look consistent with the new directory structure of apps
+
+I'd just do it in `FrameworkExtension` only (and remove/deprecate getPublicDir)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-01T19:08:27Z
+
+**Update**
+
+Removed the configuration of the bundle directory, it is now a new convension that we can optionally use as of 4.4 version.
+
+Added `getBundleDir` method to the Bundle class, which is intended to define the root directory of the bundle. It may differ from the directory where the `Bundle.php` file is located (aka `getPath()`), e.g. when we have the new structure `src/Bundle.php` then `->getBundleDir()` is a folder higher up.
+
+The current convention is not being obsolete yet, it will (in the future).
+
+Convention from 3rd-party bundles like Doctrine (`/Resources/config/doctrine`) must progressively support the new method in order to finally be able to deprecating/remove the old structure.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-05T12:21:23Z
+
+> What's the purpose of getPath now? Should we deprecated it? Or should we plan to deprecate it in 5.1, to help bundles migrate smoothly?
+
+I think that as of 5.2 (NOV 2020) where we should start to deprecating the legacy structure as well. That'll match with the end of support for 3.4.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-06T22:21:37Z
+
+Sorry for the rebasing after the approved revisions, I needed to update my PhpUnit bridge to make my local phpunit work properly.
+
+Status: This Is Ready In My Side ;)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-07T02:10:52Z
+
+While I think the new conventions make sense, I'm also of the opinion the directories should not be hardcoded all over the place as you can see in the diff. IMO there should be separate methods like `getTemplateDir`, `getConfigDir` etc. on the BundleInterface. And the default Bundle class implements these new conventions as suggested in this PR. Even if it's not recommended to change the directories to have conventions across shared bundles, it just makes the discoverability and self-explanation of code much better. It's the same as with the new symfony 4 structure: The default conventions (cache, log, config etc) come with the Kernel in one place. Having the default conventions implemented in the Bundle just collects and self-explains those directories that symfony relies on. It should not be spread across all possible places like the assets:install and debug:translations command.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-07T05:08:15Z
+
+I'm against having methods that allow to change the default directories. A bundle is opinionated and convention based for directories. Developers should be able to easily find things in a third party bundle, so a common directory structure is a must.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-07T17:53:37Z
+
+**Update**
+
+ * We'll use the new directory only if the legacy directory doesn't exist.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-13T12:53:03Z
+
+I missed the last comment, let me know if it's enough.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-13T12:57:15Z
+
+I'm also working on a demo bundle/repo to show people how to migrate safely:
+https://github.com/yceruto/acme-bundle (WIP)

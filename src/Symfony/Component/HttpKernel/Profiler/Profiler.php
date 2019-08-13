@@ -137,7 +137,7 @@ class Profiler implements ResetInterface
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         if (false === $this->enabled) {
-            return;
+            return null;
         }
 
         $profile = new Profile(substr(hash('sha256', uniqid(mt_rand(), true)), 0, 6));

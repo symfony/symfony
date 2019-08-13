@@ -54,7 +54,36 @@ Dotenv
 EventDispatcher
 ---------------
 
- * The signature of the `EventDispatcherInterface::dispatch()` method should be updated to `dispatch($event, string $eventName = null)`, not doing so is deprecated
+ * The signature of the `EventDispatcherInterface::dispatch()` method has been updated, consider using the new signature `dispatch($event, string $eventName = null)` instead of the old signature `dispatch($eventName, $event)` that is deprecated
+
+   You have to swap arguments when calling `dispatch()`:
+
+   Before:
+   ```php
+   $this->eventDispatcher->dispatch(Events::My_EVENT, $event);
+   ```
+
+   After:
+   ```php
+   $this->eventDispatcher->dispatch($event, Events::My_EVENT);
+   ```
+
+   If your bundle or package needs to provide compatibility with the previous way of using the dispatcher, you can use `Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy::decorate()` to ease upgrades:
+
+   Before:
+   ```php
+   public function __construct(EventDispatcherInterface $eventDispatcher) {
+       $this->eventDispatcher = $eventDispatcher;
+   }
+   ```
+
+   After:
+   ```php
+   public function __construct(EventDispatcherInterface $eventDispatcher) {
+       $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+   }
+   ```
+
  * The `Event` class has been deprecated, use `Symfony\Contracts\EventDispatcher\Event` instead
 
 Filesystem

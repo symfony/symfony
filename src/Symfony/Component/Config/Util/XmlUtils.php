@@ -219,7 +219,7 @@ class XmlUtils
 
         switch (true) {
             case 'null' === $lowercaseValue:
-                return;
+                return null;
             case ctype_digit($value):
                 $raw = $value;
                 $cast = (int) $value;

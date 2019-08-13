@@ -42,7 +42,7 @@ interface ProfilerStorageInterface
      *
      * The method returns false if the token does not exist in the storage.
      *
-     * @return Profile The profile associated with token
+     * @return Profile|null The profile associated with token
      */
     public function read(string $token);
 

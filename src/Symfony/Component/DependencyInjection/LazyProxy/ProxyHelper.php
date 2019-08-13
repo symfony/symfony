@@ -29,7 +29,7 @@ class ProxyHelper
             $type = $r->getReturnType();
         }
         if (!$type) {
-            return;
+            return null;
         }
         if (!\is_string($type)) {
             $name = $type->getName();
@@ -45,7 +45,7 @@ class ProxyHelper
             return $prefix.$name;
         }
         if (!$r instanceof \ReflectionMethod) {
-            return;
+            return null;
         }
         if ('self' === $lcName) {
             return $prefix.$r->getDeclaringClass()->name;

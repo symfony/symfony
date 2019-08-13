@@ -48,7 +48,7 @@ class ServerParams
         $iniMax = strtolower($this->getNormalizedIniPostMaxSize());
 
         if ('' === $iniMax) {
-            return;
+            return null;
         }
 
         $max = ltrim($iniMax, '+');

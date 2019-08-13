@@ -414,12 +414,12 @@ class Filesystem
     public function readlink($path, $canonicalize = false)
     {
         if (!$canonicalize && !is_link($path)) {
-            return;
+            return null;
         }
 
         if ($canonicalize) {
             if (!$this->exists($path)) {
-                return;
+                return null;
             }
 
             if ('\\' === \DIRECTORY_SEPARATOR) {

@@ -533,7 +533,7 @@ abstract class Client
     protected function createCrawlerFromContent($uri, $content, $type)
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            return;
+            return null;
         }
 
         $crawler = new Crawler(null, $uri);

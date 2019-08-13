@@ -30,17 +30,17 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
         $notFoundSuffix = '()';
         $notFoundSuffixLen = \strlen($notFoundSuffix);
         if ($notFoundSuffixLen > $messageLen) {
-            return;
+            return null;
         }
 
         if (0 !== substr_compare($error['message'], $notFoundSuffix, -$notFoundSuffixLen)) {
-            return;
+            return null;
         }
 
         $prefix = 'Call to undefined function ';
         $prefixLen = \strlen($prefix);
         if (0 !== strpos($error['message'], $prefix)) {
-            return;
+            return null;
         }
 
         $fullyQualifiedFunctionName = substr($error['message'], $prefixLen, -$notFoundSuffixLen);

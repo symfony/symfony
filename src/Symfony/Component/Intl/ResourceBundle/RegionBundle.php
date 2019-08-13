@@ -42,7 +42,7 @@ class RegionBundle extends RegionDataProvider implements RegionBundleInterface
         try {
             return $this->getName($country, $displayLocale);
         } catch (MissingResourceException $e) {
-            return;
+            return null;
         }
     }
 

@@ -116,7 +116,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     public function read($token)
     {
         if (!$token || !file_exists($file = $this->getFilename($token))) {
-            return;
+            return null;
         }
 
         return $this->createProfileFromData($token, unserialize(file_get_contents($file)));
@@ -227,7 +227,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $position = ftell($file);
 
         if (0 === $position) {
-            return;
+            return null;
         }
 
         while (true) {

@@ -472,7 +472,7 @@ class Application
         if (!$command->isEnabled()) {
             $command->setApplication(null);
 
-            return;
+            return null;
         }
 
         if (null === $command->getDefinition()) {

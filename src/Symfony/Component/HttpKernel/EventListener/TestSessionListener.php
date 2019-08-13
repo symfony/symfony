@@ -33,7 +33,7 @@ class TestSessionListener extends AbstractTestSessionListener
     protected function getSession()
     {
         if (!$this->container->has('session')) {
-            return;
+            return null;
         }
 
         return $this->container->get('session');

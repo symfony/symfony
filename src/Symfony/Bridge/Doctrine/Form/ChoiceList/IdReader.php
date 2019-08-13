@@ -91,7 +91,7 @@ class IdReader
     public function getIdValue($object)
     {
         if (!$object) {
-            return;
+            return null;
         }
 
         if (!$this->om->contains($object)) {

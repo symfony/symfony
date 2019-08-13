@@ -223,7 +223,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
             $item = $item->value;
         }
         if (!($item = $this->getStub($item)) instanceof Stub || !$item->position) {
-            return;
+            return null;
         }
         $keys = [$key];
 
@@ -238,7 +238,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
             case Stub::TYPE_RESOURCE:
                 break;
             default:
-                return;
+                return null;
         }
 
         $data = null;

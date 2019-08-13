@@ -123,7 +123,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @see getResourceForBlockHierarchy()
      */
-    private function loadResourceForBlockNameHierarchy(string $cacheKey, FormView $view, array $blockNameHierarchy, $hierarchyLevel): bool
+    private function loadResourceForBlockNameHierarchy(string $cacheKey, FormView $view, array $blockNameHierarchy, int $hierarchyLevel): bool
     {
         $blockName = $blockNameHierarchy[$hierarchyLevel];
 

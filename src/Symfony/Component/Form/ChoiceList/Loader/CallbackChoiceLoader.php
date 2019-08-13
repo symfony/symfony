@@ -40,7 +40,7 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadChoiceList($value = null)
+    public function loadChoiceList(callable $value = null)
     {
         if (null !== $this->choiceList) {
             return $this->choiceList;
@@ -52,7 +52,7 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadChoicesForValues(array $values, $value = null)
+    public function loadChoicesForValues(array $values, callable $value = null)
     {
         // Optimize
         if (empty($values)) {
@@ -65,7 +65,7 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadValuesForChoices(array $choices, $value = null)
+    public function loadValuesForChoices(array $choices, callable $value = null)
     {
         // Optimize
         if (empty($choices)) {

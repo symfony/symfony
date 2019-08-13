@@ -53,38 +53,32 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @throws Exception\LogicException            when trying to add a child to a non-compound form
      * @throws Exception\UnexpectedTypeException   if $child or $type has an unexpected type
      */
-    public function add($child, $type = null, array $options = []);
+    public function add($child, string $type = null, array $options = []);
 
     /**
      * Returns the child with the given name.
-     *
-     * @param string $name The name of the child
      *
      * @return self
      *
      * @throws \OutOfBoundsException if the named child does not exist
      */
-    public function get($name);
+    public function get(string $name);
 
     /**
      * Returns whether a child with the given name exists.
      *
-     * @param string $name The name of the child
-     *
      * @return bool
      */
-    public function has($name);
+    public function has(string $name);
 
     /**
      * Removes a child from the form.
-     *
-     * @param string $name The name of the child to remove
      *
      * @return $this
      *
      * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
-    public function remove($name);
+    public function remove(string $name);
 
     /**
      * Returns all children in this group.
@@ -103,7 +97,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return FormErrorIterator An iterator over the {@link FormError}
      *                           instances that where added to this form
      */
-    public function getErrors($deep = false, $flatten = true);
+    public function getErrors(bool $deep = false, bool $flatten = true);
 
     /**
      * Updates the form with default model data.
@@ -309,7 +303,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
-    public function submit($submittedData, $clearMissing = true);
+    public function submit($submittedData, bool $clearMissing = true);
 
     /**
      * Returns the root of the form tree.

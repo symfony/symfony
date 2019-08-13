@@ -55,12 +55,6 @@ class FormBuilderTest extends TestCase
         $this->builder->add(true);
     }
 
-    public function testAddTypeNoString()
-    {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-        $this->builder->add('foo', 1234);
-    }
-
     public function testAddWithGuessFluent()
     {
         $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);

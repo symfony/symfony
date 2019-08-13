@@ -81,7 +81,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     /**
      * {@inheritdoc}
      */
-    public function createListFromChoices($choices, $value = null)
+    public function createListFromChoices(iterable $choices, $value = null)
     {
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);

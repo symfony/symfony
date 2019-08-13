@@ -24,7 +24,7 @@ class OptionsResolverWrapper extends OptionsResolver
 {
     private $undefined = [];
 
-    public function setNormalizer($option, \Closure $normalizer)
+    public function setNormalizer(string $option, \Closure $normalizer)
     {
         try {
             parent::setNormalizer($option, $normalizer);
@@ -35,7 +35,7 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function setAllowedValues($option, $allowedValues)
+    public function setAllowedValues(string $option, $allowedValues)
     {
         try {
             parent::setAllowedValues($option, $allowedValues);
@@ -46,7 +46,7 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function addAllowedValues($option, $allowedValues)
+    public function addAllowedValues(string $option, $allowedValues)
     {
         try {
             parent::addAllowedValues($option, $allowedValues);
@@ -57,7 +57,7 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function setAllowedTypes($option, $allowedTypes)
+    public function setAllowedTypes(string $option, $allowedTypes)
     {
         try {
             parent::setAllowedTypes($option, $allowedTypes);
@@ -68,7 +68,7 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function addAllowedTypes($option, $allowedTypes)
+    public function addAllowedTypes(string $option, $allowedTypes)
     {
         try {
             parent::addAllowedTypes($option, $allowedTypes);

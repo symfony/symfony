@@ -141,8 +141,8 @@ class Container implements ResettableContainerInterface
      * Setting a synthetic service to null resets it: has() returns false and get()
      * behaves in the same way as if the service was never created.
      *
-     * @param string $id      The service identifier
-     * @param object $service The service instance
+     * @param string      $id      The service identifier
+     * @param object|null $service The service instance
      */
     public function set($id, $service)
     {
@@ -210,7 +210,7 @@ class Container implements ResettableContainerInterface
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
      *
-     * @return object The associated service
+     * @return object|null The associated service
      *
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined

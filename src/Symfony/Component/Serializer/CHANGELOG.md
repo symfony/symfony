@@ -138,7 +138,7 @@ CHANGELOG
 
  * added `$context` support for XMLEncoder.
  * [DEPRECATION] JsonEncode and JsonDecode where modified to throw
-   an exception if error found. No need for get*Error() functions
+   an exception if error found. No need for `get*Error()` functions
 
 2.3.0
 -----

@@ -164,7 +164,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
         return [
             'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
-            'Aliases' => array_column(iterator_to_array($metadataBundle['alias']['language']), 'replacement'),
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
         ];
     }
@@ -179,9 +178,9 @@ class LanguageDataGenerator extends AbstractDataGenerator
         $aliases = iterator_to_array($metadataBundle['alias']['language']);
         $alpha2ToAlpha3 = [];
 
-        foreach ($aliases as $alias => $language) {
-            $language = $language['replacement'];
-            if (2 === \strlen($language) && 3 === \strlen($alias)) {
+        foreach ($aliases as $alias => $data) {
+            $language = $data['replacement'];
+            if (2 === \strlen($language) && 3 === \strlen($alias) && 'overlong' === $data['reason']) {
                 if (isset(self::$preferredAlpha2ToAlpha3Mapping[$language])) {
                     // Validate to prevent typos
                     if (!isset($aliases[self::$preferredAlpha2ToAlpha3Mapping[$language]])) {

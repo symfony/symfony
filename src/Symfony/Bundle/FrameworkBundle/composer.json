@@ -23,7 +23,7 @@
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/error-renderer": "^4.4|^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
-        "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/http-kernel": "^5.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",

@@ -35,11 +35,9 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
     }
 
     /**
-     * Warms up the cache.
-     *
-     * @param string $cacheDir The cache directory
+     * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir)
     {
         $router = $this->container->get('router');
 

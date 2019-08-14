@@ -53,6 +53,8 @@ trait ArrayTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function hasItem($key)
     {
@@ -68,6 +70,8 @@ trait ArrayTrait
      * {@inheritdoc}
      *
      * @param string $prefix
+     *
+     * @return bool
      */
     public function clear(/*string $prefix = ''*/)
     {
@@ -88,6 +92,8 @@ trait ArrayTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItem($key)
     {

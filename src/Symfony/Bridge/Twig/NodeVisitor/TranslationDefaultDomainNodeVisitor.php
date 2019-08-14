@@ -39,6 +39,8 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 
     /**
      * {@inheritdoc}
+     *
+     * @return Node
      */
     protected function doEnterNode(Node $node, Environment $env)
     {
@@ -91,6 +93,8 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 
     /**
      * {@inheritdoc}
+     *
+     * @return Node|null
      */
     protected function doLeaveNode(Node $node, Environment $env)
     {

@@ -27,6 +27,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getName()
     {
@@ -35,6 +37,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
@@ -76,6 +80,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function requiresSQLCommentHint(AbstractPlatform $platform)
     {

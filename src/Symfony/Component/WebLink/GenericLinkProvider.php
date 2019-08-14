@@ -61,6 +61,8 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return static
      */
     public function withLink(LinkInterface $link)
     {
@@ -72,6 +74,8 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return static
      */
     public function withoutLink(LinkInterface $link)
     {

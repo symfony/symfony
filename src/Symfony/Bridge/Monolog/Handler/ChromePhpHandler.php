@@ -72,6 +72,8 @@ class ChromePhpHandler extends BaseChromePhpHandler
 
     /**
      * Override default behavior since we check it in onKernelResponse.
+     *
+     * @return bool
      */
     protected function headersAccepted()
     {

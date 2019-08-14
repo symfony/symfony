@@ -69,6 +69,8 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -79,6 +81,8 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -105,6 +109,8 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {
@@ -142,6 +148,8 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {

@@ -32,6 +32,8 @@ class NullCache implements Psr16CacheInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -42,6 +44,8 @@ class NullCache implements Psr16CacheInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function has($key)
     {
@@ -50,6 +54,8 @@ class NullCache implements Psr16CacheInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear()
     {
@@ -58,6 +64,8 @@ class NullCache implements Psr16CacheInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function delete($key)
     {
@@ -66,6 +74,8 @@ class NullCache implements Psr16CacheInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {
@@ -74,6 +84,8 @@ class NullCache implements Psr16CacheInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -82,6 +94,8 @@ class NullCache implements Psr16CacheInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {

@@ -66,6 +66,8 @@ class ArrayCache implements Psr16CacheInterface, LoggerAwareInterface, Resettabl
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -85,6 +87,8 @@ class ArrayCache implements Psr16CacheInterface, LoggerAwareInterface, Resettabl
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {
@@ -100,6 +104,8 @@ class ArrayCache implements Psr16CacheInterface, LoggerAwareInterface, Resettabl
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -112,6 +118,8 @@ class ArrayCache implements Psr16CacheInterface, LoggerAwareInterface, Resettabl
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {

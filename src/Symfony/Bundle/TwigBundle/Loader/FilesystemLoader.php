@@ -47,6 +47,8 @@ class FilesystemLoader extends BaseFilesystemLoader
      * {@inheritdoc}
      *
      * The name parameter might also be a TemplateReferenceInterface.
+     *
+     * @return bool
      */
     public function exists($name)
     {

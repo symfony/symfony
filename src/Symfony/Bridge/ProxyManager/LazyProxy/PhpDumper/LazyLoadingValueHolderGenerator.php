@@ -29,6 +29,8 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function generate(\ReflectionClass $originalClass, ClassGenerator $classGenerator)
     {

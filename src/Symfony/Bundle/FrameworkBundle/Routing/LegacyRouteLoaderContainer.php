@@ -43,6 +43,8 @@ class LegacyRouteLoaderContainer implements ContainerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function has($id)
     {

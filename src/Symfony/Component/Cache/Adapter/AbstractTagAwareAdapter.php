@@ -151,6 +151,8 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function commit()
     {
@@ -213,6 +215,8 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      * {@inheritdoc}
      *
      * Overloaded in order to deal with tags for adjusted doDelete() signature.
+     *
+     * @return bool
      */
     public function deleteItems(array $keys)
     {

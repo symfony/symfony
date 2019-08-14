@@ -89,6 +89,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function hasItem($key)
     {
@@ -102,6 +104,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItem($key)
     {
@@ -115,6 +119,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function save(CacheItemInterface $item)
     {
@@ -128,6 +134,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
     {
@@ -169,6 +177,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
      * {@inheritdoc}
      *
      * @param string $prefix
+     *
+     * @return bool
      */
     public function clear(/*string $prefix = ''*/)
     {
@@ -187,6 +197,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItems(array $keys)
     {
@@ -201,6 +213,8 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function commit()
     {

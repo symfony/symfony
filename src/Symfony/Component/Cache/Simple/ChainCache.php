@@ -82,6 +82,8 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -123,6 +125,8 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function has($key)
     {
@@ -137,6 +141,8 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear()
     {
@@ -152,6 +158,8 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function delete($key)
     {
@@ -167,6 +175,8 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {
@@ -185,6 +195,8 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -200,6 +212,8 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {

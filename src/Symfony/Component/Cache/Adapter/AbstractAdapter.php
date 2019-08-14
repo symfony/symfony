@@ -144,6 +144,8 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function commit()
     {

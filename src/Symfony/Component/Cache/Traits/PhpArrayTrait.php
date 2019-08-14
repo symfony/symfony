@@ -124,6 +124,8 @@ EOF;
      * {@inheritdoc}
      *
      * @param string $prefix
+     *
+     * @return bool
      */
     public function clear(/*string $prefix = ''*/)
     {

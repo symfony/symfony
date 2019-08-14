@@ -17,6 +17,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Template;
+use Twig\TokenParser\TokenParserInterface;
 use Twig\TwigFunction;
 
 /**
@@ -35,6 +36,9 @@ class DumpExtension extends AbstractExtension
         $this->dumper = $dumper;
     }
 
+    /**
+     * @return TwigFunction[]
+     */
     public function getFunctions()
     {
         return [
@@ -42,6 +46,9 @@ class DumpExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @return TokenParserInterface[]
+     */
     public function getTokenParsers()
     {
         return [new DumpTokenParser()];

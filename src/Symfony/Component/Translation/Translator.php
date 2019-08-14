@@ -353,7 +353,7 @@ EOF
     /**
      * @internal
      */
-    protected function doLoadCatalogue($locale): void
+    protected function doLoadCatalogue(string $locale): void
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 

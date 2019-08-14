@@ -24,7 +24,7 @@ class RedirectableCompiledUrlMatcher extends CompiledUrlMatcher implements Redir
     /**
      * {@inheritdoc}
      */
-    public function redirect($path, $route, $scheme = null)
+    public function redirect(string $path, string $route, string $scheme = null)
     {
         return [
             '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction',

@@ -35,7 +35,6 @@ trait PriorityTaggedServiceTrait
      * @see https://bugs.php.net/60926
      *
      * @param string|TaggedIteratorArgument $tagName
-     * @param ContainerBuilder              $container
      *
      * @return Reference[]
      */

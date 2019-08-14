@@ -24,9 +24,7 @@ class RememberMeToken extends AbstractToken
     private $providerKey;
 
     /**
-     * @param UserInterface $user
-     * @param string        $providerKey
-     * @param string        $secret      A secret used to make sure the token is created by the app and not by a malicious client
+     * @param string $secret A secret used to make sure the token is created by the app and not by a malicious client
      *
      * @throws \InvalidArgumentException
      */

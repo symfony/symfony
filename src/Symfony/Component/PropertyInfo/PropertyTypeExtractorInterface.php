@@ -23,7 +23,6 @@ interface PropertyTypeExtractorInterface
      *
      * @param string $class
      * @param string $property
-     * @param array  $context
      *
      * @return Type[]|null
      */

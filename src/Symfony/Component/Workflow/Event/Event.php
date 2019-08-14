@@ -30,7 +30,6 @@ class Event extends BaseEvent
 
     /**
      * @param object            $subject
-     * @param Marking           $marking
      * @param Transition        $transition
      * @param WorkflowInterface $workflow
      */

@@ -28,9 +28,6 @@ abstract class AbstractNode implements NodeInterface
      */
     private $nodeName;
 
-    /**
-     * @return string
-     */
     public function getNodeName(): string
     {
         if (null === $this->nodeName) {

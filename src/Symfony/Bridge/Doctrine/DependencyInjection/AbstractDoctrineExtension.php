@@ -117,7 +117,6 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register the mapping driver configuration for later use with the object managers metadata driver chain.
      *
-     * @param array  $mappingConfig
      * @param string $mappingName
      *
      * @throws \InvalidArgumentException
@@ -225,7 +224,6 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Assertion if the specified mapping information is valid.
      *
-     * @param array  $mappingConfig
      * @param string $objectManagerName
      *
      * @throws \InvalidArgumentException

@@ -52,8 +52,6 @@ class GuardAuthenticatorHandler
 
     /**
      * Authenticates the given token in the system.
-     *
-     * @param string $providerKey The name of the provider/firewall being used for authentication
      */
     public function authenticateWithToken(TokenInterface $token, Request $request, string $providerKey = null)
     {

@@ -309,7 +309,6 @@ class YamlFileLoader extends FileLoader
      * @param string       $id
      * @param array|string $service
      * @param string       $file
-     * @param array        $defaults
      *
      * @throws InvalidArgumentException When tags are invalid
      */

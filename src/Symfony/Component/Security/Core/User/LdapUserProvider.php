@@ -116,7 +116,6 @@ class LdapUserProvider implements UserProviderInterface
      * Loads a user from an LDAP entry.
      *
      * @param string $username
-     * @param Entry  $entry
      *
      * @return User
      */

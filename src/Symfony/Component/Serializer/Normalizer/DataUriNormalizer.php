@@ -144,8 +144,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     /**
      * Gets the mime type of the object. Defaults to application/octet-stream.
      *
-     * @param \SplFileInfo $object
-     *
      * @return string
      */
     private function getMimeType(\SplFileInfo $object)
@@ -167,8 +165,6 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
 
     /**
      * Returns the \SplFileObject instance associated with the given \SplFileInfo instance.
-     *
-     * @param \SplFileInfo $object
      *
      * @return \SplFileObject
      */

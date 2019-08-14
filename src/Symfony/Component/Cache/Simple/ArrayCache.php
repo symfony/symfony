@@ -35,7 +35,6 @@ class ArrayCache implements Psr16CacheInterface, LoggerAwareInterface, Resettabl
     private $defaultLifetime;
 
     /**
-     * @param int  $defaultLifetime
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
     public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true)

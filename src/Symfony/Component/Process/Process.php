@@ -218,7 +218,6 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
-     * @param array         $env      An array of additional env vars to set when running the process
      *
      * @return int The exit status code
      *
@@ -240,9 +239,6 @@ class Process implements \IteratorAggregate
      *
      * This is identical to run() except that an exception is thrown if the process
      * exits with a non-zero exit code.
-     *
-     * @param callable|null $callback
-     * @param array         $env      An array of additional env vars to set when running the process
      *
      * @return self
      *
@@ -273,7 +269,6 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
-     * @param array         $env      An array of additional env vars to set when running the process
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
@@ -360,7 +355,6 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
-     * @param array         $env      An array of additional env vars to set when running the process
      *
      * @return $this
      *

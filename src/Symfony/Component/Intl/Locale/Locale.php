@@ -105,9 +105,8 @@ class Locale
     /**
      * Not supported. Checks if a language tag filter matches with locale.
      *
-     * @param string $langtag      The language tag to check
-     * @param string $locale       The language range to check against
-     * @param bool   $canonicalize
+     * @param string $langtag The language tag to check
+     * @param string $locale  The language range to check against
      *
      * @return string The corresponding locale code
      *

@@ -630,8 +630,6 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @param iterable $iterator
-     *
      * @return $this
      *
      * @throws \InvalidArgumentException when the given argument is not iterable

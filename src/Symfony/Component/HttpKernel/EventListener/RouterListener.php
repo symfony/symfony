@@ -53,7 +53,6 @@ class RouterListener implements EventSubscriberInterface
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher    The Url or Request matcher
      * @param RequestContext|null                         $context    The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      * @param string                                      $projectDir
-     * @param bool                                        $debug
      *
      * @throws \InvalidArgumentException
      */

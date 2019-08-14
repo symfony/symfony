@@ -225,7 +225,6 @@ class IntlDateFormatter
     /**
      * Not supported. Formats an object.
      *
-     * @param object $object
      * @param mixed  $format
      * @param string $locale
      *

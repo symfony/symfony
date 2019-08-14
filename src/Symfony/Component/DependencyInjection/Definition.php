@@ -422,8 +422,6 @@ class Definition
     /**
      * Sets whether or not instanceof conditionals should be prepended with a global set.
      *
-     * @param bool $autoconfigured
-     *
      * @return $this
      */
     public function setAutoconfigured(bool $autoconfigured)
@@ -819,8 +817,6 @@ class Definition
      * Bindings map $named or FQCN arguments to values that should be
      * injected in the matching parameters (of the constructor, of methods
      * called and of controller actions).
-     *
-     * @param array $bindings
      *
      * @return $this
      */

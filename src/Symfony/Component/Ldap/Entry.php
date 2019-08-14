@@ -74,9 +74,6 @@ class Entry
 
     /**
      * Sets a value for the given attribute.
-     *
-     * @param string $name
-     * @param array  $value
      */
     public function setAttribute(string $name, array $value)
     {
@@ -85,8 +82,6 @@ class Entry
 
     /**
      * Removes a given attribute.
-     *
-     * @param string $name
      */
     public function removeAttribute(string $name)
     {

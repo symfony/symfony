@@ -70,8 +70,6 @@ class Processor
      * @param array  $config A config array
      * @param string $key    The key to normalize
      * @param string $plural The plural form of the key if it is irregular
-     *
-     * @return array
      */
     public static function normalizeConfig(array $config, string $key, string $plural = null): array
     {

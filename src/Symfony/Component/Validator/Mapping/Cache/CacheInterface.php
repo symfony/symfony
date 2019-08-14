@@ -22,8 +22,6 @@ interface CacheInterface
 {
     /**
      * Returns whether metadata for the given class exists in the cache.
-     *
-     * @param string $class
      */
     public function has(string $class);
 

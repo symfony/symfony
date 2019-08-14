@@ -188,8 +188,6 @@ class Question
     /**
      * Sets a validator for the question.
      *
-     * @param callable|null $validator
-     *
      * @return $this
      */
     public function setValidator(callable $validator = null)
@@ -247,8 +245,6 @@ class Question
      * Sets a normalizer for the response.
      *
      * The normalizer can be a callable (a string), a closure or a class implementing __invoke.
-     *
-     * @param callable $normalizer
      *
      * @return $this
      */

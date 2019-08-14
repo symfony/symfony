@@ -289,7 +289,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * traversal, the object will be iterated and each nested object will be
      * validated instead.
      *
-     *
      * @throws NoSuchMetadataException      If the object has no associated metadata
      *                                      and does not implement {@link \Traversable}
      *                                      or if traversal is disabled via the

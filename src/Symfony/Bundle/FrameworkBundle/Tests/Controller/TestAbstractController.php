@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Psr\Link\LinkInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Link\LinkInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;

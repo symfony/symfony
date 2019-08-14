@@ -62,8 +62,7 @@ interface FormFactoryInterface
     /**
      * Returns a form builder.
      *
-     * @param mixed $data    The initial data
-
+     * @param mixed $data The initial data
      *
      * @return FormBuilderInterface The form builder
      *

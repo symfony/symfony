@@ -153,8 +153,6 @@ class Deprecation
     }
 
     /**
-     * @param string $utilPrefix
-     *
      * @return bool
      */
     public function isLegacy()

@@ -39,8 +39,6 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     }
 
     /**
-     * @param int $max
-     *
      * @return ProgressBar
      */
     public function createProgressBar(int $max = 0)

@@ -27,8 +27,6 @@ class StringUtil
     /**
      * Returns the trimmed data.
      *
-     * @param string $string
-     *
      * @return string
      */
     public static function trim(string $string)

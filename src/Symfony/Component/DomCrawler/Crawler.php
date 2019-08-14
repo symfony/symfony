@@ -863,7 +863,6 @@ class Crawler implements \Countable, \IteratorAggregate
      *     echo Crawler::xpathLiteral('a\'b"c');
      *     //prints concat('a', "'", 'b"c')
      *
-     *
      * @return string Converted string
      */
     public static function xpathLiteral(string $s)

@@ -233,9 +233,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Gets and caches attributes for the given object, format and context.
      *
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
+     * @param object $object
      *
      * @return string[]
      */
@@ -274,9 +272,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Extracts attributes to normalize from the class of the given object, format and context.
      *
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
+     * @param object $object
      *
      * @return string[]
      */
@@ -285,10 +281,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Gets the attribute value.
      *
-     * @param object      $object
-     * @param string      $attribute
-     * @param string|null $format
-     * @param array       $context
+     * @param object $object
      *
      * @return mixed
      */
@@ -361,7 +354,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param string      $attribute
      * @param mixed       $value
      * @param string|null $format
-     * @param array       $context
      */
     abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []);
 

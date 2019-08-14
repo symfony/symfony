@@ -32,7 +32,6 @@ use Symfony\Component\Routing\RouteCollection;
  * recognizes several parameters: requirements, options, defaults, schemes,
  * methods, host, and name. The name parameter is mandatory.
  * Here is an example of how you should be able to use it:
- *
  *     /**
  *      * @Route("/Blog")
  *      * /
@@ -44,7 +43,6 @@ use Symfony\Component\Routing\RouteCollection;
  *         public function index()
  *         {
  *         }
- *
  *         /**
  *          * @Route("/{id}", name="blog_post", requirements = {"id" = "\d+"})
  *          * /
@@ -240,9 +238,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Gets the default route name for a class method.
-     *
-     * @param \ReflectionClass  $class
-     * @param \ReflectionMethod $method
      *
      * @return string
      */

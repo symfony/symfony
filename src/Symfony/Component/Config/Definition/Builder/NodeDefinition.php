@@ -345,8 +345,6 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Set PathSeparator to use.
      *
-     * @param string $separator
-     *
      * @return $this
      */
     public function setPathSeparator(string $separator)

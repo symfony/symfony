@@ -219,7 +219,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     }
 
     /**
-     * @param \DOMNode             $node
      * @param \DOMDocumentFragment $fragment
      */
     final protected function appendDocumentFragment(\DOMNode $node, $fragment): bool

@@ -555,8 +555,6 @@ class XmlFileLoader extends FileLoader
     /**
      * Validates a documents XML schema.
      *
-     * @param \DOMDocument $dom
-     *
      * @return bool
      *
      * @throws RuntimeException When extension references a non-existent XSD file
@@ -671,8 +669,6 @@ EOF
 
     /**
      * Loads from an extension.
-     *
-     * @param \DOMDocument $xml
      */
     private function loadFromExtensions(\DOMDocument $xml)
     {

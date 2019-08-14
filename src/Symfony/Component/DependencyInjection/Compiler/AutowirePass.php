@@ -137,11 +137,6 @@ class AutowirePass extends AbstractRecursivePass
         return $value;
     }
 
-    /**
-     * @param \ReflectionClass $reflectionClass
-     *
-     * @return array
-     */
     private function autowireCalls(\ReflectionClass $reflectionClass, bool $isRoot): array
     {
         $this->decoratedId = null;

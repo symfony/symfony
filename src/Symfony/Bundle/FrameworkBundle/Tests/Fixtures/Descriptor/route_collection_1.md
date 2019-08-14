@@ -8,11 +8,11 @@ route_1
 - Scheme: http|https
 - Method: GET|HEAD
 - Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub
-- Defaults:
+- Defaults: 
     - `name`: Joseph
-- Requirements:
+- Requirements: 
     - `name`: [a-z]+
-- Options:
+- Options: 
     - `compiler_class`: Symfony\Component\Routing\RouteCompiler
     - `opt1`: val1
     - `opt2`: val2
@@ -30,7 +30,7 @@ route_2
 - Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub
 - Defaults: NONE
 - Requirements: NO CUSTOM
-- Options:
+- Options: 
     - `compiler_class`: Symfony\Component\Routing\RouteCompiler
     - `opt1`: val1
     - `opt2`: val2

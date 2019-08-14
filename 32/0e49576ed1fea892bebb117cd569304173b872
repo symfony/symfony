@@ -1,0 +1,524 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-02-20T18:25:58Z
+
+>     * Vendor code extending other vendor core triggers the deprecations confused
+
+That's totally fine IMO. We already do that. We should maybe only whitelist things from same vendor (or maybe same namespace) as we do in some other places.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-02-21T08:29:38Z
+
+Yes we already do that for all deprecations but they are rarely triggered by vendor code unlike these new ones. For example, on the homepage of the Symfony demo, there is 3 deprecations atm. With the "return types" deprecations, there are 34.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-02-21T10:16:16Z
+
+The thing is, our deprecation reporting tool is meant to tell you when you are ready to migrate to the new major version safely (when there is no deprecation anymore). If some vendor you use rely on the deprecated stuff, you *cannot* migrate.
+
+Other deprecations are *also* regularly coming from vendors, and you need to know about them too.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-02-21T11:02:51Z
+
+I'm fine with that. I just wanted to highlight the fact that if this feature ends up being merged, people are gonna find A LOT MORE of vendor deprecations than what they are used to.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-03-06T14:08:11Z
+
+Just updated my code to handle the cases from the official PHPDoc types pages https://docs.phpdoc.org/guides/types.html
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-29T10:13:07Z
+
+Triggering a deprecation based on the fact that the interface has `@return` is wrong. This phpdoc does not imply that the next version will switch to using an actual return type. That would trigger far too many useless deprecations.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-05T17:20:08Z
+
+> Triggering a deprecation based on the fact that the interface has @return is wrong
+
+wrong is too strong. I agree with the risk you describe. What we're seeking for here is a way to warn ppl they should add return type hints before we add some ourselves.
+
+Let's do as in #30987: keep the deprecation only for `Symfony\*`. I would also suggest triggering it on PHP 7.2 only so that ppl can actually do something about the notices.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-05-29T16:19:07Z
+
+@nicolas-grekas Why PHP 7.2? Don't you mean the lowest PHP version supported by each returnable type ? eg : 7.1 for void, 7.0 for string, etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-29T16:21:26Z
+
+Because only PHP7.2 has the require type variance that allows adding the return type hint without generating a fatal error when the base interface doesn't.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-26T07:44:07Z
+
+> Because only PHP7.2 has the require type variance that allows adding the return type hint without generating a fatal error when the base interface doesn't.
+
+PHP 7.1 already allows you to do that. https://3v4l.org/5lN5J
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-06-26T09:22:41Z
+
+That's what I thought too.
+
+BTW, the help I need here would be to compare both proposed implementations (dedicated functions vs nested conditins) with Blackfire to check the performance impact (since I don't have a subscription myself).
+
+Also TODO :
+- [x] add the check on `Symfony\*` and the PHP version
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-06-28T17:24:08Z
+
+Just rebased + took last comments into account.
+
+The deprecations are triggered for any classes that extends / implements a Symfony class / interface and if the PHP version is >= 7.1. 👀 But isn't this runtime check useless since the minimum required PHP version by the component is currently 7.2.9?
+
+The failed tests caused by those new deprecations can partially help us to add strict return types in the code base.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-28T17:43:34Z
+
+@fancyweb this should target 4.4, where PHP 7.1 is the minimum.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-28T22:07:13Z
+
+> The deprecations are triggered for any classes that extends / implements a Symfony class / interface and if the PHP version is >= 7.1. 👀 But isn't this runtime check useless since the minimum required PHP version by the component is currently 7.2.9?
+
+Yes, we don‘t need the php version check. All php version supported by the error handler support adding return types in overridden methods.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-06T11:53:44Z
+
+@nicolas-grekas If this PR is meant as a preparation for adding return types to public and protected methods in 5.0 – would it make sense to add return types to private methods in 4.4 already like we did with #32786 for parameter types?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-06T11:56:52Z
+
+> would it make sense to add return types to private methods in 4.4 already like we did with #32786 for parameter types
+
+I suppose yes, *when that removes annotations*.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-06T12:21:49Z
+
+All right, I'll have a look.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-10T17:32:45Z
+
+@symfony/mergers this PR is ready, I'd like to merge it ASAP.
+
+The 1st commit makes the `DebugClassLoader` complain about methods that override a parent but miss declaring their return type, either by real declaration or annotation.
+
+The goal is to tell userland when they need to add a return-type to their classes of course.
+
+The 2nd commit is "eat-your-own-dog-food": propagating annotations from parent to child classes. This makes the PR deprecation free. Of course, all those should be turned into real return-type declarations in 5.0.
+
+Note that the change has been automated so it should be pretty safe (and tests pass). The patching script is in the 1st commit. It's dead code, but I'd like to have it part of the git history. We'll remove it once everything is completed.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-11T10:31:08Z
+
+Why force people to add a return type __phpdoc__ to subclasses?
+And adjusting our own docs with
+
+```
+/**
+     * {@inheritdoc}
+     *
+     * @return ?array
+     */
+```
+
+seems rather useless. I don't see the point of it. To me the debug class loader should ignore classes inside the Symfony namespace as we can't add the return types in 4.4 yet. We only need to check user-land classes and then we also don't care about the sub-class phpdoc at al.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-11T11:13:01Z
+
+> Why force people to add a return type phpdoc to subclasses?
+
+I might have explained myself badly, that's certainly not the case. The message is asking ppl to add real return types. But because it is not always possible when preserving BC is desired (like in our own codebase or in a third party bundle), it is possible to opt-out from the deprecation by using an annotation instead.
+
+This creates a continuous upgrade path, which is what we strive for.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-11T12:49:10Z
+
+Thanks for explaining. That makes sense. But I still would recommend that we disable this for our own code. So we don't have to add return phpdocs in 4.4.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-11T13:28:19Z
+
+what about opt-out thru `@inheritdoc`? (assuming it declares some return type, which is actually a common case in core).
+
+another issue is `mixed` which you cant declare for real, so at this point we are forcing a duplicate `@return` (assuming the parent provides it using annotations)
+
+last not but not least, "inheritdoc" is implied when no doc is present. Not sure you want to account for it..
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-11T13:40:07Z
+
+> what about opt-out thru @inheritdoc? (assuming it declares some return type, which is actually a common case in core).
+
+We want opt-out to be explicit, thus `@return` has to be explicit. Note that we already have the exact same logic for `@param`.
+
+> another issue is mixed
+
+`mixed` or multi-types return annotations are not reported, because hey, we will not be replacing them with real return type since that's not possible.
+
+> last not but not least, "inheritdoc" is implied when no doc is present. Not sure you want to account for it..
+
+inheritdoc vs no-doc is why we want the annotation to be repeated explicitly in the direct parent: because we don't want to care about transitivity and it makes everything much simpler to reason about and implement. (that also should answer @Tobion comment above)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-11T14:20:19Z
+
+Note that we enable this only for the `Symfony\` namespace for now, but I don't see why we shouldn't do it for all namespaces. We should discuss this afterwards IMHO.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-11T14:21:37Z
+
+I don't like the return phpdocs in subclasses at all. Normally we only changed the phpdoc of subclasses where the subclass changes something that is different from its parent. With this PR it changes this concept totally.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-11T14:45:46Z
+
+> I don't like the return phpdocs in subclasses at all. Normally we only changed the phpdoc of subclasses where the subclass changes something that is different from its parent. With this PR it changes this concept totally.
+
+I don't know about this concept personally, but there is no other way if we want to add return types in a smooth way. The good thing here is that while the PR is big, we won't forget adding them in the future anymore, because the new logic will trigger a notice if we do. That means the change is stable, thermodynamically :) which is nice (and required actually.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-12T15:58:11Z
+
+I updated this PR to take @Tobion's comments into account.
+
+`DebugClassLoader` now considers missing return declarations within the same vendor namespace as "do not report". But all missing return declarations across different vendor namespaces do trigger one now (and not only for the `Symfony\` prefix anymore).
+
+This means this PR still adds `@return` annotations, but a lot less, and only for those methods that override a method *from a vendor namespace*. That's a nice step forward :)
+
+PR is ready but needs https://github.com/egulias/EmailValidator/pull/209 to be green.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-12T16:46:41Z
+
+> But all missing return declarations across different vendor namespaces do trigger one now (and not only for the `Symfony\` prefix anymore).
+
+I'm not convinced that enabling this feature for any vendor library is a wise step. Let's say, I implement an interface like this one in my application:
+
+```php
+namespace Acme\SomeLibary;
+
+interface ExtensionInterface
+{
+    /**
+     * @return array
+     */
+    public function getPlugins();
+}
+```
+
+If I understood you correctly, `DebugClassLoader` will now complain about my implementation if I don't implement the method as `public function getPlugins(): array`. In that case, the class loader makes some assumtions:
+1. The doc block is not a lie.
+2. The library is going to change the method signature in a future release.
+3. The new method signature will have the return type `array`.
+
+Those are assumptions we can safely make for the `Symfony` namespace, but not for the whole world. While working on the parameter type PR, we've found so many lying doc blocks – there are certainly quite a lot in 3rd party libraries as well. The feature might be well intended, but I honestly don't feel good about auto-enabling it for code that the Symfony project does not have control over.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-12T17:07:13Z
+
+I totally I agree with @derrabus. There will be ALOT false positives. Symfonys code quality is very good but we still found many wrong or imprecise phpdoc annotations when adding real types.
+So other code will have similar issues. For example what if the phpdoc of some library is wrong and now I get a warning about a adding a return type that isn't actually the right one. I would either need to wait on upstream to fix their phpdoc or I need to add a wrong return type myself.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-12T17:56:31Z
+
+If the docblock is a lie, adding the real return type will immediately break so this won't be unnoticed, quite the contrary.
+
+I understand what you mean and you might be right. But on the other side, there is NO other way to add return types for libraries without breaking things badly. This means that the alternative is either: libs add return types like cowboys, or libs don't take the risk and never add return types. Both are worse alternatives.
+
+I think we have the reach to provide a path forward, and a smooth one.
+I'd like we give it a try during the next months.
+There will be time to revert before tagging `.0` if needed.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-08-12T18:12:03Z
+
+> If I understood you correctly, DebugClassLoader will now complain about my implementation if I don't implement the method as `public function getPlugins(): array`
+
+No, as long as your method has any return type or any `@return` doc block, there will be no deprecation triggered.
+
+> Those are assumptions we can safely make for the Symfony namespace, but not for the whole world.
+
+Yes but in a perfect world, that should be the case. Their doc return types should be right. Let's try to make things better!
+
+> we've found so many lying doc blocks
+> There will be ALOT false positives
+> we still found many wrong or imprecise phpdoc
+
+That's why this feature will improve the code of a lot of PHP vendors. Userland will add return types to get rid of the deprecations, and if they turn to be wrong, there's a lot of chances they are going to be reported / fixed quickly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-12T19:39:47Z
+
+~Now with a third commit that replaces `return;` by `return null;` in the methods that will have a return type in master.~ squashed with the 2nd commit
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-13T08:30:22Z
+
+> No, as long as your method has any return type or any `@return` doc block, there will be no deprecation triggered.
+
+Mmmh, that feels broken as well. So let's say, I have an event subscriber implementing `EventSubscriberInterface` with `public static function getSubscribedEvents()`. My IDE generated a stub function for me, without a return type declaration and with the whole docblock copied over from the interface. Assuming that the interface will receive an `: array` return type, my subscriber will break when upgrading to Symfony 5 without any prior deprecation notice. imho, I must get a deprecation here, no matter what my docblock says.
+
+> Yes but in a perfect world, that should be the case. Their doc return types should be right. Let's try to make things better!
+
+Other vendors might have different strategies for upgrading doc blocks to return types. Maybe a library chooses to turn `@return array` into `: iterable`. Maybe a vendors chose to use `: self` for `@return $this` – we've decided against that strategy, but that doesn't render the alternative invalid.
+
+The `@return` annotation never had the semantics of "If we eventually add a return type declaration, it's going to be the very type we've annotated here.". We can decide that for the Symfony codebase, `@return` can/should/must be interpreted that way. But we cannot make that decision for everyone.
+
+Also, even in Symfony we have doc blocks that intentionally lie (e.g. #32411) because of undocumented internal behavior. I could imagine that other projects have that kind of skeletons in the closet as well.
+
+I would really prefer to solve this problem for Symfony first. And maybe we can find a way for vendors to opt-in to our return type deperecations afterwards? Please, let's not lecture the php world on how to write doc blocks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T10:33:54Z
+
+Patching the source code is now controller by the `SYMFONY_PATCH_TYPE_DECLARATIONS_COMPAT` env var.
+For reference, here is how I patched the source with it.
+First step: run the test suite, with concurrency disabled because that's not compatible with patching:
+`SYMFONY_PATCH_TYPE_DECLARATIONS_COMPAT=Symfony\ ./phpunit`
+
+This will miss some classes because we all have some skipped tests, so I then ran:
+`composer install -o`
+`SYMFONY_PATCH_TYPE_DECLARATIONS_COMPAT=Symfony\ php patch.php`
+
+Where `patch.php` is this script:
+<details>
+
+```php
+<?php
+
+require __DIR__.'/.phpunit/phpunit-8.3-0/vendor/autoload.php';
+
+$loader = require __DIR__.'/vendor/autoload.php';
+
+Symfony\Component\ErrorHandler\DebugClassLoader::enable();
+
+$container = new Symfony\Component\DependencyInjection\ContainerBuilder();
+
+foreach ($loader->getClassMap() as $class => $file) {
+    if (0 === strpos($class, 'Symfony\\')) {
+        if (!$container->getReflectionClass($class, false)) {
+            echo $file, "\n";
+        }
+    }
+}
+```
+
+</details>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T10:44:50Z
+
+> So let's say, I have an event subscriber implementing EventSubscriberInterface with public static function getSubscribedEvents(). My IDE generated a stub function for me, without a return type declaration and with the whole docblock copied over from the interface. Assuming that the interface will receive an : array return type, my subscriber will break when upgrading to Symfony 5 without any prior deprecation notice. imho, I must get a deprecation here, no matter what my docblock says.
+
+If the IDE copies the docblock instead of generating an `{@inheritdoc}`, that's where the bug is. You won't get a deprecation in this situation that's correct, and there is nothing we can do about it. Note that the logic triggering deprecations doesn't have to be bullet proof. It has to be useful enough to help the mass of the code migrate. Achieving 100% accuracy is not a goal.
+
+> Other vendors might have different strategies for upgrading doc blocks to return types. Maybe a library chooses to turn `@return` array into : iterable. Maybe a vendors chose to use : self for `@return $this` – we've decided against that strategy, but that doesn't render the alternative invalid.
+
+Yes, and that's fine: the alternative is worse anyway (hard BC breaks all around or no return types ever for libs).
+
+> The `@return` annotation never had the semantics of "If we eventually add a return type declaration, it's going to be the very type we've annotated here.". We can decide that for the Symfony codebase, `@return` can/should/must be interpreted that way. But we cannot make that decision for everyone.
+
+Yes we can, we're all in the same boat. Showing where a library can/should be improved is part of a virtous circle that will benefit everyone.
+
+> Also, even in Symfony we have doc blocks that intentionally lie (e.g. #32411) because of undocumented internal behavior. I could imagine that other projects have that kind of skeletons in the closet as well.
+
+Then we'll notice when adding real return types - that's the big benefit of them - not being able to cheat. And we'll have to fix them in 4.x. Virtuous circle also.
+
+> I would really prefer to solve this problem for Symfony first. And maybe we can find a way for vendors to opt-in to our return type deperecations afterwards? Please, let's not lecture the php world on how to write doc blocks.
+
+Merging will allow validating or invalidating the proposal. Let's not be shy. We'll be in a much better position to fine tune the behavior if we have real world feedback.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-13T14:09:24Z
+
+> If the IDE copies the docblock instead of generating an `{@inheritdoc}`, that's where the bug is.
+
+I strongly disagree. PhpStorm has done this by default ever since, so we need to acknowledge that kind of code is out there. You and I might not consider this habit to be best practice, however it is neither disallowed nor inherently wrong. And with all due respect for novice developers: the kind of developer that keeps the copied doc block might benefit the most from a properly working deprecation system.
+
+Also, this is just an example. It is not disallowed to repeat a `@return` annotation when implementing an interface. In fact, I have worked with teams in the past that encouraged this practice through their own CS guidelines.
+
+> You won't get a deprecation in this situation that's correct, and there is nothing we can do about it.
+
+My example a direct userland implementation of a Symfony interface that will 100% break on upgrade. How's that case undetectable?
+
+> Note that the logic triggering deprecations doesn't have to be bullet proof. It has to be useful enough to help the mass of the code migrate. Achieving 100% accuracy is not a goal.
+
+Fair enough. But I would consider my example as pretty essential to the main goal of this PR: Tell the developer, which classes are going to break in Symfony 5 because of newly introduced return type declarations. Not having this kind of notification is what currently holds us back from adding return types to master. Everything else is icing on the cake.
+
+> > Other vendors might have different strategies for upgrading doc blocks to return types. Maybe a library chooses to turn `@return` array into : iterable. Maybe a vendors chose to use : self for `@return $this` – we've decided against that strategy, but that doesn't render the alternative invalid.
+>
+> Yes, and that's fine
+
+Absolutely not: We would be luring the developer into adding a return type that is incompatible with the type that the library vendor eventually might chose to add. In that case the upgrade path would become *a lot* harder.
+
+> the alternative is worse anyway (hard BC breaks all around or no return types ever for libs).
+
+I'm not sure if those are the only alternatives.
+
+Again: I don't question the intentions behind this PR. It is very well motivated and I do want this PR to be merged in some form. But I think that the current concept is flawed:
+
+* Whether a class is going to break in Symfony 5 has nothing to do with its doc block.
+* We're guessing an upgrade path for all php libraries in the world that might turn out to be totally wrong.
+* We're making assumptions about correct and incorrect phpdoc annotations that are stricter than the current (de-facto) standard.
+
+I get the impression that by aiming at fixing the return type problem for the whole world, we're missing the target that we originally aimed at: Create a smooth upgrade path from Symfony 4 to 5.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T14:16:37Z
+
+> My example a direct userland implementation of a Symfony interface that will 100% break on upgrade. How's that case undetectable?
+
+Because you're forgetting about third party bundles that do need an upgrade path too: we need to provide them a way to be deprecation-free with 4.4. Annotations are the way.
+
+> We would be luring the developer into adding a return type that is incompatible with the type that the library vendor eventually might chose to add. In that case the upgrade path would become a lot harder.
+
+This sounds scary but I'm not scared: I'm asking for real-world feedback instead because not doing something by fear of something else that might not happen in practice would be a missed opportunity.
+
+There is zero logic currently in DebugClassLoader that is tightly coupled to Symfony. We *did* something generic here already, that fits the PHP world.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-13T14:39:20Z
+
+> Because you're forgetting about third party bundles that do need an upgrade path too: we need to provide them a way to be deprecation-free with 4.4. Annotations are the way.
+
+If they would break with Symfony 5, they shouldn't be deprecation-free in 4.4. How many bundles still trigger deprecations because they instantiate a `TreeBuilder` without `$name` or dispatch an event with the old order of arguments? The very fact that a bundle triggers deprecations triggers developers to fix them. 😃
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T15:26:25Z
+
+> If they would break with Symfony 5, they shouldn't be deprecation-free in 4.4. How many bundles still trigger deprecations because they instantiate a TreeBuilder without $name or dispatch an event with the old order of arguments? The very fact that a bundle triggers deprecations triggers developers to fix them. smiley
+
+the way we want it to work, and achieved doing so is the following:
+- ppl update their deps the best they can
+- they fix all deprecations until there are none left
+- they allow the next major version and do composer up
+- profit (in practice: fix the remaining)
+
+This means bundles should be deprecation free *before* the bump. Exactly like using Symfony 4.4 is running deprecation-free before the bump despite the return types being not set yet.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-13T15:41:39Z
+
+> This means bundles should be deprecation free _before_ the bump.
+
+Exactly. And that means the bundles must have adopted the return types added with Symfony 5, because they're going to break with the bump otherwise. A bundle creator can add return types and at the same time remain compatible with Symfony 4.4 ([example](https://3v4l.org/IH87e)). So the path to get the bundle deprecation-free is to add the necessary return types.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-13T16:01:53Z
+
+> If the IDE copies the docblock instead of generating an `{@inheritdoc}`, that's where the bug is.
+
+We actually can find this pattern in the Symfony codebase as well. I've fixed the Twig bridge as an example: #33145.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T21:03:13Z
+
+> that means the bundles must have adopted the return types added with Symfony 5
+
+That's only for packages that rely on some Symfony type. If a dep depends on Symfony, we can assume they don't allow v5 in their composer.json file. Nothing will break until this is relaxed, because v5 will just not be installable yet. How do you know? By trying and seeing composer refuse to upgrade to v5, `composer why` for the details. The next question is: *when* does one reach this point in the migration process? Only one possible answer: when you're deprecation-free, because it's pointless to try v5 when you're not yet. But then, the dep that blocks us doesn't use return-types yet! Because if it were, v5 would be allowed for sure! You see the chicken and egg situation?
+
+Now, let's take the group of deps that don't rely on Symfony. Basically, they don't care with what we're doing. So they won't do anything that we could ask them to do, because that'd be added maintainance burden for them, or just because getting a message is hard, provided we have the reach. And that's fair. I don't believe adding an opt-in configuration would work for any dep past the one we have direct influence over.
+
+But I can bet on the fact that deps do want to use types, especially if they already use docblock annotations. I'd bet on this because return-types help maintaining a codebase.
+
+So: yes, there will be docblocks that won't be accurate. But that'll be caught immediately, by just looking at the failure a real return type will trigger. And btw, ppl don't need us to add real return types right now. They're already allowed to do so.
+
+We can help by showing which types would be needed where.
+This is exactly what the strategy in this PR provides.
+
+It's true that this won't report annotations that duplicate a parent `@return`. But that's not an issue if we ship the very next tool we're going to need for the Symfony codebase: one that turns `@return` into return type declarations.
+
+This PR is creating this forward path, which, I believe, solves all issues mentionned above and creates the smoother process I can think of.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T21:15:01Z
+
+PR is green BTW :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-13T21:40:44Z
+
+>> My example a direct userland implementation of a Symfony interface that will 100% break on upgrade. How's that case undetectable?
+
+> Because you're forgetting about third party bundles that do need an upgrade path too: we need to provide them a way to be deprecation-free with 4.4. Annotations are the way.
+
+I think ignoring all user-land classes that have auto-generated phpdocs based on the parent makes this new feature useless in alot of cases. Such code exists alot, probably because that is the default behavior of phpstorm. I don't think we can realistically ignore this.
+So I don't think return phpdcocs are the right solution to opting-out of these warnings. Can't we simply ignore all missing return types in vendor libraries? At the end this feature is for end-users and missing return types are irrelevant in vendors. Hm thinking about this, if people split their apps in bundles, then their vendors are not irrelevant. Maybe we can do a combination of both? return phpdocs in vendors are ok for opting out but they are not enough for non-vendor classes?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-14T06:59:51Z
+
+> return phpdocs in vendors are ok for opting out but they are not enough for non-vendor classes?
+
+I think that's a good plan. Because there is no simple way to decide vendor vs non-vendor at runtime, I think we're going to have to ask ppl to declare their namespace when they're at this step in the migration process.
+
+This means the 1st step would be this PR, exactly as is now. Then, we would ask ppl to run a command / their tests again, but this time with an env var that would give their `App\` prefix.
+This could either just report the missing spots, or patch directly the source.
+
+We're going to need this tooling too, to migrate this very codebase. Let's see what the next PRs will provide on this path.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-14T13:11:21Z
+
+I'm now merging to unlock progress on the topic. Let's keep the discussion open, we'll continue fine-tuning the upgrade path until stable is out.

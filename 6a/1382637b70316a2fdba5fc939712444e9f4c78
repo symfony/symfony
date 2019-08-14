@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-13T20:51:22Z
+
+/cc @derrabus some things to borrow to close #32179 here :)
+
+---------------------------------------------------------------------------
+
+by tigitz at 2019-08-13T21:17:07Z
+
+Cleaning of some files went a little bit too far and broke some php doc extraction tests :sweat_smile:, will fix this

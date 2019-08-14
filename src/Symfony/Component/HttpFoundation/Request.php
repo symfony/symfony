@@ -278,6 +278,7 @@ class Request
         $this->basePath = null;
         $this->method = null;
         $this->format = null;
+        $this->host = null;
     }
 
     /**

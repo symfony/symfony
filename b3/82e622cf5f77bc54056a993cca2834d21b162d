@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ausi at 2019-08-14T06:43:36Z
+
+I didn’t find a way to mock the `ini_get()` function to create better tests. I tried a similar approach as the `ClockMock` class from the phpunit-bridge but it didn’t work as it seems that `ini_get()` cannot be overwritten with a namespaced function on the fly.

@@ -40,6 +40,8 @@ class CodeExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @return TwigFilter[]
      */
     public function getFilters()
     {

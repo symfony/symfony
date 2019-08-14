@@ -63,6 +63,8 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function reset()
     {

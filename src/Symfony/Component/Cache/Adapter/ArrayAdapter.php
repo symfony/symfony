@@ -78,6 +78,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function hasItem($key)
     {
@@ -120,6 +122,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItem($key)
     {
@@ -133,6 +137,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItems(array $keys)
     {
@@ -145,6 +151,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function save(CacheItemInterface $item)
     {
@@ -176,6 +184,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
     {
@@ -184,6 +194,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function commit()
     {
@@ -192,6 +204,8 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear(string $prefix = '')
     {

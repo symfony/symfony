@@ -510,7 +510,7 @@ abstract class AbstractBrowser
     protected function createCrawlerFromContent(string $uri, string $content, string $type)
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            return;
+            return null;
         }
 
         $crawler = new Crawler(null, $uri);

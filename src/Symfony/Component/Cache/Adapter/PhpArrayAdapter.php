@@ -169,6 +169,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function hasItem($key)
     {
@@ -184,6 +186,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItem($key)
     {
@@ -199,6 +203,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteItems(array $keys)
     {
@@ -229,6 +235,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function save(CacheItemInterface $item)
     {
@@ -241,6 +249,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
     {
@@ -253,6 +263,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function commit()
     {
@@ -261,6 +273,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear(string $prefix = '')
     {

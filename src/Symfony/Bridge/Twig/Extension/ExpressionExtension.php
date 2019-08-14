@@ -24,6 +24,8 @@ class ExpressionExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
+     *
+     * @return TwigFunction[]
      */
     public function getFunctions()
     {

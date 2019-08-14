@@ -353,6 +353,40 @@ class DebugClassLoaderTest extends TestCase
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\DefinitionInEvaluatedCode', true));
     }
+
+    public function testReturnType()
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\ReturnType', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeGrandParent::returnTypeGrandParent()" will return "string" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParentInterface::returnTypeParentInterface()" will return "string" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeInterface::returnTypeInterface()" will return "string" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneNonNullableReturnableType()" will return "void" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneNonNullableReturnableTypeWithNull()" will return "void" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneNullableReturnableType()" will return "array" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneNullableReturnableTypeWithNull()" will return "?bool" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneOtherType()" will return "\ArrayIterator" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::oneOtherTypeWithNull()" will return "?\ArrayIterator" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::manyIterables()" will return "array" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::nullableReturnableTypeNormalization()" will return "object" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::nonNullableReturnableTypeNormalization()" will return "void" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::commonNonObjectReturnedTypeNormalization()" will return "object" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::bracketsNormalization()" will return "array" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::booleanNormalization()" will return "bool" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::callableNormalization1()" will return "callable" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::callableNormalization2()" will return "callable" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::otherTypeNormalization()" will return "\ArrayIterator" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::arrayWithLessThanSignNormalization()" will return "array" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+        ], $deprecations);
+    }
 }
 
 class ClassLoader
@@ -435,6 +469,10 @@ class ClassLoader
         } elseif ('Test\\'.__NAMESPACE__.'\ExtendsVirtualMagicCall' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsVirtualMagicCall extends \\'.__NAMESPACE__.'\Fixtures\VirtualClassMagicCall implements \\'.__NAMESPACE__.'\Fixtures\VirtualInterface {
             }');
+        } elseif ('Test\\'.__NAMESPACE__.'\ReturnType' === $class) {
+            return $fixtureDir.\DIRECTORY_SEPARATOR.'ReturnType.php';
+        } elseif ('Test\\'.__NAMESPACE__.'\Fixtures\OutsideInterface' === $class) {
+            return $fixtureDir.\DIRECTORY_SEPARATOR.'OutsideInterface.php';
         }
     }
 }

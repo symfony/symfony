@@ -364,12 +364,12 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return;
+            return null;
         }
 
         if (!\is_object($user = $token->getUser())) {
             // e.g. anonymous authentication
-            return;
+            return null;
         }
 
         return $user;

@@ -41,46 +41,73 @@ class Logger implements LoggerInterface
         ];
     }
 
+    /**
+     * @return void
+     */
     public function log($level, $message, array $context = [])
     {
         $this->logs[$level][] = $message;
     }
 
+    /**
+     * @return void
+     */
     public function emergency($message, array $context = [])
     {
         $this->log('emergency', $message, $context);
     }
 
+    /**
+     * @return void
+     */
     public function alert($message, array $context = [])
     {
         $this->log('alert', $message, $context);
     }
 
+    /**
+     * @return void
+     */
     public function critical($message, array $context = [])
     {
         $this->log('critical', $message, $context);
     }
 
+    /**
+     * @return void
+     */
     public function error($message, array $context = [])
     {
         $this->log('error', $message, $context);
     }
 
+    /**
+     * @return void
+     */
     public function warning($message, array $context = [])
     {
         $this->log('warning', $message, $context);
     }
 
+    /**
+     * @return void
+     */
     public function notice($message, array $context = [])
     {
         $this->log('notice', $message, $context);
     }
 
+    /**
+     * @return void
+     */
     public function info($message, array $context = [])
     {
         $this->log('info', $message, $context);
     }
 
+    /**
+     * @return void
+     */
     public function debug($message, array $context = [])
     {
         $this->log('debug', $message, $context);

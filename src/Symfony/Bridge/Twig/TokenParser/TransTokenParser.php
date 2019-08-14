@@ -15,6 +15,7 @@ use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Error\SyntaxError;
 use Twig\Node\Expression\AbstractExpression;
 use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Node;
 use Twig\Node\TextNode;
 use Twig\Token;
 use Twig\TokenParser\AbstractTokenParser;
@@ -28,6 +29,8 @@ class TransTokenParser extends AbstractTokenParser
 {
     /**
      * {@inheritdoc}
+     *
+     * @return Node
      */
     public function parse(Token $token)
     {
@@ -86,6 +89,8 @@ class TransTokenParser extends AbstractTokenParser
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getTag()
     {

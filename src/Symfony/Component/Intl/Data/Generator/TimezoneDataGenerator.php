@@ -84,13 +84,13 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         // Don't generate aliases, as they are resolved during runtime
         // Unless an alias is needed as fallback for de-duplication purposes
         if (isset($this->localeAliases[$displayLocale]) && !$this->generatingFallback) {
-            return;
+            return null;
         }
 
         $localeBundle = $reader->read($tempDir, $displayLocale);
 
         if (!isset($localeBundle['zoneStrings']) || null === $localeBundle['zoneStrings']) {
-            return;
+            return null;
         }
 
         $data = [
@@ -115,7 +115,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             $data['Meta'] = array_diff($data['Meta'], $fallback['Meta']);
         }
         if (!$data['Names'] && !$data['Meta']) {
-            return;
+            return null;
         }
 
         $this->zoneIds = array_merge($this->zoneIds, array_keys($data['Names']));

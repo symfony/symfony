@@ -62,6 +62,8 @@ class WebProfilerExtension extends ProfilerExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @return TwigFunction[]
      */
     public function getFunctions()
     {

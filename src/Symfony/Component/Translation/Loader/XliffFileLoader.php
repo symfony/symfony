@@ -116,9 +116,7 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
-     * @param \DOMDocument     $dom
-     * @param MessageCatalogue $catalogue
-     * @param string           $domain
+     * @param string $domain
      */
     private function extractXliff2(\DOMDocument $dom, MessageCatalogue $catalogue, $domain)
     {
@@ -182,9 +180,8 @@ class XliffFileLoader implements LoaderInterface
     /**
      * Validates and parses the given file into a DOMDocument.
      *
-     * @param string       $file
-     * @param \DOMDocument $dom
-     * @param string       $schema source of the schema
+     * @param string $file
+     * @param string $schema source of the schema
      *
      * @throws InvalidResourceException
      */
@@ -284,8 +281,6 @@ class XliffFileLoader implements LoaderInterface
      * Gets xliff file version based on the root "version" attribute.
      * Defaults to 1.2 for backwards compatibility.
      *
-     * @param \DOMDocument $dom
-     *
      * @throws InvalidArgumentException
      *
      * @return string
@@ -314,8 +309,7 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
-     * @param \SimpleXMLElement|null $noteElement
-     * @param string|null            $encoding
+     * @param string|null $encoding
      *
      * @return array
      */

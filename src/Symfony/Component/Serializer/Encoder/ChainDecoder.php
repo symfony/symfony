@@ -60,7 +60,6 @@ class ChainDecoder implements DecoderInterface /*, ContextAwareDecoderInterface*
      * Gets the decoder supporting the format.
      *
      * @param string $format
-     * @param array  $context
      *
      * @return DecoderInterface
      *

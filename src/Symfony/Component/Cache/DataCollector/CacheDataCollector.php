@@ -30,8 +30,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     private $instances = [];
 
     /**
-     * @param string           $name
-     * @param TraceableAdapter $instance
+     * @param string $name
      */
     public function addInstance($name, TraceableAdapter $instance)
     {

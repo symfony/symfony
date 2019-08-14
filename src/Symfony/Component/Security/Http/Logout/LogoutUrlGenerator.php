@@ -46,7 +46,6 @@ class LogoutUrlGenerator
      * @param string                         $csrfTokenId      The ID of the CSRF token
      * @param string                         $csrfParameter    The CSRF token parameter name
      * @param CsrfTokenManagerInterface|null $csrfTokenManager A CsrfTokenManagerInterface instance
-     * @param string|null                    $context          The listener context
      */
     public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null/*, string $context = null*/)
     {

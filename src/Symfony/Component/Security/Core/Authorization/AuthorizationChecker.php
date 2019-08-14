@@ -31,7 +31,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     private $alwaysAuthenticate;
 
     /**
-     * @param TokenStorageInterface          $tokenStorage
      * @param AuthenticationManagerInterface $authenticationManager An AuthenticationManager instance
      * @param AccessDecisionManagerInterface $accessDecisionManager An AccessDecisionManager instance
      * @param bool                           $alwaysAuthenticate

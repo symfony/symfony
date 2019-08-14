@@ -470,9 +470,8 @@ EOF;
     /**
      * Generates the service instance.
      *
-     * @param string     $id
-     * @param Definition $definition
-     * @param bool       $isSimpleInstance
+     * @param string $id
+     * @param bool   $isSimpleInstance
      *
      * @return string
      *
@@ -508,8 +507,6 @@ EOF;
 
     /**
      * Checks if the definition is a trivial instance.
-     *
-     * @param Definition $definition
      *
      * @return bool
      */
@@ -554,8 +551,7 @@ EOF;
     /**
      * Adds method calls to a service definition.
      *
-     * @param Definition $definition
-     * @param string     $variableName
+     * @param string $variableName
      *
      * @return string
      */
@@ -587,8 +583,7 @@ EOF;
     /**
      * Adds configurator definition.
      *
-     * @param Definition $definition
-     * @param string     $variableName
+     * @param string $variableName
      *
      * @return string
      */
@@ -624,9 +619,8 @@ EOF;
     /**
      * Adds a service.
      *
-     * @param string     $id
-     * @param Definition $definition
-     * @param string     &$file
+     * @param string $id
+     * @param string &$file
      *
      * @return string
      */
@@ -1471,7 +1465,6 @@ EOF;
     /**
      * Exports parameters.
      *
-     * @param array  $parameters
      * @param string $path
      * @param int    $indent
      *

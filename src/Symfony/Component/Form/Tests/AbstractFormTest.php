@@ -57,7 +57,6 @@ abstract class AbstractFormTest extends TestCase
      * @param string                   $name
      * @param EventDispatcherInterface $dispatcher
      * @param string|null              $dataClass
-     * @param array                    $options
      *
      * @return FormBuilder
      */

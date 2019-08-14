@@ -91,8 +91,7 @@ abstract class AbstractDataGenerator
     }
 
     /**
-     * @param LocaleScanner $scanner
-     * @param string        $sourceDir
+     * @param string $sourceDir
      *
      * @return string[]
      */

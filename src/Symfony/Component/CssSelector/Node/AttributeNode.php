@@ -30,11 +30,10 @@ class AttributeNode extends AbstractNode
     private $value;
 
     /**
-     * @param NodeInterface $selector
-     * @param string        $namespace
-     * @param string        $attribute
-     * @param string        $operator
-     * @param string        $value
+     * @param string $namespace
+     * @param string $attribute
+     * @param string $operator
+     * @param string $value
      */
     public function __construct(NodeInterface $selector, $namespace, $attribute, $operator, $value)
     {

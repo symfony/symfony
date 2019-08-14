@@ -899,7 +899,6 @@ class Crawler implements \Countable, \IteratorAggregate
      *     echo Crawler::xpathLiteral('a\'b"c');
      *     //prints concat('a', "'", 'b"c')
      *
-     *
      * @param string $s String to be escaped
      *
      * @return string Converted string
@@ -1095,9 +1094,6 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param \DOMDocument $document
-     * @param array        $prefixes
-     *
      * @return \DOMXPath
      *
      * @throws \InvalidArgumentException
@@ -1117,8 +1113,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param \DOMXPath $domxpath
-     * @param string    $prefix
+     * @param string $prefix
      *
      * @return string
      *

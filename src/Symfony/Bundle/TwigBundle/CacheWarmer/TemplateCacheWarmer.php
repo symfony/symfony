@@ -32,7 +32,6 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
      * TemplateCacheWarmer constructor.
      *
      * @param ContainerInterface $container
-     * @param \Traversable       $iterator
      */
     public function __construct($container, \Traversable $iterator)
     {

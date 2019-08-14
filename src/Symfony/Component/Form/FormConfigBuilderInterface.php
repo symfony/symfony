@@ -47,8 +47,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * The reverseTransform method of the transformer is used to convert from the
      * view to the normalized format.
      *
-     * @param DataTransformerInterface $viewTransformer
-     * @param bool                     $forcePrepend    If set to true, prepend instead of appending
+     * @param bool $forcePrepend If set to true, prepend instead of appending
      *
      * @return $this The configuration object
      */
@@ -69,8 +68,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * The reverseTransform method of the transformer is used to convert from the
      * normalized to the model format.
      *
-     * @param DataTransformerInterface $modelTransformer
-     * @param bool                     $forceAppend      If set to true, append instead of prepending
+     * @param bool $forceAppend If set to true, append instead of prepending
      *
      * @return $this The configuration object
      */

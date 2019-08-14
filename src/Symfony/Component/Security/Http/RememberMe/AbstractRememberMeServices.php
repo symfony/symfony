@@ -44,10 +44,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     private $userProviders;
 
     /**
-     * @param array           $userProviders
      * @param string          $secret
      * @param string          $providerKey
-     * @param array           $options
      * @param LoggerInterface $logger
      *
      * @throws \InvalidArgumentException

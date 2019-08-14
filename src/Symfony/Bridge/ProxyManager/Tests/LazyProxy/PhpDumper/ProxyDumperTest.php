@@ -41,8 +41,7 @@ class ProxyDumperTest extends TestCase
     /**
      * @dataProvider getProxyCandidates
      *
-     * @param Definition $definition
-     * @param bool       $expected
+     * @param bool $expected
      */
     public function testIsProxyCandidate(Definition $definition, $expected)
     {

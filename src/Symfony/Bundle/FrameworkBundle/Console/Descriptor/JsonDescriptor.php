@@ -207,8 +207,7 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param Definition $definition
-     * @param bool       $omitTags
+     * @param bool $omitTags
      *
      * @return array
      */
@@ -285,8 +284,7 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param string|null              $event
+     * @param string|null $event
      *
      * @return array
      */
@@ -318,7 +316,6 @@ class JsonDescriptor extends Descriptor
 
     /**
      * @param callable $callable
-     * @param array    $options
      *
      * @return array
      */

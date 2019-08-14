@@ -35,7 +35,6 @@ interface SerializerInterface
      * @param mixed  $data
      * @param string $type
      * @param string $format
-     * @param array  $context
      *
      * @return object
      */

@@ -40,7 +40,6 @@ interface LdapInterface
      *
      * @param string $dn
      * @param string $query
-     * @param array  $options
      *
      * @return QueryInterface
      */

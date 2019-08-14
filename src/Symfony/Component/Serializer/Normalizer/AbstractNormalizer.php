@@ -96,8 +96,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Set circular reference handler.
      *
-     * @param callable $circularReferenceHandler
-     *
      * @return self
      */
     public function setCircularReferenceHandler(callable $circularReferenceHandler)
@@ -194,7 +192,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * Gets attributes to normalize using groups.
      *
      * @param string|object $classOrObject
-     * @param array         $context
      * @param bool          $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
      * @throws LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
@@ -239,7 +236,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * @param object|string $classOrObject
      * @param string        $attribute
      * @param string|null   $format
-     * @param array         $context
      *
      * @return bool
      */
@@ -278,11 +274,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * Returns the method to use to construct an object. This method must be either
      * the object constructor or static.
      *
-     * @param array            $data
-     * @param string           $class
-     * @param array            $context
-     * @param \ReflectionClass $reflectionClass
-     * @param array|bool       $allowedAttributes
+     * @param string     $class
+     * @param array|bool $allowedAttributes
      *
      * @return \ReflectionMethod|null
      */
@@ -299,12 +292,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * is removed from the context before being returned to avoid side effects
      * when recursively normalizing an object graph.
      *
-     * @param array            $data
-     * @param string           $class
-     * @param array            $context
-     * @param \ReflectionClass $reflectionClass
-     * @param array|bool       $allowedAttributes
-     * @param string|null      $format
+     * @param string     $class
+     * @param array|bool $allowedAttributes
      *
      * @return object
      *
@@ -413,9 +402,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     }
 
     /**
-     * @param array       $parentContext
-     * @param string      $attribute     Attribute name
-     * @param string|null $format
+     * @param string $attribute Attribute name
      *
      * @return array
      *

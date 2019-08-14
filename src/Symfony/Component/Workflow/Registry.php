@@ -24,7 +24,6 @@ class Registry
     private $workflows = [];
 
     /**
-     * @param Workflow                        $workflow
      * @param string|SupportStrategyInterface $supportStrategy
      */
     public function add(Workflow $workflow, $supportStrategy)

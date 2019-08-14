@@ -38,8 +38,7 @@ interface TranslatorInterface
     /**
      * Translates a parsed selector node to an XPath expression.
      *
-     * @param SelectorNode $selector
-     * @param string       $prefix
+     * @param string $prefix
      *
      * @return string
      */

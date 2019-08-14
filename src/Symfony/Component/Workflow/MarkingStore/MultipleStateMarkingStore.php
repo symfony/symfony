@@ -30,8 +30,7 @@ class MultipleStateMarkingStore implements MarkingStoreInterface
     private $propertyAccessor;
 
     /**
-     * @param string                         $property
-     * @param PropertyAccessorInterface|null $propertyAccessor
+     * @param string $property
      */
     public function __construct($property = 'marking', PropertyAccessorInterface $propertyAccessor = null)
     {

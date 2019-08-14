@@ -105,7 +105,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param object      $object
      * @param string|null $format
-     * @param array       $context
      *
      * @return string[]
      */
@@ -142,7 +141,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param object      $object
      * @param string|null $format
-     * @param array       $context
      *
      * @return string[]
      */
@@ -154,7 +152,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param object      $object
      * @param string      $attribute
      * @param string|null $format
-     * @param array       $context
      *
      * @return mixed
      */
@@ -219,7 +216,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param string      $attribute
      * @param mixed       $value
      * @param string|null $format
-     * @param array       $context
      */
     abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []);
 
@@ -230,7 +226,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param string      $attribute
      * @param mixed       $data
      * @param string|null $format
-     * @param array       $context
      *
      * @return mixed
      *
@@ -339,7 +334,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param AttributeMetadataInterface[] $attributesMetadata
      * @param string                       $class
      * @param string                       $attribute
-     * @param array                        $context
      *
      * @return bool
      */
@@ -399,7 +393,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * The key must be different for every option in the context that could change which attributes should be handled.
      *
      * @param string|null $format
-     * @param array       $context
      *
      * @return bool|string
      */

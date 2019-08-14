@@ -413,7 +413,6 @@ EODUMP
 
     /**
      * @param string $name
-     * @param array  $options
      *
      * @return FormBuilder
      */

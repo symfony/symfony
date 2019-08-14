@@ -92,9 +92,7 @@ abstract class FileDumper implements DumperInterface
     /**
      * Transforms a domain of a message catalogue to its string representation.
      *
-     * @param MessageCatalogue $messages
-     * @param string           $domain
-     * @param array            $options
+     * @param string $domain
      *
      * @return string representation
      */

@@ -739,7 +739,6 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     /**
      * @param string $name
      * @param string $dataClass
-     * @param array  $options
      *
      * @return FormBuilder
      */

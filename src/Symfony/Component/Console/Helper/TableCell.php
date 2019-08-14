@@ -26,7 +26,6 @@ class TableCell
 
     /**
      * @param string $value
-     * @param array  $options
      */
     public function __construct($value = '', array $options = [])
     {

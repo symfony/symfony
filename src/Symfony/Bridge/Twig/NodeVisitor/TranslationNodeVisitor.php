@@ -104,8 +104,7 @@ class TranslationNodeVisitor extends AbstractNodeVisitor
     }
 
     /**
-     * @param Node $arguments
-     * @param int  $index
+     * @param int $index
      *
      * @return string|null
      */

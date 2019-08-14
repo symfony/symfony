@@ -36,14 +36,12 @@ class LdapUserProvider implements UserProviderInterface
     private $passwordAttribute;
 
     /**
-     * @param LdapInterface $ldap
-     * @param string        $baseDn
-     * @param string        $searchDn
-     * @param string        $searchPassword
-     * @param array         $defaultRoles
-     * @param string        $uidKey
-     * @param string        $filter
-     * @param string        $passwordAttribute
+     * @param string $baseDn
+     * @param string $searchDn
+     * @param string $searchPassword
+     * @param string $uidKey
+     * @param string $filter
+     * @param string $passwordAttribute
      */
     public function __construct(LdapInterface $ldap, $baseDn, $searchDn = null, $searchPassword = null, array $defaultRoles = [], $uidKey = 'sAMAccountName', $filter = '({uid_key}={username})', $passwordAttribute = null)
     {
@@ -122,7 +120,6 @@ class LdapUserProvider implements UserProviderInterface
      * Loads a user from an LDAP entry.
      *
      * @param string $username
-     * @param Entry  $entry
      *
      * @return User
      */

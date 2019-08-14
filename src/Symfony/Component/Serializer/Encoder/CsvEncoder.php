@@ -178,8 +178,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * Flattens an array and generates keys including the path.
      *
-     * @param array  $array
-     * @param array  $result
      * @param string $keySeparator
      * @param string $parentKey
      */

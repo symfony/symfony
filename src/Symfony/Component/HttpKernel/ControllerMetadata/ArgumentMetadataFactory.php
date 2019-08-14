@@ -67,8 +67,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * Returns whether an argument is variadic.
      *
-     * @param \ReflectionParameter $parameter
-     *
      * @return bool
      */
     private function isVariadic(\ReflectionParameter $parameter)
@@ -78,8 +76,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 
     /**
      * Determines whether an argument has a default value.
-     *
-     * @param \ReflectionParameter $parameter
      *
      * @return bool
      */
@@ -91,8 +87,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * Returns a default value if available.
      *
-     * @param \ReflectionParameter $parameter
-     *
      * @return mixed|null
      */
     private function getDefaultValue(\ReflectionParameter $parameter)
@@ -102,8 +96,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 
     /**
      * Returns an associated type to the given parameter if available.
-     *
-     * @param \ReflectionParameter $parameter
      *
      * @return string|null
      */

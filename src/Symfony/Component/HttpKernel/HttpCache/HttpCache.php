@@ -645,8 +645,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Calculates the key we use in the "trace" array for a given request.
      *
-     * @param Request $request
-     *
      * @return string
      */
     private function getTraceKey(Request $request)
@@ -662,8 +660,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Checks whether the given (cached) response may be served as "stale" when a revalidation
      * is currently in progress.
-     *
-     * @param Response $entry
      *
      * @return bool true when the stale response may be served, false otherwise
      */

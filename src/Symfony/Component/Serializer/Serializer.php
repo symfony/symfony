@@ -109,7 +109,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function serialize($data, $format, array $context = [])
+    final public function serialize($data, string $format, array $context = [])
     {
         if (!$this->supportsEncoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Serialization for the format %s is not supported', $format));
@@ -125,7 +125,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function deserialize($data, $type, $format, array $context = [])
+    final public function deserialize($data, string $type, string $format, array $context = [])
     {
         if (!$this->supportsDecoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Deserialization for the format %s is not supported', $format));
@@ -139,7 +139,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = null, array $context = [])
+    public function normalize($data, string $format = null, array $context = [])
     {
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
@@ -175,7 +175,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
@@ -191,7 +191,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = [])
     {
         return null !== $this->getNormalizer($data, $format, $context);
     }
@@ -199,7 +199,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = [])
     {
         return null !== $this->getDenormalizer($data, $type, $format, $context);
     }
@@ -282,7 +282,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function encode($data, $format, array $context = [])
+    final public function encode($data, string $format, array $context = [])
     {
         return $this->encoder->encode($data, $format, $context);
     }
@@ -290,7 +290,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    final public function decode($data, $format, array $context = [])
+    final public function decode(string $data, string $format, array $context = [])
     {
         return $this->decoder->decode($data, $format, $context);
     }
@@ -298,7 +298,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format, array $context = [])
+    public function supportsEncoding(string $format, array $context = [])
     {
         return $this->encoder->supportsEncoding($format, $context);
     }
@@ -306,7 +306,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format, array $context = [])
+    public function supportsDecoding(string $format, array $context = [])
     {
         return $this->decoder->supportsDecoding($format, $context);
     }

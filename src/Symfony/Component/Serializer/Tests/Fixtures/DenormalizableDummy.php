@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class DenormalizableDummy implements DenormalizableInterface
 {
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = [])
+    public function denormalize(DenormalizerInterface $denormalizer, $data, string $format = null, array $context = [])
     {
     }
 }

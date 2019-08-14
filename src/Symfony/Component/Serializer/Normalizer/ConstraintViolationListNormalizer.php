@@ -41,7 +41,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         $violations = [];
         $messages = [];
@@ -83,7 +83,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof ConstraintViolationListInterface;
     }

@@ -34,9 +34,6 @@ class InMemoryTransportFactoryTest extends TestCase
     }
 
     /**
-     * @param string $dsn
-     * @param bool   $expected
-     *
      * @dataProvider provideDSN
      */
     public function testSupports(string $dsn, bool $expected = true)

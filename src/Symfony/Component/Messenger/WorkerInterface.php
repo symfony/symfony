@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger;
 /**
  * Interface for Workers that handle messages from transports.
  *
- *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
 interface WorkerInterface

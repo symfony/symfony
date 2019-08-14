@@ -21,8 +21,6 @@ class Gitignore
     /**
      * Returns a regexp which is the equivalent of the gitignore pattern.
      *
-     * @param string $gitignoreFileContent
-     *
      * @return string The regexp
      */
     public static function toRegex(string $gitignoreFileContent): string

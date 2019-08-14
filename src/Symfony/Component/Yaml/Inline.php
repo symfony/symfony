@@ -745,8 +745,6 @@ EOF;
 
     /**
      * Gets a regex that matches a YAML number in hexadecimal notation.
-     *
-     * @return string
      */
     private static function getHexRegex(): string
     {

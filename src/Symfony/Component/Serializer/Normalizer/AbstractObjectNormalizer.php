@@ -242,7 +242,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param object      $object
      * @param string|null $format
-     * @param array       $context
      *
      * @return string[]
      */
@@ -283,7 +282,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param object      $object
      * @param string|null $format
-     * @param array       $context
      *
      * @return string[]
      */
@@ -295,7 +293,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param object      $object
      * @param string      $attribute
      * @param string|null $format
-     * @param array       $context
      *
      * @return mixed
      */
@@ -380,7 +377,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param string      $attribute
      * @param mixed       $value
      * @param string|null $format
-     * @param array       $context
      */
     abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []);
 

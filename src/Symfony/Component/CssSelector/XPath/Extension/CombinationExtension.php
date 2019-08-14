@@ -38,9 +38,6 @@ class CombinationExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @return XPathExpr
-     */
     public function translateDescendant(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
         return $xpath->join('/descendant-or-self::*/', $combinedXpath);

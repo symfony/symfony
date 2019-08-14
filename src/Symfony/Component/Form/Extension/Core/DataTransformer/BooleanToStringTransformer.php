@@ -28,8 +28,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
     private $falseValues;
 
     /**
-     * @param string $trueValue   The value emitted upon transform if the input is true
-     * @param array  $falseValues
+     * @param string $trueValue The value emitted upon transform if the input is true
      */
     public function __construct(string $trueValue, array $falseValues = [null])
     {

@@ -50,8 +50,6 @@ class ClassMetadata implements ClassMetadataInterface
 
     /**
      * Constructs a metadata for the given class.
-     *
-     * @param string $class
      */
     public function __construct(string $class, ClassDiscriminatorMapping $classDiscriminatorMapping = null)
     {

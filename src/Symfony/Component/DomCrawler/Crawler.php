@@ -913,7 +913,6 @@ class Crawler implements \Countable, \IteratorAggregate
      *     echo Crawler::xpathLiteral('a\'b"c');
      *     //prints concat('a', "'", 'b"c')
      *
-     *
      * @param string $s String to be escaped
      *
      * @return string Converted string

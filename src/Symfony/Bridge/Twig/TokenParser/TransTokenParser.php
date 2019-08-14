@@ -15,7 +15,6 @@ use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Error\SyntaxError;
 use Twig\Node\Expression\AbstractExpression;
 use Twig\Node\Expression\ArrayExpression;
-use Twig\Node\Node;
 use Twig\Node\TextNode;
 use Twig\Token;
 use Twig\TokenParser\AbstractTokenParser;

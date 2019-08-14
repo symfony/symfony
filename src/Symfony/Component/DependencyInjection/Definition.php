@@ -864,8 +864,6 @@ class Definition
      * injected in the matching parameters (of the constructor, of methods
      * called and of controller actions).
      *
-     * @param array $bindings
-     *
      * @return $this
      */
     public function setBindings(array $bindings)

@@ -59,9 +59,6 @@ final class MailboxHeader extends AbstractHeader
         $this->address = $address;
     }
 
-    /**
-     * @return Address
-     */
     public function getAddress(): Address
     {
         return $this->address;

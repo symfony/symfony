@@ -31,9 +31,9 @@ final class EmailHtmlBodyContains extends Constraint
     }
 
     /**
-     * @param RawMessage $message
-     *
      * {@inheritdoc}
+     *
+     * @param RawMessage $message
      */
     protected function matches($message): bool
     {
@@ -45,11 +45,11 @@ final class EmailHtmlBodyContains extends Constraint
     }
 
     /**
-     * @param RawMessage $message
-     *
      * {@inheritdoc}
+     *
+     * @param RawMessage $message
      */
-    protected function failureDescription($email): string
+    protected function failureDescription($message): string
     {
         return 'the Email HTML body '.$this->toString();
     }

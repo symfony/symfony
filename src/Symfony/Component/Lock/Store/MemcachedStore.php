@@ -38,8 +38,7 @@ class MemcachedStore implements StoreInterface
     }
 
     /**
-     * @param \Memcached $memcached
-     * @param int        $initialTtl the expiration delay of locks in seconds
+     * @param int $initialTtl the expiration delay of locks in seconds
      */
     public function __construct(\Memcached $memcached, int $initialTtl = 300)
     {

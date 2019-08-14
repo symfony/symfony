@@ -760,7 +760,7 @@ Symfony is the result of the work of many people who made the code better
  - Thomas Ploch
  - Benjamin Grandfond (benjamin)
  - Tiago Brito (blackmx)
- - 
+ -
  - Richard van den Brand (ricbra)
  - develop
  - flip111

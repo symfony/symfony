@@ -353,4 +353,18 @@ class UploadedFileTest extends TestCase
 
         $this->assertFalse($file->isValid());
     }
+
+    public function testGetMaxFilesize()
+    {
+        $size = UploadedFile::getMaxFilesize();
+
+        $this->assertIsInt($size);
+        $this->assertGreaterThan(0, $size);
+
+        if (0 === (int) ini_get('post_max_size') && 0 === (int) ini_get('upload_max_filesize')) {
+            $this->assertSame(PHP_INT_MAX, $size);
+        } else {
+            $this->assertLessThan(PHP_INT_MAX, $size);
+        }
+    }
 }

@@ -1,2 +1,3 @@
 framework:
-    csrf_protection: ~
+    csrf_protection:
+        storage: session

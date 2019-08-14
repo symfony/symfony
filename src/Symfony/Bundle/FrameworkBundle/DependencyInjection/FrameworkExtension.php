@@ -107,6 +107,9 @@ use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\EventListener\CookieTokenStorageListener;
+use Symfony\Component\Security\Csrf\TokenStorage\CookieTokenStorage;
+use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
@@ -257,8 +260,11 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
+        if (null === $config['csrf_protection']['storage']) {
+            $config['csrf_protection']['storage'] = $this->sessionConfigEnabled || !class_exists(CookieTokenStorage::class) ? 'session' : 'cookie';
+        }
         if (null === $config['csrf_protection']['enabled']) {
-            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class);
+            $config['csrf_protection']['enabled'] = ($this->sessionConfigEnabled || 'session' !== $config['csrf_protection']['storage']) && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class);
         }
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
@@ -1450,12 +1456,31 @@ class FrameworkExtension extends Extension
             throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed. Try running "composer require symfony/security-csrf".');
         }
 
-        if (!$this->sessionConfigEnabled) {
-            throw new \LogicException('CSRF protection needs sessions to be enabled.');
-        }
-
         // Enable services for CSRF protection (even without forms)
         $loader->load('security_csrf.xml');
+        switch ($config['storage']) {
+            case 'session':
+                if (!$this->sessionConfigEnabled) {
+                    throw new \LogicException('CSRF protection needs sessions to be enabled.');
+                }
+
+                $container->setAlias('security.csrf.token_storage', SessionTokenStorage::class);
+                break;
+            case 'cookie':
+                if (!class_exists(CookieTokenStorage::class)) {
+                    throw new LogicException('CSRF support with Cookie Storage is not installed. Try running "composer require symfony/security-csrf:^4.4".');
+                }
+
+                $container->setAlias('security.csrf.token_storage', CookieTokenStorage::class);
+                break;
+            default:
+                $container->setAlias('security.csrf.token_storage', $config['storage']);
+                break;
+        }
+
+        if ('cookie' !== $config['storage']) {
+            $container->removeDefinition(CookieTokenStorageListener::class);
+        }
 
         if (!class_exists(CsrfExtension::class)) {
             $container->removeDefinition('twig.extension.security_csrf');

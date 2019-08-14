@@ -12,6 +12,7 @@ CHANGELOG
    for "guard" authenticators that deal with user passwords
  * Marked all dispatched event classes as `@final`
  * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`.
+ * Added `CookieTokenStorage`
 
 4.3.0
 -----

@@ -41,6 +41,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Csrf\TokenStorage\CookieTokenStorage;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -129,6 +130,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->expectException('LogicException');
         $this->expectExceptionMessage('CSRF protection needs sessions to be enabled.');
         $this->createContainerFromFile('csrf_needs_session');
+    }
+
+    public function testCsrfProtectionFallbackToCookie()
+    {
+        if (!class_exists(CookieTokenStorage::class)) {
+            $this->markTestSkipped('Cookie storage requires symfony/security 4.4+');
+        }
+        $container = $this->createContainerFromFile('csrf_fallback_to_cookie');
+
+        $this->assertSame(CookieTokenStorage::class, (string) $container->getAlias('security.csrf.token_storage'));
     }
 
     public function testCsrfProtectionForFormsEnablesCsrfProtectionAutomatically()

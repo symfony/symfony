@@ -215,7 +215,8 @@ class ConfigurationTest extends TestCase
             'ide' => null,
             'default_locale' => 'en',
             'csrf_protection' => [
-                'enabled' => false,
+                'enabled' => null,
+                'storage' => null,
             ],
             'form' => [
                 'enabled' => !class_exists(FullStack::class),

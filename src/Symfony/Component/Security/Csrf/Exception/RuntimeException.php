@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Security\Csrf\Exception;
 
+use Symfony\Component\Security\Core\Exception\RuntimeException as CoreRuntimeException;
+
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class TokenNotFoundException extends RuntimeException
+class RuntimeException extends CoreRuntimeException
 {
 }

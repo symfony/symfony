@@ -10,8 +10,16 @@
         <service id="security.csrf.token_generator" class="Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator" />
         <service id="Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface" alias="security.csrf.token_generator" />
 
-        <service id="security.csrf.token_storage" class="Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage">
+        <service id="Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage">
             <argument type="service" id="session" />
+        </service>
+        <service id="Symfony\Component\Security\Csrf\TokenStorage\CookieTokenStorage">
+            <argument type="service" id="request_stack" />
+            <argument>%kernel.secret%</argument>
+        </service>
+        <service id="Symfony\Component\Security\Csrf\EventListener\CookieTokenStorageListener">
+            <argument type="service" id="security.csrf.token_storage"/>
+            <tag name="kernel.event_subscriber" />
         </service>
         <service id="Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface" alias="security.csrf.token_storage" />
 

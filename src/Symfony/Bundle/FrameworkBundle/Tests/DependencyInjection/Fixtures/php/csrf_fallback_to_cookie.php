@@ -1,7 +1,8 @@
 <?php
 
 $container->loadFromExtension('framework', [
+    'session' => false,
     'csrf_protection' => [
-        'storage' => 'session',
+        'enabled' => true,
     ],
 ]);

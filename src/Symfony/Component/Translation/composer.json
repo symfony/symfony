@@ -23,8 +23,8 @@
     "require-dev": {
         "symfony/config": "^4.4|^5.0",
         "symfony/console": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/dependency-injection": "^5.0",
+        "symfony/http-kernel": "^5.0",
         "symfony/intl": "^4.4|^5.0",
         "symfony/service-contracts": "^1.1.2",
         "symfony/var-dumper": "^4.4|^5.0",
@@ -34,7 +34,8 @@
     },
     "conflict": {
         "symfony/config": "<4.4",
-        "symfony/dependency-injection": "<4.4",
+        "symfony/dependency-injection": "<5.0",
+        "symfony/http-kernel": "<5.0",
         "symfony/twig-bundle": "<5.0",
         "symfony/yaml": "<4.4"
     },

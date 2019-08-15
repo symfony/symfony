@@ -91,7 +91,7 @@ EOF;
         }
 
         if (version_compare(self::getProxyManagerVersion(), '2.5', '<')) {
-            $code = str_replace(' \Closure::bind(function ', ' \Closure::bind(static function ', $code);
+            $code = preg_replace('/ \\\\Closure::bind\(function ((?:& )?\(\$instance(?:, \$value)?\))/', ' \Closure::bind(static function \1', $code);
         }
 
         return $code;

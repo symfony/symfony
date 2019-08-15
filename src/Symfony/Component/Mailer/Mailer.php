@@ -32,6 +32,7 @@ class Mailer implements MailerInterface
     {
         $this->transport = $transport;
         $this->bus = $bus;
+        $this->dispatcher = $dispatcher;
     }
 
     public function send(RawMessage $message, SmtpEnvelope $envelope = null): void

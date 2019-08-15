@@ -38,19 +38,19 @@ interface DumperInterface
     /**
      * Dumps while entering an hash.
      *
-     * @param int    $type     A Cursor::HASH_* const for the type of hash
-     * @param string $class    The object class, resource type or array count
-     * @param bool   $hasChild When the dump of the hash has child item
+     * @param int        $type     A Cursor::HASH_* const for the type of hash
+     * @param string|int $class    The object class, resource type or array count
+     * @param bool       $hasChild When the dump of the hash has child item
      */
     public function enterHash(Cursor $cursor, $type, $class, $hasChild);
 
     /**
      * Dumps while leaving an hash.
      *
-     * @param int    $type     A Cursor::HASH_* const for the type of hash
-     * @param string $class    The object class, resource type or array count
-     * @param bool   $hasChild When the dump of the hash has child item
-     * @param int    $cut      The number of items the hash has been cut by
+     * @param int        $type     A Cursor::HASH_* const for the type of hash
+     * @param string|int $class    The object class, resource type or array count
+     * @param bool       $hasChild When the dump of the hash has child item
+     * @param int        $cut      The number of items the hash has been cut by
      */
     public function leaveHash(Cursor $cursor, $type, $class, $hasChild, $cut);
 }

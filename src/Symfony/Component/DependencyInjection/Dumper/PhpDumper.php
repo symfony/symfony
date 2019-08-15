@@ -492,7 +492,7 @@ EOF;
                 $proxyCode = substr(Kernel::stripComments($proxyCode), 5);
             }
 
-            $proxyClasses[sprintf('%s.php', explode(' ', $proxyCode, 3)[1])] = $proxyCode;
+            $proxyClasses[sprintf('%s.php', explode(' ', $this->inlineRequires ? substr($proxyCode, \strlen($code)) : $proxyCode, 3)[1])] = $proxyCode;
         }
 
         return $proxyClasses;

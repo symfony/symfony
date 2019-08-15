@@ -60,20 +60,6 @@ class ProxyDumperTest extends TestCase
         );
     }
 
-    public function testStaticBinding()
-    {
-        if (!class_exists(Version::class) || version_compare(\defined(Version::class.'::VERSION') ? Version::VERSION : Version::getVersion(), '2.1', '<')) {
-            $this->markTestSkipped('ProxyManager prior to version 2.1 does not support static binding');
-        }
-
-        $definition = new Definition(__CLASS__);
-        $definition->setLazy(true);
-
-        $code = $this->dumper->getProxyCode($definition);
-
-        $this->assertStringContainsString('\Closure::bind(static function (\PHPUnit\Framework\TestCase $instance) {', $code);
-    }
-
     public function testDeterministicProxyCode()
     {
         $definition = new Definition(__CLASS__);

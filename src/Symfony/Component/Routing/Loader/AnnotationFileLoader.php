@@ -81,11 +81,9 @@ class AnnotationFileLoader extends FileLoader
     /**
      * Returns the full class name for the first class in the file.
      *
-     * @param string $file A PHP file path
-     *
      * @return string|false Full class name if found, false otherwise
      */
-    protected function findClass($file)
+    protected function findClass(string $file)
     {
         $class = false;
         $namespace = false;

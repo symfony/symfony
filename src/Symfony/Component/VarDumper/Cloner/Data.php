@@ -61,7 +61,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * @param bool $recursive Whether values should be resolved recursively or not
+     * @param array|bool $recursive Whether values should be resolved recursively or not
      *
      * @return string|int|float|bool|array|Data[]|null A native representation of the original value
      */
@@ -182,7 +182,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param int $maxDepth The max dumped depth level
      *
-     * @return self A clone of $this
+     * @return static
      */
     public function withMaxDepth($maxDepth)
     {
@@ -197,7 +197,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param int $maxItemsPerDepth The max number of items dumped per depth level
      *
-     * @return self A clone of $this
+     * @return static
      */
     public function withMaxItemsPerDepth($maxItemsPerDepth)
     {
@@ -212,7 +212,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param bool $useRefHandles False to hide global ref. handles
      *
-     * @return self A clone of $this
+     * @return static
      */
     public function withRefHandles($useRefHandles)
     {
@@ -227,7 +227,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param string|int $key The key to seek to
      *
-     * @return self|null A clone of $this or null if the key is not set
+     * @return static|null Null if the key is not set
      */
     public function seek($key)
     {

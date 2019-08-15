@@ -17,7 +17,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
@@ -138,15 +137,6 @@ class PdoStore implements PersistingStoreInterface
         }
 
         $this->checkNotExpired($key);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function waitAndSave(Key $key)
-    {
-        @trigger_error(sprintf('%s() is deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', __METHOD__));
-        throw new NotSupportedException(sprintf('The store "%s" does not supports blocking locks.', __METHOD__));
     }
 
     /**

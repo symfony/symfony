@@ -123,6 +123,9 @@ class Translator extends BaseTranslator implements WarmableInterface
         parent::initializeCatalogue($locale);
     }
 
+    /**
+     * @internal
+     */
     protected function doLoadCatalogue($locale): void
     {
         parent::doLoadCatalogue($locale);

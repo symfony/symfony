@@ -867,7 +867,15 @@ class FrameworkExtension extends Extension
         // session storage
         $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
         $options = ['cache_limiter' => '0'];
-        foreach (['name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode'] as $key) {
+
+        $possibleOptions = ['name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode'];
+
+        if (\PHP_VERSION_ID > 70100) {
+            $possibleOptions[] = 'sid_length';
+            $possibleOptions[] = 'sid_bits_per_character';
+        }
+
+        foreach ($possibleOptions as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }

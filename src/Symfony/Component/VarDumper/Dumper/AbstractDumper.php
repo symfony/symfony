@@ -185,13 +185,13 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Converts a non-UTF-8 string to UTF-8.
      *
-     * @param string $s The non-UTF-8 string to convert
+     * @param string|null $s The non-UTF-8 string to convert
      *
-     * @return string The string converted to UTF-8
+     * @return string|null The string converted to UTF-8
      */
     protected function utf8Encode($s)
     {
-        if (preg_match('//u', $s)) {
+        if (null === $s || preg_match('//u', $s)) {
             return $s;
         }
 

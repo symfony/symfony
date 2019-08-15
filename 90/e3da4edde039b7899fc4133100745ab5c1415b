@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-15T08:05:02Z
+
+Some changes here are for 3.4, here you are: #33179
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-15T08:52:53Z
+
+Thanks for the help, @nicolas-grekas. Can you please merge your changes upwards, so I can resolve the conflicts?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-15T09:20:10Z
+
+Looks like Console fails with the change, something related to disabling colors?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-15T09:20:42Z
+
+More backports: #33182.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-15T09:54:21Z
+
+> Looks like Console fails with the change, something related to disabling colors?
+
+But only on AppVeyor, right? The test in question is green on my Mac. 😕

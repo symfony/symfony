@@ -40,7 +40,7 @@ class XmlReaderCaster
         \XMLReader::XML_DECLARATION => 'XML_DECLARATION',
     ];
 
-    public static function castXmlReader(\XMLReader $reader, array $a, Stub $stub, $isNested)
+    public static function castXmlReader(\XMLReader $reader, array $a, Stub $stub, bool $isNested)
     {
         $props = Caster::PREFIX_VIRTUAL.'parserProperties';
         $info = [

@@ -83,7 +83,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return string The string representation of the passed value
      */
-    protected function formatValue($value, $format = 0)
+    protected function formatValue($value, int $format = 0)
     {
         $isDateTime = $value instanceof \DateTimeInterface;
 
@@ -156,7 +156,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @see formatValue()
      */
-    protected function formatValues(array $values, $format = 0)
+    protected function formatValues(array $values, int $format = 0)
     {
         foreach ($values as $key => $value) {
             $values[$key] = $this->formatValue($value, $format);

@@ -110,12 +110,12 @@ class DateCaster
         return $filter & Caster::EXCLUDE_VERBOSE ? $p : $p + $a;
     }
 
-    private static function formatDateTime(\DateTimeInterface $d, $extra = '')
+    private static function formatDateTime(\DateTimeInterface $d, string $extra = ''): string
     {
         return $d->format('Y-m-d H:i:'.self::formatSeconds($d->format('s'), $d->format('u')).$extra);
     }
 
-    private static function formatSeconds($s, $us)
+    private static function formatSeconds(string $s, string $us): string
     {
         return sprintf('%02d.%s', $s, 0 === ($len = \strlen($t = rtrim($us, '0'))) ? '0' : ($len <= 3 ? str_pad($t, 3, '0') : $us));
     }

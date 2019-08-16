@@ -363,13 +363,13 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $type, $format = null, array $context = [])
     {
         $serializer = $this->serializer;
-        $class = substr($class, 0, -2);
+        $type = substr($type, 0, -2);
 
         foreach ($data as $key => $value) {
-            $data[$key] = $serializer->denormalize($value, $class, $format, $context);
+            $data[$key] = $serializer->denormalize($value, $type, $format, $context);
         }
 
         return $data;

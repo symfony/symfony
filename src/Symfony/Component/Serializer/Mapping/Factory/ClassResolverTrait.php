@@ -25,6 +25,8 @@ trait ClassResolverTrait
     /**
      * Gets a class name for a given class or instance.
      *
+     * @param object|string $value
+     *
      * @throws InvalidArgumentException If the class does not exists
      */
     private function getClass($value): string

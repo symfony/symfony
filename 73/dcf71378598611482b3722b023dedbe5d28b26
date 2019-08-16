@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2019-08-15T11:26:31Z
+
+For the record, `$class`/`$type` can be other kind of types, including interfaces: https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Serializer/Normalizer/DateTimeNormalizer.php#L31
+
+However, as even interfaces define the constant `::class` in PHP, using `$class` looks good enough for me.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-15T11:35:04Z
+
+@dunglas We can also change `$class` to `$type` everywhere. My concern was just to sync the parameters. In case of the `ArrayDenoramalizer` we accept `SomeClass[]`, so `$type` might be more accurate.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-08-15T11:36:47Z
+
+Indeed, maybe should we use `$type` everywhere then.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-15T11:44:57Z
+
+Done.

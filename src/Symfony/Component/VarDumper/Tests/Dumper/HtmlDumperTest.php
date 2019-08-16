@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\ImgStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
@@ -159,5 +160,28 @@ EOTXT
             ,
             $out
         );
+    }
+
+    /**
+     * @dataProvider varToDumpProvider
+     */
+    public function testDumpString($var, $needle)
+    {
+        $dumper = new HtmlDumper();
+        $cloner = new VarCloner();
+
+        ob_start();
+        $dumper->dump($cloner->cloneVar($var));
+        $out = ob_get_clean();
+
+        $this->assertStringContainsString($needle, $out);
+    }
+
+    public function varToDumpProvider()
+    {
+        return [
+            [['dummy' => new ImgStub('dummy', 'img/png', '100em')], '<img src="data:img/png;base64,ZHVtbXk=" />'],
+            ['foo', '<span class=sf-dump-str title="3 characters">foo</span>'],
+        ];
     }
 }

@@ -24,7 +24,7 @@ final class NamedAddress extends Address
     {
         parent::__construct($address);
 
-        $this->name = $name;
+        $this->name = trim(str_replace(["\n", "\r"], '', $name));
     }
 
     public function getName(): string

@@ -24,4 +24,19 @@ class NamedAddressTest extends TestCase
         $this->assertEquals('Fabien <fabien@xn--symfon-nwa.com>', $a->toString());
         $this->assertEquals('fabien@xn--symfon-nwa.com', $a->getEncodedAddress());
     }
+
+    public function nameEmptyDataProvider(): array
+    {
+        return [[''], [' '], [" \r\n "]];
+    }
+
+    /**
+     * @dataProvider nameEmptyDataProvider
+     */
+    public function testNameEmpty(string $name)
+    {
+        $mail = 'mail@example.org';
+
+        $this->assertSame($mail, (new NamedAddress($mail, $name))->getEncodedNamedAddress());
+    }
 }

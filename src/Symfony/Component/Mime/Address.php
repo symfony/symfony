@@ -40,11 +40,11 @@ class Address
             self::$validator = new EmailValidator();
         }
 
-        if (!self::$validator->isValid($address, new RFCValidation())) {
+        $this->address = trim($address);
+
+        if (!self::$validator->isValid($this->address, new RFCValidation())) {
             throw new RfcComplianceException(sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
         }
-
-        $this->address = $address;
     }
 
     public function getAddress(): string

@@ -199,9 +199,9 @@ class FileValidator extends ConstraintValidator
         }
     }
 
-    private static function moreDecimalsThan($double, $numberOfDecimals)
+    private static function moreDecimalsThan(string $double, int $numberOfDecimals): bool
     {
-        return \strlen((string) $double) > \strlen(round($double, $numberOfDecimals));
+        return \strlen($double) > \strlen(round($double, $numberOfDecimals));
     }
 
     /**

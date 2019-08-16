@@ -69,7 +69,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function denormalize($data, $class, string $format = null, array $context = [])
+    public function denormalize($data, $type, string $format = null, array $context = [])
     {
         if (!\is_string($data)) {
             throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', \gettype($data)));

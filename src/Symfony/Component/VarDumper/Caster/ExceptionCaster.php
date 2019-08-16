@@ -261,7 +261,7 @@ class ExceptionCaster
         return $a;
     }
 
-    private static function filterExceptionArray($xClass, array $a, string $xPrefix, int $filter)
+    private static function filterExceptionArray(string $xClass, array $a, string $xPrefix, int $filter): array
     {
         if (isset($a[$xPrefix.'trace'])) {
             $trace = $a[$xPrefix.'trace'];
@@ -294,7 +294,7 @@ class ExceptionCaster
         return $a;
     }
 
-    private static function traceUnshift(array &$trace, ?string $class, string $file, int $line)
+    private static function traceUnshift(array &$trace, ?string $class, string $file, int $line): void
     {
         if (isset($trace[0]['file'], $trace[0]['line']) && $trace[0]['file'] === $file && $trace[0]['line'] === $line) {
             return;
@@ -306,7 +306,7 @@ class ExceptionCaster
         ]);
     }
 
-    private static function extractSource(string $srcLines, int $line, int $srcContext, ?string $title, string $lang, string $file = null)
+    private static function extractSource(string $srcLines, int $line, int $srcContext, ?string $title, string $lang, string $file = null): EnumStub
     {
         $srcLines = explode("\n", $srcLines);
         $src = [];

@@ -30,7 +30,7 @@ interface DenormalizerInterface
      * Denormalizes data back into an object of the given class.
      *
      * @param mixed  $data    Data to restore
-     * @param string $class   The expected class to instantiate
+     * @param string $type    The expected class to instantiate
      * @param string $format  Format the given data was extracted from
      * @param array  $context Options available to the denormalizer
      *
@@ -44,7 +44,7 @@ interface DenormalizerInterface
      * @throws RuntimeException         Occurs if the class cannot be instantiated
      * @throws ExceptionInterface       Occurs for all the other cases of errors
      */
-    public function denormalize($data, string $class, string $format = null, array $context = []);
+    public function denormalize($data, string $type, string $format = null, array $context = []);
 
     /**
      * Checks whether the given class is supported for denormalization by this normalizer.

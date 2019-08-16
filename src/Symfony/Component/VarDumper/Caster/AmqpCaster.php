@@ -191,7 +191,7 @@ class AmqpCaster
         return $a;
     }
 
-    private static function extractFlags(int $flags)
+    private static function extractFlags(int $flags): ConstStub
     {
         $flagsArray = [];
 

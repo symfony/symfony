@@ -119,7 +119,7 @@ class CachePoolsTest extends AbstractWebTestCase
     }
 
     /**
-     * Make sure the taggable_config.yml config will actually give us a pool that implements TagAwareCacheInterface
+     * Make sure the taggable_config.yml config will actually give us a pool that implements TagAwareCacheInterface.
      */
     public function testTaggableCachePool()
     {

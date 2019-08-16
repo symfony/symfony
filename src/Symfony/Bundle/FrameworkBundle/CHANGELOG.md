@@ -62,6 +62,7 @@ CHANGELOG
  * Added `asset.request_context.base_path` and `asset.request_context.secure` parameters
    to provide a default request context in case the stack is empty (similar to `router.request_context.*` parameters)
  * Display environment variables managed by `Dotenv` in `AboutCommand`
+ * Added php ini session options `sid_length` and `sid_bits_per_character` to the `session` section of the configuration
 
 3.3.0
 -----

@@ -67,7 +67,7 @@ abstract class AbstractTransport implements TransportInterface
             }
         }
 
-        $event = new MessageEvent($message, $envelope, $this->getName(), true);
+        $event = new MessageEvent($message, $envelope, $this->getName());
         $this->dispatcher->dispatch($event);
         $envelope = $event->getEnvelope();
         if (!$envelope->getRecipients()) {

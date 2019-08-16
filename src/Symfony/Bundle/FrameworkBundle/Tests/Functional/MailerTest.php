@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FullStack;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\SentMessage;
@@ -71,9 +72,19 @@ class MailerTest extends AbstractWebTestCase
         $client->request('GET', '/send_email');
 
         $this->assertEmailCount(2);
-        $this->assertEmailIsQueued($this->getMailerEvent(0));
+        $first = 0;
+        $second = 1;
+        if (!class_exists(FullStack::class)) {
+            $this->assertQueuedEmailCount(2);
+            $first = 1;
+            $second = 3;
+            $this->assertEmailIsQueued($this->getMailerEvent(0));
+            $this->assertEmailIsQueued($this->getMailerEvent(2));
+        }
+        $this->assertEmailIsNotQueued($this->getMailerEvent($first));
+        $this->assertEmailIsNotQueued($this->getMailerEvent($second));
 
-        $email = $this->getMailerMessage(0);
+        $email = $this->getMailerMessage($first);
         $this->assertEmailHasHeader($email, 'To');
         $this->assertEmailHeaderSame($email, 'To', 'fabien@symfony.com');
         $this->assertEmailHeaderNotSame($email, 'To', 'helene@symfony.com');
@@ -83,7 +94,7 @@ class MailerTest extends AbstractWebTestCase
         $this->assertEmailHtmlBodyNotContains($email, 'Bar');
         $this->assertEmailAttachementCount($email, 1);
 
-        $email = $this->getMailerMessage(1);
+        $email = $this->getMailerMessage($second);
         $this->assertEmailAddressContains($email, 'To', 'fabien@symfony.com');
         $this->assertEmailAddressContains($email, 'To', 'thomas@symfony.com');
         $this->assertEmailAddressContains($email, 'Reply-To', 'me@symfony.com');

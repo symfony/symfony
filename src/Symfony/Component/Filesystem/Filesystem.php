@@ -743,6 +743,11 @@ class Filesystem
         return 2 === \count($components) ? [$components[0], $components[1]] : [null, $components[0]];
     }
 
+    /**
+     * @param callable $func
+     *
+     * @return mixed
+     */
     private static function box($func)
     {
         self::$lastError = null;

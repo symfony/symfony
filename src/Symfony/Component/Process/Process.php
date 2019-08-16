@@ -217,7 +217,7 @@ class Process implements \IteratorAggregate
      * This is identical to run() except that an exception is thrown if the process
      * exits with a non-zero exit code.
      *
-     * @return self
+     * @return $this
      *
      * @throws RuntimeException       if PHP was compiled with --enable-sigchild and the enhanced sigchild compatibility mode is not enabled
      * @throws ProcessFailedException if the process didn't terminate successfully
@@ -942,7 +942,7 @@ class Process implements \IteratorAggregate
      *
      * @param string|array $commandline The command to execute
      *
-     * @return self The current Process instance
+     * @return $this
      */
     public function setCommandLine($commandline)
     {
@@ -978,7 +978,7 @@ class Process implements \IteratorAggregate
      *
      * @param int|float|null $timeout The timeout in seconds
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @throws InvalidArgumentException if the timeout is negative
      */
@@ -996,7 +996,7 @@ class Process implements \IteratorAggregate
      *
      * @param int|float|null $timeout The timeout in seconds
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @throws LogicException           if the output is disabled
      * @throws InvalidArgumentException if the timeout is negative
@@ -1017,7 +1017,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $tty True to enabled and false to disable
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @throws RuntimeException In case the TTY mode is not supported
      */
@@ -1058,7 +1058,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $bool
      *
-     * @return self
+     * @return $this
      */
     public function setPty($bool)
     {
@@ -1098,7 +1098,7 @@ class Process implements \IteratorAggregate
      *
      * @param string $cwd The new working directory
      *
-     * @return self The current Process instance
+     * @return $this
      */
     public function setWorkingDirectory($cwd)
     {
@@ -1130,7 +1130,7 @@ class Process implements \IteratorAggregate
      *
      * @param array $env The new environment variables
      *
-     * @return self The current Process instance
+     * @return $this
      */
     public function setEnv(array $env)
     {
@@ -1161,7 +1161,7 @@ class Process implements \IteratorAggregate
      *
      * @param string|int|float|bool|resource|\Traversable|null $input The content
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @throws LogicException In case the process is running
      */
@@ -1195,7 +1195,7 @@ class Process implements \IteratorAggregate
      *
      * @param array $options The new options
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @deprecated since version 3.3, to be removed in 4.0.
      */
@@ -1229,7 +1229,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $enhance
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @deprecated since version 3.3, to be removed in 4.0. Enhanced Windows compatibility will always be enabled.
      */
@@ -1265,7 +1265,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $enhance
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @deprecated since version 3.3, to be removed in 4.0.
      */
@@ -1283,7 +1283,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $inheritEnv
      *
-     * @return self The current Process instance
+     * @return $this
      */
     public function inheritEnvironmentVariables($inheritEnv = true)
     {

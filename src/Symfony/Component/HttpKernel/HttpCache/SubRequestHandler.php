@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class SubRequestHandler
 {
-    public static function handle(HttpKernelInterface $kernel, Request $request, $type, $catch): Response
+    public static function handle(HttpKernelInterface $kernel, Request $request, int $type, bool $catch): Response
     {
         // save global state related to trusted headers and proxies
         $trustedProxies = Request::getTrustedProxies();

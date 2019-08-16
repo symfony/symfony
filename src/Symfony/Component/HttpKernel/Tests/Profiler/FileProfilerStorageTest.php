@@ -53,11 +53,13 @@ class FileProfilerStorageTest extends TestCase
         $parentProfile->setIp('127.0.0.1');
         $parentProfile->setUrl('http://foo.bar/parent');
         $parentProfile->setStatusCode(200);
+        $parentProfile->setMethod('GET');
 
         $childProfile = new Profile('token_child');
         $childProfile->setIp('127.0.0.1');
         $childProfile->setUrl('http://foo.bar/child');
         $childProfile->setStatusCode(200);
+        $childProfile->setMethod('GET');
 
         $parentProfile->addChild($childProfile);
 
@@ -86,6 +88,7 @@ class FileProfilerStorageTest extends TestCase
         $profile->setUrl('http://foo.bar/\'');
         $profile->setIp('127.0.0.1');
         $profile->setStatusCode(200);
+        $profile->setMethod('GET');
 
         $this->storage->write($profile);
         $this->assertNotFalse($this->storage->read('simple_quote'), '->write() accepts single quotes in URL');
@@ -94,6 +97,7 @@ class FileProfilerStorageTest extends TestCase
         $profile->setUrl('http://foo.bar/"');
         $profile->setIp('127.0.0.1');
         $profile->setStatusCode(200);
+        $profile->setMethod('GET');
 
         $this->storage->write($profile);
         $this->assertNotFalse($this->storage->read('double_quote'), '->write() accepts double quotes in URL');
@@ -102,6 +106,7 @@ class FileProfilerStorageTest extends TestCase
         $profile->setUrl('http://foo.bar/\\');
         $profile->setIp('127.0.0.1');
         $profile->setStatusCode(200);
+        $profile->setMethod('GET');
 
         $this->storage->write($profile);
         $this->assertNotFalse($this->storage->read('backslash'), '->write() accepts backslash in URL');
@@ -110,6 +115,7 @@ class FileProfilerStorageTest extends TestCase
         $profile->setUrl('http://foo.bar/,');
         $profile->setIp('127.0.0.1');
         $profile->setStatusCode(200);
+        $profile->setMethod('GET');
 
         $this->storage->write($profile);
         $this->assertNotFalse($this->storage->read('comma'), '->write() accepts comma in URL');
@@ -121,6 +127,7 @@ class FileProfilerStorageTest extends TestCase
         $profile->setUrl('http://example.com/');
         $profile->setIp('127.0.0.1');
         $profile->setStatusCode(200);
+        $profile->setMethod('GET');
 
         $this->assertTrue($this->storage->write($profile), '->write() returns true when the token is unique');
 

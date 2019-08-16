@@ -114,7 +114,7 @@ class Profile
         return $this->method;
     }
 
-    public function setMethod($method)
+    public function setMethod(string $method)
     {
         $this->method = $method;
     }

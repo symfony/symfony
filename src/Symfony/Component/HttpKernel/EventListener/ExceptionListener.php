@@ -33,7 +33,7 @@ class ExceptionListener implements EventSubscriberInterface
     protected $logger;
     protected $debug;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false)
+    public function __construct($controller, LoggerInterface $logger = null, bool $debug = false)
     {
         $this->controller = $controller;
         $this->logger = $logger;

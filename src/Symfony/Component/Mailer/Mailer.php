@@ -54,7 +54,7 @@ class Mailer implements MailerInterface
                     throw new TransportException('Cannot send message without a valid envelope.', 0, $e);
                 }
             }
-            $event = new MessageEvent($message, $envelope, $this->transport->getName());
+            $event = new MessageEvent($message, $envelope, $this->transport->getName(), true);
             $this->dispatcher->dispatch($event);
         }
 

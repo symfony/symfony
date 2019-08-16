@@ -25,6 +25,11 @@ trait MailerAssertionsTrait
         self::assertThat(self::getMessageMailerEvents(), new MailerConstraint\EmailCount($count, $transport), $message);
     }
 
+    public static function assertQueuedEmailCount(int $count, string $transport = null, string $message = ''): void
+    {
+        self::assertThat(self::getMessageMailerEvents(), new MailerConstraint\EmailCount($count, $transport, true), $message);
+    }
+
     public static function assertEmailIsQueued(MessageEvent $event, string $message = ''): void
     {
         self::assertThat($event, new MailerConstraint\EmailIsQueued(), $message);

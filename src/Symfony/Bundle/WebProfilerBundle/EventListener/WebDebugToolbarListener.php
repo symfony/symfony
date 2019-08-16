@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +37,8 @@ use Twig\Environment;
  */
 class WebDebugToolbarListener implements EventSubscriberInterface
 {
+    use LoggerAwareTrait;
+
     const DISABLED = 1;
     const ENABLED = 2;
 
@@ -53,6 +57,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->mode = $mode;
         $this->excludedAjaxPaths = $excludedAjaxPaths;
         $this->cspHandler = $cspHandler;
+        $this->logger = new NullLogger();
     }
 
     public function isEnabled()
@@ -132,7 +137,11 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             ))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
             $response->setContent($content);
+
+            return;
         }
+
+        $this->logger->debug('No closing body tag was found. Please add one to display the toolbar.');
     }
 
     public static function getSubscribedEvents()

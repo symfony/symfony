@@ -39,7 +39,7 @@ class MessageBus implements MessageBusInterface
                 private $middlewareHandlers;
                 private $cachedIterator;
 
-                public function __construct($middlewareHandlers)
+                public function __construct(\Traversable $middlewareHandlers)
                 {
                     $this->middlewareHandlers = $middlewareHandlers;
                 }

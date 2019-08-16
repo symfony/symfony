@@ -199,7 +199,7 @@ class Cookie
         );
     }
 
-    private static function parseDate($dateValue)
+    private static function parseDate(string $dateValue): ?string
     {
         // trim single quotes around date if present
         if (($length = \strlen($dateValue)) > 1 && "'" === $dateValue[0] && "'" === $dateValue[$length - 1]) {
@@ -216,6 +216,8 @@ class Cookie
         if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
             return $date->format('U');
         }
+
+        return null;
     }
 
     /**

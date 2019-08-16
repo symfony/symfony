@@ -106,7 +106,7 @@ EOF
         return $this->display($io, $filesInfo);
     }
 
-    private function validate(string $content, $file = null)
+    private function validate(string $content, string $file = null): array
     {
         $errors = [];
 

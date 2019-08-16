@@ -72,7 +72,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     /**
      * @internal
      */
-    final protected function ignoreAutoloadException($class, \Exception $exception)
+    final protected function ignoreAutoloadException(string $class, \Exception $exception): void
     {
         try {
             ClassExistenceResource::throwOnRequiredClass($class, $exception);

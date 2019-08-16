@@ -180,7 +180,7 @@ class ConsoleFormatter implements FormatterInterface
         return $record;
     }
 
-    private function dumpData($data, $colors = null)
+    private function dumpData($data, bool $colors = null): string
     {
         if (null === $this->dumper) {
             return '';

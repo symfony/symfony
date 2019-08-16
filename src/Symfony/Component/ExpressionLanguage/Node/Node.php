@@ -64,7 +64,7 @@ class Node
         }
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate(array $functions, array $values)
     {
         $results = [];
         foreach ($this->nodes as $node) {
@@ -90,7 +90,7 @@ class Node
         return $dump;
     }
 
-    protected function dumpString($value)
+    protected function dumpString(string $value)
     {
         return sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
     }

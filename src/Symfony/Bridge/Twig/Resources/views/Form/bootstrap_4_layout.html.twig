@@ -26,7 +26,7 @@
 
 {% block datetime_widget -%}
     {%- if widget != 'single_text' and not valid -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid'), aria-invalid="true"|trim}) -%}
         {% set valid = true %}
     {%- endif -%}
     {{- parent() -}}
@@ -34,7 +34,7 @@
 
 {% block date_widget -%}
     {%- if widget != 'single_text' and not valid -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid'), aria-invalid="true"|trim}) -%}
         {% set valid = true %}
     {%- endif -%}
     {{- parent() -}}
@@ -42,7 +42,7 @@
 
 {% block time_widget -%}
     {%- if widget != 'single_text' and not valid -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid'), aria-invalid="true"|trim}) -%}
         {% set valid = true %}
     {%- endif -%}
     {{- parent() -}}
@@ -50,13 +50,13 @@
 
 {% block dateinterval_widget -%}
     {%- if widget != 'single_text' and not valid -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid'), aria-invalid="true"|trim}) -%}
         {% set valid = true %}
     {%- endif -%}
     {%- if widget == 'single_text' -%}
         {{- block('form_widget_simple') -}}
     {%- else -%}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}, aria-invalid="true") -%}
         <div {{ block('widget_container_attributes') }}>
             {%- if with_years -%}
             <div class="col-auto">
@@ -144,7 +144,7 @@
 
 {%- block widget_attributes -%}
     {%- if not valid %}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' is-invalid')|trim}) %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' is-invalid'), aria-invalid="true"|trim}) %}
     {% endif -%}
     {{ parent() }}
 {%- endblock widget_attributes -%}

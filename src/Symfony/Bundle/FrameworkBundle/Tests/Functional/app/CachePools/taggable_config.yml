@@ -1,0 +1,16 @@
+imports:
+    - { resource: ../config/default.yml }
+
+
+framework:
+    cache:
+        pools:
+            my_taggable_pool:
+                adapter: cache.adapter.array
+                tags: true
+
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Cache\ServiceUsingCache:
+        autowire: true
+        public: true

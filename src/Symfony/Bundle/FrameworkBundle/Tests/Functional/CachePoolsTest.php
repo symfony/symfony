@@ -11,10 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Cache\ServiceUsingCache;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class CachePoolsTest extends AbstractWebTestCase
 {
@@ -114,6 +116,29 @@ class CachePoolsTest extends AbstractWebTestCase
 
         $pool7 = $container->get('cache.pool7');
         $this->assertNotInstanceof(TagAwareAdapter::class, $pool7);
+    }
+
+    /**
+     * Make sure the taggable_config.yml config will actually give us a pool that implements TagAwareCacheInterface
+     */
+    public function testTaggableCachePool()
+    {
+        static::bootKernel(['root_config' => 'taggable_config.yml', 'environment' => 'taggable_cache']);
+        $container = static::$container;
+
+        $service = $container->get(ServiceUsingCache::class);
+        $pool = $service->getCache();
+        /** @var ItemInterface $value */
+        $value = $pool->get('item_0', function (ItemInterface $item) {
+            $item->tag(['foo', 'bar']);
+
+            return 'debug';
+        });
+
+        $this->assertEquals('debug', $value);
+
+        $item = $pool->getItem('item_0');
+        $this->assertEquals(['foo', 'bar'], array_values($item->getMetadata()[ItemInterface::METADATA_TAGS]));
     }
 
     protected static function createKernel(array $options = [])

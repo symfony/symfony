@@ -7,7 +7,8 @@ CHANGELOG
  * added InvalidTtlException  
  * deprecated `StoreInterface` in favor of `BlockingStoreInterface` and `PersistingStoreInterface`
  * `Factory` is deprecated, use `LockFactory` instead
-
+ * add `DSN` object to parse dsn in the component
+ 
 4.2.0
 -----
 

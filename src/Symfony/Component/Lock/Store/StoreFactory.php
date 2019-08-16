@@ -14,6 +14,7 @@ namespace Symfony\Component\Lock\Store;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
+use Symfony\Component\Lock\Dsn;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
@@ -50,15 +51,15 @@ class StoreFactory
         if (!\is_string($connection)) {
             throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', \get_class($connection)));
         }
-
+        $validDsn = Dsn::isValid($connection);
         switch (true) {
             case 'flock' === $connection:
                 return new FlockStore();
-            case 0 === strpos($connection, 'flock://'):
-                return new FlockStore(substr($connection, 8));
+            case $validDsn && 'flock' === ($parsedDsn = Dsn::fromString($connection, []))->getScheme():
+                return new FlockStore($parsedDsn->getPath());
             case 'semaphore' === $connection:
                 return new SemaphoreStore();
-            case class_exists(AbstractAdapter::class) && preg_match('#^[a-z]++://#', $connection):
+            case class_exists(AbstractAdapter::class) && $validDsn:
                 return static::createStore(AbstractAdapter::createConnection($connection));
             default:
                 throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', $connection));

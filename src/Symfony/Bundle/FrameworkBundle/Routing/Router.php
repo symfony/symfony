@@ -74,7 +74,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir)
     {
         $currentDir = $this->getOption('cache_dir');
 

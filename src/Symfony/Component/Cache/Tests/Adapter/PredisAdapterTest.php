@@ -34,7 +34,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
 
         $params = [
             'scheme' => 'tcp',
-            'host' => 'localhost',
+            'host' => $redisHost,
             'port' => 6379,
             'persistent' => 0,
             'timeout' => 3,

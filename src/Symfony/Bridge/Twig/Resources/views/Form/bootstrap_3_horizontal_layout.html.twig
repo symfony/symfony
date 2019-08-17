@@ -27,7 +27,7 @@ col-sm-2
     {%- if help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
-    <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+    <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}" {% if (not compound or force_error|default(false)) and not valid %} aria-invalid='true'{% endif %}>
         {{- form_label(form) -}}
         <div class="{{ block('form_group_class') }}">
             {{- form_widget(form, widget_attr) -}}
@@ -60,7 +60,7 @@ col-sm-10
 {%- endblock form_group_class %}
 
 {% block checkbox_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">{#--#}
+    <div class="form-group{% if not valid %} has-error{% endif %}" {% if (not compound or force_error|default(false)) and not valid %} aria-invalid='true'{% endif %}>{#--#}
         <div class="{{ block('form_label_class') }}"></div>{#--#}
         <div class="{{ block('form_group_class') }}">
             {{- form_widget(form) -}}

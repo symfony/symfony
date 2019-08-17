@@ -83,7 +83,7 @@
     {# Do not display the label if widget is not defined in order to prevent double label rendering #}
     {%- if widget is defined -%}
         {%- if required -%}
-            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
+            {%- set label_attr = label_attr|merge({'aria-required': 'true', class: (label_attr.class|default('') ~ ' required')|trim}) -%}
         {%- endif -%}
         {%- if parent_label_class is defined -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|trim}) -%}
@@ -111,7 +111,7 @@
     {%- if help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
-    <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+    <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}" {% if (not compound or force_error|default(false)) and not valid %} aria-invalid="true" {% endif %}>
         {{- form_label(form) }} {# -#}
         {{ form_widget(form, widget_attr) }} {# -#}
         {{- form_help(form) -}}
@@ -146,14 +146,14 @@
 {%- endblock datetime_row %}
 
 {% block checkbox_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">
+    <div class="form-group{% if not valid %} has-error{% endif %}" {% if (not compound or force_error|default(false)) and not valid %} aria-invalid="true" {% endif %}>
         {{- form_widget(form) -}}
         {{- form_errors(form) -}}
     </div>
 {%- endblock checkbox_row %}
 
 {% block radio_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">
+    <div class="form-group{% if not valid %} has-error{% endif %}" {% if (not compound or force_error|default(false)) and not valid %} aria-invalid="true" {% endif %}>
         {{- form_widget(form) -}}
         {{- form_errors(form) -}}
     </div>

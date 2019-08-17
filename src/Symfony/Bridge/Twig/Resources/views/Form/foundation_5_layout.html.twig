@@ -5,14 +5,14 @@
 
 {% block form_widget_simple -%}
     {% if errors|length > 0 -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' error')|trim}) %}
+        {% set attr = attr|merge({'aria-invalid': 'true', class: (attr.class|default('') ~ ' error')|trim}) %}
     {% endif %}
     {{- parent() -}}
 {%- endblock form_widget_simple %}
 
 {% block textarea_widget -%}
     {% if errors|length > 0 -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' error')|trim}) %}
+        {% set attr = attr|merge({'aria-invalid': 'true', class: (attr.class|default('') ~ ' error')|trim}) %}
     {% endif %}
     {{- parent() -}}
 {%- endblock textarea_widget %}
@@ -144,7 +144,7 @@
 
 {% block choice_widget_collapsed -%}
     {% if errors|length > 0 -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' error')|trim}) %}
+        {% set attr = attr|merge({'aria-invalid': 'true', class: (attr.class|default('') ~ ' error')|trim}) %}
     {% endif %}
 
     {% if multiple -%}
@@ -193,7 +193,7 @@
 {% block checkbox_widget -%}
     {% set parent_label_class = parent_label_class|default('') %}
     {% if errors|length > 0 -%}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' error')|trim}) %}
+        {% set attr = attr|merge({'aria-invalid': 'true', class: (attr.class|default('') ~ ' error')|trim}) %}
     {% endif %}
     {% if 'checkbox-inline' in parent_label_class %}
         {{ form_label(form, null, { widget: parent() }) }}
@@ -210,7 +210,7 @@
         {{ form_label(form, null, { widget: parent() }) }}
     {% else %}
         {% if errors|length > 0 -%}
-            {% set attr = attr|merge({class: (attr.class|default('') ~ ' error')|trim}) %}
+            {% set attr = attr|merge({'aria-invalid': 'true', class: (attr.class|default('') ~ ' error')|trim}) %}
         {% endif %}
         <div class="radio">
             {{ form_label(form, null, { widget: parent() }) }}

@@ -102,7 +102,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format)
+    public function supportsEncoding(string $format)
     {
         return self::FORMAT === $format;
     }
@@ -184,7 +184,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format)
+    public function supportsDecoding(string $format)
     {
         return self::FORMAT === $format;
     }

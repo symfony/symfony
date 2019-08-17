@@ -170,14 +170,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * Detects if the configured circular reference limit is reached.
      *
-     * @param object $object
-     * @param array  $context
-     *
      * @return bool
      *
      * @throws CircularReferenceException
      */
-    protected function isCircularReference($object, &$context)
+    protected function isCircularReference(object $object, array &$context)
     {
         $objectHash = spl_object_hash($object);
 
@@ -229,7 +226,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return string[]|AttributeMetadataInterface[]|bool
      */
-    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
+    protected function getAllowedAttributes($classOrObject, array $context, bool $attributesAsString = false)
     {
         $allowExtraAttributes = $context[self::ALLOW_EXTRA_ATTRIBUTES] ?? $this->defaultContext[self::ALLOW_EXTRA_ATTRIBUTES];
         if (!$this->classMetadataFactory) {
@@ -265,12 +262,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Is this attribute allowed?
      *
      * @param object|string $classOrObject
-     * @param string        $attribute
-     * @param string|null   $format
      *
      * @return bool
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, string $attribute, string $format = null, array $context = [])
     {
         $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
         if (\in_array($attribute, $ignoredAttributes)) {
@@ -307,12 +302,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Returns the method to use to construct an object. This method must be either
      * the object constructor or static.
      *
-     * @param string     $class
      * @param array|bool $allowedAttributes
      *
      * @return \ReflectionMethod|null
      */
-    protected function getConstructor(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
     {
         return $reflectionClass->getConstructor();
     }
@@ -325,7 +319,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * is removed from the context before being returned to avoid side effects
      * when recursively normalizing an object graph.
      *
-     * @param string     $class
      * @param array|bool $allowedAttributes
      *
      * @return object
@@ -333,7 +326,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @throws RuntimeException
      * @throws MissingConstructorArgumentsException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
             unset($context[self::OBJECT_TO_POPULATE]);
@@ -408,7 +401,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * @internal
      */
-    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, $parameterName, $parameterData, array $context, $format = null)
+    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, $parameterData, array $context, string $format = null)
     {
         try {
             if (null !== $parameter->getClass()) {

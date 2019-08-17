@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
  */
 class TestClassMetadataFactory
 {
-    public static function createClassMetadata($withParent = false, $withInterface = false)
+    public static function createClassMetadata(bool $withParent = false, bool $withInterface = false)
     {
         $expected = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
 

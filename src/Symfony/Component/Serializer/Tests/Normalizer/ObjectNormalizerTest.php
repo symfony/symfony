@@ -599,12 +599,12 @@ class ObjectNormalizerTest extends TestCase
     public function testAdvancedNameConverter()
     {
         $nameConverter = new class() implements AdvancedNameConverterInterface {
-            public function normalize($propertyName, string $class = null, string $format = null, array $context = [])
+            public function normalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
             {
                 return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
 
-            public function denormalize($propertyName, string $class = null, string $format = null, array $context = [])
+            public function denormalize(string $propertyName, string $class = null, string $format = null, array $context = []): string
             {
                 return sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);
             }
@@ -833,7 +833,7 @@ class ObjectInner
 
 class FormatAndContextAwareNormalizer extends ObjectNormalizer
 {
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, string $attribute, string $format = null, array $context = [])
     {
         if (\in_array($attribute, ['foo', 'bar']) && 'foo_and_bar_included' === $format) {
             return true;

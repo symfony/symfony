@@ -124,12 +124,12 @@ class ChainNormalizationAwareEncoder extends ChainEncoder implements Normalizati
 
 class NormalizationAwareEncoder implements EncoderInterface, NormalizationAwareInterface
 {
-    public function supportsEncoding($format)
+    public function supportsEncoding(string $format)
     {
         return true;
     }
 
-    public function encode($data, $format, array $context = [])
+    public function encode($data, string $format, array $context = [])
     {
     }
 }

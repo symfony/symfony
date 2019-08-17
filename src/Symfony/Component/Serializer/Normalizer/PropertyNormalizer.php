@@ -41,7 +41,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, string $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null)
     {
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
@@ -76,7 +76,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, string $attribute, string $format = null, array $context = [])
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
             return false;
@@ -97,7 +97,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function extractAttributes($object, string $format = null, array $context = [])
+    protected function extractAttributes(object $object, string $format = null, array $context = [])
     {
         $reflectionObject = new \ReflectionObject($object);
         $attributes = [];
@@ -118,7 +118,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeValue($object, $attribute, string $format = null, array $context = [])
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);
@@ -137,7 +137,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);

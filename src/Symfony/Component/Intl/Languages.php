@@ -98,7 +98,7 @@ final class Languages extends ResourceBundle
      */
     public static function getAlpha3Codes(): array
     {
-        return self::readEntry(['Alpha2ToAlpha3'], 'meta');
+        return self::readEntry(['Alpha3Languages'], 'meta');
     }
 
     /**
@@ -111,7 +111,12 @@ final class Languages extends ResourceBundle
 
             return true;
         } catch (MissingResourceException $e) {
-            return false;
+            static $cache;
+            if (null === $cache) {
+                $cache = array_flip(self::getAlpha3Codes());
+            }
+
+            return isset($cache[$language]);
         }
     }
 
@@ -122,7 +127,15 @@ final class Languages extends ResourceBundle
      */
     public static function getAlpha3Name(string $language, string $displayLocale = null): string
     {
-        return self::getName(self::getAlpha2Code($language), $displayLocale);
+        try {
+            return self::getName(self::getAlpha2Code($language), $displayLocale);
+        } catch (MissingResourceException $e) {
+            if (3 === \strlen($language)) {
+                return self::getName($language, $displayLocale);
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -137,6 +150,10 @@ final class Languages extends ResourceBundle
         $alpha2Names = self::getNames($displayLocale);
         $alpha3Names = [];
         foreach ($alpha2Names as $alpha2Code => $name) {
+            if (3 === \strlen($alpha2Code)) {
+                $alpha3Names[$alpha2Code] = $name;
+                continue;
+            }
             try {
                 $alpha3Names[self::getAlpha3Code($alpha2Code)] = $name;
             } catch (MissingResourceException $e) {

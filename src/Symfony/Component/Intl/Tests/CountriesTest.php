@@ -626,6 +626,7 @@ class CountriesTest extends ResourceBundleTestCase
     {
         $this->assertTrue(Countries::alpha3CodeExists('NOR'));
         $this->assertTrue(Countries::alpha3CodeExists('NLD'));
+        $this->assertFalse(Countries::alpha3CodeExists('NL'));
         $this->assertFalse(Countries::alpha3CodeExists('NIO'));
         $this->assertFalse(Countries::alpha3CodeExists('ZZZ'));
     }

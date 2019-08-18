@@ -63,9 +63,9 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     public function remove(int $offset);
 
     /**
-     * Return Whether the List contains violation exists
+     * Return Whether the list contains or not violation.
      *
-     * @return bool Whether the List contains violation exists
+     * @return bool Whether the list contains or not violation
      */
     public function hasViolation(): bool;
 }

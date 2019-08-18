@@ -972,7 +972,7 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Sets the process timeout (max. runtime).
+     * Sets the process timeout (max. runtime) in seconds.
      *
      * To disable the timeout, set this value to null.
      *

@@ -126,8 +126,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'excluded_ajax_paths' => $this->excludedAjaxPaths,
                     'token' => $response->headers->get('X-Debug-Token'),
                     'request' => $request,
-                    'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
-                    'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
+                    'csp_script_nonce' => $nonces['csp_script_nonce'] ?? null,
+                    'csp_style_nonce' => $nonces['csp_style_nonce'] ?? null,
                 ]
             ))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);

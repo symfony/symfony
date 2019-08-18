@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-13T18:54:13Z
+
+Ready. This PR updates the list of alpha3 language codes from 180 to 589. The old list only referenced the alpha3 codes with a alpha2 mapping.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-14T10:47:42Z
+
+@TerjeBr i resolved all your reviews, i think we have to settle here for now :) Thanks for reviewing, much appreciated. If i forgot or overlooked any of your concerns still, let me know.

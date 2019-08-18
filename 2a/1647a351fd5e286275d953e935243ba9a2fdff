@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-16T05:45:34Z
+
+A mock in Workflow might have an issue, see tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-16T05:48:52Z
+
+Maybe the fix related to the failing tests should go to #33197 btw?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-16T08:18:36Z
+
+The test was right. I cannot type-hint for `WorkflowSupportStrategyInterface` yet because we also have to support a legacy interface there.

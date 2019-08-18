@@ -118,13 +118,13 @@ EOF
         throw new RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
     }
 
-    private function validate(string $template, $file)
+    private function validate(string $template, string $file): array
     {
         $realLoader = $this->twig->getLoader();
         try {
-            $temporaryLoader = new ArrayLoader([(string) $file => $template]);
+            $temporaryLoader = new ArrayLoader([$file => $template]);
             $this->twig->setLoader($temporaryLoader);
-            $nodeTree = $this->twig->parse($this->twig->tokenize(new Source($template, (string) $file)));
+            $nodeTree = $this->twig->parse($this->twig->tokenize(new Source($template, $file)));
             $this->twig->compile($nodeTree);
             $this->twig->setLoader($realLoader);
         } catch (Error $e) {

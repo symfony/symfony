@@ -181,7 +181,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    private static function throwInvalidArgumentException($message, $trace, $i, $propertyPath)
+    private static function throwInvalidArgumentException(string $message, array $trace, int $i, string $propertyPath): void
     {
         // the type mismatch is not caused by invalid arguments (but e.g. by an incompatible return type hint of the writer method)
         if (0 !== strpos($message, 'Argument ')) {

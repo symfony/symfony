@@ -119,7 +119,7 @@ class DoctrineDataCollector extends DataCollector
         return 'db';
     }
 
-    private function sanitizeQueries(string $connectionName, array $queries)
+    private function sanitizeQueries(string $connectionName, array $queries): array
     {
         foreach ($queries as $i => $query) {
             $queries[$i] = $this->sanitizeQuery($connectionName, $query);
@@ -128,7 +128,7 @@ class DoctrineDataCollector extends DataCollector
         return $queries;
     }
 
-    private function sanitizeQuery(string $connectionName, $query)
+    private function sanitizeQuery(string $connectionName, array $query): array
     {
         $query['explainable'] = true;
         if (null === $query['params']) {

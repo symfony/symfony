@@ -186,7 +186,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function file($file, string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
     {
         $response = new BinaryFileResponse($file);
-        $response->setContentDisposition($disposition, null === $fileName ? $response->getFile()->getFilename() : $fileName);
+        $response->setContentDisposition($disposition, $fileName ?? $response->getFile()->getFilename());
 
         return $response;
     }

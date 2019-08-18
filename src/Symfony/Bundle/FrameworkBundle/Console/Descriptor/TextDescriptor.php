@@ -90,7 +90,7 @@ class TextDescriptor extends Descriptor
     {
         $tableHeaders = ['Property', 'Value'];
         $tableRows = [
-            ['Route Name', isset($options['name']) ? $options['name'] : ''],
+            ['Route Name', $options['name'] ?? ''],
             ['Path', $route->getPath()],
             ['Path Regex', $route->compile()->getRegex()],
             ['Host', ('' !== $route->getHost() ? $route->getHost() : 'ANY')],
@@ -165,7 +165,7 @@ class TextDescriptor extends Descriptor
             $options['output']->table(
                 ['Service ID', 'Class'],
                 [
-                    [isset($options['id']) ? $options['id'] : '-', \get_class($service)],
+                    [$options['id'] ?? '-', \get_class($service)],
                 ]
             );
         }
@@ -177,7 +177,7 @@ class TextDescriptor extends Descriptor
     protected function describeContainerServices(ContainerBuilder $builder, array $options = [])
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
-        $showTag = isset($options['tag']) ? $options['tag'] : null;
+        $showTag = $options['tag'] ?? null;
 
         if ($showHidden) {
             $title = 'Symfony Container Hidden Services';
@@ -239,7 +239,7 @@ class TextDescriptor extends Descriptor
                     foreach ($definition->getTag($showTag) as $key => $tag) {
                         $tagValues = [];
                         foreach ($tagsNames as $tagName) {
-                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : '';
+                            $tagValues[] = $tag[$tagName] ?? '';
                         }
                         if (0 === $key) {
                             $tableRows[] = array_merge([$serviceId], $tagValues, [$definition->getClass()]);
@@ -276,7 +276,7 @@ class TextDescriptor extends Descriptor
 
         $tableHeaders = ['Option', 'Value'];
 
-        $tableRows[] = ['Service ID', isset($options['id']) ? $options['id'] : '-'];
+        $tableRows[] = ['Service ID', $options['id'] ?? '-'];
         $tableRows[] = ['Class', $definition->getClass() ?: '-'];
 
         $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
@@ -473,7 +473,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
-        $event = \array_key_exists('event', $options) ? $options['event'] : null;
+        $event = $options['event'] ?? null;
 
         if (null !== $event) {
             $title = sprintf('Registered Listeners for "%s" Event', $event);

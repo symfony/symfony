@@ -551,7 +551,7 @@ class RouterTest extends TestCase
             ->expects($this->any())
             ->method('get')
             ->willReturnCallback(function ($key) use ($params) {
-                return isset($params[$key]) ? $params[$key] : null;
+                return $params[$key] ?? null;
             })
         ;
 

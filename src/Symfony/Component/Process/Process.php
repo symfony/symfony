@@ -949,6 +949,16 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Gets the last output time in seconds
+     *
+     * @return float|null The last output time in seconds or null if it isn't started
+     */
+    public function getLastOutputTime(): ?float
+    {
+        return $this->lastOutputTime;
+    }
+
+    /**
      * Gets the command line to be executed.
      *
      * @return string The command to execute

@@ -134,7 +134,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tags) {
             foreach ($tags as $attributes) {
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
+                $priority = $attributes['priority'] ?? 0;
                 $sortedTags[$priority][] = [$serviceId, $attributes];
             }
         }

@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-04T08:26:28Z
+
+> Note: This handler is not aimed to be used in productio
+
+I'd suggest telling this in the docblock +  explain how to do it in prod
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-04T08:30:53Z
+
+> I'd suggest telling this in the docblock + explain how to do it in prod
+
+Actually, I could work a bit on it to make it available on production:
+It it's used in combinaison with a buffer handler, or a finger cross handler, all logs could be sent by batch, and so only one HTTP call.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-08T13:30:56Z
+
+* I updated the PHPdoc.
+* I added blackfire profile to the PR description
+* I enhanced the main dockbloc
+* I added an entry to the readme
+* I changed the default host to 127.0.0.1:9200
+* I added a timeout to 1 sec
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-08T13:34:14Z
+
+@nicolas-grekas How can I disable **all exceptions** in the http-client? Or at least catch them all? (But I think this is not do-able since I use the __destruct feature)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-08T13:37:49Z
+
+Hmm, I managed to do something. Could you look at the last commit? Thanks
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-16T09:02:55Z
+
+I rebased this PR. It's now ready and green :green_heart:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-16T13:26:52Z
+
+> edit : do you plan to add real doc, or a blog post to explain the config for dev/vs prod ?
+> i think it is a must have, to not degrade perf on prod :)
+
+Not really. There is already many blog post on internet about symfony + ELK
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-16T16:43:45Z
+
+I addressed your comments
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2019-07-17T16:01:20Z
+
+@lyrixx
+
+> Not really. There is already many blog post on internet about symfony + ELK
+
+my comment was more for configuring **this new handler** in the proper way inside a symfony **dev|prod** stack :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-17T16:06:22Z
+
+> my comment was more for configuring **this new handler** in the proper way inside a symfony **dev|prod** stack :)
+
+This will be done in the monolog-bundle :)
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2019-08-14T12:25:34Z
+
+Do you plan to add some doc ?

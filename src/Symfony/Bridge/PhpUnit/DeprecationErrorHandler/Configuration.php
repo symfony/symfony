@@ -160,7 +160,7 @@ class Configuration
         }
 
         return new self(
-            isset($normalizedConfiguration['max']) ? $normalizedConfiguration['max'] : [],
+            $normalizedConfiguration['max'] ?? [],
             '',
             $verboseOutput
         );

@@ -183,8 +183,8 @@ EOPHP
 }
 
 global $argv, $argc;
-$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
-$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
+$argv = $_SERVER['argv'] ?? [];
+$argc = $_SERVER['argc'] ?? 0;
 
 if ($PHPUNIT_VERSION < 8.0) {
     $argv = array_filter($argv, function ($v) use (&$argc) { if ('--do-not-cache-result' !== $v) return true; --$argc; });
@@ -227,7 +227,7 @@ if ('\\' === DIRECTORY_SEPARATOR) {
 }
 
 if ($components) {
-    $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
+    $skippedTests = $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] ?? false;
     $runningProcs = array();
 
     foreach ($components as $component) {

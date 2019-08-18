@@ -29,7 +29,7 @@ class CommandForV6 extends BaseCommand
     {
         $listener = new SymfonyTestsListener();
 
-        $this->arguments['listeners'] = isset($this->arguments['listeners']) ? $this->arguments['listeners'] : [];
+        $this->arguments['listeners'] = $this->arguments['listeners'] ?? [];
 
         $registeredLocally = false;
 

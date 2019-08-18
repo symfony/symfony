@@ -162,7 +162,7 @@ class XliffFileDumper extends FileDumper
                 $notesElement = $dom->createElement('notes');
                 foreach ($metadata['notes'] as $note) {
                     $n = $dom->createElement('note');
-                    $n->appendChild($dom->createTextNode(isset($note['content']) ? $note['content'] : ''));
+                    $n->appendChild($dom->createTextNode($note['content'] ?? ''));
                     unset($note['content']);
 
                     foreach ($note as $name => $value) {

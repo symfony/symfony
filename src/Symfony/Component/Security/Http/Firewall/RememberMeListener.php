@@ -48,7 +48,7 @@ class RememberMeListener
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->catchExceptions = $catchExceptions;
-        $this->sessionStrategy = null === $sessionStrategy ? new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE) : $sessionStrategy;
+        $this->sessionStrategy = $sessionStrategy ?? new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
     }
 
     /**

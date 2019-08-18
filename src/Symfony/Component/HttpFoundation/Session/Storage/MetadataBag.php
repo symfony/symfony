@@ -161,6 +161,6 @@ class MetadataBag implements SessionBagInterface
     {
         $timeStamp = time();
         $this->meta[self::CREATED] = $this->meta[self::UPDATED] = $this->lastUsed = $timeStamp;
-        $this->meta[self::LIFETIME] = (null === $lifetime) ? ini_get('session.cookie_lifetime') : $lifetime;
+        $this->meta[self::LIFETIME] = $lifetime ?? ini_get('session.cookie_lifetime');
     }
 }

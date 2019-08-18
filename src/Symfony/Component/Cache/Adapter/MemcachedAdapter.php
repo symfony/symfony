@@ -154,7 +154,7 @@ class MemcachedAdapter extends AbstractAdapter
                     $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
                 }
                 $params += [
-                    'host' => isset($params['host']) ? $params['host'] : $params['path'],
+                    'host' => $params['host'] ?? $params['path'],
                     'port' => isset($params['host']) ? 11211 : null,
                     'weight' => 0,
                 ];

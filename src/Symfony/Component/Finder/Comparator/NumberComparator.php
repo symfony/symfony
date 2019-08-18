@@ -74,6 +74,6 @@ class NumberComparator extends Comparator
         }
 
         $this->setTarget($target);
-        $this->setOperator(isset($matches[1]) ? $matches[1] : '==');
+        $this->setOperator($matches[1] ?? '==');
     }
 }

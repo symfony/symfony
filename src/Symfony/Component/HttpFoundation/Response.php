@@ -443,7 +443,7 @@ class Response
         }
 
         if (null === $text) {
-            $this->statusText = isset(self::$statusTexts[$code]) ? self::$statusTexts[$code] : 'unknown status';
+            $this->statusText = self::$statusTexts[$code] ?? 'unknown status';
 
             return $this;
         }
@@ -1197,7 +1197,7 @@ class Response
         $level = \count($status);
         $flags = PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE);
 
-        while ($level-- > $targetLevel && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {
+        while ($level-- > $targetLevel && ($s = $status[$level]) && ($s['del'] ?? !isset($s['flags']) || ($s['flags'] & $flags) === $flags)) {
             if ($flush) {
                 ob_end_flush();
             } else {

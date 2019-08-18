@@ -232,7 +232,7 @@ class ExprBuilderTest extends TestCase
             ->end()
             ->end()
             ->buildTree()
-            ->finalize(null === $config ? ['key' => 'value'] : $config)
+            ->finalize($config ?? ['key' => 'value'])
         ;
     }
 

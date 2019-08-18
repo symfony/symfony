@@ -77,7 +77,7 @@ class SlotsHelper extends Helper
      */
     public function get(string $name, $default = false)
     {
-        return isset($this->slots[$name]) ? $this->slots[$name] : $default;
+        return $this->slots[$name] ?? $default;
     }
 
     /**

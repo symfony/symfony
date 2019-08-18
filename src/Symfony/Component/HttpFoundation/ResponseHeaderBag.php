@@ -51,7 +51,7 @@ class ResponseHeaderBag extends HeaderBag
     {
         $headers = [];
         foreach ($this->all() as $name => $value) {
-            $headers[isset($this->headerNames[$name]) ? $this->headerNames[$name] : $name] = $value;
+            $headers[$this->headerNames[$name] ?? $name] = $value;
         }
 
         return $headers;
@@ -174,7 +174,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function getCacheControlDirective(string $key)
     {
-        return \array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
+        return $this->computedCacheControl[$key] ?? null;
     }
 
     public function setCookie(Cookie $cookie)

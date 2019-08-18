@@ -285,9 +285,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         $hash = spl_object_hash($form);
 
         $output = &$outputByHash[$hash];
-        $output = isset($this->dataByForm[$hash])
-            ? $this->dataByForm[$hash]
-            : [];
+        $output = $this->dataByForm[$hash] ?? [];
 
         $output['children'] = [];
 
@@ -315,16 +313,12 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             $output = &$outputByHash[$formHash];
         }
 
-        $output = isset($this->dataByView[$viewHash])
-            ? $this->dataByView[$viewHash]
-            : [];
+        $output = $this->dataByView[$viewHash] ?? [];
 
         if (null !== $formHash) {
             $output = array_replace(
                 $output,
-                isset($this->dataByForm[$formHash])
-                    ? $this->dataByForm[$formHash]
-                    : []
+                $this->dataByForm[$formHash] ?? []
             );
         }
 

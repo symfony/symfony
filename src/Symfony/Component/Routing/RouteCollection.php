@@ -90,7 +90,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function get(string $name)
     {
-        return isset($this->routes[$name]) ? $this->routes[$name] : null;
+        return $this->routes[$name] ?? null;
     }
 
     /**

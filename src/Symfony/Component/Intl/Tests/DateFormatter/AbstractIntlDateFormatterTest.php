@@ -935,7 +935,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     protected function getDateTime($timestamp, $timeZone)
     {
         $dateTime = new \DateTime();
-        $dateTime->setTimestamp(null === $timestamp ? time() : $timestamp);
+        $dateTime->setTimestamp($timestamp ?? time());
         $dateTime->setTimezone(new \DateTimeZone($timeZone ?: getenv('TZ') ?: 'UTC'));
 
         return $dateTime;

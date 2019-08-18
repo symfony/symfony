@@ -36,7 +36,7 @@ class TestExtension implements FormExtensionInterface
 
     public function getType($name)
     {
-        return isset($this->types[$name]) ? $this->types[$name] : null;
+        return $this->types[$name] ?? null;
     }
 
     public function hasType($name)
@@ -57,7 +57,7 @@ class TestExtension implements FormExtensionInterface
 
     public function getTypeExtensions($name)
     {
-        return isset($this->extensions[$name]) ? $this->extensions[$name] : [];
+        return $this->extensions[$name] ?? [];
     }
 
     public function hasTypeExtensions($name)

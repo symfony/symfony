@@ -100,7 +100,7 @@ final class WrappedListener
 
         return [
             'event' => $eventName,
-            'priority' => null !== $this->priority ? $this->priority : (null !== $this->dispatcher ? $this->dispatcher->getListenerPriority($eventName, $this->listener) : null),
+            'priority' => $this->priority ?? null !== $this->dispatcher ? $this->dispatcher->getListenerPriority($eventName, $this->listener) : null,
             'pretty' => $this->pretty,
             'stub' => $this->stub,
         ];

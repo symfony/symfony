@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-02T01:18:15Z
+
+Hey @tienvx nice to meet you. I've seen just seen your mbtBundle, Then I saw this https://github.com/tienvx/messenger-memory-transport repo on your github page and I remembered to have seen a PR about memory transport on symfony. And indeed it's you. Funny chain of exploration that let me came back here in the end. I always end here in symfony. I think I'm cursed ;)
+
+---------------------------------------------------------------------------
+
+by tienvx at 2019-08-02T12:40:12Z
+
+Hello @Tobion nice to meet you too. I think because it's a small world :D btw, when this MR is merged, my repo https://github.com/tienvx/messenger-memory-transport can be archived
+
+---------------------------------------------------------------------------
+
+by tienvx at 2019-08-02T12:49:36Z
+
+Fixed a code conflict, but test case failed after merging with branch 4.4. The test case failed is in `src\Symfony/Bundle/FrameworkBundle`
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-14T10:07:15Z
+
+All green here, any update on this?
+
+---------------------------------------------------------------------------
+
+by tienvx at 2019-08-14T14:13:06Z
+
+All green. There are no more updates. This PR is waiting to be reviewed again
+
+---------------------------------------------------------------------------
+
+by tienvx at 2019-08-17T01:19:16Z
+
+Thanks for your review @Tobion . I updated the code. Please review again. Currently CI failed because of the Console component.

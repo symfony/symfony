@@ -178,4 +178,12 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
         return new static($violations);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasViolation(): bool
+    {
+        return 0 !== count($this->violations);
+    }
 }

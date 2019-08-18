@@ -146,12 +146,30 @@ EOF;
         $this->assertCount($violationsCount, $specificErrors);
     }
 
+    /**
+     * @dataProvider hasViolationProvider
+     */
+    public function testHasViolation(bool $expected, ConstraintViolationList $violationList)
+    {
+        $this->assertEquals($expected, $violationList->hasViolation());
+    }
+
     public function findByCodesProvider()
     {
         return [
             ['code1', 2],
             [['code1', 'code2'], 3],
             ['code3', 0],
+        ];
+    }
+
+    public function hasViolationProvider()
+    {
+        $violation = $this->getViolation('Error', null, null, 'code1');
+
+        return [
+            [true, new ConstraintViolationList([$violation])],
+            [false, new ConstraintViolationList],
         ];
     }
 

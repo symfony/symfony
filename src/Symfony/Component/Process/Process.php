@@ -186,6 +186,8 @@ class Process implements \IteratorAggregate
      * @param mixed|null     $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
+     * @return static
+     *
      * @throws RuntimeException When proc_open is not installed
      */
     public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)

@@ -171,9 +171,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param Request|null $request The request to get listeners for
+     * @return array
      */
     public function getCalledListeners(Request $request = null)
     {
@@ -181,7 +179,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
             return [];
         }
 
-        $hash = 1 <= \func_num_args() && null !== ($request = func_get_arg(0)) ? spl_object_hash($request) : null;
+        $hash = $request ? spl_object_hash($request) : null;
         $called = [];
         foreach ($this->callStack as $listener) {
             list($eventName, $requestHash) = $this->callStack->getInfo();
@@ -194,9 +192,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param Request|null $request The request to get listeners for
+     * @return array
      */
     public function getNotCalledListeners(Request $request = null)
     {
@@ -211,7 +207,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
             return [];
         }
 
-        $hash = 1 <= \func_num_args() && null !== ($request = func_get_arg(0)) ? spl_object_hash($request) : null;
+        $hash = $request ? spl_object_hash($request) : null;
         $calledListeners = [];
 
         if (null !== $this->callStack) {
@@ -241,12 +237,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         return $notCalled;
     }
 
-    /**
-     * @param Request|null $request The request to get orphaned events for
-     */
     public function getOrphanedEvents(Request $request = null): array
     {
-        if (1 <= \func_num_args() && null !== $request = func_get_arg(0)) {
+        if ($request) {
             return $this->orphanedEvents[spl_object_hash($request)] ?? [];
         }
 

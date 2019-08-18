@@ -34,7 +34,20 @@ class InMemoryTransportTest extends TestCase
     {
         $envelope = new Envelope(new \stdClass());
         $this->transport->send($envelope);
-        $this->assertSame([$envelope], $this->transport->get());
+        $this->assertSame([$envelope], $this->transport->getSent());
+    }
+
+    public function testQueue()
+    {
+        $envelope1 = new Envelope(new \stdClass());
+        $this->transport->send($envelope1);
+        $envelope2 = new Envelope(new \stdClass());
+        $this->transport->send($envelope2);
+        $this->assertSame([$envelope1, $envelope2], $this->transport->get());
+        $this->transport->ack($envelope1);
+        $this->assertSame([$envelope2], $this->transport->get());
+        $this->transport->reject($envelope2);
+        $this->assertSame([], $this->transport->get());
     }
 
     public function testAck()
@@ -63,5 +76,6 @@ class InMemoryTransportTest extends TestCase
         $this->assertEmpty($this->transport->get(), 'Should be empty after reset');
         $this->assertEmpty($this->transport->getAcknowledged(), 'Should be empty after reset');
         $this->assertEmpty($this->transport->getRejected(), 'Should be empty after reset');
+        $this->assertEmpty($this->transport->getSent(), 'Should be empty after reset');
     }
 }

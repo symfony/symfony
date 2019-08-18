@@ -38,7 +38,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
             'priority' => $record['level'],
             'priorityName' => $record['level_name'],
             'context' => $record['context'],
-            'channel' => isset($record['channel']) ? $record['channel'] : '',
+            'channel' => $record['channel'] ?? '',
         ];
 
         if (!isset($this->errorCount[$hash])) {

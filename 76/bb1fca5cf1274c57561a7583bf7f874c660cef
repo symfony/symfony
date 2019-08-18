@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-16T00:29:27Z
+
+@tigitz fabbot wants to remove an annotation that I'd like to keep. Is the related to the new CS Fixer rule?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-16T05:46:32Z
+
+New fabbot rule, with not perfect behavior, see https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/4505

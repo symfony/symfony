@@ -5,3 +5,4 @@ CHANGELOG
 -----
 
  * added the component
+ * added `ErrorHandler::call()` method utility to turn any PHP error into `\ErrorException`

@@ -44,6 +44,11 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('smtps', 'mandrill'),
+            true,
+        ];
+
+        yield [
             new Dsn('smtp', 'example.com'),
             false,
         ];
@@ -69,13 +74,18 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtp', 'mandrill', self::USER, self::PASSWORD),
             new MandrillSmtpTransport(self::USER, self::PASSWORD, $dispatcher, $logger),
         ];
+
+        yield [
+            new Dsn('smtps', 'mandrill', self::USER, self::PASSWORD),
+            new MandrillSmtpTransport(self::USER, self::PASSWORD, $dispatcher, $logger),
+        ];
     }
 
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('foo', 'mandrill', self::USER),
-            'The "foo" scheme is not supported for mailer "mandrill". Supported schemes are: "api", "http", "smtp".',
+            'The "foo" scheme is not supported for mailer "mandrill". Supported schemes are: "api", "http", "smtp", "smtps".',
         ];
     }
 

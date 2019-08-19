@@ -239,8 +239,8 @@ class FileType extends AbstractType
     /**
      * This method should be kept in sync with Symfony\Component\Validator\Constraints\FileValidator::moreDecimalsThan().
      */
-    private static function moreDecimalsThan($double, $numberOfDecimals)
+    private static function moreDecimalsThan(string $double, int $numberOfDecimals): bool
     {
-        return \strlen((string) $double) > \strlen(round($double, $numberOfDecimals));
+        return \strlen($double) > \strlen(round($double, $numberOfDecimals));
     }
 }

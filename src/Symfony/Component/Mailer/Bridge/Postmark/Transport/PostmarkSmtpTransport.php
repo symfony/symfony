@@ -22,7 +22,7 @@ class PostmarkSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('smtp.postmarkapp.com', 587, 'tls', null, $dispatcher, $logger);
+        parent::__construct('smtp.postmarkapp.com', 587, true, null, $dispatcher, $logger);
 
         $this->setUsername($id);
         $this->setPassword($id);

@@ -37,7 +37,6 @@ class SocketStreamTest extends TestCase
                 'cafile' => __FILE__,
             ],
         ]);
-        $s->setEncryption('ssl');
         $s->setHost('smtp.gmail.com');
         $s->setPort(465);
         $s->initialize();

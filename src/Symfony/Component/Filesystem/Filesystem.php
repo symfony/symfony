@@ -705,7 +705,10 @@ class Filesystem
         return 2 === \count($components) ? [$components[0], $components[1]] : [null, $components[0]];
     }
 
-    private static function box($func)
+    /**
+     * @return mixed
+     */
+    private static function box(callable $func)
     {
         self::$lastError = null;
         set_error_handler(__CLASS__.'::handleError');

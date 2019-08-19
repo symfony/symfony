@@ -25,7 +25,7 @@ class SesSmtpTransport extends EsmtpTransport
      */
     public function __construct(string $username, string $password, string $region = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct(sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1'), 587, 'tls', null, $dispatcher, $logger);
+        parent::__construct(sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1'), 587, true, null, $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

@@ -273,6 +273,33 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    public function testBindingArguments()
+    {
+        $amqpConnection = $this->createMock(\AMQPConnection::class);
+        $amqpChannel = $this->createMock(\AMQPChannel::class);
+        $amqpExchange = $this->createMock(\AMQPExchange::class);
+        $amqpQueue = $this->createMock(\AMQPQueue::class);
+
+        $factory = $this->createMock(AmqpFactory::class);
+        $factory->method('createConnection')->willReturn($amqpConnection);
+        $factory->method('createChannel')->willReturn($amqpChannel);
+        $factory->method('createExchange')->willReturn($amqpExchange);
+        $factory->method('createQueue')->willReturn($amqpQueue);
+
+        $amqpExchange->expects($this->once())->method('declareExchange');
+        $amqpExchange->expects($this->once())->method('publish')->with('body', null, AMQP_NOPARAM, ['headers' => []]);
+        $amqpQueue->expects($this->once())->method('declareQueue');
+        $amqpQueue->expects($this->exactly(1))->method('bind')->withConsecutive(
+            [self::DEFAULT_EXCHANGE_NAME, null, ['x-match' => 'all']]
+        );
+
+        $dsn = 'amqp://localhost?exchange[type]=headers'.
+            '&queues[queue0][binding_arguments][x-match]=all';
+
+        $connection = Connection::fromDsn($dsn, [], $factory);
+        $connection->publish('body');
+    }
+
     public function testItCanDisableTheSetup()
     {
         $factory = new TestAmqpFactory(

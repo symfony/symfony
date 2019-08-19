@@ -1030,12 +1030,13 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /*{$this->docStar}
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
- * @final since Symfony 3.3
+ * @final
  */
 class $class extends $baseClass
 {
@@ -1088,12 +1089,12 @@ EOF;
         $code .= <<<EOF
     }
 
-    public function compile()
+    public function compile(): void
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    public function isCompiled()
+    public function isCompiled(): bool
     {
         return true;
     }
@@ -1184,7 +1185,7 @@ EOF;
 
         return <<<EOF
 
-    public function getRemovedIds()
+    public function getRemovedIds(): array
     {
         return {$code};
     }
@@ -1363,7 +1364,7 @@ EOF;
         return $this->parameters[$name];
     }
 
-    public function hasParameter($name)
+    public function hasParameter($name): bool
     {
         $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
@@ -1373,12 +1374,12 @@ EOF;
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter($name, $value): void
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    public function getParameterBag()
+    public function getParameterBag(): ParameterBagInterface
     {
         if (null === $this->parameterBag) {
             $parameters = $this->parameters;
@@ -1421,26 +1422,12 @@ EOF;
     private \$loadedDynamicParameters = {$loadedDynamicParameters};
     private \$dynamicParameters = [];
 
-    /*{$this->docStar}
-     * Computes a dynamic parameter.
-     *
-     * @param string \$name The name of the dynamic parameter to load
-     *
-     * @return mixed The value of the dynamic parameter
-     *
-     * @throws InvalidArgumentException When the dynamic parameter does not exist
-     */
-    private function getDynamicParameter(\$name)
+    private function getDynamicParameter(string \$name)
     {
 {$getDynamicParameter}
     }
 
-    /*{$this->docStar}
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return $parameters;
     }

@@ -29,6 +29,8 @@ framework:
         gc_probability:  1
         gc_divisor:      108
         gc_maxlifetime:  90000
+        sid_length:      22
+        sid_bits_per_character: 4
         save_path:       /path/to/sessions
     assets:
         version: v1

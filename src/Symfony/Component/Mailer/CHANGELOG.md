@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * [BC BREAK] removed the `auth_mode` DSN option (it is now always determined automatically)
  * STARTTLS cannot be enabled anymore (it is used automatically if TLS is disabled and the server supports STARTTLS)
  * [BC BREAK] Removed the `encryption` DSN option (use `smtps` instead)
  * Added support for the `smtps` protocol (does the same as using `smtp` and port `465`)

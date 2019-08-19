@@ -23,11 +23,10 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $tls = 'smtps' === $dsn->getScheme() ? true : null;
-        $authMode = $dsn->getOption('auth_mode');
         $port = $dsn->getPort(0);
         $host = $dsn->getHost();
 
-        $transport = new EsmtpTransport($host, $port, $tls, $authMode, $this->dispatcher, $this->logger);
+        $transport = new EsmtpTransport($host, $port, $tls, $this->dispatcher, $this->logger);
 
         if ($user = $dsn->getUser()) {
             $transport->setUsername($user);

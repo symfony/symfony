@@ -54,7 +54,7 @@ class SymfonyCaster
         $stub->cut += \count($a);
         $a = [];
 
-        foreach ($response->getInfo() + ['debug' => $response->getInfo('debug')] as $k => $v) {
+        foreach ($response->getInfo() as $k => $v) {
             $a[Caster::PREFIX_VIRTUAL.$k] = $v;
         }
 

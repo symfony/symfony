@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Http\Api;
+namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Mailer\Bridge\Sendgrid\Http\Api\SendgridTransport;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class SendgridTransportTest extends TestCase
+class SendgridApiTransportTest extends TestCase
 {
     public function testSend()
     {
@@ -54,7 +54,7 @@ class SendgridTransportTest extends TestCase
             ])
             ->willReturn($response);
 
-        $mailer = new SendgridTransport('foo', $httpClient);
+        $mailer = new SendgridApiTransport('foo', $httpClient);
 
         $mailer->send($email);
     }

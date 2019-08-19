@@ -47,9 +47,9 @@ abstract class AbstractHttpTransport extends AbstractTransport
         $response = null;
         try {
             $response = $this->doSendHttp($message);
-            $message->appendDebug($response->getInfo('debug'));
+            $message->appendDebug($response->getInfo('debug') ?? '');
         } catch (HttpTransportException $e) {
-            $e->appendDebug($e->getResponse()->getInfo('debug'));
+            $e->appendDebug($e->getResponse()->getInfo('debug') ?? '');
 
             throw $e;
         }

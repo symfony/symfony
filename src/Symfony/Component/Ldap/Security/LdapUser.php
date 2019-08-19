@@ -12,6 +12,7 @@
 namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @final
  */
-class LdapUser implements UserInterface
+class LdapUser implements UserInterface, EquatableInterface
 {
     private $entry;
     private $username;
@@ -87,5 +88,29 @@ class LdapUser implements UserInterface
     public function getExtraFields(): array
     {
         return $this->extraFields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (!$user instanceof self) {
+            return false;
+        }
+
+        if ($this->getPassword() !== $user->getPassword()) {
+            return false;
+        }
+
+        if ($this->getSalt() !== $user->getSalt()) {
+            return false;
+        }
+
+        if ($this->getUsername() !== $user->getUsername()) {
+            return false;
+        }
+
+        return true;
     }
 }

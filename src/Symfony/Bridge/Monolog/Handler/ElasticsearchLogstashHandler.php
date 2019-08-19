@@ -39,6 +39,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class ElasticsearchLogstashHandler extends AbstractHandler
 {
+    use ProcessableHandlerTrait;
+    use FormattableHandlerTrait;
+
     private $endpoint;
     private $index;
     private $client;
@@ -79,7 +82,13 @@ class ElasticsearchLogstashHandler extends AbstractHandler
 
     protected function getDefaultFormatter(): FormatterInterface
     {
-        return new LogstashFormatter('application', null, null, 'ctxt_', LogstashFormatter::V1);
+        // Monolog 1.X
+        if (\defined(LogstashFormatter::class.'::V1')) {
+            return new LogstashFormatter('application', null, null, 'ctxt_', LogstashFormatter::V1);
+        }
+
+        // Monolog 2.X
+        return new LogstashFormatter('application');
     }
 
     private function sendToElasticsearch(array $records)

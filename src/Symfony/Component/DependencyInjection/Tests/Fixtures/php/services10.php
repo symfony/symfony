@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * This class has been auto-generated
@@ -31,17 +32,17 @@ class ProjectServiceContainer extends Container
         $this->aliases = [];
     }
 
-    public function compile()
+    public function compile(): void
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    public function isCompiled()
+    public function isCompiled(): bool
     {
         return true;
     }
 
-    public function getRemovedIds()
+    public function getRemovedIds(): array
     {
         return [
             'Psr\\Container\\ContainerInterface' => true,
@@ -71,17 +72,17 @@ class ProjectServiceContainer extends Container
         return $this->parameters[$name];
     }
 
-    public function hasParameter(string $name)
+    public function hasParameter(string $name): bool
     {
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter(string $name, $value)
+    public function setParameter(string $name, $value): void
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    public function getParameterBag()
+    public function getParameterBag(): ParameterBagInterface
     {
         if (null === $this->parameterBag) {
             $parameters = $this->parameters;
@@ -97,26 +98,12 @@ class ProjectServiceContainer extends Container
     private $loadedDynamicParameters = [];
     private $dynamicParameters = [];
 
-    /**
-     * Computes a dynamic parameter.
-     *
-     * @param string $name The name of the dynamic parameter to load
-     *
-     * @return mixed The value of the dynamic parameter
-     *
-     * @throws InvalidArgumentException When the dynamic parameter does not exist
-     */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
 
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return [
             'empty_value' => '',

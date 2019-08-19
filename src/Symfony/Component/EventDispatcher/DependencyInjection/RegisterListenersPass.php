@@ -48,7 +48,7 @@ class RegisterListenersPass implements CompilerPassInterface
         return $this;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->dispatcherService) && !$container->hasAlias($this->dispatcherService)) {
             return;
@@ -134,7 +134,7 @@ class ExtractingEventDispatcher extends EventDispatcher implements EventSubscrib
     public static $aliases = [];
     public static $subscriber;
 
-    public function addListener(string $eventName, $listener, int $priority = 0)
+    public function addListener(string $eventName, $listener, int $priority = 0): void
     {
         $this->listeners[] = [$eventName, $listener[1], $priority];
     }

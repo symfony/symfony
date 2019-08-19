@@ -12,10 +12,11 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ChildEventDispatcherTest extends EventDispatcherTest
 {
-    protected function createEventDispatcher()
+    protected function createEventDispatcher(): EventDispatcherInterface
     {
         return new ChildEventDispatcher();
     }

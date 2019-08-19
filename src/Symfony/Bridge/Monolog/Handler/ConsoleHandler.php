@@ -133,7 +133,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConsoleEvents::COMMAND => ['onCommand', 255],

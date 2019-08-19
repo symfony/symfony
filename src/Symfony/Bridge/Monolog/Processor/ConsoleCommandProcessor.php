@@ -60,7 +60,7 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConsoleEvents::COMMAND => ['addCommandData', 1],

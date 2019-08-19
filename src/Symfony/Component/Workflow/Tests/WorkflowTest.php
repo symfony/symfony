@@ -4,6 +4,8 @@ namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
@@ -572,7 +574,7 @@ class WorkflowTest extends TestCase
     }
 }
 
-class EventDispatcherMock implements \Symfony\Component\EventDispatcher\EventDispatcherInterface
+class EventDispatcherMock implements EventDispatcherInterface
 {
     public $dispatchedEvents = [];
 
@@ -583,19 +585,19 @@ class EventDispatcherMock implements \Symfony\Component\EventDispatcher\EventDis
         return $event;
     }
 
-    public function addListener($eventName, $listener, $priority = 0)
+    public function addListener($eventName, $listener, $priority = 0): void
     {
     }
 
-    public function addSubscriber(\Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber)
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
     }
 
-    public function removeListener($eventName, $listener)
+    public function removeListener($eventName, $listener): void
     {
     }
 
-    public function removeSubscriber(\Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber)
+    public function removeSubscriber(EventSubscriberInterface $subscriber): void
     {
     }
 

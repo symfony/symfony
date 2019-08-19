@@ -73,7 +73,7 @@ class MessageListener implements EventSubscriberInterface
         $this->renderer->render($message);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             MessageEvent::class => 'onMessage',

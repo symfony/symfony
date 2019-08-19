@@ -13,6 +13,7 @@ namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -43,7 +44,7 @@ class EventDispatcherTest extends TestCase
         $this->listener = null;
     }
 
-    protected function createEventDispatcher()
+    protected function createEventDispatcher(): EventDispatcherInterface
     {
         return new EventDispatcher();
     }

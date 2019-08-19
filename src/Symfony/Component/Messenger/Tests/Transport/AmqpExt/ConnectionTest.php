@@ -364,7 +364,7 @@ class ConnectionTest extends TestCase
         $amqpQueue->expects($this->once())->method('setName')->with(self::DEFAULT_EXCHANGE_NAME);
         $amqpQueue->expects($this->once())->method('declareQueue');
 
-        $delayExchange->expects($this->once())->method('setName')->with('delay');
+        $delayExchange->expects($this->once())->method('setName')->with('delays');
         $delayExchange->expects($this->once())->method('declareExchange');
         $delayExchange->expects($this->once())->method('publish');
 
@@ -398,7 +398,7 @@ class ConnectionTest extends TestCase
         ]);
 
         $delayQueue->expects($this->once())->method('declareQueue');
-        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay_messages__5000');
+        $delayQueue->expects($this->once())->method('bind')->with('delays', 'delay_messages__5000');
 
         $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages__5000', AMQP_NOPARAM, ['headers' => ['x-some-headers' => 'foo']]);
 
@@ -440,7 +440,7 @@ class ConnectionTest extends TestCase
         ]);
 
         $delayQueue->expects($this->once())->method('declareQueue');
-        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay_messages__120000');
+        $delayQueue->expects($this->once())->method('bind')->with('delays', 'delay_messages__120000');
 
         $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages__120000', AMQP_NOPARAM, ['headers' => []]);
         $connection->publish('{}', [], 120000);
@@ -544,7 +544,7 @@ class ConnectionTest extends TestCase
         ]);
 
         $delayQueue->expects($this->once())->method('declareQueue');
-        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay_messages_routing_key_120000');
+        $delayQueue->expects($this->once())->method('bind')->with('delays', 'delay_messages_routing_key_120000');
 
         $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_messages_routing_key_120000', AMQP_NOPARAM, ['headers' => []]);
         $connection->publish('{}', [], 120000, new AmqpStamp('routing_key'));

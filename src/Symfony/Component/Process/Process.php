@@ -186,6 +186,8 @@ class Process implements \IteratorAggregate
      * @param mixed|null     $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
+     * @return static
+     *
      * @throws RuntimeException When proc_open is not installed
      */
     public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
@@ -240,7 +242,7 @@ class Process implements \IteratorAggregate
      * This is identical to run() except that an exception is thrown if the process
      * exits with a non-zero exit code.
      *
-     * @return self
+     * @return $this
      *
      * @throws ProcessFailedException if the process didn't terminate successfully
      *
@@ -967,7 +969,7 @@ class Process implements \IteratorAggregate
      *
      * @param string|array $commandline The command to execute
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @deprecated since Symfony 4.2.
      */
@@ -1001,13 +1003,13 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Sets the process timeout (max. runtime).
+     * Sets the process timeout (max. runtime) in seconds.
      *
      * To disable the timeout, set this value to null.
      *
      * @param int|float|null $timeout The timeout in seconds
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @throws InvalidArgumentException if the timeout is negative
      */
@@ -1025,7 +1027,7 @@ class Process implements \IteratorAggregate
      *
      * @param int|float|null $timeout The timeout in seconds
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @throws LogicException           if the output is disabled
      * @throws InvalidArgumentException if the timeout is negative
@@ -1046,7 +1048,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $tty True to enabled and false to disable
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @throws RuntimeException In case the TTY mode is not supported
      */
@@ -1080,7 +1082,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $bool
      *
-     * @return self
+     * @return $this
      */
     public function setPty($bool)
     {
@@ -1120,7 +1122,7 @@ class Process implements \IteratorAggregate
      *
      * @param string $cwd The new working directory
      *
-     * @return self The current Process instance
+     * @return $this
      */
     public function setWorkingDirectory($cwd)
     {
@@ -1152,7 +1154,7 @@ class Process implements \IteratorAggregate
      *
      * @param array $env The new environment variables
      *
-     * @return self The current Process instance
+     * @return $this
      */
     public function setEnv(array $env)
     {
@@ -1183,7 +1185,7 @@ class Process implements \IteratorAggregate
      *
      * @param string|int|float|bool|resource|\Traversable|null $input The content
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @throws LogicException In case the process is running
      */
@@ -1203,7 +1205,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $inheritEnv
      *
-     * @return self The current Process instance
+     * @return $this
      *
      * @deprecated since Symfony 4.4, env variables are always inherited
      */

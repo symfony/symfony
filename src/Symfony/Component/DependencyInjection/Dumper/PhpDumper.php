@@ -1208,7 +1208,6 @@ EOF;
             if (!$id->isDeprecated()) {
                 continue;
             }
-            $id = (string) $id;
             $code .= '            '.$this->doExport($alias).' => '.$this->doExport($this->generateMethodName($alias)).",\n";
         }
 

@@ -98,7 +98,7 @@ class TestObjectLoader extends ObjectLoader
 {
     public $loaderMap = [];
 
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return 'service';
     }

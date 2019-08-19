@@ -29,7 +29,7 @@ class TraceableUrlMatcher extends UrlMatcher
 
     protected $traces;
 
-    public function getTraces($pathinfo)
+    public function getTraces(string $pathinfo)
     {
         $this->traces = [];
 
@@ -50,7 +50,7 @@ class TraceableUrlMatcher extends UrlMatcher
         return $traces;
     }
 
-    protected function matchCollection($pathinfo, RouteCollection $routes)
+    protected function matchCollection(string $pathinfo, RouteCollection $routes)
     {
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();

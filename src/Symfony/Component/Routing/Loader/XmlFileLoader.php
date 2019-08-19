@@ -69,7 +69,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
+    protected function parseNode(RouteCollection $collection, \DOMElement $node, string $path, string $file)
     {
         if (self::NAMESPACE_URI !== $node->namespaceURI) {
             return;
@@ -103,7 +103,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
+    protected function parseRoute(RouteCollection $collection, \DOMElement $node, string $path)
     {
         if ('' === $id = $node->getAttribute('id')) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" attribute.', $path));
@@ -144,7 +144,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseImport(RouteCollection $collection, \DOMElement $node, $path, $file)
+    protected function parseImport(RouteCollection $collection, \DOMElement $node, string $path, string $file)
     {
         if ('' === $resource = $node->getAttribute('resource')) {
             throw new \InvalidArgumentException(sprintf('The <import> element in file "%s" must have a "resource" attribute.', $path));
@@ -242,7 +242,7 @@ class XmlFileLoader extends FileLoader
      *                                   or when the XML structure is not as expected by the scheme -
      *                                   see validate()
      */
-    protected function loadFile($file)
+    protected function loadFile(string $file)
     {
         return XmlUtils::loadFile($file, __DIR__.static::SCHEME_PATH);
     }

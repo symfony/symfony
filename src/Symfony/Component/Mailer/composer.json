@@ -32,6 +32,9 @@
         "symfony/postmark-mailer": "^4.4|^5.0",
         "symfony/sendgrid-mailer": "^4.4|^5.0"
     },
+    "conflict": {
+        "symfony/sendgrid-mailer": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\": "" },
         "exclude-from-classmap": [

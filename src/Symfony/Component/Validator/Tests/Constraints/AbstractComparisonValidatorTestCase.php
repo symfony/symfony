@@ -244,5 +244,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      */
     protected function getErrorCode()
     {
+        return null;
     }
 }

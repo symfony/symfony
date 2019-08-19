@@ -113,6 +113,8 @@ class ApcClassLoader
 
             return true;
         }
+
+        return null;
     }
 
     /**

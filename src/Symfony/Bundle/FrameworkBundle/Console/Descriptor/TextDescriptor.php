@@ -369,7 +369,7 @@ class TextDescriptor extends Descriptor
             return;
         }
 
-        return $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]));
+        $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, ['id' => (string) $alias]));
     }
 
     /**

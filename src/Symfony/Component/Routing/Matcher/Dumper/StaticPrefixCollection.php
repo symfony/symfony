@@ -114,7 +114,7 @@ class StaticPrefixCollection
         $commonPrefix = $this->detectCommonPrefix($prefix, $itemPrefix);
 
         if (!$commonPrefix) {
-            return;
+            return null;
         }
 
         $child = new self($commonPrefix);

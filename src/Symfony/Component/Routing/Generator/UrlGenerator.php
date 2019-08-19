@@ -123,6 +123,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
+     *
+     * @return string|null
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, array $requiredSchemes = [])
     {
@@ -150,7 +152,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             $this->logger->error($message, ['parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]]);
                         }
 
-                        return;
+                        return null;
                     }
 
                     $url = $token[1].$mergedParams[$token[3]].$url;
@@ -205,7 +207,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             $this->logger->error($message, ['parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]]);
                         }
 
-                        return;
+                        return null;
                     }
 
                     $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;

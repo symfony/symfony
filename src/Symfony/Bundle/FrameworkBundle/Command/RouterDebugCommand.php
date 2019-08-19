@@ -154,10 +154,13 @@ EOF
         }
     }
 
+    /**
+     * @return callable|null
+     */
     private function extractCallable(Route $route)
     {
         if (!$route->hasDefault('_controller')) {
-            return;
+            return null;
         }
 
         $controller = $route->getDefault('_controller');
@@ -178,5 +181,7 @@ EOF
             return $controller;
         } catch (\InvalidArgumentException $e) {
         }
+
+        return null;
     }
 }

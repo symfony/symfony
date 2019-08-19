@@ -110,7 +110,7 @@ class CodeHelper extends Helper
      * @param string $file A file path
      * @param int    $line The selected line number
      *
-     * @return string An HTML string
+     * @return string|null An HTML string
      */
     public function fileExcerpt($file, $line)
     {
@@ -138,6 +138,8 @@ class CodeHelper extends Helper
 
             return '<ol start="'.max($line - 3, 1).'">'.implode("\n", $lines).'</ol>';
         }
+
+        return null;
     }
 
     /**

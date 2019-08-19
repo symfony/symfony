@@ -644,7 +644,7 @@ class Inline
             case 'null' === $scalarLower:
             case '' === $scalar:
             case '~' === $scalar:
-                return;
+                return null;
             case 'true' === $scalarLower:
                 return true;
             case 'false' === $scalarLower:
@@ -672,7 +672,7 @@ class Inline
                             throw new ParseException('Object support when parsing a YAML file has been disabled.', self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                         }
 
-                        return;
+                        return null;
                     case 0 === strpos($scalar, '!!php/object:'):
                         if (self::$objectSupport) {
                             @trigger_error(self::getDeprecationMessage('The !!php/object: tag to indicate dumped PHP objects is deprecated since Symfony 3.1 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.'), E_USER_DEPRECATED);
@@ -684,7 +684,7 @@ class Inline
                             throw new ParseException('Object support when parsing a YAML file has been disabled.', self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                         }
 
-                        return;
+                        return null;
                     case 0 === strpos($scalar, '!php/object'):
                         if (self::$objectSupport) {
                             return unserialize(self::parseScalar(substr($scalar, 12)));
@@ -694,7 +694,7 @@ class Inline
                             throw new ParseException('Object support when parsing a YAML file has been disabled.', self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                         }
 
-                        return;
+                        return null;
                     case 0 === strpos($scalar, '!php/const:'):
                         if (self::$constantSupport) {
                             @trigger_error(self::getDeprecationMessage('The !php/const: tag to indicate dumped PHP constants is deprecated since Symfony 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.'), E_USER_DEPRECATED);
@@ -709,7 +709,7 @@ class Inline
                             throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                         }
 
-                        return;
+                        return null;
                     case 0 === strpos($scalar, '!php/const'):
                         if (self::$constantSupport) {
                             $i = 0;
@@ -723,7 +723,7 @@ class Inline
                             throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                         }
 
-                        return;
+                        return null;
                     case 0 === strpos($scalar, '!!float '):
                         return (float) substr($scalar, 8);
                     case 0 === strpos($scalar, '!!binary '):
@@ -795,7 +795,7 @@ class Inline
     private static function parseTag($value, &$i, $flags)
     {
         if ('!' !== $value[$i]) {
-            return;
+            return null;
         }
 
         $tagLength = strcspn($value, " \t\n", $i + 1);
@@ -807,7 +807,7 @@ class Inline
         // Is followed by a scalar
         if ((!isset($value[$nextOffset]) || !\in_array($value[$nextOffset], ['[', '{'], true)) && 'tagged' !== $tag) {
             // Manage non-whitelisted scalars in {@link self::evaluateScalar()}
-            return;
+            return null;
         }
 
         // Built-in tags

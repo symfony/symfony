@@ -157,6 +157,8 @@ abstract class DoctrineType extends AbstractType
 
                 return $doctrineChoiceLoader;
             }
+
+            return null;
         };
 
         $choiceName = function (Options $options) {
@@ -171,6 +173,7 @@ abstract class DoctrineType extends AbstractType
             }
 
             // Otherwise, an incrementing integer is used as name automatically
+            return null;
         };
 
         // The choices are always indexed by ID (see "choices" normalizer
@@ -187,6 +190,7 @@ abstract class DoctrineType extends AbstractType
             }
 
             // Otherwise, an incrementing integer is used as value automatically
+            return null;
         };
 
         $emNormalizer = function (Options $options, $em) {

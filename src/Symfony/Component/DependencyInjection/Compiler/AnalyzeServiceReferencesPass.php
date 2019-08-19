@@ -156,7 +156,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         }
 
         if (!$this->container->hasDefinition($id)) {
-            return;
+            return null;
         }
 
         return $this->container->normalizeId($id);

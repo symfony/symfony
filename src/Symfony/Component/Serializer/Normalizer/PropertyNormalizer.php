@@ -121,7 +121,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);
         } catch (\ReflectionException $reflectionException) {
-            return;
+            return null;
         }
 
         // Override visibility

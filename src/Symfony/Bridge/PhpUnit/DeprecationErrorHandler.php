@@ -180,6 +180,8 @@ class DeprecationErrorHandler
                 ++$ref;
             }
             ++$deprecations[$group.'Count'];
+
+            return null;
         };
         $oldErrorHandler = set_error_handler($deprecationHandler);
 
@@ -291,6 +293,8 @@ class DeprecationErrorHandler
                 return \call_user_func(DeprecationErrorHandler::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
             }
             $deprecations[] = array(error_reporting(), $msg, $file);
+
+            return null;
         });
 
         register_shutdown_function(function () use ($outputFile, &$deprecations) {

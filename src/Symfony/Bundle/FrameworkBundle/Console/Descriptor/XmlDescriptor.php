@@ -98,7 +98,9 @@ class XmlDescriptor extends Descriptor
         $dom->appendChild($dom->importNode($this->getContainerAliasDocument($alias, isset($options['id']) ? $options['id'] : null)->childNodes->item(0), true));
 
         if (!$builder) {
-            return $this->writeDocument($dom);
+            $this->writeDocument($dom);
+
+            return;
         }
 
         $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($builder->getDefinition((string) $alias), (string) $alias)->childNodes->item(0), true));

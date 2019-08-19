@@ -102,7 +102,7 @@ class FileLinkFormatter implements \Serializable
             $request = $this->requestStack->getMasterRequest();
             if ($request instanceof Request) {
                 if ($this->urlFormat instanceof \Closure && !$this->urlFormat = \call_user_func($this->urlFormat)) {
-                    return;
+                    return null;
                 }
 
                 return [
@@ -111,5 +111,7 @@ class FileLinkFormatter implements \Serializable
                 ];
             }
         }
+
+        return null;
     }
 }

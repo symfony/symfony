@@ -34,10 +34,6 @@ class TestSessionListener extends AbstractTestSessionListener
 
     protected function getSession()
     {
-        if (!$this->container->has('session')) {
-            return;
-        }
-
-        return $this->container->get('session');
+        return $this->container->get('session', ContainerInterface::NULL_ON_INVALID_REFERENCE);
     }
 }

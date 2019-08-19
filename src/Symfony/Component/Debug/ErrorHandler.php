@@ -599,7 +599,9 @@ class ErrorHandler
         $this->exceptionHandler = null;
         try {
             if (null !== $exceptionHandler) {
-                return \call_user_func($exceptionHandler, $exception);
+                $exceptionHandler($exception);
+
+                return;
             }
             $handlerException = $handlerException ?: $exception;
         } catch (\Exception $handlerException) {

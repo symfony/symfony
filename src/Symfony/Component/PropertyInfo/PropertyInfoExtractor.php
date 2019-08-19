@@ -103,5 +103,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
                 return $value;
             }
         }
+
+        return null;
     }
 }

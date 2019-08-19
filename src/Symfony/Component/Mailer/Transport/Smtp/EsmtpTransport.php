@@ -29,12 +29,12 @@ class EsmtpTransport extends SmtpTransport
     private $authenticators = [];
     private $username = '';
     private $password = '';
-    private $authMode;
 
-    public function __construct(string $host = 'localhost', int $port = 0, bool $tls = null, string $authMode = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $host = 'localhost', int $port = 0, bool $tls = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         parent::__construct(null, $dispatcher, $logger);
 
+        // order is important here (roughly most secure and popular first)
         $this->authenticators = [
             new Auth\CramMd5Authenticator(),
             new Auth\LoginAuthenticator(),
@@ -61,9 +61,6 @@ class EsmtpTransport extends SmtpTransport
 
         $stream->setHost($host);
         $stream->setPort($port);
-        if (null !== $authMode) {
-            $this->setAuthMode($authMode);
-        }
     }
 
     public function setUsername(string $username): self
@@ -88,18 +85,6 @@ class EsmtpTransport extends SmtpTransport
     public function getPassword(): string
     {
         return $this->password;
-    }
-
-    public function setAuthMode(string $mode): self
-    {
-        $this->authMode = $mode;
-
-        return $this;
-    }
-
-    public function getAuthMode(): string
-    {
-        return $this->authMode;
     }
 
     public function addAuthenticator(AuthenticatorInterface $authenticator): void
@@ -166,7 +151,7 @@ class EsmtpTransport extends SmtpTransport
         $authNames = [];
         $errors = [];
         $modes = array_map('strtolower', $modes);
-        foreach ($this->getActiveAuthenticators() as $authenticator) {
+        foreach ($this->authenticators as $authenticator) {
             if (!\in_array(strtolower($authenticator->getAuthKeyword()), $modes, true)) {
                 continue;
             }
@@ -194,23 +179,5 @@ class EsmtpTransport extends SmtpTransport
         }
 
         throw new TransportException($message);
-    }
-
-    /**
-     * @return AuthenticatorInterface[]
-     */
-    private function getActiveAuthenticators(): array
-    {
-        if (!$mode = strtolower($this->authMode)) {
-            return $this->authenticators;
-        }
-
-        foreach ($this->authenticators as $authenticator) {
-            if (strtolower($authenticator->getAuthKeyword()) === $mode) {
-                return [$authenticator];
-            }
-        }
-
-        throw new TransportException(sprintf('Auth mode "%s" is invalid.', $mode));
     }
 }

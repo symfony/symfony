@@ -4,6 +4,9 @@ CHANGELOG
 4.4.0
 -----
 
+ * STARTTLS cannot be enabled anymore (it is used automatically if TLS is disabled and the server supports STARTTLS)
+ * [BC BREAK] Removed the `encryption` DSN option (use `smtps` instead)
+ * Added support for the `smtps` protocol (does the same as using `smtp` and port `465`)
  * Added PHPUnit constraints
  * Added `MessageDataCollector`
  * Added `MessageEvents` and `MessageLoggerListener` to allow collecting sent emails

@@ -36,11 +36,11 @@ final class SesTransportFactory extends AbstractTransportFactory
             return new SesHttpTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger);
         }
 
-        if ('smtp' === $scheme) {
+        if ('smtp' === $scheme || 'smtps' === $scheme) {
             return new SesSmtpTransport($user, $password, $region, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp']);
+        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp', 'smtps']);
     }
 
     public function supports(Dsn $dsn): bool

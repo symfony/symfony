@@ -22,7 +22,7 @@ class MailgunSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $username, string $password, string $region = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('us' !== ($region ?: 'us') ? sprintf('smtp.%s.mailgun.org', $region) : 'smtp.mailgun.org', 465, 'ssl', null, $dispatcher, $logger);
+        parent::__construct('us' !== ($region ?: 'us') ? sprintf('smtp.%s.mailgun.org', $region) : 'smtp.mailgun.org', 465, true, null, $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

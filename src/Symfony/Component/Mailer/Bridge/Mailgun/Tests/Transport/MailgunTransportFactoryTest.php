@@ -44,6 +44,11 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('smtps', 'mailgun'),
+            true,
+        ];
+
+        yield [
             new Dsn('smtp', 'example.com'),
             false,
         ];
@@ -74,13 +79,18 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtp', 'mailgun', self::USER, self::PASSWORD),
             new MailgunSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
         ];
+
+        yield [
+            new Dsn('smtps', 'mailgun', self::USER, self::PASSWORD),
+            new MailgunSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
+        ];
     }
 
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('foo', 'mailgun', self::USER, self::PASSWORD),
-            'The "foo" scheme is not supported for mailer "mailgun". Supported schemes are: "api", "http", "smtp".',
+            'The "foo" scheme is not supported for mailer "mailgun". Supported schemes are: "api", "http", "smtp", "smtps".',
         ];
     }
 

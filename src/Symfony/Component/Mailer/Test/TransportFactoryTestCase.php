@@ -69,7 +69,7 @@ abstract class TransportFactoryTestCase extends TestCase
         $factory = $this->getFactory();
 
         $this->assertEquals($transport, $factory->create($dsn));
-        if ('smtp' !== $dsn->getScheme()) {
+        if ('smtp' !== $dsn->getScheme() && 'smtps' !== $dsn->getScheme()) {
             $this->assertStringMatchesFormat($dsn->getScheme().'://%S'.$dsn->getHost().'%S', $transport->getName());
         }
     }

@@ -107,6 +107,8 @@ class DeprecationErrorHandler
             }
 
             $deprecations[] = [error_reporting(), $msg, $file];
+
+            return null;
         });
 
         register_shutdown_function(function () use ($outputFile, &$deprecations) {
@@ -125,7 +127,7 @@ class DeprecationErrorHandler
 
         $deprecation = new Deprecation($msg, debug_backtrace(), $file);
         if ($deprecation->isMuted()) {
-            return;
+            return null;
         }
         $group = 'other';
 
@@ -164,6 +166,8 @@ class DeprecationErrorHandler
         }
 
         ++$this->deprecations[$group.'Count'];
+
+        return null;
     }
 
     /**

@@ -739,8 +739,6 @@ class Parser
      * @param string $style       The style indicator that was used to begin this block scalar (| or >)
      * @param string $chomping    The chomping indicator that was used to begin this block scalar (+ or -)
      * @param int    $indentation The indentation indicator that was used to begin this block scalar
-     *
-     * @return string The text value
      */
     private function parseBlockScalar(string $style, string $chomping = '', int $indentation = 0): string
     {

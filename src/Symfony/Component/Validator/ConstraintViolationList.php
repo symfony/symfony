@@ -184,6 +184,6 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      */
     public function hasViolation(): bool
     {
-        return 0 !== count($this->violations);
+        return 0 !== \count($this->violations);
     }
 }

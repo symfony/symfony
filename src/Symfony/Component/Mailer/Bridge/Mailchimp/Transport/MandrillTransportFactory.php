@@ -34,13 +34,13 @@ final class MandrillTransportFactory extends AbstractTransportFactory
             return new MandrillHttpTransport($user, $this->client, $this->dispatcher, $this->logger);
         }
 
-        if ('smtp' === $scheme) {
+        if ('smtp' === $scheme || 'smtps' === $scheme) {
             $password = $this->getPassword($dsn);
 
             return new MandrillSmtpTransport($user, $password, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp']);
+        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp', 'smtps']);
     }
 
     public function supports(Dsn $dsn): bool

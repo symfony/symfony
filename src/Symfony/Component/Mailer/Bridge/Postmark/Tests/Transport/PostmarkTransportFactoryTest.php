@@ -38,6 +38,11 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('smtps', 'postmark'),
+            true,
+        ];
+
+        yield [
             new Dsn('smtp', 'example.com'),
             false,
         ];
@@ -57,13 +62,18 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtp', 'postmark', self::USER),
             new PostmarkSmtpTransport(self::USER, $dispatcher, $logger),
         ];
+
+        yield [
+            new Dsn('smtps', 'postmark', self::USER),
+            new PostmarkSmtpTransport(self::USER, $dispatcher, $logger),
+        ];
     }
 
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('foo', 'postmark', self::USER),
-            'The "foo" scheme is not supported for mailer "postmark". Supported schemes are: "api", "smtp".',
+            'The "foo" scheme is not supported for mailer "postmark". Supported schemes are: "api", "smtp", "smtps".',
         ];
     }
 

@@ -23,6 +23,11 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('smtps', 'example.com'),
+            true,
+        ];
+
+        yield [
             new Dsn('api', 'example.com'),
             false,
         ];
@@ -33,19 +38,33 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
         $eventDispatcher = $this->getDispatcher();
         $logger = $this->getLogger();
 
-        $transport = new EsmtpTransport('example.com', 25, null, null, $eventDispatcher, $logger);
+        $transport = new EsmtpTransport('localhost', 25, false, null, $eventDispatcher, $logger);
 
         yield [
-            new Dsn('smtp', 'example.com'),
+            new Dsn('smtp', 'localhost'),
             $transport,
         ];
 
-        $transport = new EsmtpTransport('example.com', 99, 'ssl', 'login', $eventDispatcher, $logger);
+        $transport = new EsmtpTransport('example.com', 99, true, 'login', $eventDispatcher, $logger);
         $transport->setUsername(self::USER);
         $transport->setPassword(self::PASSWORD);
 
         yield [
-            new Dsn('smtp', 'example.com', self::USER, self::PASSWORD, 99, ['encryption' => 'ssl', 'auth_mode' => 'login']),
+            new Dsn('smtps', 'example.com', self::USER, self::PASSWORD, 99, ['auth_mode' => 'login']),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, null, $eventDispatcher, $logger);
+
+        yield [
+            new Dsn('smtps', 'example.com'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, null, $eventDispatcher, $logger);
+
+        yield [
+            new Dsn('smtp', 'example.com', '', '', 465),
             $transport,
         ];
     }

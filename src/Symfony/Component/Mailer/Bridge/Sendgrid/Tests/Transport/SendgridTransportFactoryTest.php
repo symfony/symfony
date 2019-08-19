@@ -38,6 +38,11 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('smtps', 'sendgrid'),
+            true,
+        ];
+
+        yield [
             new Dsn('smtp', 'example.com'),
             false,
         ];
@@ -57,13 +62,18 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtp', 'sendgrid', self::USER),
             new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
         ];
+
+        yield [
+            new Dsn('smtps', 'sendgrid', self::USER),
+            new SendgridSmtpTransport(self::USER, $dispatcher, $logger),
+        ];
     }
 
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('foo', 'sendgrid', self::USER),
-            'The "foo" scheme is not supported for mailer "sendgrid". Supported schemes are: "api", "smtp".',
+            'The "foo" scheme is not supported for mailer "sendgrid". Supported schemes are: "api", "smtp", "smtps".',
         ];
     }
 }

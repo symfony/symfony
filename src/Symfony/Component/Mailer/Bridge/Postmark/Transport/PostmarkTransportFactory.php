@@ -30,11 +30,11 @@ final class PostmarkTransportFactory extends AbstractTransportFactory
             return new PostmarkApiTransport($user, $this->client, $this->dispatcher, $this->logger);
         }
 
-        if ('smtp' === $scheme) {
+        if ('smtp' === $scheme || 'smtps' === $scheme) {
             return new PostmarkSmtpTransport($user, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['api', 'smtp']);
+        throw new UnsupportedSchemeException($dsn, ['api', 'smtp', 'smtps']);
     }
 
     public function supports(Dsn $dsn): bool

@@ -22,7 +22,7 @@ class SendgridSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $key, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('smtp.sendgrid.net', 465, 'ssl', null, $dispatcher, $logger);
+        parent::__construct('smtp.sendgrid.net', 465, true, null, $dispatcher, $logger);
 
         $this->setUsername('apikey');
         $this->setPassword($key);

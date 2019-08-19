@@ -23,6 +23,11 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('smtps', 'gmail'),
+            true,
+        ];
+
+        yield [
             new Dsn('smtp', 'example.com'),
             false,
         ];
@@ -34,13 +39,18 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtp', 'gmail', self::USER, self::PASSWORD),
             new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
         ];
+
+        yield [
+            new Dsn('smtps', 'gmail', self::USER, self::PASSWORD),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+        ];
     }
 
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('foo', 'gmail', self::USER, self::PASSWORD),
-            'The "foo" scheme is not supported for mailer "gmail". Supported schemes are: "smtp".',
+            'The "foo" scheme is not supported for mailer "gmail". Supported schemes are: "smtp", "smtps".',
         ];
     }
 

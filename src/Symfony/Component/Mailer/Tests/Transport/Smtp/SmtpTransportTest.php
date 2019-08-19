@@ -20,9 +20,9 @@ class SmtpTransportTest extends TestCase
     public function testName()
     {
         $t = new SmtpTransport();
-        $this->assertEquals('smtp://localhost:25', $t->getName());
+        $this->assertEquals('smtps://localhost', $t->getName());
 
-        $t = new SmtpTransport((new SocketStream())->setHost('127.0.0.1')->setPort(2525));
+        $t = new SmtpTransport((new SocketStream())->setHost('127.0.0.1')->setPort(2525)->disableTls());
         $this->assertEquals('smtp://127.0.0.1:2525', $t->getName());
     }
 }

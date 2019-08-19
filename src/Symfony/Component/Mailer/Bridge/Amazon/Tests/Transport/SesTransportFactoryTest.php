@@ -44,6 +44,11 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('smtps', 'ses'),
+            true,
+        ];
+
+        yield [
             new Dsn('smtp', 'example.com'),
             false,
         ];
@@ -84,13 +89,18 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
             new Dsn('smtp', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
             new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger),
         ];
+
+        yield [
+            new Dsn('smtps', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
+            new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger),
+        ];
     }
 
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
             new Dsn('foo', 'ses', self::USER, self::PASSWORD),
-            'The "foo" scheme is not supported for mailer "ses". Supported schemes are: "api", "http", "smtp".',
+            'The "foo" scheme is not supported for mailer "ses". Supported schemes are: "api", "http", "smtp", "smtps".',
         ];
     }
 

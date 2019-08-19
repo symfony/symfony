@@ -74,7 +74,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $configCacheFactory;
 
     /**
-     * @param string                         $locale    The locale
+     * @param string|null                    $locale    The locale
      * @param MessageFormatterInterface|null $formatter The message formatter
      * @param string|null                    $cacheDir  The directory to use for the cache
      * @param bool                           $debug     Use cache in debug mode ?
@@ -422,13 +422,13 @@ EOF
     /**
      * Asserts that the locale is valid, throws an Exception if not.
      *
-     * @param string $locale Locale to tests
+     * @param string|null $locale Locale to tests
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
     protected function assertValidLocale($locale)
     {
-        if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
+        if (null !== $locale && !preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
         }
     }

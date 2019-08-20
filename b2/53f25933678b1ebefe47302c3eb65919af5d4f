@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-15T07:29:46Z
+
+The migration path doesn't work IMHO.
+Instead, I propose to keep the name of the column and of the property as is.
+Then, on table creation, the column should be indexed, and we should use it to store absolute expiries. We should tell in UPGRADE files which query ppl need to run to add the index to their existing DB.
+To have smooth compat with current sessions, to decide when a value in the column is a lifetime or an expiry, we would compare values to `315576000` (10 years): when the number is higher, it's an absolute date, when it's ower, it's a relative date.
+GC would be done in two DELETE queries, for >315576000 and <=315576000.
+In v6, we would simply drop the <=315576000 one, because in two years we'll be able to consider that all relevant sessions have been migrated to absolute dates.

@@ -51,6 +51,7 @@ class AppVariableTest extends TestCase
     public function testGetSession()
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request->method('hasSession')->willReturn(true);
         $request->method('getSession')->willReturn($session = new Session());
 
         $this->setRequestStack($request);
@@ -255,6 +256,7 @@ class AppVariableTest extends TestCase
         $session->method('getFlashBag')->willReturn($flashBag);
 
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request->method('hasSession')->willReturn(true);
         $request->method('getSession')->willReturn($session);
         $this->setRequestStack($request);
 

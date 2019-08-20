@@ -314,7 +314,7 @@ class ContainerTest extends TestCase
         $c->set('bar', $bar = new class() implements ResetInterface {
             public $resetCounter = 0;
 
-            public function reset()
+            public function reset(): void
             {
                 ++$this->resetCounter;
             }

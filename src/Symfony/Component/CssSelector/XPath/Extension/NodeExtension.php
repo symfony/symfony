@@ -62,7 +62,7 @@ class NodeExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getNodeTranslators()
+    public function getNodeTranslators(): array
     {
         return [
             'Selector' => [$this, 'translateSelector'],
@@ -185,7 +185,7 @@ class NodeExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'node';
     }

@@ -109,14 +109,10 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * Exceptions are not caught.
      *
-     * @param int $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     *
-     * @return Response A Response instance
-     *
      * @throws \LogicException       If one of the listener does not behave as expected
      * @throws NotFoundHttpException When controller cannot be found
      */
-    private function handleRaw(Request $request, int $type = self::MASTER_REQUEST)
+    private function handleRaw(Request $request, int $type = self::MASTER_REQUEST): Response
     {
         $this->requestStack->push($request);
 
@@ -173,8 +169,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Filters a response object.
      *
-     * @param int $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     *
      * @throws \RuntimeException if the passed object is not a Response instance
      */
     private function filterResponse(Response $response, Request $request, int $type): Response
@@ -203,8 +197,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
     /**
      * Handles an exception by trying to convert it to a Response.
-     *
-     * @param int $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @throws \Exception
      */

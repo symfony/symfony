@@ -90,7 +90,7 @@ class FormFieldRegistry
      *
      * @return bool Whether the form has the given field
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         try {
             $this->get($name);
@@ -128,7 +128,7 @@ class FormFieldRegistry
      *
      * @return FormField[] The list of fields as [string] Fully qualified name => (mixed) value)
      */
-    public function all()
+    public function all(): array
     {
         return $this->walk($this->fields, $this->base);
     }

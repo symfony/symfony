@@ -49,7 +49,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     {
         $reader = new AnnotationReader();
         $this->loader = new class($reader) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot): void
             {
             }
         };
@@ -237,7 +237,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             ->willReturn([])
         ;
         $loader = new class($reader) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot): void
             {
             }
         };
@@ -319,7 +319,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         ;
 
         $loader = new class($reader) extends AnnotationClassLoader {
-            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot): void
             {
             }
         };

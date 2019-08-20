@@ -43,7 +43,7 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function getDescriptors()
+    public function getDescriptors(): array
     {
         if (!$this->haveReadSupport) {
             $nullstream = fopen('/dev/null', 'c');
@@ -81,7 +81,7 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         return [];
     }
@@ -89,7 +89,7 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function readAndWrite(bool $blocking, bool $close = false)
+    public function readAndWrite(bool $blocking, bool $close = false): array
     {
         $this->unblock();
         $w = $this->write();
@@ -138,7 +138,7 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function haveReadSupport()
+    public function haveReadSupport(): bool
     {
         return $this->haveReadSupport;
     }
@@ -146,7 +146,7 @@ class UnixPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function areOpen()
+    public function areOpen(): bool
     {
         return (bool) $this->pipes;
     }

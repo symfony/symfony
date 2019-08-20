@@ -44,7 +44,7 @@ class MessageBus implements MessageBusInterface
                     $this->middlewareHandlers = $middlewareHandlers;
                 }
 
-                public function getIterator()
+                public function getIterator(): \Traversable
                 {
                     if (null === $this->cachedIterator) {
                         $this->cachedIterator = new \ArrayObject(iterator_to_array($this->middlewareHandlers, false));

@@ -38,10 +38,8 @@ class ContentSecurityPolicyHandler
      *  - The request - In case HTML content is fetched via AJAX and inserted in DOM, it must use the same nonce as origin
      *  - The response -  A call to getNonces() has already been done previously. Same nonce are returned
      *  - They are otherwise randomly generated
-     *
-     * @return array
      */
-    public function getNonces(Request $request, Response $response)
+    public function getNonces(Request $request, Response $response): array
     {
         if ($request->headers->has('X-SymfonyProfiler-Script-Nonce') && $request->headers->has('X-SymfonyProfiler-Style-Nonce')) {
             return [
@@ -83,7 +81,7 @@ class ContentSecurityPolicyHandler
      *
      * @return array Nonces used by the bundle in Content-Security-Policy header
      */
-    public function updateResponseHeaders(Request $request, Response $response)
+    public function updateResponseHeaders(Request $request, Response $response): array
     {
         if ($this->cspDisabled) {
             $this->removeCspHeaders($response);

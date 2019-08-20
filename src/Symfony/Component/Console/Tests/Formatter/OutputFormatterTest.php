@@ -157,13 +157,9 @@ class OutputFormatterTest extends TestCase
     }
 
     /**
-     * @param string      $tag
-     * @param string|null $expected
-     * @param string|null $input
-     *
      * @dataProvider provideInlineStyleOptionsCases
      */
-    public function testInlineStyleOptions($tag, $expected = null, $input = null)
+    public function testInlineStyleOptions(string $tag, string $expected = null, string $input = null)
     {
         $styleString = substr($tag, 1, -1);
         $formatter = new OutputFormatter(true);
@@ -171,7 +167,7 @@ class OutputFormatterTest extends TestCase
         $method->setAccessible(true);
         $result = $method->invoke($formatter, $styleString);
         if (null === $expected) {
-            $this->assertFalse($result);
+            $this->assertNull($result);
             $expected = $tag.$input.'</'.$styleString.'>';
             $this->assertSame($expected, $formatter->format($expected));
         } else {

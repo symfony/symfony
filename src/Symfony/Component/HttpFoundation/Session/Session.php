@@ -147,11 +147,9 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * @return bool
-     *
      * @internal
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         if ($this->isStarted()) {
             ++$this->usageIndex;

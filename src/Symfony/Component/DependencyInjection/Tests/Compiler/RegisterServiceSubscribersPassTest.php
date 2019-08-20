@@ -196,7 +196,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $subscriber = new class() implements ServiceSubscriberInterface {
-            public static function getSubscribedServices()
+            public static function getSubscribedServices(): array
             {
                 return [
                     'some.service' => 'stdClass',

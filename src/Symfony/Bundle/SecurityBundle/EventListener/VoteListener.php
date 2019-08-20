@@ -39,7 +39,7 @@ class VoteListener implements EventSubscriberInterface
         $this->traceableAccessDecisionManager->addVoterVote($event->getVoter(), $event->getAttributes(), $event->getVote());
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return ['debug.security.authorization.vote' => 'onVoterVote'];
     }

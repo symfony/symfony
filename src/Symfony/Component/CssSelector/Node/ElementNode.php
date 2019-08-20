@@ -32,18 +32,12 @@ class ElementNode extends AbstractNode
         $this->element = $element;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNamespace()
+    public function getNamespace(): ?string
     {
         return $this->namespace;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getElement()
+    public function getElement(): ?string
     {
         return $this->element;
     }

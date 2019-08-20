@@ -26,15 +26,9 @@ class TimeValidator extends ConstraintValidator
     /**
      * Checks whether a time is valid.
      *
-     * @param int $hour   The hour
-     * @param int $minute The minute
-     * @param int $second The second
-     *
-     * @return bool Whether the time is valid
-     *
      * @internal
      */
-    public static function checkTime($hour, $minute, $second)
+    public static function checkTime(int $hour, int $minute, float $second): bool
     {
         return $hour >= 0 && $hour < 24 && $minute >= 0 && $minute < 60 && $second >= 0 && $second < 60;
     }

@@ -26,11 +26,9 @@ class SemaphoreStore implements BlockingStoreInterface
     /**
      * Returns whether or not the store is supported.
      *
-     * @return bool
-     *
      * @internal
      */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         return \extension_loaded('sysvsem');
     }

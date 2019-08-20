@@ -17,7 +17,10 @@ CHANGELOG
  * passing arguments to `Request::isMethodSafe()` is deprecated.
  * `ApacheRequest` is deprecated, use the `Request` class instead.
  * passing a third argument to `HeaderBag::get()` is deprecated, use method `all()` instead
-
+ * `PdoSessionHandler` now precalculates the expiry timestamp in the lifetime column,
+    make sure to run `CREATE INDEX EXPIRY ON sessions (sess_lifetime)` to update your database
+    to speed up garbage collection of expired sessions.
+ 
 4.3.0
 -----
 

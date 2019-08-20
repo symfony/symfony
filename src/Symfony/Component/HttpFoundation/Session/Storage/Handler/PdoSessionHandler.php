@@ -65,6 +65,8 @@ class PdoSessionHandler extends AbstractSessionHandler
      */
     const LOCK_TRANSACTIONAL = 2;
 
+    private const MAX_LIFETIME = 315576000;
+
     /**
      * @var \PDO|null PDO instance or null when not connected yet
      */
@@ -237,6 +239,7 @@ class PdoSessionHandler extends AbstractSessionHandler
 
         try {
             $this->pdo->exec($sql);
+            $this->pdo->exec("CREATE INDEX EXPIRY ON $this->table ($this->lifetimeCol)");
         } catch (\PDOException $e) {
             $this->rollback();
 
@@ -368,14 +371,14 @@ class PdoSessionHandler extends AbstractSessionHandler
      */
     public function updateTimestamp($sessionId, $data)
     {
-        $maxlifetime = (int) ini_get('session.gc_maxlifetime');
+        $expiry = time() + (int) ini_get('session.gc_maxlifetime');
 
         try {
             $updateStmt = $this->pdo->prepare(
-                "UPDATE $this->table SET $this->lifetimeCol = :lifetime, $this->timeCol = :time WHERE $this->idCol = :id"
+                "UPDATE $this->table SET $this->lifetimeCol = :expiry, $this->timeCol = :time WHERE $this->idCol = :id"
             );
             $updateStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
-            $updateStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+            $updateStmt->bindParam(':expiry', $expiry, \PDO::PARAM_INT);
             $updateStmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $updateStmt->execute();
         } catch (\PDOException $e) {
@@ -402,14 +405,21 @@ class PdoSessionHandler extends AbstractSessionHandler
             $this->gcCalled = false;
 
             // delete the session records that have expired
-            if ('mysql' === $this->driver) {
-                $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol < :time";
-            } else {
-                $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol < :time - $this->timeCol";
-            }
-
+            $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol < :time AND $this->lifetimeCol > :min";
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+            $stmt->bindValue(':min', self::MAX_LIFETIME, \PDO::PARAM_INT);
+            $stmt->execute();
+            // to be removed in 6.0
+            if ('mysql' === $this->driver) {
+                $legacySql = "DELETE FROM $this->table WHERE $this->lifetimeCol <= :min AND $this->lifetimeCol + $this->timeCol < :time";
+            } else {
+                $legacySql = "DELETE FROM $this->table WHERE $this->lifetimeCol <= :min AND $this->lifetimeCol < :time - $this->timeCol";
+            }
+
+            $stmt = $this->pdo->prepare($legacySql);
+            $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+            $stmt->bindValue(':min', self::MAX_LIFETIME, \PDO::PARAM_INT);
             $stmt->execute();
         }
 
@@ -614,7 +624,12 @@ class PdoSessionHandler extends AbstractSessionHandler
             $sessionRows = $selectStmt->fetchAll(\PDO::FETCH_NUM);
 
             if ($sessionRows) {
-                if ($sessionRows[0][1] + $sessionRows[0][2] < time()) {
+                $expiry = (int) $sessionRows[0][1];
+                if ($expiry <= self::MAX_LIFETIME) {
+                    $expiry += $sessionRows[0][2];
+                }
+
+                if ($expiry < time()) {
                     $this->sessionExpired = true;
 
                     return '';
@@ -745,6 +760,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         if (self::LOCK_TRANSACTIONAL === $this->lockMode) {
             $this->beginTransaction();
 
+            // selecting the time column should be removed in 6.0
             switch ($this->driver) {
                 case 'mysql':
                 case 'oci':
@@ -773,18 +789,18 @@ class PdoSessionHandler extends AbstractSessionHandler
                 $data = fopen('php://memory', 'r+');
                 fwrite($data, $sessionData);
                 rewind($data);
-                $sql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, EMPTY_BLOB(), :lifetime, :time) RETURNING $this->dataCol into :data";
+                $sql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, EMPTY_BLOB(), :expiry, :time) RETURNING $this->dataCol into :data";
                 break;
             default:
                 $data = $sessionData;
-                $sql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time)";
+                $sql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :expiry, :time)";
                 break;
         }
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
         $stmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-        $stmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+        $stmt->bindValue(':expiry', time() + $maxlifetime, \PDO::PARAM_INT);
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
 
         return $stmt;
@@ -800,18 +816,18 @@ class PdoSessionHandler extends AbstractSessionHandler
                 $data = fopen('php://memory', 'r+');
                 fwrite($data, $sessionData);
                 rewind($data);
-                $sql = "UPDATE $this->table SET $this->dataCol = EMPTY_BLOB(), $this->lifetimeCol = :lifetime, $this->timeCol = :time WHERE $this->idCol = :id RETURNING $this->dataCol into :data";
+                $sql = "UPDATE $this->table SET $this->dataCol = EMPTY_BLOB(), $this->lifetimeCol = :expiry, $this->timeCol = :time WHERE $this->idCol = :id RETURNING $this->dataCol into :data";
                 break;
             default:
                 $data = $sessionData;
-                $sql = "UPDATE $this->table SET $this->dataCol = :data, $this->lifetimeCol = :lifetime, $this->timeCol = :time WHERE $this->idCol = :id";
+                $sql = "UPDATE $this->table SET $this->dataCol = :data, $this->lifetimeCol = :expiry, $this->timeCol = :time WHERE $this->idCol = :id";
                 break;
         }
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
         $stmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-        $stmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+        $stmt->bindValue(':expiry', time() + $maxlifetime, \PDO::PARAM_INT);
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
 
         return $stmt;
@@ -824,7 +840,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     {
         switch (true) {
             case 'mysql' === $this->driver:
-                $mergeSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time) ".
+                $mergeSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :expiry, :time) ".
                     "ON DUPLICATE KEY UPDATE $this->dataCol = VALUES($this->dataCol), $this->lifetimeCol = VALUES($this->lifetimeCol), $this->timeCol = VALUES($this->timeCol)";
                 break;
             case 'sqlsrv' === $this->driver && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>='):
@@ -835,10 +851,10 @@ class PdoSessionHandler extends AbstractSessionHandler
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = ?, $this->lifetimeCol = ?, $this->timeCol = ?;";
                 break;
             case 'sqlite' === $this->driver:
-                $mergeSql = "INSERT OR REPLACE INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time)";
+                $mergeSql = "INSERT OR REPLACE INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :expiry, :time)";
                 break;
             case 'pgsql' === $this->driver && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '9.5', '>='):
-                $mergeSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time) ".
+                $mergeSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :expiry, :time) ".
                     "ON CONFLICT ($this->idCol) DO UPDATE SET ($this->dataCol, $this->lifetimeCol, $this->timeCol) = (EXCLUDED.$this->dataCol, EXCLUDED.$this->lifetimeCol, EXCLUDED.$this->timeCol)";
                 break;
             default:
@@ -852,15 +868,15 @@ class PdoSessionHandler extends AbstractSessionHandler
             $mergeStmt->bindParam(1, $sessionId, \PDO::PARAM_STR);
             $mergeStmt->bindParam(2, $sessionId, \PDO::PARAM_STR);
             $mergeStmt->bindParam(3, $data, \PDO::PARAM_LOB);
-            $mergeStmt->bindParam(4, $maxlifetime, \PDO::PARAM_INT);
-            $mergeStmt->bindValue(5, time(), \PDO::PARAM_INT);
-            $mergeStmt->bindParam(6, $data, \PDO::PARAM_LOB);
-            $mergeStmt->bindParam(7, $maxlifetime, \PDO::PARAM_INT);
-            $mergeStmt->bindValue(8, time(), \PDO::PARAM_INT);
+            $mergeStmt->bindValue(4, time() + $maxlifetime, \PDO::PARAM_INT);
+            $mergeStmt->bindValue(4, time(), \PDO::PARAM_INT);
+            $mergeStmt->bindParam(5, $data, \PDO::PARAM_LOB);
+            $mergeStmt->bindValue(6, time() + $maxlifetime, \PDO::PARAM_INT);
+            $mergeStmt->bindValue(6, time(), \PDO::PARAM_INT);
         } else {
             $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
             $mergeStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-            $mergeStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+            $mergeStmt->bindValue(':expiry', time() + $maxlifetime, \PDO::PARAM_INT);
             $mergeStmt->bindValue(':time', time(), \PDO::PARAM_INT);
         }
 

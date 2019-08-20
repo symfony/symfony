@@ -65,12 +65,10 @@ class EntityType extends DoctrineType
      * We consider two query builders with an equal SQL string and
      * equal parameters to be equal.
      *
-     * @return array
-     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder)
+    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder): ?array
     {
         return [
             $queryBuilder->getQuery()->getSQL(),

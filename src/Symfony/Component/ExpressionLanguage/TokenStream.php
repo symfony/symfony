@@ -82,10 +82,8 @@ class TokenStream
 
     /**
      * @internal
-     *
-     * @return string
      */
-    public function getExpression()
+    public function getExpression(): string
     {
         return $this->expression;
     }

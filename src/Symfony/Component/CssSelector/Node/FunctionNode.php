@@ -52,7 +52,7 @@ class FunctionNode extends AbstractNode
     /**
      * @return Token[]
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }

@@ -49,7 +49,7 @@ class GeneratorConfig
      *
      * @return BundleWriterInterface[]
      */
-    public function getBundleWriters()
+    public function getBundleWriters(): array
     {
         return $this->bundleWriters;
     }
@@ -60,7 +60,7 @@ class GeneratorConfig
      *
      * @return string An absolute path to a directory
      */
-    public function getSourceDir()
+    public function getSourceDir(): string
     {
         return $this->sourceDir;
     }
@@ -70,7 +70,7 @@ class GeneratorConfig
      *
      * @return string The ICU version string
      */
-    public function getIcuVersion()
+    public function getIcuVersion(): string
     {
         return $this->icuVersion;
     }

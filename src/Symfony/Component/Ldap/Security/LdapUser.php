@@ -90,6 +90,11 @@ class LdapUser implements UserInterface, EquatableInterface
         return $this->extraFields;
     }
 
+    public function setPassword(string $password)
+    {
+        $this->password = $password;
+    }
+
     /**
      * {@inheritdoc}
      */

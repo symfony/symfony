@@ -316,10 +316,7 @@ class MemcachedAdapter extends AbstractAdapter
         throw new CacheException(sprintf('MemcachedAdapter client error: %s.', strtolower($this->client->getResultMessage())));
     }
 
-    /**
-     * @return \Memcached
-     */
-    private function getClient()
+    private function getClient(): \Memcached
     {
         if ($this->client) {
             return $this->client;

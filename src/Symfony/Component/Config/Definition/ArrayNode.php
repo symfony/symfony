@@ -388,7 +388,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             if (!isset($this->children[$k])) {
-                throw new \RuntimeException('merge() expects a normalized config array.');
+                if (!$this->ignoreExtraKeys || $this->removeExtraKeys) {
+                    throw new \RuntimeException('merge() expects a normalized config array.');
+                }
+
+                $leftSide[$k] = $v;
+                continue;
             }
 
             $leftSide[$k] = $this->children[$k]->merge($leftSide[$k], $v);

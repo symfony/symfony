@@ -56,6 +56,8 @@ class CookieJar
                 }
             }
         }
+
+        return null;
     }
 
     /**

@@ -183,6 +183,8 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         foreach ($this->getItems([$key]) as $item) {
             return $item;
         }
+
+        return null;
     }
 
     /**

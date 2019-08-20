@@ -109,6 +109,8 @@ abstract class AbstractSurrogate implements SurrogateInterface
                 throw $e;
             }
         }
+
+        return null;
     }
 
     /**

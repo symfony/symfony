@@ -97,7 +97,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('property_accessor');
 
         if (!method_exists(PropertyAccessor::class, 'createCache')) {
-            return $this->assertFalse($container->hasDefinition('cache.property_access'));
+            $this->assertFalse($container->hasDefinition('cache.property_access'));
+
+            return;
         }
 
         $cache = $container->getDefinition('cache.property_access');
@@ -110,7 +112,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('property_accessor', ['kernel.debug' => true]);
 
         if (!method_exists(PropertyAccessor::class, 'createCache')) {
-            return $this->assertFalse($container->hasDefinition('cache.property_access'));
+            $this->assertFalse($container->hasDefinition('cache.property_access'));
+
+            return;
         }
 
         $cache = $container->getDefinition('cache.property_access');
@@ -477,6 +481,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(108, $options['gc_divisor']);
         $this->assertEquals(1, $options['gc_probability']);
         $this->assertEquals(90000, $options['gc_maxlifetime']);
+        $this->assertEquals(22, $options['sid_length']);
+        $this->assertEquals(4, $options['sid_bits_per_character']);
 
         $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
     }

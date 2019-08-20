@@ -52,6 +52,9 @@ trait VarDumperTestTrait
         $this->assertStringMatchesFormat($this->prepareExpectation($expected, $filter), $this->getDump($data, null, $filter), $message);
     }
 
+    /**
+     * @return string|null
+     */
     protected function getDump($data, $key = null, int $filter = 0)
     {
         if (null === $flags = $this->varDumperConfig['flags']) {
@@ -67,7 +70,7 @@ trait VarDumperTestTrait
         $dumper->setColors(false);
         $data = $cloner->cloneVar($data, $filter)->withRefHandles(false);
         if (null !== $key && null === $data = $data->seek($key)) {
-            return;
+            return null;
         }
 
         return rtrim($dumper->dump($data, true));

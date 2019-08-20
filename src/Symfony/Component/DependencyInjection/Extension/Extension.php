@@ -99,7 +99,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
         return null;
     }
 
-    final protected function processConfiguration(ConfigurationInterface $configuration, array $configs)
+    final protected function processConfiguration(ConfigurationInterface $configuration, array $configs): array
     {
         $processor = new Processor();
 

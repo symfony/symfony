@@ -50,8 +50,7 @@ class ProxyHelper
         if ('self' === $lcName) {
             return $prefix.$r->getDeclaringClass()->name;
         }
-        if ($parent = $r->getDeclaringClass()->getParentClass()) {
-            return $prefix.$parent->name;
-        }
+
+        return ($parent = $r->getDeclaringClass()->getParentClass()) ? $prefix.$parent->name : null;
     }
 }

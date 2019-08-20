@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper;
 
 use PHPUnit\Framework\TestCase;
-use ProxyManager\Version;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;

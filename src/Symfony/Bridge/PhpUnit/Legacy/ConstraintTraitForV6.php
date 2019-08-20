@@ -49,6 +49,10 @@ trait ConstraintTraitForV6
      */
     protected function exporter()
     {
+        if (null === $this->exporter) {
+            $this->exporter = new Exporter();
+        }
+
         return $this->exporter;
     }
 

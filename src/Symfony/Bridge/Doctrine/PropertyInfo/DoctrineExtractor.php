@@ -157,6 +157,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     return $builtinType ? [new Type($builtinType, $nullable)] : null;
             }
         }
+
+        return null;
     }
 
     /**

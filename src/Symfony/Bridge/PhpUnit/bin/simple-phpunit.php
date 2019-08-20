@@ -187,7 +187,7 @@ $argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
 $argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
 
 if ($PHPUNIT_VERSION < 8.0) {
-    $argv = array_filter($argv, function ($v) use (&$argc) { if ('--do-not-cache-result' !== $v) return true; --$argc; });
+    $argv = array_filter($argv, function ($v) use (&$argc) { if ('--do-not-cache-result' !== $v) return true; --$argc; return false; });
 } elseif (filter_var(getenv('SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE'), FILTER_VALIDATE_BOOLEAN)) {
     $argv[] = '--do-not-cache-result';
     ++$argc;

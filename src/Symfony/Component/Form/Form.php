@@ -760,9 +760,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             return $this->clickedButton;
         }
 
-        if ($this->parent && method_exists($this->parent, 'getClickedButton')) {
-            return $this->parent->getClickedButton();
-        }
+        return $this->parent && method_exists($this->parent, 'getClickedButton') ? $this->parent->getClickedButton() : null;
     }
 
     /**

@@ -94,6 +94,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                 return $varDescription;
             }
         }
+
+        return null;
     }
 
     /**

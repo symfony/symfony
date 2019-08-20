@@ -46,6 +46,8 @@ class ArrayInput extends Input
 
             return $value;
         }
+
+        return null;
     }
 
     /**

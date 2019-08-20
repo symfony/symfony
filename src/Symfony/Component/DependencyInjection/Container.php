@@ -273,6 +273,8 @@ class Container implements ContainerInterface, ResetInterface
 
             throw new ServiceNotFoundException($id, null, null, $alternatives);
         }
+
+        return null;
     }
 
     /**

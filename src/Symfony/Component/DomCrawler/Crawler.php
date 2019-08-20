@@ -1007,9 +1007,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function getNode(int $position)
     {
-        if (isset($this->nodes[$position])) {
-            return $this->nodes[$position];
-        }
+        return isset($this->nodes[$position]) ? $this->nodes[$position] : null;
     }
 
     /**
@@ -1123,11 +1121,7 @@ class Crawler implements \Countable, \IteratorAggregate
         // ask for one namespace, otherwise we'd get a collection with an item for each node
         $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', $this->defaultNamespacePrefix === $prefix ? '' : $prefix));
 
-        if ($node = $namespaces->item(0)) {
-            return $node->nodeValue;
-        }
-
-        return null;
+        return ($node = $namespaces->item(0)) ? $node->nodeValue : null;
     }
 
     private function findNamespacePrefixes(string $xpath): array

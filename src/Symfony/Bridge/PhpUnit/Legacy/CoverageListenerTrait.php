@@ -91,11 +91,7 @@ class CoverageListenerTrait
         $sutFqcn = str_replace('\\Tests\\', '\\', $class);
         $sutFqcn = preg_replace('{Test$}', '', $sutFqcn);
 
-        if (!class_exists($sutFqcn)) {
-            return;
-        }
-
-        return $sutFqcn;
+        return class_exists($sutFqcn) ? $sutFqcn : null;
     }
 
     public function __sleep()

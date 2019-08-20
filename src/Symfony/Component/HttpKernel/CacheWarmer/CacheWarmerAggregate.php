@@ -58,7 +58,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                 if (isset($collectedLogs[$message])) {
                     ++$collectedLogs[$message]['count'];
 
-                    return;
+                    return null;
                 }
 
                 $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
@@ -78,6 +78,8 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                     'trace' => $backtrace,
                     'count' => 1,
                 ];
+
+                return null;
             });
         }
 

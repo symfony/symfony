@@ -367,7 +367,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $expectedTypes = [];
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
-                return;
+                return null;
             }
 
             if ($type->isCollection() && null !== ($collectionValueType = $type->getCollectionValueType()) && Type::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType()) {

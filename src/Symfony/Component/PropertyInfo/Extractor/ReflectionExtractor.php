@@ -151,6 +151,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         if ($fromDefaultValue = $this->extractFromDefaultValue($class, $property)) {
             return $fromDefaultValue;
         }
+
+        return null;
     }
 
     /**

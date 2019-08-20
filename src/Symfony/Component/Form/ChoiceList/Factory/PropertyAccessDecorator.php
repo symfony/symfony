@@ -77,9 +77,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                 // when such values are passed to
                 // ChoiceListInterface::getValuesForChoices(). Handle this case
                 // so that the call to getValue() doesn't break.
-                if (\is_object($choice) || \is_array($choice)) {
-                    return $accessor->getValue($choice, $value);
-                }
+                return \is_object($choice) || \is_array($choice) ? $accessor->getValue($choice, $value) : null;
             };
         }
 
@@ -107,9 +105,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                 // when such values are passed to
                 // ChoiceListInterface::getValuesForChoices(). Handle this case
                 // so that the call to getValue() doesn't break.
-                if (\is_object($choice) || \is_array($choice)) {
-                    return $accessor->getValue($choice, $value);
-                }
+                return \is_object($choice) || \is_array($choice) ? $accessor->getValue($choice, $value) : null;
             };
         }
 
@@ -176,6 +172,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                     return $accessor->getValue($choice, $groupBy);
                 } catch (UnexpectedTypeException $e) {
                     // Don't group if path is not readable
+                    return null;
                 }
             };
         }

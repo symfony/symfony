@@ -265,6 +265,8 @@ class ArgvInput extends Input
 
             return $token;
         }
+
+        return null;
     }
 
     /**

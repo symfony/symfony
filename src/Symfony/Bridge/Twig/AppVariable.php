@@ -83,9 +83,8 @@ class AppVariable
         }
 
         $user = $token->getUser();
-        if (\is_object($user)) {
-            return $user;
-        }
+
+        return \is_object($user) ? $user : null;
     }
 
     /**

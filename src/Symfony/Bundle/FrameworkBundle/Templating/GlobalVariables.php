@@ -70,7 +70,9 @@ class GlobalVariables
      */
     public function getSession()
     {
-        return ($request = $this->getRequest()) ? $request->getSession() : null;
+        $request = $this->getRequest();
+
+        return $request && $request->hasSession() ? $request->getSession() : null;
     }
 
     /**

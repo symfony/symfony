@@ -109,6 +109,9 @@ HttpFoundation
 
  * `ApacheRequest` is deprecated, use `Request` class instead.
  * Passing a third argument to `HeaderBag::get()` is deprecated since Symfony 4.4, use method `all()` instead
+ * `PdoSessionHandler` now precalculates the expiry timestamp in the lifetime column,
+    make sure to run `CREATE INDEX EXPIRY ON sessions (sess_lifetime)` to update your database
+    to speed up garbage collection of expired sessions.
 
 HttpKernel
 ----------

@@ -1236,7 +1236,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
                     yield $k => $this->resolveServices($v);
                 }
-            }, function () use ($value) {
+            }, function () use ($value): int {
                 $count = 0;
                 foreach ($value->getValues() as $v) {
                     foreach (self::getServiceConditionals($v) as $s) {
@@ -1641,7 +1641,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
-    private function getExpressionLanguage()
+    private function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
@@ -1653,7 +1653,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->expressionLanguage;
     }
 
-    private function inVendors(string $path)
+    private function inVendors(string $path): bool
     {
         if (null === $this->vendors) {
             $resource = new ComposerResource();

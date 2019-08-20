@@ -71,7 +71,7 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->assertSame($this->container->getParameterBag()->resolveValue('%env(BAZ)%'), $boundValue);
     }
 
-    private function createContainerBuilder()
+    private function createContainerBuilder(): ContainerBuilder
     {
         $containerBuilder = new ContainerBuilder();
 

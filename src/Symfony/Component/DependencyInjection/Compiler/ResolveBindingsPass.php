@@ -205,6 +205,9 @@ class ResolveBindingsPass extends AbstractRecursivePass
         return parent::processValue($value, $isRoot);
     }
 
+    /**
+     * @return mixed
+     */
     private function getBindingValue(BoundArgument $binding)
     {
         list($bindingValue, $bindingId) = $binding->getValues();

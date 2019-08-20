@@ -684,7 +684,7 @@ EOF;
         return $calls;
     }
 
-    private function addServiceProperties(Definition $definition, string $variableName = 'instance')
+    private function addServiceProperties(Definition $definition, string $variableName = 'instance'): string
     {
         $code = '';
         foreach ($definition->getProperties() as $name => $value) {
@@ -967,7 +967,7 @@ EOTXT
         return $publicServices.$privateServices;
     }
 
-    private function generateServiceFiles(array $services)
+    private function generateServiceFiles(array $services): iterable
     {
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
@@ -993,7 +993,7 @@ EOTXT
         }
     }
 
-    private function addNewInstance(Definition $definition, string $return = '', string $id = null)
+    private function addNewInstance(Definition $definition, string $return = '', string $id = null): string
     {
         $tail = $return ? ";\n" : '';
 
@@ -1914,7 +1914,7 @@ EOF;
         }
     }
 
-    private function getExpressionLanguage()
+    private function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
@@ -1941,7 +1941,7 @@ EOF;
         return $this->expressionLanguage;
     }
 
-    private function isHotPath(Definition $definition)
+    private function isHotPath(Definition $definition): bool
     {
         return $this->hotPathTag && $definition->hasTag($this->hotPathTag) && !$definition->isDeprecated();
     }
@@ -1965,6 +1965,9 @@ EOF;
         return 1 === \count($ids);
     }
 
+    /**
+     * @return mixed
+     */
     private function export($value)
     {
         if (null !== $this->targetDirRegex && \is_string($value) && preg_match($this->targetDirRegex, $value, $matches, PREG_OFFSET_CAPTURE)) {
@@ -1988,6 +1991,9 @@ EOF;
         return $this->doExport($value, true);
     }
 
+    /**
+     * @return mixed
+     */
     private function doExport($value, bool $resolveEnv = false)
     {
         $shouldCacheValue = $resolveEnv && \is_string($value);

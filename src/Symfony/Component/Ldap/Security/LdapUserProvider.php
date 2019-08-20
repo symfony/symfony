@@ -108,7 +108,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
-        return new LdapUser($user->getEntry(), $user->getUsername(), $user->getPassword(), $user->getRoles());
+        return $this->loadUserByUsername($user->getUsername());
     }
 
     /**

@@ -45,7 +45,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = [])
+    public function getProperties($class, array $context = []): ?array
     {
         return $this->extract($this->listExtractors, 'getProperties', [$class, $context]);
     }
@@ -53,7 +53,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = [])
+    public function getShortDescription($class, $property, array $context = []): ?string
     {
         return $this->extract($this->descriptionExtractors, 'getShortDescription', [$class, $property, $context]);
     }
@@ -61,7 +61,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = [])
+    public function getLongDescription($class, $property, array $context = []): ?string
     {
         return $this->extract($this->descriptionExtractors, 'getLongDescription', [$class, $property, $context]);
     }
@@ -69,7 +69,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = [])
+    public function getTypes($class, $property, array $context = []): ?array
     {
         return $this->extract($this->typeExtractors, 'getTypes', [$class, $property, $context]);
     }
@@ -77,7 +77,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = [])
+    public function isReadable($class, $property, array $context = []): ?bool
     {
         return $this->extract($this->accessExtractors, 'isReadable', [$class, $property, $context]);
     }
@@ -85,7 +85,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = [])
+    public function isWritable($class, $property, array $context = []): ?bool
     {
         return $this->extract($this->accessExtractors, 'isWritable', [$class, $property, $context]);
     }

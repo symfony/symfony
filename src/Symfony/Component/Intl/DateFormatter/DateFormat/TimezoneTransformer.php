@@ -97,7 +97,7 @@ class TimezoneTransformer extends Transformer
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
      * @throws \InvalidArgumentException When the value can not be matched with pattern
      */
-    public static function getEtcTimeZoneId($formattedTimeZone)
+    public static function getEtcTimeZoneId(string $formattedTimeZone): string
     {
         if (preg_match('/GMT(?P<signal>[+-])(?P<hours>\d{2}):?(?P<minutes>\d{2})/', $formattedTimeZone, $matches)) {
             $hours = (int) $matches['hours'];

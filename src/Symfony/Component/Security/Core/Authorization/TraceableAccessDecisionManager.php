@@ -48,7 +48,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function decide(TokenInterface $token, array $attributes, $object = null)
+    public function decide(TokenInterface $token, array $attributes, $object = null): bool
     {
         $currentDecisionLog = [
             'attributes' => $attributes,
@@ -86,7 +86,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @return string
      */
-    public function getStrategy()
+    public function getStrategy(): string
     {
         // The $strategy property is misleading because it stores the name of its
         // method (e.g. 'decideAffirmative') instead of the original strategy name
@@ -97,7 +97,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @return iterable|VoterInterface[]
      */
-    public function getVoters()
+    public function getVoters(): iterable
     {
         return $this->voters;
     }
@@ -105,7 +105,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @return array
      */
-    public function getDecisionLog()
+    public function getDecisionLog(): array
     {
         return $this->decisionLog;
     }

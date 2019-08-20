@@ -58,10 +58,8 @@ abstract class IntlGlobals
      * Returns whether the error code indicates a failure.
      *
      * @param int $errorCode The error code returned by IntlGlobals::getErrorCode()
-     *
-     * @return bool
      */
-    public static function isFailure($errorCode)
+    public static function isFailure(int $errorCode): bool
     {
         return isset(self::$errorCodes[$errorCode])
             && $errorCode > self::U_ZERO_ERROR;
@@ -83,10 +81,8 @@ abstract class IntlGlobals
      * Returns the error message of the last operation.
      *
      * Returns "U_ZERO_ERROR" if no error occurred.
-     *
-     * @return string
      */
-    public static function getErrorMessage()
+    public static function getErrorMessage(): string
     {
         return self::$errorMessage;
     }
@@ -95,10 +91,8 @@ abstract class IntlGlobals
      * Returns the symbolic name for a given error code.
      *
      * @param int $code The error code returned by IntlGlobals::getErrorCode()
-     *
-     * @return string
      */
-    public static function getErrorName($code)
+    public static function getErrorName(int $code): string
     {
         return self::$errorCodes[$code] ?? '[BOGUS UErrorCode]';
     }
@@ -111,7 +105,7 @@ abstract class IntlGlobals
      *
      * @throws \InvalidArgumentException If the code is not one of the error constants in this class
      */
-    public static function setError($code, $message = '')
+    public static function setError(int $code, string $message = '')
     {
         if (!isset(self::$errorCodes[$code])) {
             throw new \InvalidArgumentException(sprintf('No such error code: "%s"', $code));

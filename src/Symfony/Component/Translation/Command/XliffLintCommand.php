@@ -223,10 +223,7 @@ EOF
         }
     }
 
-    /**
-     * @return string|null
-     */
-    private function getStdin()
+    private function getStdin(): ?string
     {
         if (0 !== ftell(STDIN)) {
             return null;

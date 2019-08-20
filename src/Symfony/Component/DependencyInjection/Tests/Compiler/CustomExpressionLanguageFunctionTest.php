@@ -19,7 +19,7 @@ class CustomExpressionLanguageFunctionTest extends TestCase
             ->setArguments([new Expression('custom_func("foobar")')]);
 
         $container->addExpressionLanguageProvider(new class() implements ExpressionFunctionProviderInterface {
-            public function getFunctions()
+            public function getFunctions(): array
             {
                 return [
                     ExpressionFunction::fromPhp('strtolower', 'custom_func'),

@@ -29,20 +29,14 @@ final class SessionBagProxy implements SessionBagInterface
         $this->usageIndex = &$usageIndex;
     }
 
-    /**
-     * @return SessionBagInterface
-     */
-    public function getBag()
+    public function getBag(): SessionBagInterface
     {
         ++$this->usageIndex;
 
         return $this->bag;
     }
 
-    /**
-     * @return bool
-     */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         if (!isset($this->data[$this->bag->getStorageKey()])) {
             return true;
@@ -55,7 +49,7 @@ final class SessionBagProxy implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->bag->getName();
     }
@@ -74,7 +68,7 @@ final class SessionBagProxy implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getStorageKey()
+    public function getStorageKey(): string
     {
         return $this->bag->getStorageKey();
     }

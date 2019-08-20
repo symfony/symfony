@@ -26,15 +26,9 @@ class DateValidator extends ConstraintValidator
     /**
      * Checks whether a date is valid.
      *
-     * @param int $year  The year
-     * @param int $month The month
-     * @param int $day   The day
-     *
-     * @return bool Whether the date is valid
-     *
      * @internal
      */
-    public static function checkDate($year, $month, $day)
+    public static function checkDate(int $year, int $month, int $day): bool
     {
         return checkdate($month, $day, $year);
     }

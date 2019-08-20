@@ -47,10 +47,8 @@ class CollectionConfigurator
 
     /**
      * Creates a sub-collection.
-     *
-     * @return self
      */
-    final public function collection($name = '')
+    final public function collection($name = ''): self
     {
         return new self($this->collection, $this->name.$name, $this, $this->prefixes);
     }

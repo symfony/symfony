@@ -42,7 +42,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function scanLocales(LocaleScanner $scanner, $sourceDir)
+    protected function scanLocales(LocaleScanner $scanner, $sourceDir): array
     {
         $this->localeAliases = $scanner->scanAliases($sourceDir.'/locales');
 
@@ -75,7 +75,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale)
+    protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale): ?array
     {
         if (!$this->zoneToCountryMapping) {
             $this->zoneToCountryMapping = self::generateZoneToCountryMapping($reader->read($tempDir, 'windowsZones'));
@@ -126,7 +126,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir): ?array
     {
         $rootBundle = $reader->read($tempDir, 'root');
 
@@ -139,7 +139,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir): ?array
     {
         $rootBundle = $reader->read($tempDir, 'root');
 

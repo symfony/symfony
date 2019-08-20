@@ -33,7 +33,7 @@ class SerializerExtractor implements PropertyListExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = [])
+    public function getProperties($class, array $context = []): ?array
     {
         if (!isset($context['serializer_groups']) || !\is_array($context['serializer_groups'])) {
             return null;

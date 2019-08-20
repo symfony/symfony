@@ -213,11 +213,9 @@ EOF
     /**
      * Loads the ContainerBuilder from the cache.
      *
-     * @return ContainerBuilder
-     *
      * @throws \LogicException
      */
-    protected function getContainerBuilder()
+    protected function getContainerBuilder(): ContainerBuilder
     {
         if ($this->containerBuilder) {
             return $this->containerBuilder;

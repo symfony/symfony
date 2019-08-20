@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -41,7 +42,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function isCompiled()
+    public function isCompiled(): bool
     {
         return $this->getPublicContainer()->isCompiled();
     }
@@ -49,7 +50,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function getParameterBag()
+    public function getParameterBag(): ParameterBagInterface
     {
         return $this->getPublicContainer()->getParameterBag();
     }
@@ -65,7 +66,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function hasParameter($name)
+    public function hasParameter($name): bool
     {
         return $this->getPublicContainer()->hasParameter($name);
     }
@@ -89,7 +90,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function has($id)
+    public function has($id): bool
     {
         return $this->getPublicContainer()->has($id) || $this->getPrivateContainer()->has($id);
     }
@@ -105,7 +106,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function initialized($id)
+    public function initialized($id): bool
     {
         return $this->getPublicContainer()->initialized($id);
     }
@@ -121,7 +122,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function getServiceIds()
+    public function getServiceIds(): array
     {
         return $this->getPublicContainer()->getServiceIds();
     }
@@ -129,7 +130,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function getRemovedIds()
+    public function getRemovedIds(): array
     {
         return $this->getPublicContainer()->getRemovedIds();
     }

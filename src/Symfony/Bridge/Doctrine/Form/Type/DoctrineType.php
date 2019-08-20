@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
@@ -51,12 +52,10 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      *
      * @param object $choice The object
      *
-     * @return string The string representation of the object
-     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public static function createChoiceLabel($choice)
+    public static function createChoiceLabel($choice): string
     {
         return (string) $choice;
     }
@@ -73,12 +72,10 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * @param string     $value  The choice value. Corresponds to the object's
      *                           ID here.
      *
-     * @return string The field name
-     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public static function createChoiceName($choice, $key, $value)
+    public static function createChoiceName($choice, $key, $value): string
     {
         return str_replace('-', '_', (string) $value);
     }
@@ -88,17 +85,15 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * For instance in ORM two query builders with an equal SQL string and
      * equal parameters are considered to be equal.
      *
-     * @param object $queryBuilder
-     *
-     * @return array|false Array with important QueryBuilder parts or false if
-     *                     they can't be determined
+     * @return array|null Array with important QueryBuilder parts or null if
+     *                    they can't be determined
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash($queryBuilder)
+    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder): ?array
     {
-        return false;
+        return null;
     }
 
     public function __construct(ManagerRegistry $registry)
@@ -127,7 +122,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
                 // If there is no QueryBuilder we can safely cache DoctrineChoiceLoader,
                 // also if concrete Type can return important QueryBuilder parts to generate
                 // hash key we go for it as well
-                if (!$options['query_builder'] || false !== ($qbParts = $this->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
+                if (!$options['query_builder'] || null !== $qbParts = $this->getQueryBuilderPartsForCachingHash($options['query_builder'])) {
                     $hash = CachingFactoryDecorator::generateHash([
                         $options['em'],
                         $options['class'],

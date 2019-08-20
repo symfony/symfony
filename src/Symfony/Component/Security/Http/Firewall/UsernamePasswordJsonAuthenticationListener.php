@@ -135,6 +135,9 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $event->setResponse($response);
     }
 
+    /**
+     * @return Response|null
+     */
     private function onSuccess(Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
@@ -151,7 +154,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         }
 
         if (!$this->successHandler) {
-            return; // let the original request succeeds
+            return null; // let the original request succeeds
         }
 
         $response = $this->successHandler->onAuthenticationSuccess($request, $token);

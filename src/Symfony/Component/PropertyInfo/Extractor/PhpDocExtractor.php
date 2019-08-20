@@ -89,6 +89,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                 return $varDescription;
             }
         }
+
+        return null;
     }
 
     /**
@@ -203,7 +205,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
         } catch (\ReflectionException $e) {
-            return;
+            return null;
         }
 
         try {
@@ -248,7 +250,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         if (!isset($reflectionMethod)) {
-            return;
+            return null;
         }
 
         try {

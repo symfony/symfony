@@ -138,6 +138,8 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         if (\is_callable([$object, $haser])) {
             return $object->$haser();
         }
+
+        return null;
     }
 
     /**

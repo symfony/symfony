@@ -25,6 +25,8 @@ class ClockMock
         }
 
         self::$now = is_numeric($enable) ? (float) $enable : ($enable ? microtime(true) : null);
+
+        return null;
     }
 
     public static function time()
@@ -54,6 +56,8 @@ class ClockMock
         }
 
         self::$now += $us / 1000000;
+
+        return null;
     }
 
     public static function microtime($asFloat = false)

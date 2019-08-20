@@ -49,5 +49,7 @@ class ContainerAwareRuntimeLoader implements RuntimeLoaderInterface
         if (null !== $this->logger) {
             $this->logger->warning(sprintf('Class "%s" is not configured as a Twig runtime. Add the "twig.runtime" tag to the related service in the container.', $class));
         }
+
+        return null;
     }
 }

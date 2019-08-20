@@ -90,5 +90,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
                 return $extension;
             }
         }
+
+        return null;
     }
 }

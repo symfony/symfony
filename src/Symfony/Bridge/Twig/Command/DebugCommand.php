@@ -220,16 +220,16 @@ EOF
             return $entity;
         }
         if ('tests' === $type) {
-            return;
+            return null;
         }
         if ('functions' === $type || 'filters' === $type) {
             $cb = $entity->getCallable();
             if (null === $cb) {
-                return;
+                return null;
             }
             if (\is_array($cb)) {
                 if (!method_exists($cb[0], $cb[1])) {
-                    return;
+                    return null;
                 }
                 $refl = new \ReflectionMethod($cb[0], $cb[1]);
             } elseif (\is_object($cb) && method_exists($cb, '__invoke')) {
@@ -268,6 +268,8 @@ EOF
 
             return $args;
         }
+
+        return null;
     }
 
     private function getPrettyMetadata($type, $entity, $decorated)
@@ -302,5 +304,7 @@ EOF
         if ('filters' === $type) {
             return $meta ? '('.implode(', ', $meta).')' : '';
         }
+
+        return null;
     }
 }

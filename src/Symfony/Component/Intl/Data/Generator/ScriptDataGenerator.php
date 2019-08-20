@@ -73,6 +73,8 @@ class ScriptDataGenerator extends AbstractDataGenerator
 
             return $data;
         }
+
+        return null;
     }
 
     /**

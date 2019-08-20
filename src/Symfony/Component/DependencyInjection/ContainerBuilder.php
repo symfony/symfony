@@ -354,7 +354,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getReflectionClass($class, $throw = true)
     {
         if (!$class = $this->getParameterBag()->resolveValue($class)) {
-            return;
+            return null;
         }
 
         if (isset(self::$internalTypes[$class])) {
@@ -621,7 +621,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $definition = $this->getDefinition($id);
         } catch (ServiceNotFoundException $e) {
             if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                return;
+                return null;
             }
 
             throw $e;

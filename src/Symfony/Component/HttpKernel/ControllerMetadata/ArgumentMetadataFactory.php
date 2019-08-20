@@ -103,17 +103,17 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     {
         if ($this->supportsParameterType) {
             if (!$type = $parameter->getType()) {
-                return;
+                return null;
             }
             $name = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
             if ('array' === $name && !$type->isBuiltin()) {
                 // Special case for HHVM with variadics
-                return;
+                return null;
             }
         } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $parameter, $name)) {
             $name = $name[1];
         } else {
-            return;
+            return null;
         }
         $lcName = strtolower($name);
 
@@ -121,7 +121,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
             return $name;
         }
         if (!$function instanceof \ReflectionMethod) {
-            return;
+            return null;
         }
         if ('self' === $lcName) {
             return $function->getDeclaringClass()->name;
@@ -129,5 +129,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         if ($parent = $function->getDeclaringClass()->getParentClass()) {
             return $parent->name;
         }
+
+        return null;
     }
 }

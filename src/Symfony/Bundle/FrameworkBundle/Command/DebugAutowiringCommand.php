@@ -93,5 +93,7 @@ EOF
         }
 
         $io->table([], $tableRows);
+
+        return null;
     }
 }

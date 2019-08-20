@@ -49,6 +49,8 @@ class ParserTest extends TestCase
                 }
 
                 $deprecations[] = $msg;
+
+                return null;
             });
         }
 

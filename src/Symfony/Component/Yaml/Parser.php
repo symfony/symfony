@@ -564,7 +564,7 @@ class Parser
         $oldLineIndentation = $this->getCurrentLineIndentation();
 
         if (!$this->moveToNextLine()) {
-            return;
+            return '';
         }
 
         if (null === $indentation) {
@@ -607,7 +607,7 @@ class Parser
         } else {
             $this->moveToPreviousLine();
 
-            return;
+            return '';
         }
 
         if ($inSequence && $oldLineIndentation === $newIndent && isset($data[0][0]) && '-' === $data[0][0]) {
@@ -615,7 +615,7 @@ class Parser
             // and therefore no nested list or mapping
             $this->moveToPreviousLine();
 
-            return;
+            return '';
         }
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
@@ -1102,14 +1102,17 @@ class Parser
         return $value;
     }
 
+    /**
+     * @return string|null
+     */
     private function getLineTag($value, $flags, $nextLineCheck = true)
     {
         if ('' === $value || '!' !== $value[0] || 1 !== self::preg_match('/^'.self::TAG_PATTERN.' *( +#.*)?$/', $value, $matches)) {
-            return;
+            return null;
         }
 
         if ($nextLineCheck && !$this->isNextLineIndented()) {
-            return;
+            return null;
         }
 
         $tag = substr($matches['tag'], 1);

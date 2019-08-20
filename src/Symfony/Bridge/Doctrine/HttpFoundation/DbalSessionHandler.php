@@ -248,6 +248,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
                 return "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) ".
                     "ON CONFLICT ($this->idCol) DO UPDATE SET ($this->dataCol, $this->timeCol) = (EXCLUDED.$this->dataCol, EXCLUDED.$this->timeCol)";
         }
+
+        return null;
     }
 
     private function getServerVersion()

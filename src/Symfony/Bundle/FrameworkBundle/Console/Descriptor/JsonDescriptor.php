@@ -142,7 +142,9 @@ class JsonDescriptor extends Descriptor
     protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null)
     {
         if (!$builder) {
-            return $this->writeData($this->getContainerAliasData($alias), $options);
+            $this->writeData($this->getContainerAliasData($alias), $options);
+
+            return;
         }
 
         $this->writeData(

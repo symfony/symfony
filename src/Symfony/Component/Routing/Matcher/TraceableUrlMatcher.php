@@ -127,6 +127,8 @@ class TraceableUrlMatcher extends UrlMatcher
 
             return true;
         }
+
+        return [];
     }
 
     private function addTrace($log, $level = self::ROUTE_DOES_NOT_MATCH, $name = null, $route = null)

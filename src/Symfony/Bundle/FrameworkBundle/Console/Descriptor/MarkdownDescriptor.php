@@ -249,7 +249,9 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Public: '.($alias->isPublic() && !$alias->isPrivate() ? 'yes' : 'no');
 
         if (!isset($options['id'])) {
-            return $this->write($output);
+            $this->write($output);
+
+            return;
         }
 
         $this->write(sprintf("### %s\n\n%s\n", $options['id'], $output));

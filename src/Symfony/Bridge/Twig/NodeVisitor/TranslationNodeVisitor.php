@@ -115,7 +115,7 @@ class TranslationNodeVisitor extends AbstractNodeVisitor
         } elseif ($arguments->hasNode($index)) {
             $argument = $arguments->getNode($index);
         } else {
-            return;
+            return null;
         }
 
         return $this->getReadDomainFromNode($argument);

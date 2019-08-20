@@ -357,6 +357,8 @@ class SymfonyTestsListenerTrait
             $msg = 'Unsilenced deprecation: '.$msg;
         }
         $this->gatheredDeprecations[] = $msg;
+
+        return null;
     }
 
     /**

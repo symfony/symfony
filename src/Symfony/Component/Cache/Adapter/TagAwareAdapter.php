@@ -177,6 +177,8 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
         foreach ($this->getItems([$key]) as $item) {
             return $item;
         }
+
+        return null;
     }
 
     /**

@@ -148,6 +148,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 
             throw $e;
         }
+
+        return null;
     }
 
     /**

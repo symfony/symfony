@@ -88,7 +88,7 @@ class Response
     const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;                             // RFC6585
 
     /**
-     * @var \Symfony\Component\HttpFoundation\ResponseHeaderBag
+     * @var ResponseHeaderBag
      */
     public $headers;
 
@@ -790,6 +790,8 @@ class Response
         if (null !== $this->getExpires()) {
             return (int) $this->getExpires()->format('U') - (int) $this->getDate()->format('U');
         }
+
+        return null;
     }
 
     /**
@@ -846,6 +848,8 @@ class Response
         if (null !== $maxAge = $this->getMaxAge()) {
             return $maxAge - $this->getAge();
         }
+
+        return null;
     }
 
     /**

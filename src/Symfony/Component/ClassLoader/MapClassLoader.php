@@ -63,8 +63,6 @@ class MapClassLoader
      */
     public function findFile($class)
     {
-        if (isset($this->map[$class])) {
-            return $this->map[$class];
-        }
+        return isset($this->map[$class]) ? $this->map[$class] : null;
     }
 }

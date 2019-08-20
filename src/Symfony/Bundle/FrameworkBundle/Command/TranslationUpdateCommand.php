@@ -242,7 +242,7 @@ EOF
         if (!\count($operation->getDomains())) {
             $errorIo->warning('No translation messages were found.');
 
-            return;
+            return null;
         }
 
         $resultMessage = 'Translation files were successfully updated';
@@ -307,6 +307,8 @@ EOF
         }
 
         $errorIo->success($resultMessage.'.');
+
+        return null;
     }
 
     private function filterCatalogue(MessageCatalogue $catalogue, $domain)

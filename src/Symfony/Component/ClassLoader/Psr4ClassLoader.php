@@ -55,6 +55,8 @@ class Psr4ClassLoader
                 }
             }
         }
+
+        return null;
     }
 
     /**

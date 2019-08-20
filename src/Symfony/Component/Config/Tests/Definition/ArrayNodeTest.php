@@ -255,4 +255,66 @@ class ArrayNodeTest extends TestCase
         restore_error_handler();
         $this->assertTrue($deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
+
+    /**
+     * @dataProvider getDataWithIncludedExtraKeys
+     */
+    public function testMergeWithoutIgnoringExtraKeys($prenormalizeds, $merged)
+    {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('merge() expects a normalized config array.');
+        $node = new ArrayNode('root');
+        $node->addChild(new ScalarNode('foo'));
+        $node->addChild(new ScalarNode('bar'));
+        $node->setIgnoreExtraKeys(false);
+
+        $r = new \ReflectionMethod($node, 'mergeValues');
+        $r->setAccessible(true);
+
+        $r->invoke($node, ...$prenormalizeds);
+    }
+
+    /**
+     * @dataProvider getDataWithIncludedExtraKeys
+     */
+    public function testMergeWithIgnoringAndRemovingExtraKeys($prenormalizeds, $merged)
+    {
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('merge() expects a normalized config array.');
+        $node = new ArrayNode('root');
+        $node->addChild(new ScalarNode('foo'));
+        $node->addChild(new ScalarNode('bar'));
+        $node->setIgnoreExtraKeys(true);
+
+        $r = new \ReflectionMethod($node, 'mergeValues');
+        $r->setAccessible(true);
+
+        $r->invoke($node, ...$prenormalizeds);
+    }
+
+    /**
+     * @dataProvider getDataWithIncludedExtraKeys
+     */
+    public function testMergeWithIgnoringExtraKeys($prenormalizeds, $merged)
+    {
+        $node = new ArrayNode('root');
+        $node->addChild(new ScalarNode('foo'));
+        $node->addChild(new ScalarNode('bar'));
+        $node->setIgnoreExtraKeys(true, false);
+
+        $r = new \ReflectionMethod($node, 'mergeValues');
+        $r->setAccessible(true);
+
+        $this->assertEquals($merged, $r->invoke($node, ...$prenormalizeds));
+    }
+
+    public function getDataWithIncludedExtraKeys()
+    {
+        return [
+            [
+                [['foo' => 'bar', 'baz' => 'not foo'], ['bar' => 'baz', 'baz' => 'foo']],
+                ['foo' => 'bar', 'bar' => 'baz', 'baz' => 'foo'],
+            ],
+        ];
+    }
 }

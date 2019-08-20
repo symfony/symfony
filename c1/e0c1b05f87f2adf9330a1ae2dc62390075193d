@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-10T18:16:04Z
+
+Let's not revert before we understand.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-11T11:28:28Z
+
+@fabpot a stacktrace from the original issue would be helpful :) there are a few possible known suspects: https://github.com/symfony/symfony/search?l=PHP&q=%22Class+%25s+used+for+service+%25s+cannot+be+found.%22
+
+the rationale isnt 100% clear to me, i.e. why exactly didnt we detect `\Foo\Bar` vs. `Foo\Bar` at an early stage? We had some discussion about it when introducing `ResolveClassPass` i believe.
+
+Now, some passes will benefit from #33111 when running "before removing" (e.g. `AddConsoleCommandPass`) whereas others will benefit from #33092 (e.g. `RegisterEnvVarProcessorsPass`).
+
+So we may have somewhat of a chicken/egg situation, nevertheless the behavior change is real.
+
+I guess the user may process such service IDs themselves (so we are as preservative as possible). For reproducible builds we don't involve class_exists (correct me if im wrong), as such we would make a big assumption on service IDs. Hence we provide an error as late as possible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-11T11:34:37Z
+
+>  why we dont consider \Foo\Bar vs. Foo\Bar equal. We had some discussion about it when introducing ResolveClassPass i believe
+
+I can answer that: because we do not want any normalization logic around ids. We got rid of any when making them case sensitive and that reduced the complexity by a nice margin. We do not want to introduce it again in a different flavor.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-11T11:39:17Z
+
+sorry, ive updated my comment :) basically, why didnt we do #33092 when introducing ResolveClassPass
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-11T11:50:09Z
+
+the discussion im recalling is #28006, same topic really :sweat_smile:

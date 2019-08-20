@@ -228,9 +228,7 @@ class YamlDumper extends Dumper
     /**
      * Dumps callable to YAML format.
      *
-     * @param callable $callable
-     *
-     * @return callable
+     * @param mixed $callable
      */
     private function dumpCallable($callable)
     {

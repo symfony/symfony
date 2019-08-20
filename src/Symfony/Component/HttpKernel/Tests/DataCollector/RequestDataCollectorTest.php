@@ -305,7 +305,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Magic method to allow non existing methods to be called and delegated.
      */
-    public function __call($method, $args)
+    public function __call(string $method, array $args)
     {
         throw new \LogicException('Unexpected method call');
     }
@@ -313,7 +313,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Magic method to allow non existing methods to be called and delegated.
      */
-    public static function __callStatic($method, $args)
+    public static function __callStatic(string $method, array $args)
     {
         throw new \LogicException('Unexpected method call');
     }

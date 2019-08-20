@@ -126,7 +126,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         yield from $value;
     }
 
-    public function __get($key)
+    public function __get(string $key)
     {
         if (null !== $data = $this->seek($key)) {
             $item = $this->getStub($data->data[$data->position][$data->key]);
@@ -140,7 +140,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return bool
      */
-    public function __isset($key)
+    public function __isset(string $key)
     {
         return null !== $this->seek($key);
     }

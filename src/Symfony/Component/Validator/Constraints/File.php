@@ -71,7 +71,7 @@ class File extends Constraint
         }
     }
 
-    public function __set($option, $value)
+    public function __set(string $option, $value)
     {
         if ('maxSize' === $option) {
             $this->normalizeBinaryFormat($value);
@@ -82,7 +82,7 @@ class File extends Constraint
         parent::__set($option, $value);
     }
 
-    public function __get($option)
+    public function __get(string $option)
     {
         if ('maxSize' === $option) {
             return $this->maxSize;
@@ -91,7 +91,7 @@ class File extends Constraint
         return parent::__get($option);
     }
 
-    public function __isset($option)
+    public function __isset(string $option)
     {
         if ('maxSize' === $option) {
             return true;

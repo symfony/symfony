@@ -41,7 +41,7 @@ class NodeExtension extends AbstractExtension
     /**
      * @return $this
      */
-    public function setFlag(int $flag, bool $on)
+    public function setFlag(int $flag, bool $on): self
     {
         if ($on && !$this->hasFlag($flag)) {
             $this->flags += $flag;

@@ -114,8 +114,10 @@ class FormFieldRegistry
         if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
         } elseif (\is_array($value)) {
-            $fields = self::create($name, $value);
-            foreach ($fields->all() as $k => $v) {
+            $registry = new static();
+            $registry->base = $name;
+            $registry->fields = $value;
+            foreach ($registry->all() as $k => $v) {
                 $this->set($k, $v);
             }
         } else {
@@ -131,25 +133,6 @@ class FormFieldRegistry
     public function all(): array
     {
         return $this->walk($this->fields, $this->base);
-    }
-
-    /**
-     * Creates an instance of the class.
-     *
-     * This function is made private because it allows overriding the $base and
-     * the $values properties without any type checking.
-     *
-     * @param array $values The values of the fields
-     *
-     * @return static
-     */
-    private static function create(string $base, array $values)
-    {
-        $registry = new static();
-        $registry->base = $base;
-        $registry->fields = $values;
-
-        return $registry;
     }
 
     /**

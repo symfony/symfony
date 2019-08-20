@@ -16,7 +16,7 @@ trait PublicTrait
     /**
      * @return $this
      */
-    final public function public()
+    final public function public(): self
     {
         $this->definition->setPublic(true);
 
@@ -26,7 +26,7 @@ trait PublicTrait
     /**
      * @return $this
      */
-    final public function private()
+    final public function private(): self
     {
         $this->definition->setPublic(false);
 

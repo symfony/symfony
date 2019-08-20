@@ -16,11 +16,9 @@ trait ShareTrait
     /**
      * Sets if the service must be shared or not.
      *
-     * @param bool $shared Whether the service must be shared or not
-     *
      * @return $this
      */
-    final public function share($shared = true)
+    final public function share(bool $shared = true): self
     {
         $this->definition->setShared($shared);
 

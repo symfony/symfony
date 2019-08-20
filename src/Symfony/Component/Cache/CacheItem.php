@@ -56,6 +56,8 @@ final class CacheItem implements CacheItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
     public function set($value)
     {
@@ -66,6 +68,8 @@ final class CacheItem implements CacheItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
     public function expiresAt($expiration)
     {
@@ -82,6 +86,8 @@ final class CacheItem implements CacheItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
     public function expiresAfter($time)
     {
@@ -103,7 +109,7 @@ final class CacheItem implements CacheItemInterface
      *
      * @param string|string[] $tags A tag or array of tags
      *
-     * @return static
+     * @return $this
      *
      * @throws InvalidArgumentException When $tag is not valid
      */

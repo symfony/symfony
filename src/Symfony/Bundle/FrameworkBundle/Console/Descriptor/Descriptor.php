@@ -174,7 +174,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes a callable.
      *
-     * @param callable $callable
+     * @param mixed $callable
      */
     abstract protected function describeCallable($callable, array $options = []);
 

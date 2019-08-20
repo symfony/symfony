@@ -512,12 +512,12 @@ class Parser
      *
      * @throws ParseException When indentation problem are detected
      */
-    private function getNextEmbedBlock(int $indentation = null, bool $inSequence = false): ?string
+    private function getNextEmbedBlock(int $indentation = null, bool $inSequence = false): string
     {
         $oldLineIndentation = $this->getCurrentLineIndentation();
 
         if (!$this->moveToNextLine()) {
-            return null;
+            return '';
         }
 
         if (null === $indentation) {
@@ -560,7 +560,7 @@ class Parser
         } else {
             $this->moveToPreviousLine();
 
-            return null;
+            return '';
         }
 
         if ($inSequence && $oldLineIndentation === $newIndent && isset($data[0][0]) && '-' === $data[0][0]) {
@@ -568,7 +568,7 @@ class Parser
             // and therefore no nested list or mapping
             $this->moveToPreviousLine();
 
-            return null;
+            return '';
         }
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();

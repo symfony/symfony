@@ -513,7 +513,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 if (isset($collectedLogs[$message])) {
                     ++$collectedLogs[$message]['count'];
 
-                    return;
+                    return null;
                 }
 
                 $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
@@ -540,6 +540,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                     'trace' => [$backtrace[0]],
                     'count' => 1,
                 ];
+
+                return null;
             });
         }
 

@@ -242,16 +242,19 @@ class Profiler implements ResetInterface
         return $this->collectors[$name];
     }
 
+    /**
+     * @return int|null
+     */
     private function getTimestamp($value)
     {
         if (null === $value || '' == $value) {
-            return;
+            return null;
         }
 
         try {
             $value = new \DateTime(is_numeric($value) ? '@'.$value : $value);
         } catch (\Exception $e) {
-            return;
+            return null;
         }
 
         return $value->getTimestamp();

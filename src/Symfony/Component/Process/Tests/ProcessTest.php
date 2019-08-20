@@ -1224,6 +1224,8 @@ class ProcessTest extends TestCase
 
                 return $stream;
             }
+
+            return null;
         };
 
         $input = new InputStream();

@@ -46,7 +46,7 @@ if (class_exists(Version::class) && version_compare(\defined(Version::class.'::V
             $functionLoader = $functionLoader[0];
         }
         if (!\is_object($functionLoader)) {
-            return;
+            return null;
         }
         if ($functionLoader instanceof ClassLoader) {
             return $functionLoader;
@@ -57,6 +57,8 @@ if (class_exists(Version::class) && version_compare(\defined(Version::class.'::V
         if ($functionLoader instanceof \Symfony\Component\ErrorHandler\DebugClassLoader) {
             return $getComposerClassLoader($functionLoader->getClassLoader());
         }
+
+        return null;
     };
 
     $classLoader = null;

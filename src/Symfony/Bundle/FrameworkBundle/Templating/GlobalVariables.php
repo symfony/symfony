@@ -49,15 +49,12 @@ class GlobalVariables
     public function getUser()
     {
         if (!$token = $this->getToken()) {
-            return;
+            return null;
         }
 
         $user = $token->getUser();
-        if (!\is_object($user)) {
-            return;
-        }
 
-        return $user;
+        return \is_object($user) ? $user : null;
     }
 
     /**
@@ -65,9 +62,7 @@ class GlobalVariables
      */
     public function getRequest()
     {
-        if ($this->container->has('request_stack')) {
-            return $this->container->get('request_stack')->getCurrentRequest();
-        }
+        return $this->container->has('request_stack') ? $this->container->get('request_stack')->getCurrentRequest() : null;
     }
 
     /**
@@ -75,9 +70,7 @@ class GlobalVariables
      */
     public function getSession()
     {
-        if ($request = $this->getRequest()) {
-            return $request->getSession();
-        }
+        return ($request = $this->getRequest()) ? $request->getSession() : null;
     }
 
     /**

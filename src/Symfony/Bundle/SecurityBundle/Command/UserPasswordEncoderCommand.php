@@ -162,6 +162,8 @@ EOF
         }
 
         $errorIo->success('Password encoding succeeded');
+
+        return null;
     }
 
     /**

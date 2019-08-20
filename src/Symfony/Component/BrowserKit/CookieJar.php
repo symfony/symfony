@@ -60,6 +60,8 @@ class CookieJar
                 }
             }
         }
+
+        return null;
     }
 
     /**

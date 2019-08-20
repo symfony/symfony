@@ -110,6 +110,8 @@ class RegionDataGenerator extends AbstractDataGenerator
 
             return $data;
         }
+
+        return null;
     }
 
     /**

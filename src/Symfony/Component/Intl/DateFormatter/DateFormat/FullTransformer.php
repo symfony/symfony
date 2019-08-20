@@ -101,7 +101,7 @@ class FullTransformer
      * @param string    $dateChars The date characters to be replaced with a formatted ICU value
      * @param \DateTime $dateTime  A DateTime object to be used to generate the formatted value
      *
-     * @return string The formatted value
+     * @return string|null The formatted value
      *
      * @throws NotImplementedException When it encounters a not implemented date character
      */
@@ -123,6 +123,8 @@ class FullTransformer
         if (false !== strpos($this->notImplementedChars, $dateChars[0])) {
             throw new NotImplementedException(sprintf('Unimplemented date character "%s" in format "%s"', $dateChars[0], $this->pattern));
         }
+
+        return null;
     }
 
     /**
@@ -196,6 +198,8 @@ class FullTransformer
 
                 return "(?P<$captureName>".$transformer->getReverseMatchingRegExp($length).')';
             }
+
+            return null;
         }, $escapedPattern);
 
         return $reverseMatchingRegExp;

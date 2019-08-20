@@ -34,7 +34,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * @return string The type of the value
+     * @return string|null The type of the value
      */
     public function getType()
     {
@@ -58,6 +58,8 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         if (Stub::TYPE_RESOURCE === $item->type) {
             return $item->class.' resource';
         }
+
+        return null;
     }
 
     /**
@@ -125,6 +127,8 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 
             return $item instanceof Stub || [] === $item ? $data : $item;
         }
+
+        return null;
     }
 
     public function __isset($key)

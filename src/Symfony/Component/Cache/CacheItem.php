@@ -67,7 +67,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function set($value)
+    public function set($value): self
     {
         $this->value = $value;
 
@@ -79,7 +79,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAt($expiration)
+    public function expiresAt($expiration): self
     {
         if (null === $expiration) {
             $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
@@ -97,7 +97,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAfter($time)
+    public function expiresAfter($time): self
     {
         if (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;

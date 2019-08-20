@@ -6,6 +6,12 @@ CHANGELOG
 
  * The `DebugHandlersListener` class has been marked as `final`
  * Added new Bundle directory convention consistent with standard skeletons
+ * Deprecated the second and third argument of `KernelInterface::locateResource`
+ * Deprecated the second and third argument of `FileLocator::__construct`
+ * Deprecated loading resources from `%kernel.root_dir%/Resources` and `%kernel.root_dir%` as
+   fallback directories. Resources like service definitions are usually loaded relative to the
+   current directory or with a glob pattern. The fallback directories have never been advocated
+   so you likely do not use those in any app based on the SF Standard or Flex edition.
 
 4.3.0
 -----

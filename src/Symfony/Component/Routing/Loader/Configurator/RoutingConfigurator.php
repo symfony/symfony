@@ -33,7 +33,7 @@ class RoutingConfigurator
         $this->file = $file;
     }
 
-    final public function import($resource, $type = null, $ignoreErrors = false): ImportConfigurator
+    final public function import($resource, string $type = null, bool $ignoreErrors = false): ImportConfigurator
     {
         $this->loader->setCurrentDir(\dirname($this->path));
         $imported = $this->loader->import($resource, $type, $ignoreErrors, $this->file);
@@ -49,7 +49,7 @@ class RoutingConfigurator
         return new ImportConfigurator($this->collection, $mergedCollection);
     }
 
-    final public function collection($name = ''): CollectionConfigurator
+    final public function collection(string $name = ''): CollectionConfigurator
     {
         return new CollectionConfigurator($this->collection, $name);
     }

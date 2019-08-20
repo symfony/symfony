@@ -22,7 +22,7 @@ class FormFieldRegistry
 {
     private $fields = [];
 
-    private $base;
+    private $base = '';
 
     /**
      * Adds a field to the registry.
@@ -47,7 +47,7 @@ class FormFieldRegistry
     }
 
     /**
-     * Removes a field and its children from the registry.
+     * Removes a field based on the fully qualifed name and its children from the registry.
      */
     public function remove(string $name)
     {
@@ -64,7 +64,7 @@ class FormFieldRegistry
     }
 
     /**
-     * Returns the value of the field and its children.
+     * Returns the value of the field based on the fully qualifed name and its children.
      *
      * @return mixed The value of the field
      *
@@ -86,7 +86,7 @@ class FormFieldRegistry
     }
 
     /**
-     * Tests whether the form has the given field.
+     * Tests whether the form has the given field based on the fully qualified name.
      *
      * @return bool Whether the form has the given field
      */
@@ -102,7 +102,7 @@ class FormFieldRegistry
     }
 
     /**
-     * Set the value of a field and its children.
+     * Set the value of a field based on the fully qualified name and its children.
      *
      * @param mixed $value The value
      *

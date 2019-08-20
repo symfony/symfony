@@ -206,11 +206,9 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param string $serviceId
-     *
      * @return mixed
      */
-    protected function resolveServiceDefinition(ContainerBuilder $builder, $serviceId)
+    protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId)
     {
         if ($builder->hasDefinition($serviceId)) {
             return $builder->getDefinition($serviceId);
@@ -229,10 +227,7 @@ abstract class Descriptor implements DescriptorInterface
         return $builder->get($serviceId);
     }
 
-    /**
-     * @param bool $showHidden
-     */
-    protected function findDefinitionsByTag(ContainerBuilder $builder, $showHidden): array
+    protected function findDefinitionsByTag(ContainerBuilder $builder, bool $showHidden): array
     {
         $definitions = [];
         $tags = $builder->findTags();

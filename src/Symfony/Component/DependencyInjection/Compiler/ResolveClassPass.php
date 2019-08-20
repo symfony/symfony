@@ -29,12 +29,9 @@ class ResolveClassPass implements CompilerPassInterface
             if ($definition->isSynthetic() || null !== $definition->getClass()) {
                 continue;
             }
-            if (preg_match('/^\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)++$/', $id)) {
+            if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)++$/', $id)) {
                 if ($definition instanceof ChildDefinition && !class_exists($id)) {
                     throw new InvalidArgumentException(sprintf('Service definition "%s" has a parent but no class, and its name looks like a FQCN. Either the class is missing or you want to inherit it from the parent service. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class.', $id));
-                }
-                if ('\\' === $id[0]) {
-                    throw new InvalidArgumentException(sprintf('Service definition "%s" has no class, and its name looks like a FQCN but it starts with a backslash; remove the leading backslash.', $id));
                 }
                 $definition->setClass($id);
             }

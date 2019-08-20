@@ -21,6 +21,8 @@ use Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHand
 use Symfony\Component\ErrorHandler\FatalErrorHandler\FatalErrorHandlerInterface;
 use Symfony\Component\ErrorHandler\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 use Symfony\Component\ErrorHandler\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 /**
  * A generic ErrorHandler for the PHP engine.
@@ -144,6 +146,8 @@ class ErrorHandler
                 $handler->setExceptionHandler($p);
                 $prev[0]->setExceptionHandler($p);
             }
+        } elseif (null === $prev && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+            $handler->setExceptionHandler([$handler, 'sendPhpResponse']);
         } else {
             $handler->setExceptionHandler($prev);
         }
@@ -320,7 +324,7 @@ class ErrorHandler
     public function scopeAt(int $levels, bool $replace = false): int
     {
         $prev = $this->scopedErrors;
-        $this->scopedErrors = (int) $levels;
+        $this->scopedErrors = $levels;
         if (!$replace) {
             $this->scopedErrors |= $prev;
         }
@@ -358,7 +362,7 @@ class ErrorHandler
     public function screamAt(int $levels, bool $replace = false): int
     {
         $prev = $this->screamedErrors;
-        $this->screamedErrors = (int) $levels;
+        $this->screamedErrors = $levels;
         if (!$replace) {
             $this->screamedErrors |= $prev;
         }
@@ -680,6 +684,29 @@ class ErrorHandler
         if ($exit && self::$exitCode) {
             $exitCode = self::$exitCode;
             register_shutdown_function('register_shutdown_function', function () use ($exitCode) { exit($exitCode); });
+        }
+    }
+
+    /**
+     * Sends the error associated with the given Exception as a plain PHP response.
+     *
+     * As this method is mainly called during Kernel boot, where nothing is yet
+     * available, the Response content is always HTML.
+     */
+    private function sendPhpResponse(\Throwable $exception)
+    {
+        $charset = ini_get('default_charset') ?: 'UTF-8';
+
+        if (!headers_sent()) {
+            header('HTTP/1.0 500');
+            header(sprintf('Content-Type: text/html; charset=%s', $charset));
+        }
+
+        if (class_exists(HtmlErrorRenderer::class)) {
+            echo (new HtmlErrorRenderer(true))->render(FlattenException::createFromThrowable($exception));
+        } else {
+            $message = htmlspecialchars($exception->getMessage(), ENT_COMPAT | ENT_SUBSTITUTE, $charset);
+            echo sprintf('<!DOCTYPE html><html><head><meta charset="%s" /><meta name="robots" content="noindex,nofollow" /></head><body>%s</body></html>', $charset, $message);
         }
     }
 

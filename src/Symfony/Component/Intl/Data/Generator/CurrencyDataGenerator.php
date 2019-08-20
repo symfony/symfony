@@ -90,6 +90,8 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
             return $data;
         }
+
+        return null;
     }
 
     /**

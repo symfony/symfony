@@ -75,6 +75,8 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
 
             return new ClassNotFoundException($message, $exception);
         }
+
+        return null;
     }
 
     /**

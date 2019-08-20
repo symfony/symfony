@@ -86,9 +86,7 @@ abstract class Bundle implements BundleInterface
             }
         }
 
-        if ($this->extension) {
-            return $this->extension;
-        }
+        return $this->extension ?: null;
     }
 
     /**
@@ -153,9 +151,7 @@ abstract class Bundle implements BundleInterface
      */
     protected function createContainerExtension()
     {
-        if (class_exists($class = $this->getContainerExtensionClass())) {
-            return new $class();
-        }
+        return class_exists($class = $this->getContainerExtensionClass()) ? new $class() : null;
     }
 
     private function parseClassName()

@@ -117,5 +117,6 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      */
     protected function getErrorCode()
     {
+        return null;
     }
 }

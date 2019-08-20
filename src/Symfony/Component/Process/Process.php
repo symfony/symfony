@@ -1321,25 +1321,21 @@ class Process implements \IteratorAggregate
     protected function buildCallback(callable $callback = null)
     {
         if ($this->outputDisabled) {
-            return function ($type, $data) use ($callback) {
-                if (null !== $callback) {
-                    return $callback($type, $data);
-                }
+            return function ($type, $data) use ($callback): bool {
+                return null !== $callback && $callback($type, $data);
             };
         }
 
         $out = self::OUT;
 
-        return function ($type, $data) use ($callback, $out) {
+        return function ($type, $data) use ($callback, $out): bool {
             if ($out == $type) {
                 $this->addOutput($data);
             } else {
                 $this->addErrorOutput($data);
             }
 
-            if (null !== $callback) {
-                return $callback($type, $data);
-            }
+            return null !== $callback && $callback($type, $data);
         };
     }
 

@@ -282,6 +282,8 @@ class Container implements ResettableContainerInterface
 
             throw new ServiceNotFoundException($id, null, null, $alternatives);
         }
+
+        return null;
     }
 
     /**

@@ -309,6 +309,8 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
                 return $normalizer->denormalize($data, $type, $format, $context);
             }
         }
+
+        return null;
     }
 
     public function supportsDenormalization($data, $type, $format = null)

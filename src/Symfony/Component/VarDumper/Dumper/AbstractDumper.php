@@ -153,6 +153,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
                 setlocale(LC_NUMERIC, $locale);
             }
         }
+
+        return null;
     }
 
     /**

@@ -100,6 +100,8 @@ final class CurlResponse implements ResponseInterface
 
                     return 1; // Abort the request
                 }
+
+                return null;
             });
         }
 

@@ -119,7 +119,7 @@ class WebServerConfig
         return gethostbyname($localHostname).':'.$this->port;
     }
 
-    private function findFrontController(string $documentRoot, string $env)
+    private function findFrontController(string $documentRoot, string $env): ?string
     {
         $fileNames = $this->getFrontControllerFileNames($env);
 
@@ -128,14 +128,16 @@ class WebServerConfig
                 return $fileName;
             }
         }
+
+        return null;
     }
 
-    private function getFrontControllerFileNames(string $env)
+    private function getFrontControllerFileNames(string $env): array
     {
         return ['app_'.$env.'.php', 'app.php', 'index_'.$env.'.php', 'index.php'];
     }
 
-    private function findBestPort()
+    private function findBestPort(): int
     {
         $port = 8000;
         while (false !== $fp = @fsockopen($this->hostname, $port, $errno, $errstr, 1)) {

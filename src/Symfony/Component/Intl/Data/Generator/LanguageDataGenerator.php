@@ -141,6 +141,8 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
             return $data;
         }
+
+        return null;
     }
 
     /**

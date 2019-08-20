@@ -72,6 +72,8 @@ class UndefinedCallableHandler
         }
 
         self::onUndefined($name, 'filter', self::$filterComponents[$name]);
+
+        return true;
     }
 
     public static function onUndefinedFunction($name)
@@ -81,6 +83,8 @@ class UndefinedCallableHandler
         }
 
         self::onUndefined($name, 'function', self::$functionComponents[$name]);
+
+        return true;
     }
 
     private static function onUndefined($name, $type, $component)

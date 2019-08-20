@@ -98,9 +98,7 @@ class ProfilerControllerTest extends TestCase
             ->expects($this->exactly(2))
             ->method('loadProfile')
             ->willReturnCallback(function ($token) {
-                if ('found' == $token) {
-                    return new Profile($token);
-                }
+                return 'found' == $token ? new Profile($token) : null;
             })
         ;
 

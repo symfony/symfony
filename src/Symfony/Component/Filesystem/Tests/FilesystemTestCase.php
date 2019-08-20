@@ -21,7 +21,7 @@ class FilesystemTestCase extends TestCase
     protected $longPathNamesWindows = [];
 
     /**
-     * @var \Symfony\Component\Filesystem\Filesystem
+     * @var Filesystem
      */
     protected $filesystem = null;
 
@@ -110,9 +110,8 @@ class FilesystemTestCase extends TestCase
         $this->markAsSkippedIfPosixIsMissing();
 
         $infos = stat($filepath);
-        if ($datas = posix_getpwuid($infos['uid'])) {
-            return $datas['name'];
-        }
+
+        return ($datas = posix_getpwuid($infos['uid'])) ? $datas['name'] : null;
     }
 
     protected function getFileGroup($filepath)

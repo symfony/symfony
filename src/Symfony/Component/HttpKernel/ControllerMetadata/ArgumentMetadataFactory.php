@@ -48,7 +48,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function)
     {
         if (!$type = $parameter->getType()) {
-            return;
+            return null;
         }
         $name = $type->getName();
         $lcName = strtolower($name);
@@ -57,7 +57,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
             return $name;
         }
         if (!$function instanceof \ReflectionMethod) {
-            return;
+            return null;
         }
         if ('self' === $lcName) {
             return $function->getDeclaringClass()->name;
@@ -65,5 +65,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         if ($parent = $function->getDeclaringClass()->getParentClass()) {
             return $parent->name;
         }
+
+        return null;
     }
 }

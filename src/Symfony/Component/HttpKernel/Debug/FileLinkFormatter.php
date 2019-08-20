@@ -101,5 +101,7 @@ class FileLinkFormatter
                 ];
             }
         }
+
+        return null;
     }
 }

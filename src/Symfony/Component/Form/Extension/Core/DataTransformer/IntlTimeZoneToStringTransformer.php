@@ -34,7 +34,7 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
     public function transform($intlTimeZone)
     {
         if (null === $intlTimeZone) {
-            return;
+            return null;
         }
 
         if ($this->multiple) {

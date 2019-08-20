@@ -145,6 +145,8 @@ EOF
         }
 
         $io->newLine();
+
+        return null;
     }
 
     private function getFileLink(string $class): string

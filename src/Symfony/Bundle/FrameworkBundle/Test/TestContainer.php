@@ -98,7 +98,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function get($id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
+    public function get($id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
     {
         return $this->getPrivateContainer()->has($id) ? $this->getPrivateContainer()->get($id) : $this->getPublicContainer()->get($id, $invalidBehavior);
     }

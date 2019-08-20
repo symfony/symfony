@@ -180,10 +180,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      * Gets the fallback locales.
      *
      * @internal
-     *
-     * @return array The fallback locales
      */
-    public function getFallbackLocales()
+    public function getFallbackLocales(): array
     {
         return $this->fallbackLocales;
     }

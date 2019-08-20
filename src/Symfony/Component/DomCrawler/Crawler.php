@@ -898,7 +898,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @return static
      */
-    private function filterRelativeXPath(string $xpath)
+    private function filterRelativeXPath(string $xpath): object
     {
         $prefixes = $this->findNamespacePrefixes($xpath);
 
@@ -1140,7 +1140,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @return static
      */
-    private function createSubCrawler($nodes)
+    private function createSubCrawler($nodes): object
     {
         $crawler = new static($nodes, $this->uri, $this->baseHref);
         $crawler->isHtml = $this->isHtml;

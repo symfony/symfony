@@ -19,7 +19,7 @@ trait AbstractTrait
      *
      * @return $this
      */
-    final public function abstract(bool $abstract = true)
+    final public function abstract(bool $abstract = true): self
     {
         $this->definition->setAbstract($abstract);
 

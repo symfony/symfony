@@ -18,7 +18,7 @@ trait AutowireTrait
      *
      * @return $this
      */
-    final public function autowire(bool $autowired = true)
+    final public function autowire(bool $autowired = true): self
     {
         $this->definition->setAutowired($autowired);
 

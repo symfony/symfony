@@ -22,7 +22,7 @@ trait FactoryTrait
      *
      * @return $this
      */
-    final public function factory($factory)
+    final public function factory($factory): self
     {
         if (\is_string($factory) && 1 === substr_count($factory, ':')) {
             $factoryParts = explode(':', $factory);

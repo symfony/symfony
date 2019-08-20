@@ -47,7 +47,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null)
+    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null): array
     {
         $file = $this->getIndexFilename();
 
@@ -113,7 +113,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function read(string $token)
+    public function read(string $token): ?Profile
     {
         if (!$token || !file_exists($file = $this->getFilename($token))) {
             return null;
@@ -127,7 +127,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @throws \RuntimeException
      */
-    public function write(Profile $profile)
+    public function write(Profile $profile): bool
     {
         $file = $this->getFilename($profile->getToken());
 

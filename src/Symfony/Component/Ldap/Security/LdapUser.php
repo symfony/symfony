@@ -49,7 +49,7 @@ class LdapUser implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->roles;
     }
@@ -88,6 +88,11 @@ class LdapUser implements UserInterface, EquatableInterface
     public function getExtraFields(): array
     {
         return $this->extraFields;
+    }
+
+    public function setPassword(string $password)
+    {
+        $this->password = $password;
     }
 
     /**

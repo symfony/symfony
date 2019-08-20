@@ -41,7 +41,7 @@ class ImportConfigurator
      *
      * @return $this
      */
-    final public function prefix($prefix, bool $trailingSlashOnRoot = true): object
+    final public function prefix($prefix, bool $trailingSlashOnRoot = true): self
     {
         if (!\is_array($prefix)) {
             $this->route->addPrefix($prefix);
@@ -84,7 +84,7 @@ class ImportConfigurator
      *
      * @return $this
      */
-    final public function namePrefix(string $namePrefix): object
+    final public function namePrefix(string $namePrefix): self
     {
         $this->route->addNamePrefix($namePrefix);
 

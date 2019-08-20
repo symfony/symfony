@@ -125,11 +125,9 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         try {
-            if ($user->isEqualTo($this->loadUserByUsername($user->getUsername()))) {
-                $user->getEntry()->setAttribute($this->passwordAttribute, [$newEncodedPassword]);
-                $this->ldap->getEntryManager()->update($user->getEntry());
-                $user->setPassword($newEncodedPassword);
-            }
+            $user->getEntry()->setAttribute($this->passwordAttribute, [$newEncodedPassword]);
+            $this->ldap->getEntryManager()->update($user->getEntry());
+            $user->setPassword($newEncodedPassword);
         } catch (ExceptionInterface $e) {
             // ignore failed password upgrades
         }

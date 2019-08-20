@@ -18,7 +18,7 @@ trait FileTrait
      *
      * @return $this
      */
-    final public function file(string $file): object
+    final public function file(string $file): self
     {
         $this->definition->setFile($file);
 

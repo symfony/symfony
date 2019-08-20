@@ -20,9 +20,9 @@ trait TagTrait
      *
      * @return $this
      */
-    final public function tag(string $name, array $attributes = []): object
+    final public function tag(string $name, array $attributes = []): self
     {
-        if (!\is_string($name) || '' === $name) {
+        if ('' === $name) {
             throw new InvalidArgumentException(sprintf('The tag name for service "%s" must be a non-empty string.', $this->id));
         }
 

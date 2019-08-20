@@ -61,19 +61,14 @@ class Security
      *
      * @param mixed $attributes
      * @param mixed $subject
-     *
-     * @return bool
      */
-    public function isGranted($attributes, $subject = null)
+    public function isGranted($attributes, $subject = null): bool
     {
         return $this->container->get('security.authorization_checker')
             ->isGranted($attributes, $subject);
     }
 
-    /**
-     * @return TokenInterface|null
-     */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         return $this->container->get('security.token_storage')->getToken();
     }

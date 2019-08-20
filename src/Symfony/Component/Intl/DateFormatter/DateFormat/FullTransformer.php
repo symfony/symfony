@@ -74,7 +74,7 @@ class FullTransformer
      *
      * @return string The formatted value
      */
-    public function format(\DateTime $dateTime)
+    public function format(\DateTime $dateTime): string
     {
         $formatted = preg_replace_callback($this->regExp, function ($matches) use ($dateTime) {
             return $this->formatReplace($matches[0], $dateTime);
@@ -120,7 +120,7 @@ class FullTransformer
      *
      * @throws \InvalidArgumentException When the value can not be matched with pattern
      */
-    public function parse(\DateTime $dateTime, $value)
+    public function parse(\DateTime $dateTime, string $value)
     {
         $reverseMatchingRegExp = $this->getReverseMatchingRegExp($this->pattern);
         $reverseMatchingRegExp = '/^'.$reverseMatchingRegExp.'$/';

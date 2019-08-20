@@ -48,10 +48,8 @@ class FormFieldRegistry
 
     /**
      * Removes a field and its children from the registry.
-     *
-     * @param string $name The fully qualified name of the base field
      */
-    public function remove($name)
+    public function remove(string $name)
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -68,13 +66,11 @@ class FormFieldRegistry
     /**
      * Returns the value of the field and its children.
      *
-     * @param string $name The fully qualified name of the field
-     *
      * @return mixed The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function &get($name)
+    public function &get(string $name)
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -92,11 +88,9 @@ class FormFieldRegistry
     /**
      * Tests whether the form has the given field.
      *
-     * @param string $name The fully qualified name of the field
-     *
      * @return bool Whether the form has the given field
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         try {
             $this->get($name);
@@ -110,12 +104,11 @@ class FormFieldRegistry
     /**
      * Set the value of a field and its children.
      *
-     * @param string $name  The fully qualified name of the field
-     * @param mixed  $value The value
+     * @param mixed $value The value
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function set($name, $value)
+    public function set(string $name, $value)
     {
         $target = &$this->get($name);
         if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
@@ -135,7 +128,7 @@ class FormFieldRegistry
      *
      * @return FormField[] The list of fields as [string] Fully qualified name => (mixed) value)
      */
-    public function all()
+    public function all(): array
     {
         return $this->walk($this->fields, $this->base);
     }
@@ -146,12 +139,11 @@ class FormFieldRegistry
      * This function is made private because it allows overriding the $base and
      * the $values properties without any type checking.
      *
-     * @param string $base   The fully qualified name of the base field
-     * @param array  $values The values of the fields
+     * @param array $values The values of the fields
      *
      * @return static
      */
-    private static function create($base, array $values)
+    private static function create(string $base, array $values)
     {
         $registry = new static();
         $registry->base = $base;

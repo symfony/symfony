@@ -84,23 +84,12 @@ abstract class Descriptor implements DescriptorInterface
         }
     }
 
-    /**
-     * Returns the output.
-     *
-     * @return OutputInterface The output
-     */
-    protected function getOutput()
+    protected function getOutput(): OutputInterface
     {
         return $this->output;
     }
 
-    /**
-     * Writes content to output.
-     *
-     * @param string $content
-     * @param bool   $decorated
-     */
-    protected function write($content, $decorated = false)
+    protected function write(string $content, bool $decorated = false)
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
@@ -182,10 +171,8 @@ abstract class Descriptor implements DescriptorInterface
      * Formats a value as string.
      *
      * @param mixed $value
-     *
-     * @return string
      */
-    protected function formatValue($value)
+    protected function formatValue($value): string
     {
         if (\is_object($value)) {
             return sprintf('object(%s)', \get_class($value));
@@ -202,10 +189,8 @@ abstract class Descriptor implements DescriptorInterface
      * Formats a parameter.
      *
      * @param mixed $value
-     *
-     * @return string
      */
-    protected function formatParameter($value)
+    protected function formatParameter($value): string
     {
         if (\is_bool($value) || \is_array($value) || (null === $value)) {
             $jsonString = json_encode($value);
@@ -246,10 +231,8 @@ abstract class Descriptor implements DescriptorInterface
 
     /**
      * @param bool $showHidden
-     *
-     * @return array
      */
-    protected function findDefinitionsByTag(ContainerBuilder $builder, $showHidden)
+    protected function findDefinitionsByTag(ContainerBuilder $builder, $showHidden): array
     {
         $definitions = [];
         $tags = $builder->findTags();

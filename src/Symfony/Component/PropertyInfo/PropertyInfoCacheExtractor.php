@@ -35,7 +35,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = [])
+    public function isReadable($class, $property, array $context = []): ?bool
     {
         return $this->extract('isReadable', [$class, $property, $context]);
     }
@@ -43,7 +43,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = [])
+    public function isWritable($class, $property, array $context = []): ?bool
     {
         return $this->extract('isWritable', [$class, $property, $context]);
     }
@@ -51,7 +51,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = [])
+    public function getShortDescription($class, $property, array $context = []): ?string
     {
         return $this->extract('getShortDescription', [$class, $property, $context]);
     }
@@ -59,7 +59,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = [])
+    public function getLongDescription($class, $property, array $context = []): ?string
     {
         return $this->extract('getLongDescription', [$class, $property, $context]);
     }
@@ -67,7 +67,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = [])
+    public function getProperties($class, array $context = []): ?array
     {
         return $this->extract('getProperties', [$class, $context]);
     }
@@ -75,7 +75,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = [])
+    public function getTypes($class, $property, array $context = []): ?array
     {
         return $this->extract('getTypes', [$class, $property, $context]);
     }

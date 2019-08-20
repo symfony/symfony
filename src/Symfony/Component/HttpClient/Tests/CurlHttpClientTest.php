@@ -41,7 +41,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         $logger = new class() extends AbstractLogger {
             public $logs = [];
 
-            public function log($level, $message, array $context = [])
+            public function log($level, $message, array $context = []): void
             {
                 $this->logs[] = $message;
             }

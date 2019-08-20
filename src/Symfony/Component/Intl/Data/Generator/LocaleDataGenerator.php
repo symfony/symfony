@@ -36,7 +36,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function scanLocales(LocaleScanner $scanner, $sourceDir)
+    protected function scanLocales(LocaleScanner $scanner, $sourceDir): array
     {
         $this->locales = $scanner->scanLocales($sourceDir.'/locales');
         $this->localeAliases = $scanner->scanAliases($sourceDir.'/locales');
@@ -74,7 +74,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale)
+    protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale): ?array
     {
         // Don't generate aliases, as they are resolved during runtime
         // Unless an alias is needed as fallback for de-duplication purposes
@@ -133,14 +133,14 @@ class LocaleDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir): ?array
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir): ?array
     {
         return [
             'Locales' => $this->locales,

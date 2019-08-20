@@ -1496,11 +1496,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets removed binding ids.
      *
-     * @return array
-     *
      * @internal
      */
-    public function getRemovedBindingIds()
+    public function getRemovedBindingIds(): array
     {
         return $this->removedBindingIds;
     }
@@ -1508,11 +1506,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Removes bindings for a service.
      *
-     * @param string $id The service identifier
-     *
      * @internal
      */
-    public function removeBindings($id)
+    public function removeBindings(string $id)
     {
         if ($this->hasDefinition($id)) {
             foreach ($this->getDefinition($id)->getBindings() as $key => $binding) {
@@ -1527,11 +1523,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param mixed $value An array of conditionals to return
      *
-     * @return array An array of Service conditionals
-     *
      * @internal
      */
-    public static function getServiceConditionals($value)
+    public static function getServiceConditionals($value): array
     {
         $services = [];
 
@@ -1551,11 +1545,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param mixed $value An array of conditionals to return
      *
-     * @return array An array of uninitialized conditionals
-     *
      * @internal
      */
-    public static function getInitializedConditionals($value)
+    public static function getInitializedConditionals($value): array
     {
         $services = [];
 

@@ -43,7 +43,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format, array $context = [])
+    public function supportsEncoding($format, array $context = []): bool
     {
         try {
             $this->getEncoder($format, $context);
@@ -56,12 +56,8 @@ class ChainEncoder implements ContextAwareEncoderInterface
 
     /**
      * Checks whether the normalization is needed for the given format.
-     *
-     * @param string $format
-     *
-     * @return bool
      */
-    public function needsNormalization($format, array $context = [])
+    public function needsNormalization(string $format, array $context = []): bool
     {
         $encoder = $this->getEncoder($format, $context);
 

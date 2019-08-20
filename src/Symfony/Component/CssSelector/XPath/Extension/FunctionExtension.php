@@ -33,7 +33,7 @@ class FunctionExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getFunctionTranslators()
+    public function getFunctionTranslators(): array
     {
         return [
             'nth-child' => [$this, 'translateNthChild'],
@@ -164,7 +164,7 @@ class FunctionExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'function';
     }

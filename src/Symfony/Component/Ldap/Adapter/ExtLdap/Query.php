@@ -169,7 +169,7 @@ class Query extends AbstractQuery
      *
      * @internal
      */
-    public function getResources()
+    public function getResources(): array
     {
         return $this->results;
     }

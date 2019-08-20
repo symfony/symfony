@@ -33,14 +33,12 @@ class LocaleScanner
     /**
      * Returns all locales found in the given directory.
      *
-     * @param string $sourceDir The directory with ICU files
-     *
      * @return array An array of locales. The result also contains locales that
      *               are in fact just aliases for other locales. Use
      *               {@link scanAliases()} to determine which of the locales
      *               are aliases
      */
-    public function scanLocales($sourceDir)
+    public function scanLocales(string $sourceDir): array
     {
         $locales = glob($sourceDir.'/*.txt');
 
@@ -60,12 +58,10 @@ class LocaleScanner
     /**
      * Returns all locale aliases found in the given directory.
      *
-     * @param string $sourceDir The directory with ICU files
-     *
      * @return array An array with the locale aliases as keys and the aliased
      *               locales as values
      */
-    public function scanAliases($sourceDir)
+    public function scanAliases(string $sourceDir): array
     {
         $locales = $this->scanLocales($sourceDir);
         $aliases = [];

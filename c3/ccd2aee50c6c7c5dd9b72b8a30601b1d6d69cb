@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by alex-dev at 2019-08-12T15:50:01Z
+
+Code styling issues were not fixed to minimize impact.
+I've got no idea what is broken in Travis 7.2, looks like Twig Bridge is missing a PSR-13 related class.
+
+---------------------------------------------------------------------------
+
+by thomaspicquet at 2019-08-14T22:14:46Z
+
+tried these changes as I was hitting the same issue and it works with them, can't wait for this PR to go live

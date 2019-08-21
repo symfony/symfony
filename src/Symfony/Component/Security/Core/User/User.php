@@ -69,6 +69,7 @@ final class User implements UserInterface, EquatableInterface, AdvancedUserInter
      */
     public function getSalt()
     {
+        return null;
     }
 
     /**

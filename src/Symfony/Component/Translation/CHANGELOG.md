@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+ * removed support for using `null` as the locale in `Translator`
  * removed `TranslatorInterface`
  * removed `MessageSelector`
  * removed `ChoiceMessageFormatterInterface`

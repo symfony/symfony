@@ -84,12 +84,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct(?string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false)
+    public function __construct(string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false)
     {
-        if (null === $locale) {
-            @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->setLocale($locale, false);
 
         if (null === $formatter) {
@@ -149,10 +145,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function setLocale($locale)
     {
-        if (null === $locale && (2 > \func_num_args() || func_get_arg(1))) {
-            @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->assertValidLocale($locale);
         $this->locale = $locale;
     }
@@ -178,9 +170,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         $this->catalogues = [];
 
         foreach ($locales as $locale) {
-            if (null === $locale) {
-                @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
-            }
             $this->assertValidLocale($locale);
         }
 
@@ -431,11 +420,9 @@ EOF
     /**
      * Asserts that the locale is valid, throws an Exception if not.
      *
-     * @param string $locale Locale to tests
-     *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    protected function assertValidLocale($locale)
+    protected function assertValidLocale(string $locale)
     {
         if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));

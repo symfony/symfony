@@ -13,8 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Cont
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\NamedAddress;
 
 class EmailController
 {
@@ -29,7 +29,7 @@ class EmailController
         );
 
         $mailer->send((new Email())->to('fabien@symfony.com', 'thomas@symfony.com')->from('fabien@symfony.com')->subject('Foo')
-            ->addReplyTo(new NamedAddress('me@symfony.com', 'Fabien Potencier'))
+            ->addReplyTo(new Address('me@symfony.com', 'Fabien Potencier'))
             ->addCc('cc@symfony.com')
             ->text('Bar!')
             ->html('<p>Foo</p>')

@@ -14,7 +14,6 @@ namespace Symfony\Component\Mime\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\NamedAddress;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
@@ -58,7 +57,7 @@ class EmailTest extends TestCase
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
-        $thomas = new NamedAddress('thomas@symfony.com', 'Thomas');
+        $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
         $this->assertSame($e, $e->from('fabien@symfony.com', $helene, $thomas));
@@ -91,7 +90,7 @@ class EmailTest extends TestCase
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
-        $thomas = new NamedAddress('thomas@symfony.com', 'Thomas');
+        $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
         $this->assertSame($e, $e->replyTo('fabien@symfony.com', $helene, $thomas));
@@ -124,7 +123,7 @@ class EmailTest extends TestCase
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
-        $thomas = new NamedAddress('thomas@symfony.com', 'Thomas');
+        $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
         $this->assertSame($e, $e->to('fabien@symfony.com', $helene, $thomas));
@@ -157,7 +156,7 @@ class EmailTest extends TestCase
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
-        $thomas = new NamedAddress('thomas@symfony.com', 'Thomas');
+        $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
         $this->assertSame($e, $e->cc('fabien@symfony.com', $helene, $thomas));
@@ -190,7 +189,7 @@ class EmailTest extends TestCase
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
-        $thomas = new NamedAddress('thomas@symfony.com', 'Thomas');
+        $thomas = new Address('thomas@symfony.com', 'Thomas');
         $caramel = new Address('caramel@symfony.com');
 
         $this->assertSame($e, $e->bcc('fabien@symfony.com', $helene, $thomas));

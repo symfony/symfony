@@ -101,7 +101,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string ...$addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -111,7 +111,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string ...$addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -121,7 +121,7 @@ class Email extends Message
     }
 
     /**
-     * @return (Address|NamedAddress)[]
+     * @return Address[]
      */
     public function getFrom(): array
     {
@@ -157,7 +157,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string ...$addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -167,7 +167,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string ...$addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -177,7 +177,7 @@ class Email extends Message
     }
 
     /**
-     * @return (Address|NamedAddress)[]
+     * @return Address[]
      */
     public function getTo(): array
     {
@@ -185,7 +185,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string ...$addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -205,7 +205,7 @@ class Email extends Message
     }
 
     /**
-     * @return (Address|NamedAddress)[]
+     * @return Address[]
      */
     public function getCc(): array
     {
@@ -213,7 +213,7 @@ class Email extends Message
     }
 
     /**
-     * @param Address|NamedAddress|string ...$addresses
+     * @param Address|string ...$addresses
      *
      * @return $this
      */
@@ -233,7 +233,7 @@ class Email extends Message
     }
 
     /**
-     * @return (Address|NamedAddress)[]
+     * @return Address[]
      */
     public function getBcc(): array
     {
@@ -524,10 +524,10 @@ class Email extends Message
 
     private function addListAddressHeaderBody(string $name, array $addresses)
     {
-        if (!$to = $this->getHeaders()->get($name)) {
+        if (!$header = $this->getHeaders()->get($name)) {
             return $this->setListAddressHeaderBody($name, $addresses);
         }
-        $to->addAddresses(Address::createArray($addresses));
+        $header->addAddresses(Address::createArray($addresses));
 
         return $this;
     }
@@ -536,8 +536,8 @@ class Email extends Message
     {
         $addresses = Address::createArray($addresses);
         $headers = $this->getHeaders();
-        if ($to = $headers->get($name)) {
-            $to->setAddresses($addresses);
+        if ($header = $headers->get($name)) {
+            $header->setAddresses($addresses);
         } else {
             $headers->addMailboxListHeader($name, $addresses);
         }

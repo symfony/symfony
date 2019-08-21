@@ -14,7 +14,6 @@ namespace Symfony\Component\Mime\Tests\Header;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\MailboxHeader;
-use Symfony\Component\Mime\NamedAddress;
 
 class MailboxHeaderTest extends TestCase
 {
@@ -44,17 +43,17 @@ class MailboxHeaderTest extends TestCase
         $header->setAddress(new Address('fabien@sïmfony.com'));
         $this->assertEquals('fabien@xn--smfony-iwa.com', $header->getBodyAsString());
 
-        $header = new MailboxHeader('Sender', new NamedAddress('fabien@symfony.com', 'Fabien Potencier'));
+        $header = new MailboxHeader('Sender', new Address('fabien@symfony.com', 'Fabien Potencier'));
         $this->assertEquals('Fabien Potencier <fabien@symfony.com>', $header->getBodyAsString());
 
-        $header = new MailboxHeader('Sender', new NamedAddress('fabien@symfony.com', 'Fabien Potencier, "from Symfony"'));
+        $header = new MailboxHeader('Sender', new Address('fabien@symfony.com', 'Fabien Potencier, "from Symfony"'));
         $this->assertEquals('"Fabien Potencier, \"from Symfony\"" <fabien@symfony.com>', $header->getBodyAsString());
 
-        $header = new MailboxHeader('From', new NamedAddress('fabien@symfony.com', 'Fabien Potencier, \\escaped\\'));
+        $header = new MailboxHeader('From', new Address('fabien@symfony.com', 'Fabien Potencier, \\escaped\\'));
         $this->assertEquals('"Fabien Potencier, \\\\escaped\\\\" <fabien@symfony.com>', $header->getBodyAsString());
 
         $name = 'P'.pack('C', 0x8F).'tencier';
-        $header = new MailboxHeader('Sender', new NamedAddress('fabien@symfony.com', 'Fabien '.$name));
+        $header = new MailboxHeader('Sender', new Address('fabien@symfony.com', 'Fabien '.$name));
         $header->setCharset('iso-8859-1');
         $this->assertEquals('Fabien =?'.$header->getCharset().'?Q?P=8Ftencier?= <fabien@symfony.com>', $header->getBodyAsString());
     }
@@ -71,7 +70,7 @@ class MailboxHeaderTest extends TestCase
         $header = new MailboxHeader('Sender', new Address('fabien@symfony.com'));
         $this->assertEquals('Sender: fabien@symfony.com', $header->toString());
 
-        $header = new MailboxHeader('Sender', new NamedAddress('fabien@symfony.com', 'Fabien Potencier'));
+        $header = new MailboxHeader('Sender', new Address('fabien@symfony.com', 'Fabien Potencier'));
         $this->assertEquals('Sender: Fabien Potencier <fabien@symfony.com>', $header->toString());
     }
 }

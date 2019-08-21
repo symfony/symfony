@@ -103,7 +103,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
         $this->assertSame(<<<'HTML'
 <div class="input-group"><div class="input-group-prepend">
                     <span class="input-group-text">&euro; </span>
-                </div><input type="text" id="name" name="name" required="required" class="form-control" /></div>
+                </div><input type="text" id="name" name="name" required="required" aria-required="true" class="form-control" /></div>
 HTML
         , trim($this->renderWidget($view)));
     }

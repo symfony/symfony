@@ -17,10 +17,8 @@ use Twig\Profiler\Profile;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class ProfilerExtension extends BaseProfilerExtension
+final class ProfilerExtension extends BaseProfilerExtension
 {
     private $stopwatch;
     private $events;
@@ -50,13 +48,5 @@ class ProfilerExtension extends BaseProfilerExtension
             $this->events[$profile]->stop();
             unset($this->events[$profile]);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'native_profiler';
     }
 }

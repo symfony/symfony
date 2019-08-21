@@ -22,29 +22,27 @@ use Twig\NodeVisitor\AbstractNodeVisitor;
  * TranslationNodeVisitor extracts translation messages.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class TranslationNodeVisitor extends AbstractNodeVisitor
+final class TranslationNodeVisitor extends AbstractNodeVisitor
 {
     const UNDEFINED_DOMAIN = '_undefined';
 
     private $enabled = false;
     private $messages = [];
 
-    public function enable()
+    public function enable(): void
     {
         $this->enabled = true;
         $this->messages = [];
     }
 
-    public function disable()
+    public function disable(): void
     {
         $this->enabled = false;
         $this->messages = [];
     }
 
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }

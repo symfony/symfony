@@ -17,10 +17,8 @@ use Twig\TwigFunction;
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @final
  */
-class CsrfExtension extends AbstractExtension
+final class CsrfExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}

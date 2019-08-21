@@ -19,10 +19,8 @@ use Twig\TwigFilter;
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class CodeExtension extends AbstractExtension
+final class CodeExtension extends AbstractExtension
 {
     private $fileLinkFormat;
     private $charset;
@@ -30,8 +28,6 @@ class CodeExtension extends AbstractExtension
 
     /**
      * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
-     * @param string                   $projectDir     The project directory
-     * @param string                   $charset        The charset
      */
     public function __construct($fileLinkFormat, string $projectDir, string $charset)
     {
@@ -42,8 +38,6 @@ class CodeExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFilter[]
      */
     public function getFilters(): array
     {
@@ -61,7 +55,7 @@ class CodeExtension extends AbstractExtension
         ];
     }
 
-    public function abbrClass(string $class)
+    public function abbrClass(string $class): string
     {
         $parts = explode('\\', $class);
         $short = array_pop($parts);
@@ -69,7 +63,7 @@ class CodeExtension extends AbstractExtension
         return sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
-    public function abbrMethod(string $method)
+    public function abbrMethod(string $method): string
     {
         if (false !== strpos($method, '::')) {
             list($class, $method) = explode('::', $method, 2);
@@ -85,10 +79,8 @@ class CodeExtension extends AbstractExtension
 
     /**
      * Formats an array as a string.
-     *
-     * @return string
      */
-    public function formatArgs(array $args)
+    public function formatArgs(array $args): string
     {
         $result = [];
         foreach ($args as $key => $item) {
@@ -116,20 +108,16 @@ class CodeExtension extends AbstractExtension
 
     /**
      * Formats an array as a string.
-     *
-     * @return string
      */
-    public function formatArgsAsText(array $args)
+    public function formatArgsAsText(array $args): string
     {
         return strip_tags($this->formatArgs($args));
     }
 
     /**
      * Returns an excerpt of a code file around the given line number.
-     *
-     * @return string An HTML string
      */
-    public function fileExcerpt(string $file, int $line, int $srcContext = 3)
+    public function fileExcerpt(string $file, int $line, int $srcContext = 3): ?string
     {
         if (is_file($file) && is_readable($file)) {
             // highlight_file could throw warnings
@@ -160,10 +148,8 @@ class CodeExtension extends AbstractExtension
 
     /**
      * Formats a file path.
-     *
-     * @return string
      */
-    public function formatFile(string $file, int $line, string $text = null)
+    public function formatFile(string $file, int $line, string $text = null): string
     {
         $file = trim($file);
 
@@ -211,7 +197,7 @@ class CodeExtension extends AbstractExtension
         return null;
     }
 
-    public function formatFileFromText(string $text)
+    public function formatFileFromText(string $text): string
     {
         return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
             return 'in '.$this->formatFile($match[2], $match[3]);
@@ -221,7 +207,7 @@ class CodeExtension extends AbstractExtension
     /**
      * @internal
      */
-    public function formatLogMessage(string $message, array $context)
+    public function formatLogMessage(string $message, array $context): string
     {
         if ($context && false !== strpos($message, '{')) {
             $replacements = [];
@@ -239,15 +225,7 @@ class CodeExtension extends AbstractExtension
         return htmlspecialchars($message, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'code';
-    }
-
-    protected static function fixCodeMarkup(string $line)
+    protected static function fixCodeMarkup(string $line): string
     {
         // </span> ending tag from previous line
         $opening = strpos($line, '<span');

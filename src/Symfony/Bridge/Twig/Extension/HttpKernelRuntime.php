@@ -18,10 +18,8 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
  * Provides integration with the HttpKernel component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class HttpKernelRuntime
+final class HttpKernelRuntime
 {
     private $handler;
 
@@ -35,11 +33,9 @@ class HttpKernelRuntime
      *
      * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
      *
-     * @return string The fragment content
-     *
      * @see FragmentHandler::render()
      */
-    public function renderFragment($uri, array $options = [])
+    public function renderFragment($uri, array $options = []): string
     {
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
@@ -52,11 +48,9 @@ class HttpKernelRuntime
      *
      * @param string|ControllerReference $uri A URI as a string or a ControllerReference instance
      *
-     * @return string The fragment content
-     *
      * @see FragmentHandler::render()
      */
-    public function renderFragmentStrategy(string $strategy, $uri, array $options = [])
+    public function renderFragmentStrategy(string $strategy, $uri, array $options = []): string
     {
         return $this->handler->render($uri, $strategy, $options);
     }

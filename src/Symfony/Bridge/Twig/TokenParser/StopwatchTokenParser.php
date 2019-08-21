@@ -21,10 +21,8 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the stopwatch tag.
  *
  * @author Wouter J <wouter@wouterj.nl>
- *
- * @final
  */
-class StopwatchTokenParser extends AbstractTokenParser
+final class StopwatchTokenParser extends AbstractTokenParser
 {
     protected $stopwatchIsAvailable;
 
@@ -54,7 +52,7 @@ class StopwatchTokenParser extends AbstractTokenParser
         return $body;
     }
 
-    public function decideStopwatchEnd(Token $token)
+    public function decideStopwatchEnd(Token $token): bool
     {
         return $token->test('endstopwatch');
     }

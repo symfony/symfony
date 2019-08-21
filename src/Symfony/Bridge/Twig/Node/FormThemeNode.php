@@ -17,10 +17,8 @@ use Twig\Node\Node;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class FormThemeNode extends Node
+final class FormThemeNode extends Node
 {
     public function __construct(Node $form, Node $resources, int $lineno, string $tag = null, bool $only = false)
     {

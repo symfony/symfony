@@ -19,10 +19,8 @@ use Twig\Node\Node;
  * Represents a stopwatch node.
  *
  * @author Wouter J <wouter@wouterj.nl>
- *
- * @final
  */
-class StopwatchNode extends Node
+final class StopwatchNode extends Node
 {
     public function __construct(Node $name, Node $body, AssignNameExpression $var, int $lineno = 0, string $tag = null)
     {

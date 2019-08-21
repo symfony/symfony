@@ -19,10 +19,8 @@ use Twig\TwigFunction;
  * Twig extension for the Symfony Asset component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class AssetExtension extends AbstractExtension
+final class AssetExtension extends AbstractExtension
 {
     private $packages;
 
@@ -33,8 +31,6 @@ class AssetExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFunction[]
      */
     public function getFunctions(): array
     {
@@ -49,31 +45,17 @@ class AssetExtension extends AbstractExtension
      *
      * If the package used to generate the path is an instance of
      * UrlPackage, you will always get a URL and not a path.
-     *
-     * @return string The public path of the asset
      */
-    public function getAssetUrl(string $path, string $packageName = null)
+    public function getAssetUrl(string $path, string $packageName = null): string
     {
         return $this->packages->getUrl($path, $packageName);
     }
 
     /**
      * Returns the version of an asset.
-     *
-     * @return string The asset version
      */
-    public function getAssetVersion(string $path, string $packageName = null)
+    public function getAssetVersion(string $path, string $packageName = null): string
     {
         return $this->packages->getVersion($path, $packageName);
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'asset';
     }
 }

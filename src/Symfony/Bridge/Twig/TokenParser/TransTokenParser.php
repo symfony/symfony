@@ -24,10 +24,8 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the 'trans' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class TransTokenParser extends AbstractTokenParser
+final class TransTokenParser extends AbstractTokenParser
 {
     /**
      * {@inheritdoc}
@@ -82,7 +80,7 @@ class TransTokenParser extends AbstractTokenParser
         return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
     }
 
-    public function decideTransFork(Token $token)
+    public function decideTransFork(Token $token): bool
     {
         return $token->test(['endtrans']);
     }

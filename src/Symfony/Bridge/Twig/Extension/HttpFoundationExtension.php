@@ -20,10 +20,8 @@ use Twig\TwigFunction;
  * Twig extension for the Symfony HttpFoundation component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class HttpFoundationExtension extends AbstractExtension
+final class HttpFoundationExtension extends AbstractExtension
 {
     private $urlHelper;
 
@@ -34,8 +32,6 @@ class HttpFoundationExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFunction[]
      */
     public function getFunctions(): array
     {
@@ -50,11 +46,9 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * This method returns the path unchanged if no request is available.
      *
-     * @return string The absolute URL
-     *
      * @see Request::getUriForPath()
      */
-    public function generateAbsoluteUrl(string $path)
+    public function generateAbsoluteUrl(string $path): string
     {
         return $this->urlHelper->getAbsoluteUrl($path);
     }
@@ -64,22 +58,10 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * This method returns the path unchanged if no request is available.
      *
-     * @return string The relative path
-     *
      * @see Request::getRelativeUriForPath()
      */
-    public function generateRelativePath(string $path)
+    public function generateRelativePath(string $path): string
     {
         return $this->urlHelper->getRelativePath($path);
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'request';
     }
 }

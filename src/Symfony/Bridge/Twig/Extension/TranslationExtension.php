@@ -19,17 +19,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 use Twig\Extension\AbstractExtension;
 use Twig\NodeVisitor\NodeVisitorInterface;
-use Twig\TokenParser\AbstractTokenParser;
 use Twig\TwigFilter;
 
 /**
  * Provides integration of the Translation component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final
  */
-class TranslationExtension extends AbstractExtension
+final class TranslationExtension extends AbstractExtension
 {
     private $translator;
     private $translationNodeVisitor;
@@ -40,7 +37,7 @@ class TranslationExtension extends AbstractExtension
         $this->translationNodeVisitor = $translationNodeVisitor;
     }
 
-    public function getTranslator(): ?TranslatorInterface
+    public function getTranslator(): TranslatorInterface
     {
         if (null === $this->translator) {
             if (!interface_exists(TranslatorInterface::class)) {
@@ -57,8 +54,6 @@ class TranslationExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFilter[]
      */
     public function getFilters(): array
     {
@@ -68,9 +63,7 @@ class TranslationExtension extends AbstractExtension
     }
 
     /**
-     * Returns the token parser instance to add to the existing list.
-     *
-     * @return AbstractTokenParser[]
+     * {@inheritdoc}
      */
     public function getTokenParsers(): array
     {
@@ -85,8 +78,6 @@ class TranslationExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return NodeVisitorInterface[]
      */
     public function getNodeVisitors(): array
     {
@@ -105,13 +96,5 @@ class TranslationExtension extends AbstractExtension
         }
 
         return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
-    {
-        return 'translator';
     }
 }

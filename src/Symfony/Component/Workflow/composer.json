@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": "^5.5.9|>=7.0.8",
-        "symfony/property-access": "~2.3|~3.0|~4.0"
+        "symfony/property-access": "~3.4.31|^4.3.4"
     },
     "require-dev": {
         "psr/log": "~1.0",

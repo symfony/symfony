@@ -108,6 +108,8 @@ class FileLoaderTest extends TestCase
     }
 
     /**
+     * @group issue-32995
+     *
      * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
      */
     public function testRegisterClassesWithExclude()
@@ -140,6 +142,8 @@ class FileLoaderTest extends TestCase
     }
 
     /**
+     * @group issue-32995
+     *
      * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
      */
     public function testNestedRegisterClasses()
@@ -171,6 +175,8 @@ class FileLoaderTest extends TestCase
     }
 
     /**
+     * @group issue-32995
+     *
      * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
      */
     public function testMissingParentClass()

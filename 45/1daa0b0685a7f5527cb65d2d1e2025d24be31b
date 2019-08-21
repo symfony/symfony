@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-21T06:42:09Z
+
+There are now some remaining deprecation warnings from SecurityBundle, FB and TwigBridge related to `Symfony\Bridge\Twig\TokenParser\TransTokenParser`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-21T07:11:24Z
+
+@yceruto "fixed". I don't see why `TransChoiceTokenParser` extends `TransTokenParser` (as no code is shared). I made it extend `AbstractExtension` instead.

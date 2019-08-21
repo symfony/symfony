@@ -26,6 +26,7 @@ use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -166,7 +167,7 @@ class DummyValidator implements ValidatorInterface
 
     public function validate($value, $constraints = null, $groups = null)
     {
-        return [$this->violation];
+        return new ConstraintViolationList([$this->violation]);
     }
 
     public function validateProperty($object, $propertyName, $groups = null)

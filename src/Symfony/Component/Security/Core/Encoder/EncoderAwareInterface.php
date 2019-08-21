@@ -22,7 +22,7 @@ interface EncoderAwareInterface
      * If the method returns null, the standard way to retrieve the encoder
      * will be used instead.
      *
-     * @return string
+     * @return string|null
      */
     public function getEncoderName();
 }

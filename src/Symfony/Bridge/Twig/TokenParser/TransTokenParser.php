@@ -24,6 +24,8 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the 'trans' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class TransTokenParser extends AbstractTokenParser
 {

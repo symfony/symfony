@@ -25,6 +25,8 @@ use Twig\TwigTest;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class FormExtension extends AbstractExtension
 {

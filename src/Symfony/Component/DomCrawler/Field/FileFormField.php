@@ -48,7 +48,7 @@ class FileFormField extends FormField
     /**
      * Sets the value of the field.
      *
-     * @param string $value The value of the field
+     * @param string|null $value The value of the field
      */
     public function setValue($value)
     {

@@ -194,6 +194,11 @@ Stopwatch
 
  * Deprecated passing `null` as 1st (`$id`) argument of `Section::get()` method, pass a valid child section identifier instead.
 
+Translation
+-----------
+
+ * Deprecated support for using `null` as the locale in `Translator`.
+
 TwigBridge
 ----------
 

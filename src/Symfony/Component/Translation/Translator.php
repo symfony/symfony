@@ -88,7 +88,11 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      */
     public function __construct(?string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false)
     {
-        $this->setLocale($locale);
+        if (null === $locale) {
+            @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        $this->setLocale($locale, false);
 
         if (null === $formatter) {
             $formatter = new MessageFormatter();
@@ -151,6 +155,10 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      */
     public function setLocale($locale)
     {
+        if (null === $locale && (2 > \func_num_args() || func_get_arg(1))) {
+            @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $this->assertValidLocale($locale);
         $this->locale = $locale;
     }
@@ -176,6 +184,9 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
         $this->catalogues = [];
 
         foreach ($locales as $locale) {
+            if (null === $locale) {
+                @trigger_error(sprintf('Passing "null" as the $locale argument to %s() is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
+            }
             $this->assertValidLocale($locale);
         }
 

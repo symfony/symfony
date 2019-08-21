@@ -518,6 +518,7 @@ Stopwatch
 Translation
 -----------
 
+ * Support for using `null` as the locale in `Translator` has been removed.
  * The `FileDumper::setBackup()` method has been removed.
  * The `TranslationWriter::disableBackup()` method has been removed.
  * The `TranslatorInterface` has been removed in favor of `Symfony\Contracts\Translation\TranslatorInterface`

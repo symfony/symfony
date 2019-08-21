@@ -34,9 +34,12 @@ class TranslatorTest extends TestCase
     {
         $translator = new Translator($locale);
 
-        $this->assertEquals($locale, $translator->getLocale());
+        $this->assertSame($locale, $translator->getLocale());
     }
 
+    /**
+     * @group legacy
+     */
     public function testConstructorWithoutLocale()
     {
         $translator = new Translator(null);
@@ -73,6 +76,17 @@ class TranslatorTest extends TestCase
         $translator->setLocale($locale);
 
         $this->assertEquals($locale, $translator->getLocale());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSetNullLocale()
+    {
+        $translator = new Translator('en');
+        $translator->setLocale(null);
+
+        $this->assertNull($translator->getLocale());
     }
 
     public function testGetCatalogue()
@@ -158,6 +172,17 @@ class TranslatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testSetNullFallbackLocale()
+    {
+        $translator = new Translator('en');
+        $translator->setFallbackLocales(['fr', null]);
+        // no assertion. this method just asserts that no exception is thrown
+        $this->addToAssertionCount(1);
+    }
+
     public function testTransWithFallbackLocale()
     {
         $translator = new Translator('fr_FR');
@@ -184,9 +209,6 @@ class TranslatorTest extends TestCase
      */
     public function testAddResourceValidLocales($locale)
     {
-        if (null === $locale) {
-            $this->markTestSkipped('null is not a valid locale');
-        }
         $translator = new Translator('fr');
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
         // no assertion. this method just asserts that no exception is thrown
@@ -382,9 +404,6 @@ class TranslatorTest extends TestCase
      */
     public function testTransValidLocale($locale)
     {
-        if (null === $locale) {
-            $this->markTestSkipped('null is not a valid locale');
-        }
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', ['test' => 'OK'], $locale);
@@ -454,6 +473,20 @@ class TranslatorTest extends TestCase
         $translator->addResource('array', ['foo' => 'foofoo'], 'en');
 
         $translator->transChoice('foo', 1, [], '', $locale);
+        // no assertion. this method just asserts that no exception is thrown
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testTransChoiceNullLocale()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => 'foofoo'], 'en');
+
+        $translator->transChoice('foo', 1, [], '', null);
         // no assertion. this method just asserts that no exception is thrown
         $this->addToAssertionCount(1);
     }
@@ -552,7 +585,6 @@ class TranslatorTest extends TestCase
     {
         return [
             [''],
-            [null],
             ['fr'],
             ['francais'],
             ['FR'],

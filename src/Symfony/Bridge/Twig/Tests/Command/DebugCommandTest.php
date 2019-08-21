@@ -254,7 +254,7 @@ TXT
 
     public function testDebugTemplateNameWithChainLoader()
     {
-        $tester = $this->createCommandTester(['templates/' => null], [], null, null, true);
+        $tester = $this->createCommandTester(['templates/' => null], [], null, true);
         $ret = $tester->execute(['name' => 'base.html.twig'], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
@@ -264,7 +264,7 @@ TXT
     public function testWithGlobals()
     {
         $message = '<error>foo</error>';
-        $tester = $this->createCommandTester([], [], null, null, false, ['message' => $message]);
+        $tester = $this->createCommandTester([], [], null, false, ['message' => $message]);
         $tester->execute([], ['decorated' => true]);
         $display = $tester->getDisplay();
         $this->assertStringContainsString(json_encode($message), $display);
@@ -273,7 +273,7 @@ TXT
     public function testWithGlobalsJson()
     {
         $globals = ['message' => '<error>foo</error>'];
-        $tester = $this->createCommandTester([], [], null, null, false, $globals);
+        $tester = $this->createCommandTester([], [], null, false, $globals);
         $tester->execute(['--format' => 'json'], ['decorated' => true]);
         $display = $tester->getDisplay();
         $display = json_decode($display, true);
@@ -292,7 +292,7 @@ TXT
         $this->assertNotSame($display1, $display2);
     }
 
-    private function createCommandTester(array $paths = [], array $bundleMetadata = [], string $defaultPath = null, string $rootDir = null, bool $useChainLoader = false, array $globals = []): CommandTester
+    private function createCommandTester(array $paths = [], array $bundleMetadata = [], string $defaultPath = null, bool $useChainLoader = false, array $globals = []): CommandTester
     {
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $loader = new FilesystemLoader([], $projectDir);
@@ -314,7 +314,7 @@ TXT
         }
 
         $application = new Application();
-        $application->add(new DebugCommand($environment, $projectDir, $bundleMetadata, $defaultPath, null, $rootDir));
+        $application->add(new DebugCommand($environment, $projectDir, $bundleMetadata, $defaultPath, null));
         $command = $application->find('debug:twig');
 
         return new CommandTester($command);

@@ -330,4 +330,16 @@ class LdapUserProviderTest extends TestCase
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword', ['email']);
         $this->assertInstanceOf(LdapUser::class, $provider->loadUserByUsername('foo'));
     }
+
+    public function testRefreshSendUnsupportedUserExceptionWhenProvidedUserIsNotLdapUserOne() {
+        // Todo
+    }
+
+    public function testRefreshIsSuccessFullWhenLdapUserIsTheSameAsSessionOne() {
+        // Todo
+    }
+
+    public function testRefreshFailsWhenLdapUserIsNotTheSameAsSessionOne() {
+        // Todo
+    }
 }

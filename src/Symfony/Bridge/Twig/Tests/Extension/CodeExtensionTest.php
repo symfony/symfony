@@ -44,7 +44,7 @@ class CodeExtensionTest extends TestCase
         $this->assertEquals($this->getExtension()->abbrMethod($method), $abbr);
     }
 
-    public function getClassNameProvider()
+    public function getClassNameProvider(): array
     {
         return [
             ['F\Q\N\Foo', '<abbr title="F\Q\N\Foo">Foo</abbr>'],
@@ -52,7 +52,7 @@ class CodeExtensionTest extends TestCase
         ];
     }
 
-    public function getMethodNameProvider()
+    public function getMethodNameProvider(): array
     {
         return [
             ['F\Q\N\Foo::Method', '<abbr title="F\Q\N\Foo">Foo</abbr>::Method()'],
@@ -62,12 +62,7 @@ class CodeExtensionTest extends TestCase
         ];
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('code', $this->getExtension()->getName());
-    }
-
-    protected function getExtension()
+    protected function getExtension(): CodeExtension
     {
         return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), \DIRECTORY_SEPARATOR.'project', 'UTF-8');
     }

@@ -15,7 +15,6 @@ use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
-use Twig\TokenParser\TokenParserInterface;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
@@ -25,17 +24,13 @@ use Twig\TwigTest;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @final since Symfony 4.4
  */
-class FormExtension extends AbstractExtension
+final class FormExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
-     *
-     * @return TokenParserInterface[]
      */
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [
             // {% form_theme form "SomeBundle::widgets.twig" %}
@@ -45,10 +40,8 @@ class FormExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('form_widget', null, ['node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => ['html']]),
@@ -67,10 +60,8 @@ class FormExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFilter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('humanize', ['Symfony\Component\Form\FormRenderer', 'humanize']),
@@ -80,23 +71,13 @@ class FormExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigTest[]
      */
-    public function getTests()
+    public function getTests(): array
     {
         return [
             new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),
             new TwigTest('rootform', 'Symfony\Bridge\Twig\Extension\twig_is_root_form'),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'form';
     }
 }
 
@@ -107,11 +88,9 @@ class FormExtension extends AbstractExtension
  *
  * @param string|array $selectedValue The selected value to compare
  *
- * @return bool Whether the choice is selected
- *
  * @see ChoiceView::isSelected()
  */
-function twig_is_selected_choice(ChoiceView $choice, $selectedValue)
+function twig_is_selected_choice(ChoiceView $choice, $selectedValue): bool
 {
     if (\is_array($selectedValue)) {
         return \in_array($choice->value, $selectedValue, true);
@@ -123,7 +102,7 @@ function twig_is_selected_choice(ChoiceView $choice, $selectedValue)
 /**
  * @internal
  */
-function twig_is_root_form(FormView $formView)
+function twig_is_root_form(FormView $formView): bool
 {
     return null === $formView->parent;
 }

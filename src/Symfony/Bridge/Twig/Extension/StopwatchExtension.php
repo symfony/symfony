@@ -20,10 +20,8 @@ use Twig\TokenParser\TokenParserInterface;
  * Twig extension for the stopwatch helper.
  *
  * @author Wouter J <wouter@wouterj.nl>
- *
- * @final since Symfony 4.4
  */
-class StopwatchExtension extends AbstractExtension
+final class StopwatchExtension extends AbstractExtension
 {
     private $stopwatch;
     private $enabled;
@@ -34,7 +32,7 @@ class StopwatchExtension extends AbstractExtension
         $this->enabled = $enabled;
     }
 
-    public function getStopwatch()
+    public function getStopwatch(): Stopwatch
     {
         return $this->stopwatch;
     }
@@ -42,7 +40,7 @@ class StopwatchExtension extends AbstractExtension
     /**
      * @return TokenParserInterface[]
      */
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [
             /*
@@ -52,10 +50,5 @@ class StopwatchExtension extends AbstractExtension
              */
             new StopwatchTokenParser(null !== $this->stopwatch && $this->enabled),
         ];
-    }
-
-    public function getName()
-    {
-        return 'stopwatch';
     }
 }

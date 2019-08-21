@@ -41,7 +41,7 @@
         "symfony/translation-contracts": "^1.1",
         "symfony/var-dumper": "^4.4|^5.0",
         "psr/cache": "~1.0",
-        "twig/twig": "^2.4"
+        "twig/twig": "^2.4|^3"
     },
     "provide": {
         "psr/log-implementation": "1.0"

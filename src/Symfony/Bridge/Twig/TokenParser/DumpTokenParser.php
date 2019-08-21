@@ -26,17 +26,13 @@ use Twig\TokenParser\AbstractTokenParser;
  *     {% dump foo, bar %}
  *
  * @author Julien Galenski <julien.galenski@gmail.com>
- *
- * @final since Symfony 4.4
  */
-class DumpTokenParser extends AbstractTokenParser
+final class DumpTokenParser extends AbstractTokenParser
 {
     /**
      * {@inheritdoc}
-     *
-     * @return Node
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $values = null;
         if (!$this->parser->getStream()->test(Token::BLOCK_END_TYPE)) {
@@ -49,10 +45,8 @@ class DumpTokenParser extends AbstractTokenParser
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'dump';
     }

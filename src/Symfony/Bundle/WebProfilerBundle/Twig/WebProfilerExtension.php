@@ -48,12 +48,12 @@ class WebProfilerExtension extends ProfilerExtension
         $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
     }
 
-    public function enter(Profile $profile)
+    public function enter(Profile $profile): void
     {
         ++$this->stackLevel;
     }
 
-    public function leave(Profile $profile)
+    public function leave(Profile $profile): void
     {
         if (0 === --$this->stackLevel) {
             $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
@@ -62,10 +62,8 @@ class WebProfilerExtension extends ProfilerExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('profiler_dump', [$this, 'dumpData'], ['is_safe' => ['html'], 'needs_environment' => true]),

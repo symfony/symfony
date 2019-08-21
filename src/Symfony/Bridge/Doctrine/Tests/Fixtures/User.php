@@ -35,7 +35,7 @@ class User implements UserInterface
         $this->name = $name;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
     }
 

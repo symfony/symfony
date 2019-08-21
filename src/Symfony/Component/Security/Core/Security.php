@@ -34,7 +34,10 @@ class Security
         $this->container = $container;
     }
 
-    public function getUser(): ?UserInterface
+    /**
+     * @return UserInterface|null
+     */
+    public function getUser()
     {
         if (!$token = $this->getToken()) {
             return null;

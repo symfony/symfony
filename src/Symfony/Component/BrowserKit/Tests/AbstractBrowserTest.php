@@ -39,10 +39,7 @@ class TestClient extends AbstractBrowser
         $this->nextScript = $script;
     }
 
-    /**
-     * @return object
-     */
-    protected function doRequest($request)
+    protected function doRequest($request): Response
     {
         if (null === $this->nextResponse) {
             return new Response();
@@ -938,10 +935,7 @@ class ClassThatInheritClient extends AbstractBrowser
         $this->nextResponse = $response;
     }
 
-    /**
-     * @return object
-     */
-    protected function doRequest($request)
+    protected function doRequest($request): Response
     {
         if (null === $this->nextResponse) {
             return new Response();

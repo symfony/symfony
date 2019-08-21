@@ -301,16 +301,10 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
     {
     }
 
-    /**
-     * @return object
-     */
     public function deserialize($data, $type, $format, array $context = [])
     {
     }
 
-    /**
-     * @return object
-     */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         foreach ($this->normalizers as $normalizer) {

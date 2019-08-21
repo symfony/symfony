@@ -135,7 +135,7 @@ class EncoderFactoryTest extends TestCase
 
 class SomeUser implements UserInterface
 {
-    public function getRoles()
+    public function getRoles(): array
     {
     }
 
@@ -164,7 +164,7 @@ class EncAwareUser extends SomeUser implements EncoderAwareInterface
 {
     public $encoderName = 'encoder_name';
 
-    public function getEncoderName(): string
+    public function getEncoderName(): ?string
     {
         return $this->encoderName;
     }

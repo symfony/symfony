@@ -212,6 +212,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.http_method_override', $config['http_method_override']);
         $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
+        $container->setParameter('kernel.error_controller', $config['error_controller']);
 
         if (!$container->hasParameter('debug.file_link_format')) {
             if (!$container->hasParameter('templating.helper.code.file_link_format')) {

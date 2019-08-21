@@ -28,7 +28,6 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -83,6 +82,9 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('trusted_hosts')
                     ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                     ->prototype('scalar')->end()
+                ->end()
+                ->scalarNode('error_controller')
+                    ->defaultValue('error_controller')
                 ->end()
             ->end()
         ;

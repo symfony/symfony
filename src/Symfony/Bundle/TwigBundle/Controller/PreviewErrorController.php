@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
-use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use the "%s" instead.', PreviewErrorController::class, \Symfony\Component\HttpKernel\Controller\ErrorController::class), E_USER_DEPRECATED);
 
 /**
  * PreviewErrorController can be used to test error pages.
@@ -23,27 +23,23 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * It will create a test exception and forward it to another controller.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
+ *
+ * @deprecated since Symfony 4.4, use the Symfony\Component\HttpKernel\Controller\ErrorController instead.
  */
 class PreviewErrorController
 {
     protected $kernel;
     protected $controller;
-    private $errorRenderer;
 
-    public function __construct(HttpKernelInterface $kernel, $controller, ErrorRenderer $errorRenderer = null)
+    public function __construct(HttpKernelInterface $kernel, $controller)
     {
         $this->kernel = $kernel;
         $this->controller = $controller;
-        $this->errorRenderer = $errorRenderer;
     }
 
     public function previewErrorPageAction(Request $request, $code)
     {
-        $exception = FlattenException::createFromThrowable(new \Exception('Something has intentionally gone wrong.'), $code, ['X-Debug' => false]);
-
-        if (null === $this->controller && null !== $this->errorRenderer) {
-            return new Response($this->errorRenderer->render($exception, $request->getPreferredFormat()), $code);
-        }
+        $exception = FlattenException::createFromThrowable(new \Exception('Something has intentionally gone wrong.'), $code);
 
         /*
          * This Request mimics the parameters set by

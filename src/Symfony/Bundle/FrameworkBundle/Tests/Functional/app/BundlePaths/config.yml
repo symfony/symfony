@@ -8,4 +8,4 @@ framework:
 
 twig:
     strict_variables: '%kernel.debug%'
-    exception_controller: ~
+    exception_controller: null # to be removed in 5.0

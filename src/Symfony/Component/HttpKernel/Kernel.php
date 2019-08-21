@@ -226,11 +226,21 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \RuntimeException if a custom resource is hidden by a resource in a derived bundle
      */
-    public function locateResource(string $name, string $dir = null, bool $first = true)
+    public function locateResource(string $name/*, $dir = null, $first = true, $triggerDeprecation = true*/)
     {
+        if (2 <= \func_num_args()) {
+            $dir = func_get_arg(1);
+            $first = 3 <= \func_num_args() ? func_get_arg(2) : true;
+
+            if (4 !== \func_num_args() || func_get_arg(3)) {
+                @trigger_error(sprintf('Passing more than one argument to %s is deprecated since Symfony 4.4 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            }
+        } else {
+            $dir = null;
+            $first = true;
+        }
+
         if ('@' !== $name[0]) {
             throw new \InvalidArgumentException(sprintf('A resource name must start with @ ("%s" given).', $name));
         }
@@ -252,6 +262,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
         if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
             $files[] = $file;
+
+            // see https://symfony.com/doc/current/bundles/override.html on how to overwrite parts of a bundle
+            @trigger_error(sprintf('Overwriting the resource "%s" with "%s" is deprecated since Symfony 4.4 and will be removed in 5.0.', $name, $file), E_USER_DEPRECATED);
         }
 
         if (file_exists($file = $bundle->getPath().'/'.$path)) {

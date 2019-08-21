@@ -46,7 +46,9 @@ class LocaleAwareListener implements EventSubscriberInterface
     public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
         if (null === $parentRequest = $this->requestStack->getParentRequest()) {
-            $this->setLocale($event->getRequest()->getDefaultLocale());
+            foreach ($this->localeAwareServices as $service) {
+                $service->setLocale($event->getRequest()->getDefaultLocale());
+            }
 
             return;
         }
@@ -63,7 +65,7 @@ class LocaleAwareListener implements EventSubscriberInterface
         ];
     }
 
-    private function setLocale(string $locale, string $defaultLocale = null): void
+    private function setLocale(string $locale, string $defaultLocale): void
     {
         foreach ($this->localeAwareServices as $service) {
             try {

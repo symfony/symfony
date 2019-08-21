@@ -24,6 +24,9 @@
         "egulias/email-validator": "^2.0",
         "symfony/dependency-injection": "^4.4|^5.0"
     },
+    "conflict": {
+        "symfony/mailer": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mime\\": "" },
         "exclude-from-classmap": [

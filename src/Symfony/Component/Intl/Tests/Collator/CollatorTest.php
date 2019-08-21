@@ -19,7 +19,7 @@ class CollatorTest extends AbstractCollatorTest
     public function testConstructorWithUnsupportedLocale()
     {
         $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
-        new Collator('pt_BR');
+        $this->getCollator('pt_BR');
     }
 
     public function testCompare()
@@ -90,12 +90,14 @@ class CollatorTest extends AbstractCollatorTest
 
     public function testStaticCreate()
     {
-        $collator = Collator::create('en');
+        $collator = $this->getCollator('en');
+        $collator = $collator::create('en');
         $this->assertInstanceOf('\Symfony\Component\Intl\Collator\Collator', $collator);
     }
 
     protected function getCollator($locale)
     {
-        return new Collator($locale);
+        return new class($locale) extends Collator {
+        };
     }
 }

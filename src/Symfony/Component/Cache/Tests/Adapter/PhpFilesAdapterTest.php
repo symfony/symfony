@@ -23,7 +23,7 @@ class PhpFilesAdapterTest extends AdapterTestCase
         'testDefaultLifeTime' => 'PhpFilesAdapter does not allow configuring a default lifetime.',
     ];
 
-    public function createCachePool()
+    public function createCachePool(): CacheItemPoolInterface
     {
         return new PhpFilesAdapter('sf-cache');
     }

@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
  */
 class FilesystemAdapterTest extends AdapterTestCase
 {
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         return new FilesystemAdapter('', $defaultLifetime);
     }

@@ -49,10 +49,7 @@ class PhpBridgeSessionStorageTest extends TestCase
         $this->savePath = null;
     }
 
-    /**
-     * @return PhpBridgeSessionStorage
-     */
-    protected function getStorage()
+    protected function getStorage(): PhpBridgeSessionStorage
     {
         $storage = new PhpBridgeSessionStorage();
         $storage->registerBag(new AttributeBag());

@@ -17,6 +17,9 @@ class TestObjectRouteLoader extends ObjectRouteLoader
 {
     public $loaderMap = [];
 
+    /**
+     * @return object
+     */
     protected function getServiceObject($id)
     {
         return $this->loaderMap[$id] ?? null;

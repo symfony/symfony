@@ -56,6 +56,9 @@ class LegacyEventDispatcherTest extends EventDispatcherTest
 
 class TestLegacyEventDispatcher extends EventDispatcher
 {
+    /**
+     * @return object
+     */
     public function dispatch($eventName, Event $event = null)
     {
         return parent::dispatch($event, $eventName);

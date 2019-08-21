@@ -68,7 +68,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         return $formatter;
     }
 
-    protected function getIntlErrorMessage()
+    protected function getIntlErrorMessage(): string
     {
         return intl_get_error_message();
     }
@@ -78,7 +78,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         return intl_get_error_code();
     }
 
-    protected function isIntlFailure($errorCode)
+    protected function isIntlFailure($errorCode): bool
     {
         return intl_is_failure($errorCode);
     }

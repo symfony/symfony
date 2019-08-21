@@ -40,7 +40,7 @@ class UploadValidatorExtensionTest extends TypeTestCase
 
 class DummyTranslator implements TranslatorInterface
 {
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null): string
     {
         return 'translated max {{ max }}!';
     }

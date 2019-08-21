@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests;
 
 use Cache\IntegrationTests\SimpleCacheTest;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Psr16Cache;
@@ -39,12 +40,12 @@ class Psr16CacheTest extends SimpleCacheTest
         }
     }
 
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new Psr16Cache(new FilesystemAdapter('', $defaultLifetime));
     }
 
-    public static function validKeys()
+    public static function validKeys(): array
     {
         return array_merge(parent::validKeys(), [["a\0b"]]);
     }

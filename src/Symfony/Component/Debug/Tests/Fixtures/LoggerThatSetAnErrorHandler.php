@@ -6,7 +6,7 @@ use Symfony\Component\Debug\BufferingLogger;
 
 class LoggerThatSetAnErrorHandler extends BufferingLogger
 {
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         set_error_handler('is_string');
         parent::log($level, $message, $context);

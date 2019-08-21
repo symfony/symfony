@@ -39,7 +39,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    public function getStore()
+    public function getStore(): PersistingStoreInterface
     {
         $redis = new \Predis\Client('tcp://'.getenv('REDIS_HOST').':6379');
         try {

@@ -15,6 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\ConnectionInterface;
+use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Exception\DriverNotFoundException;
 use Symfony\Component\Ldap\Ldap;
 
@@ -54,6 +55,7 @@ class LdapTest extends TestCase
             ->expects($this->once())
             ->method('escape')
             ->with('foo', 'bar', 'baz')
+            ->willReturn('');
         ;
         $this->ldap->escape('foo', 'bar', 'baz');
     }
@@ -64,6 +66,7 @@ class LdapTest extends TestCase
             ->expects($this->once())
             ->method('createQuery')
             ->with('foo', 'bar', ['baz'])
+            ->willReturn($this->createMock(QueryInterface::class))
         ;
         $this->ldap->query('foo', 'bar', ['baz']);
     }

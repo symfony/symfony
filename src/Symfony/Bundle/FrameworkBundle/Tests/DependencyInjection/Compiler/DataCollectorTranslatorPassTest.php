@@ -108,7 +108,7 @@ class DataCollectorTranslatorPassTest extends TestCase
 
 class TranslatorWithTranslatorBag implements TranslatorInterface
 {
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null): string
     {
     }
 }

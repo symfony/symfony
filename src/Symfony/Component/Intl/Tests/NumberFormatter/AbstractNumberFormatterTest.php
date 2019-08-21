@@ -836,18 +836,11 @@ abstract class AbstractNumberFormatterTest extends TestCase
     }
 
     /**
-     * @param string $locale
-     * @param null   $style
-     * @param null   $pattern
-     *
-     * @return \NumberFormatter
+     * @return NumberFormatter|\NumberFormatter
      */
-    abstract protected function getNumberFormatter($locale = 'en', $style = null, $pattern = null);
+    abstract protected function getNumberFormatter(string $locale = 'en', string $style = null, string $pattern = null);
 
-    /**
-     * @return string
-     */
-    abstract protected function getIntlErrorMessage();
+    abstract protected function getIntlErrorMessage(): string;
 
     /**
      * @return int
@@ -856,8 +849,6 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     /**
      * @param int $errorCode
-     *
-     * @return bool
      */
-    abstract protected function isIntlFailure($errorCode);
+    abstract protected function isIntlFailure($errorCode): bool;
 }

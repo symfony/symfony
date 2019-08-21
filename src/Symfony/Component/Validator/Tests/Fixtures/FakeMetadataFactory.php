@@ -13,13 +13,13 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
-use Symfony\Component\Validator\MetadataInterface;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 
 class FakeMetadataFactory implements MetadataFactoryInterface
 {
     protected $metadatas = [];
 
-    public function getMetadataFor($class)
+    public function getMetadataFor($class): MetadataInterface
     {
         $hash = null;
 
@@ -43,7 +43,7 @@ class FakeMetadataFactory implements MetadataFactoryInterface
         return $this->metadatas[$class];
     }
 
-    public function hasMetadataFor($class)
+    public function hasMetadataFor($class): bool
     {
         $hash = null;
 

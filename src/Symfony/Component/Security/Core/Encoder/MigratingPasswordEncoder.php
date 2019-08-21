@@ -34,7 +34,7 @@ final class MigratingPasswordEncoder extends BasePasswordEncoder implements Self
     /**
      * {@inheritdoc}
      */
-    public function encodePassword($raw, $salt)
+    public function encodePassword($raw, $salt): string
     {
         return $this->bestEncoder->encodePassword($raw, $salt);
     }
@@ -42,7 +42,7 @@ final class MigratingPasswordEncoder extends BasePasswordEncoder implements Self
     /**
      * {@inheritdoc}
      */
-    public function isPasswordValid($encoded, $raw, $salt)
+    public function isPasswordValid($encoded, $raw, $salt): bool
     {
         if ($this->bestEncoder->isPasswordValid($encoded, $raw, $salt)) {
             return true;

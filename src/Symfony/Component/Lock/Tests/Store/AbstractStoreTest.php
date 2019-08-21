@@ -21,10 +21,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 abstract class AbstractStoreTest extends TestCase
 {
-    /**
-     * @return PersistingStoreInterface
-     */
-    abstract protected function getStore();
+    abstract protected function getStore(): PersistingStoreInterface;
 
     public function testSave()
     {

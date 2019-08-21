@@ -104,7 +104,7 @@ class SomeServiceSubscriber implements ServiceSubscriberInterface
         return $this->container->get('foo');
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return ['bar' => 'stdClass'];
     }

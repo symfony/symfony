@@ -202,7 +202,7 @@ class ExtendedCallableClass extends CallableClass
 
 class RouteStub extends Route
 {
-    public function compile()
+    public function compile(): CompiledRoute
     {
         return new CompiledRoute('', '#PATH_REGEX#', [], [], '#HOST_REGEX#');
     }

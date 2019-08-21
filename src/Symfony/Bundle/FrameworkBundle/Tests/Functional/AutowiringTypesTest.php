@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundle
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
 
 class AutowiringTypesTest extends AbstractWebTestCase
@@ -70,7 +71,7 @@ class AutowiringTypesTest extends AbstractWebTestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $autowiredServices->getCachePool());
     }
 
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = []): KernelInterface
     {
         return parent::createKernel(['test_case' => 'AutowiringTypes'] + $options);
     }

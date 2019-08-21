@@ -15,6 +15,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolsTest extends AbstractWebTestCase
 {
@@ -116,7 +117,7 @@ class CachePoolsTest extends AbstractWebTestCase
         $this->assertNotInstanceof(TagAwareAdapter::class, $pool7);
     }
 
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = []): KernelInterface
     {
         return parent::createKernel(['test_case' => 'CachePools'] + $options);
     }

@@ -39,15 +39,15 @@ class User implements UserInterface
     {
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->name;
     }

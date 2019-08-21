@@ -61,7 +61,7 @@ class DummyExtension extends Extension
         $this->alias = $alias;
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return $this->alias;
     }

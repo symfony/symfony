@@ -6,7 +6,8 @@ use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
 class TestServiceSubscriberChild extends TestServiceSubscriberParent
 {
-    use ServiceSubscriberTrait, TestServiceSubscriberTrait;
+    use ServiceSubscriberTrait;
+    use TestServiceSubscriberTrait;
 
     private function testDefinition2(): TestDefinition2
     {

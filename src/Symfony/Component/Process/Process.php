@@ -955,7 +955,7 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Gets the last output time in seconds
+     * Gets the last output time in seconds.
      *
      * @return float|null The last output time in seconds or null if it isn't started
      */

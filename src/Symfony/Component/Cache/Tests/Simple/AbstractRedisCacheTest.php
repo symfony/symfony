@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\RedisCache;
 
 /**
@@ -26,7 +27,7 @@ abstract class AbstractRedisCacheTest extends CacheTestCase
 
     protected static $redis;
 
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new RedisCache(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }

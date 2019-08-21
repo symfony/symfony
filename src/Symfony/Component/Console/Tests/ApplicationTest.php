@@ -1758,7 +1758,7 @@ class CustomApplication extends Application
      *
      * @return InputDefinition An InputDefinition instance
      */
-    protected function getDefaultInputDefinition()
+    protected function getDefaultInputDefinition(): InputDefinition
     {
         return new InputDefinition([new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.')]);
     }
@@ -1768,7 +1768,7 @@ class CustomApplication extends Application
      *
      * @return HelperSet A HelperSet instance
      */
-    protected function getDefaultHelperSet()
+    protected function getDefaultHelperSet(): HelperSet
     {
         return new HelperSet([new FormatterHelper()]);
     }
@@ -1799,7 +1799,7 @@ class LazyCommand extends Command
 
 class DisabledCommand extends Command
 {
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return false;
     }

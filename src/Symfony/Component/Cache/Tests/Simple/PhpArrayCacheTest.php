@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\NullCache;
 use Symfony\Component\Cache\Simple\PhpArrayCache;
 use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
@@ -62,7 +63,7 @@ class PhpArrayCacheTest extends CacheTestCase
         }
     }
 
-    public function createSimpleCache()
+    public function createSimpleCache(): CacheInterface
     {
         return new PhpArrayCacheWrapper(self::$file, new NullCache());
     }

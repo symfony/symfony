@@ -109,7 +109,7 @@ final class Intl
      *
      * @return bool Returns true if the intl extension is installed, false otherwise
      */
-    public static function isExtensionLoaded()
+    public static function isExtensionLoaded(): bool
     {
         return class_exists('\ResourceBundle');
     }
@@ -121,7 +121,7 @@ final class Intl
      *
      * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Currencies} instead.
      */
-    public static function getCurrencyBundle()
+    public static function getCurrencyBundle(): CurrencyBundleInterface
     {
         @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Currencies::class), E_USER_DEPRECATED);
 
@@ -143,7 +143,7 @@ final class Intl
      *
      * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Languages} or {@see Scripts} instead.
      */
-    public static function getLanguageBundle()
+    public static function getLanguageBundle(): LanguageBundleInterface
     {
         @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" or "%s" instead.', __METHOD__, Languages::class, Scripts::class), E_USER_DEPRECATED);
 
@@ -169,7 +169,7 @@ final class Intl
      *
      * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Locales} instead.
      */
-    public static function getLocaleBundle()
+    public static function getLocaleBundle(): LocaleBundleInterface
     {
         @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Locales::class), E_USER_DEPRECATED);
 
@@ -190,7 +190,7 @@ final class Intl
      *
      * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Countries} instead.
      */
-    public static function getRegionBundle()
+    public static function getRegionBundle(): RegionBundleInterface
     {
         @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Countries::class), E_USER_DEPRECATED);
 
@@ -210,7 +210,7 @@ final class Intl
      *
      * @return string|null The ICU version or NULL if it could not be determined
      */
-    public static function getIcuVersion()
+    public static function getIcuVersion(): ?string
     {
         if (false === self::$icuVersion) {
             if (!self::isExtensionLoaded()) {
@@ -240,7 +240,7 @@ final class Intl
      *
      * @return string The version of the installed ICU data
      */
-    public static function getIcuDataVersion()
+    public static function getIcuDataVersion(): string
     {
         if (false === self::$icuDataVersion) {
             self::$icuDataVersion = trim(file_get_contents(self::getDataDirectory().'/version.txt'));
@@ -254,7 +254,7 @@ final class Intl
      *
      * @return string The ICU version of the stub classes
      */
-    public static function getIcuStubVersion()
+    public static function getIcuStubVersion(): string
     {
         return '64.2';
     }
@@ -264,7 +264,7 @@ final class Intl
      *
      * @return string The absolute path to the data directory
      */
-    public static function getDataDirectory()
+    public static function getDataDirectory(): string
     {
         return __DIR__.'/Resources/data';
     }

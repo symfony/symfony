@@ -1241,6 +1241,9 @@ HTML;
 
 class ClassThatInheritCrawler extends Crawler
 {
+    /**
+     * @return static
+     */
     public function children()
     {
         parent::children();

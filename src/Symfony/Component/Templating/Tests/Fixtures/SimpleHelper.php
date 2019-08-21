@@ -27,7 +27,7 @@ class SimpleHelper extends Helper
         return $this->value;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'foo';
     }

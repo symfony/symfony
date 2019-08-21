@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqualValidator;
 
@@ -24,12 +25,12 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
         return new GreaterThanOrEqualValidator();
     }
 
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new GreaterThanOrEqual($options);
     }
 
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return GreaterThanOrEqual::TOO_LOW_ERROR;
     }
@@ -37,7 +38,7 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [3, 2],
@@ -57,7 +58,7 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath()
+    public function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [5],
@@ -68,7 +69,7 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [1, '1', 2, '2', 'integer'],

@@ -25,7 +25,7 @@ class StorageTest extends TestCase
 
 class TestStorage extends Storage
 {
-    public function getContent()
+    public function getContent(): string
     {
     }
 }

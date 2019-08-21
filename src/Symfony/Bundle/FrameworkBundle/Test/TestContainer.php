@@ -97,6 +97,8 @@ class TestContainer extends Container
 
     /**
      * {@inheritdoc}
+     *
+     * @return object|null
      */
     public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
     {

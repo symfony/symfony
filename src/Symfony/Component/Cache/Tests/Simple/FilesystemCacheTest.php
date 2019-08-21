@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
  */
 class FilesystemCacheTest extends CacheTestCase
 {
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new FilesystemCache('', $defaultLifetime);
     }

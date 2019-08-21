@@ -33,7 +33,7 @@ class CompiledRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
 
 class TestCompiledRedirectableUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface
 {
-    public function redirect($path, $route, $scheme = null)
+    public function redirect($path, $route, $scheme = null): array
     {
         return [];
     }

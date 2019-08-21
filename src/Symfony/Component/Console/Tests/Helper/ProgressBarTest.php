@@ -867,10 +867,8 @@ class ProgressBarTest extends TestCase
 
     /**
      * Provides each defined format.
-     *
-     * @return array
      */
-    public function provideFormat()
+    public function provideFormat(): array
     {
         return [
             ['normal'],

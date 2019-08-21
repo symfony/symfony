@@ -139,15 +139,15 @@ class SomeUser implements UserInterface
     {
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
     }
 
@@ -164,7 +164,7 @@ class EncAwareUser extends SomeUser implements EncoderAwareInterface
 {
     public $encoderName = 'encoder_name';
 
-    public function getEncoderName()
+    public function getEncoderName(): string
     {
         return $this->encoderName;
     }

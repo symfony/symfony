@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\DoctrineCache;
 use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
 
@@ -25,7 +26,7 @@ class DoctrineCacheTest extends CacheTestCase
         'testNotUnserializable' => 'ArrayCache does not use serialize/unserialize',
     ];
 
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new DoctrineCache(new ArrayCache($defaultLifetime), '', $defaultLifetime);
     }

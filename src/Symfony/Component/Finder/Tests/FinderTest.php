@@ -1438,6 +1438,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
 class ClassThatInheritFinder extends Finder
 {
+    /**
+     * @return $this
+     */
     public function sortByName()
     {
         parent::sortByName();

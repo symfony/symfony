@@ -25,10 +25,8 @@ class MockStream
      * @param int    $options     Holds additional flags set by the streams API
      * @param string $opened_path If the path is opened successfully, and STREAM_USE_PATH is set in options,
      *                            opened_path should be set to the full path of the file/resource that was actually opened
-     *
-     * @return bool
      */
-    public function stream_open($path, $mode, $options, &$opened_path)
+    public function stream_open($path, $mode, $options, &$opened_path): bool
     {
         return true;
     }
@@ -39,7 +37,7 @@ class MockStream
      *
      * @return array File stats
      */
-    public function url_stat($path, $flags)
+    public function url_stat($path, $flags): array
     {
         return [];
     }

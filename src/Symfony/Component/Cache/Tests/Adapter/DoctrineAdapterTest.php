@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
 
@@ -26,7 +27,7 @@ class DoctrineAdapterTest extends AdapterTestCase
         'testClearPrefix' => 'Doctrine cannot clear by prefix',
     ];
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         return new DoctrineAdapter(new ArrayCache($defaultLifetime), '', $defaultLifetime);
     }

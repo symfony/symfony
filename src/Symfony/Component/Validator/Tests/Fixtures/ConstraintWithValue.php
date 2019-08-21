@@ -19,7 +19,7 @@ class ConstraintWithValue extends Constraint
     public $property;
     public $value;
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'property';
     }

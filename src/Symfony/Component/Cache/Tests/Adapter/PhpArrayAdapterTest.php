@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
@@ -70,7 +71,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool($defaultLifetime = 0, $testMethod = null)
+    public function createCachePool($defaultLifetime = 0, $testMethod = null): CacheItemPoolInterface
     {
         if ('testGetMetadata' === $testMethod || 'testClearPrefix' === $testMethod) {
             return new PhpArrayAdapter(self::$file, new FilesystemAdapter());
@@ -145,7 +146,7 @@ class PhpArrayAdapterWrapper extends PhpArrayAdapter
 {
     protected $data = [];
 
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         (\Closure::bind(function () use ($item) {
             $key = $item->getKey();

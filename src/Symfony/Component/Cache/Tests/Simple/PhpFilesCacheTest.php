@@ -24,7 +24,7 @@ class PhpFilesCacheTest extends CacheTestCase
         'testDefaultLifeTime' => 'PhpFilesCache does not allow configuring a default lifetime.',
     ];
 
-    public function createSimpleCache()
+    public function createSimpleCache(): CacheInterface
     {
         return new PhpFilesCache('sf-cache');
     }

@@ -183,7 +183,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         };
     }
 
-    protected function getIntlErrorMessage()
+    protected function getIntlErrorMessage(): string
     {
         return IntlGlobals::getErrorMessage();
     }
@@ -193,7 +193,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         return IntlGlobals::getErrorCode();
     }
 
-    protected function isIntlFailure($errorCode)
+    protected function isIntlFailure($errorCode): bool
     {
         return IntlGlobals::isFailure($errorCode);
     }

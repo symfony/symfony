@@ -10,7 +10,7 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
     {
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             __CLASS__,

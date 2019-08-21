@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures;
 
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReference;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class StubTemplateNameParser implements TemplateNameParserInterface
 {
@@ -26,7 +27,7 @@ class StubTemplateNameParser implements TemplateNameParserInterface
         $this->rootTheme = $rootTheme;
     }
 
-    public function parse($name)
+    public function parse($name): TemplateReferenceInterface
     {
         list($bundle, $controller, $template) = explode(':', $name, 3);
 

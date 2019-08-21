@@ -37,7 +37,7 @@ final class LegacyEventProxy extends Event
         return $this->event;
     }
 
-    public function isPropagationStopped()
+    public function isPropagationStopped(): bool
     {
         if (!$this->event instanceof ContractsEvent && !$this->event instanceof StoppableEventInterface) {
             return false;

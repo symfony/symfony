@@ -41,7 +41,7 @@ class GitignoreTest extends TestCase
      *               ],
      *               ]
      */
-    public function provider()
+    public function provider(): array
     {
         return [
             [

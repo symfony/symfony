@@ -79,7 +79,7 @@ class DummyServerParams extends ServerParams
         $this->size = $size;
     }
 
-    public function getNormalizedIniPostMaxSize()
+    public function getNormalizedIniPostMaxSize(): string
     {
         return $this->size;
     }

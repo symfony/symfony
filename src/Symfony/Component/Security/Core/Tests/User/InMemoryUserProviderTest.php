@@ -40,10 +40,7 @@ class InMemoryUserProviderTest extends TestCase
         $this->assertFalse($refreshedUser->isCredentialsNonExpired());
     }
 
-    /**
-     * @return InMemoryUserProvider
-     */
-    protected function createProvider()
+    protected function createProvider(): InMemoryUserProvider
     {
         return new InMemoryUserProvider([
             'fabien' => [

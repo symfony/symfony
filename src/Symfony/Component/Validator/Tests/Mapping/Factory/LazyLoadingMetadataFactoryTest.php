@@ -209,8 +209,10 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
 class TestLoader implements LoaderInterface
 {
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $metadata->addConstraint(new ConstraintA());
+
+        return true;
     }
 }

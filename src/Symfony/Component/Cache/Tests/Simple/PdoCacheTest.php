@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\PdoCache;
 use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
 
@@ -41,7 +42,7 @@ class PdoCacheTest extends CacheTestCase
         @unlink(self::$dbFile);
     }
 
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new PdoCache('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }

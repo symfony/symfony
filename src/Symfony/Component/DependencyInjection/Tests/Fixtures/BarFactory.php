@@ -11,7 +11,7 @@ class BarFactory
 
     public function __construct(iterable $bars)
     {
-        $this->bars = \iterator_to_array($bars);
+        $this->bars = iterator_to_array($bars);
     }
 
     public function getDefaultBar(): BarInterface

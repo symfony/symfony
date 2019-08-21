@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\SimpleCacheAdapter;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\Cache\Simple\FilesystemCache;
@@ -26,7 +27,7 @@ class SimpleCacheAdapterTest extends AdapterTestCase
         'testClearPrefix' => 'SimpleCache cannot clear by prefix',
     ];
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         return new SimpleCacheAdapter(new FilesystemCache(), '', $defaultLifetime);
     }

@@ -24,9 +24,6 @@ class BaseUser
 
     /**
      * BaseUser constructor.
-     *
-     * @param int    $id
-     * @param string $username
      */
     public function __construct(int $id, string $username)
     {
@@ -42,10 +39,7 @@ class BaseUser
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }

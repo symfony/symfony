@@ -167,7 +167,7 @@ class TestLogger extends Logger implements DebugLoggerInterface
 
 class TestKernel implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
     {
         return new Response('foo');
     }
@@ -175,7 +175,7 @@ class TestKernel implements HttpKernelInterface
 
 class TestKernelThatThrowsException implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
     {
         throw new \RuntimeException('bar');
     }

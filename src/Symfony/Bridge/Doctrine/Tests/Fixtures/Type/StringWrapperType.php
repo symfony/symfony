@@ -34,10 +34,8 @@ class StringWrapperType extends StringType
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'string_wrapper';
     }

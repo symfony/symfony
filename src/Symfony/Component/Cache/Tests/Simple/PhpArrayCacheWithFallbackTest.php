@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\FilesystemCache;
 use Symfony\Component\Cache\Simple\PhpArrayCache;
 use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
@@ -49,7 +50,7 @@ class PhpArrayCacheWithFallbackTest extends CacheTestCase
         }
     }
 
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new PhpArrayCache(self::$file, new FilesystemCache('php-array-fallback', $defaultLifetime));
     }

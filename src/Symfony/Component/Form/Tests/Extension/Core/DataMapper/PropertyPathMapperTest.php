@@ -333,7 +333,7 @@ class PropertyPathMapperTest extends TestCase
 
 class SubmittedForm extends Form
 {
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return true;
     }
@@ -341,7 +341,7 @@ class SubmittedForm extends Form
 
 class NotSynchronizedForm extends Form
 {
-    public function isSynchronized()
+    public function isSynchronized(): bool
     {
         return false;
     }

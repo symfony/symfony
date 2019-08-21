@@ -39,7 +39,7 @@ class DumpedRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
 
 class TestDumpedRedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {
-    public function redirect($path, $route, $scheme = null)
+    public function redirect($path, $route, $scheme = null): array
     {
         return [];
     }

@@ -16,11 +16,11 @@ use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
 
 class PasswordEncoder extends BasePasswordEncoder
 {
-    public function encodePassword($raw, $salt)
+    public function encodePassword($raw, $salt): string
     {
     }
 
-    public function isPasswordValid($encoded, $raw, $salt)
+    public function isPasswordValid($encoded, $raw, $salt): bool
     {
     }
 }

@@ -300,7 +300,7 @@ class TranslatorCacheTest extends TestCase
 
 class StaleResource implements SelfCheckingResourceInterface
 {
-    public function isFresh($timestamp)
+    public function isFresh($timestamp): bool
     {
         return false;
     }
@@ -309,7 +309,7 @@ class StaleResource implements SelfCheckingResourceInterface
     {
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }

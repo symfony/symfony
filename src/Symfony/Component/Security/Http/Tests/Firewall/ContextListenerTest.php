@@ -380,17 +380,17 @@ class ContextListenerTest extends TestCase
 
 class NotSupportingUserProvider implements UserProviderInterface
 {
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): UserInterface
     {
         throw new UsernameNotFoundException();
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         throw new UnsupportedUserException();
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return false;
     }
@@ -405,11 +405,11 @@ class SupportingUserProvider implements UserProviderInterface
         $this->refreshedUser = $refreshedUser;
     }
 
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): UserInterface
     {
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof User) {
             throw new UnsupportedUserException();
@@ -422,7 +422,7 @@ class SupportingUserProvider implements UserProviderInterface
         return $this->refreshedUser;
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return 'Symfony\Component\Security\Core\User\User' === $class;
     }

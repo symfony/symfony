@@ -39,12 +39,12 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
         parent::testGetTextAttribute();
     }
 
-    protected function getNumberFormatter($locale = 'en', $style = null, $pattern = null)
+    protected function getNumberFormatter(?string $locale = 'en', string $style = null, string $pattern = null): \NumberFormatter
     {
         return new \NumberFormatter($locale, $style, $pattern);
     }
 
-    protected function getIntlErrorMessage()
+    protected function getIntlErrorMessage(): string
     {
         return intl_get_error_message();
     }
@@ -54,7 +54,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
         return intl_get_error_code();
     }
 
-    protected function isIntlFailure($errorCode)
+    protected function isIntlFailure($errorCode): bool
     {
         return intl_is_failure($errorCode);
     }

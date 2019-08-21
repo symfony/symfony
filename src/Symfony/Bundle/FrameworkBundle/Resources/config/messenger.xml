@@ -110,5 +110,64 @@
             <argument /> <!-- Message bus locator -->
             <argument type="service" id="messenger.default_bus" />
         </service>
+
+        <!-- commands -->
+        <service id="console.command.messenger_consume_messages" class="Symfony\Component\Messenger\Command\ConsumeMessagesCommand">
+            <argument /> <!-- Routable message bus -->
+            <argument type="service" id="messenger.receiver_locator" />
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument type="collection" /> <!-- Receiver names -->
+            <argument type="service" id="messenger.retry_strategy_locator" />
+            <argument type="service" id="event_dispatcher" />
+            <call method="setCachePoolForRestartSignal">
+                <argument type="service" id="cache.messenger.restart_workers_signal" />
+            </call>
+
+            <tag name="console.command" command="messenger:consume" />
+            <tag name="console.command" command="messenger:consume-messages" />
+            <tag name="monolog.logger" channel="messenger" />
+        </service>
+
+        <service id="console.command.messenger_setup_transports" class="Symfony\Component\Messenger\Command\SetupTransportsCommand">
+            <argument type="service" id="messenger.receiver_locator" />
+            <argument type="collection" /> <!-- Receiver names -->
+
+            <tag name="console.command" command="messenger:setup-transports" />
+        </service>
+
+        <service id="console.command.messenger_debug" class="Symfony\Component\Messenger\Command\DebugCommand">
+            <argument type="collection" /> <!-- Message to handlers mapping -->
+            <tag name="console.command" command="debug:messenger" />
+        </service>
+
+        <service id="console.command.messenger_stop_workers" class="Symfony\Component\Messenger\Command\StopWorkersCommand">
+            <argument type="service" id="cache.messenger.restart_workers_signal" />
+            <tag name="console.command" command="messenger:stop-workers" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_retry" class="Symfony\Component\Messenger\Command\FailedMessagesRetryCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+            <argument type="service" id="messenger.routable_message_bus" />
+            <argument type="service" id="event_dispatcher" />
+            <argument /> <!-- Retry strategy -->
+            <argument type="service" id="logger" />
+
+            <tag name="console.command" command="messenger:failed:retry" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_show" class="Symfony\Component\Messenger\Command\FailedMessagesShowCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+
+            <tag name="console.command" command="messenger:failed:show" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_remove" class="Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+
+            <tag name="console.command" command="messenger:failed:remove" />
+        </service>
     </services>
 </container>

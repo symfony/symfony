@@ -46,7 +46,7 @@ use Symfony\Component\Intl\Locale\Locale;
  *
  * @internal
  */
-class IntlDateFormatter
+abstract class IntlDateFormatter
 {
     /**
      * The error code from the last operation.
@@ -78,9 +78,9 @@ class IntlDateFormatter
      */
     private $defaultDateFormats = [
         self::NONE => '',
-        self::FULL => 'EEEE, LLLL d, y',
-        self::LONG => 'LLLL d, y',
-        self::MEDIUM => 'LLL d, y',
+        self::FULL => 'EEEE, MMMM d, y',
+        self::LONG => 'MMMM d, y',
+        self::MEDIUM => 'MMM d, y',
         self::SHORT => 'M/d/yy',
     ];
 
@@ -160,7 +160,7 @@ class IntlDateFormatter
      *                                                          One of the calendar constants
      * @param string|null                             $pattern  Optional pattern to use when formatting
      *
-     * @return self
+     * @return static
      *
      * @see https://php.net/intldateformatter.create
      * @see http://userguide.icu-project.org/formatparse/datetime
@@ -170,7 +170,7 @@ class IntlDateFormatter
      */
     public static function create(?string $locale, ?int $datetype, ?int $timetype, $timezone = null, int $calendar = self::GREGORIAN, ?string $pattern = null)
     {
-        return new self($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
+        return new static($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }
 
     /**
@@ -597,14 +597,19 @@ class IntlDateFormatter
      */
     protected function getDefaultPattern()
     {
-        $patternParts = [];
+        $pattern = '';
         if (self::NONE !== $this->datetype) {
-            $patternParts[] = $this->defaultDateFormats[$this->datetype];
+            $pattern = $this->defaultDateFormats[$this->datetype];
         }
         if (self::NONE !== $this->timetype) {
-            $patternParts[] = $this->defaultTimeFormats[$this->timetype];
+            if (self::FULL === $this->datetype || self::LONG === $this->datetype) {
+                $pattern .= ' \'at\' ';
+            } elseif (self::NONE !== $this->datetype) {
+                $pattern .= ', ';
+            }
+            $pattern .= $this->defaultTimeFormats[$this->timetype];
         }
 
-        return implode(', ', $patternParts);
+        return $pattern;
     }
 }

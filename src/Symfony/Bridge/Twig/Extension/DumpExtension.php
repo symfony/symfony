@@ -24,6 +24,8 @@ use Twig\TwigFunction;
  * Provides integration of the dump() function with Twig.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final since Symfony 4.4
  */
 class DumpExtension extends AbstractExtension
 {

@@ -21,6 +21,8 @@ use Twig\TwigFunction;
  * WorkflowExtension.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since Symfony 4.4
  */
 class WorkflowExtension extends AbstractExtension
 {

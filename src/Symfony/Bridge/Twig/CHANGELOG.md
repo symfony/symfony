@@ -11,6 +11,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * marked all classes extending twig as `@final`
  * deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
    `DebugCommand::__construct()` method, swap the variables position.
 

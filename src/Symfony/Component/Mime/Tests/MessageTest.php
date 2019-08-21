@@ -17,7 +17,6 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
-use Symfony\Component\Mime\NamedAddress;
 use Symfony\Component\Mime\Part\TextPart;
 
 class MessageTest extends TestCase
@@ -94,9 +93,9 @@ class MessageTest extends TestCase
     public function testGetPreparedHeadersWithNamedFrom()
     {
         $message = new Message();
-        $message->getHeaders()->addMailboxListHeader('From', [new NamedAddress('fabien@symfony.com', 'Fabien')]);
+        $message->getHeaders()->addMailboxListHeader('From', [new Address('fabien@symfony.com', 'Fabien')]);
         $h = $message->getPreparedHeaders();
-        $this->assertEquals(new MailboxListHeader('From', [new NamedAddress('fabien@symfony.com', 'Fabien')]), $h->get('From'));
+        $this->assertEquals(new MailboxListHeader('From', [new Address('fabien@symfony.com', 'Fabien')]), $h->get('From'));
         $this->assertTrue($h->has('Message-Id'));
     }
 

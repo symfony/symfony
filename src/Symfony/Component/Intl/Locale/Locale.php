@@ -24,7 +24,7 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException;
  *
  * @internal
  */
-class Locale
+abstract class Locale
 {
     const DEFAULT_LOCALE = null;
 

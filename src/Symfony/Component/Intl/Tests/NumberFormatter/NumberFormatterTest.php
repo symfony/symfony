@@ -23,19 +23,19 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
     public function testConstructorWithUnsupportedLocale()
     {
         $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
-        new NumberFormatter('pt_BR');
+        $this->getNumberFormatter('pt_BR');
     }
 
     public function testConstructorWithUnsupportedStyle()
     {
         $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException');
-        new NumberFormatter('en', NumberFormatter::PATTERN_DECIMAL);
+        $this->getNumberFormatter('en', NumberFormatter::PATTERN_DECIMAL);
     }
 
     public function testConstructorWithPatternDifferentThanNull()
     {
         $this->expectException('Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException');
-        new NumberFormatter('en', NumberFormatter::DECIMAL, '');
+        $this->getNumberFormatter('en', NumberFormatter::DECIMAL, '');
     }
 
     public function testSetAttributeWithUnsupportedAttribute()
@@ -62,10 +62,8 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
 
     public function testCreate()
     {
-        $this->assertInstanceOf(
-            '\Symfony\Component\Intl\NumberFormatter\NumberFormatter',
-            NumberFormatter::create('en', NumberFormatter::DECIMAL)
-        );
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $this->assertInstanceOf(NumberFormatter::class, $formatter::create('en', NumberFormatter::DECIMAL));
     }
 
     public function testFormatWithCurrencyStyle()
@@ -172,7 +170,8 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
 
     protected function getNumberFormatter($locale = 'en', $style = null, $pattern = null)
     {
-        return new NumberFormatter($locale, $style, $pattern);
+        return new class($locale, $style, $pattern) extends NumberFormatter {
+        };
     }
 
     protected function getIntlErrorMessage()

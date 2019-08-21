@@ -21,6 +21,8 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the 'form_theme' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class FormThemeTokenParser extends AbstractTokenParser
 {

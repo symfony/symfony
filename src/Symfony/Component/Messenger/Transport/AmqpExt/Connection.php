@@ -251,11 +251,7 @@ class Connection
             $this->amqpDelayExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpDelayExchange->setName($this->connectionOptions['delay']['exchange_name']);
             $this->amqpDelayExchange->setType(AMQP_EX_TYPE_DIRECT);
-            if ('delays' === $this->connectionOptions['delay']['exchange_name']) {
-                // only add the new flag when the name was not provided explicitly so we're using the new default name to prevent a redeclaration error
-                // the condition will be removed in 4.4
-                $this->amqpDelayExchange->setFlags(AMQP_DURABLE);
-            }
+            $this->amqpDelayExchange->setFlags(AMQP_DURABLE);
         }
 
         return $this->amqpDelayExchange;
@@ -278,24 +274,17 @@ class Connection
             [$delay, $this->exchangeOptions['name'], $routingKey ?? ''],
             $this->connectionOptions['delay']['queue_name_pattern']
         ));
-        if ('delay_%exchange_name%_%routing_key%_%delay%' === $this->connectionOptions['delay']['queue_name_pattern']) {
-            // the condition will be removed in 4.4
-            $queue->setFlags(AMQP_DURABLE);
-            $extraArguments = [
-                // delete the delay queue 10 seconds after the message expires
-                // publishing another message redeclares the queue which renews the lease
-                'x-expires' => $delay + 10000,
-            ];
-        } else {
-            $extraArguments = [];
-        }
+        $queue->setFlags(AMQP_DURABLE);
         $queue->setArguments([
             'x-message-ttl' => $delay,
+            // delete the delay queue 10 seconds after the message expires
+            // publishing another message redeclares the queue which renews the lease
+            'x-expires' => $delay + 10000,
             'x-dead-letter-exchange' => $this->exchangeOptions['name'],
             // after being released from to DLX, make sure the original routing key will be used
             // we must use an empty string instead of null for the argument to be picked up
             'x-dead-letter-routing-key' => $routingKey ?? '',
-        ] + $extraArguments);
+        ]);
 
         return $queue;
     }

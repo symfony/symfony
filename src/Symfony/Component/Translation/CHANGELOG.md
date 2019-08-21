@@ -14,6 +14,11 @@ CHANGELOG
  * removed `MessageFormatter::choiceFormat()`
  * added argument `$filename` to `PhpExtractor::parseTokens()`
 
+4.4.0
+-----
+
+ * deprecated support for using `null` as the locale in `Translator`
+
 4.3.0
 -----
 

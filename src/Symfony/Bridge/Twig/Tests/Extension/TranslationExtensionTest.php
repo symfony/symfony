@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader as TwigArrayLoader;
+use Twig\TemplateWrapper;
 
 class TranslationExtensionTest extends TestCase
 {
@@ -187,7 +189,7 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render([])));
     }
 
-    protected function getTemplate($template, $translator = null)
+    private function getTemplate($template, TranslatorInterface $translator = null): TemplateWrapper
     {
         if (null === $translator) {
             $translator = new Translator('en');
@@ -201,6 +203,6 @@ class TranslationExtensionTest extends TestCase
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new TranslationExtension($translator));
 
-        return $twig->loadTemplate('index');
+        return $twig->load('index');
     }
 }

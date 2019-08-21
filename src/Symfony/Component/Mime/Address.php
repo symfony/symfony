@@ -21,14 +21,15 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Address
+final class Address
 {
     private static $validator;
     private static $encoder;
 
     private $address;
+    private $name;
 
-    public function __construct(string $address)
+    public function __construct(string $address, string $name = '')
     {
         if (!class_exists(EmailValidator::class)) {
             throw new LogicException(sprintf('The "%s" class cannot be used as it needs "%s"; try running "composer require egulias/email-validator".', __CLASS__, EmailValidator::class));
@@ -38,16 +39,22 @@ class Address
             self::$validator = new EmailValidator();
         }
 
-        if (!self::$validator->isValid($address, new RFCValidation())) {
+        $this->address = trim($address);
+        $this->name = trim(str_replace(["\n", "\r"], '', $name));
+
+        if (!self::$validator->isValid($this->address, new RFCValidation())) {
             throw new RfcComplianceException(sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
         }
-
-        $this->address = $address;
     }
 
     public function getAddress(): string
     {
         return $this->address;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     public function getEncodedAddress(): string
@@ -61,7 +68,7 @@ class Address
 
     public function toString(): string
     {
-        return $this->getEncodedAddress();
+        return ($n = $this->getName()) ? $n.' <'.$this->getEncodedAddress().'>' : $this->getEncodedAddress();
     }
 
     /**

@@ -21,6 +21,8 @@ use Twig\Node\Expression\FunctionExpression;
  * is "foo", the block "foo" will be rendered.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class RenderBlockNode extends FunctionExpression
 {

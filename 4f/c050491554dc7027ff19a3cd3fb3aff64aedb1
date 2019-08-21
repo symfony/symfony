@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-21T05:50:06Z
+
+See #33269
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-21T08:35:35Z
+
+Now that #33269 has been merged, I think we can finish this one @derrabus. Twig 3.0 will be released *before* Symfony 5, so this is safe and will allow us to spot issues sooner than later. Thank you.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T09:02:56Z
+
+Ready.
+
+Also, I'm wondering if we should backport the composer.json changes (except for the bridge, of course) to 4.4. An Symfony 4.4 application with TwigBridge 5.0 should technically be able to run Twig 3.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-21T09:06:35Z
+
+Symfony 4.4 still supports 1.x, so it cannot support 1.x/2.x and 3.0 at the same time.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-21T12:06:10Z
+
+I've just merged 4.4 into master so that this one can be rebased.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-21T12:54:00Z
+
+We should also replace all `@final since Symfony 4.4` by `@final` here.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T12:54:02Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T12:56:21Z
+
+> We should also replace all `@final since Symfony 4.4` by `@final` here.
+
+Done.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T13:07:54Z
+
+Should I also remove the `getName()` implementations from the Twig extensions? IIRC, we only need them for Twig 1 which has been dropped on master. Do we use them for anything else?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T13:09:18Z
+
+Also, I will add return type declarations to all `@final`classes where possible.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-21T13:14:03Z
+
+`getName()` can be removed
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T14:05:44Z
+
+Ready.

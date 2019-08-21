@@ -573,7 +573,7 @@ class EventDispatcherMock implements \Symfony\Component\EventDispatcher\EventDis
 {
     public $dispatchedEvents = [];
 
-    public function dispatch($event, string $eventName = null): Event
+    public function dispatch($event, string $eventName = null): object
     {
         $this->dispatchedEvents[] = $eventName;
 

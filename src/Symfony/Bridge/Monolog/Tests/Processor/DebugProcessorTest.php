@@ -66,7 +66,7 @@ class DebugProcessorTest extends TestCase
     public function testInheritedClassCallGetLogsWithoutArgument()
     {
         $debugProcessorChild = new ClassThatInheritDebugProcessor();
-        $this->assertNull($debugProcessorChild->getLogs());
+        $this->assertSame([], $debugProcessorChild->getLogs());
     }
 
     public function testInheritedClassCallCountErrorsWithoutArgument()

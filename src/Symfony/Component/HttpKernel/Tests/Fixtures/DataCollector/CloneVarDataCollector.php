@@ -39,7 +39,7 @@ class CloneVarDataCollector extends DataCollector
         return $this->data;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'clone_var';
     }

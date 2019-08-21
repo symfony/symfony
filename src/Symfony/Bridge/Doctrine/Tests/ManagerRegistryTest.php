@@ -51,7 +51,7 @@ class TestManagerRegistry extends ManagerRegistry
         $this->container = $container;
     }
 
-    public function getAliasNamespace($alias)
+    public function getAliasNamespace($alias): string
     {
         return 'Foo';
     }

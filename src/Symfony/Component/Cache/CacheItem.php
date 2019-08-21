@@ -36,10 +36,8 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -54,10 +52,8 @@ final class CacheItem implements ItemInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function isHit()
+    public function isHit(): bool
     {
         return $this->isHit;
     }
@@ -153,11 +149,9 @@ final class CacheItem implements ItemInterface
     /**
      * Returns the list of tags bound to the value coming from the pool storage if any.
      *
-     * @return array
-     *
      * @deprecated since Symfony 4.2, use the "getMetadata()" method instead.
      */
-    public function getPreviousTags()
+    public function getPreviousTags(): array
     {
         @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "getMetadata()" method instead.', __METHOD__), E_USER_DEPRECATED);
 
@@ -169,11 +163,9 @@ final class CacheItem implements ItemInterface
      *
      * @param string $key The key to validate
      *
-     * @return string
-     *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key)
+    public static function validateKey($key): string
     {
         if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', \is_object($key) ? \get_class($key) : \gettype($key)));

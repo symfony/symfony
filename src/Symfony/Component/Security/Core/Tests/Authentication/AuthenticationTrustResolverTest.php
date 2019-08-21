@@ -164,11 +164,11 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function __toString()
+    public function __toString(): string
     {
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
     }
 
@@ -184,11 +184,11 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
     }
 
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
     }
 
@@ -200,7 +200,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
     }
 
@@ -208,7 +208,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function hasAttribute($name)
+    public function hasAttribute($name): bool
     {
     }
 

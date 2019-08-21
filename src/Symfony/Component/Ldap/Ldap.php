@@ -12,6 +12,8 @@
 namespace Symfony\Component\Ldap;
 
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
+use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
+use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Exception\DriverNotFoundException;
 
 /**
@@ -41,7 +43,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function query($dn, $query, array $options = [])
+    public function query($dn, $query, array $options = []): QueryInterface
     {
         return $this->adapter->createQuery($dn, $query, $options);
     }
@@ -49,7 +51,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntryManager()
+    public function getEntryManager(): EntryManagerInterface
     {
         return $this->adapter->getEntryManager();
     }
@@ -57,7 +59,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function escape($subject, $ignore = '', $flags = 0)
+    public function escape($subject, $ignore = '', $flags = 0): string
     {
         return $this->adapter->escape($subject, $ignore, $flags);
     }

@@ -40,10 +40,7 @@ final class PathHeader extends AbstractHeader
         $this->setAddress($body);
     }
 
-    /**
-     * @return Address
-     */
-    public function getBody()
+    public function getBody(): Address
     {
         return $this->getAddress();
     }

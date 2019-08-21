@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\MemcachedStore;
 
 /**
@@ -46,7 +47,7 @@ class MemcachedStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    public function getStore()
+    public function getStore(): PersistingStoreInterface
     {
         $memcached = new \Memcached();
         $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);

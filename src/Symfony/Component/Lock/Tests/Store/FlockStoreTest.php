@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 
 /**
@@ -24,7 +25,7 @@ class FlockStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    protected function getStore()
+    protected function getStore(): PersistingStoreInterface
     {
         return new FlockStore();
     }

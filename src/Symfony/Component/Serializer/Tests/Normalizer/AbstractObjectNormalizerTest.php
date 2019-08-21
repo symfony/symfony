@@ -214,7 +214,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 {
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes($object, $format = null, array $context = []): array
     {
         return [];
     }
@@ -228,11 +228,14 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
         $object->$attribute = $value;
     }
 
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = []): bool
     {
         return \in_array($attribute, ['foo', 'baz', 'quux', 'value']);
     }
 
+    /**
+     * @return object
+     */
     public function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
         return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);
@@ -257,7 +260,7 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
         parent::__construct(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
     }
 
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes($object, $format = null, array $context = []): array
     {
     }
 
@@ -294,7 +297,7 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
         $this->normalizers = $normalizers;
     }
 
-    public function serialize($data, $format, array $context = [])
+    public function serialize($data, $format, array $context = []): string
     {
     }
 
@@ -313,7 +316,7 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
         return null;
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return true;
     }
@@ -321,7 +324,7 @@ class SerializerCollectionDummy implements SerializerInterface, DenormalizerInte
 
 class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
 {
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes($object, $format = null, array $context = []): array
     {
     }
 
@@ -334,11 +337,14 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
         $object->$attribute = $value;
     }
 
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = []): bool
     {
         return true;
     }
 
+    /**
+     * @return object
+     */
     public function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
         return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);
@@ -380,7 +386,7 @@ class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareIn
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return '[]' === substr($type, -2)
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);

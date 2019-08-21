@@ -544,11 +544,9 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * @param string $attribute Attribute name
      *
-     * @return array
-     *
      * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute/*, ?string $format */)
+    protected function createChildContext(array $parentContext, $attribute/*, ?string $format */): array
     {
         if (\func_num_args() < 3) {
             @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', \get_class($this), __FUNCTION__), E_USER_DEPRECATED);

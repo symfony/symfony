@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\ArrayCache;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\Cache\Simple\ArrayCache;
  */
 class ArrayCacheTest extends CacheTestCase
 {
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new ArrayCache($defaultLifetime);
     }

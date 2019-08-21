@@ -148,9 +148,9 @@ class LoggerTest extends TestCase
 
 class ClassThatInheritLogger extends Logger
 {
-    public function getLogs()
+    public function getLogs(): array
     {
-        parent::getLogs();
+        return parent::getLogs();
     }
 
     public function countErrors()

@@ -28,10 +28,7 @@ class JsonScriptDataProviderTest extends AbstractScriptDataProviderTest
         return Intl::getDataDirectory();
     }
 
-    /**
-     * @return BundleReaderInterface
-     */
-    protected function createBundleReader()
+    protected function createBundleReader(): BundleReaderInterface
     {
         return new JsonBundleReader();
     }

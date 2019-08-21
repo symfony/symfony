@@ -32,7 +32,7 @@ class EmptyAppTest extends TestCase
 
 class EmptyAppKernel extends Kernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [new TwigBundle()];
     }
@@ -49,12 +49,12 @@ class EmptyAppKernel extends Kernel
         });
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/'.Kernel::VERSION.'/EmptyAppKernel/cache/'.$this->environment;
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sys_get_temp_dir().'/'.Kernel::VERSION.'/EmptyAppKernel/logs';
     }

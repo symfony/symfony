@@ -4,8 +4,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Bar\FooClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\Reference;
 
 require_once __DIR__.'/../includes/classes.php';
 require_once __DIR__.'/../includes/foo.php';

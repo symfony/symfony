@@ -24,7 +24,7 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
  */
 class ChainCacheTest extends CacheTestCase
 {
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new ChainCache([new ArrayCache($defaultLifetime), new FilesystemCache('', $defaultLifetime)], $defaultLifetime);
     }

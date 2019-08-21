@@ -58,10 +58,8 @@ class PhpEngineTest extends TestCase
 
     /**
      * Creates a Container with a Session-containing Request service.
-     *
-     * @return Container
      */
-    protected function getContainer()
+    protected function getContainer(): Container
     {
         $container = new Container();
         $session = new Session(new MockArraySessionStorage());

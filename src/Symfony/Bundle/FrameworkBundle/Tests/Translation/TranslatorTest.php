@@ -410,7 +410,7 @@ class TranslatorWithInvalidLocale extends Translator
     /**
      * {@inheritdoc}
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return 'invalid locale';
     }

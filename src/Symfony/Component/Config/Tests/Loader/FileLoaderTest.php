@@ -103,7 +103,7 @@ class TestFileLoader extends FileLoader
         return $resource;
     }
 
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return $this->supports;
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\Validator\Constraints\PositiveOrZero;
  */
 class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends GreaterThanOrEqualValidatorTest
 {
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new PositiveOrZero();
     }
@@ -26,7 +27,7 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [0, 0],
@@ -42,7 +43,7 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [-1, '-1', 0, '0', 'integer'],

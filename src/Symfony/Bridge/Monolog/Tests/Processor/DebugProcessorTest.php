@@ -99,9 +99,9 @@ class DebugProcessorTest extends TestCase
 
 class ClassThatInheritDebugProcessor extends DebugProcessor
 {
-    public function getLogs()
+    public function getLogs(): array
     {
-        parent::getLogs();
+        return parent::getLogs();
     }
 
     public function countErrors()

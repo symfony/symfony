@@ -34,12 +34,12 @@ class TestExtension implements FormExtensionInterface
         $this->types[\get_class($type)] = $type;
     }
 
-    public function getType($name)
+    public function getType($name): FormTypeInterface
     {
         return isset($this->types[$name]) ? $this->types[$name] : null;
     }
 
-    public function hasType($name)
+    public function hasType($name): bool
     {
         return isset($this->types[$name]);
     }
@@ -55,17 +55,17 @@ class TestExtension implements FormExtensionInterface
         }
     }
 
-    public function getTypeExtensions($name)
+    public function getTypeExtensions($name): array
     {
         return isset($this->extensions[$name]) ? $this->extensions[$name] : [];
     }
 
-    public function hasTypeExtensions($name)
+    public function hasTypeExtensions($name): bool
     {
         return isset($this->extensions[$name]);
     }
 
-    public function getTypeGuesser()
+    public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         return $this->guesser;
     }

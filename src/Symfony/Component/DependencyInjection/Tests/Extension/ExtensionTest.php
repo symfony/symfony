@@ -50,7 +50,7 @@ class EnableableExtension extends Extension
     {
     }
 
-    public function isConfigEnabled(ContainerBuilder $container, array $config)
+    public function isConfigEnabled(ContainerBuilder $container, array $config): bool
     {
         return parent::isConfigEnabled($container, $config);
     }

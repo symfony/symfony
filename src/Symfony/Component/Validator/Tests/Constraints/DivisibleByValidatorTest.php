@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Constraints\DivisibleByValidator;
 
@@ -24,12 +25,12 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
         return new DivisibleByValidator();
     }
 
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new DivisibleBy($options);
     }
 
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return DivisibleBy::NOT_DIVISIBLE_BY;
     }
@@ -37,7 +38,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [-7, 1],
@@ -54,7 +55,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath()
+    public function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [25],
@@ -64,7 +65,7 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [1, '1', 2, '2', 'integer'],

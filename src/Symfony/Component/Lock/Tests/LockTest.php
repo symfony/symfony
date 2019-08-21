@@ -34,6 +34,9 @@ class LockTest extends TestCase
         $store
             ->expects($this->once())
             ->method('save');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertTrue($lock->acquire(false));
     }
@@ -47,6 +50,9 @@ class LockTest extends TestCase
         $store
             ->expects($this->once())
             ->method('save');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertTrue($lock->acquire(false));
     }
@@ -63,6 +69,9 @@ class LockTest extends TestCase
         $store
             ->expects($this->once())
             ->method('save');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertTrue($lock->acquire(false));
     }
@@ -77,6 +86,9 @@ class LockTest extends TestCase
             ->expects($this->once())
             ->method('save')
             ->willThrowException(new LockConflictedException());
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertFalse($lock->acquire(false));
     }
@@ -91,6 +103,9 @@ class LockTest extends TestCase
             ->expects($this->once())
             ->method('save')
             ->willThrowException(new LockConflictedException());
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertFalse($lock->acquire(false));
     }
@@ -107,6 +122,9 @@ class LockTest extends TestCase
         $store
             ->expects($this->once())
             ->method('waitAndSave');
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertTrue($lock->acquire(true));
     }
@@ -124,6 +142,9 @@ class LockTest extends TestCase
             ->expects($this->once())
             ->method('putOffExpiration')
             ->with($key, 10);
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $lock->acquire();
     }
@@ -138,6 +159,9 @@ class LockTest extends TestCase
             ->expects($this->once())
             ->method('putOffExpiration')
             ->with($key, 10);
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $lock->refresh();
     }
@@ -152,6 +176,9 @@ class LockTest extends TestCase
             ->expects($this->once())
             ->method('putOffExpiration')
             ->with($key, 20);
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $lock->refresh(20);
     }
@@ -163,10 +190,9 @@ class LockTest extends TestCase
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->any())
             ->method('exists')
             ->with($key)
-            ->will($this->onConsecutiveCalls(true, false));
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->assertTrue($lock->isAcquired());
     }
@@ -219,7 +245,7 @@ class LockTest extends TestCase
 
         $store
             ->method('exists')
-            ->willReturnOnConsecutiveCalls([true, false])
+            ->willReturnOnConsecutiveCalls(true, false)
         ;
         $store
             ->expects($this->once())
@@ -238,7 +264,7 @@ class LockTest extends TestCase
 
         $store
             ->method('exists')
-            ->willReturnOnConsecutiveCalls([true, false])
+            ->willReturnOnConsecutiveCalls(true, false)
         ;
         $store
             ->expects($this->never())

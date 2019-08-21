@@ -32,10 +32,7 @@ class ConsoleLoggerTest extends TestCase
      */
     protected $output;
 
-    /**
-     * @return LoggerInterface
-     */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         $this->output = new DummyOutput(OutputInterface::VERBOSITY_VERBOSE);
 
@@ -56,7 +53,7 @@ class ConsoleLoggerTest extends TestCase
      *
      * @return string[]
      */
-    public function getLogs()
+    public function getLogs(): array
     {
         return $this->output->getLogs();
     }

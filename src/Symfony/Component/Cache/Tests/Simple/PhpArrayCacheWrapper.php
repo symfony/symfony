@@ -17,7 +17,7 @@ class PhpArrayCacheWrapper extends PhpArrayCache
 {
     protected $data = [];
 
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         (\Closure::bind(function () use ($key, $value) {
             $this->data[$key] = $value;
@@ -28,7 +28,7 @@ class PhpArrayCacheWrapper extends PhpArrayCache
         return true;
     }
 
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         if (!\is_array($values) && !$values instanceof \Traversable) {
             return parent::setMultiple($values, $ttl);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\RedisStore;
 
 /**
@@ -38,7 +39,7 @@ abstract class AbstractRedisStoreTest extends AbstractStoreTest
     /**
      * {@inheritdoc}
      */
-    public function getStore()
+    public function getStore(): PersistingStoreInterface
     {
         return new RedisStore($this->getRedisConnection());
     }

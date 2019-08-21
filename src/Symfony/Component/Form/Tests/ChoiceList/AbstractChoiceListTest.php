@@ -218,10 +218,7 @@ abstract class AbstractChoiceListTest extends TestCase
         $this->assertNotEmpty($this->list->getChoicesForValues($values));
     }
 
-    /**
-     * @return \Symfony\Component\Form\ChoiceList\ChoiceListInterface
-     */
-    abstract protected function createChoiceList();
+    abstract protected function createChoiceList(): \Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
     abstract protected function getChoices();
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Constraints\NotEqualToValidator;
 
@@ -24,12 +25,12 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return new NotEqualToValidator();
     }
 
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new NotEqualTo($options);
     }
 
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return NotEqualTo::IS_EQUAL_ERROR;
     }
@@ -37,7 +38,7 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [1, 2],
@@ -53,7 +54,7 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath()
+    public function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [0],
@@ -63,7 +64,7 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [3, '3', 3, '3', 'integer'],

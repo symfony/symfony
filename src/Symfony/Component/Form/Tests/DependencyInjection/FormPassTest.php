@@ -238,10 +238,7 @@ class FormPassTest extends TestCase
         $this->assertEquals($expectedRegisteredExtensions, $extDefinition->getArgument(1));
     }
 
-    /**
-     * @return array
-     */
-    public function addLegacyTaggedTypeExtensionsDataProvider()
+    public function addLegacyTaggedTypeExtensionsDataProvider(): array
     {
         return [
             [

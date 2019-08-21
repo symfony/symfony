@@ -110,10 +110,7 @@ YAML;
         return $filename;
     }
 
-    /**
-     * @return CommandTester
-     */
-    protected function createCommandTester()
+    protected function createCommandTester(): CommandTester
     {
         $application = new Application();
         $application->add(new LintCommand());

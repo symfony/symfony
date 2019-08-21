@@ -20,7 +20,7 @@ class NodeBuilder extends BaseNodeBuilder
         return $this->node($name, 'bar');
     }
 
-    protected function getNodeClass($type)
+    protected function getNodeClass($type): string
     {
         switch ($type) {
             case 'variable':

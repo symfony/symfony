@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Store\RetryTillSaveStore;
 
@@ -21,7 +22,7 @@ class RetryTillSaveStoreTest extends AbstractStoreTest
 {
     use BlockingStoreTestTrait;
 
-    public function getStore()
+    public function getStore(): PersistingStoreInterface
     {
         $redis = new \Predis\Client('tcp://'.getenv('REDIS_HOST').':6379');
         try {

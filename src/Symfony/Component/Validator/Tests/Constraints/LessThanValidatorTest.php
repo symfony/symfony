@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\LessThanValidator;
 
@@ -24,12 +25,12 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         return new LessThanValidator();
     }
 
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new LessThan($options);
     }
 
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return LessThan::TOO_HIGH_ERROR;
     }
@@ -37,7 +38,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [1, 2],
@@ -53,7 +54,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath()
+    public function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [4],
@@ -63,7 +64,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [3, '3', 2, '2', 'integer'],

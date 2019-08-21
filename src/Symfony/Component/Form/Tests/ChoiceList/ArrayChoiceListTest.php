@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\ChoiceList;
 
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -27,7 +28,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
         parent::setUp();
     }
 
-    protected function createChoiceList()
+    protected function createChoiceList(): ChoiceListInterface
     {
         return new ArrayChoiceList($this->getChoices());
     }

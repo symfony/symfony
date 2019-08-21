@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Guard\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -98,21 +99,19 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     private $loginUrl;
     private $defaultSuccessRedirectUrl;
 
-    public function supports(Request $request)
+    public function supports(Request $request): bool
     {
         return true;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
     }
 
     /**
      * @param mixed $defaultSuccessRedirectUrl
-     *
-     * @return TestFormLoginAuthenticator
      */
-    public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl)
+    public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl): TestFormLoginAuthenticator
     {
         $this->defaultSuccessRedirectUrl = $defaultSuccessRedirectUrl;
 
@@ -121,10 +120,8 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 
     /**
      * @param mixed $loginUrl
-     *
-     * @return TestFormLoginAuthenticator
      */
-    public function setLoginUrl($loginUrl)
+    public function setLoginUrl($loginUrl): TestFormLoginAuthenticator
     {
         $this->loginUrl = $loginUrl;
 
@@ -134,7 +131,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * {@inheritdoc}
      */
-    protected function getLoginUrl()
+    protected function getLoginUrl(): string
     {
         return $this->loginUrl;
     }
@@ -158,7 +155,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * {@inheritdoc}
      */
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
     {
         return $userProvider->loadUserByUsername($credentials);
     }
@@ -166,7 +163,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * {@inheritdoc}
      */
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $user): bool
     {
         return true;
     }

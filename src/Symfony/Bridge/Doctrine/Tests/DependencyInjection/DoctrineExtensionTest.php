@@ -257,10 +257,7 @@ class DoctrineExtensionTest extends TestCase
         $method->invokeArgs($this->extension, [$objectManager, $container, $cacheName]);
     }
 
-    /**
-     * @return \Symfony\Component\DependencyInjection\ContainerBuilder
-     */
-    protected function createContainer(array $data = [])
+    protected function createContainer(array $data = []): ContainerBuilder
     {
         return new ContainerBuilder(new ParameterBag(array_merge([
             'kernel.bundles' => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],

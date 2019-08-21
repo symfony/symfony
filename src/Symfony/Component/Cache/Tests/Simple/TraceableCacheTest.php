@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\FilesystemCache;
 use Symfony\Component\Cache\Simple\TraceableCache;
 
@@ -24,7 +25,7 @@ class TraceableCacheTest extends CacheTestCase
         'testPrune' => 'TraceableCache just proxies',
     ];
 
-    public function createSimpleCache($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0): CacheInterface
     {
         return new TraceableCache(new FilesystemCache('', $defaultLifetime));
     }

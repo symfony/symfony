@@ -32,15 +32,12 @@ final class ClassInstanceSupportStrategy implements SupportStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Workflow $workflow, $subject)
+    public function supports(Workflow $workflow, $subject): bool
     {
         return $subject instanceof $this->className;
     }
 
-    /**
-     * @return string
-     */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }

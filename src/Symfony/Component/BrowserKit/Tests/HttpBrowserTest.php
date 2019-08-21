@@ -58,7 +58,7 @@ class TestHttpClient extends HttpBrowser
         $this->nextScript = $script;
     }
 
-    protected function filterResponse($response)
+    protected function filterResponse($response): Response
     {
         if ($response instanceof SpecialHttpResponse) {
             return new Response($response->getContent(), $response->getStatusCode(), $response->getHeaders());
@@ -67,7 +67,7 @@ class TestHttpClient extends HttpBrowser
         return $response;
     }
 
-    protected function doRequest($request)
+    protected function doRequest($request): Response
     {
         $response = parent::doRequest($request);
 

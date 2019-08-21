@@ -53,10 +53,7 @@ class NativeSessionStorageTest extends TestCase
         $this->savePath = null;
     }
 
-    /**
-     * @return NativeSessionStorage
-     */
-    protected function getStorage(array $options = [])
+    protected function getStorage(array $options = []): NativeSessionStorage
     {
         $storage = new NativeSessionStorage($options);
         $storage->registerBag(new AttributeBag());

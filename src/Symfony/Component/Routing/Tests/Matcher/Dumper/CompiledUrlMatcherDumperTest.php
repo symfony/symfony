@@ -487,7 +487,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
 
 class TestCompiledUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface
 {
-    public function redirect($path, $route, $scheme = null)
+    public function redirect($path, $route, $scheme = null): array
     {
         return [];
     }

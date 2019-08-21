@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
+use Symfony\Component\Mailer\Bridge\Amazon\Credential\InstanceCredentialProvider;
+use Symfony\Component\Mailer\Bridge\Amazon\Credential\UsernamePasswordCredential;
+use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -21,23 +24,41 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  */
 final class SesTransportFactory extends AbstractTransportFactory
 {
+    private $credentialProvider;
+
+    public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null)
+    {
+        parent::__construct($dispatcher, $client, $logger);
+
+        $this->credentialProvider = new InstanceCredentialProvider($client);
+    }
+
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
-        $user = $this->getUser($dsn);
-        $password = $this->getPassword($dsn);
+        try {
+            $credential = new UsernamePasswordCredential($this->getUser($dsn), $this->getPassword($dsn));
+        } catch (IncompleteDsnException $e) {
+            $role = $dsn->getOption('role');
+
+            if (null === $role) {
+                throw new IncompleteDsnException('User and password nor role is not set.');
+            }
+
+            $credential = $this->credentialProvider->getCredential($role);
+        }
         $region = $dsn->getOption('region');
 
         if ('api' === $scheme) {
-            return new SesApiTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger);
+            return new SesApiTransport($credential, $region, $this->client, $this->dispatcher, $this->logger);
         }
 
         if ('http' === $scheme) {
-            return new SesHttpTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger);
+            return new SesHttpTransport($credential, $region, $this->client, $this->dispatcher, $this->logger);
         }
 
         if ('smtp' === $scheme || 'smtps' === $scheme) {
-            return new SesSmtpTransport($user, $password, $region, $this->dispatcher, $this->logger);
+            return new SesSmtpTransport($credential, $region, $this->dispatcher, $this->logger);
         }
 
         throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp', 'smtps']);

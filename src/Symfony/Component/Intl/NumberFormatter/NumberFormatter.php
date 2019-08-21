@@ -40,7 +40,7 @@ use Symfony\Component\Intl\Locale\Locale;
  *
  * @internal
  */
-class NumberFormatter
+abstract class NumberFormatter
 {
     /* Format style constants */
     const PATTERN_DECIMAL = 0;
@@ -286,7 +286,7 @@ class NumberFormatter
      *                             NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                             described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
-     * @return self
+     * @return static
      *
      * @see https://php.net/numberformatter.create
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
@@ -298,7 +298,7 @@ class NumberFormatter
      */
     public static function create($locale = 'en', $style = null, $pattern = null)
     {
-        return new self($locale, $style, $pattern);
+        return new static($locale, $style, $pattern);
     }
 
     /**

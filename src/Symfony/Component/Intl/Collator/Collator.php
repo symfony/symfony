@@ -33,7 +33,7 @@ use Symfony\Component\Intl\Locale\Locale;
  *
  * @internal
  */
-class Collator
+abstract class Collator
 {
     /* Attribute constants */
     const FRENCH_COLLATION = 0;
@@ -86,13 +86,13 @@ class Collator
      *
      * @param string|null $locale The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      *
-     * @return self
+     * @return static
      *
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      */
     public static function create($locale)
     {
-        return new self($locale);
+        return new static($locale);
     }
 
     /**

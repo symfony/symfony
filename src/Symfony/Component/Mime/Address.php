@@ -39,12 +39,12 @@ final class Address
             self::$validator = new EmailValidator();
         }
 
-        if (!self::$validator->isValid($address, new RFCValidation())) {
+        $this->address = trim($address);
+        $this->name = trim(str_replace(["\n", "\r"], '', $name));
+
+        if (!self::$validator->isValid($this->address, new RFCValidation())) {
             throw new RfcComplianceException(sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
         }
-
-        $this->address = $address;
-        $this->name = $name;
     }
 
     public function getAddress(): string

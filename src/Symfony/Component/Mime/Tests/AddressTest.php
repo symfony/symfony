@@ -63,4 +63,18 @@ class AddressTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         Address::createArray([new \stdClass()]);
     }
+
+    /**
+     * @dataProvider nameEmptyDataProvider
+     */
+    public function testNameEmpty(string $name)
+    {
+        $mail = 'mail@example.org';
+        $this->assertSame($mail, (new Address($mail, $name))->toString());
+    }
+
+    public function nameEmptyDataProvider(): array
+    {
+        return [[''], [' '], [" \r\n "]];
+    }
 }

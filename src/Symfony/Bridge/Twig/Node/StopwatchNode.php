@@ -19,6 +19,8 @@ use Twig\Node\Node;
  * Represents a stopwatch node.
  *
  * @author Wouter J <wouter@wouterj.nl>
+ *
+ * @final since Symfony 4.4
  */
 class StopwatchNode extends Node
 {

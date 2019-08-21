@@ -24,6 +24,8 @@ class_exists('Twig\Node\Expression\ArrayExpression');
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class TransNode extends Node
 {

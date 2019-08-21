@@ -22,6 +22,8 @@ use Twig\TwigFunction;
  * Provides integration of the Routing component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class RoutingExtension extends AbstractExtension
 {

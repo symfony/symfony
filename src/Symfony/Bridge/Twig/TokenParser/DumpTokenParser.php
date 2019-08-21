@@ -26,6 +26,8 @@ use Twig\TokenParser\AbstractTokenParser;
  *     {% dump foo, bar %}
  *
  * @author Julien Galenski <julien.galenski@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class DumpTokenParser extends AbstractTokenParser
 {

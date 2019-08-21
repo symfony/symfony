@@ -73,7 +73,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
 
         foreach ($templates as $template) {
             try {
-                $twig->loadTemplate($template);
+                $twig->load($template);
             } catch (Error $e) {
                 // problem during compilation, give up
             }

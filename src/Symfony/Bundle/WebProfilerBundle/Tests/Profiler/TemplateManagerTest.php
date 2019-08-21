@@ -127,7 +127,7 @@ class ProfileDummy extends Profile
         parent::__construct('token');
     }
 
-    public function hasCollector($name)
+    public function hasCollector($name): bool
     {
         switch ($name) {
             case 'foo':

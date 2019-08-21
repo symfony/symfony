@@ -132,7 +132,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
 class FooConfiguration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('foo');
         $treeBuilder->getRootNode()
@@ -147,12 +147,12 @@ class FooConfiguration implements ConfigurationInterface
 
 class FooExtension extends Extension
 {
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'foo';
     }
 
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         return new FooConfiguration();
     }
@@ -179,12 +179,12 @@ class BarExtension extends Extension
 
 class ThrowingExtension extends Extension
 {
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'throwing';
     }
 
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         return new FooConfiguration();
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
@@ -42,7 +43,7 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         return new PhpArrayAdapter(self::$file, new FilesystemAdapter('php-array-fallback', $defaultLifetime));
     }

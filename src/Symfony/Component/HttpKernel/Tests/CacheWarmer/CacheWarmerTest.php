@@ -59,7 +59,7 @@ class TestCacheWarmer extends CacheWarmer
         $this->writeCacheFile($this->file, 'content');
     }
 
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }

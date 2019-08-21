@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\IdenticalToValidator;
 
@@ -24,17 +25,17 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return new IdenticalToValidator();
     }
 
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new IdenticalTo($options);
     }
 
-    protected function getErrorCode()
+    protected function getErrorCode(): ?string
     {
         return IdenticalTo::NOT_IDENTICAL_ERROR;
     }
 
-    public function provideAllValidComparisons()
+    public function provideAllValidComparisons(): array
     {
         $this->setDefaultTimezone('UTC');
 
@@ -50,7 +51,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         $date = new \DateTime('2000-01-01');
         $object = new ComparisonTest_Class(2);
@@ -72,7 +73,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisonsToPropertyPath()
+    public function provideValidComparisonsToPropertyPath(): array
     {
         return [
             [5],
@@ -82,7 +83,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [1, '1', 2, '2', 'integer'],

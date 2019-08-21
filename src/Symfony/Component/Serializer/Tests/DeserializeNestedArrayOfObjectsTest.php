@@ -64,7 +64,7 @@ class Zoo
     /**
      * @return Animal[]
      */
-    public function getAnimals()
+    public function getAnimals(): array
     {
         return $this->animals;
     }
@@ -94,7 +94,7 @@ class ZooImmutable
     /**
      * @return Animal[]
      */
-    public function getAnimals()
+    public function getAnimals(): array
     {
         return $this->animals;
     }
@@ -110,10 +110,7 @@ class Animal
         echo '';
     }
 
-    /**
-     * @return string|null
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }

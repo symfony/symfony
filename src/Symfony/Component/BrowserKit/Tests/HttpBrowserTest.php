@@ -54,7 +54,7 @@ class TestHttpClient extends HttpBrowser
         $this->nextScript = $script;
     }
 
-    protected function filterResponse($response)
+    protected function filterResponse($response): Response
     {
         return $response;
     }

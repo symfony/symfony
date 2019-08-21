@@ -41,74 +41,47 @@ class Logger implements LoggerInterface
         ];
     }
 
-    /**
-     * @return void
-     */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         $this->logs[$level][] = $message;
     }
 
-    /**
-     * @return void
-     */
-    public function emergency($message, array $context = [])
+    public function emergency($message, array $context = []): void
     {
         $this->log('emergency', $message, $context);
     }
 
-    /**
-     * @return void
-     */
-    public function alert($message, array $context = [])
+    public function alert($message, array $context = []): void
     {
         $this->log('alert', $message, $context);
     }
 
-    /**
-     * @return void
-     */
-    public function critical($message, array $context = [])
+    public function critical($message, array $context = []): void
     {
         $this->log('critical', $message, $context);
     }
 
-    /**
-     * @return void
-     */
-    public function error($message, array $context = [])
+    public function error($message, array $context = []): void
     {
         $this->log('error', $message, $context);
     }
 
-    /**
-     * @return void
-     */
-    public function warning($message, array $context = [])
+    public function warning($message, array $context = []): void
     {
         $this->log('warning', $message, $context);
     }
 
-    /**
-     * @return void
-     */
-    public function notice($message, array $context = [])
+    public function notice($message, array $context = []): void
     {
         $this->log('notice', $message, $context);
     }
 
-    /**
-     * @return void
-     */
-    public function info($message, array $context = [])
+    public function info($message, array $context = []): void
     {
         $this->log('info', $message, $context);
     }
 
-    /**
-     * @return void
-     */
-    public function debug($message, array $context = [])
+    public function debug($message, array $context = []): void
     {
         $this->log('debug', $message, $context);
     }

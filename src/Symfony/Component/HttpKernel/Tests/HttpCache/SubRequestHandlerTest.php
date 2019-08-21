@@ -143,7 +143,7 @@ class TestSubRequestHandlerKernel implements HttpKernelInterface
         $this->assertCallback = $assertCallback;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
     {
         $assertCallback = $this->assertCallback;
         $assertCallback($request, $type, $catch);

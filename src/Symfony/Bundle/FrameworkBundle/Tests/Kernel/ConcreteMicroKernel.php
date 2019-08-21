@@ -47,19 +47,19 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         throw new Danger();
     }
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [
             new FrameworkBundle(),
         ];
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return $this->cacheDir = sys_get_temp_dir().'/sf_micro_kernel';
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return $this->cacheDir;
     }
@@ -100,7 +100,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::EXCEPTION => 'onKernelException',

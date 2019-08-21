@@ -296,7 +296,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
 class EnvConfiguration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('env_extension');
         $treeBuilder->getRootNode()
@@ -359,7 +359,7 @@ class EnvConfiguration implements ConfigurationInterface
 
 class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('env_extension');
         $treeBuilder->getRootNode()
@@ -385,12 +385,12 @@ class EnvExtension extends Extension
         $this->configuration = $configuration ?? new EnvConfiguration();
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'env_extension';
     }
 
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         return $this->configuration;
     }

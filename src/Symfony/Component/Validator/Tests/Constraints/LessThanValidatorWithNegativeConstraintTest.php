@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Negative;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\Validator\Constraints\Negative;
  */
 class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
 {
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new Negative();
     }
@@ -26,7 +27,7 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [-1, 0],
@@ -39,7 +40,7 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [0, '0', 0, '0', 'integer'],

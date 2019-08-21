@@ -179,7 +179,7 @@ class RegisterListenersPassTest extends TestCase
 
 class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'event' => 'onEvent',

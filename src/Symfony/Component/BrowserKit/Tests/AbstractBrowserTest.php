@@ -16,6 +16,7 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
 
 class TestClient extends AbstractBrowser
@@ -33,7 +34,7 @@ class TestClient extends AbstractBrowser
         $this->nextScript = $script;
     }
 
-    protected function doRequest($request)
+    protected function doRequest($request): Response
     {
         if (null === $this->nextResponse) {
             return new Response();
@@ -45,7 +46,7 @@ class TestClient extends AbstractBrowser
         return $response;
     }
 
-    protected function filterResponse($response)
+    protected function filterResponse($response): Response
     {
         return $response;
     }
@@ -888,7 +889,7 @@ class ClassThatInheritClient extends AbstractBrowser
         $this->nextResponse = $response;
     }
 
-    protected function doRequest($request)
+    protected function doRequest($request): Response
     {
         if (null === $this->nextResponse) {
             return new Response();
@@ -900,7 +901,7 @@ class ClassThatInheritClient extends AbstractBrowser
         return $response;
     }
 
-    public function submit(DomCrawlerForm $form, array $values = [], array $serverParameters = [])
+    public function submit(DomCrawlerForm $form, array $values = [], array $serverParameters = []): Crawler
     {
         return parent::submit($form, $values, $serverParameters);
     }

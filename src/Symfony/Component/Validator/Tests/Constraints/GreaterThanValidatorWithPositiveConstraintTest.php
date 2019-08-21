@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Positive;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\Validator\Constraints\Positive;
  */
 class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidatorTest
 {
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new Positive();
     }
@@ -26,7 +27,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [2, 0],
@@ -39,7 +40,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [0, '0', 0, '0', 'integer'],

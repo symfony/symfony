@@ -78,12 +78,12 @@ class FileDumperTest extends TestCase
 
 class ConcreteFileDumper extends FileDumper
 {
-    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = [])
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = []): string
     {
         return http_build_query($messages->all($domain), '', '&');
     }
 
-    protected function getExtension()
+    protected function getExtension(): string
     {
         return 'concrete';
     }

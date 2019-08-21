@@ -19,14 +19,14 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class TestAppKernel extends Kernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [
             new FrameworkBundle(),
         ];
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__.'/test';
     }

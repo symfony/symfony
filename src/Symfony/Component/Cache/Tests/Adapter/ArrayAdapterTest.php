@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
@@ -24,7 +25,7 @@ class ArrayAdapterTest extends AdapterTestCase
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
     ];
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         return new ArrayAdapter($defaultLifetime);
     }

@@ -61,7 +61,7 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 
 class DummyConstraint extends Constraint
 {
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return DummyConstraintValidator::class;
     }

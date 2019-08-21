@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NegativeOrZero;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\Validator\Constraints\NegativeOrZero;
  */
 class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanOrEqualValidatorTest
 {
-    protected function createConstraint(array $options = null)
+    protected function createConstraint(array $options = null): Constraint
     {
         return new NegativeOrZero();
     }
@@ -26,7 +27,7 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     /**
      * {@inheritdoc}
      */
-    public function provideValidComparisons()
+    public function provideValidComparisons(): array
     {
         return [
             [0, 0],
@@ -40,7 +41,7 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     /**
      * {@inheritdoc}
      */
-    public function provideInvalidComparisons()
+    public function provideInvalidComparisons(): array
     {
         return [
             [2, '2', 0, '0', 'integer'],

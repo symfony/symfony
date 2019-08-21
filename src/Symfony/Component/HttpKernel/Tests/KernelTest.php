@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
+use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
@@ -589,10 +590,8 @@ EOF;
 
     /**
      * Returns a mock for the BundleInterface.
-     *
-     * @return BundleInterface
      */
-    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
+    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null): BundleInterface
     {
         $bundle = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')
@@ -632,10 +631,8 @@ EOF;
      *
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
-     *
-     * @return Kernel
      */
-    protected function getKernel(array $methods = [], array $bundles = [])
+    protected function getKernel(array $methods = [], array $bundles = []): Kernel
     {
         $methods[] = 'registerBundles';
 
@@ -673,7 +670,7 @@ class TestKernel implements HttpKernelInterface
         $this->terminateCalled = true;
     }
 
-    public function handle(Request $request, int $type = self::MASTER_REQUEST, bool $catch = true)
+    public function handle(Request $request, int $type = self::MASTER_REQUEST, bool $catch = true): Response
     {
     }
 }
@@ -692,7 +689,7 @@ class CustomProjectDirKernel extends Kernel
         $this->httpKernel = $httpKernel;
     }
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [];
     }
@@ -701,7 +698,7 @@ class CustomProjectDirKernel extends Kernel
     {
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__.'/Fixtures';
     }
@@ -713,7 +710,7 @@ class CustomProjectDirKernel extends Kernel
         }
     }
 
-    protected function getHttpKernel()
+    protected function getHttpKernel(): HttpKernelInterface
     {
         return $this->httpKernel;
     }

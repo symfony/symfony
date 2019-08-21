@@ -59,12 +59,12 @@ class VoterTest extends TestCase
 
 class VoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute(string $attribute, $object, TokenInterface $token)
+    protected function voteOnAttribute(string $attribute, $object, TokenInterface $token): bool
     {
         return 'EDIT' === $attribute;
     }
 
-    protected function supports(string $attribute, $object)
+    protected function supports(string $attribute, $object): bool
     {
         return $object instanceof \stdClass && \in_array($attribute, ['EDIT', 'CREATE']);
     }

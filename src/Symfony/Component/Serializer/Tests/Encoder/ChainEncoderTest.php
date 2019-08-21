@@ -124,7 +124,7 @@ class ChainNormalizationAwareEncoder extends ChainEncoder implements Normalizati
 
 class NormalizationAwareEncoder implements EncoderInterface, NormalizationAwareInterface
 {
-    public function supportsEncoding(string $format)
+    public function supportsEncoding(string $format): bool
     {
         return true;
     }

@@ -53,7 +53,7 @@ class NoTemplatingEntryTest extends TestCase
 
 class NoTemplatingEntryKernel extends Kernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [new FrameworkBundle(), new TwigBundle()];
     }
@@ -73,12 +73,12 @@ class NoTemplatingEntryKernel extends Kernel
         });
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/'.Kernel::VERSION.'/NoTemplatingEntryKernel/cache/'.$this->environment;
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sys_get_temp_dir().'/'.Kernel::VERSION.'/NoTemplatingEntryKernel/logs';
     }

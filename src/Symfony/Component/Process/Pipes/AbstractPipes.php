@@ -86,8 +86,6 @@ abstract class AbstractPipes implements PipesInterface
     /**
      * Writes input to stdin.
      *
-     * @return array|null
-     *
      * @throws InvalidArgumentException When an input iterator yields a non supported value
      */
     protected function write(): ?array

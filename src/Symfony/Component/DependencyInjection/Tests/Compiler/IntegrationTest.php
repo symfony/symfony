@@ -406,7 +406,7 @@ class IntegrationTest extends TestCase
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface
 {
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [];
     }

@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 
 class RecursiveFormTypeBar extends AbstractType
 {
-    public function getParent()
+    public function getParent(): ?string
     {
         return RecursiveFormTypeBaz::class;
     }

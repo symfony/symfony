@@ -43,7 +43,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function query(string $dn, string $query, array $options = []): ?QueryInterface
+    public function query(string $dn, string $query, array $options = []): QueryInterface
     {
         return $this->adapter->createQuery($dn, $query, $options);
     }
@@ -51,7 +51,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntryManager(): ?EntryManagerInterface
+    public function getEntryManager(): EntryManagerInterface
     {
         return $this->adapter->getEntryManager();
     }
@@ -59,7 +59,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function escape(string $subject, string $ignore = '', int $flags = 0): ?string
+    public function escape(string $subject, string $ignore = '', int $flags = 0): string
     {
         return $this->adapter->escape($subject, $ignore, $flags);
     }

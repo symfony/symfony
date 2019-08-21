@@ -833,7 +833,7 @@ class ObjectInner
 
 class FormatAndContextAwareNormalizer extends ObjectNormalizer
 {
-    protected function isAllowedAttribute($classOrObject, string $attribute, string $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, string $attribute, string $format = null, array $context = []): bool
     {
         if (\in_array($attribute, ['foo', 'bar']) && 'foo_and_bar_included' === $format) {
             return true;

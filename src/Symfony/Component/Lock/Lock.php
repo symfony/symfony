@@ -149,7 +149,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function isAcquired()
+    public function isAcquired(): bool
     {
         return $this->dirty = $this->store->exists($this->key);
     }
@@ -189,7 +189,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function getRemainingLifetime()
+    public function getRemainingLifetime(): ?float
     {
         return $this->key->getRemainingLifetime();
     }

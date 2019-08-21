@@ -164,10 +164,7 @@ EOPHP;
         $this->assertSame(123, @$foo->dynamicProp);
     }
 
-    /**
-     * @return array
-     */
-    public function getProxyCandidates()
+    public function getProxyCandidates(): array
     {
         $definitions = [
             [new Definition(__CLASS__), true],

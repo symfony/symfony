@@ -87,7 +87,7 @@ class ProjectTemplateLoaderVar extends Loader
         return false;
     }
 
-    public function isFresh(TemplateReferenceInterface $template, int $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         return false;
     }

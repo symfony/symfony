@@ -57,7 +57,7 @@ class LoggerTest extends TestCase
      *
      * @return string[]
      */
-    public function getLogs()
+    public function getLogs(): array
     {
         return file($this->tmpFile, FILE_IGNORE_NEW_LINES);
     }

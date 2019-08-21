@@ -23,10 +23,7 @@ class TestSingularAndPluralProps
     /** @var array */
     private $emails = [];
 
-    /**
-     * @return string|null
-     */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -39,10 +36,7 @@ class TestSingularAndPluralProps
         $this->email = $email;
     }
 
-    /**
-     * @return array
-     */
-    public function getEmails()
+    public function getEmails(): array
     {
         return $this->emails;
     }

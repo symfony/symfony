@@ -1328,7 +1328,7 @@ class Rot13EnvVarProcessor implements EnvVarProcessorInterface
         return str_rot13($getEnv($name));
     }
 
-    public static function getProvidedTypes()
+    public static function getProvidedTypes(): array
     {
         return ['rot13' => 'string'];
     }

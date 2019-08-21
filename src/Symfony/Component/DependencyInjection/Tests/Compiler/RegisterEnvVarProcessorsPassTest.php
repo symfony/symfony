@@ -78,7 +78,7 @@ class SimpleProcessor implements EnvVarProcessorInterface
         return $getEnv($name);
     }
 
-    public static function getProvidedTypes()
+    public static function getProvidedTypes(): array
     {
         return ['foo' => 'string'];
     }
@@ -86,7 +86,7 @@ class SimpleProcessor implements EnvVarProcessorInterface
 
 class BadProcessor extends SimpleProcessor
 {
-    public static function getProvidedTypes()
+    public static function getProvidedTypes(): array
     {
         return ['foo' => 'string|foo'];
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
@@ -25,7 +26,7 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
  */
 class ChainAdapterTest extends AdapterTestCase
 {
-    public function createCachePool($defaultLifetime = 0, $testMethod = null)
+    public function createCachePool($defaultLifetime = 0, $testMethod = null): CacheItemPoolInterface
     {
         if ('testGetMetadata' === $testMethod) {
             return new ChainAdapter([new FilesystemAdapter('', $defaultLifetime)], $defaultLifetime);

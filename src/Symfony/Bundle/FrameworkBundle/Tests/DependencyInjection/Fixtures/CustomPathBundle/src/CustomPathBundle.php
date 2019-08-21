@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class CustomPathBundle extends Bundle
 {
-    public function getPath()
+    public function getPath(): string
     {
         return __DIR__.'/..';
     }

@@ -95,7 +95,7 @@ class CollatorTest extends AbstractCollatorTest
         $this->assertInstanceOf('\Symfony\Component\Intl\Collator\Collator', $collator);
     }
 
-    protected function getCollator($locale)
+    protected function getCollator(?string $locale): Collator
     {
         return new class($locale) extends Collator {
         };

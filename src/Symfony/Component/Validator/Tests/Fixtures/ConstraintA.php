@@ -19,7 +19,7 @@ class ConstraintA extends Constraint
     public $property1;
     public $property2;
 
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'property2';
     }

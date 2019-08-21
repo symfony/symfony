@@ -14,6 +14,7 @@ namespace Symfony\Component\Templating\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\Loader\Loader;
+use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateNameParser;
@@ -194,7 +195,7 @@ class PhpEngineTest extends TestCase
 
 class ProjectTemplateEngine extends PhpEngine
 {
-    public function getLoader()
+    public function getLoader(): LoaderInterface
     {
         return $this->loader;
     }
@@ -219,7 +220,7 @@ class ProjectTemplateLoader extends Loader
         return false;
     }
 
-    public function isFresh(TemplateReferenceInterface $template, int $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         return false;
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
@@ -24,7 +25,7 @@ class TagAwareAdapterTest extends AdapterTestCase
 {
     use TagAwareTestTrait;
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
     {
         return new TagAwareAdapter(new FilesystemAdapter('', $defaultLifetime));
     }

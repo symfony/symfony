@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 abstract class AbstractWebTestCase extends BaseWebTestCase
 {
@@ -42,14 +43,14 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         $fs->remove($dir);
     }
 
-    protected static function getKernelClass()
+    protected static function getKernelClass(): string
     {
         require_once __DIR__.'/app/AppKernel.php';
 
         return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel';
     }
 
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = []): KernelInterface
     {
         $class = self::getKernelClass();
 

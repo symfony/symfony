@@ -168,13 +168,13 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
         $formatter->setTextAttribute(NumberFormatter::NEGATIVE_PREFIX, '-');
     }
 
-    protected function getNumberFormatter($locale = 'en', $style = null, $pattern = null)
+    protected function getNumberFormatter(?string $locale = 'en', string $style = null, string $pattern = null): NumberFormatter
     {
         return new class($locale, $style, $pattern) extends NumberFormatter {
         };
     }
 
-    protected function getIntlErrorMessage()
+    protected function getIntlErrorMessage(): string
     {
         return IntlGlobals::getErrorMessage();
     }
@@ -184,7 +184,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
         return IntlGlobals::getErrorCode();
     }
 
-    protected function isIntlFailure($errorCode)
+    protected function isIntlFailure($errorCode): bool
     {
         return IntlGlobals::isFailure($errorCode);
     }

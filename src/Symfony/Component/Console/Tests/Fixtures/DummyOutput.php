@@ -20,10 +20,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
  */
 class DummyOutput extends BufferedOutput
 {
-    /**
-     * @return array
-     */
-    public function getLogs()
+    public function getLogs(): array
     {
         $logs = [];
         foreach (explode(PHP_EOL, trim($this->fetch())) as $message) {

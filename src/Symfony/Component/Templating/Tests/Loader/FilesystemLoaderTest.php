@@ -79,7 +79,7 @@ class ProjectTemplateLoader2 extends FilesystemLoader
         return $this->templatePathPatterns;
     }
 
-    public static function isAbsolutePath($path)
+    public static function isAbsolutePath($path): bool
     {
         return parent::isAbsolutePath($path);
     }

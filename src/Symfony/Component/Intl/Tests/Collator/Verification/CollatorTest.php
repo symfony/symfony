@@ -29,7 +29,7 @@ class CollatorTest extends AbstractCollatorTest
         parent::setUp();
     }
 
-    protected function getCollator($locale)
+    protected function getCollator(?string $locale): \Collator
     {
         return new \Collator($locale);
     }

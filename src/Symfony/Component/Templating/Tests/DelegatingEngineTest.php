@@ -150,15 +150,15 @@ interface MyStreamingEngine extends StreamingEngineInterface, EngineInterface
 
 class TestEngine implements EngineInterface
 {
-    public function render($name, array $parameters = [])
+    public function render($name, array $parameters = []): string
     {
     }
 
-    public function exists($name)
+    public function exists($name): bool
     {
     }
 
-    public function supports($name)
+    public function supports($name): bool
     {
         return true;
     }

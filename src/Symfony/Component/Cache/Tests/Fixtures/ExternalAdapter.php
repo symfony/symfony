@@ -29,74 +29,47 @@ class ExternalAdapter implements CacheItemPoolInterface
         $this->cache = new ArrayAdapter($defaultLifetime);
     }
 
-    /**
-     * @return CacheItemInterface
-     */
-    public function getItem($key)
+    public function getItem($key): CacheItemInterface
     {
         return $this->cache->getItem($key);
     }
 
-    /**
-     * @return iterable
-     */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): iterable
     {
         return $this->cache->getItems($keys);
     }
 
-    /**
-     * @return bool
-     */
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
         return $this->cache->hasItem($key);
     }
 
-    /**
-     * @return bool
-     */
-    public function clear()
+    public function clear(): bool
     {
         return $this->cache->clear();
     }
 
-    /**
-     * @return bool
-     */
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
         return $this->cache->deleteItem($key);
     }
 
-    /**
-     * @return bool
-     */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         return $this->cache->deleteItems($keys);
     }
 
-    /**
-     * @return bool
-     */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         return $this->cache->save($item);
     }
 
-    /**
-     * @return bool
-     */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
         return $this->cache->saveDeferred($item);
     }
 
-    /**
-     * @return bool
-     */
-    public function commit()
+    public function commit(): bool
     {
         return $this->cache->commit();
     }

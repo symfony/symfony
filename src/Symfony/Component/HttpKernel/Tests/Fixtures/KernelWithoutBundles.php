@@ -13,11 +13,12 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 class KernelWithoutBundles extends Kernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [];
     }
@@ -26,7 +27,7 @@ class KernelWithoutBundles extends Kernel
     {
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }

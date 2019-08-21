@@ -41,10 +41,7 @@ class HttpBrowser extends AbstractBrowser
         parent::__construct([], $history, $cookieJar);
     }
 
-    /**
-     * @return Response
-     */
-    protected function doRequest($request)
+    protected function doRequest($request): Response
     {
         $headers = $this->getHeaders($request);
         [$body, $extraHeaders] = $this->getBodyAndExtraHeaders($request);

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Event;
 
+/**
+ * @final since Symfony 4.4
+ */
 class AuthenticationSuccessEvent extends AuthenticationEvent
 {
 }

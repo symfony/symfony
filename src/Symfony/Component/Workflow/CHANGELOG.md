@@ -4,7 +4,12 @@ CHANGELOG
 5.0.0
 -----
 
- * added argument `$context` to `MarkingStoreInterface::setMarking()`
+ * Added argument `$context` to `MarkingStoreInterface::setMarking()`
+
+4.4.0
+-----
+
+ * Marked all dispatched event classes as `@final`
 
 4.3.0
 -----

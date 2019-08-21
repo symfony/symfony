@@ -24,6 +24,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * Controllers should be callables.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class ControllerEvent extends KernelEvent
 {

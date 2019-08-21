@@ -20,7 +20,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class MessageEvent extends Event
+final class MessageEvent extends Event
 {
     private $message;
     private $envelope;

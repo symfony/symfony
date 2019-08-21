@@ -26,6 +26,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * event.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class ExceptionEvent extends RequestEvent
 {

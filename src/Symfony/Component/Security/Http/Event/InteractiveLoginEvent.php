@@ -17,6 +17,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class InteractiveLoginEvent extends Event
 {

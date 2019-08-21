@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * will always return the value of `HttpKernelInterface::MASTER_REQUEST`.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @final since Symfony 4.4
  */
 class TerminateEvent extends KernelEvent
 {

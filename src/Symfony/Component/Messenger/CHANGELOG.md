@@ -14,6 +14,7 @@ CHANGELOG
    pass a `RoutableMessageBus`  instance instead.
  * Added support for auto trimming of Redis streams.
  * `InMemoryTransport` handle acknowledged and rejected messages.
+ * Made all dispatched worker event classes final.
 
 4.3.0
 -----
@@ -46,11 +47,11 @@ CHANGELOG
  * Added `AmqpStamp` allowing to provide a routing key, flags and attributes on message publishing.
  * [BC BREAK] Removed publishing with a `routing_key` option from queue configuration, for
    AMQP. Use exchange `default_publish_routing_key` or `AmqpStamp` instead.
- * [BC BREAK] Changed the `queue` option in the AMQP transport DSN to be `queues[name]`. You can 
+ * [BC BREAK] Changed the `queue` option in the AMQP transport DSN to be `queues[name]`. You can
    therefore name the queue but also configure `binding_keys`, `flags` and `arguments`.
- * [BC BREAK] The methods `get`, `ack`, `nack` and `queue` of the AMQP `Connection` 
+ * [BC BREAK] The methods `get`, `ack`, `nack` and `queue` of the AMQP `Connection`
    have a new argument: the queue name.
- * Added optional parameter `prefetch_count` in connection configuration, 
+ * Added optional parameter `prefetch_count` in connection configuration,
    to setup channel prefetch count.
  * New classes: `RoutableMessageBus`, `AddBusNameStampMiddleware`
    and `BusNameStamp` were added, which allow you to add a bus identifier
@@ -103,7 +104,7 @@ CHANGELOG
    only. Pass the `auto_setup` connection option to control this.
  * Added a `SetupTransportsCommand` command to setup the transports
  * Added a Doctrine transport. For example, use the `doctrine://default` DSN (this uses the `default` Doctrine entity manager)
- * [BC BREAK] The `getConnectionConfiguration` method on Amqp's `Connection` has been removed. 
+ * [BC BREAK] The `getConnectionConfiguration` method on Amqp's `Connection` has been removed.
  * [BC BREAK] A `HandlerFailedException` exception will be thrown if one or more handler fails.
  * [BC BREAK] The `HandlersLocationInterface::getHandlers` method needs to return `HandlerDescriptor`
    instances instead of callables.
@@ -115,7 +116,7 @@ CHANGELOG
 4.2.0
 -----
 
- * Added `HandleTrait` leveraging a message bus instance to return a single 
+ * Added `HandleTrait` leveraging a message bus instance to return a single
    synchronous message handling result
  * Added `HandledStamp` & `SentStamp` stamps
  * All the changes below are BC BREAKS

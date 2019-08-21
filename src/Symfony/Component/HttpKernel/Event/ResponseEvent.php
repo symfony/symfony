@@ -23,6 +23,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * browser.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class ResponseEvent extends KernelEvent
 {

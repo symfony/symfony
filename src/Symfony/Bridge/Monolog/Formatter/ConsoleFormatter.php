@@ -133,7 +133,7 @@ class ConsoleFormatter implements FormatterInterface
     /**
      * @internal
      */
-    public function echoLine($line, $depth, $indentPad)
+    public function echoLine(string $line, int $depth, string $indentPad)
     {
         if (-1 !== $depth) {
             fwrite($this->outputBuffer, $line);
@@ -143,7 +143,7 @@ class ConsoleFormatter implements FormatterInterface
     /**
      * @internal
      */
-    public function castObject($v, array $a, Stub $s, $isNested)
+    public function castObject($v, array $a, Stub $s, bool $isNested)
     {
         if ($this->options['multiline']) {
             return $a;

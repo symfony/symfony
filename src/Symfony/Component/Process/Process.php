@@ -602,7 +602,7 @@ class Process implements \IteratorAggregate
      *
      * @return \Generator
      */
-    public function getIterator($flags = 0)
+    public function getIterator(int $flags = 0)
     {
         $this->readPipesForOutput(__FUNCTION__, false);
 
@@ -995,13 +995,11 @@ class Process implements \IteratorAggregate
      *
      * To disable the timeout, set this value to null.
      *
-     * @param int|float|null $timeout The timeout in seconds
-     *
      * @return $this
      *
      * @throws InvalidArgumentException if the timeout is negative
      */
-    public function setTimeout($timeout)
+    public function setTimeout(?float $timeout)
     {
         $this->timeout = $this->validateTimeout($timeout);
 
@@ -1009,18 +1007,16 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Sets the process idle timeout (max. time since last output).
+     * Sets the process idle timeout (max. time since last output) in seconds.
      *
      * To disable the timeout, set this value to null.
-     *
-     * @param int|float|null $timeout The timeout in seconds
      *
      * @return $this
      *
      * @throws LogicException           if the output is disabled
      * @throws InvalidArgumentException if the timeout is negative
      */
-    public function setIdleTimeout($timeout)
+    public function setIdleTimeout(?float $timeout)
     {
         if (null !== $timeout && $this->outputDisabled) {
             throw new LogicException('Idle timeout can not be set while the output is disabled.');
@@ -1048,7 +1044,7 @@ class Process implements \IteratorAggregate
             throw new RuntimeException('TTY mode requires /dev/tty to be read/writable.');
         }
 
-        $this->tty = (bool) $tty;
+        $this->tty = $tty;
 
         return $this;
     }

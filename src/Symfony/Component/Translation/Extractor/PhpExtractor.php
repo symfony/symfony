@@ -226,13 +226,11 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     }
 
     /**
-     * @param string $file
-     *
      * @return bool
      *
      * @throws \InvalidArgumentException
      */
-    protected function canBeExtracted($file)
+    protected function canBeExtracted(string $file)
     {
         return $this->isFile($file) && 'php' === pathinfo($file, PATHINFO_EXTENSION);
     }

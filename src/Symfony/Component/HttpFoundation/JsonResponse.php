@@ -83,7 +83,7 @@ class JsonResponse extends Response
      *
      * @return static
      */
-    public static function fromJsonString($data = null, int $status = 200, array $headers = [])
+    public static function fromJsonString(string $data = null, int $status = 200, array $headers = [])
     {
         return new static($data, $status, $headers, true);
     }

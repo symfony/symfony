@@ -332,11 +332,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Remaps multiple singular values to a single plural value.
      *
-     * @param array $value The source values
-     *
      * @return array The remapped values
      */
-    protected function remapXml($value)
+    protected function remapXml(array $value)
     {
         foreach ($this->xmlRemappings as list($singular, $plural)) {
             if (!isset($value[$singular])) {

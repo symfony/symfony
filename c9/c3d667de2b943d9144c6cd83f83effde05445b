@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-21T09:51:31Z
+
+@stof is right, I read too fast. We should avoid to `unwrap` when not strictly needed.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-08-21T10:16:38Z
+
+the only place needing to unwrap is the form renderer engine, because it relies on internal Twig APIs to manipulate blocks (which is bad news, as there is no BC guarantee for them)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T11:32:53Z
+
+I can't do much about the unwrapping in `TwigRendererEngine` and would advise against changing `TwigEngine`: it's a deprecated class anyway and we're risking a BC break.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T11:41:31Z
+
+CI failure seems to be an internal hiccup at Travis.

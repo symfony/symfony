@@ -157,6 +157,11 @@ Messenger
  * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
    pass a `RoutableMessageBus`  instance instead.
 
+Mime
+----
+
+ * Removed `NamedAddress`, use `Address` instead (which supports a name now)
+
 MonologBridge
 --------------
 

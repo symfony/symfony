@@ -13,7 +13,6 @@ namespace Symfony\Component\Mime\Header;
 
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\LogicException;
-use Symfony\Component\Mime\NamedAddress;
 
 /**
  * A collection of headers.
@@ -60,7 +59,7 @@ final class Headers
     }
 
     /**
-     * @param (NamedAddress|Address|string)[] $addresses
+     * @param (Address|string)[] $addresses
      *
      * @return $this
      */
@@ -70,7 +69,7 @@ final class Headers
     }
 
     /**
-     * @param NamedAddress|Address|string $address
+     * @param Address|string $address
      *
      * @return $this
      */

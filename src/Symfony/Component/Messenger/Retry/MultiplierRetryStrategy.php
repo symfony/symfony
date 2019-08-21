@@ -39,7 +39,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
     private $maxDelayMilliseconds;
 
     /**
-     * @param int   $maxRetries           The maximum number of time to retry (null means indefinitely)
+     * @param int   $maxRetries           The maximum number of time to retry (null or -1 means indefinitely)
      * @param int   $delayMilliseconds    Amount of time to delay (or the initial value when multiplier is used)
      * @param float $multiplier           Multiplier to apply to the delay each time a retry occurs
      * @param int   $maxDelayMilliseconds Maximum delay to allow (0 means no maximum)
@@ -66,7 +66,7 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
 
     public function isRetryable(Envelope $message): bool
     {
-        if (null === $this->maxRetries) {
+        if (null === $this->maxRetries || -1 === $this->maxRetries) {
             return true;
         }
 

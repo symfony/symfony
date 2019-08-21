@@ -1212,7 +1212,7 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                         ->children()
                                             ->scalarNode('service')->defaultNull()->info('Service id to override the retry strategy entirely')->end()
-                                            ->integerNode('max_retries')->defaultValue(3)->min(0)->end()
+                                            ->integerNode('max_retries')->defaultValue(3)->min(-1)->end()
                                             ->integerNode('delay')->defaultValue(1000)->min(0)->info('Time in ms to delay (or the initial value when multiplier is used)')->end()
                                             ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, delay will grow exponentially for each retry: this delay = (delay * (multiple ^ retries))')->end()
                                             ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite)')->end()

@@ -111,5 +111,16 @@
             <argument type="service" id="translator"/>
             <argument type="string">%validator.translation_domain%</argument>
         </service>
+
+        <!-- commands -->
+        <service id="console.command.form_debug" class="Symfony\Component\Form\Command\DebugCommand">
+            <argument type="service" id="form.registry" />
+            <argument type="collection" /> <!-- All form types namespaces are stored here by FormPass -->
+            <argument type="collection" /> <!-- All services form types are stored here by FormPass -->
+            <argument type="collection" /> <!-- All type extensions are stored here by FormPass -->
+            <argument type="collection" /> <!-- All type guessers are stored here by FormPass -->
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
+            <tag name="console.command" command="debug:form" />
+        </service>
     </services>
 </container>

@@ -277,8 +277,6 @@ class FrameworkExtension extends Extension
                 $container->removeDefinition('form.type_extension.form.validator');
                 $container->removeDefinition('form.type_guesser.validator');
             }
-        } else {
-            $container->removeDefinition('console.command.form_debug');
         }
 
         if ($this->isConfigEnabled($container, $config['assets'])) {

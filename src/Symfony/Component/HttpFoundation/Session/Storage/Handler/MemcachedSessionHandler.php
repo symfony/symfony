@@ -40,9 +40,6 @@ class MemcachedSessionHandler extends AbstractSessionHandler
      *  * prefix: The prefix to use for the memcached keys in order to avoid collision
      *  * expiretime: The time to live in seconds.
      *
-     * @param \Memcached $memcached A \Memcached instance
-     * @param array      $options   An associative array of Memcached options
-     *
      * @throws \InvalidArgumentException When unsupported options are passed
      */
     public function __construct(\Memcached $memcached, array $options = [])
@@ -58,7 +55,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function close()
     {
@@ -74,7 +71,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function updateTimestamp($sessionId, $data)
     {
@@ -102,7 +99,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function gc($maxlifetime)
     {

@@ -327,12 +327,12 @@ class BinaryFileResponse extends Response
         if (null !== $content) {
             throw new \LogicException('The content cannot be set on a BinaryFileResponse instance.');
         }
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return false
      */
     public function getContent()
     {

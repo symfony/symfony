@@ -71,7 +71,7 @@ class Process implements \IteratorAggregate
     private $status = self::STATUS_READY;
     private $incrementalOutputOffset = 0;
     private $incrementalErrorOutputOffset = 0;
-    private $tty;
+    private $tty = false;
     private $pty;
     private $inheritEnv = false;
 

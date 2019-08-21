@@ -121,7 +121,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         if ($first) {
-            return \count($headers[$key]) ? $headers[$key][0] : $default;
+            return \count($headers[$key]) ? (string) $headers[$key][0] : $default;
         }
 
         return $headers[$key];

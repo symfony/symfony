@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added the "extra_fields" option, an array of custom fields to pull from the LDAP server
+ * Fix the refresh method of the Ldap user provider according to symfony preconization.
 
 4.3.0
 -----

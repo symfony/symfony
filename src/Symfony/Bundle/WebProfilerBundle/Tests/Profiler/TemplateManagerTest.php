@@ -103,10 +103,6 @@ class TemplateManagerTest extends TestCase
     {
         $this->twigEnvironment = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
 
-        $this->twigEnvironment->expects($this->any())
-            ->method('loadTemplate')
-            ->willReturn('loadedTemplate');
-
         if (interface_exists('Twig\Loader\SourceContextLoaderInterface')) {
             $loader = $this->getMockBuilder('Twig\Loader\SourceContextLoaderInterface')->getMock();
         } else {

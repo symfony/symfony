@@ -19,6 +19,8 @@ use Symfony\Component\Workflow\TransitionBlockerList;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since Symfony 4.4
  */
 class GuardEvent extends Event
 {

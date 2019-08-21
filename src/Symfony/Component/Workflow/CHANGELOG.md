@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+* Marked all dispatched event classes as `@final`
+
 4.3.0
 -----
 

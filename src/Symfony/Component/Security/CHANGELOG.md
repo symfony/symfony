@@ -10,6 +10,7 @@ CHANGELOG
  * Added and implemented `PasswordUpgraderInterface`, for opportunistic password migrations
  * Added `Guard\PasswordAuthenticatedInterface`, an optional interface
    for "guard" authenticators that deal with user passwords
+ * Marked all dispatched event classes as `@final`
 
 4.3.0
 -----

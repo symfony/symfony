@@ -10,6 +10,7 @@ CHANGELOG
  * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
  * The type guesser guesses the HTML accept attribute when a mime type is configured in the File or Image constraint.
  * Overriding the methods `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` without the `void` return-type is deprecated.
+ * marked all dispatched event classes as `@final`
 
 4.3.0
 -----

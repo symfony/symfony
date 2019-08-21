@@ -20,6 +20,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * SwitchUserEvent.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class SwitchUserEvent extends Event
 {

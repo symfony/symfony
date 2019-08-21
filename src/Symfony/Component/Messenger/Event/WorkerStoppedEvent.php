@@ -16,6 +16,6 @@ namespace Symfony\Component\Messenger\Event;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class WorkerStoppedEvent
+final class WorkerStoppedEvent
 {
 }

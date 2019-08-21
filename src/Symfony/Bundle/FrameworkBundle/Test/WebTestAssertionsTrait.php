@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\Constraint\LogicalAnd;
 use PHPUnit\Framework\Constraint\LogicalNot;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Test\Constraint as BrowserKitConstraint;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint as DomCrawlerConstraint;
@@ -186,7 +186,7 @@ trait WebTestAssertionsTrait
         self::assertThat(self::getRequest(), $constraint, $message);
     }
 
-    private static function getClient(KernelBrowser $newClient = null): ?KernelBrowser
+    private static function getClient(AbstractBrowser $newClient = null): ?AbstractBrowser
     {
         static $client;
 
@@ -194,7 +194,7 @@ trait WebTestAssertionsTrait
             return $client = $newClient;
         }
 
-        if (!$client instanceof KernelBrowser) {
+        if (!$client instanceof AbstractBrowser) {
             static::fail(sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient()"?', __CLASS__));
         }
 

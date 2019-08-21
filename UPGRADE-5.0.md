@@ -333,6 +333,10 @@ HttpKernel
 
    As many bundles must be compatible with a range of Symfony versions, the current 
    directory convention is not deprecated yet, but it will be in the future.
+ * Removed the second and third argument of `KernelInterface::locateResource`
+ * Removed the second and third argument of `FileLocator::__construct`
+ * Removed loading resources from `%kernel.root_dir%/Resources` and `%kernel.root_dir%` as
+   fallback directories.
 
 Intl
 ----

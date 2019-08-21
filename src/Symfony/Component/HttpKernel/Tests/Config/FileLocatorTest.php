@@ -34,6 +34,9 @@ class FileLocatorTest extends TestCase
         $locator->locate('/some/path');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLocateWithGlobalResourcePath()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();

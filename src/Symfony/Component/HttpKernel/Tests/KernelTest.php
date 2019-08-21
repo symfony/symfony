@@ -389,6 +389,9 @@ EOF;
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Bundle1Bundle/foo.txt'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLocateResourceIgnoresDirOnNonResource()
     {
         $kernel = $this->getKernel(['getBundle']);
@@ -404,6 +407,9 @@ EOF;
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testLocateResourceReturnsTheDirOneForResources()
     {
         $kernel = $this->getKernel(['getBundle']);
@@ -419,7 +425,10 @@ EOF;
         );
     }
 
-    public function testLocateResourceOnDirectories()
+    /**
+     * @group legacy
+     */
+    public function testLocateResourceOnDirectoriesWithOverwrite()
     {
         $kernel = $this->getKernel(['getBundle']);
         $kernel
@@ -436,7 +445,10 @@ EOF;
             __DIR__.'/Fixtures/Resources/FooBundle',
             $kernel->locateResource('@FooBundle/Resources', __DIR__.'/Fixtures/Resources')
         );
+    }
 
+    public function testLocateResourceOnDirectories()
+    {
         $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->exactly(2))

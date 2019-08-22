@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Shkarsardar at 2019-08-09T12:09:48Z
+
+can you explain it? how the feature should work
+
+---------------------------------------------------------------------------
+
+by gisostallenberg at 2019-08-09T12:15:59Z
+
+@Shkarsardar see https://github.com/symfony/symfony-docs/pull/12128
+
+---------------------------------------------------------------------------
+
+by gisostallenberg at 2019-08-12T20:08:04Z
+
+Thanks so much for all the effort you put in checking this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-21T08:33:50Z
+
+@gisostallenberg Can you rebase as #33270 has been merged now?

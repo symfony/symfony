@@ -209,7 +209,7 @@ class VarExporterTest extends TestCase
 
 class MySerializable implements \Serializable
 {
-    public function serialize()
+    public function serialize(): string
     {
         return '123';
     }
@@ -227,7 +227,7 @@ class MyWakeup
     public $baz;
     public $def = 234;
 
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['sub', 'baz'];
     }
@@ -305,7 +305,7 @@ class MyArrayObject extends \ArrayObject
 
 class GoodNight
 {
-    public function __sleep()
+    public function __sleep(): array
     {
         $this->good = 'night';
 
@@ -395,7 +395,7 @@ class FooSerializable implements \Serializable
 
 class Php74Serializable implements \Serializable
 {
-    public function __serialize()
+    public function __serialize(): array
     {
         return [$this->foo = new \stdClass()];
     }
@@ -405,7 +405,7 @@ class Php74Serializable implements \Serializable
         list($this->foo) = $data;
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         throw new \BadMethodCallException();
     }
@@ -415,7 +415,7 @@ class Php74Serializable implements \Serializable
         throw new \BadMethodCallException();
     }
 
-    public function serialize()
+    public function serialize(): string
     {
         throw new \BadMethodCallException();
     }

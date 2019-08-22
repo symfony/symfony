@@ -339,7 +339,7 @@ EOF
 
 class TableCell
 {
-    public function __toString()
+    public function __toString(): string
     {
         return '<info>some info</info>';
     }

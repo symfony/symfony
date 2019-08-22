@@ -1035,7 +1035,7 @@ class ResponseTest extends ResponseTestCase
 
 class StringableObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'Foo';
     }

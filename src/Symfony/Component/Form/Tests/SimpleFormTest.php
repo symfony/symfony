@@ -32,7 +32,7 @@ class SimpleFormTest_Countable implements \Countable
         $this->count = $count;
     }
 
-    public function count()
+    public function count(): int
     {
         return $this->count;
     }
@@ -47,7 +47,7 @@ class SimpleFormTest_Traversable implements \IteratorAggregate
         $this->iterator = new \ArrayIterator($count > 0 ? array_fill(0, $count, 'Foo') : []);
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return $this->iterator;
     }

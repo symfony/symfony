@@ -281,7 +281,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
 class EmailProvider
 {
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }

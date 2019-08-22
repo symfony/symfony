@@ -102,7 +102,7 @@ class AuthenticationException extends RuntimeException
     /**
      * @internal
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         $this->serialized = $this->__serialize();
 

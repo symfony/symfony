@@ -106,11 +106,17 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $children;
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return \count($this->getValue());
     }
 
+    /**
+     * @return \Traversable
+     */
     public function getIterator()
     {
         if (!\is_array($value = $this->getValue())) {
@@ -136,6 +142,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return null !== $this->seek($key);
     }
 
+    /**
+     * @return bool
+     */
     public function offsetExists($key)
     {
         return $this->__isset($key);

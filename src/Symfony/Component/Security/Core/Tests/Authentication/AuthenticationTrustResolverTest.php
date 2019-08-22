@@ -119,7 +119,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function serialize()
+    public function serialize(): string
     {
     }
 

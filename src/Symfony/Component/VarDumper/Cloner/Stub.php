@@ -44,7 +44,7 @@ class Stub
     /**
      * @internal
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         $properties = [];
 

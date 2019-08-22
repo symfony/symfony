@@ -42,6 +42,9 @@ class Collection implements CollectionInterface
         return $this->entries;
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         $con = $this->connection->getResource();
@@ -58,6 +61,9 @@ class Collection implements CollectionInterface
         return $count;
     }
 
+    /**
+     * @return \Traversable
+     */
     public function getIterator()
     {
         if (0 === $this->count()) {
@@ -81,6 +87,9 @@ class Collection implements CollectionInterface
         }
     }
 
+    /**
+     * @return bool
+     */
     public function offsetExists($offset)
     {
         $this->toArray();

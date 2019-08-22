@@ -23,6 +23,15 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
  */
 final class Address
 {
+    /**
+     * A regex that matches a structure like 'Name <email@address.com>'.
+     * It matches anything between the first < and last > as email address.
+     * This allows to use a single string to construct an Address, which can be convenient to use in
+     * config, and allows to have more readable config.
+     * This does not try to cover all edge cases for address.
+     */
+    private const FROM_STRING_PATTERN = '~(?<displayName>[^<]*)<(?<addrSpec>.*)>[^>]*~';
+
     private static $validator;
     private static $encoder;
 
@@ -99,5 +108,18 @@ final class Address
         }
 
         return $addrs;
+    }
+
+    public static function fromString(string $string): self
+    {
+        if (false === strpos($string, '<')) {
+            return new self($string, '');
+        }
+
+        if (!preg_match(self::FROM_STRING_PATTERN, $string, $matches)) {
+            throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $string, static::class));
+        }
+
+        return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
     }
 }

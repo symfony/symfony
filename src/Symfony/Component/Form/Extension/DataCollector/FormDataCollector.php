@@ -234,7 +234,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * @internal
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         foreach ($this->data['forms_by_hash'] as &$form) {
             if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {

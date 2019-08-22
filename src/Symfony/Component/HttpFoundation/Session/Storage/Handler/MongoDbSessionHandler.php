@@ -80,7 +80,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function close()
     {
@@ -100,7 +100,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
     public function gc($maxlifetime)
     {
@@ -134,7 +134,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function updateTimestamp($sessionId, $data)
     {

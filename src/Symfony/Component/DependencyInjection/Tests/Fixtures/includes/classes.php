@@ -83,17 +83,17 @@ class MethodCallClass
 
 class DummyProxyDumper implements ProxyDumper
 {
-    public function isProxyCandidate(Definition $definition)
+    public function isProxyCandidate(Definition $definition): bool
     {
         return $definition->isLazy();
     }
 
-    public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode)
+    public function getProxyFactoryCode(Definition $definition, string $id, string $factoryCode): string
     {
         return "        // lazy factory for {$definition->getClass()}\n\n";
     }
 
-    public function getProxyCode(Definition $definition)
+    public function getProxyCode(Definition $definition): string
     {
         return "// proxy code for {$definition->getClass()}\n";
     }

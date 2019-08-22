@@ -55,8 +55,9 @@ class LdapTest extends TestCase
             ->expects($this->once())
             ->method('escape')
             ->with('foo', 'bar', 0)
-            ->willReturn('');
+            ->willReturn('')
         ;
+
         $this->ldap->escape('foo', 'bar', 0);
     }
 

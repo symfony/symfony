@@ -191,7 +191,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
 
 class DummyUserClass
 {
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }

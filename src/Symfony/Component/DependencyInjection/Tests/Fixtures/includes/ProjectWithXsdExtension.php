@@ -2,17 +2,17 @@
 
 class ProjectWithXsdExtension extends ProjectExtension
 {
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string
     {
         return __DIR__.'/schema';
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://www.example.com/schema/projectwithxsd';
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'projectwithxsd';
     }

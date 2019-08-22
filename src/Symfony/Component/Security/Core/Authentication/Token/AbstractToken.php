@@ -163,10 +163,9 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      *
      * @final since Symfony 4.3, use __serialize() instead
-     *
      * @internal since Symfony 4.3, use __serialize() instead
      */
     public function serialize()

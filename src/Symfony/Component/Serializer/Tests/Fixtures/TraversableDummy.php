@@ -16,7 +16,7 @@ class TraversableDummy implements \IteratorAggregate
     public $foo = 'foo';
     public $bar = 'bar';
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator(get_object_vars($this));
     }

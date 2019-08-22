@@ -63,7 +63,7 @@ final class TransitionBlockerList implements \IteratorAggregate, \Countable
      *
      * @return \ArrayIterator|TransitionBlocker[]
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->blockers);
     }

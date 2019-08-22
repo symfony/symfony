@@ -25,7 +25,7 @@ class ComparisonTest_Class
         $this->value = $value;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->value;
     }

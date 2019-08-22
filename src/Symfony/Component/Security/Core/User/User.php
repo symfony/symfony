@@ -45,7 +45,7 @@ final class User implements UserInterface, EquatableInterface, AdvancedUserInter
         $this->extraFields = $extraFields;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getUsername();
     }

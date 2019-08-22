@@ -200,7 +200,7 @@ class LoggerTest extends TestCase
 
 class DummyTest
 {
-    public function __toString()
+    public function __toString(): string
     {
     }
 }

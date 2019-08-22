@@ -158,7 +158,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     }
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
     public function count()
     {

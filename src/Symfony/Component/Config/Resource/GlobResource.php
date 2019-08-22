@@ -91,6 +91,9 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         return ['prefix', 'pattern', 'recursive', 'hash', 'forExclusion', 'excludedPrefixes'];
     }
 
+    /**
+     * @return \Traversable
+     */
     public function getIterator()
     {
         if (!file_exists($this->prefix) || (!$this->recursive && '' === $this->pattern)) {

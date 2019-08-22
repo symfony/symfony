@@ -48,7 +48,7 @@ class PropertyPathMapper implements DataMapperInterface
             if (!$empty && null !== $propertyPath && $config->getMapped()) {
                 $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
             } else {
-                $form->setData($form->getConfig()->getData());
+                $form->setData($config->getData());
             }
         }
     }

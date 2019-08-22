@@ -522,12 +522,6 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('session')
-                    ->validate()
-                        ->ifTrue(function ($v) {
-                            return empty($v['handler_id']) && !empty($v['save_path']);
-                        })
-                        ->thenInvalid('Session save path is ignored without a handler service')
-                    ->end()
                     ->info('session configuration')
                     ->canBeEnabled()
                     ->children()
@@ -553,7 +547,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->defaultValue(1)->end()
                         ->scalarNode('gc_maxlifetime')->end()
-                        ->scalarNode('save_path')->end()
+                        ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
                         ->integerNode('metadata_update_threshold')
                             ->defaultValue(0)
                             ->info('seconds to wait between 2 session metadata updates')

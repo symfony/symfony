@@ -21,7 +21,7 @@
         "symfony/polyfill-mbstring": "^1.0"
     },
     "require-dev": {
-        "egulias/email-validator": "^2.0",
+        "egulias/email-validator": "^2.1.10",
         "symfony/dependency-injection": "~3.4|^4.1"
     },
     "autoload": {

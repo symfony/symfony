@@ -21,7 +21,7 @@
         "twig/twig": "^1.41|^2.10"
     },
     "require-dev": {
-        "egulias/email-validator": "^2.0",
+        "egulias/email-validator": "^2.1.10",
         "fig/link-util": "^1.0",
         "symfony/asset": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",

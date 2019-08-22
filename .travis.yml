@@ -26,9 +26,9 @@ env:
 matrix:
     include:
         - php: 7.2
-        - php: 7.2
-          env: deps=high
         - php: 7.3
+          env: deps=high
+        - php: 7.4snapshot
           env: deps=low
     fast_finish: true
 
@@ -77,6 +77,12 @@ before_install:
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
       find ~/.phpenv -name xdebug.ini -delete
+
+      if [[ $TRAVIS_PHP_VERSION = 7.4* && $deps ]]; then
+          export PHPUNIT_X="$PHPUNIT_X,issue-32995"
+      elif [[ $TRAVIS_PHP_VERSION = 7.4* ]]; then
+          export PHPUNIT_X="$PHPUNIT --group issue-32995"
+      fi
 
       nanoseconds () {
           local cmd="date"

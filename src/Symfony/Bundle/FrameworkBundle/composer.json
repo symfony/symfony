@@ -30,6 +30,7 @@
         "symfony/routing": "^5.0"
     },
     "require-dev": {
+        "doctrine/annotations": "~1.7",
         "doctrine/cache": "~1.0",
         "symfony/asset": "^4.4|^5.0",
         "symfony/browser-kit": "^4.4|^5.0",
@@ -57,9 +58,8 @@
         "symfony/yaml": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
         "symfony/web-link": "^4.4|^5.0",
-        "doctrine/annotations": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0",
-        "twig/twig": "^2.4|^3"
+        "twig/twig": "^2.10|^3"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",

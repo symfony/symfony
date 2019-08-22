@@ -254,6 +254,8 @@ abstract class AdapterTestCase extends CachePoolTest
     }
 
     /**
+     * @group issue-32995
+     *
      * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
      */
     public function testSavingObject()

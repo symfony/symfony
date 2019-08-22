@@ -6,23 +6,24 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
         clone $p['ArrayObject'],
     ],
     null,
-    [],
-    $o[0],
     [
-        [
-            0,
-            [
-                1,
-                $o[0],
-            ],
-            [
-                'foo' => $o[1],
+        'ArrayObject' => [
+            "\0" => [
+                [
+                    [
+                        1,
+                        $o[0],
+                    ],
+                    0,
+                ],
             ],
         ],
-        -1 => [
-            0,
-            [],
-            [],
+        'stdClass' => [
+            'foo' => [
+                $o[1],
+            ],
         ],
-    ]
+    ],
+    $o[0],
+    []
 );

@@ -20,10 +20,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  * SwitchUserEvent.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.4
  */
-class SwitchUserEvent extends Event
+final class SwitchUserEvent extends Event
 {
     private $request;
     private $targetUser;
@@ -36,26 +34,17 @@ class SwitchUserEvent extends Event
         $this->token = $token;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
 
-    /**
-     * @return UserInterface
-     */
-    public function getTargetUser()
+    public function getTargetUser(): UserInterface
     {
         return $this->targetUser;
     }
 
-    /**
-     * @return TokenInterface|null
-     */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         return $this->token;
     }

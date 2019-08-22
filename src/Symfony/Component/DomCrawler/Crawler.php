@@ -427,6 +427,45 @@ class Crawler implements \Countable, \IteratorAggregate
         return $this->createSubCrawler($this->sibling($this->getNode(0)->parentNode->firstChild));
     }
 
+    public function matches(string $selector): bool
+    {
+        if (!$this->nodes) {
+            return false;
+        }
+
+        $converter = $this->createCssSelectorConverter();
+        $xpath = $converter->toXPath($selector, 'self::');
+
+        return 0 !== $this->filterRelativeXPath($xpath)->count();
+    }
+
+    /**
+     * Return first parents (heading toward the document root) of the Element that matches the provided selector.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
+     *
+     * @throws \InvalidArgumentException When current node is empty
+     */
+    public function closest(string $selector): ?self
+    {
+        if (!$this->nodes) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        $domNode = $this->getNode(0);
+
+        while (XML_ELEMENT_NODE === $domNode->nodeType) {
+            $node = $this->createSubCrawler($domNode);
+            if ($node->matches($selector)) {
+                return $node;
+            }
+
+            $domNode = $node->getNode(0)->parentNode;
+        }
+
+        return null;
+    }
+
     /**
      * Returns the next siblings nodes of the current selection.
      *
@@ -607,6 +646,22 @@ class Crawler implements \Countable, \IteratorAggregate
         }
 
         return $html;
+    }
+
+    public function outerHtml(): string
+    {
+        if (!\count($this)) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        $node = $this->getNode(0);
+        $owner = $node->ownerDocument;
+
+        if (null !== $this->html5Parser && '<!DOCTYPE html>' === $owner->saveXML($owner->childNodes[0])) {
+            $owner = $this->html5Parser;
+        }
+
+        return $owner->saveHTML($node);
     }
 
     /**

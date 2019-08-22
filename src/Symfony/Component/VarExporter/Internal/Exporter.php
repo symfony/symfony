@@ -155,7 +155,7 @@ class Exporter
                     }
                     $sleep[$n] = false;
                 }
-                if (!\array_key_exists($name, $proto) || $proto[$name] !== $v) {
+                if (!\array_key_exists($name, $proto) || $proto[$name] !== $v || "\x00Error\x00trace" === $name || "\x00Exception\x00trace" === $name) {
                     $properties[$c][$n] = $v;
                 }
             }
@@ -291,7 +291,7 @@ class Exporter
                 continue;
             }
             if (!Registry::$instantiableWithoutConstructor[$class]) {
-                if (is_subclass_of($class, 'Serializable')) {
+                if (is_subclass_of($class, 'Serializable') && !method_exists($class, '__unserialize')) {
                     $serializables[$k] = 'C:'.\strlen($class).':"'.$class.'":0:{}';
                 } else {
                     $serializables[$k] = 'O:'.\strlen($class).':"'.$class.'":0:{}';

@@ -6,15 +6,16 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
         clone ($p['stdClass'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('stdClass')),
     ],
     null,
-    [],
-    $o[0],
     [
-        [
-            [
-                $o[1],
-                345,
+        'SplObjectStorage' => [
+            "\0" => [
+                [
+                    $o[1],
+                    345,
+                ],
             ],
-            [],
         ],
-    ]
+    ],
+    $o[0],
+    []
 );

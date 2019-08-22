@@ -115,9 +115,11 @@ final class Address
         if (false === strpos($string, '<')) {
             return new self($string, '');
         }
+
         if (!preg_match(self::FROM_STRING_PATTERN, $string, $matches)) {
             throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $string, static::class));
         }
+
         return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
     }
 }

@@ -122,7 +122,7 @@ class SecurityTest extends TestCase
 
 class StringishUser
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'stringish_user';
     }

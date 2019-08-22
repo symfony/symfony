@@ -20,7 +20,7 @@ class Countable implements \Countable
         $this->content = $content;
     }
 
-    public function count()
+    public function count(): int
     {
         return \count($this->content);
     }

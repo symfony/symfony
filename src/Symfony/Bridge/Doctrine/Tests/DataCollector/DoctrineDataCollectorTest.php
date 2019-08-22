@@ -205,7 +205,7 @@ class DoctrineDataCollectorTest extends TestCase
 
 class StringRepresentableClass
 {
-    public function __toString()
+    public function __toString(): string
     {
         return 'string representation';
     }

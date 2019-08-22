@@ -860,7 +860,7 @@ class DefaultChoiceListFactoryTest_Castable
         $this->property = $property;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->property;
     }

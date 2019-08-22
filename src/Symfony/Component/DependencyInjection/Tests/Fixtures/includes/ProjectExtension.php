@@ -25,17 +25,17 @@ class ProjectExtension implements ExtensionInterface
         return $configuration;
     }
 
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string
     {
         return false;
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://www.example.com/schema/project';
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'project';
     }

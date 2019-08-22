@@ -79,7 +79,7 @@ class AppKernel extends Kernel
         $container->register('logger', NullLogger::class);
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
     }

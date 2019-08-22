@@ -27,7 +27,7 @@ final class Key
         $this->resource = $resource;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->resource;
     }

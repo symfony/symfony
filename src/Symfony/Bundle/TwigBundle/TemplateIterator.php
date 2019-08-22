@@ -43,7 +43,7 @@ class TemplateIterator implements \IteratorAggregate
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Traversable
      */
     public function getIterator()
     {

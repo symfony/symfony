@@ -148,7 +148,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     /**
      * @internal
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         if (!$this->dataCount) {
             $this->data = [];

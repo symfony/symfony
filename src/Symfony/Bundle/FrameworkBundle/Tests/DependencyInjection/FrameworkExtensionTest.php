@@ -499,12 +499,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
-    public function testNullSessionHandlerWithSavePath()
-    {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
-        $this->createContainerFromFile('session_savepath');
-    }
-
     public function testRequest()
     {
         $container = $this->createContainerFromFile('full');

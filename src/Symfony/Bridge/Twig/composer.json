@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^5.5.9|>=7.0.8",
-        "twig/twig": "^1.40|^2.9"
+        "twig/twig": "^1.41|^2.10"
     },
     "require-dev": {
         "fig/link-util": "^1.0",

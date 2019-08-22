@@ -44,7 +44,7 @@
         "symfony/yaml": "~3.4|~4.0",
         "symfony/expression-language": "~2.8|~3.0|~4.0",
         "doctrine/doctrine-bundle": "~1.5",
-        "twig/twig": "~1.34|~2.4"
+        "twig/twig": "~1.41|~2.10"
     },
     "conflict": {
         "symfony/var-dumper": "<3.3",

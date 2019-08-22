@@ -62,6 +62,8 @@ class ResolveBindingsPassTest extends TestCase
     }
 
     /**
+     * @group issue-32995
+     *
      * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
      */
     public function testMissingParent()

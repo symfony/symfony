@@ -23,7 +23,7 @@
         "symfony/http-foundation": "~2.8|~3.0|~4.0",
         "symfony/http-kernel": "^3.3|~4.0",
         "symfony/polyfill-ctype": "~1.8",
-        "twig/twig": "~1.40|~2.9"
+        "twig/twig": "~1.41|~2.10"
     },
     "require-dev": {
         "symfony/asset": "~2.8|~3.0|~4.0",
@@ -37,7 +37,7 @@
         "symfony/yaml": "~2.8|~3.0|~4.0",
         "symfony/framework-bundle": "^3.3.11|~4.0",
         "symfony/web-link": "~3.3|~4.0",
-        "doctrine/annotations": "~1.0",
+        "doctrine/annotations": "~1.7",
         "doctrine/cache": "~1.0"
     },
     "conflict": {

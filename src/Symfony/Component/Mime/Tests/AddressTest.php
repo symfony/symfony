@@ -13,6 +13,7 @@ namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 
 class AddressTest extends TestCase
 {
@@ -76,5 +77,80 @@ class AddressTest extends TestCase
     public function nameEmptyDataProvider(): array
     {
         return [[''], [' '], [" \r\n "]];
+    }
+
+    /**
+     * @dataProvider fromStringProvider
+     */
+    public function testFromString($string, $displayName, $addrSpec)
+    {
+        $address = Address::fromString($string);
+        $this->assertEquals($displayName, $address->getName());
+        $this->assertEquals($addrSpec, $address->getAddress());
+        $fromToStringAddress = Address::fromString($address->toString());
+        $this->assertEquals($displayName, $fromToStringAddress->getName());
+        $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
+    }
+
+    public function testFromStringFailure()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Address::fromString('Jane Doe <example@example.com');
+    }
+
+    public function fromStringProvider()
+    {
+        return [
+            [
+                'example@example.com',
+                '',
+                'example@example.com',
+            ],
+            [
+                '<example@example.com>',
+                '',
+                'example@example.com',
+            ],
+            [
+                'Jane Doe <example@example.com>',
+                'Jane Doe',
+                'example@example.com',
+            ],
+            [
+                'Jane Doe<example@example.com>',
+                'Jane Doe',
+                'example@example.com',
+            ],
+            [
+                '\'Jane Doe\' <example@example.com>',
+                'Jane Doe',
+                'example@example.com',
+            ],
+            [
+                '"Jane Doe" <example@example.com>',
+                'Jane Doe',
+                'example@example.com',
+            ],
+            [
+                'Jane Doe <"ex<ample"@example.com>',
+                'Jane Doe',
+                '"ex<ample"@example.com',
+            ],
+            [
+                'Jane Doe <"ex<amp>le"@example.com>',
+                'Jane Doe',
+                '"ex<amp>le"@example.com',
+            ],
+            [
+                'Jane Doe > <"ex<am  p>le"@example.com>',
+                'Jane Doe >',
+                '"ex<am  p>le"@example.com',
+            ],
+            [
+                'Jane Doe <example@example.com>discarded',
+                'Jane Doe',
+                'example@example.com',
+            ],
+        ];
     }
 }

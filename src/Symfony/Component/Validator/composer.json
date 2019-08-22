@@ -35,11 +35,12 @@
         "symfony/property-access": "~3.4|~4.0",
         "symfony/property-info": "~3.4|~4.0",
         "symfony/translation": "~4.2",
-        "doctrine/annotations": "~1.0",
+        "doctrine/annotations": "~1.7",
         "doctrine/cache": "~1.0",
-        "egulias/email-validator": "^1.2.8|~2.0"
+        "egulias/email-validator": "^2.1.10"
     },
     "conflict": {
+        "doctrine/lexer": "<1.0.2",
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/dependency-injection": "<3.4",
         "symfony/http-kernel": "<3.4",

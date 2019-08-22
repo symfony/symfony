@@ -24,6 +24,7 @@
         "symfony/service-contracts": "^1.1"
     },
     "require-dev": {
+        "doctrine/annotations": "~1.7",
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/config": "^4.2",
         "symfony/dependency-injection": "~3.4|~4.0",

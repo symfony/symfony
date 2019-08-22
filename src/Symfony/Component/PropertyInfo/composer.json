@@ -31,7 +31,7 @@
         "symfony/cache": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0",
-        "doctrine/annotations": "~1.0"
+        "doctrine/annotations": "~1.7"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",

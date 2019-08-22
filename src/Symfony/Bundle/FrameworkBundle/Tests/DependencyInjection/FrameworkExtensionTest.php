@@ -465,12 +465,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
     }
 
-    public function testNullSessionHandlerWithSavePath()
-    {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
-        $this->createContainerFromFile('session_savepath');
-    }
-
     public function testRequest()
     {
         $container = $this->createContainerFromFile('full');

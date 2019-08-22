@@ -374,6 +374,7 @@ class ConfigurationTest extends TestCase
                 'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
                 'gc_probability' => 1,
+                'save_path' => '%kernel.cache_dir%/sessions',
                 'metadata_update_threshold' => '0',
                 'use_strict_mode' => true,
             ],

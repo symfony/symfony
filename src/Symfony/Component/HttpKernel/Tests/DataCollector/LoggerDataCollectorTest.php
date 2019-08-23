@@ -23,7 +23,7 @@ class LoggerDataCollectorTest extends TestCase
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
-        $logger->expects($this->once())->method('countErrors')->willReturn('foo');
+        $logger->expects($this->once())->method('countErrors')->willReturn(123);
         $logger->expects($this->exactly(2))->method('getLogs')->willReturn([]);
 
         $c = new LoggerDataCollector($logger, __DIR__.'/');

@@ -840,10 +840,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     abstract protected function getIntlErrorMessage(): string;
 
-    /**
-     * @return int
-     */
-    abstract protected function getIntlErrorCode();
+    abstract protected function getIntlErrorCode(): int;
 
     /**
      * @param int $errorCode

@@ -72,6 +72,9 @@ class ExceptionListenerTest extends TestCase
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testExceptionWhenEntryPointReturnsBadValue()
     {
         $event = $this->createEvent(new AuthenticationException());

@@ -8,6 +8,17 @@
             <span class="sf-toolbar-value">{{ collector.requestCount }}</span>
         {% endset %}
 
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Total requests</b>
+                <span>{{ collector.requestCount }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>HTTP errors</b>
+                <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.errorCount }}</span>
+            </div>
+        {% endset %}
+
         {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
     {% endif %}
 {% endblock %}

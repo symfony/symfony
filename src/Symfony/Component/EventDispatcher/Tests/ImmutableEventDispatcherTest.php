@@ -47,7 +47,7 @@ class ImmutableEventDispatcherTest extends TestCase
             ->with($event, 'event')
             ->willReturn($resultEvent);
 
-        $this->assertSame($resultEvent, $this->dispatcher->dispatch('event', $event));
+        $this->assertSame($resultEvent, $this->dispatcher->dispatch($event, 'event'));
     }
 
     public function testGetListenersDelegates()

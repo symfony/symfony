@@ -870,6 +870,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->__construct($environment, $debug);
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {

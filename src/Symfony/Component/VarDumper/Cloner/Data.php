@@ -137,6 +137,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return null;
     }
 
+    /**
+     * @return bool
+     */
     public function __isset($key)
     {
         return null !== $this->seek($key);
@@ -165,6 +168,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         $value = $this->getValue();

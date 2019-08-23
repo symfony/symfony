@@ -125,6 +125,9 @@ class DataPart extends TextPart
         }
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         // converts the body to a string

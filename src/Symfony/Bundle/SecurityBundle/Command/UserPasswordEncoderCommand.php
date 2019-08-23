@@ -101,7 +101,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
@@ -163,7 +163,7 @@ EOF
 
         $errorIo->success('Password encoding succeeded');
 
-        return null;
+        return 0;
     }
 
     /**

@@ -73,7 +73,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         return intl_get_error_message();
     }
 
-    protected function getIntlErrorCode()
+    protected function getIntlErrorCode(): int
     {
         return intl_get_error_code();
     }

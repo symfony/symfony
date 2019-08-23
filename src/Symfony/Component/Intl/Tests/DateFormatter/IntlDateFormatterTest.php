@@ -188,7 +188,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         return IntlGlobals::getErrorMessage();
     }
 
-    protected function getIntlErrorCode()
+    protected function getIntlErrorCode(): int
     {
         return IntlGlobals::getErrorCode();
     }

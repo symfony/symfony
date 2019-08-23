@@ -91,6 +91,9 @@ abstract class DataCollector implements DataCollectorInterface
         return $casters;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         return ['data'];

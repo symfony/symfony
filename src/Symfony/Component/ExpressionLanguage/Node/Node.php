@@ -33,6 +33,9 @@ class Node
         $this->attributes = $attributes;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         $attributes = [];

@@ -795,6 +795,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $output;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         return ['environment', 'debug'];

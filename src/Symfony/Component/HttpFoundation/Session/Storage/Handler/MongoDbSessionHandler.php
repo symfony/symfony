@@ -100,7 +100,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function gc($maxlifetime)
     {

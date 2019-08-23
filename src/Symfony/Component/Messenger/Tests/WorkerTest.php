@@ -27,6 +27,7 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Component\Messenger\Worker\StopWhenMessageCountIsExceededWorker;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -360,6 +361,30 @@ class WorkerTest extends TestCase
 
         // make sure they were processed in the correct order
         $this->assertSame([$envelope1, $envelope2, $envelope3, $envelope4, $envelope5, $envelope6], $processedEnvelopes);
+    }
+
+    public function testWorkerWithDecorator()
+    {
+        $envelope1 = new Envelope(new DummyMessage('message1'));
+        $envelope2 = new Envelope(new DummyMessage('message2'));
+        $envelope3 = new Envelope(new DummyMessage('message3'));
+
+        $receiver = new DummyReceiver([
+            [$envelope1, $envelope2, $envelope3],
+        ]);
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+
+        $worker = new Worker([$receiver], $bus);
+        $workerWithDecorator = new StopWhenMessageCountIsExceededWorker($worker, 2);
+        $processedEnvelopes = [];
+        $workerWithDecorator->run([], function (?Envelope $envelope) use ($worker, &$processedEnvelopes) {
+            if (null !== $envelope) {
+                $processedEnvelopes[] = $envelope;
+            }
+        });
+
+        $this->assertSame([$envelope1, $envelope2], $processedEnvelopes);
     }
 }
 

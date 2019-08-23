@@ -150,7 +150,7 @@ class Command
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
-     * @return int|null null or 0 if everything went fine, or an error code
+     * @return int|void void or 0 if everything went fine, or an exit code
      *
      * @throws LogicException When this abstract method is not implemented
      *

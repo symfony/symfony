@@ -153,8 +153,8 @@ class ClassThatInheritLogger extends Logger
         return parent::getLogs();
     }
 
-    public function countErrors()
+    public function countErrors(): int
     {
-        parent::countErrors();
+        return parent::countErrors();
     }
 }

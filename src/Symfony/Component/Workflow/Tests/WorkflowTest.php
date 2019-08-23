@@ -601,7 +601,7 @@ class EventDispatcherMock implements \Symfony\Component\EventDispatcher\EventDis
     {
     }
 
-    public function getListenerPriority($eventName, $listener)
+    public function getListenerPriority($eventName, $listener): ?int
     {
     }
 

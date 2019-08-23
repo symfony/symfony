@@ -31,7 +31,7 @@ class Exporter
      * @param int               &$objectsCount
      * @param bool              &$valuesAreStatic
      *
-     * @return int
+     * @return array
      *
      * @throws NotInstantiableTypeException When a value cannot be serialized
      */

@@ -102,7 +102,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
@@ -236,7 +236,7 @@ EOF
         if (!\count($operation->getDomains())) {
             $errorIo->warning('No translation messages were found.');
 
-            return null;
+            return 0;
         }
 
         $resultMessage = 'Translation files were successfully updated';
@@ -302,7 +302,7 @@ EOF
 
         $errorIo->success($resultMessage.'.');
 
-        return null;
+        return 0;
     }
 
     private function filterCatalogue(MessageCatalogue $catalogue, string $domain): MessageCatalogue

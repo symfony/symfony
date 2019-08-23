@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2019-08-17T09:42:36Z
+
+:+1: What about deprecating the other two methods? (in favor of making them private/protected in Symfony 5.0)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-17T12:26:40Z
+
+I don't think deprecating is worth the trouble it will put on users.
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-08-17T19:52:41Z
+
+From a DX perspective, this would be really amazing if we could make something like this:
+
+```yaml
+# config/routes.yaml
+doc_shortcut:
+    path: /doc
+    controller: RedirectController
+    defaults:
+        route: 'doc_page'
+
+legacy_doc:
+    path: /legacy/doc
+    controller: RedirectController
+    defaults:
+        path: 'https://legacy.example.com/doc'
+```
+Or perhaps:
+```yaml
+# config/routes.yaml
+doc_shortcut:
+    path: /doc
+    redirect:
+        route: 'doc_page'
+
+legacy_doc:
+    path: /legacy/doc
+    redirect:
+        path: 'https://legacy.example.com/doc'
+```

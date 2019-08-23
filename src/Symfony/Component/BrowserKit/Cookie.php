@@ -83,6 +83,8 @@ class Cookie
 
     /**
      * Returns the HTTP representation of the Cookie.
+     *
+     * @return string
      */
     public function __toString()
     {

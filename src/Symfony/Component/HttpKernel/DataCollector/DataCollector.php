@@ -114,6 +114,9 @@ abstract class DataCollector implements DataCollectorInterface
         return $casters;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {

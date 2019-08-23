@@ -35,6 +35,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'form.type',
         'form.type_extension',
         'form.type_guesser',
+        'http_client.client',
         'kernel.cache_clearer',
         'kernel.cache_warmer',
         'kernel.event_listener',

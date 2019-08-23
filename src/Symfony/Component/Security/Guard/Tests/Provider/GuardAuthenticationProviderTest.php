@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Guard\Tests\Provider;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Provider\GuardAuthenticationProvider;
@@ -87,6 +88,41 @@ class GuardAuthenticationProviderTest extends TestCase
         $this->assertSame($authedToken, $actualAuthedToken);
     }
 
+    public function testCheckCredentialsReturningFalseFailsAuthentication()
+    {
+        $this->expectException(BadCredentialsException::class);
+        $providerKey = 'my_uncool_firewall';
+
+        $authenticator = $this->createMock(AuthenticatorInterface::class);
+
+        // make sure the authenticator is used
+        $this->preAuthenticationToken->expects($this->any())
+            ->method('getGuardProviderKey')
+            // the 0 index, to match the only authenticator
+            ->willReturn('my_uncool_firewall_0');
+
+        $this->preAuthenticationToken->expects($this->atLeastOnce())
+            ->method('getCredentials')
+            ->willReturn('non-null-value');
+
+        $mockedUser = $this->createMock(UserInterface::class);
+        $authenticator->expects($this->once())
+            ->method('getUser')
+            ->willReturn($mockedUser);
+        // checkCredentials is called
+        $authenticator->expects($this->once())
+            ->method('checkCredentials')
+            // authentication fails :(
+            ->willReturn(false);
+
+        $provider = new GuardAuthenticationProvider([$authenticator], $this->userProvider, $providerKey, $this->userChecker);
+        $provider->authenticate($this->preAuthenticationToken);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation %s::checkCredentials() must return a boolean value. You returned NULL. This behavior is deprecated in Symfony 4.4 and will trigger a TypeError in Symfony 5.
+     */
     public function testCheckCredentialsReturningNonTrueFailsAuthentication()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');

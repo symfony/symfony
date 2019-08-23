@@ -194,6 +194,7 @@ Security
 
  * The `LdapUserProvider` class has been deprecated, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead.
  * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` should add a new `needsRehash()` method
+ * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`. Please explicitly return `false` to indicate invalid credentials.
 
 Stopwatch
 ---------

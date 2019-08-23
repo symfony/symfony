@@ -467,6 +467,7 @@ Security
  * The `BCryptPasswordEncoder` class has been removed, use `NativePasswordEncoder` instead.
  * Classes implementing the `TokenInterface` must implement the two new methods
    `__serialize` and `__unserialize`
+ * Implementations of `Guard\AuthenticatorInterface::checkCredentials()` must return a boolean value now. Please explicitly return `false` to indicate invalid credentials.
 
 SecurityBundle
 --------------

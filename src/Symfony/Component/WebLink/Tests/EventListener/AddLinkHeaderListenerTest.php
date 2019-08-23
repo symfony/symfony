@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\GenericLinkProvider;
@@ -33,10 +34,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $subscriber = new AddLinkHeaderListener();
 
-        $event = $this->getMockBuilder(ResponseEvent::class)->disableOriginalConstructor()->getMock();
-        $event->method('isMasterRequest')->willReturn(true);
-        $event->method('getRequest')->willReturn($request);
-        $event->method('getResponse')->willReturn($response);
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST, $response);
 
         $subscriber->onKernelResponse($event);
 

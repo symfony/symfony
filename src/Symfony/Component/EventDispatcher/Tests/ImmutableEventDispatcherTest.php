@@ -40,13 +40,14 @@ class ImmutableEventDispatcherTest extends TestCase
     public function testDispatchDelegates()
     {
         $event = new Event();
+        $resultEvent = new Event();
 
         $this->innerDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($event, 'event')
-            ->willReturn('result');
+            ->willReturn($resultEvent);
 
-        $this->assertSame('result', $this->dispatcher->dispatch($event, 'event'));
+        $this->assertSame($resultEvent, $this->dispatcher->dispatch('event', $event));
     }
 
     public function testGetListenersDelegates()
@@ -54,9 +55,9 @@ class ImmutableEventDispatcherTest extends TestCase
         $this->innerDispatcher->expects($this->once())
             ->method('getListeners')
             ->with('event')
-            ->willReturn('result');
+            ->willReturn(['result']);
 
-        $this->assertSame('result', $this->dispatcher->getListeners('event'));
+        $this->assertSame(['result'], $this->dispatcher->getListeners('event'));
     }
 
     public function testHasListenersDelegates()
@@ -64,9 +65,9 @@ class ImmutableEventDispatcherTest extends TestCase
         $this->innerDispatcher->expects($this->once())
             ->method('hasListeners')
             ->with('event')
-            ->willReturn('result');
+            ->willReturn(true);
 
-        $this->assertSame('result', $this->dispatcher->hasListeners('event'));
+        $this->assertTrue($this->dispatcher->hasListeners('event'));
     }
 
     public function testAddListenerDisallowed()

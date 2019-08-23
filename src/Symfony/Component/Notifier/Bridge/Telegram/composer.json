@@ -1,0 +1,35 @@
+{
+    "name": "symfony/telegram-notifier",
+    "type": "symfony-bridge",
+    "description": "Symfony Telegram Notifier Bridge",
+    "keywords": ["telegram", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.2.9",
+        "symfony/http-client": "^4.3|^5.0",
+        "symfony/notifier": "^5.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Telegram\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.0-dev"
+        }
+    }
+}

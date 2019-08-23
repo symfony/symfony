@@ -24,7 +24,7 @@ class GmailTransport extends EsmtpTransport
 {
     public function __construct(string $username, string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('smtp.gmail.com', 465, 'ssl', null, $dispatcher, $logger);
+        parent::__construct('smtp.gmail.com', 465, 'ssl', 'login', $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

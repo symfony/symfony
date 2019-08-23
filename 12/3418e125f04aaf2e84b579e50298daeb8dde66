@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-07T14:42:35Z
+
+@tyx: Can you please re-add the header information? This is a requirement.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-07T14:42:55Z
+
+fabbot has some interesting things to say :)
+
+---------------------------------------------------------------------------
+
+by tyx at 2019-08-07T15:09:50Z
+
+Many failures on travis seem unrelated : https://travis-ci.org/symfony/symfony/jobs/568907222#L5407
+
+Except one https://travis-ci.org/symfony/symfony/jobs/568907222#L5422 but I guess it's a normal failure as it does not use the right `http_client` package (The failure is about loading the debug http client stuff in FrameworkBundle without loading the change in http_client)

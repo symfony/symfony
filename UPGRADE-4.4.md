@@ -72,6 +72,8 @@ DoctrineBridge
  * Deprecated passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field.
  * Deprecated not passing an `IdReader` to the `DoctrineChoiceLoader` when the query can be optimized with single id field.
  * Deprecated `RegistryInterface`, use `Doctrine\Common\Persistence\ManagerRegistry`.
+ * Added a new `getMetadataDriverClass` method to replace class parameters in `AbstractDoctrineExtension`. This method
+   will be abstract in Symfony 5 and must be declared in extending classes.
 
 Filesystem
 ----------

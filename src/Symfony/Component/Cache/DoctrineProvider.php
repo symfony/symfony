@@ -90,7 +90,7 @@ class DoctrineProvider extends CacheProvider implements PruneableInterface, Rese
      */
     protected function doFlush()
     {
-        $this->pool->clear();
+        return $this->pool->clear();
     }
 
     /**
@@ -98,5 +98,6 @@ class DoctrineProvider extends CacheProvider implements PruneableInterface, Rese
      */
     protected function doGetStats()
     {
+        return null;
     }
 }

@@ -864,7 +864,7 @@ class Process implements \IteratorAggregate
      * @param int|float $timeout The timeout in seconds
      * @param int       $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL (9)
      *
-     * @return int The exit-code of the process
+     * @return int|null The exit-code of the process or null if it's not running
      */
     public function stop($timeout = 10, $signal = null)
     {

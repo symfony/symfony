@@ -53,6 +53,7 @@ class CacheClearCommand extends Command
     protected function configure()
     {
         $this
+            ->setAliases(['cc'])
             ->setDefinition([
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),

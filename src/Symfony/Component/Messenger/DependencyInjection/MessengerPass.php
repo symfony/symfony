@@ -109,6 +109,10 @@ class MessengerPass implements CompilerPassInterface
                         $options = ['method' => $options];
                     }
 
+                    if (!isset($options['from_transport']) && isset($tag['from_transport'])) {
+                        $options['from_transport'] = $tag['from_transport'];
+                    }
+
                     $priority = $tag['priority'] ?? $options['priority'] ?? 0;
                     $method = $options['method'] ?? '__invoke';
 

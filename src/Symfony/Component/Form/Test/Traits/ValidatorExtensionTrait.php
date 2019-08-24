@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Test\Traits;
 
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -37,9 +38,9 @@ trait ValidatorExtensionTrait
         }
 
         $this->validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->setMethods(['addPropertyConstraint'])->getMock();
+        $metadata = $this->getMockBuilder(ClassMetadata::class)->setConstructorArgs([''])->setMethods(['addPropertyConstraint'])->getMock();
         $this->validator->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
-        $this->validator->expects($this->any())->method('validate')->will($this->returnValue([]));
+        $this->validator->expects($this->any())->method('validate')->will($this->returnValue(new ConstraintViolationList()));
 
         return new ValidatorExtension($this->validator);
     }

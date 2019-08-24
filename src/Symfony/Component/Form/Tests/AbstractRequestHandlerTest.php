@@ -346,7 +346,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
             [1024, '1K', false],
             [null, '1K', false],
             [1024, '', false],
-            [1024, 0, false],
+            [1024, '0', false],
         ];
     }
 

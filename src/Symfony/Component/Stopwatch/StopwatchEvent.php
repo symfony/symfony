@@ -217,7 +217,7 @@ class StopwatchEvent
      */
     protected function getNow()
     {
-        return $this->formatTime(microtime(true) * 1000 - $this->origin);
+        return $this->formatTime(\hrtime(true) / 1e6 - $this->origin);
     }
 
     /**

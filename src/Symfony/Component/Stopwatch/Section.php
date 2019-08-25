@@ -85,7 +85,7 @@ class Section
     public function open($id)
     {
         if (null === $id || null === $session = $this->get($id)) {
-            $session = $this->children[] = new self(microtime(true) * 1000, $this->morePrecision);
+            $session = $this->children[] = new self(\hrtime(true) / 1e6, $this->morePrecision);
         }
 
         return $session;

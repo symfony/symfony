@@ -210,11 +210,14 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      */
     public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
+        if ('' === $id = (string) $id) {
+            return '';
+        }
+
         if (null === $domain) {
             $domain = 'messages';
         }
 
-        $id = (string) $id;
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();
         while (!$catalogue->defines($id, $domain)) {
@@ -242,6 +245,10 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     {
         @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), E_USER_DEPRECATED);
 
+        if ('' === $id = (string) $id) {
+            return '';
+        }
+
         if (!$this->formatter instanceof ChoiceMessageFormatterInterface) {
             throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', \get_class($this->formatter)));
         }
@@ -250,7 +257,6 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
             $domain = 'messages';
         }
 
-        $id = (string) $id;
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();
         while (!$catalogue->defines($id, $domain)) {

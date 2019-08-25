@@ -231,7 +231,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Gets the roles of the user.
      *
-     * @return array The roles
+     * @return array|Data
      */
     public function getRoles()
     {
@@ -241,7 +241,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Gets the inherited roles of the user.
      *
-     * @return array The inherited roles
+     * @return array|Data
      */
     public function getInheritedRoles()
     {
@@ -269,16 +269,25 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         return $this->data['authenticated'];
     }
 
+    /**
+     * @return bool
+     */
     public function isImpersonated()
     {
         return $this->data['impersonated'];
     }
 
+    /**
+     * @return string|null
+     */
     public function getImpersonatorUser()
     {
         return $this->data['impersonator_user'];
     }
 
+    /**
+     * @return string|null
+     */
     public function getImpersonationExitPath()
     {
         return $this->data['impersonation_exit_path'];
@@ -287,7 +296,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the class name of the security token.
      *
-     * @return string The token
+     * @return string|Data|null The token
      */
     public function getTokenClass()
     {
@@ -297,7 +306,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the full security token class as Data object.
      *
-     * @return Data
+     * @return Data|null
      */
     public function getToken()
     {
@@ -307,7 +316,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Get the logout URL.
      *
-     * @return string The logout URL
+     * @return string|null The logout URL
      */
     public function getLogoutUrl()
     {
@@ -317,7 +326,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Returns the FQCN of the security voters enabled in the application.
      *
-     * @return string[]
+     * @return string[]|Data
      */
     public function getVoters()
     {
@@ -337,7 +346,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Returns the log of the security decisions made by the access decision manager.
      *
-     * @return array
+     * @return array|Data
      */
     public function getAccessDecisionLog()
     {
@@ -347,13 +356,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Returns the configuration of the current firewall context.
      *
-     * @return array
+     * @return array|Data
      */
     public function getFirewall()
     {
         return $this->data['firewall'];
     }
 
+    /**
+     * @return array|Data
+     */
     public function getListeners()
     {
         return $this->data['listeners'];

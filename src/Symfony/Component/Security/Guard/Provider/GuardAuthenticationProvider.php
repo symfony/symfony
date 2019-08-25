@@ -113,7 +113,11 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         }
 
         $this->userChecker->checkPreAuth($user);
-        if (true !== $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
+        if (true !== $checkCredentialsResult = $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
+            if (false !== $checkCredentialsResult) {
+                @trigger_error(sprintf('%s::checkCredentials() must return a boolean value. You returned %s. This behavior is deprecated in Symfony 4.4 and will trigger a TypeError in Symfony 5.', \get_class($guardAuthenticator), \is_object($checkCredentialsResult) ? \get_class($checkCredentialsResult) : \gettype($checkCredentialsResult)), E_USER_DEPRECATED);
+            }
+
             throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true.', \get_class($guardAuthenticator)));
         }
         if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordEncoder && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && method_exists($this->passwordEncoder, 'needsRehash') && $this->passwordEncoder->needsRehash($user)) {

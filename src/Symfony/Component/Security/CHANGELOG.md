@@ -11,6 +11,7 @@ CHANGELOG
  * Added `Guard\PasswordAuthenticatedInterface`, an optional interface
    for "guard" authenticators that deal with user passwords
  * Marked all dispatched event classes as `@final`
+ * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`.
 
 4.3.0
 -----

@@ -110,7 +110,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
             }
         }
 
-        return null;
+        return '';
     }
 
     /**

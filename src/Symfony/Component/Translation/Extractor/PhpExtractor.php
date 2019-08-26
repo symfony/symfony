@@ -103,7 +103,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      *
      * @param mixed $token
      *
-     * @return string
+     * @return string|null
      */
     protected function normalizeToken($token)
     {
@@ -257,9 +257,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     }
 
     /**
-     * @param string|array $directory
-     *
-     * @return array
+     * {@inheritdoc}
      */
     protected function extractFromDirectory($directory)
     {

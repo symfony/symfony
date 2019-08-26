@@ -119,7 +119,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Gets the token.
      *
-     * @return string The token
+     * @return string|null The token
      */
     public function getToken()
     {

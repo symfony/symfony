@@ -127,7 +127,7 @@ class FormError implements \Serializable
     /**
      * Returns the form that caused this error.
      *
-     * @return FormInterface The form that caused this error
+     * @return FormInterface|null The form that caused this error
      */
     public function getOrigin()
     {

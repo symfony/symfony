@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Tests\Http\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -40,6 +41,10 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             ->method('checkRequestPath')
             ->willReturn(true)
         ;
+        $httpUtils
+            ->method('createRedirectResponse')
+            ->willReturn(new RedirectResponse('/hello'))
+        ;
 
         $failureHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface')->getMock();
         $failureHandler
@@ -52,7 +57,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         $authenticationManager
             ->expects($ok ? $this->once() : $this->never())
             ->method('authenticate')
-            ->willReturn(new Response())
+            ->willReturnArgument(0)
         ;
 
         $listener = new UsernamePasswordFormAuthenticationListener(
@@ -61,7 +66,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             $this->getMockBuilder('Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface')->getMock(),
             $httpUtils,
             'TheProviderKey',
-            $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface')->getMock(),
+            new DefaultAuthenticationSuccessHandler($httpUtils),
             $failureHandler,
             ['require_previous_session' => false]
         );

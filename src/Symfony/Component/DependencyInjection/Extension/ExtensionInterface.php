@@ -37,7 +37,7 @@ interface ExtensionInterface
     /**
      * Returns the base path for the XSD files.
      *
-     * @return string The XSD base path
+     * @return string|false
      */
     public function getXsdValidationBasePath();
 

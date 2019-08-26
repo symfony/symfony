@@ -49,6 +49,9 @@ class BundleTest extends TestCase
         $this->assertNull($bundle2->registerCommands($app));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetContainerExtensionWithInvalidClass()
     {
         $this->expectException('LogicException');

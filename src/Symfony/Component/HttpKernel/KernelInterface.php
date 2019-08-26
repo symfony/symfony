@@ -138,7 +138,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Gets the request start time (not available if debug is disabled).
      *
-     * @return int The request start timestamp
+     * @return float The request start timestamp
      */
     public function getStartTime();
 

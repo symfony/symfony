@@ -52,6 +52,10 @@ class YamlFileLoader extends FileLoader
             restore_error_handler();
         }
 
-        return $messages;
+        if (null !== $messages && !\is_array($messages)) {
+            throw new InvalidResourceException(sprintf('Unable to load file "%s".', $resource));
+        }
+
+        return $messages ?: [];
     }
 }

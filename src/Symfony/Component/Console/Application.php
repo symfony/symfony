@@ -21,7 +21,6 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
-use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -457,13 +456,8 @@ class Application
             return null;
         }
 
-        if (null === $command->getDefinition()) {
-            throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', \get_class($command)));
-        }
-
-        if (!$command->getName()) {
-            throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', \get_class($command)));
-        }
+        // Will throw if the command is not correctly initialized.
+        $command->getDefinition();
 
         $this->commands[$command->getName()] = $command;
 
@@ -1023,7 +1017,7 @@ class Application
     /**
      * Gets the name of the command based on input.
      *
-     * @return string The command name
+     * @return string|null
      */
     protected function getCommandName(InputInterface $input)
     {

@@ -144,7 +144,8 @@ class SessionHandlerProxyTest extends TestCase
     {
         $mock = $this->getMockBuilder(['SessionHandlerInterface', 'SessionUpdateTimestampHandlerInterface'])->getMock();
         $mock->expects($this->once())
-            ->method('updateTimestamp');
+            ->method('updateTimestamp')
+            ->willReturn(false);
 
         $proxy = new SessionHandlerProxy($mock);
         $proxy->updateTimestamp('id', 'data');

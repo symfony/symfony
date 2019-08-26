@@ -1141,28 +1141,29 @@ class PhpDumperTest extends TestCase
         $this->assertSame('some value', $container->get('foo'));
     }
 
-	public function testAliasCanBeFoundInTheDumpedContainerWhenBothTheAliasAndTheServiceArePublic() {
-		$container = new ContainerBuilder();
+    public function testAliasCanBeFoundInTheDumpedContainerWhenBothTheAliasAndTheServiceArePublic()
+    {
+        $container = new ContainerBuilder();
 
-		$container->register('foo', stdClass::class)->setPublic(true);
-		$container->setAlias('bar', 'foo')->setPublic(true);
+        $container->register('foo', stdClass::class)->setPublic(true);
+        $container->setAlias('bar', 'foo')->setPublic(true);
 
-		$container->compile();
+        $container->compile();
 
-		// Bar is found in the compiled container
-		$service_ids = $container->getServiceIds();
-		$this->assertContains("bar", $service_ids);
+        // Bar is found in the compiled container
+        $service_ids = $container->getServiceIds();
+        $this->assertContains('bar', $service_ids);
 
-		$dumper = new PhpDumper($container);
-		$dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_AliasesCanBeFoundInTheDumpedContainer']);
-		eval('?>'.$dump);
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_AliasesCanBeFoundInTheDumpedContainer']);
+        eval('?>'.$dump);
 
-		$container = new \Symfony_DI_PhpDumper_AliasesCanBeFoundInTheDumpedContainer();
+        $container = new \Symfony_DI_PhpDumper_AliasesCanBeFoundInTheDumpedContainer();
 
-		// Bar should still be found in the compiled container
-		$service_ids = $container->getServiceIds();
-		$this->assertContains("bar", $service_ids);
-	}
+        // Bar should still be found in the compiled container
+        $service_ids = $container->getServiceIds();
+        $this->assertContains('bar', $service_ids);
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface

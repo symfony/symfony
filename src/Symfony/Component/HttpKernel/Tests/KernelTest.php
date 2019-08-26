@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
-use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
@@ -626,7 +625,7 @@ EOF;
     {
         $bundle = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')
-            ->setMethods(['getPath', 'getPublicDir', 'getParent', 'getName'])
+            ->setMethods(['getPath', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -646,18 +645,6 @@ EOF;
             ->expects($this->any())
             ->method('getPath')
             ->willReturn($dir)
-        ;
-
-        $bundle
-            ->expects($this->any())
-            ->method('getPublicDir')
-            ->willReturn('Resources/public')
-        ;
-
-        $bundle
-            ->expects($this->any())
-            ->method('getParent')
-            ->willReturn($parent)
         ;
 
         return $bundle;

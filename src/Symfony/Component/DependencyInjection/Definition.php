@@ -807,7 +807,7 @@ class Definition
     /**
      * Gets the configurator to call after the service is fully initialized.
      *
-     * @return callable|null The PHP callable to call
+     * @return callable|array|null
      */
     public function getConfigurator()
     {

@@ -18,6 +18,9 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class DaoAuthenticationProviderTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testRetrieveUserWhenProviderDoesNotReturnAnUserInterface()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationServiceException');

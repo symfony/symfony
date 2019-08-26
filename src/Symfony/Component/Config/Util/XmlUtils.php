@@ -152,7 +152,7 @@ class XmlUtils
      * @param \DOMElement $element     A \DOMElement instance
      * @param bool        $checkPrefix Check prefix in an element or an attribute name
      *
-     * @return array A PHP array
+     * @return mixed
      */
     public static function convertDomElementToArray(\DOMElement $element, $checkPrefix = true)
     {

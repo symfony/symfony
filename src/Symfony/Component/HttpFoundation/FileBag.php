@@ -75,8 +75,8 @@ class FileBag extends ParameterBag
             return $file;
         }
 
-        $file = $this->fixPhpFilesArray($file);
         if (\is_array($file)) {
+            $file = $this->fixPhpFilesArray($file);
             $keys = array_keys($file);
             sort($keys);
 
@@ -109,14 +109,12 @@ class FileBag extends ParameterBag
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
+     * @param array $data
+     *
      * @return array
      */
     protected function fixPhpFilesArray($data)
     {
-        if (!\is_array($data)) {
-            return $data;
-        }
-
         $keys = array_keys($data);
         sort($keys);
 

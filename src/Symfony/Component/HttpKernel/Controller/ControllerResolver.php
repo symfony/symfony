@@ -82,7 +82,11 @@ class ControllerResolver implements ControllerResolverInterface
             return $controller;
         }
 
-        $callable = $this->createController($controller);
+        try {
+            $callable = $this->createController($controller);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable. %s', $request->getPathInfo(), $e->getMessage()));
+        }
 
         if (!\is_callable($callable)) {
             throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable. %s', $request->getPathInfo(), $this->getControllerError($callable)));
@@ -97,17 +101,25 @@ class ControllerResolver implements ControllerResolverInterface
      * @param string $controller A Controller string
      *
      * @return callable A PHP callable
+     *
+     * @throws \InvalidArgumentException When the controller cannot be created
      */
     protected function createController($controller)
     {
         if (false === strpos($controller, '::')) {
-            return $this->instantiateController($controller);
+            $controller = $this->instantiateController($controller);
+
+            if (!\is_callable($controller)) {
+                throw new \InvalidArgumentException($this->getControllerError($controller));
+            }
+
+            return $controller;
         }
 
         list($class, $method) = explode('::', $controller, 2);
 
         try {
-            return [$this->instantiateController($class), $method];
+            $controller = [$this->instantiateController($class), $method];
         } catch (\Error | \LogicException $e) {
             try {
                 if ((new \ReflectionMethod($class, $method))->isStatic()) {
@@ -119,6 +131,12 @@ class ControllerResolver implements ControllerResolverInterface
 
             throw $e;
         }
+
+        if (!\is_callable($controller)) {
+            throw new \InvalidArgumentException($this->getControllerError($controller));
+        }
+
+        return $controller;
     }
 
     /**

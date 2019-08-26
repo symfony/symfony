@@ -749,7 +749,7 @@ EOF
      *
      * @param \DOMElement $element A \DOMElement instance
      *
-     * @return array A PHP array
+     * @return mixed
      */
     public static function convertDomElementToArray(\DOMElement $element)
     {

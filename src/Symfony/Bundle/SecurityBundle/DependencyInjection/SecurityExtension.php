@@ -787,9 +787,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
+     * {@inheritdoc}
      */
     public function getXsdValidationBasePath()
     {

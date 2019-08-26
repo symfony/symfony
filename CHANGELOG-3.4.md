@@ -7,6 +7,35 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.31 (2019-08-26)
+
+ * bug #33335 [DependencyInjection] Fixed the `getServiceIds` implementation to always return aliases (pdommelen)
+ * bug #33244 [Router] Fix TraceableUrlMatcher behaviour with trailing slash (Xavier Leune)
+ * bug #33172 [Console] fixed a PHP notice when there is no function in the stack trace of an Exception (fabpot)
+ * bug #33157 Fix getMaxFilesize() returning zero (ausi)
+ * bug #33139 [Intl] Cleanup unused language aliases entry (ro0NL)
+ * bug #33066 [Serializer] Fix negative DateInterval (jderusse)
+ * bug #33033 [Lock] consistently throw NotSupportException (xabbuh)
+ * bug #32516 [FrameworkBundle][Config] Ignore exceptions thrown during reflection classes autoload (fancyweb)
+ * bug #32981 Fix tests/code for php 7.4 (jderusse)
+ * bug #32992 [ProxyManagerBridge] Polyfill for unmaintained version (jderusse)
+ * bug #32933 [PhpUnitBridge] fixed PHPUnit 8.3 compatibility: method handleError was renamed to __invoke (karser)
+ * bug #32947 [Intl] Support DateTimeInterface in IntlDateFormatter::format (pierredup)
+ * bug #32838 [FrameworkBundle] Detect indirect env vars in routing (ro0NL)
+ * bug #32918 [Intl] Order alpha2 to alpha3 mapping (ro0NL)
+ * bug #32902 [PhpUnitBridge] Allow sutFqcnResolver to return array (VincentLanglet)
+ * bug #32682 [HttpFoundation] Revert getClientIp @return docblock (ossinkine)
+ * bug #32910 [Yaml] PHP-8: Uncaught TypeError: abs() expects parameter 1 to be int or float, string given (Aleksandr Dankovtsev)
+ * bug #32870 #32853 Check if $this->parameters is array. (ABGEO07)
+ * bug #32868 [PhpUnitBridge] Allow symfony/phpunit-bridge > 4.2 to be installed with phpunit 4.8 (jderusse)
+ * bug #32767 [Yaml] fix comment in multi line value (soufianZantar)
+ * bug #32790 [HttpFoundation] Fix `getMaxFilesize` (bennyborn)
+ * bug #32796 [Cache] fix warning on PHP 7.4 (jpauli)
+ * bug #32806 [Console] fix warning on PHP 7.4 (rez1dent3)
+ * bug #32809 Don't add object-value of static properties in the signature of container metadata-cache (arjenm)
+ * bug #30096 [DI] Fix dumping Doctrine-like service graphs (bis) (weaverryan, nicolas-grekas)
+ * bug #32799 [HttpKernel] do not stopwatch sections when profiler is disabled (Tobion)
+
 * 3.4.30 (2019-07-27)
 
  * bug #32503 Fix multiSelect ChoiceQuestion when answers have spaces (IceMaD)

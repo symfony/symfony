@@ -499,6 +499,10 @@ class Request
         try {
             $content = $this->getContent();
         } catch (\LogicException $e) {
+            if (\PHP_VERSION_ID >= 70400) {
+                throw $e;
+            }
+
             return trigger_error($e, E_USER_ERROR);
         }
 
@@ -795,7 +799,7 @@ class Request
      * ("Client-Ip" for instance), configure it via the $trustedHeaderSet
      * argument of the Request::setTrustedProxies() method instead.
      *
-     * @return string The client IP address
+     * @return string|null The client IP address
      *
      * @see getClientIps()
      * @see https://wikipedia.org/wiki/X-Forwarded-For

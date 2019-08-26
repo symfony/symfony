@@ -371,8 +371,6 @@ class Container implements ResettableContainerInterface
 
     /**
      * Creates a service by requiring its factory file.
-     *
-     * @return object The service created by the file
      */
     protected function load($file)
     {

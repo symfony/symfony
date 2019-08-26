@@ -160,7 +160,7 @@ class HttpKernelBrowserTest extends TestCase
         ;
         $file->expects($this->any())
             ->method('getClientSize')
-            ->willReturn(INF)
+            ->willReturn(PHP_INT_MAX)
         ;
 
         $client->request('POST', '/', [], [$file]);

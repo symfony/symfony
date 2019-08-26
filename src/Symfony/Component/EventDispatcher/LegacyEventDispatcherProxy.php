@@ -51,7 +51,7 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
      *
      * @param string|null $eventName
      *
-     * @return Event
+     * @return object
      */
     public function dispatch($event/*, string $eventName = null*/)
     {

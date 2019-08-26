@@ -24,16 +24,16 @@ class ProfilerTest extends AbstractWebTestCase
         }
 
         $client->request('GET', '/profiler');
-        $this->assertFalse($client->getProfile());
+        $this->assertNull($client->getProfile());
 
         // enable the profiler for the next request
         $client->enableProfiler();
-        $this->assertFalse($client->getProfile());
+        $this->assertNull($client->getProfile());
         $client->request('GET', '/profiler');
         $this->assertIsObject($client->getProfile());
 
         $client->request('GET', '/profiler');
-        $this->assertFalse($client->getProfile());
+        $this->assertNull($client->getProfile());
     }
 
     public function getConfigs()

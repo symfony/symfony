@@ -62,6 +62,9 @@ class ObjectLoaderTest extends TestCase
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testExceptionOnNoObjectReturned()
     {
         $this->expectException('LogicException');

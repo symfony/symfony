@@ -12,11 +12,11 @@
 namespace Symfony\Component\Security\Guard\Tests\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Provider\GuardAuthenticationProvider;
+use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
@@ -69,7 +69,7 @@ class GuardAuthenticationProviderTest extends TestCase
             ->with($enteredCredentials, $mockedUser)
             // authentication works!
             ->willReturn(true);
-        $authedToken = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $authedToken = $this->getMockBuilder(GuardTokenInterface::class)->getMock();
         $authenticatorB->expects($this->once())
             ->method('createAuthenticatedToken')
             ->with($mockedUser, $providerKey)

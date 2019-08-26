@@ -193,7 +193,7 @@ class PropertyPathBuilder
     /**
      * Returns the current property path.
      *
-     * @return PropertyPathInterface The constructed property path
+     * @return PropertyPathInterface|null The constructed property path
      */
     public function getPropertyPath()
     {

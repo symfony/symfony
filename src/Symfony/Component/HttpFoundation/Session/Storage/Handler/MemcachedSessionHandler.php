@@ -99,7 +99,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function gc($maxlifetime)
     {

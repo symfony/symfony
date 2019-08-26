@@ -260,7 +260,7 @@ install:
       run_tests () {
           set -e
           export PHP=$1
-          if [[ $PHP != 7.4* && $PHP != $TRAVIS_PHP_VERSION && $TRAVIS_PULL_REQUEST != false ]]; then
+          if [[ $PHP != 7.5* && $PHP != $TRAVIS_PHP_VERSION && $TRAVIS_PULL_REQUEST != false ]]; then
               echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"
               break
           fi

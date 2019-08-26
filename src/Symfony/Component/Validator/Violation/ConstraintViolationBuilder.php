@@ -45,7 +45,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     private $cause;
 
     /**
-     * @param string              $message    The error message as a string or a stringable object
+     * @param string|object       $message    The error message as a string or a stringable object
      * @param TranslatorInterface $translator
      */
     public function __construct(ConstraintViolationList $violations, Constraint $constraint, $message, array $parameters, $root, string $propertyPath, $invalidValue, $translator, string $translationDomain = null)

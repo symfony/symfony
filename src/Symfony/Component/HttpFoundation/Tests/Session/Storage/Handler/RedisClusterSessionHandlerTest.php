@@ -24,7 +24,10 @@ class RedisClusterSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
         }
     }
 
-    protected function createRedisClient(string $host): \RedisCluster
+    /**
+     * @return \RedisCluster|object
+     */
+    protected function createRedisClient(string $host)
     {
         return new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
     }

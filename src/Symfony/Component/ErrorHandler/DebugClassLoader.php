@@ -752,6 +752,14 @@ class DebugClassLoader
             unset($typesMap['array']);
         }
 
+        $iterable = $object = true;
+        foreach ($typesMap as $n => $t) {
+            if ('null' !== $n) {
+                $iterable = $iterable && (\in_array($n, ['array', 'iterable']) || false !== strpos($n, 'Iterator'));
+                $object = $object && (\in_array($n, ['callable', 'object', '$this', 'static']) || !isset(self::SPECIAL_RETURN_TYPES[$n]));
+            }
+        }
+
         $normalizedType = key($typesMap);
         $returnType = current($typesMap);
 
@@ -762,8 +770,14 @@ class DebugClassLoader
                 $normalizedType = $t;
                 $returnType = $t;
             } elseif ($n !== $normalizedType || !preg_match('/^\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $n)) {
-                // ignore multi-types return declarations
-                return;
+                if ($iterable) {
+                    $normalizedType = $returnType = 'iterable';
+                } elseif ($object) {
+                    $normalizedType = $returnType = 'object';
+                } else {
+                    // ignore multi-types return declarations
+                    return;
+                }
             }
         }
 

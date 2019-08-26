@@ -42,7 +42,7 @@ class DebugClassLoader
         'bool' => 'bool',
         'callable' => 'callable',
         'float' => 'float',
-        'int' => 'integer',
+        'int' => 'int',
         'iterable' => 'iterable',
         'object' => 'object',
         'string' => 'string',
@@ -64,10 +64,79 @@ class DebugClassLoader
         'parent' => true,
     ];
 
+    private const MAGIC_METHODS = [
+        '__set' => 'void',
+        '__isset' => 'bool',
+        '__unset' => 'void',
+        '__sleep' => 'array',
+        '__wakeup' => 'void',
+        '__toString' => 'string',
+        '__clone' => 'void',
+        '__debugInfo' => 'array',
+        '__serialize' => 'array',
+        '__unserialize' => 'void',
+    ];
+
+    private const INTERNAL_TYPES = [
+        'ArrayAccess' => [
+            'offsetExists' => 'bool',
+            'offsetSet' => 'void',
+            'offsetUnset' => 'void',
+        ],
+        'Countable' => [
+            'count' => 'int',
+        ],
+        'Iterator' => [
+            'next' => 'void',
+            'valid' => 'bool',
+            'rewind' => 'void',
+        ],
+        'IteratorAggregate' => [
+            'getIterator' => '\Traversable',
+        ],
+        'OuterIterator' => [
+            'getInnerIterator' => '\Iterator',
+        ],
+        'RecursiveIterator' => [
+            'hasChildren' => 'bool',
+        ],
+        'SeekableIterator' => [
+            'seek' => 'void',
+        ],
+        'Serializable' => [
+            'serialize' => 'string',
+            'unserialize' => 'void',
+        ],
+        'SessionHandlerInterface' => [
+            'open' => 'bool',
+            'close' => 'bool',
+            'read' => 'string',
+            'write' => 'bool',
+            'destroy' => 'bool',
+            'gc' => 'bool',
+        ],
+        'SessionIdInterface' => [
+            'create_sid' => 'string',
+        ],
+        'SessionUpdateTimestampHandlerInterface' => [
+            'validateId' => 'bool',
+            'updateTimestamp' => 'bool',
+        ],
+        'Throwable' => [
+            'getMessage' => 'string',
+            'getCode' => 'int',
+            'getFile' => 'string',
+            'getLine' => 'int',
+            'getTrace' => 'array',
+            'getPrevious' => '?\Throwable',
+            'getTraceAsString' => 'string',
+        ],
+    ];
+
     private $classLoader;
     private $isFinder;
     private $loaded = [];
-    private $compatPatch;
+    private $patchTypes;
     private static $caseCheck;
     private static $checkedClasses = [];
     private static $final = [];
@@ -80,12 +149,13 @@ class DebugClassLoader
     private static $method = [];
     private static $returnTypes = [];
     private static $methodTraits = [];
+    private static $fileOffsets = [];
 
     public function __construct(callable $classLoader)
     {
         $this->classLoader = $classLoader;
         $this->isFinder = \is_array($classLoader) && method_exists($classLoader[0], 'findFile');
-        $this->compatPatch = getenv('SYMFONY_PATCH_TYPE_DECLARATIONS_COMPAT') ?: null;
+        parse_str(getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') ?: '', $this->patchTypes);
 
         if (!isset(self::$caseCheck)) {
             $file = file_exists(__FILE__) ? __FILE__ : rtrim(realpath('.'), \DIRECTORY_SEPARATOR);
@@ -160,12 +230,21 @@ class DebugClassLoader
             spl_autoload_unregister($function);
         }
 
+        $loader = null;
+
         foreach ($functions as $function) {
             if (\is_array($function) && $function[0] instanceof self) {
+                $loader = $function[0];
                 $function = $function[0]->getClassLoader();
             }
 
             spl_autoload_register($function);
+        }
+
+        if (null !== $loader) {
+            foreach (array_merge(get_declared_interfaces(), get_declared_traits(), get_declared_classes()) as $class) {
+                $loader->checkClass($class);
+            }
         }
     }
 
@@ -256,6 +335,9 @@ class DebugClassLoader
 
     public function checkAnnotations(\ReflectionClass $refl, string $class): array
     {
+        if ('Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV7' === $class || 'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV6' === $class) {
+            return [];
+        }
         $deprecations = [];
 
         // Don't trigger deprecations for classes in the same vendor
@@ -348,7 +430,7 @@ class DebugClassLoader
         if (trait_exists($class)) {
             $file = $refl->getFileName();
 
-            foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
+            foreach ($refl->getMethods() as $method) {
                 if ($method->getFileName() === $file) {
                     self::$methodTraits[$file][$method->getStartLine()] = $class;
                 }
@@ -368,9 +450,17 @@ class DebugClassLoader
                     self::${$property}[$class] = self::${$property}[$class] ? self::${$property}[$use] + self::${$property}[$class] : self::${$property}[$use];
                 }
             }
+
+            if (null !== (self::INTERNAL_TYPES[$use] ?? null)) {
+                foreach (self::INTERNAL_TYPES[$use] as $method => $returnType) {
+                    if ('void' !== $returnType) {
+                        self::$returnTypes[$class] += [$method => [$returnType, $returnType, $class, '']];
+                    }
+                }
+            }
         }
 
-        foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
+        foreach ($refl->getMethods() as $method) {
             if ($method->class !== $class) {
                 continue;
             }
@@ -413,32 +503,69 @@ class DebugClassLoader
                 }
             }
 
-            if (isset(self::$returnTypes[$class][$method->name]) && !$method->hasReturnType() && !($doc && preg_match('/\n\s+\* @return +(\S+)/', $doc))) {
-                list($normalizedType, $returnType, $declaringClass, $declaringFile) = self::$returnTypes[$class][$method->name];
+            $forcePatchTypes = $this->patchTypes['force'] ?? null;
 
-                if (null !== $this->compatPatch && 0 === strpos($class, $this->compatPatch)) {
-                    self::fixReturnStatements($method, $normalizedType);
+            if ($canAddReturnType = null !== $forcePatchTypes && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
+                if ('void' !== (self::MAGIC_METHODS[$method->name] ?? 'void')) {
+                    $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
+                }
+
+                $canAddReturnType = ($this->patchTypes['force'] ?? false)
+                    || false !== strpos($refl->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
+                    || $refl->isFinal()
+                    || $method->isFinal()
+                    || $method->isPrivate()
+                    || ('' === (self::$internal[$class] ?? null) && !$refl->isAbstract())
+                    || '' === (self::$final[$class] ?? null)
+                    || preg_match('/@(final|internal)$/m', $doc)
+                ;
+            }
+
+            if (null !== ($returnType = self::$returnTypes[$class][$method->name] ?? self::MAGIC_METHODS[$method->name] ?? null) && !$method->hasReturnType() && !($doc && preg_match('/\n\s+\* @return +(\S+)/', $doc))) {
+                if ('void' === $returnType) {
+                    $canAddReturnType = false;
+                }
+
+                list($normalizedType, $returnType, $declaringClass, $declaringFile) = \is_string($returnType) ? [$returnType, $returnType, '', ''] : $returnType;
+
+                if ($canAddReturnType && 'docblock' !== ($this->patchTypes['force'] ?? false)) {
+                    $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                 }
 
                 if (strncmp($ns, $declaringClass, $len)) {
-                    if (null !== $this->compatPatch && 0 === strpos($class, $this->compatPatch)) {
-                        self::patchMethod($method, $returnType, $declaringFile);
+                    if ($canAddReturnType && 'docblock' === ($this->patchTypes['force'] ?? false) && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
+                        $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
+                    } elseif ('' !== $declaringClass) {
+                        $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $normalizedType, $class);
                     }
-
-                    $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $normalizedType, $class);
                 }
             }
 
             if (!$doc) {
+                $this->patchTypes['force'] = $forcePatchTypes;
+
                 continue;
             }
 
-            if (!$method->hasReturnType() && false !== strpos($doc, '@return') && preg_match('/\n\s+\* @return +(\S+)/', $doc, $matches)) {
+            $matches = [];
+
+            if (!$method->hasReturnType() && ((false !== strpos($doc, '@return') && preg_match('/\n\s+\* @return +(\S+)/', $doc, $matches)) || 'void' !== (self::MAGIC_METHODS[$method->name] ?? 'void'))) {
+                $matches = $matches ?: [1 => self::MAGIC_METHODS[$method->name]];
                 $this->setReturnType($matches[1], $method, $parent);
 
-                if (null !== $this->compatPatch && 0 === strpos($class, $this->compatPatch)) {
-                    self::fixReturnStatements($method, self::$returnTypes[$class][$method->name][0] ?? '?');
+                if (isset(self::$returnTypes[$class][$method->name][0]) && $canAddReturnType) {
+                    $this->fixReturnStatements($method, self::$returnTypes[$class][$method->name][0]);
                 }
+
+                if ($method->isPrivate()) {
+                    unset(self::$returnTypes[$class][$method->name]);
+                }
+            }
+
+            $this->patchTypes['force'] = $forcePatchTypes;
+
+            if ($method->isPrivate()) {
+                continue;
             }
 
             $finalOrInternal = false;
@@ -609,9 +736,13 @@ class DebugClassLoader
             $typesMap[$this->normalizeType($t, $method->class, $parent)] = $t;
         }
 
-        if (isset($typesMap['array']) && (isset($typesMap['Traversable']) || isset($typesMap['\Traversable']))) {
-            $typesMap['iterable'] = 'array' !== $typesMap['array'] ? $typesMap['array'] : 'iterable';
-            unset($typesMap['array'], $typesMap['Traversable'], $typesMap['\Traversable']);
+        if (isset($typesMap['array'])) {
+            if (isset($typesMap['Traversable']) || isset($typesMap['\Traversable'])) {
+                $typesMap['iterable'] = 'array' !== $typesMap['array'] ? $typesMap['array'] : 'iterable';
+                unset($typesMap['array'], $typesMap['Traversable'], $typesMap['\Traversable']);
+            } elseif ('array' !== $typesMap['array'] && isset(self::$returnTypes[$method->class][$method->name])) {
+                return;
+            }
         }
 
         if (isset($typesMap['array']) && isset($typesMap['iterable'])) {
@@ -630,7 +761,7 @@ class DebugClassLoader
             } elseif ('null' === $normalizedType) {
                 $normalizedType = $t;
                 $returnType = $t;
-            } elseif ($n !== $normalizedType) {
+            } elseif ($n !== $normalizedType || !preg_match('/^\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $n)) {
                 // ignore multi-types return declarations
                 return;
             }
@@ -680,7 +811,7 @@ class DebugClassLoader
     /**
      * Utility method to add @return annotations to the Symfony code-base where it triggers a self-deprecations.
      */
-    private static function patchMethod(\ReflectionMethod $method, string $returnType, string $declaringFile)
+    private function patchMethod(\ReflectionMethod $method, string $returnType, string $declaringFile, string $normalizedType)
     {
         static $patchedMethods = [];
         static $useStatements = [];
@@ -690,8 +821,10 @@ class DebugClassLoader
         }
 
         $patchedMethods[$file][$startLine] = true;
-        $patchedMethods[$file][0] = $patchedMethods[$file][0] ?? 0;
-        $startLine += $patchedMethods[$file][0] - 2;
+        $fileOffset = self::$fileOffsets[$file] ?? 0;
+        $startLine += $fileOffset - 2;
+        $nullable = '?' === $normalizedType[0] ? '?' : '';
+        $normalizedType = ltrim($normalizedType, '?');
         $returnType = explode('|', $returnType);
         $code = file($file);
 
@@ -737,32 +870,42 @@ class DebugClassLoader
             if (!isset($useMap[$alias])) {
                 $useStatements[$file][2][$alias] = $type;
                 $code[$useOffset] = "use $type;\n".$code[$useOffset];
-                ++$patchedMethods[$file][0];
+                ++$fileOffset;
             } elseif ($useMap[$alias] !== $type) {
                 $alias .= 'FIXME';
                 $useStatements[$file][2][$alias] = $type;
                 $code[$useOffset] = "use $type as $alias;\n".$code[$useOffset];
-                ++$patchedMethods[$file][0];
+                ++$fileOffset;
             }
 
             $returnType[$i] = null !== $format ? sprintf($format, $alias) : $alias;
+
+            if (!isset(self::SPECIAL_RETURN_TYPES[$normalizedType]) && !isset(self::SPECIAL_RETURN_TYPES[$returnType[$i]])) {
+                $normalizedType = $returnType[$i];
+            }
         }
 
-        $returnType = implode('|', $returnType);
+        if ('docblock' === ($this->patchTypes['force'] ?? null) || ('object' === $normalizedType && ($this->patchTypes['php71-compat'] ?? false))) {
+            $returnType = implode('|', $returnType);
 
-        if ($method->getDocComment()) {
-            $code[$startLine] = "     * @return $returnType\n".$code[$startLine];
-        } else {
-            $code[$startLine] .= <<<EOTXT
+            if ($method->getDocComment()) {
+                $code[$startLine] = "     * @return $returnType\n".$code[$startLine];
+            } else {
+                $code[$startLine] .= <<<EOTXT
     /**
      * @return $returnType
      */
 
 EOTXT;
+            }
+
+            $fileOffset += substr_count($code[$startLine], "\n") - 1;
         }
 
-        $patchedMethods[$file][0] += substr_count($code[$startLine], "\n") - 1;
+        self::$fileOffsets[$file] = $fileOffset;
         file_put_contents($file, $code);
+
+        $this->fixReturnStatements($method, $nullable.$normalizedType);
     }
 
     private static function getUseStatements(string $file): array
@@ -808,15 +951,25 @@ EOTXT;
         return [$namespace, $useOffset, $useMap];
     }
 
-    private static function fixReturnStatements(\ReflectionMethod $method, string $returnType)
+    private function fixReturnStatements(\ReflectionMethod $method, string $returnType)
     {
+        if (($this->patchTypes['php71-compat'] ?? false) && 'object' === ltrim($returnType, '?') && 'docblock' !== ($this->patchTypes['force'] ?? null)) {
+            return;
+        }
+
         if (!file_exists($file = $method->getFileName())) {
             return;
         }
 
         $fixedCode = $code = file($file);
-        $end = $method->getEndLine();
-        for ($i = $method->getStartLine(); $i < $end; ++$i) {
+        $i = (self::$fileOffsets[$file] ?? 0) + $method->getStartLine();
+
+        if ('?' !== $returnType && 'docblock' !== ($this->patchTypes['force'] ?? null)) {
+            $fixedCode[$i - 1] = preg_replace('/\)(;?\n)/', "): $returnType\\1", $code[$i - 1]);
+        }
+
+        $end = $method->isGenerator() ? $i : $method->getEndLine();
+        for (; $i < $end; ++$i) {
             if ('void' === $returnType) {
                 $fixedCode[$i] = str_replace('    return null;', '    return;', $code[$i]);
             } elseif ('mixed' === $returnType || '?' === $returnType[0]) {

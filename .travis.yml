@@ -26,6 +26,7 @@ env:
 matrix:
     include:
         - php: 7.2
+          env: php_extra="7.4snapshot"
         - php: 7.3
           env: deps=high
         - php: 7.4snapshot
@@ -78,10 +79,8 @@ before_install:
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
       find ~/.phpenv -name xdebug.ini -delete
 
-      if [[ $TRAVIS_PHP_VERSION = 7.4* && $deps ]]; then
+      if [[ $TRAVIS_PHP_VERSION = 7.4* ]]; then
           export PHPUNIT_X="$PHPUNIT_X,issue-32995"
-      elif [[ $TRAVIS_PHP_VERSION = 7.4* ]]; then
-          export PHPUNIT_X="$PHPUNIT --group issue-32995"
       fi
 
       nanoseconds () {
@@ -149,7 +148,7 @@ before_install:
     - |
       # php.ini configuration
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
-          phpenv global $PHP 2>/dev/null || (cd / && wget https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/14.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
+          phpenv global $PHP 2>/dev/null || (cd / && wget https://storage.googleapis.com/travis-ci-language-archives/php/binaries/ubuntu/16.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           echo date.timezone = Europe/Paris >> $INI
           echo memory_limit = -1 >> $INI
@@ -261,7 +260,7 @@ install:
       run_tests () {
           set -e
           export PHP=$1
-          if [[ $PHP != $TRAVIS_PHP_VERSION && $TRAVIS_PULL_REQUEST != false ]]; then
+          if [[ $PHP != 7.4* && $PHP != $TRAVIS_PHP_VERSION && $TRAVIS_PULL_REQUEST != false ]]; then
               echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"
               break
           fi
@@ -278,6 +277,17 @@ install:
               echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable) && $PHPUNIT_X'"
               echo "$COMPONENTS" | xargs -n1 -I{} tar --append -f ~/php-ext/composer-lowest.lock.tar {}/composer.lock
           else
+              if [[ $PHP = 7.4* ]]; then
+                  # add return types before running the test suite
+                  rm vendor/symfony/contracts -Rf
+                  ln -sd $(realpath src/Symfony/Contracts) vendor/symfony/contracts
+                  sed -i 's/"\*\*\/Tests\/"//' composer.json
+                  composer install --optimize-autoloader
+                  php .github/patch-types.php
+                  php .github/patch-types.php # ensure the script is idempotent
+                  export PHPUNIT_X="$PHPUNIT_X,issue-32995,legacy"
+              fi
+
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
               tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
               if [[ $PHP = ${MIN_PHP%.*} ]]; then

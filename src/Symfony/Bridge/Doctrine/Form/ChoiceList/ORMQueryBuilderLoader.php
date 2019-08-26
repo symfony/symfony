@@ -84,6 +84,6 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         return $qb->andWhere($where)
                   ->getQuery()
                   ->setParameter($parameter, $values, $parameterType)
-                  ->getResult() ?: [];
+                  ->getResult();
     }
 }

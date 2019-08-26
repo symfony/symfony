@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
-use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\Ldap\Exception\UnexpectedValueException;
 
 /**
  * A class representing the Ldap extension's options, which can be used with
@@ -71,7 +71,7 @@ final class ConnectionOptions
      * Fetches an option's corresponding constant value from an option name.
      * The option name can either be in snake or camel case.
      *
-     * @throws LdapException
+     * @throws UnexpectedValueException
      */
     public static function getOption(string $name): int
     {
@@ -79,7 +79,7 @@ final class ConnectionOptions
         $constantName = self::getOptionName($name);
 
         if (!\defined($constantName)) {
-            throw new LdapException(sprintf('Unknown option "%s".', $name));
+            throw new UnexpectedValueException(sprintf('Unknown option "%s".', $name));
         }
 
         return \constant($constantName);

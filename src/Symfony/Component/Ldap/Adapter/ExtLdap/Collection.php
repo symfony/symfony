@@ -51,9 +51,9 @@ class Collection implements CollectionInterface
         $searches = $this->search->getResources();
         $count = 0;
         foreach ($searches as $search) {
-            $searchCount = ldap_count_entries($con, $search);
+            $searchCount = @ldap_count_entries($con, $search);
             if (false === $searchCount) {
-                throw new LdapException(sprintf('Error while retrieving entry count: %s.', ldap_error($con)));
+                throw LdapException::create('Error while retrieving entry count: [{errorCode}] {errorMsg}.', ldap_errno($con));
             }
             $count += $searchCount;
         }
@@ -73,10 +73,10 @@ class Collection implements CollectionInterface
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();
         foreach ($searches as $search) {
-            $current = ldap_first_entry($con, $search);
+            $current = @ldap_first_entry($con, $search);
 
             if (false === $current) {
-                throw new LdapException(sprintf('Could not rewind entries array: %s.', ldap_error($con)));
+                throw LdapException::create('Could not rewind entries array: [{errorCode}] {errorMsg}.', ldap_errno($con));
             }
 
             yield $this->getSingleEntry($con, $current);
@@ -120,18 +120,18 @@ class Collection implements CollectionInterface
 
     private function getSingleEntry($con, $current): Entry
     {
-        $attributes = ldap_get_attributes($con, $current);
+        $attributes = @ldap_get_attributes($con, $current);
 
         if (false === $attributes) {
-            throw new LdapException(sprintf('Could not fetch attributes: %s.', ldap_error($con)));
+            throw LdapException::create('Could not fetch attributes: [{errorCode}] {errorMsg}.', ldap_errno($con));
         }
 
         $attributes = $this->cleanupAttributes($attributes);
 
-        $dn = ldap_get_dn($con, $current);
+        $dn = @ldap_get_dn($con, $current);
 
         if (false === $dn) {
-            throw new LdapException(sprintf('Could not fetch DN: %s.', ldap_error($con)));
+            throw LdapException::create('Could not fetch DN: [{errorCode}] {errorMsg}.', ldap_errno($con));
         }
 
         return new Entry($dn, $attributes);

@@ -12,10 +12,10 @@
 namespace Symfony\Component\Ldap\Exception;
 
 /**
- * ConnectionException is thrown if binding to ldap can not be established.
+ * ExtensionNotLoadedException is thrown is a required PHP extension is not loaded.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Dominic Tubach <dominic.tubach@to.com>
  */
-class ConnectionException extends LdapException implements ExceptionInterface
+class ExtensionNotLoadedException extends \RuntimeException implements ExceptionInterface
 {
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Ldap\Exception;
 
 /**
- * LdapException is thrown if php ldap module is not loaded.
+ * DriverNotFoundException is thrown if adapter is not found in adapter map.
  *
  * @author Charles Sarrazin <charles@sarraz.in>
  */

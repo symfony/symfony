@@ -12,10 +12,10 @@
 namespace Symfony\Component\Ldap\Exception;
 
 /**
- * ConnectionException is thrown if binding to ldap can not be established.
+ * MalformedDistinguishedNameException is thrown in case of an malformed DN.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Dominic Tubach <dominic.tubach@to.com>
  */
-class ConnectionException extends LdapException implements ExceptionInterface
+class MalformedDistinguishedNameException extends \RuntimeException implements ExceptionInterface
 {
 }

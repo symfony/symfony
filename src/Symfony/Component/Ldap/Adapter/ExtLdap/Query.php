@@ -12,6 +12,7 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
+use Symfony\Component\Ldap\Exception\DomainException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 
@@ -48,8 +49,8 @@ class Query extends AbstractQuery
             if (false === $result || null === $result) {
                 continue;
             }
-            if (!ldap_free_result($result)) {
-                throw new LdapException(sprintf('Could not free results: %s.', ldap_error($con)));
+            if (!@ldap_free_result($result)) {
+                throw LdapException::create('Could not free results: [{errorCode}] {errorMsg}.', ldap_errno($con));
             }
         }
         $this->results = null;
@@ -80,7 +81,7 @@ class Query extends AbstractQuery
                     $func = 'ldap_search';
                     break;
                 default:
-                    throw new LdapException(sprintf('Could not search in scope "%s".', $this->options['scope']));
+                    throw new DomainException(sprintf('Could not search in scope "%s".', $this->options['scope']));
             }
 
             $itemsLeft = $maxItems = $this->options['maxItems'];
@@ -97,7 +98,9 @@ class Query extends AbstractQuery
             $cookie = '';
             do {
                 if ($pageControl) {
-                    ldap_control_paged_result($con, $pageSize, true, $cookie);
+                    if (!@ldap_control_paged_result($con, $pageSize, true, $cookie)) {
+                        throw LdapException::create('Could not send the LDAP pagination control: [{errorCode}] {errorMsg}.', ldap_errno($con));
+                    }
                 }
                 $sizeLimit = $itemsLeft;
                 if ($pageSize > 0 && $sizeLimit >= $pageSize) {
@@ -115,15 +118,12 @@ class Query extends AbstractQuery
                 );
 
                 if (false === $search) {
-                    $ldapError = '';
-                    if ($errno = ldap_errno($con)) {
-                        $ldapError = sprintf(' LDAP error was [%d] %s', $errno, ldap_error($con));
-                    }
+                    $errorCode = ldap_errno($con);
                     if ($pageControl) {
                         $this->resetPagination();
                     }
 
-                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
+                    throw LdapException::create(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s": [{errorCode}] {errorMsg}.', $this->dn, $this->query, implode(',', $this->options['filter'])), $errorCode);
                 }
 
                 $this->results[] = $search;
@@ -133,7 +133,9 @@ class Query extends AbstractQuery
                     break;
                 }
                 if ($pageControl) {
-                    ldap_control_paged_result_response($con, $search, $cookie);
+                    if (!@ldap_control_paged_result_response($con, $search, $cookie)) {
+                        throw LdapException::create('Could not retrieve the LDAP pagination cookie: [{errorCode}] {errorMsg}.', ldap_errno($con));
+                    }
                 }
             } while (null !== $cookie && '' !== $cookie);
 

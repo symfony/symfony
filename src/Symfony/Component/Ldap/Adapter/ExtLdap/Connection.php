@@ -58,16 +58,16 @@ class Connection extends AbstractConnection
         }
 
         if (false === @ldap_bind($this->connection, $dn, $password)) {
-            $error = ldap_error($this->connection);
-            switch (ldap_errno($this->connection)) {
+            $errorCode = ldap_errno($this->connection);
+            switch ($errorCode) {
                 case self::LDAP_INVALID_CREDENTIALS:
-                    throw new InvalidCredentialsException($error);
+                    throw InvalidCredentialsException::create('{errorMsg}', $errorCode);
                 case self::LDAP_TIMEOUT:
-                    throw new ConnectionTimeoutException($error);
+                    throw ConnectionTimeoutException::create('{errorMsg}', $errorCode);
                 case self::LDAP_ALREADY_EXISTS:
-                    throw new AlreadyExistsException($error);
+                    throw AlreadyExistsException::create('{errorMsg}', $errorCode);
             }
-            throw new ConnectionException($error);
+            throw ConnectionException::create('{errorMsg}', $errorCode);
         }
 
         $this->bound = true;
@@ -88,14 +88,14 @@ class Connection extends AbstractConnection
     public function setOption($name, $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
-            throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
+            throw LdapException::create(sprintf('Could not set value "%s" for option "%s": [{errorCode}] {errorMsg}.', $value, $name), ldap_errno($this->connection));
         }
     }
 
     public function getOption($name)
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
-            throw new LdapException(sprintf('Could not retrieve value for option "%s".', $name));
+            throw LdapException::create(sprintf('Could not retrieve value for option "%s": [{errorCode}] {errorMsg}.', $name), ldap_errno($this->connection));
         }
 
         return $ret;
@@ -135,19 +135,17 @@ class Connection extends AbstractConnection
             $this->setOption($name, $value);
         }
 
-        if (false === $this->connection) {
-            throw new LdapException(sprintf('Could not connect to Ldap server: %s.', ldap_error($this->connection)));
-        }
-
         if ('tls' === $this->config['encryption'] && false === @ldap_start_tls($this->connection)) {
-            throw new LdapException(sprintf('Could not initiate TLS connection: %s.', ldap_error($this->connection)));
+            throw LdapException::create('Could not initiate TLS connection: [{errorCode}] {errorMsg}.', ldap_errno($this->connection));
         }
     }
 
     private function disconnect()
     {
         if ($this->connection && \is_resource($this->connection)) {
-            ldap_unbind($this->connection);
+            if (!@ldap_unbind($this->connection)) {
+                throw LdapException::create('Could not unbind from LDAP: [{errorCode}] {errorMsg}', ldap_errno($this->connection));
+            }
         }
 
         $this->connection = null;

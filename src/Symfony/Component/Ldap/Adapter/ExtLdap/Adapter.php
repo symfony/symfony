@@ -12,7 +12,7 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
-use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\Ldap\Exception\ExtensionNotLoadedException;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
@@ -26,7 +26,7 @@ class Adapter implements AdapterInterface
     public function __construct(array $config = [])
     {
         if (!\extension_loaded('ldap')) {
-            throw new LdapException('The LDAP PHP extension is not enabled.');
+            throw new ExtensionNotLoadedException('The LDAP PHP extension is not enabled.');
         }
 
         $this->config = $config;

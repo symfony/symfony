@@ -14,12 +14,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Connection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\EntryManager;
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\MalformedDistinguishedNameException;
 
 class EntryManagerTest extends TestCase
 {
     public function testMove()
     {
-        $this->expectException('Symfony\Component\Ldap\Exception\LdapException');
+        $this->expectException(MalformedDistinguishedNameException::class);
         $this->expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
         $connection = $this->createMock(Connection::class);
         $connection

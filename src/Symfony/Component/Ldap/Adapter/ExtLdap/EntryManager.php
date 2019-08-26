@@ -14,6 +14,7 @@ namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\Ldap\Exception\MalformedDistinguishedNameException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
 
@@ -38,7 +39,7 @@ class EntryManager implements EntryManagerInterface
         $con = $this->getConnectionResource();
 
         if (!@ldap_add($con, $entry->getDn(), $entry->getAttributes())) {
-            throw new LdapException(sprintf('Could not add entry "%s": %s.', $entry->getDn(), ldap_error($con)));
+            throw LdapException::create(sprintf('Could not add entry "%s": [{errorCode}] {errorMsg}.', $entry->getDn()), ldap_errno($con));
         }
 
         return $this;
@@ -52,7 +53,7 @@ class EntryManager implements EntryManagerInterface
         $con = $this->getConnectionResource();
 
         if (!@ldap_modify($con, $entry->getDn(), $entry->getAttributes())) {
-            throw new LdapException(sprintf('Could not update entry "%s": %s.', $entry->getDn(), ldap_error($con)));
+            throw LdapException::create(sprintf('Could not update entry "%s": [{errorCode}] {errorMsg}.', $entry->getDn()), ldap_errno($con));
         }
     }
 
@@ -64,7 +65,7 @@ class EntryManager implements EntryManagerInterface
         $con = $this->getConnectionResource();
 
         if (!@ldap_delete($con, $entry->getDn())) {
-            throw new LdapException(sprintf('Could not remove entry "%s": %s.', $entry->getDn(), ldap_error($con)));
+            throw LdapException::create(sprintf('Could not remove entry "%s": [{errorCode}] {errorMsg}.', $entry->getDn()), ldap_errno($con));
         }
     }
 
@@ -79,7 +80,7 @@ class EntryManager implements EntryManagerInterface
         $con = $this->getConnectionResource();
 
         if (!@ldap_mod_add($con, $entry->getDn(), [$attribute => $values])) {
-            throw new LdapException(sprintf('Could not add values to entry "%s", attribute %s: %s.', $entry->getDn(), $attribute, ldap_error($con)));
+            throw LdapException::create(sprintf('Could not add values to entry "%s", attribute "%s": [{errorCode}] {errorMsg}.', $entry->getDn(), $attribute), ldap_errno($con));
         }
     }
 
@@ -94,7 +95,7 @@ class EntryManager implements EntryManagerInterface
         $con = $this->getConnectionResource();
 
         if (!@ldap_mod_del($con, $entry->getDn(), [$attribute => $values])) {
-            throw new LdapException(sprintf('Could not remove values from entry "%s", attribute %s: %s.', $entry->getDn(), $attribute, ldap_error($con)));
+            throw LdapException::create(sprintf('Could not remove values from entry "%s", attribute "%s": [{errorCode}] {errorMsg}.', $entry->getDn(), $attribute), ldap_errno($con));
         }
     }
 
@@ -106,15 +107,16 @@ class EntryManager implements EntryManagerInterface
         $con = $this->getConnectionResource();
 
         if (!@ldap_rename($con, $entry->getDn(), $newRdn, null, $removeOldRdn)) {
-            throw new LdapException(sprintf('Could not rename entry "%s" to "%s": %s.', $entry->getDn(), $newRdn, ldap_error($con)));
+            throw LdapException::create(sprintf('Could not rename entry "%s" to "%s": [{errorCode}] {errorMsg}.', $entry->getDn(), $newRdn), ldap_errno($con));
         }
     }
 
     /**
      * Moves an entry on the Ldap server.
      *
-     * @throws NotBoundException if the connection has not been previously bound
-     * @throws LdapException     if an error is thrown during the rename operation
+     * @throws NotBoundException                   if the connection has not been previously bound
+     * @throws LdapException                       if an error is thrown during the rename operation
+     * @throws MalformedDistinguishedNameException if entry contains a malformed DN.
      */
     public function move(Entry $entry, string $newParent)
     {
@@ -122,7 +124,7 @@ class EntryManager implements EntryManagerInterface
         $rdn = $this->parseRdnFromEntry($entry);
         // deleteOldRdn does not matter here, since the Rdn will not be changing in the move.
         if (!@ldap_rename($con, $entry->getDn(), $rdn, $newParent, true)) {
-            throw new LdapException(sprintf('Could not move entry "%s" to "%s": %s.', $entry->getDn(), $newParent, ldap_error($con)));
+            throw LdapException::create(sprintf('Could not move entry "%s" to "%s": [{errorCode}] {errorMsg}.', $entry->getDn(), $newParent), ldap_errno($con));
         }
     }
 
@@ -152,14 +154,14 @@ class EntryManager implements EntryManagerInterface
         }
 
         if (!@ldap_modify_batch($this->getConnectionResource(), $dn, $operationsMapped)) {
-            throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": "%s".', $dn, ldap_error($this->getConnectionResource())));
+            throw UpdateOperationException::create(sprintf('Error executing UpdateOperation on "%s": [{errorCode}] {errorMsg}.', $dn), ldap_errno($this->getConnectionResource()));
         }
     }
 
     private function parseRdnFromEntry(Entry $entry): string
     {
         if (!preg_match('/^([^,]+),/', $entry->getDn(), $matches)) {
-            throw new LdapException(sprintf('Entry "%s" malformed, could not parse RDN.', $entry->getDn()));
+            throw new MalformedDistinguishedNameException(sprintf('Entry "%s" malformed, could not parse RDN.', $entry->getDn()));
         }
 
         return $matches[1];

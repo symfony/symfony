@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
-use Symfony\Component\Ldap\Exception\UpdateOperationException;
+use Symfony\Component\Ldap\Exception\UnexpectedValueException;
 
 class UpdateOperation
 {
@@ -30,15 +30,15 @@ class UpdateOperation
      * @param int    $operationType An LDAP_MODIFY_BATCH_* constant
      * @param string $attribute     The attribute to batch modify on
      *
-     * @throws UpdateOperationException on consistency errors during construction
+     * @throws UnexpectedValueException on consistency errors during construction
      */
     public function __construct(int $operationType, string $attribute, ?array $values)
     {
         if (!\in_array($operationType, $this->validOperationTypes, true)) {
-            throw new UpdateOperationException(sprintf('"%s" is not a valid modification type.', $operationType));
+            throw new UnexpectedValueException(sprintf('"%s" is not a valid modification type.', $operationType));
         }
         if (LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {
-            throw new UpdateOperationException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', \gettype($values)));
+            throw new UnexpectedValueException(sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', \gettype($values)));
         }
 
         $this->operationType = $operationType;

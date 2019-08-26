@@ -111,26 +111,6 @@ EOF;
         $this->assertSame($expected, (string) $violation);
     }
 
-    public function testMessageCanBeStringableObject()
-    {
-        $message = new ToString();
-        $violation = new ConstraintViolation(
-            $message,
-            (string) $message,
-            [],
-            'Root',
-            'property.path',
-            null
-        );
-
-        $expected = <<<'EOF'
-Root.property.path:
-    toString
-EOF;
-        $this->assertSame($expected, (string) $violation);
-        $this->assertSame((string) $message, $violation->getMessage());
-    }
-
     public function testMessageCannotBeArray()
     {
         $this->expectException(\TypeError::class);

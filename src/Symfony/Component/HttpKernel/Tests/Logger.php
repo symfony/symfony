@@ -22,10 +22,7 @@ class Logger implements LoggerInterface
         $this->clear();
     }
 
-    /**
-     * @return array
-     */
-    public function getLogs($level = false)
+    public function getLogs($level = false): array
     {
         return false === $level ? $this->logs : $this->logs[$level];
     }

@@ -36,6 +36,13 @@ class TestAppKernel extends Kernel
         $loader->load(__DIR__.\DIRECTORY_SEPARATOR.'config.yml');
     }
 
+    public function setAnnotatedClassCache(array $annotatedClasses)
+    {
+        $annotatedClasses = array_diff($annotatedClasses, ['Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController', 'Symfony\Bundle\TwigBundle\Controller\ExceptionController']);
+
+        parent::setAnnotatedClassCache($annotatedClasses);
+    }
+
     protected function build(ContainerBuilder $container)
     {
         $container->register('logger', NullLogger::class);

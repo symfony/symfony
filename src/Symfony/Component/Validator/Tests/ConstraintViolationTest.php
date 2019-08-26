@@ -108,4 +108,66 @@ EOF;
 
         $this->assertSame($expected, (string) $violation);
     }
+
+    public function testMessageCanBeStringableObject()
+    {
+        $message = new ToString();
+        $violation = new ConstraintViolation(
+            $message,
+            (string) $message,
+            [],
+            'Root',
+            'property.path',
+            null
+        );
+
+        $expected = <<<'EOF'
+Root.property.path:
+    toString
+EOF;
+        $this->assertSame($expected, (string) $violation);
+        $this->assertSame((string) $message, $violation->getMessage());
+    }
+
+    public function testMessageCannotBeArray()
+    {
+        $this->expectException(\TypeError::class);
+        $violation = new ConstraintViolation(
+            ['cannot be an array'],
+            '',
+            [],
+            'Root',
+            'property.path',
+            null
+        );
+    }
+
+    public function testMessageObjectMustBeStringable()
+    {
+        $this->expectException(\TypeError::class);
+        $violation = new ConstraintViolation(
+            new CustomArrayObject(),
+            '',
+            [],
+            'Root',
+            'property.path',
+            null
+        );
+    }
+
+    public function testNonStringCode()
+    {
+        $violation = new ConstraintViolation(
+            '42 cannot be used here',
+            'this is the message template',
+            [],
+            ['some_value' => 42],
+            'some_value',
+            null,
+            null,
+            42
+        );
+
+        self::assertSame(42, $violation->getCode());
+    }
 }

@@ -50,6 +50,8 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
      * {@inheritdoc}
      *
      * @param string|null $eventName
+     *
+     * @return object
      */
     public function dispatch($event/*, string $eventName = null*/)
     {

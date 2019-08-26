@@ -26,7 +26,7 @@ class HttpException extends \RuntimeException implements HttpExceptionInterface
         $this->statusCode = $statusCode;
         $this->headers = $headers;
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $statusCode, $previous);
     }
 
     public function getStatusCode()

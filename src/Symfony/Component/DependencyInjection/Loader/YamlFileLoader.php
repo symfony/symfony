@@ -150,6 +150,9 @@ class YamlFileLoader extends FileLoader
             $this->parseDefinitions($content, $path);
         } finally {
             $this->instanceof = [];
+            $this->interfaces = [];
+            $this->singlyImplemented = [];
+            $this->singlyImplementedAliases = [];
         }
     }
 
@@ -318,6 +321,7 @@ class YamlFileLoader extends FileLoader
 
         if (\is_string($service) && 0 === strpos($service, '@')) {
             $this->container->setAlias($id, $alias = new Alias(substr($service, 1)));
+            unset($this->singlyImplementedAliases[$id]);
             if (isset($defaults['public'])) {
                 $alias->setPublic($defaults['public']);
             }
@@ -341,6 +345,7 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['alias'])) {
             $this->container->setAlias($id, $alias = new Alias($service['alias']));
+            unset($this->singlyImplementedAliases[$id]);
             if (\array_key_exists('public', $service)) {
                 $alias->setPublic($service['public']);
             } elseif (isset($defaults['public'])) {

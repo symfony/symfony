@@ -105,6 +105,7 @@ class ServicesConfigurator extends AbstractConfigurator
         $ref = static::processValue($referencedId, true);
         $alias = new Alias((string) $ref, $this->defaults->isPublic());
         $this->container->setAlias($id, $alias);
+        $this->loader->removeSinglyImplementedAlias((string) $ref);
 
         return new AliasConfigurator($this, $alias);
     }

@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\SinglyImplementedInterface\Port\:
+        resource: ../Prototype/SinglyImplementedInterface/Port/*
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\SinglyImplementedInterface\Adapter\:
+        resource: ../Prototype/SinglyImplementedInterface/Adapter/*

@@ -63,6 +63,18 @@ class PhpFileLoader extends FileLoader
 
         return 'php' === $type;
     }
+
+    public function resetBeforeConfiguringServices(): void
+    {
+        $this->interfaces = [];
+        $this->singlyImplemented = [];
+        $this->singlyImplementedAliases = [];
+    }
+
+    public function removeSinglyImplementedAlias(string $alias): void
+    {
+        unset($this->singlyImplementedAliases[$alias]);
+    }
 }
 
 /**

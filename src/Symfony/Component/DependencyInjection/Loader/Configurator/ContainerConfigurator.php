@@ -73,6 +73,8 @@ class ContainerConfigurator extends AbstractConfigurator
 
     final public function services(): ServicesConfigurator
     {
+        $this->loader->resetBeforeConfiguringServices();
+
         return new ServicesConfigurator($this->container, $this->loader, $this->instanceof, $this->path, $this->anonymousCount);
     }
 }

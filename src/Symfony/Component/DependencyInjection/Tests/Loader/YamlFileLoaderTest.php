@@ -415,6 +415,7 @@ class YamlFileLoaderTest extends TestCase
             false, [
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'BadClasses') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'OtherDir') => true,
+                str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'SinglyImplementedInterface') => true,
             ]
         );
         $this->assertContains((string) $globResource, $resources);
@@ -833,5 +834,51 @@ class YamlFileLoaderTest extends TestCase
         $iteratorArgument = $container->getDefinition('iterator_service')->getArgument(0);
         $this->assertInstanceOf(TaggedIteratorArgument::class, $iteratorArgument);
         $this->assertNull($iteratorArgument->getIndexAttribute());
+    }
+
+    public function testSinglyImplementedInterfacesInMultipleResources()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('singly_implemented_interface_in_multiple_resources.yml');
+
+        $alias = $container->getAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class);
+
+        $this->assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
+    }
+
+    public function testNotSinglyImplementedInterfacesInMultipleResources()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('not_singly_implemented_interface_in_multiple_resources.yml');
+
+        $this->assertFalse($container->hasAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class));
+    }
+
+    public function testNotSinglyImplementedInterfacesInMultipleResourcesWithPreviouslyRegisteredAlias()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('not_singly_implemented_interface_in_multiple_resources_with_previously_registered_alias.yml');
+
+        $alias = $container->getAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class);
+
+        $this->assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
+    }
+
+    public function testNotSinglyImplementedInterfacesInMultipleResourcesWithPreviouslyRegisteredAlias2()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('not_singly_implemented_interface_in_multiple_resources_with_previously_registered_alias2.yml');
+
+        $alias = $container->getAlias(Prototype\SinglyImplementedInterface\Port\PortInterface::class);
+
+        $this->assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
     }
 }

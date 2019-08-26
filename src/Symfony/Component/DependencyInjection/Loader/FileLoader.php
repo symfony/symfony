@@ -29,6 +29,9 @@ abstract class FileLoader extends BaseFileLoader
     protected $container;
     protected $isLoadingInstanceof = false;
     protected $instanceof = [];
+    protected $interfaces = [];
+    protected $singlyImplemented = [];
+    protected $singlyImplementedAliases = [];
 
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator)
     {
@@ -57,12 +60,10 @@ abstract class FileLoader extends BaseFileLoader
         $classes = $this->findClasses($namespace, $resource, (array) $exclude);
         // prepare for deep cloning
         $serializedPrototype = serialize($prototype);
-        $interfaces = [];
-        $singlyImplemented = [];
 
         foreach ($classes as $class => $errorMessage) {
             if (interface_exists($class, false)) {
-                $interfaces[] = $class;
+                $this->interfaces[] = $class;
             } else {
                 $this->setDefinition($class, $definition = unserialize($serializedPrototype));
                 if (null !== $errorMessage) {
@@ -71,14 +72,17 @@ abstract class FileLoader extends BaseFileLoader
                     continue;
                 }
                 foreach (class_implements($class, false) as $interface) {
-                    $singlyImplemented[$interface] = isset($singlyImplemented[$interface]) ? false : $class;
+                    $this->singlyImplemented[$interface] = isset($this->singlyImplemented[$interface]) ? false : $class;
                 }
             }
         }
-        foreach ($interfaces as $interface) {
-            if (!empty($singlyImplemented[$interface])) {
-                $this->container->setAlias($interface, $singlyImplemented[$interface])
-                    ->setPublic(false);
+
+        foreach ($this->interfaces as $interface) {
+            if (!empty($this->singlyImplemented[$interface]) && !$this->container->hasAlias($interface)) {
+                $this->container->setAlias($interface, $this->singlyImplemented[$interface])->setPublic(false);
+                $this->singlyImplementedAliases[$interface] = true;
+            } elseif ($this->singlyImplementedAliases[$interface] ?? false) {
+                $this->container->removeAlias($interface);
             }
         }
     }

@@ -144,7 +144,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     /**
      * Loads a user from an LDAP entry.
      *
-     * @return LdapUser
+     * @return UserInterface
      */
     protected function loadUser(string $username, Entry $entry)
     {

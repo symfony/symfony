@@ -14,11 +14,12 @@ namespace Symfony\Bridge\Twig\Tests\Mime;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
-class RendererTest extends TestCase
+class BodyRendererTest extends TestCase
 {
     public function testRenderTextOnly(): void
     {
@@ -54,7 +55,13 @@ class RendererTest extends TestCase
         $this->assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
     }
 
-    private function prepareEmail(?string $text, ?string $html): TemplatedEmail
+    public function testRenderWithContextReservedEmailEntry(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->prepareEmail('Text', '', ['email' => 'reserved!']);
+    }
+
+    private function prepareEmail(?string $text, ?string $html, array $context = []): TemplatedEmail
     {
         $twig = new Environment(new ArrayLoader([
             'text' => $text,
@@ -63,7 +70,11 @@ class RendererTest extends TestCase
             'image.jpg' => 'Some image data',
         ]));
         $renderer = new BodyRenderer($twig);
-        $email = (new TemplatedEmail())->to('fabien@symfony.com')->from('helene@symfony.com');
+        $email = (new TemplatedEmail())
+            ->to('fabien@symfony.com')
+            ->from('helene@symfony.com')
+            ->context($context)
+        ;
         if (null !== $text) {
             $email->textTemplate('text');
         }

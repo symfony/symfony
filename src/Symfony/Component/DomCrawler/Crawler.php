@@ -44,7 +44,7 @@ class Crawler implements \Countable, \IteratorAggregate
     private $document;
 
     /**
-     * @var \DOMElement[]
+     * @var \DOMNode[]
      */
     private $nodes = [];
 
@@ -61,7 +61,7 @@ class Crawler implements \Countable, \IteratorAggregate
     private $html5Parser;
 
     /**
-     * @param mixed $node A Node to use as the base for the crawling
+     * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A Node to use as the base for the crawling
      */
     public function __construct($node = null, string $uri = null, string $baseHref = null)
     {
@@ -107,7 +107,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * This method uses the appropriate specialized add*() method based
      * on the type of the argument.
      *
-     * @param \DOMNodeList|\DOMNode|array|string|null $node A node
+     * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A node
      *
      * @throws \InvalidArgumentException when node is not the expected type
      */
@@ -1058,7 +1058,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @return \DOMElement|null
+     * @return \DOMNode|null
      */
     public function getNode(int $position)
     {
@@ -1074,7 +1074,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @return \ArrayIterator|\DOMElement[]
+     * @return \ArrayIterator|\DOMNode[]
      */
     public function getIterator()
     {
@@ -1191,7 +1191,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Creates a crawler for some subnodes.
      *
-     * @param \DOMElement|\DOMElement[]|\DOMNodeList|null $nodes
+     * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $nodes
      *
      * @return static
      */
@@ -1207,7 +1207,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @throws \RuntimeException If the CssSelector Component is not available
+     * @throws \LogicException If the CssSelector Component is not available
      */
     private function createCssSelectorConverter(): CssSelectorConverter
     {

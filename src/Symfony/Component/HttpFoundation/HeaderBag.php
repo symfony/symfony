@@ -108,7 +108,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     {
         $headers = $this->all($key);
 
-        return $headers[0] ?? $default;
+        return isset($headers[0]) ? (string) $headers[0] : $default;
     }
 
     /**

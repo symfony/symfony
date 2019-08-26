@@ -25,7 +25,7 @@ class ProjectExtension implements ExtensionInterface
         return $configuration;
     }
 
-    public function getXsdValidationBasePath(): string
+    public function getXsdValidationBasePath()
     {
         return false;
     }

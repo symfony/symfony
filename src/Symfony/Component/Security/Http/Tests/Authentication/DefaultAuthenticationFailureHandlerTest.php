@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Security;
@@ -62,7 +63,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     public function testRedirect()
     {
-        $response = new Response();
+        $response = new RedirectResponse('/login');
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, '/login')
             ->willReturn($response);

@@ -414,7 +414,7 @@ abstract class IntlDateFormatter
      *                         contain -1 otherwise it will contain the position at which parsing
      *                         ended. If $parse_pos > strlen($value), the parse fails immediately.
      *
-     * @return int Parsed value as a timestamp
+     * @return int|false Parsed value as a timestamp
      *
      * @see https://php.net/intldateformatter.parse
      *

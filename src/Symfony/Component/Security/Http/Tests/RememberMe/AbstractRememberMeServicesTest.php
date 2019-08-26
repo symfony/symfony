@@ -39,6 +39,9 @@ class AbstractRememberMeServicesTest extends TestCase
         $this->assertNull($service->autoLogin(new Request()));
     }
 
+    /**
+     * @group legacy
+     */
     public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
     {
         $this->expectException('RuntimeException');

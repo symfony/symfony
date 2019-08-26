@@ -128,7 +128,7 @@ Root.property.path:
     toString
 EOF;
         $this->assertSame($expected, (string) $violation);
-        $this->assertSame($message, $violation->getMessage());
+        $this->assertSame((string) $message, $violation->getMessage());
     }
 
     public function testMessageCannotBeArray()

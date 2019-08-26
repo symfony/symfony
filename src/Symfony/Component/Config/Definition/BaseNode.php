@@ -102,16 +102,25 @@ abstract class BaseNode implements NodeInterface
         $this->attributes[$key] = $value;
     }
 
+    /**
+     * @return mixed
+     */
     public function getAttribute(string $key, $default = null)
     {
         return isset($this->attributes[$key]) ? $this->attributes[$key] : $default;
     }
 
+    /**
+     * @return bool
+     */
     public function hasAttribute(string $key)
     {
         return isset($this->attributes[$key]);
     }
 
+    /**
+     * @return array
+     */
     public function getAttributes()
     {
         return $this->attributes;
@@ -138,7 +147,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Returns info message.
      *
-     * @return string The info text
+     * @return string|null The info text
      */
     public function getInfo()
     {
@@ -158,7 +167,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Retrieves the example configuration for this node.
      *
-     * @return string|array The example
+     * @return string|array|null The example
      */
     public function getExample()
     {

@@ -94,7 +94,7 @@ class Profile
     /**
      * Returns the IP.
      *
-     * @return string The IP
+     * @return string|null The IP
      */
     public function getIp()
     {
@@ -107,7 +107,9 @@ class Profile
     }
 
     /**
-     * @return string The request method
+     * Returns the request method.
+     *
+     * @return string|null The request method
      */
     public function getMethod()
     {
@@ -120,7 +122,9 @@ class Profile
     }
 
     /**
-     * @return string The URL
+     * Returns the URL.
+     *
+     * @return string|null The URL
      */
     public function getUrl()
     {
@@ -155,7 +159,7 @@ class Profile
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getStatusCode()
     {

@@ -127,8 +127,6 @@ class StreamedResponse extends Response
 
     /**
      * {@inheritdoc}
-     *
-     * @return false
      */
     public function getContent()
     {

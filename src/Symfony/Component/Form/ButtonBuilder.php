@@ -27,7 +27,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * @var bool
      */
-    private $disabled;
+    private $disabled = false;
 
     /**
      * @var ResolvedFormTypeInterface

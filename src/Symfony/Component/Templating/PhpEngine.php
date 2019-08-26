@@ -285,7 +285,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param mixed $value A variable to escape
      *
-     * @return string The escaped value
+     * @return mixed The escaped value
      */
     public function escape($value, string $context = 'html')
     {

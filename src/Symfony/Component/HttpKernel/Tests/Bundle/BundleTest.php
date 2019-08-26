@@ -28,6 +28,9 @@ class BundleTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetContainerExtensionWithInvalidClass()
     {
         $this->expectException('LogicException');

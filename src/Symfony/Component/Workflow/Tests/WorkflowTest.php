@@ -20,6 +20,9 @@ class WorkflowTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
+    /**
+     * @group legacy
+     */
     public function testGetMarkingWithInvalidStoreReturn()
     {
         $this->expectException('Symfony\Component\Workflow\Exception\LogicException');

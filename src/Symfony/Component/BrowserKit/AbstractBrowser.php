@@ -146,7 +146,9 @@ abstract class AbstractBrowser
     /**
      * Gets single server parameter for specified key.
      *
-     * @return string A value of the parameter
+     * @param mixed $default A default value when key is undefined
+     *
+     * @return mixed A value of the parameter
      */
     public function getServerParameter(string $key, $default = '')
     {

@@ -123,6 +123,9 @@ class LogoutListenerTest extends TestCase
         $listener($event);
     }
 
+    /**
+     * @group legacy
+     */
     public function testSuccessHandlerReturnsNonResponse()
     {
         $this->expectException('RuntimeException');

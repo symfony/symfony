@@ -1139,6 +1139,30 @@ class PhpDumperTest extends TestCase
         $this->assertTrue($container->has('foo'));
         $this->assertSame('some value', $container->get('foo'));
     }
+
+    public function testAliasCanBeFoundInTheDumpedContainerWhenBothTheAliasAndTheServiceArePublic()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')->setPublic(true);
+        $container->setAlias('bar', 'foo')->setPublic(true);
+
+        $container->compile();
+
+        // Bar is found in the compiled container
+        $service_ids = $container->getServiceIds();
+        $this->assertContains('bar', $service_ids);
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_AliasesCanBeFoundInTheDumpedContainer']);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_AliasesCanBeFoundInTheDumpedContainer();
+
+        // Bar should still be found in the compiled container
+        $service_ids = $container->getServiceIds();
+        $this->assertContains('bar', $service_ids);
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface

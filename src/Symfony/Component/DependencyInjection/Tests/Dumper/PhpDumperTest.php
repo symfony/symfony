@@ -1300,6 +1300,30 @@ class PhpDumperTest extends TestCase
         $this->assertSame('some value', $container->get('bar')->foo);
     }
 
+    public function testAliasCanBeFoundInTheDumpedContainerWhenBothTheAliasAndTheServiceArePublic()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')->setPublic(true);
+        $container->setAlias('bar', 'foo')->setPublic(true);
+
+        $container->compile();
+
+        // Bar is found in the compiled container
+        $service_ids = $container->getServiceIds();
+        $this->assertContains('bar', $service_ids);
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_AliasesCanBeFoundInTheDumpedContainer']);
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_AliasesCanBeFoundInTheDumpedContainer();
+
+        // Bar should still be found in the compiled container
+        $service_ids = $container->getServiceIds();
+        $this->assertContains('bar', $service_ids);
+    }
+
     public function testWither()
     {
         $container = new ContainerBuilder();

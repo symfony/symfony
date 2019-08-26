@@ -90,6 +90,10 @@ class Worker implements WorkerInterface
 
                     $this->handleMessage($envelope, $receiver, $transportName, $this->retryStrategies[$transportName] ?? null);
                     $onHandled($envelope);
+
+                    if ($this->shouldStop) {
+                        break 2;
+                    }
                 }
 
                 // after handling a single receiver, quit and start the loop again

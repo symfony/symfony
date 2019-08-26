@@ -1,0 +1,138 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-19T10:59:33Z
+
+Sounds like a solid plan to me. We are not in a hurry. We need to carefully build a plan and targeting 6.0 is probably the thing to do.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-19T12:20:11Z
+
+First of all, thank you very much for all the effort you have put into this!
+
+> TL;DR: my conclusion is that we cannot make it for 5.0.
+
+That's a sad and disappointing conclusion. 😞 But I refuse to give up at this point – especially after the wall of text that I posted last night as #33228. 😉 We might not get fully typed, but I'm still convinced we can get further than we are at the moment.
+
+We already have added a few return types (mainly because we were somewhat forced to: #27905) and probably will be required to add a few more (#33039).
+
+> 1. The burden this will put on the community is immense,
+
+Yes, but that'll still be the case two years from now. The main difference I see is that we won't have a maintained Symfony version anymore that still supports php 5. I admit, that might help a little. 🤔
+
+> especially when considering that third party libs must also be updated for any apps to work at all on a return-typed 5.0.
+
+Why's that? Having types in Symfony does not require the whole world to release typed versions of their libraries as well.
+
+Third-party libraries only need to be updated if they implement/extend Symfony interfaces/classes that received types with 5.0. Perhaps we can find some problematic hot spots and exclude them when adding return types, such as (list might be incomplete):
+
+* `Symfony\Component\Config\Definition\ConfigurationInterface`
+* `Symfony\Component\DependencyInjection\Extension\ExtensionInterface`
+* `Symfony\Component\EventDispatcher\EventSubscriberInterface`
+* `Symfony\Component\HttpKernel\Bundle\BundleInterface`
+
+That could ease the migration for many third-party bundles.
+
+> 2. We need return type covariance, yet this won't be available before PHP 7.4, while 5.0 supports 7.2.
+
+Can you elaborate on this point? I mean, having full covariance is certainly nice to have, but wouldn't call it a requirement. Apart from fluent interfaces (for which we have found a reasonable compromise), where would we actually depend on covariance? Maybe we can exclude those classes when adding return types or work with a combination of a more generic return type declaration and a more specific `@return` annotation here? We should even be able to teach `DebugClassLoader` to detect such cases.
+
+I mean, there might always be features in newer php releases that might come handy. Who knows, maybe in two years from now, generics have been added to php 8.1 and then we say: "Hey, we can't add return types because we desperately need generics to go fully typed!"
+
+> * in 4.4: add all possible return types that don't break BC, e.g. in `Tests` and in generated code
+
+For 5.0: At least add return types to everything that is flagged as `@internal`? 🥺
+
+> * spot and fix places where annotations aren't accurate, add more annotations where possible.
+
+I expect to find most of these cases when actually adding return types. 🤔
+
+> Ideally, we could reach a point where we could test branch 4.4 _with_ return-types: we'd use the tooling to add them automatically in the CI job, then we'd run tests and they should be green. Let's do this?
+
+Yes! Even if we will never add types, we would end up with properly configured mocks and a codebase without inconsistent return points. Wouldn't be too bad after all. 😎
+
+In preparation of the issue I wrote yesterday, I've done some experiments on my own. I followed a more manual approach, using PhpStorm inspections and refactorings. One result that I already have is a typed version of the EventDispatcher. I will post a PR later – even if we don't merge it, it might still be a good reference. Also, we might want to cherry-pick the changes I've made to the tests. 😃
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-19T15:19:23Z
+
+> That's a sad and disappointing conclusion.
+
+The issue is complex enough, let's keep a cool head. I don't think it's sad when it's a well-crafted engineering decision, and when there's a plan forward to bring return-types in a less brutal way.
+
+> We already have added a few return types (mainly because we were somewhat forced to: #27905) and probably will be required to add a few more (#33039).
+
+True, that's the cost of having third-party dependencies. Yet the scope is very limited, it's not the same story than doing it for the whole codebase.
+
+>> The burden this will put on the community is immense,
+> Yes, but that'll still be the case two years from now.
+
+Absolutely not, you missed the last item on my plan above: we would throw deprecation notices starting from 5.1 (the same as `DebugClassLoader` does right now), so that ppl would be encouraged to add return types well ahead of v6.
+
+> Having types in Symfony does not require the whole world to release typed versions of their libraries as well.
+> Third-party libraries only need to be updated if they implement/extend Symfony interfaces/classes
+
+That's enough a blocker. ALL lines changed in this PR are individual BC breaks. That's way too abrupt. This can make v5 fail totally, as far as adoption is concerned.
+
+> having full covariance is certainly nice to have, but wouldn't call it a requirement.
+
+That's what I was reminded when working on this PR: e.g. `FrameworkBundle`'s `Client::doRequest()` returns `Response`, while the parent returns `object`. That's totaly legal. Form has similar needs for covariance, DoctrineBridge too. DebugClassLoader can detect them, but cannot change this: if ppl add the parent's return type as they would be forced to do if we add them, it will be impossible to add those more specific return types ever.
+
+> For 5.0: At least add return types to everything that is flagged as `@internal`? 🥺
+
+Yes, or 4.4.
+
+> Even if we will never add types, we would end up with properly configured mocks and a codebase without inconsistent return points. Wouldn't be too bad after all.
+
+:sunglasses:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-19T15:33:21Z
+
+>> For 5.0: At least add return types to everything that is flagged as @Internal? 🥺
+
+> Yes, or 4.4.
+
+We could also add return types to final classes, ref. #33152
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-19T17:09:15Z
+
+> > That's a sad and disappointing conclusion.
+>
+> The issue is complex enough, let's keep a cool head. I don't think it's sad when it's a well-crafted engineering decision, and when there's a plan forward to bring return-types in a less brutal way.
+
+Sure, I meant no offense. After all the effort that has gone into this already, of course I am disappointed if the conclusion is that we won't proceed for now. That doesn't mean that you've made a bad decision. Your plan sounds reasonable and we really might be in a better position two years from now.
+
+Yet, you make it sound like we have to decide between two extreme options: Leaving everything as it is or going 100%. I was trying to find a middle ground. Adding types where the impact is low. Of course, estimating the impact of each change is hard and nothing we could do fully automated.
+
+But this is ultimately not my decision. If the plan is to make adding return types a smooth two-year project, I'm still in and would offer my help with executing the plan, if I may.
+
+Also, the more I think about your suggestion of a CI run with an automatically patched typed version of the current codebase, the more I like it. That way, we might already get some benefits of adding return types without actually adding them. Can you that that up? I would offer to help fixing those tests.
+
+> ALL lines changed in this PR are individual BC breaks. That's way too abrupt. This can make v5 fail totally, as far as adoption is concerned.
+
+Yes, you are right. I might have underestimated that danger.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-19T21:17:28Z
+
+> One result that I already have is a typed version of the EventDispatcher. I will post a PR later – even if we don't merge it, it might still be a good reference.
+
+As promised: #33248
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-22T15:36:31Z
+
+This PR now paves the way to execute the plan: attached are some scripts to add return types in the CI, just before running the tests. They fail for now, but we should be able to fix them all. I already fixed some issues actually, and would happily accept PRs [on my fork](https://github.com/nicolas-grekas/symfony/tree/eh-return-types) to move this forward! Can't wait your PRs :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-25T20:03:50Z
+
+PR now green on Travis, help wanted for fixing failures on appveyor.

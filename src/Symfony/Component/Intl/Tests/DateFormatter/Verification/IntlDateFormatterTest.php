@@ -57,7 +57,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         parent::testDateAndTimeType($timestamp, $datetype, $timetype, $expected);
     }
 
-    protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
+    protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null): object
     {
         IntlTestHelper::requireFullIntl($this, '55.1');
 

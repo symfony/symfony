@@ -52,7 +52,7 @@ class CachePruneCommandTest extends TestCase
     /**
      * @return MockObject|KernelInterface
      */
-    private function getKernel()
+    private function getKernel(): object
     {
         $container = $this
             ->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
@@ -78,7 +78,7 @@ class CachePruneCommandTest extends TestCase
     /**
      * @return MockObject|PruneableInterface
      */
-    private function getPruneableInterfaceMock()
+    private function getPruneableInterfaceMock(): object
     {
         $pruneable = $this
             ->getMockBuilder(PruneableInterface::class)

@@ -11,7 +11,7 @@ class Configuration implements ConfigurationInterface
     {
     }
 
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         return new TreeBuilder('root');
     }

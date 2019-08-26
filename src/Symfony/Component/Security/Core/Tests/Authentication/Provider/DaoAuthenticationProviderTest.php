@@ -328,22 +328,22 @@ class DaoAuthenticationProviderTest extends TestCase
 
 class TestUser implements UserInterface
 {
-    public function getRoles()
+    public function getRoles(): array
     {
         return [];
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return 'secret';
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return null;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return 'jane_doe';
     }

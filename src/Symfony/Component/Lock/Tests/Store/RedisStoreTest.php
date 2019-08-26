@@ -28,7 +28,10 @@ class RedisStoreTest extends AbstractRedisStoreTest
         }
     }
 
-    protected function getRedisConnection()
+    /**
+     * @return \Redis
+     */
+    protected function getRedisConnection(): object
     {
         $redis = new \Redis();
         $redis->connect(getenv('REDIS_HOST'));

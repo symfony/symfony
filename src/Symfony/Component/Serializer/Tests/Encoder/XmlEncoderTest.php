@@ -828,7 +828,7 @@ XML;
     /**
      * @return MockObject|NormalizerInterface
      */
-    private function createMockDateTimeNormalizer()
+    private function createMockDateTimeNormalizer(): object
     {
         $mock = $this->getMockBuilder('\Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock();
 

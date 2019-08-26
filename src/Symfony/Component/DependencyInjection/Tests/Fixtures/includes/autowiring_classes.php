@@ -279,7 +279,7 @@ class Wither
      * @required
      * @return static
      */
-    public function withFoo1(Foo $foo)
+    public function withFoo1(Foo $foo): object
     {
         return $this->withFoo2($foo);
     }
@@ -288,7 +288,7 @@ class Wither
      * @required
      * @return static
      */
-    public function withFoo2(Foo $foo)
+    public function withFoo2(Foo $foo): object
     {
         $new = clone $this;
         $new->foo = $foo;

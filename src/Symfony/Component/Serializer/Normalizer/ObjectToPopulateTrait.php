@@ -23,7 +23,7 @@ trait ObjectToPopulateTrait
      *
      * @return object|null an object if things check out, null otherwise
      */
-    protected function extractObjectToPopulate(string $class, array $context, string $key = null)
+    protected function extractObjectToPopulate(string $class, array $context, string $key = null): ?object
     {
         $key = $key ?? AbstractNormalizer::OBJECT_TO_POPULATE;
 

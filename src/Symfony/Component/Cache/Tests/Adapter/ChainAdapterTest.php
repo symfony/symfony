@@ -73,7 +73,7 @@ class ChainAdapterTest extends AdapterTestCase
     /**
      * @return MockObject|PruneableCacheInterface
      */
-    private function getPruneableMock()
+    private function getPruneableMock(): object
     {
         $pruneable = $this
             ->getMockBuilder(PruneableCacheInterface::class)
@@ -90,7 +90,7 @@ class ChainAdapterTest extends AdapterTestCase
     /**
      * @return MockObject|PruneableCacheInterface
      */
-    private function getFailingPruneableMock()
+    private function getFailingPruneableMock(): object
     {
         $pruneable = $this
             ->getMockBuilder(PruneableCacheInterface::class)
@@ -107,7 +107,7 @@ class ChainAdapterTest extends AdapterTestCase
     /**
      * @return MockObject|AdapterInterface
      */
-    private function getNonPruneableMock()
+    private function getNonPruneableMock(): object
     {
         return $this
             ->getMockBuilder(AdapterInterface::class)

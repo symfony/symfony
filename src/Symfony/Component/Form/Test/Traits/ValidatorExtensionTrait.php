@@ -24,10 +24,7 @@ trait ValidatorExtensionTrait
      */
     protected $validator;
 
-    /**
-     * @return ValidatorExtension
-     */
-    protected function getValidatorExtension()
+    protected function getValidatorExtension(): ValidatorExtension
     {
         if (!interface_exists(ValidatorInterface::class)) {
             throw new \Exception('In order to use the "ValidatorExtensionTrait", the symfony/validator component must be installed');

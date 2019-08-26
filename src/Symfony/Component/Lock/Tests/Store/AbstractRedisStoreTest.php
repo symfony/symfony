@@ -34,7 +34,7 @@ abstract class AbstractRedisStoreTest extends AbstractStoreTest
      *
      * @return \Redis|\RedisArray|\RedisCluster|\Predis\Client
      */
-    abstract protected function getRedisConnection();
+    abstract protected function getRedisConnection(): object;
 
     /**
      * {@inheritdoc}

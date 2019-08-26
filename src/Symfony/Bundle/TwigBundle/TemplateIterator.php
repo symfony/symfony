@@ -39,10 +39,7 @@ class TemplateIterator implements \IteratorAggregate
         $this->defaultPath = $defaultPath;
     }
 
-    /**
-     * @return \Traversable
-     */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         if (null !== $this->templates) {
             return $this->templates;

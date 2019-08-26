@@ -14,9 +14,9 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 class RedisSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
 {
     /**
-     * @return \Redis|object
+     * @return \Redis
      */
-    protected function createRedisClient(string $host)
+    protected function createRedisClient(string $host): object
     {
         $client = new \Redis();
         $client->connect($host);

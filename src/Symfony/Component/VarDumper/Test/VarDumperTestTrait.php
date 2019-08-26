@@ -55,7 +55,7 @@ trait VarDumperTestTrait
     /**
      * @return string|null
      */
-    protected function getDump($data, $key = null, int $filter = 0)
+    protected function getDump($data, $key = null, int $filter = 0): ?string
     {
         if (null === $flags = $this->varDumperConfig['flags']) {
             $flags = getenv('DUMP_LIGHT_ARRAY') ? CliDumper::DUMP_LIGHT_ARRAY : 0;

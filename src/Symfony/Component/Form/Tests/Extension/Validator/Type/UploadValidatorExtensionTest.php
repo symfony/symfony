@@ -50,7 +50,7 @@ class DummyTranslator implements TranslatorInterface, LocaleAwareInterface
     {
     }
 
-    public function getLocale()
+    public function getLocale(): string
     {
         return 'en';
     }

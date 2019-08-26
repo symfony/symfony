@@ -963,7 +963,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     /**
      * @return IntlDateFormatter|\IntlDateFormatter
      */
-    abstract protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null);
+    abstract protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null): object;
 
     abstract protected function getIntlErrorMessage(): string;
 

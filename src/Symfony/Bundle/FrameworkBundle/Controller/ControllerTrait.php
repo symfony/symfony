@@ -120,8 +120,6 @@ trait ControllerTrait
      *
      * @author Temuri Takalandze (ABGEO) <takalandzet@gmail.com>
      *
-     * @return RedirectResponse
-     *
      * @final
      */
     protected function redirectToBack(): RedirectResponse
@@ -129,7 +127,7 @@ trait ControllerTrait
         // Get current request.
         $request = $this->container
             ->get('request_stack')
-            ->getCurrentRequest();;
+            ->getCurrentRequest();
 
         // Get referer URL.
         $referer = $request->headers->get('referer');

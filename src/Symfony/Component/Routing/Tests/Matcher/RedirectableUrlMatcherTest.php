@@ -115,17 +115,6 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertSame(['_route' => 'foo'], $matcher->match('/foo'));
     }
 
-    public function testFallbackPage()
-    {
-        $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo/'));
-        $coll->add('bar', new Route('/{name}'));
-
-        $matcher = $this->getUrlMatcher($coll);
-        $matcher->expects($this->once())->method('redirect')->with('/foo/')->willReturn(['_route' => 'foo']);
-        $this->assertSame(['_route' => 'foo'], $matcher->match('/foo'));
-    }
-
     public function testSlashAndVerbPrecedenceWithRedirection()
     {
         $coll = new RouteCollection();

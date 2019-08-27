@@ -609,6 +609,28 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', 'a' => 'foo/'], $matcher->match('/foo/'));
     }
 
+    public function testRouteWithAndWithoutTrailingSlash()
+    {
+        $coll = new RouteCollection();
+        $coll->add('hard_route_with_trailing_slash', new Route('/a/'));
+        $coll->add('dynamic_route_without_trailing_slash', new Route('/{b}', [], ['b' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'hard_route_with_trailing_slash'], $matcher->match('/a/'), 'truc3');
+        $this->assertEquals(['_route' => 'dynamic_route_without_trailing_slash', 'b' => 'a'], $matcher->match('/a'), 'truc4');
+
+        // Order of definitions matters
+        $coll = new RouteCollection();
+        $coll->add('dynamic_route_without_trailing_slash', new Route('/{b}', [], ['b' => '.+']));
+        $coll->add('hard_route_with_trailing_slash', new Route('/a/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'dynamic_route_without_trailing_slash', 'b' => 'a/'], $matcher->match('/a/'), 'truc1');
+        $this->assertEquals(['_route' => 'dynamic_route_without_trailing_slash', 'b' => 'a'], $matcher->match('/a'), 'truc2');
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

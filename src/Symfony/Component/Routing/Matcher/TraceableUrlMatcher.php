@@ -50,13 +50,12 @@ class TraceableUrlMatcher extends UrlMatcher
         return $traces;
     }
 
-    protected function matchCollection($pathinfo, RouteCollection $routes)
+    protected function matchCollection($pathinfo, RouteCollection $routes, $supportsTrailingSlash)
     {
         // HEAD and GET are equivalent as per RFC
         if ('HEAD' === $method = $this->context->getMethod()) {
             $method = 'GET';
         }
-        $supportsTrailingSlash = '/' !== $pathinfo && '' !== $pathinfo && $this instanceof RedirectableUrlMatcherInterface;
 
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();

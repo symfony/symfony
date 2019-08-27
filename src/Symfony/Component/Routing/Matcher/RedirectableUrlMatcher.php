@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
 
@@ -25,14 +27,22 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
     public function match($pathinfo)
     {
         try {
-            $parameters = parent::match($pathinfo);
+            $parameters = $this->matchCollectionByTrailingSlashSupport($pathinfo, false);
         } catch (ResourceNotFoundException $e) {
             if ('/' === substr($pathinfo, -1) || !\in_array($this->context->getMethod(), ['HEAD', 'GET'])) {
                 throw $e;
             }
 
             try {
-                $parameters = parent::match($pathinfo.'/');
+                $parameters = $this->matchCollectionByTrailingSlashSupport($pathinfo.'/', true);
+
+                return array_replace($parameters, $this->redirect($pathinfo.'/', isset($parameters['_route']) ? $parameters['_route'] : null));
+            } catch (ResourceNotFoundException $e2) {
+                throw $e;
+            }
+        } catch (MethodNotAllowedException $e) {
+            try {
+                $parameters = $this->matchCollectionByTrailingSlashSupport($pathinfo.'/', true);
 
                 return array_replace($parameters, $this->redirect($pathinfo.'/', isset($parameters['_route']) ? $parameters['_route'] : null));
             } catch (ResourceNotFoundException $e2) {
@@ -61,5 +71,21 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
         }
 
         return [self::REQUIREMENT_MATCH, null];
+    }
+
+    protected function matchCollectionByTrailingSlashSupport($pathinfo, $trailingSlashSupport)
+    {
+        $this->allow = [];
+        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes, $trailingSlashSupport)) {
+            return $ret;
+        }
+
+        if ('/' === $pathinfo && !$this->allow) {
+            throw new NoConfigurationException();
+        }
+
+        throw 0 < \count($this->allow)
+            ? new MethodNotAllowedException(array_unique($this->allow))
+            : new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
     }
 }

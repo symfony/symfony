@@ -71,8 +71,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     public function match($pathinfo)
     {
         $this->allow = [];
+        $supportsTrailingSlash = '/' !== $pathinfo && '' !== $pathinfo && $this instanceof RedirectableUrlMatcherInterface;
 
-        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
+        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes, $supportsTrailingSlash)) {
             return $ret;
         }
 
@@ -116,13 +117,12 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      */
-    protected function matchCollection($pathinfo, RouteCollection $routes)
+    protected function matchCollection($pathinfo, RouteCollection $routes, $supportsTrailingSlash)
     {
         // HEAD and GET are equivalent as per RFC
         if ('HEAD' === $method = $this->context->getMethod()) {
             $method = 'GET';
         }
-        $supportsTrailingSlash = '/' !== $pathinfo && '' !== $pathinfo && $this instanceof RedirectableUrlMatcherInterface;
 
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();

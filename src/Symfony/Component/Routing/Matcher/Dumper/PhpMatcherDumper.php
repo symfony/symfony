@@ -93,14 +93,58 @@ EOF;
      */
     private function generateMatchMethod($supportsRedirections)
     {
-        $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
-
         return <<<EOF
     public function match(\$rawPathinfo)
+    {
+        try {
+            return \$this->matchWithoutTrailingSlashManagement(\$rawPathinfo);
+        } catch (MethodNotAllowedException \$e) {
+            throw \$e;
+        } catch (ResourceNotFoundException \$e) {
+            return \$this->matchWithTrailingSlashManagement(\$rawPathinfo);
+        }
+    }
+    
+{$this->generateMatchWithTrailingSlashManagement($supportsRedirections)}
+    
+{$this->generateMatchWithoutTrailingSlashManagement($supportsRedirections)}
+EOF;
+    }
+
+    private function generateMatchWithTrailingSlashManagement($supportsRedirections)
+    {
+        $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections, true), "\n");
+
+        return <<<EOF
+    public function matchWithTrailingSlashManagement(\$rawPathinfo)
     {
         \$allow = [];
         \$pathinfo = rawurldecode(\$rawPathinfo);
         \$trimmedPathinfo = rtrim(\$pathinfo, '/');
+        \$context = \$this->context;
+        \$request = \$this->request ?: \$this->createRequest(\$pathinfo);
+        \$requestMethod = \$canonicalMethod = \$context->getMethod();
+
+        if ('HEAD' === \$requestMethod) {
+            \$canonicalMethod = 'GET';
+        }
+
+$code
+
+        throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();
+    }
+EOF;
+    }
+
+    private function generateMatchWithoutTrailingSlashManagement($supportsRedirections)
+    {
+        $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections, false), "\n");
+
+        return <<<EOF
+    public function matchWithoutTrailingSlashManagement(\$rawPathinfo)
+    {
+        \$allow = [];
+        \$pathinfo = rawurldecode(\$rawPathinfo);
         \$context = \$this->context;
         \$request = \$this->request ?: \$this->createRequest(\$pathinfo);
         \$requestMethod = \$canonicalMethod = \$context->getMethod();
@@ -124,7 +168,7 @@ EOF;
      *
      * @return string PHP code
      */
-    private function compileRoutes(RouteCollection $routes, $supportsRedirections)
+    private function compileRoutes(RouteCollection $routes, $supportsRedirections, $trailingSlashManagement = true)
     {
         $fetchedHost = false;
         $groups = $this->groupRoutesByHostRegex($routes);
@@ -141,7 +185,7 @@ EOF;
             }
 
             $tree = $this->buildStaticPrefixCollection($collection);
-            $groupCode = $this->compileStaticPrefixRoutes($tree, $supportsRedirections);
+            $groupCode = $this->compileStaticPrefixRoutes($tree, $supportsRedirections, $trailingSlashManagement);
 
             if (null !== $regex) {
                 // apply extra indention at each line (except empty ones)
@@ -184,7 +228,7 @@ EOF;
      *
      * @return string PHP code
      */
-    private function compileStaticPrefixRoutes(StaticPrefixCollection $collection, $supportsRedirections, $ifOrElseIf = 'if')
+    private function compileStaticPrefixRoutes(StaticPrefixCollection $collection, $supportsRedirections, $trailingSlashManagement, $ifOrElseIf = 'if')
     {
         $code = '';
         $prefix = $collection->getPrefix();
@@ -200,7 +244,7 @@ EOF;
                 $code .= $this->compileStaticPrefixRoutes($route, $supportsRedirections, $ifOrElseIf);
                 $ifOrElseIf = 'elseif';
             } else {
-                $code .= $this->compileRoute($route[1]->getRoute(), $route[1]->getName(), $supportsRedirections, $prefix)."\n";
+                $code .= $this->compileRoute($route[1]->getRoute(), $route[1]->getName(), $supportsRedirections, $trailingSlashManagement, $prefix)."\n";
                 $ifOrElseIf = 'if';
             }
         }
@@ -226,7 +270,7 @@ EOF;
      *
      * @throws \LogicException
      */
-    private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
+    private function compileRoute(Route $route, $name, $supportsRedirections, $trailingSlashManagement, $parentPrefix = null)
     {
         $code = '';
         $compiledRoute = $route->compile();
@@ -236,7 +280,7 @@ EOF;
         $hostMatches = false;
         $methods = $route->getMethods();
 
-        $supportsTrailingSlash = $supportsRedirections && (!$methods || \in_array('GET', $methods));
+        $supportsTrailingSlash = $supportsRedirections && (!$methods || \in_array('GET', $methods)) && $trailingSlashManagement;
         $regex = $compiledRoute->getRegex();
 
         if (!\count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#'.('u' === substr($regex, -1) ? 'u' : ''), $regex, $m)) {

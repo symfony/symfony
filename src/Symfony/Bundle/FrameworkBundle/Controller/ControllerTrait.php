@@ -118,10 +118,8 @@ trait ControllerTrait
     /**
      * Returns a RedirectResponse to last accessed url.
      *
-     * @param int    $status   HTTP Status code.
-     * @param string $fallback Default redirect URL.
-     *
-     * @return RedirectResponse
+     * @param int    $status   HTTP Status code
+     * @param string $fallback Default redirect URL
      *
      * @final
      */
@@ -137,6 +135,7 @@ trait ControllerTrait
         }
 
         $referer = $request->headers->get('referer');
+
         return $this->redirect($referer ?? $fallback, $status);
     }
 

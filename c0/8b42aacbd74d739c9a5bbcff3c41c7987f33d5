@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-26T20:05:20Z
+
+This will make fabbot green and Travis red :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-08-26T20:25:20Z
+
+~The Form component tests are green now. AppVeyor failure doesn't look related.~ green :)

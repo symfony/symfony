@@ -118,9 +118,6 @@ trait ControllerTrait
     /**
      * Returns a RedirectResponse to last accessed url.
      *
-     * @param int    $status   HTTP Status code
-     * @param string $fallback Default redirect URL
-     *
      * @final
      */
     protected function redirectBack(int $status = 302, string $fallback = '/'): RedirectResponse

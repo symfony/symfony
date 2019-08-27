@@ -118,8 +118,6 @@ trait ControllerTrait
     /**
      * Returns a RedirectResponse to last accessed url.
      *
-     * @author Temuri Takalandze (ABGEO) <takalandzet@gmail.com>
-     *
      * @final
      */
     protected function redirectToBack(): RedirectResponse
@@ -133,10 +131,7 @@ trait ControllerTrait
             throw new \LogicException('Request should exist so it can be processed for error.');
         }
 
-        // Get referer URL.
         $referer = $request->headers->get('referer');
-
-        // Redirect to referer url or /.
         return $this->redirect($referer ?? '/');
     }
 

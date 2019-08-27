@@ -122,6 +122,7 @@ DoctrineBridge
  * Passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field will throw an exception, pass `null` instead
  * Not passing an `IdReader` to the `DoctrineChoiceLoader` when the query can be optimized with single id field will not apply any optimization
  * The `RegistryInterface` has been removed.
+ * Added a new `getMetadataDriverClass` method in `AbstractDoctrineExtension` to replace class parameters. 
 
 DomCrawler
 ----------

@@ -118,13 +118,14 @@ trait ControllerTrait
     /**
      * Returns a RedirectResponse to last accessed url.
      *
+     * @param int    $status   HTTP Status code.
      * @param string $fallback Default redirect URL.
      *
      * @return RedirectResponse
      *
      * @final
      */
-    protected function redirectBack(string $fallback = '/'): RedirectResponse
+    protected function redirectBack(int $status = 302, string $fallback = '/'): RedirectResponse
     {
         // Get current request.
         $request = $this->container
@@ -136,7 +137,7 @@ trait ControllerTrait
         }
 
         $referer = $request->headers->get('referer');
-        return $this->redirect($referer ?? $fallback);
+        return $this->redirect($referer ?? $fallback, $status);
     }
 
     /**

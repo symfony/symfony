@@ -558,7 +558,7 @@ trait TestControllerTrait
         isGranted as public;
         denyAccessUnlessGranted as public;
         redirectToRoute as public;
-        redirectToBack as public;
+        redirectBack as public;
         addFlash as public;
         isCsrfTokenValid as public;
         renderView as public;

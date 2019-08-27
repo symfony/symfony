@@ -120,7 +120,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function redirectToBack(): RedirectResponse
+    protected function redirectBack(): RedirectResponse
     {
         // Get current request.
         $request = $this->container

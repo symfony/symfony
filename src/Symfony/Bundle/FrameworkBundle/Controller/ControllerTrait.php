@@ -129,6 +129,10 @@ trait ControllerTrait
             ->get('request_stack')
             ->getCurrentRequest();
 
+        if (null === $request) {
+            throw new \LogicException('Request should exist so it can be processed for error.');
+        }
+
         // Get referer URL.
         $referer = $request->headers->get('referer');
 

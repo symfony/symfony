@@ -358,24 +358,6 @@ EOF;
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Bundle1Bundle/foo.txt'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLocateResourceIgnoresDirOnNonResource()
-    {
-        $kernel = $this->getKernel(['getBundle']);
-        $kernel
-            ->expects($this->once())
-            ->method('getBundle')
-            ->willReturn($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))
-        ;
-
-        $this->assertEquals(
-            __DIR__.'/Fixtures/Bundle1Bundle/foo.txt',
-            $kernel->locateResource('@Bundle1Bundle/foo.txt', __DIR__.'/Fixtures')
-        );
-    }
-
     public function testLocateResourceOnDirectories()
     {
         $kernel = $this->getKernel(['getBundle']);

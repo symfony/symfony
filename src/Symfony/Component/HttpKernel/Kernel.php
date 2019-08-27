@@ -243,9 +243,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             list($bundleName, $path) = explode('/', $bundleName, 2);
         }
 
-        $overridePath = substr($path, 9);
         $bundle = $this->getBundle($bundleName);
-
         if (file_exists($file = $bundle->getPath().'/'.$path)) {
             return $file;
         }
@@ -546,14 +544,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             ];
         }
 
-        $rootDir = new \ReflectionObject($this);
-        $rootDir = \dirname($rootDir->getFileName());
-
         return [
-            /*
-             * @deprecated since Symfony 4.2, use kernel.project_dir instead
-             */
-            'kernel.root_dir' => realpath($rootDir) ?: $rootDir,
             'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
             'kernel.environment' => $this->environment,
             'kernel.debug' => $this->debug,

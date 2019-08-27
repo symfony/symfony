@@ -171,8 +171,6 @@ class TranslationDebugCommandTest extends TestCase
             ->willReturn([]);
 
         $container = new Container();
-        $container->setParameter('kernel.root_dir', $this->translationDir);
-
         $kernel
             ->expects($this->any())
             ->method('getContainer')

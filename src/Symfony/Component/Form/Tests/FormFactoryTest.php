@@ -13,8 +13,9 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -180,7 +181,7 @@ class FormFactoryTest extends TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $form = $this->createMock(FormInterface::class);
+        $form = $this->createForm();
 
         $this->builder->expects($this->once())
             ->method('getForm')
@@ -213,7 +214,7 @@ class FormFactoryTest extends TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $form = $this->createMock(FormInterface::class);
+        $form = $this->createForm();
 
         $this->builder->expects($this->once())
             ->method('getForm')
@@ -451,6 +452,13 @@ class FormFactoryTest extends TestCase
         );
 
         $this->assertSame($this->builder, $this->builder);
+    }
+
+    protected function createForm()
+    {
+        $formBuilder = new FormBuilder('', null, new EventDispatcher(), $this->factory);
+
+        return $formBuilder->getForm();
     }
 
     private function getMockFactory(array $methods = [])

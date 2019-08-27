@@ -116,6 +116,29 @@ trait ControllerTrait
     }
 
     /**
+     * Returns a RedirectResponse to last accessed url.
+     *
+     * @author Temuri Takalandze (ABGEO) <takalandzet@gmail.com>
+     *
+     * @return RedirectResponse
+     *
+     * @final
+     */
+    protected function redirectToBack(): RedirectResponse
+    {
+        // Get current request.
+        $request = $this->container
+            ->get('request_stack')
+            ->getCurrentRequest();;
+
+        // Get referer URL.
+        $referer = $request->headers->get('referer');
+
+        // Redirect to referer url or /.
+        return $this->redirect($referer ?? '/');
+    }
+
+    /**
      * Returns a JsonResponse that uses the serializer component if enabled, or json_encode.
      *
      * @final

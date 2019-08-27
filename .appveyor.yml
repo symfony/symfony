@@ -50,7 +50,7 @@ install:
     - copy /Y php.ini-min php.ini
     - echo extension=php_openssl.dll >> php.ini
     - cd c:\projects\symfony
-    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/1.7.1/composer.phar)
+    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/1.9.0/composer.phar)
     - php composer.phar self-update
     - copy /Y .composer\* %APPDATA%\Composer\
     - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex dev-master

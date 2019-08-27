@@ -76,7 +76,7 @@ before_install:
       export PHPUNIT=$(readlink -f ./phpunit)
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
-      export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
+      export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       find ~/.phpenv -name xdebug.ini -delete
 
       if [[ $TRAVIS_PHP_VERSION = 7.4* ]]; then
@@ -227,7 +227,7 @@ install:
           SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//) &&
           git fetch origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
-          COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n')
+          COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       else
           SYMFONY_VERSION=$(cat composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*')
       fi
@@ -235,7 +235,7 @@ install:
     - |
       # Skip the phpunit-bridge on not-master branches when $deps is empty
       if [[ ! $deps && $TRAVIS_BRANCH != master ]]; then
-          COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h\n')
+          COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h\n' | sort)
       fi
 
     - |

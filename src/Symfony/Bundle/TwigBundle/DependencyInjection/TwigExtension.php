@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\Translator;
 use Twig\Extension\ExtensionInterface;
@@ -48,6 +49,10 @@ class TwigExtension extends Extension
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
+
+            if (Kernel::MAJOR_VERSION < 5) {
+                $container->getDefinition('twig.command.debug')->replaceArgument(5, '%kernel.root_dir%');
+            }
         }
 
         if (class_exists(Mailer::class)) {
@@ -108,6 +113,10 @@ class TwigExtension extends Extension
         $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);
         $container->getDefinition('twig.template_iterator')->replaceArgument(2, $config['paths']);
 
+        if (Kernel::MAJOR_VERSION < 5) {
+            $container->getDefinition('twig.template_iterator')->replaceArgument(1, '%kernel.root_dir%');
+        }
+
         foreach ($this->getBundleTemplatePaths($container, $config) as $name => $paths) {
             $namespace = $this->normalizeBundleName($name);
             foreach ($paths as $path) {
@@ -120,14 +129,16 @@ class TwigExtension extends Extension
             }
         }
 
-        if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
-            if ($dir !== $defaultTwigPath) {
-                @trigger_error(sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultTwigPath), E_USER_DEPRECATED);
-            }
+        if ($container->hasParameter('kernel.root_dir')) {
+            if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
+                if ($dir !== $defaultTwigPath) {
+                    @trigger_error(sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultTwigPath), E_USER_DEPRECATED);
+                }
 
-            $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$dir]);
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$dir]);
+            }
+            $container->addResource(new FileExistenceResource($dir));
         }
-        $container->addResource(new FileExistenceResource($dir));
 
         if (file_exists($defaultTwigPath)) {
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$defaultTwigPath]);
@@ -176,12 +187,14 @@ class TwigExtension extends Extension
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             $defaultOverrideBundlePath = $container->getParameterBag()->resolveValue($config['default_path']).'/bundles/'.$name;
 
-            if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
-                @trigger_error(sprintf('Loading Twig templates for "%s" from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $name, $dir, $defaultOverrideBundlePath), E_USER_DEPRECATED);
+            if ($container->hasParameter('kernel.root_dir')) {
+                if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
+                    @trigger_error(sprintf('Loading Twig templates for "%s" from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $name, $dir, $defaultOverrideBundlePath), E_USER_DEPRECATED);
 
-                $bundleHierarchy[$name][] = $dir;
+                    $bundleHierarchy[$name][] = $dir;
+                }
+                $container->addResource(new FileExistenceResource($dir));
             }
-            $container->addResource(new FileExistenceResource($dir));
 
             if (file_exists($defaultOverrideBundlePath)) {
                 $bundleHierarchy[$name][] = $defaultOverrideBundlePath;

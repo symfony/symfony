@@ -70,6 +70,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
@@ -181,6 +182,15 @@ class FrameworkExtension extends Extension
             if (!class_exists(BaseYamlLintCommand::class)) {
                 $container->removeDefinition('console.command.yaml_lint');
             }
+        }
+
+        if (Kernel::MAJOR_VERSION < 5) {
+            $container->getDefinition('file_locator')
+                ->addArgument('%kernel.root_dir%/Resources')
+                ->addArgument([
+                    '%kernel.root_dir%',
+                ])
+                ->addArgument(false);
         }
 
         // Load Cache configuration first as it is used by other components
@@ -960,6 +970,14 @@ class FrameworkExtension extends Extension
                 ->addMethodCall('setLogger', [$logger]);
         }
 
+        if (Kernel::MAJOR_VERSION < 5) {
+            $container->getDefinition('templating.finder')
+                ->addArgument('%kernel.root_dir%/Resources');
+        } else {
+            $container->getDefinition('templating.finder')
+                ->addArgument(null);
+        }
+
         if (!empty($config['loaders'])) {
             $loaders = array_map(function ($loader) { return new Reference($loader); }, $config['loaders']);
 
@@ -1150,14 +1168,13 @@ class FrameworkExtension extends Extension
             $dirs[] = $transPaths[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
         }
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
-        $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if ($container->fileExists($dir = $bundle['path'].'/Resources/translations') || $container->fileExists($dir = $bundle['path'].'/translations')) {
                 $dirs[] = $dir;
             } else {
                 $nonExistingDirs[] = $dir;
             }
-            if ($container->fileExists($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
+            if ($container->hasParameter('kernel.root_dir') && $container->fileExists($dir = $container->getParameter('kernel.root_dir').sprintf('/Resources/%s/translations', $name))) {
                 @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
                 $dirs[] = $dir;
             } else {
@@ -1187,7 +1204,7 @@ class FrameworkExtension extends Extension
             $nonExistingDirs[] = $defaultDir;
         }
 
-        if ($container->fileExists($dir = $rootDir.'/Resources/translations')) {
+        if ($container->hasParameter('kernel.root_dir') && $container->fileExists($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
             if ($dir !== $defaultDir) {
                 @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
             }

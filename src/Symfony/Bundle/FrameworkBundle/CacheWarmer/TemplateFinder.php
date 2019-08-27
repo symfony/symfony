@@ -34,9 +34,9 @@ class TemplateFinder implements TemplateFinderInterface
     private $templates;
 
     /**
-     * @param string $rootDir The directory where global templates can be stored
+     * @param string|null $rootDir The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, TemplateNameParserInterface $parser, string $rootDir)
+    public function __construct(KernelInterface $kernel, TemplateNameParserInterface $parser, string $rootDir = null)
     {
         $this->kernel = $kernel;
         $this->parser = $parser;
@@ -60,7 +60,9 @@ class TemplateFinder implements TemplateFinderInterface
             $templates = array_merge($templates, $this->findTemplatesInBundle($bundle));
         }
 
-        $templates = array_merge($templates, $this->findTemplatesInFolder($this->rootDir.'/views'));
+        if (null !== $this->rootDir) {
+            $templates = array_merge($templates, $this->findTemplatesInFolder($this->rootDir.'/views'));
+        }
 
         return $this->templates = $templates;
     }
@@ -99,7 +101,7 @@ class TemplateFinder implements TemplateFinderInterface
         $name = $bundle->getName();
         $templates = array_unique(array_merge(
             $this->findTemplatesInFolder($bundle->getPath().'/Resources/views'),
-            $this->findTemplatesInFolder($this->rootDir.'/'.$name.'/views')
+            null !== $this->rootDir ? $this->findTemplatesInFolder($this->rootDir.'/'.$name.'/views') : []
         ));
 
         foreach ($templates as $i => $template) {

@@ -132,11 +132,10 @@ EOF
         $domain = $input->getOption('domain');
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
-        $rootDir = $kernel->getContainer()->getParameter('kernel.root_dir');
 
         // Define Root Paths
         $transPaths = $this->transPaths;
-        if (is_dir($dir = $rootDir.'/Resources/translations')) {
+        if ($kernel->getContainer()->hasParameter('kernel.root_dir') && is_dir($dir = $kernel->getContainer()->getParameter('kernel.root_dir').'/Resources/translations')) {
             if ($dir !== $this->defaultTransPath) {
                 $notice = sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
                 @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
@@ -147,7 +146,7 @@ EOF
             $transPaths[] = $this->defaultTransPath;
         }
         $viewsPaths = $this->viewsPaths;
-        if (is_dir($dir = $rootDir.'/Resources/views')) {
+        if ($kernel->getContainer()->hasParameter('kernel.root_dir') && is_dir($dir = $kernel->getContainer()->getParameter('kernel.root_dir').'/Resources/views')) {
             if ($dir !== $this->defaultViewsPath) {
                 $notice = sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, ', $dir);
                 @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
@@ -168,7 +167,7 @@ EOF
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath;
                 }
-                if (is_dir($dir = sprintf('%s/Resources/%s/translations', $rootDir, $bundle->getName()))) {
+                if ($kernel->getContainer()->hasParameter('kernel.root_dir') && is_dir($dir = sprintf('%s/Resources/%s/translations', $kernel->getContainer()->getParameter('kernel.root_dir'), $bundle->getName()))) {
                     $transPaths[] = $dir;
                     $notice = sprintf('Storing translations files for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $dir, $bundle->getName());
                     @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
@@ -176,7 +175,7 @@ EOF
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath;
                 }
-                if (is_dir($dir = sprintf('%s/Resources/%s/views', $rootDir, $bundle->getName()))) {
+                if ($kernel->getContainer()->hasParameter('kernel.root_dir') && is_dir($dir = sprintf('%s/Resources/%s/views', $kernel->getContainer()->getParameter('kernel.root_dir'), $bundle->getName()))) {
                     $viewsPaths[] = $dir;
                     $notice = sprintf('Loading Twig templates for "%s" from the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $dir);
                     @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
@@ -210,12 +209,12 @@ EOF
                 $bundleDir = $bundle->getPath();
                 $transPaths[] = is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundle->getPath().'/translations';
                 $viewsPaths[] = is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundle->getPath().'/templates';
-                if (is_dir($deprecatedPath = sprintf('%s/Resources/%s/translations', $rootDir, $bundle->getName()))) {
+                if ($kernel->getContainer()->hasParameter('kernel.root_dir') && is_dir($deprecatedPath = sprintf('%s/Resources/%s/translations', $kernel->getContainer()->getParameter('kernel.root_dir'), $bundle->getName()))) {
                     $transPaths[] = $deprecatedPath;
                     $notice = sprintf('Storing translations files for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $deprecatedPath);
                     @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
                 }
-                if (is_dir($deprecatedPath = sprintf('%s/Resources/%s/views', $rootDir, $bundle->getName()))) {
+                if ($kernel->getContainer()->hasParameter('kernel.root_dir') && is_dir($deprecatedPath = sprintf('%s/Resources/%s/views', $kernel->getContainer()->getParameter('kernel.root_dir'), $bundle->getName()))) {
                     $viewsPaths[] = $deprecatedPath;
                     $notice = sprintf('Loading Twig templates for "%s" from the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $deprecatedPath);
                     @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);

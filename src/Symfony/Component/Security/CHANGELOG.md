@@ -4,6 +4,8 @@ CHANGELOG
 5.0.0
 -----
 
+ * Implementations of `Guard\AuthenticatorInterface::checkCredentials()` must return
+   a boolean value now. Please explicitly return `false` to indicate invalid credentials.
  * The `LdapUserProvider` class has been removed, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead.
  * The `FirewallMapInterface::getListeners()` method must return an array of 3 elements.
  * Removed the `ContextListener::setLogoutOnUserChange()` method.

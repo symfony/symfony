@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\ContentTypeStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
@@ -61,7 +62,7 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function decode(array $encodedEnvelope): Envelope
+    public function decode(array $encodedEnvelope, ?string $contentType = null): Envelope
     {
         if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
             throw new MessageDecodingFailedException('Encoded envelope should have at least a "body" and some "headers".');
@@ -74,13 +75,23 @@ class Serializer implements SerializerInterface
         $stamps = $this->decodeStamps($encodedEnvelope);
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
+        if (!$contentType && !($contentType = ($encodedEnvelope['headers']['content-type'] ?? null))) {
+            foreach ($stamps as $stamp) {
+                if ($stamp instanceof ContentTypeStamp) {
+                    $contentType = $stamp->getContentType();
+                    break; // First one wins, having more is inconsistent.
+                }
+            }
+        }
+        $format = $this->contentTypeToSerializerFormat($contentType ?? $this->format);
+
         $context = $this->context;
         if (null !== $serializerStamp) {
             $context = $serializerStamp->getContext() + $context;
         }
 
         try {
-            $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $this->format, $context);
+            $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $format, $context);
         } catch (UnexpectedValueException $e) {
             throw new MessageDecodingFailedException(sprintf('Could not decode message: %s.', $e->getMessage()), $e->getCode(), $e);
         }
@@ -99,14 +110,45 @@ class Serializer implements SerializerInterface
             $context = $serializerStamp->getContext() + $context;
         }
 
+        $contentType = 'application/'.$this->format;
+        if ($contentTypeStamps = $envelope->all(ContentTypeStamp::class)) {
+            $contentType = $contentTypeStamps[0]->getContentType();
+        }
+        $format = $this->contentTypeToSerializerFormat($contentType);
+
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 
-        $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
+        $headers = [
+            'type' => \get_class($envelope->getMessage()),
+            'content-type' => $contentType,
+        ] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
 
         return [
-            'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
+            'body' => $this->serializer->serialize($envelope->getMessage(), $format, $context),
             'headers' => $headers,
         ];
+    }
+
+    /**
+     * Convert mime content type to serializer format
+     */
+    private function contentTypeToSerializerFormat(string $contentType): string
+    {
+        // @todo there is room for improvement here, and it would the
+        //    serializer component responsability to do this transparently.
+        if (false === \strpos($contentType, '/')) {
+            return $contentType;
+        }
+        if (false !== \strpos($contentType, 'csv')) {
+            return 'csv';
+        }
+        if (false !== \strpos($contentType, 'json')) {
+            return 'json';
+        }
+        if (false !== \strpos($contentType, 'xml')) {
+            return 'xml';
+        }
+        return $contentType;
     }
 
     private function decodeStamps(array $encodedEnvelope): array

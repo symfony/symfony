@@ -25,7 +25,7 @@ class PhpSerializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function decode(array $encodedEnvelope): Envelope
+    public function decode(array $encodedEnvelope, ?string $contentType = null): Envelope
     {
         if (empty($encodedEnvelope['body'])) {
             throw new MessageDecodingFailedException('Encoded envelope should have at least a "body".');

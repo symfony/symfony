@@ -31,6 +31,16 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
+    public function testIgnoresContentType()
+    {
+        $serializer = new PhpSerializer();
+
+        $envelope = new Envelope(new DummyMessage('Hello'));
+
+        $encoded = $serializer->encode($envelope, 'application/xml');
+        $this->assertEquals($envelope, $serializer->decode($encoded));
+    }
+
     public function testDecodingFailsWithMissingBodyKey()
     {
         $this->expectException(MessageDecodingFailedException::class);

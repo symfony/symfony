@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\ContentTypeStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
@@ -104,6 +105,96 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('type', $encoded['headers']);
         $this->assertArrayHasKey('X-Message-Stamp-'.SerializerStamp::class, $encoded['headers']);
         $this->assertArrayHasKey('X-Message-Stamp-'.ValidationStamp::class, $encoded['headers']);
+    }
+
+    public function testEncodeWithContentTypeStamp()
+    {
+        $serializer = new Serializer(
+            $symfonySerializer = $this->createMock(SerializerComponentInterface::class),
+            'json'
+        );
+
+        $envelope = (new Envelope($message = new DummyMessage('test')))
+            ->with(new SerializerStamp([ObjectNormalizer::GROUPS => ['foo']]))
+            ->with(new ContentTypeStamp('text/xml'))
+            ->with(new ValidationStamp(['foo', 'bar']));
+
+        $symfonySerializer
+            ->expects($this->at(3))
+            ->method('serialize')->with(
+                $message,
+                'xml',
+                [
+                    ObjectNormalizer::GROUPS => ['foo'],
+                ]
+            )
+        ;
+
+        $encoded = $serializer->encode($envelope);
+
+        $this->assertArrayHasKey('content-type', $encoded['headers']);
+        $this->assertSame('text/xml', $encoded['headers']['content-type']);
+    }
+
+    public function testDecodeWithContentType()
+    {
+        $serializer = new Serializer(
+            $symfonySerializer = $this->createMock(SerializerComponentInterface::class),
+            'json'
+        );
+
+        $symfonySerializer
+            ->expects($this->at(0))
+            ->method('deserialize')->with(
+                '<xml/>',
+                DummyMessage::class,
+                'xml',
+                []
+            )
+            ->willReturn(new DummyMessage('test'))
+        ;
+
+        $serializer->decode([
+            'body' => '<xml/>',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'content-type' => 'application/text+xml',
+            ],
+        ]);
+    }
+
+    public function testDecodeWithContentTypeStamp()
+    {
+        $serializer = new Serializer(
+            $symfonySerializer = $this->createMock(SerializerComponentInterface::class),
+            'json'
+        );
+
+        $symfonySerializer
+            ->expects($this->at(0))
+            ->method('deserialize')
+            ->with('[{"contentType":"application/xml"}]', ContentTypeStamp::class.'[]', 'json', [])
+            ->willReturn([new ContentTypeStamp('application/xml')])
+        ;
+
+        $symfonySerializer
+            ->expects($this->at(1))
+            ->method('deserialize')->with(
+                '<xml/>',
+                DummyMessage::class,
+                'xml',
+                []
+            )
+            ->willReturn(new DummyMessage('test'))
+        ;
+
+        $serializer->decode([
+            'body' => '<xml/>',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.ContentTypeStamp::class => '[{"contentType":"application/xml"}]',
+            ],
+        ]);
     }
 
     public function testDecodeWithSymfonySerializerStamp()

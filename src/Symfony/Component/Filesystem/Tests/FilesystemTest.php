@@ -1711,6 +1711,44 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
+     * @dataProvider providePathSegmentsForJoin
+     */
+    public function testJoinPath(string $expectedJoinedPath, array $pathSegments): void
+    {
+        $this->assertSame($expectedJoinedPath, \Symfony\Component\Filesystem\Filesystem::joinPaths(...$pathSegments));
+    }
+
+    public function providePathSegmentsForJoin(): array
+    {
+        return [
+            'simple join' => [
+                'etc/init.d',
+                ['etc', 'init.d'],
+            ],
+            'keep heading and trailing separators' => [
+                '/etc/init.d/',
+                ['/etc', 'init.d/'],
+            ],
+            'skip empty' => [
+                'etc/init.d',
+                ['', 'etc', '', '', 'init.d', ''],
+            ],
+            'does not trim heading and trailing separator if respective segments are empty' => [
+                '/etc/init.d/',
+                ['', '/etc', '', '', 'init.d/', ''],
+            ],
+            'trims both types of separators' => [
+                'etc/some/other',
+                ['etc\\', '\\some\\', '\\other'],
+            ],
+            'keeps heading and trailing backslashes' => [
+                '\\etc/init.d\\',
+                ['\\etc', 'init.d\\'],
+            ],
+        ];
+    }
+
+    /**
      * Normalize the given path (transform each blackslash into a real directory separator).
      */
     private function normalize(string $path): string

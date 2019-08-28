@@ -24,6 +24,27 @@ class Filesystem
 {
     private static $lastError;
 
+    public static function joinPaths(string ...$pathSegments): string
+    {
+        // remove empty segments
+        $pathSegments = array_filter($pathSegments);
+
+        $potentialDirectorySeparators = '/\\';
+        // keep leading separator
+        $first = rtrim(array_shift($pathSegments), $potentialDirectorySeparators);
+        // keep trailing separator
+        $last = ltrim(array_pop($pathSegments), $potentialDirectorySeparators);
+        // trim separators in between
+        $pathSegments = array_map(function ($item) use ($potentialDirectorySeparators) {
+            return trim($item, $potentialDirectorySeparators);
+        }, $pathSegments);
+
+        array_push($pathSegments, $last);
+        array_unshift($pathSegments, $first);
+
+        return implode('/', $pathSegments);
+    }
+
     /**
      * Copies a file.
      *

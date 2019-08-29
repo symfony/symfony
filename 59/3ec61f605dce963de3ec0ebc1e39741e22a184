@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-29T15:14:46Z
+
+Green, this is not needed anymore: deps=low jobs ignore deprecations already.

@@ -369,6 +369,12 @@ class ResponseTest extends ResponseTestCase
         $this->assertNull($response->headers->get('Expires'), '->expire() removes the Expires header when the response is fresh');
     }
 
+    public function testNullExpireHeader()
+    {
+        $response = new Response(null, 200, ['Expires' => null]);
+        $this->assertNull($response->getExpires());
+    }
+
     public function testGetTtl()
     {
         $response = new Response();

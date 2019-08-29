@@ -505,9 +505,26 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // they are collectable during submission only
         $this->errors = [];
 
+        $dispatcher = $this->config->getEventDispatcher();
+
         // Obviously, a disabled form should not change its data upon submission.
-        if ($this->isDisabled()) {
+        if ($this->isDisabled() && $this->isRoot()) {
             $this->submitted = true;
+
+            if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
+                $event = new FormEvent($this, $submittedData);
+                $dispatcher->dispatch(FormEvents::PRE_SUBMIT, $event);
+            }
+
+            if ($dispatcher->hasListeners(FormEvents::SUBMIT)) {
+                $event = new FormEvent($this, $this->getNormData());
+                $dispatcher->dispatch(FormEvents::SUBMIT, $event);
+            }
+
+            if ($dispatcher->hasListeners(FormEvents::POST_SUBMIT)) {
+                $event = new FormEvent($this, $this->getViewData());
+                $dispatcher->dispatch(FormEvents::POST_SUBMIT, $event);
+            }
 
             return $this;
         }
@@ -537,8 +554,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $submittedData = null;
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
         }
-
-        $dispatcher = $this->config->getEventDispatcher();
 
         $modelData = null;
         $normData = null;
@@ -750,10 +765,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     {
         if (!$this->submitted) {
             throw new LogicException('Cannot check if an unsubmitted form is valid. Call Form::isSubmitted() before Form::isValid().');
-        }
-
-        if ($this->isDisabled()) {
-            return true;
         }
 
         return 0 === \count($this->getErrors(true));

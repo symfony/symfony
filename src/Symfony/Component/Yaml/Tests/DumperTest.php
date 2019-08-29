@@ -525,6 +525,23 @@ YAML;
         $this->assertSame($expected, $yaml);
     }
 
+    public function testDumpingNotInlinedScalarTaggedValue()
+    {
+        $data = [
+            'user1' => new TaggedValue('user', 'jane'),
+            'user2' => new TaggedValue('user', 'john'),
+        ];
+        $expected = <<<YAML
+user1: !user
+    jane
+user2: !user
+    john
+
+YAML;
+
+        $this->assertSame($expected, $this->dumper->dump($data, 2));
+    }
+
     public function testDumpMultiLineStringAsScalarBlock()
     {
         $data = [

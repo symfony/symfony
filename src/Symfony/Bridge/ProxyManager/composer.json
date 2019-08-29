@@ -25,7 +25,6 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" },
-        "classmap": [ "Legacy/ProxiedMethodReturnExpression.php" ],
         "exclude-from-classmap": [
             "/Tests/"
         ]

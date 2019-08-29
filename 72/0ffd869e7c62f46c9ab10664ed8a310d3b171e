@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-08-29T16:16:19Z
+
+Should we do the same for `getDefinition()`? And revisit both on 4.4 with upgrade paths?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-29T16:19:07Z
+
+Unless someone complains, I wouldn't anticipate doing the same for `getDefinition()`.

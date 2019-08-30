@@ -57,19 +57,11 @@ class SymfonyStyle extends OutputStyle
         parent::__construct($output);
     }
 
-    /**
-     * @return OutputWrapperInterface
-     */
     public function getOutputWrapper(): OutputWrapperInterface
     {
         return $this->outputWrapper;
     }
 
-    /**
-     * @param OutputWrapperInterface $outputWrapper
-     *
-     * @return $this
-     */
     public function setOutputWrapper(OutputWrapperInterface $outputWrapper)
     {
         $this->outputWrapper = $outputWrapper;

@@ -20,7 +20,7 @@ class OutputWrapperTest extends TestCase
     {
         $wrapper = new OutputWrapper();
         // Test UTF-8 chars + URL
-        $text = "Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna maximus porttitor. Donec ullamcorper risus at <error>libero ornare</error> efficitur.";
+        $text = 'Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna maximus porttitor. Donec ullamcorper risus at <error>libero ornare</error> efficitur.';
         $baseExpected = <<<EOS
 Árvíztűrőtükörfúrógé
 p https://github.com/symfony/symfony Lorem ipsum

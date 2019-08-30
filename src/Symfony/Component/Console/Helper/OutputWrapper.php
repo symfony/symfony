@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Symfony package.
@@ -48,19 +48,11 @@ class OutputWrapper implements OutputWrapperInterface
 
     private $keepUrlsTogether = true;
 
-    /**
-     * @return bool
-     */
     public function isKeepUrlsTogether(): bool
     {
         return $this->keepUrlsTogether;
     }
 
-    /**
-     * @param bool $keepUrlsTogether
-     *
-     * @return $this
-     */
     public function setKeepUrlsTogether(bool $keepUrlsTogether)
     {
         $this->keepUrlsTogether = $keepUrlsTogether;
@@ -84,8 +76,8 @@ class OutputWrapper implements OutputWrapperInterface
         $blocks = implode('|', $patternBlocks);
         $rowPattern = "(?:$blocks)$limitPattern";
         $pattern = sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s))(?:\r?\n)?|(?:\r?\n|$))#imux', $rowPattern);
-        $output = rtrim(preg_replace($pattern, '\\1' . $break, $text), $break);
+        $output = rtrim(preg_replace($pattern, '\\1'.$break, $text), $break);
 
-        return str_replace(' ' . $break, $break, $output);
+        return str_replace(' '.$break, $break, $output);
     }
 }

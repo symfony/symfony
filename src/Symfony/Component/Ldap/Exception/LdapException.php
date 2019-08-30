@@ -30,7 +30,7 @@ class LdapException extends \RuntimeException implements ExceptionInterface
      */
     public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
     {
-        if (2 > func_num_args()) {
+        if (2 > \func_num_args()) {
             @trigger_error(sprintf('Not specifying the LDAP error code in "%s::__construct()" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);
         }
 

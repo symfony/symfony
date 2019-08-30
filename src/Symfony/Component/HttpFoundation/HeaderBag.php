@@ -118,7 +118,15 @@ class HeaderBag implements \IteratorAggregate, \Countable
             }
         }
 
-        return isset($headers[0]) ? (string) $headers[0] : $default;
+        if (!$headers) {
+            return $default;
+        }
+
+        if (null === $headers[0]) {
+            return null;
+        }
+
+        return (string) $headers[0];
     }
 
     /**

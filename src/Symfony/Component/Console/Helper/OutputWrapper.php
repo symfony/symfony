@@ -46,16 +46,16 @@ class OutputWrapper implements OutputWrapperInterface
 {
     const URL_PATTERN = 'https?://[^ ]+';
 
-    private $keepUrlsTogether = true;
+    private $allowCutUrls = false;
 
-    public function isKeepUrlsTogether(): bool
+    public function isAllowCutUrls(): bool
     {
-        return $this->keepUrlsTogether;
+        return $this->allowCutUrls;
     }
 
-    public function setKeepUrlsTogether(bool $keepUrlsTogether)
+    public function setAllowCutUrls(bool $allowCutUrls)
     {
-        $this->keepUrlsTogether = $keepUrlsTogether;
+        $this->allowCutUrls = $allowCutUrls;
 
         return $this;
     }
@@ -69,7 +69,7 @@ class OutputWrapper implements OutputWrapperInterface
         $tagPattern = sprintf('<(?:(?:%1$s)|/(?:%1$s)?)>', '[a-z][^<>]*+');
         $limitPattern = "{1,$width}";
         $patternBlocks = [$tagPattern];
-        if ($this->keepUrlsTogether) {
+        if (!$this->allowCutUrls) {
             $patternBlocks[] = self::URL_PATTERN;
         }
         $patternBlocks[] = '.';

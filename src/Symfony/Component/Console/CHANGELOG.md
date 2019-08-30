@@ -8,6 +8,9 @@ CHANGELOG
  * added method `preventRedrawFasterThan()` and `forceRedrawSlowerThan()` on `ProgressBar`
  * `Application` implements `ResetInterface`
  * marked all dispatched event classes as `@final`
+ * added `OutputWrapperInterface` and `OutputWrapper` to allow modifying your
+   wrapping strategy in `SymfonyStyle` or in other `OutputStyle`. Eg: you can
+   switch off to wrap URLs.
 
 4.3.0
 -----

@@ -5,6 +5,9 @@ CHANGELOG
 ---
 
  * Add method `__toString()` to `InputInterface`
+ * Added `OutputWrapperInterface` and `OutputWrapper` to allow modifying your
+   wrapping strategy in `SymfonyStyle` or in other `OutputStyle`. Eg: you can
+   switch off to wrap URLs.
  * Deprecate `Command::$defaultName` and `Command::$defaultDescription`, use the `AsCommand` attribute instead
 
 6.0

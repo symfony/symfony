@@ -78,8 +78,8 @@ class LocaleDataGenerator extends AbstractDataGenerator
         // Generate locale names for all locales that have translations in
         // at least the language or the region bundle
         $displayFormat = $reader->readEntry($tempDir.'/lang', $displayLocale, ['localeDisplayPattern']);
-        $pattern = $displayFormat['pattern'] ?? '{0} ({1})';
-        $separator = $displayFormat['separator'] ?? '{0}, {1}';
+        $pattern = isset($displayFormat['pattern']) ? $displayFormat['pattern'] : '{0} ({1})';
+        $separator = isset($displayFormat['separator']) ? $displayFormat['separator'] : '{0}, {1}';
         $localeNames = [];
         foreach ($this->locales as $locale) {
             // Ensure a normalized list of pure locales

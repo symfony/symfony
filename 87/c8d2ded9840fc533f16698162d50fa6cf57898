@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-08-30T14:20:23Z
+
+The minimum version of SF 3.4 isn't PHP 5.3 or I forgot something?
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2019-08-30T14:47:43Z
+
+The minimum compatibility of symfony/phpunit-bridge is PHP 5.3
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2019-08-30T14:48:51Z
+
+I used ^3.4 in my Travis-CI test for PHP 5.3 and it suddenly broke with the version 3.4.31.

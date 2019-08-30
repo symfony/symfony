@@ -30,6 +30,9 @@ final class ConstraintValidatorTest extends TestCase
         $defaultTimezone = date_default_timezone_get();
         date_default_timezone_set('Europe/Moscow'); // GMT+3
 
+        $negativeDateInterval = new \DateInterval('PT30S');
+        $negativeDateInterval->invert = 1;
+
         $data = [
             ['true', true],
             ['false', false],
@@ -44,6 +47,13 @@ final class ConstraintValidatorTest extends TestCase
             [class_exists(\IntlDateFormatter::class) ? 'Feb 2, 1971, 8:00 AM' : '1971-02-02 08:00:00', $dateTime, ConstraintValidator::PRETTY_DATE],
             [class_exists(\IntlDateFormatter::class) ? 'Jan 1, 1970, 6:00 AM' : '1970-01-01 06:00:00', new \DateTimeImmutable('1970-01-01T06:00:00Z'), ConstraintValidator::PRETTY_DATE],
             [class_exists(\IntlDateFormatter::class) ? 'Jan 1, 1970, 3:00 PM' : '1970-01-01 15:00:00', (new \DateTimeImmutable('1970-01-01T23:00:00'))->setTimezone(new \DateTimeZone('America/New_York')), ConstraintValidator::PRETTY_DATE],
+            ['object', new \DateInterval('PT30S')],
+            ['1 year, 1 month, 1 day, 1 hour, 1 minute and 1 second', new \DateInterval('P1Y1M1DT1H1M1S'), ConstraintValidator::PRETTY_DATE_INTERVAL],
+            ['3 months and 4 seconds', new \DateInterval('P3MT4S'), ConstraintValidator::PRETTY_DATE_INTERVAL],
+            ['0', new \DateInterval('PT0S'), ConstraintValidator::PRETTY_DATE_INTERVAL],
+            ['0', ($dateTime = new \DateTimeImmutable())->diff($dateTime), ConstraintValidator::PRETTY_DATE_INTERVAL],
+            ['7 days', new \DateInterval('P1W'), ConstraintValidator::PRETTY_DATE_INTERVAL],
+            ['-30 seconds', $negativeDateInterval, ConstraintValidator::PRETTY_DATE_INTERVAL],
         ];
 
         date_default_timezone_set($defaultTimezone);

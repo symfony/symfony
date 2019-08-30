@@ -754,6 +754,182 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
     }
+
+    /**
+     * @dataProvider validDateIntervalsMinOnlyProvider
+     */
+    public function testValidDateIntervalsMinOnly(\DateInterval $value, $min)
+    {
+        $this->validator->validate($value, new Range([
+            'min' => $min,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function validDateIntervalsMinOnlyProvider()
+    {
+        $negative = new \DateInterval('PT30S');
+        $negative->invert = 1;
+
+        return [
+            ['30 > 20 (\DateInterval instance)' => new \DateInterval('PT30S'), new \DateInterval('PT20S')],
+            ['30 > 20 (string)' => new \DateInterval('PT30S'), '+20 seconds'],
+            ['30 === 30' => new \DateInterval('PT30S'), '+30 seconds'],
+            ['30 > 0' => new \DateInterval('PT30S'), 0],
+            ['-30 > -31' => $negative, '-31 seconds'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidDateIntervalsMinOnlyProvider
+     */
+    public function testInvalidDateIntervalsMinOnly(\DateInterval $value, $min, string $expectedValue, string $expectedLimit)
+    {
+        $this->validator->validate($value, new Range([
+            'min' => $min,
+            'minMessage' => 'foo',
+        ]));
+
+        $this->buildViolation('foo')
+            ->setParameter('{{ value }}', $expectedValue)
+            ->setParameter('{{ limit }}', $expectedLimit)
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    public function invalidDateIntervalsMinOnlyProvider()
+    {
+        $negative = new \DateInterval('PT30S');
+        $negative->invert = 1;
+
+        return [
+            ['30 < 31 (\DateInterval instance)' => new \DateInterval('PT30S'), new \DateInterval('PT31S'), '30 seconds', '31 seconds'],
+            ['30 < 31 (string)' => new \DateInterval('PT30S'), '+31 seconds', '30 seconds', '31 seconds'],
+            ['-30 < 0' => $negative, 0, '-30 seconds', '0'],
+            ['-30 < -29' => $negative, '-29 seconds', '-30 seconds', '-29 seconds'],
+        ];
+    }
+
+    /**
+     * @dataProvider validDateIntervalsMaxOnlyProvider
+     */
+    public function testValidDateIntervalsMaxOnly(\DateInterval $value, $max)
+    {
+        $this->validator->validate($value, new Range([
+            'max' => $max,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function validDateIntervalsMaxOnlyProvider()
+    {
+        $negative = new \DateInterval('PT30S');
+        $negative->invert = 1;
+
+        return [
+            ['30 < 31 (\DateInterval instance)' => new \DateInterval('PT30S'), new \DateInterval('PT31S')],
+            ['30 < 31 (string)' => new \DateInterval('PT30S'), '+31 seconds'],
+            ['30 === 30' => new \DateInterval('PT30S'), '+30 seconds'],
+            ['-30 < 0' => $negative, 0],
+            ['-30 < -20' => $negative, '-20 seconds'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidDateIntervalsMaxOnlyProvider
+     */
+    public function testInvalidDateIntervalsMaxOnly(\DateInterval $value, $max, string $expectedValue, string $expectedLimit)
+    {
+        $this->validator->validate($value, new Range([
+            'max' => $max,
+            'maxMessage' => 'foo',
+        ]));
+
+        $this->buildViolation('foo')
+            ->setParameter('{{ value }}', $expectedValue)
+            ->setParameter('{{ limit }}', $expectedLimit)
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    public function invalidDateIntervalsMaxOnlyProvider()
+    {
+        $negative = new \DateInterval('PT30S');
+        $negative->invert = 1;
+
+        return [
+            ['30 > 29 (\DateInterval instance)' => new \DateInterval('PT30S'), new \DateInterval('PT29S'), '30 seconds', '29 seconds'],
+            ['30 > 29 (string)' => new \DateInterval('PT30S'), '+29 seconds', '30 seconds', '29 seconds'],
+            ['30 > 0' => new \DateInterval('PT30S'), 0, '30 seconds', '0'],
+            ['-30 > -31' => $negative, '-31 seconds', '-30 seconds', '-31 seconds'],
+        ];
+    }
+
+    /**
+     * @dataProvider validDateIntervalsCombinedProvider
+     */
+    public function testValidDateIntervalsCombined(\DateInterval $value, $min, $max)
+    {
+        $this->validator->validate($value, new Range([
+            'min' => $min,
+            'max' => $max,
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function validDateIntervalsCombinedProvider()
+    {
+        $negative = new \DateInterval('PT30S');
+        $negative->invert = 1;
+
+        return [
+            ['31 < 30 < 29 (2 \DateInterval instances)' => new \DateInterval('PT30S'), new \DateInterval('PT29S'), new \DateInterval('PT31S')],
+            ['31 < 30 < 29 (\DateInterval instances & string)' => new \DateInterval('PT30S'), new \DateInterval('PT29S'), '+31 seconds'],
+            ['31 < 30 < 29 (string & \DateInterval instance)' => new \DateInterval('PT30S'), '+29 seconds', new \DateInterval('PT31S')],
+            ['31 < 30 < 29 (2 strings)' => new \DateInterval('PT30S'), '+29 seconds', '+31 seconds'],
+            ['31 < 30 < 0' => new \DateInterval('PT30S'), 0, '+31 seconds'],
+            ['0 < -30 < -31' => $negative, '-31 seconds', 0],
+            ['-29 < -30 < -31' => $negative, '-31 seconds', '-29 seconds'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidDateIntervalsCombinedProvider
+     */
+    public function testInvalidDateIntervalsCombined(\DateInterval $value, $min, $max, string $expectedValue, string $expectedMin, string $expectedMax)
+    {
+        $this->validator->validate($value, new Range([
+            'min' => $min,
+            'max' => $max,
+            'notInRangeMessage' => 'foo',
+        ]));
+
+        $this->buildViolation('foo')
+            ->setParameter('{{ value }}', $expectedValue)
+            ->setParameter('{{ min }}', $expectedMin)
+            ->setParameter('{{ max }}', $expectedMax)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function invalidDateIntervalsCombinedProvider()
+    {
+        $negative = new \DateInterval('PT30S');
+        $negative->invert = 1;
+
+        return [
+            ['30 < 31 && 30 > 29 (2 \DateInterval instances)' => new \DateInterval('PT30S'), new \DateInterval('PT31S'), new \DateInterval('PT29S'), '30 seconds', '31 seconds', '29 seconds'],
+            ['30 < 31 && 30 > 29 (\DateInterval instances & string)' => new \DateInterval('PT30S'), new \DateInterval('PT31S'), '+29 seconds', '30 seconds', '31 seconds', '29 seconds'],
+            ['30 < 31 && 30 > 29 (string & \DateInterval instance)' => new \DateInterval('PT30S'), '+31 seconds', new \DateInterval('PT29S'),  '30 seconds', '31 seconds', '29 seconds'],
+            ['30 < 31 && 30 > 29 (2 strings)' => new \DateInterval('PT30S'), '+31 seconds', '+29 seconds',  '30 seconds', '31 seconds', '29 seconds'],
+            ['30 < 31 && 30 > 0' => new \DateInterval('PT30S'), '+31 seconds', 0, '30 seconds', '31 seconds', '0'],
+            ['-30 < 0 && -30 > -31' => $negative, 0, '-31 seconds', '-30 seconds', '0', '-31 seconds'],
+            ['-30 < -29 && -30 > -31' => $negative, '-29 seconds', '-31 seconds', '-30 seconds', '-29 seconds', '-31 seconds'],
+        ];
+    }
 }
 
 final class Limit

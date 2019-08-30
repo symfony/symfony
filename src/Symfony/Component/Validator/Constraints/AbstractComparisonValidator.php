@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Util\DateIntervalComparisonHelper;
 
 /**
  * Provides a base class for the validation of property comparisons.
@@ -61,11 +62,14 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             $comparedValue = $constraint->value;
         }
 
-        // Convert strings to DateTimes if comparing another DateTime
-        // This allows to compare with any date/time value supported by
-        // the DateTime constructor:
-        // https://php.net/datetime.formats
+        $isDateIntervalComparison = false;
+
         if (\is_string($comparedValue) && $value instanceof \DateTimeInterface) {
+            // Convert strings to DateTimes if comparing another DateTime
+            // This allows to compare with any date/time value supported by
+            // the DateTime constructor:
+            // https://php.net/datetime.formats
+
             // If $value is immutable, convert the compared value to a DateTimeImmutable too, otherwise use DateTime
             $dateTimeClass = $value instanceof \DateTimeImmutable ? \DateTimeImmutable::class : \DateTime::class;
 
@@ -74,13 +78,22 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             } catch (\Exception $e) {
                 throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, $dateTimeClass, \get_class($constraint)));
             }
+        } elseif ($isDateIntervalComparison = DateIntervalComparisonHelper::supports($value, $comparedValue)) {
+            $originalValue = $value;
+            $value = DateIntervalComparisonHelper::convertValue($dateIntervalReference = new \DateTimeImmutable(), $value);
+
+            try {
+                $comparedValue = DateIntervalComparisonHelper::convertComparedValue($dateIntervalReference, $comparedValue);
+            } catch (\InvalidArgumentException $e) {
+                throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $comparedValue, \get_class($constraint)));
+            }
         }
 
         if (!$this->compareValues($value, $comparedValue)) {
             $violationBuilder = $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE))
-                ->setParameter('{{ compared_value }}', $this->formatValue($comparedValue, self::OBJECT_TO_STRING | self::PRETTY_DATE))
-                ->setParameter('{{ compared_value_type }}', $this->formatTypeOf($comparedValue))
+                ->setParameter('{{ value }}', $this->formatValue(!$isDateIntervalComparison ? $value : $originalValue, self::OBJECT_TO_STRING | self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
+                ->setParameter('{{ compared_value }}', $this->formatValue($messageComparedValue = (!$isDateIntervalComparison ? $comparedValue : $dateIntervalReference->diff($comparedValue)), self::OBJECT_TO_STRING | self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
+                ->setParameter('{{ compared_value_type }}', $this->formatTypeOf($messageComparedValue))
                 ->setCode($this->getErrorCode());
 
             if (null !== $path) {

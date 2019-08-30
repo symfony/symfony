@@ -40,6 +40,9 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideValidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [2, 1],
             [new \DateTime('2005/01/01'), new \DateTime('2001/01/01')],
@@ -48,6 +51,9 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(5), new ComparisonTest_Class(4)],
             ['333', '22'],
             [null, 1],
+            ['30 > 29 (string)' => new \DateInterval('PT30S'), '+29 seconds'],
+            ['30 > 29 (\DateInterval instance)' => new \DateInterval('PT30S'), new \DateInterval('PT29S')],
+            ['-30 > -31' => $negativeDateInterval, '-31 seconds'],
         ];
     }
 
@@ -66,6 +72,9 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideInvalidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [1, '1', 2, '2', 'integer'],
             [2, '2', 2, '2', 'integer'],
@@ -79,6 +88,9 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             ['22', '"22"', '333', '"333"', 'string'],
             ['22', '"22"', '22', '"22"', 'string'],
+            ['30 < 31 (string)' => new \DateInterval('PT30S'), '30 seconds', '+31 seconds', '31 seconds', \DateInterval::class],
+            ['30 < 31 (\DateInterval instance)' => new \DateInterval('PT30S'), '30 seconds', new \DateInterval('PT31S'), '31 seconds', \DateInterval::class],
+            ['-30 < -29' => $negativeDateInterval, '-30 seconds', '-29 seconds', '-29 seconds', \DateInterval::class],
         ];
     }
 

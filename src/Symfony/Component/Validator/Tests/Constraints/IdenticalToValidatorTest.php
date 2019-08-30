@@ -67,6 +67,12 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         $immutableDate = new \DateTimeImmutable('2000-01-01');
         $comparisons[] = [$immutableDate, $immutableDate];
 
+        $comparisons['\DateInterval instance === \DateInterval instance'] = [$dateInterval = new \DateInterval('P2Y'), $dateInterval];
+
+        $negativeDateInterval = new \DateInterval('P2Y');
+        $negativeDateInterval->invert = 1;
+        $comparisons['negative \DateInterval instance === negative \DateInterval instance'] = [$negativeDateInterval, $negativeDateInterval];
+
         return $comparisons;
     }
 
@@ -85,6 +91,9 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideInvalidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('P2Y');
+        $negativeDateInterval->invert = 1;
+
         return [
             [1, '1', 2, '2', 'integer'],
             [2, '2', '2', '"2"', 'string'],
@@ -92,6 +101,8 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', 'DateTime'],
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('1999-01-01'), 'Jan 1, 1999, 12:00 AM', 'DateTime'],
             [new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
+            ['\DateInterval instance !== same string' => new \DateInterval('P22M'), '22 months', '+22 months', '1 year and 10 months', \DateInterval::class],
+            ['negative \DateInterval instance !== same negative string' => $negativeDateInterval, '-2 years', '-2 years', '-2 years', \DateInterval::class],
         ];
     }
 

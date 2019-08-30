@@ -40,6 +40,9 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
      */
     public function provideValidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [3, 2],
             [1, 1],
@@ -52,6 +55,12 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
             ['a', 'a'],
             ['z', 'a'],
             [null, 1],
+            ['30 > 29 (string)' => new \DateInterval('PT30S'), '+29 seconds'],
+            ['30 > 29 (\DateInterval instance)' => new \DateInterval('PT30S'), new \DateInterval('PT29S')],
+            ['30 = 30 (string)' => new \DateInterval('PT30S'), '+30 seconds'],
+            ['30 = 30 (\DateInterval instance)' => new \DateInterval('PT30S'), new \DateInterval('PT30S')],
+            ['-30 > -31' => $negativeDateInterval, '-31 seconds'],
+            ['-30 = -30' => $negativeDateInterval, '-30 seconds'],
         ];
     }
 
@@ -71,12 +80,18 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
      */
     public function provideInvalidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [1, '1', 2, '2', 'integer'],
             [new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2005/01/01'), 'Jan 1, 2005, 12:00 AM', 'DateTime'],
             [new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', '2005/01/01', 'Jan 1, 2005, 12:00 AM', 'DateTime'],
             [new \DateTime('2000/01/01 UTC'), 'Jan 1, 2000, 12:00 AM', '2005/01/01 UTC', 'Jan 1, 2005, 12:00 AM', 'DateTime'],
             ['b', '"b"', 'c', '"c"', 'string'],
+            ['30 < 31 (string)' => new \DateInterval('PT30S'), '30 seconds', '+31 seconds', '31 seconds', \DateInterval::class],
+            ['30 < 31 (\DateInterval instance)' => new \DateInterval('PT30S'), '30 seconds', new \DateInterval('PT31S'), '31 seconds', \DateInterval::class],
+            ['-30 < -29' => $negativeDateInterval, '-30 seconds', '-29 seconds', '-29 seconds', \DateInterval::class],
         ];
     }
 

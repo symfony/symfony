@@ -35,6 +35,7 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
             [2.5, 0],
             ['333', '0'],
             [null, 0],
+            ['1 > 0' => new \DateInterval('P1W'), 0],
         ];
     }
 
@@ -43,11 +44,15 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
      */
     public function provideInvalidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('P1W');
+        $negativeDateInterval->invert = 1;
+
         return [
             [0, '0', 0, '0', 'integer'],
             [-1, '-1', 0, '0', 'integer'],
             [-2, '-2', 0, '0', 'integer'],
             [-2.5, '-2.5', 0, '0', 'integer'],
+            ['-1 < 0' => $negativeDateInterval, '-7 days', 0, '0', \DateInterval::class],
         ];
     }
 

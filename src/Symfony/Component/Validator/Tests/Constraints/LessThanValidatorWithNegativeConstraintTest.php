@@ -30,11 +30,15 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
      */
     public function provideValidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT440S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [-1, 0],
             [-2, 0],
             [-2.5, 0],
             [null, 0],
+            ['-440 < 0' => $negativeDateInterval, 0],
         ];
     }
 
@@ -48,6 +52,7 @@ class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
             [2, '2', 0, '0', 'integer'],
             [2.5, '2.5', 0, '0', 'integer'],
             [333, '333', 0, '0', 'integer'],
+            ['1 > 0' => new \DateInterval('P1D'), '1 day', 0, '0', \DateInterval::class],
         ];
     }
 

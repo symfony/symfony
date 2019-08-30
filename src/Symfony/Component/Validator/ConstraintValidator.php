@@ -32,6 +32,12 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     const OBJECT_TO_STRING = 2;
 
     /**
+     * Whether to format {@link \DateInterval} objects as human readable strings
+     * eg: 6 hours, 1 minute and 2 seconds.
+     */
+    const PRETTY_DATE_INTERVAL = 4;
+
+    /**
      * @var ExecutionContextInterface
      */
     protected $context;
@@ -96,6 +102,37 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
             }
 
             return $value->format('Y-m-d H:i:s');
+        }
+
+        if (($format & self::PRETTY_DATE_INTERVAL) && $value instanceof \DateInterval) {
+            $formattedValueParts = [];
+            foreach ([
+                'y' => 'year',
+                'm' => 'month',
+                'd' => 'day',
+                'h' => 'hour',
+                'i' => 'minute',
+                's' => 'second',
+                'f' => 'microsecond',
+            ] as $p => $label) {
+                if (!$formattedValue = $value->format('%'.$p)) {
+                    continue;
+                }
+
+                if ($formattedValue > 1) {
+                    $label .= 's';
+                }
+
+                $formattedValueParts[] = $formattedValue.' '.$label;
+            }
+
+            if (!$formattedValueParts) {
+                return '0';
+            }
+
+            $lastFormattedValuePart = array_pop($formattedValueParts);
+
+            return $value->format('%r').(!$formattedValueParts ? $lastFormattedValuePart : implode(', ', $formattedValueParts).' and '.$lastFormattedValuePart);
         }
 
         if (\is_object($value)) {

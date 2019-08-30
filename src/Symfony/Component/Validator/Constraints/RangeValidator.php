@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Util\DateIntervalComparisonHelper;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -44,7 +45,7 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_numeric($value) && !$value instanceof \DateTimeInterface) {
+        if (!is_numeric($value) && !$value instanceof \DateTimeInterface && !$value instanceof \DateInterval) {
             $this->context->buildViolation($constraint->invalidMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setCode(Range::INVALID_CHARACTERS_ERROR)
@@ -56,11 +57,15 @@ class RangeValidator extends ConstraintValidator
         $min = $this->getLimit($constraint->minPropertyPath, $constraint->min, $constraint);
         $max = $this->getLimit($constraint->maxPropertyPath, $constraint->max, $constraint);
 
-        // Convert strings to DateTimes if comparing another DateTime
-        // This allows to compare with any date/time value supported by
-        // the DateTime constructor:
-        // https://php.net/datetime.formats
+        $minIsDateIntervalComparison = false;
+        $maxIsDateIntervalComparison = false;
+
         if ($value instanceof \DateTimeInterface) {
+            // Convert strings to DateTimes if comparing another DateTime
+            // This allows to compare with any date/time value supported by
+            // the DateTime constructor:
+            // https://php.net/datetime.formats
+
             $dateTimeClass = null;
 
             if (\is_string($min)) {
@@ -82,6 +87,27 @@ class RangeValidator extends ConstraintValidator
                     throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $max, $dateTimeClass, \get_class($constraint)));
                 }
             }
+        } elseif (($minIsDateIntervalComparison = DateIntervalComparisonHelper::supports($value, $min)) || ($maxIsDateIntervalComparison = DateIntervalComparisonHelper::supports($value, $max))) {
+            $originalValue = $value;
+            $value = DateIntervalComparisonHelper::convertValue($dateIntervalReference = new \DateTimeImmutable(), $value);
+
+            if ($minIsDateIntervalComparison) {
+                try {
+                    $min = DateIntervalComparisonHelper::convertComparedValue($dateIntervalReference, $min);
+                } catch (\InvalidArgumentException $e) {
+                    throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $max, \get_class($constraint)));
+                }
+
+                $maxIsDateIntervalComparison = DateIntervalComparisonHelper::supports($originalValue, $max);
+            }
+
+            if ($maxIsDateIntervalComparison) {
+                try {
+                    $max = DateIntervalComparisonHelper::convertComparedValue($dateIntervalReference, $max);
+                } catch (\InvalidArgumentException $e) {
+                    throw new ConstraintDefinitionException(sprintf('The min value "%s" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $min, \get_class($constraint)));
+                }
+            }
         }
 
         $hasLowerLimit = null !== $min;
@@ -89,9 +115,9 @@ class RangeValidator extends ConstraintValidator
 
         if ($hasLowerLimit && $hasUpperLimit && ($value < $min || $value > $max)) {
             $violationBuilder = $this->context->buildViolation($constraint->notInRangeMessage)
-                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
-                ->setParameter('{{ min }}', $this->formatValue($min, self::PRETTY_DATE))
-                ->setParameter('{{ max }}', $this->formatValue($max, self::PRETTY_DATE))
+                ->setParameter('{{ value }}', $this->formatValue(!$minIsDateIntervalComparison && !$maxIsDateIntervalComparison ? $value : $originalValue, self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
+                ->setParameter('{{ min }}', $this->formatValue(!$minIsDateIntervalComparison ? $min : $dateIntervalReference->diff($min), self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
+                ->setParameter('{{ max }}', $this->formatValue(!$maxIsDateIntervalComparison ? $max : $dateIntervalReference->diff($max), self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
                 ->setCode(Range::NOT_IN_RANGE_ERROR);
 
             if (null !== $constraint->maxPropertyPath) {
@@ -109,8 +135,8 @@ class RangeValidator extends ConstraintValidator
 
         if ($hasUpperLimit && $value > $max) {
             $violationBuilder = $this->context->buildViolation($constraint->maxMessage)
-                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
-                ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE))
+                ->setParameter('{{ value }}', $this->formatValue(!$minIsDateIntervalComparison && !$maxIsDateIntervalComparison ? $value : $originalValue, self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
+                ->setParameter('{{ limit }}', $this->formatValue(!$maxIsDateIntervalComparison ? $max : $dateIntervalReference->diff($max), self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
                 ->setCode(Range::TOO_HIGH_ERROR);
 
             if (null !== $constraint->maxPropertyPath) {
@@ -128,8 +154,8 @@ class RangeValidator extends ConstraintValidator
 
         if ($hasLowerLimit && $value < $min) {
             $violationBuilder = $this->context->buildViolation($constraint->minMessage)
-                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
-                ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))
+                ->setParameter('{{ value }}', $this->formatValue(!$minIsDateIntervalComparison && !$maxIsDateIntervalComparison ? $value : $originalValue, self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
+                ->setParameter('{{ limit }}', $this->formatValue(!$minIsDateIntervalComparison ? $min : $dateIntervalReference->diff($min), self::PRETTY_DATE | self::PRETTY_DATE_INTERVAL))
                 ->setCode(Range::TOO_LOW_ERROR);
 
             if (null !== $constraint->maxPropertyPath) {

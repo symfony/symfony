@@ -40,6 +40,9 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideValidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [1, 2],
             [new \DateTime('2000-01-01'), new \DateTime('2010-01-01')],
@@ -48,6 +51,9 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(4), new ComparisonTest_Class(5)],
             ['22', '333'],
             [null, 1],
+            ['30 < 31 (string)' => new \DateInterval('PT30S'), '+31 seconds'],
+            ['30 < 31 (\DateInterval instance)' => new \DateInterval('PT30S'), new \DateInterval('PT31S')],
+            ['-30 < -29' => $negativeDateInterval, '-29 seconds'],
         ];
     }
 
@@ -66,6 +72,9 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideInvalidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [3, '3', 2, '2', 'integer'],
             [2, '2', 2, '2', 'integer'],
@@ -78,6 +87,9 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             [new ComparisonTest_Class(6), '6', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             ['333', '"333"', '22', '"22"', 'string'],
+            ['30 > 29 (string)' => new \DateInterval('PT30S'), '30 seconds', '+29 seconds', '29 seconds', \DateInterval::class],
+            ['30 > 29 (\DateInterval instance)' => new \DateInterval('PT30S'), '30 seconds', new \DateInterval('PT29S'), '29 seconds', \DateInterval::class],
+            ['-30 > -31' => $negativeDateInterval, '-30 seconds', '-31 seconds', '-31 seconds', \DateInterval::class],
         ];
     }
 

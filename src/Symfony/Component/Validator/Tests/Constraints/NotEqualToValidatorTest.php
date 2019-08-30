@@ -40,6 +40,9 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideValidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT1H');
+        $negativeDateInterval->invert = 1;
+
         return [
             [1, 2],
             ['22', '333'],
@@ -48,6 +51,9 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
             [new \DateTime('2001-01-01 UTC'), '2000-01-01 UTC'],
             [new ComparisonTest_Class(6), new ComparisonTest_Class(5)],
             [null, 1],
+            ['1 != 2 (string)' => new \DateInterval('PT1H'), '+2 hours'],
+            ['1 != 2 (\DateInterval instance)' => new \DateInterval('PT1H'), new \DateInterval('PT2H')],
+            ['-1 != -2' => $negativeDateInterval, '-2 hours'],
         ];
     }
 
@@ -66,6 +72,9 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideInvalidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT1H');
+        $negativeDateInterval->invert = 1;
+
         return [
             [3, '3', 3, '3', 'integer'],
             ['2', '"2"', 2, '2', 'integer'],
@@ -74,6 +83,9 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
             [new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', '2000-01-01', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new \DateTime('2000-01-01 UTC'), 'Jan 1, 2000, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
+            ['1 == 1 (string)' => new \DateInterval('PT1H'), '1 hour', '+1 hour', '1 hour', \DateInterval::class],
+            ['1 == 1 (\DateInterval instance)' => new \DateInterval('PT1H'), '1 hour', new \DateInterval('PT1H'), '1 hour', \DateInterval::class],
+            ['-1 == -1' => $negativeDateInterval, '-1 hour', '-1 hour', '-1 hour', \DateInterval::class],
         ];
     }
 

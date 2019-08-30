@@ -40,6 +40,9 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideValidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30H');
+        $negativeDateInterval->invert = 1;
+
         return [
             [1, 2],
             [1, 1],
@@ -54,6 +57,12 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
             ['a', 'a'],
             ['a', 'z'],
             [null, 1],
+            ['30 < 31 (string)' => new \DateInterval('PT30H'), '+31 hours'],
+            ['30 < 31 (\DateInterval instance)' => new \DateInterval('PT30H'), new \DateInterval('PT31H')],
+            ['30 = 30' => new \DateInterval('PT30H'), '+30 hours'],
+            ['30 = 30' => new \DateInterval('PT30H'), new \DateInterval('PT30H')],
+            ['-30 < -29' => $negativeDateInterval, '-29 hours'],
+            ['-30 = -30' => $negativeDateInterval, '-30 hours'],
         ];
     }
 
@@ -73,6 +82,9 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideInvalidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30H');
+        $negativeDateInterval->invert = 1;
+
         return [
             [2, '2', 1, '1', 'integer'],
             [new \DateTime('2010-01-01'), 'Jan 1, 2010, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'],
@@ -80,6 +92,9 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
             [new \DateTime('2010-01-01 UTC'), 'Jan 1, 2010, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(4), '4', __NAMESPACE__.'\ComparisonTest_Class'],
             ['c', '"c"', 'b', '"b"', 'string'],
+            ['30 > 29 (string)' => new \DateInterval('PT30H'), '30 hours', '+29 hours', '1 day and 5 hours', \DateInterval::class],
+            ['30 > 29 (\DateInterval instance)' => new \DateInterval('PT30H'), '30 hours', new \DateInterval('PT29H'), '1 day and 5 hours', \DateInterval::class],
+            ['-30 > -31' => $negativeDateInterval, '-30 hours', '-31 hours', '-1 day and 7 hours', \DateInterval::class],
         ];
     }
 

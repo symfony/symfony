@@ -30,12 +30,17 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
      */
     public function provideValidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT30S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [0, 0],
             [-1, 0],
             [-2, 0],
             [-2.5, 0],
             [null, 0],
+            ['-30 <= 0' => $negativeDateInterval, 0],
+            ['0 <= 0' => new \DateInterval('PT0S'), 0],
         ];
     }
 
@@ -48,6 +53,7 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
             [2, '2', 0, '0', 'integer'],
             [2.5, '2.5', 0, '0', 'integer'],
             [333, '333', 0, '0', 'integer'],
+            ['1 > 0' => new \DateInterval('P1Y'), '1 year', 0, '0', \DateInterval::class],
         ];
     }
 

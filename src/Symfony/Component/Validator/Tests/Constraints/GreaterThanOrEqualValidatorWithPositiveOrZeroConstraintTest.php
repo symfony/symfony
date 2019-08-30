@@ -38,6 +38,8 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
             ['0', '0'],
             ['333', '0'],
             [null, 0],
+            ['30 >= 0' => new \DateInterval('PT30S'), 0],
+            ['0 >= 0' => new \DateInterval('PT0S'), 0],
         ];
     }
 
@@ -46,10 +48,14 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Greate
      */
     public function provideInvalidComparisons(): array
     {
+        $negativeDateInterval = new \DateInterval('PT45S');
+        $negativeDateInterval->invert = 1;
+
         return [
             [-1, '-1', 0, '0', 'integer'],
             [-2, '-2', 0, '0', 'integer'],
             [-2.5, '-2.5', 0, '0', 'integer'],
+            ['-45 < 0' => $negativeDateInterval, '-45 seconds', 0, '0', \DateInterval::class],
         ];
     }
 

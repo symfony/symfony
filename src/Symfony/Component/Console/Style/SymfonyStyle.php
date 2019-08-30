@@ -14,6 +14,8 @@ namespace Symfony\Component\Console\Style;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\OutputWrapper;
+use Symfony\Component\Console\Helper\OutputWrapperInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Helper\Table;
@@ -39,8 +41,10 @@ class SymfonyStyle extends OutputStyle
     private $progressBar;
     private $lineLength;
     private $bufferedOutput;
+    /** @var OutputWrapperInterface */
+    private $outputWrapper;
 
-    public function __construct(InputInterface $input, OutputInterface $output)
+    public function __construct(InputInterface $input, OutputInterface $output, ?OutputWrapperInterface $outputWrapper = null)
     {
         $this->input = $input;
         $this->bufferedOutput = new BufferedOutput($output->getVerbosity(), false, clone $output->getFormatter());
@@ -48,7 +52,29 @@ class SymfonyStyle extends OutputStyle
         $width = (new Terminal())->getWidth() ?: self::MAX_LINE_LENGTH;
         $this->lineLength = min($width - (int) (\DIRECTORY_SEPARATOR === '\\'), self::MAX_LINE_LENGTH);
 
+        $this->outputWrapper = $outputWrapper ?: new OutputWrapper();
+
         parent::__construct($output);
+    }
+
+    /**
+     * @return OutputWrapperInterface
+     */
+    public function getOutputWrapper(): OutputWrapperInterface
+    {
+        return $this->outputWrapper;
+    }
+
+    /**
+     * @param OutputWrapperInterface $outputWrapper
+     *
+     * @return $this
+     */
+    public function setOutputWrapper(OutputWrapperInterface $outputWrapper)
+    {
+        $this->outputWrapper = $outputWrapper;
+
+        return $this;
     }
 
     /**
@@ -193,7 +219,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function ask($question, $default = null, $validator = null)
+    public function ask(string $question, ?string $default = null, callable $validator = null)
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
@@ -204,7 +230,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function askHidden($question, $validator = null)
+    public function askHidden(string $question, callable $validator = null)
     {
         $question = new Question($question);
 
@@ -217,7 +243,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function confirm($question, $default = true)
+    public function confirm(string $question, bool $default = true)
     {
         return $this->askQuestion(new ConfirmationQuestion($question, $default));
     }
@@ -396,7 +422,7 @@ class SymfonyStyle extends OutputStyle
 
         if (null !== $type) {
             $type = sprintf('[%s] ', $type);
-            $indentLength = \strlen($type);
+            $indentLength = Helper::strlen($type);
             $lineIndentation = str_repeat(' ', $indentLength);
         }
 
@@ -406,7 +432,7 @@ class SymfonyStyle extends OutputStyle
                 $message = OutputFormatter::escape($message);
             }
 
-            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - $prefixLength - $indentLength, PHP_EOL, true)));
+            $lines = array_merge($lines, explode(PHP_EOL, $this->outputWrapper->wrap($message, $this->lineLength - $prefixLength - $indentLength, PHP_EOL)));
 
             if (\count($messages) > 1 && $key < \count($messages) - 1) {
                 $lines[] = '';

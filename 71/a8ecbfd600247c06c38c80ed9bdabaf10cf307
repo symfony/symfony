@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2019-08-21T19:49:19Z
+
+I identified a similar problem with `ChoiceFormField`, fixed in another commit.

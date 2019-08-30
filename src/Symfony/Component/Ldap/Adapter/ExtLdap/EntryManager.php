@@ -116,7 +116,7 @@ class EntryManager implements EntryManagerInterface
      *
      * @throws NotBoundException                   if the connection has not been previously bound
      * @throws LdapException                       if an error is thrown during the rename operation
-     * @throws MalformedDistinguishedNameException if entry contains a malformed DN.
+     * @throws MalformedDistinguishedNameException if entry contains a malformed DN
      */
     public function move(Entry $entry, string $newParent)
     {

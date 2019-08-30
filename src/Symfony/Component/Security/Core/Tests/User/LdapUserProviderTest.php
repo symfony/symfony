@@ -32,7 +32,7 @@ class LdapUserProviderTest extends TestCase
         $ldap
             ->expects($this->once())
             ->method('bind')
-            ->willThrowException(new ConnectionException())
+            ->willThrowException(new ConnectionException('Test', 80))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');

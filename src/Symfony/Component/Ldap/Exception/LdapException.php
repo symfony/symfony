@@ -12,7 +12,10 @@
 namespace Symfony\Component\Ldap\Exception;
 
 /**
- * LdapException is thrown if an LDAP operation fails.
+ * LdapException is thrown if an LDAP operation fails. For BC compatibility
+ * the classes ExtensionNotLoadedException, MalformedDistinguishedNameException,
+ * and UnexpectedValueException extend this class, though they are not thrown
+ * because of a failed LDAP operation.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Dominic Tubach <dominic.tubach@to.com>
@@ -22,12 +25,15 @@ class LdapException extends \RuntimeException implements ExceptionInterface
     /**
      * This constructor ensures that an error code is specified.
      *
-     * @param string     $message
-     * @param int        $code     The LDAP error code.
+     * @param int        $code     the LDAP error code
      * @param \Throwable $previous
      */
-    public function __construct(string $message, int $code, \Throwable $previous = null)
+    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
     {
+        if (2 > func_num_args()) {
+            @trigger_error(sprintf('Not specifying the LDAP error code in "%s::__construct()" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         parent::__construct($message, $code, $previous);
     }
 
@@ -36,7 +42,7 @@ class LdapException extends \RuntimeException implements ExceptionInterface
      *                              are {errorCode} and {errorMsg} that will be
      *                              replaced by the LDAP error code and the LDAP
      *                              error message, respectively.
-     * @param int    $errorCode     The LDAP error code.
+     * @param int    $errorCode     the LDAP error code
      *
      * @return static
      */
@@ -44,7 +50,7 @@ class LdapException extends \RuntimeException implements ExceptionInterface
     {
         $message = strtr($messageFormat, [
             '{errorCode}' => $errorCode,
-            '{errorMsg}'  => ldap_err2str($errorCode),
+            '{errorMsg}' => ldap_err2str($errorCode),
         ]);
 
         return new static($message, $errorCode);

@@ -12,10 +12,18 @@
 namespace Symfony\Component\Ldap\Exception;
 
 /**
- * ExtensionNotLoadedException is thrown is a required PHP extension is not loaded.
+ * ExtensionNotLoadedException is thrown if a required PHP extension is not loaded.
+ *
+ * This class should extend \RuntimeException, but extends LdapException for BC
+ * compatibility.
  *
  * @author Dominic Tubach <dominic.tubach@to.com>
  */
-class ExtensionNotLoadedException extends \RuntimeException implements ExceptionInterface
+class ExtensionNotLoadedException extends LdapException implements ExceptionInterface
 {
+    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
+    {
+        // avoid deprecation error
+        parent::__construct($message, $code, $previous);
+    }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Formatter;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Helper\OutputWrapperInterface;
 
 /**
  * Formatter class for console output.
@@ -144,8 +145,8 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 
         $offset = 0;
         $output = '';
-        $openTagRegex = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
-        $closeTagRegex = '[a-z][^<>]*+';
+        $openTagRegex = OutputWrapperInterface::TAG_OPEN_REGEX_SEGMENT;
+        $closeTagRegex = OutputWrapperInterface::TAG_CLOSE_REGEX_SEGMENT;
         $currentLineLength = 0;
         preg_match_all("#<(($openTagRegex) | /($closeTagRegex)?)>#ix", $message, $matches, \PREG_OFFSET_CAPTURE);
         foreach ($matches[0] as $i => $match) {
@@ -161,7 +162,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             $offset = $pos + \strlen($text);
 
             // opening tag?
-            if ($open = '/' != $text[1]) {
+            if ($open = ('/' !== $text[1])) {
                 $tag = $matches[1][$i][0];
             } else {
                 $tag = $matches[3][$i][0] ?? '';

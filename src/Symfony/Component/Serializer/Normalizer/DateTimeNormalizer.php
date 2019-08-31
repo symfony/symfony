@@ -90,7 +90,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
-        $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
+        $dateTimeFormat = $context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY];
         $timezone = $this->getTimezone($context);
 
         if ('' === $data || null === $data) {

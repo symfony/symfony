@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Handler\RawMessage;
 use Symfony\Component\Messenger\Stamp\ContentTypeStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
@@ -33,57 +34,84 @@ use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterfa
  */
 class Serializer implements SerializerInterface
 {
+    // There is no registered PHP serialized data mime type by IANA, using
+    // a custom arbitrary one to identify it.
+    // @todo later add "; charset=utf-8" and support for encoding
+    //   although this probably should be handled by the serialize component
+    const CONTENT_TYPE_PHP_SERIALIZED = 'application/x-php-serialized';
+
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
+    private $phpSerializer;
     private $serializer;
     private $format;
     private $context;
+    private $allowRawMessages;
 
-    public function __construct(SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
+    /**
+     * Constructor
+     *
+     * @param SerializerInterface $serializer Symfony serializer
+     * @param string $format                  Default serialization format for messages that don't carry a ContentTypeStamp
+     * @param array $context                  Default serializer context
+     * @param bool $allowRawMessages          If set true messages that cannot be unserialized will be wrapped in RawMessage instances
+     */
+    public function __construct(?SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [], bool $allowRawMessages = false)
     {
-        $this->serializer = $serializer ?? self::create()->serializer;
-        $this->format = $format;
+        $this->phpSerializer = new PhpSerializer();
+        $this->serializer = $serializer;
+        $this->format = 'php' === $format ? self::CONTENT_TYPE_PHP_SERIALIZED : $format;
         $this->context = $context;
+        $this->allowRawMessages = $allowRawMessages;
     }
 
     public static function create(): self
     {
-        if (!class_exists(SymfonySerializer::class)) {
-            throw new LogicException(sprintf('The "%s" class requires Symfony\'s Serializer component. Try running "composer require symfony/serializer" or use "%s" instead.', __CLASS__, PhpSerializer::class));
+        $symfonySerializer = null;
+
+        if (class_exists(SymfonySerializer::class)) {
+            $encoders = [new XmlEncoder(), new JsonEncoder()];
+            $normalizers = [new ArrayDenormalizer(), new ObjectNormalizer()];
+            $symfonySerializer = new SymfonySerializer($normalizers, $encoders);
         }
 
-        $encoders = [new XmlEncoder(), new JsonEncoder()];
-        $normalizers = [new ArrayDenormalizer(), new ObjectNormalizer()];
-        $serializer = new SymfonySerializer($normalizers, $encoders);
-
-        return new self($serializer);
+        return new self($symfonySerializer);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function decode(array $encodedEnvelope, ?string $contentType = null): Envelope
+    public function decode(array $encodedEnvelope): Envelope
     {
-        if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
-            throw new MessageDecodingFailedException('Encoded envelope should have at least a "body" and some "headers".');
-        }
-
-        if (empty($encodedEnvelope['headers']['type'])) {
-            throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
+        if (empty($encodedEnvelope['body'])) {
+            throw new MessageDecodingFailedException('Encoded envelope should have at least a "body".');
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);
-        $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
-        if (!$contentType && !($contentType = ($encodedEnvelope['headers']['content-type'] ?? null))) {
-            foreach ($stamps as $stamp) {
-                if ($stamp instanceof ContentTypeStamp) {
-                    $contentType = $stamp->getContentType();
-                    break; // First one wins, having more is inconsistent.
-                }
-            }
+        // $this->format can be a mimetype fomatted string as well
+        $contentType = $this->getMimeTypeForFormat($encodedEnvelope['headers']['Content-Type'] ?? $this->format);
+
+        if (self::CONTENT_TYPE_PHP_SERIALIZED === $contentType) {
+            return $this->phpSerializer->decode($encodedEnvelope)->with(...$stamps);
         }
-        $format = $this->contentTypeToSerializerFormat($contentType ?? $this->format);
+
+        if (!$this->serializer) {
+            if (!$this->allowRawMessages) {
+                throw $this->createSerializerInstallHintException();
+            }
+            return new Envelope(new RawMessage($encodedEnvelope['body'], $encodedEnvelope['headers'] ?? []), $stamps);
+        }
+
+        if (empty($encodedEnvelope['headers']['type'])) {
+            if (!$this->allowRawMessages) {
+                throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
+            }
+            return new Envelope(new RawMessage($encodedEnvelope['body'], $encodedEnvelope['headers'] ?? []), $stamps);
+        }
+
+        $serializerStamp = $this->findFirstSerializerStamp($stamps);
+        $format = $this->getFormatForMimetype($contentType);
 
         $context = $this->context;
         if (null !== $serializerStamp) {
@@ -93,7 +121,10 @@ class Serializer implements SerializerInterface
         try {
             $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $format, $context);
         } catch (UnexpectedValueException $e) {
-            throw new MessageDecodingFailedException(sprintf('Could not decode message: %s.', $e->getMessage()), $e->getCode(), $e);
+            if (!$this->allowRawMessages) {
+                throw new MessageDecodingFailedException(sprintf('Could not decode message: %s.', $e->getMessage()), $e->getCode(), $e);
+            }
+            $message = new RawMessage($encodedEnvelope['body'], $encodedEnvelope['headers']);
         }
 
         return new Envelope($message, $stamps);
@@ -110,50 +141,54 @@ class Serializer implements SerializerInterface
             $context = $serializerStamp->getContext() + $context;
         }
 
-        $contentType = 'application/'.$this->format;
+        $contentType = null;
+        // Allow messages to be sent with an arbitrary content-type
         if ($contentTypeStamps = $envelope->all(ContentTypeStamp::class)) {
             $contentType = $contentTypeStamps[0]->getContentType();
         }
-        $format = $this->contentTypeToSerializerFormat($contentType);
+        if (!$contentType) {
+            $contentType = $this->format;
+        }
+
+        if (self::CONTENT_TYPE_PHP_SERIALIZED === $contentType) {
+            $encodedEnvelope = $this->phpSerializer->encode($envelope);
+            $encodedEnvelope['headers']['Content-Type'] = self::CONTENT_TYPE_PHP_SERIALIZED;
+
+            return $encodedEnvelope;
+        }
+
+        if (!$this->serializer) {
+            throw $this->createSerializerInstallHintException();
+        }
+
+        // Apply both transformations to ensure everything is normalized,
+        // content type could be a serializer format if set by the developers
+        // and format could be a content type by configuration.
+        $contentType = $this->getMimeTypeForFormat($contentType);
+        $format = $this->getFormatForMimetype($contentType);
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
-
-        $headers = [
-            'type' => \get_class($envelope->getMessage()),
-            'content-type' => $contentType,
-        ] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
+        $message = $envelope->getMessage();
 
         return [
-            'body' => $this->serializer->serialize($envelope->getMessage(), $format, $context),
-            'headers' => $headers,
+            'body' => $this->serializer->serialize($message, $format, $context),
+            'headers' => [
+                // @todo 'string' is a bit stupid here, but type should be propagated
+                //   by the envelope from the end-user developer
+                'type' => \is_object($message) ? \get_class($message) : 'string',
+                'Content-Type' => $contentType,
+            ] + $this->encodeStamps($envelope),
         ];
-    }
-
-    /**
-     * Convert mime content type to serializer format
-     */
-    private function contentTypeToSerializerFormat(string $contentType): string
-    {
-        // @todo there is room for improvement here, and it would the
-        //    serializer component responsability to do this transparently.
-        if (false === \strpos($contentType, '/')) {
-            return $contentType;
-        }
-        if (false !== \strpos($contentType, 'csv')) {
-            return 'csv';
-        }
-        if (false !== \strpos($contentType, 'json')) {
-            return 'json';
-        }
-        if (false !== \strpos($contentType, 'xml')) {
-            return 'xml';
-        }
-        return $contentType;
     }
 
     private function decodeStamps(array $encodedEnvelope): array
     {
+        if (empty($encodedEnvelope['headers'])) {
+            return [];
+        }
+
         $stamps = [];
+
         foreach ($encodedEnvelope['headers'] as $name => $value) {
             if (0 !== strpos($name, self::STAMP_HEADER_PREFIX)) {
                 continue;
@@ -174,7 +209,8 @@ class Serializer implements SerializerInterface
 
     private function encodeStamps(Envelope $envelope): array
     {
-        if (!$allStamps = $envelope->all()) {
+        // Drop content-type stamp since it is supposed be stored in headers
+        if (!$allStamps = $envelope->withoutAll(ContentTypeStamp::class)->all()) {
             return [];
         }
 
@@ -200,15 +236,34 @@ class Serializer implements SerializerInterface
         return null;
     }
 
-    private function getContentTypeHeader(): array
+    private function getFormatForMimetype(string $contentType): string
     {
-        $mimeType = $this->getMimeTypeForFormat();
-
-        return null === $mimeType ? [] : ['Content-Type' => $mimeType];
+        // @todo there is room for improvement here, and it would the
+        //    serializer component responsability to do this transparently.
+        if (false === \strpos($contentType, '/')) {
+            return $contentType;
+        }
+        if (false !== \strpos($contentType, 'csv')) {
+            return 'csv';
+        }
+        if (false !== \strpos($contentType, 'json')) {
+            return 'json';
+        }
+        if (false !== \strpos($contentType, 'xml')) {
+            return 'xml';
+        }
+        if (false !== \strpos($contentType, 'yaml')) {
+            return 'yaml';
+        }
+        return $contentType;
     }
 
-    private function getMimeTypeForFormat(): ?string
+    private function getMimeTypeForFormat(string $format): string
     {
+        if (false !== \strpos($format, '/')) {
+            return $format;
+        }
+
         switch ($this->format) {
             case 'json':
                 return 'application/json';
@@ -221,6 +276,11 @@ class Serializer implements SerializerInterface
                 return 'text/csv';
         }
 
-        return null;
+        return 'application/'.$format;
+    }
+
+    private function createSerializerInstallHintException(): LogicException
+    {
+        return new LogicException(sprintf('The "%s" class requires Symfony\'s Serializer component. Try running "composer require symfony/serializer" or use "%s" instead.', __CLASS__, PhpSerializer::class));
     }
 }

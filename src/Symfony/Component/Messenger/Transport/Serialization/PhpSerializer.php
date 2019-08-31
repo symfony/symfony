@@ -25,7 +25,7 @@ class PhpSerializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function decode(array $encodedEnvelope, ?string $contentType = null): Envelope
+    public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body'])) {
             throw new MessageDecodingFailedException('Encoded envelope should have at least a "body".');
@@ -33,7 +33,15 @@ class PhpSerializer implements SerializerInterface
 
         $serializeEnvelope = stripslashes($encodedEnvelope['body']);
 
-        return $this->safelyUnserialize($serializeEnvelope);
+        $envelope = $this->safelyUnserialize($serializeEnvelope);
+
+        // Allow serialized raw message which will permit arbitrary message
+        // unserialization, in case it wasn't stored with the full envelope.
+        if (!$envelope instanceof Envelope) {
+            $envelope = new Envelope($envelope);
+        }
+
+        return $envelope;
     }
 
     /**
@@ -52,7 +60,6 @@ class PhpSerializer implements SerializerInterface
 
     private function safelyUnserialize($contents)
     {
-        $e = null;
         $signalingException = new MessageDecodingFailedException(sprintf('Could not decode message using PHP serialization: %s.', $contents));
         $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {

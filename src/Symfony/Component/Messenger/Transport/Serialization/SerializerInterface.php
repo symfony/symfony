@@ -33,7 +33,7 @@ interface SerializerInterface
      *
      * @throws MessageDecodingFailedException
      */
-    public function decode(array $encodedEnvelope, ?string $contentType = null): Envelope;
+    public function decode(array $encodedEnvelope): Envelope;
 
     /**
      * Encodes an envelope content (message & stamps) to a common format understandable by transports.

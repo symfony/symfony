@@ -31,9 +31,6 @@ final class Envelope
      */
     public function __construct($message, array $stamps = [])
     {
-        if (!\is_object($message)) {
-            throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object but got %s.', __METHOD__, \gettype($message)));
-        }
         $this->message = $message;
 
         foreach ($stamps as $stamp) {

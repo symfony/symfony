@@ -316,6 +316,10 @@ class FrameworkExtension extends Extension
             $this->registerHttpClientConfiguration($config['http_client'], $container, $loader, $config['profiler']);
         }
 
+        if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
+            $this->registerMailerConfiguration($config['mailer'], $container, $loader);
+        }
+
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
         $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
@@ -344,10 +348,6 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
-        }
-
-        if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
-            $this->registerMailerConfiguration($config['mailer'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {

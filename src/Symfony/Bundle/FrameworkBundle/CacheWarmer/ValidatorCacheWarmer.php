@@ -16,6 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Validator\Mapping\Cache\Psr6Cache;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
@@ -54,7 +55,11 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
         }
 
         $loaders = $this->validatorBuilder->getLoaders();
-        $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), new Psr6Cache($arrayAdapter));
+        $cache = new Psr6Cache($arrayAdapter);
+        $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $cache);
+
+        // mark the cache as being warmed up
+        $cache->write(new ClassMetadata('warmed-up'));
 
         foreach ($this->extractSupportedLoaders($loaders) as $loader) {
             foreach ($loader->getMappedClasses() as $mappedClass) {

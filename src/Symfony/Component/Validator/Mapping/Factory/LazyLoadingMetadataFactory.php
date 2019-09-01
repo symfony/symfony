@@ -48,6 +48,8 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
      */
     protected $loadedClasses = [];
 
+    private $warmedUp;
+
     /**
      * Creates a new metadata factory.
      *
@@ -101,12 +103,12 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 
         $metadata = new ClassMetadata($class);
 
-        if (null !== $this->loader) {
+        if (null !== $this->loader && (null === $this->cache || !$this->warmedUp ?? $this->warmedUp = $this->cache->read('warmed-up'))) {
             $this->loader->loadClassMetadata($metadata);
-        }
 
-        if (null !== $this->cache) {
-            $this->cache->write($metadata);
+            if (null !== $this->cache) {
+                $this->cache->write($metadata);
+            }
         }
 
         // Include constraints from the parent class

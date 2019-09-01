@@ -529,6 +529,10 @@ class Application
     {
         $namespaces = [];
         foreach ($this->all() as $command) {
+            if ($command->isHidden()) {
+                continue;
+            }
+
             $namespaces = array_merge($namespaces, $this->extractAllNamespaces($command->getName()));
 
             foreach ($command->getAliases() as $alias) {
@@ -622,6 +626,11 @@ class Application
             $message = sprintf('Command "%s" is not defined.', $name);
 
             if ($alternatives = $this->findAlternatives($name, $allCommands)) {
+                // remove hidden commands
+                $alternatives = array_filter($alternatives, function ($name) {
+                    return !$this->get($name)->isHidden();
+                });
+
                 if (1 == \count($alternatives)) {
                     $message .= "\n\nDid you mean this?\n    ";
                 } else {
@@ -630,7 +639,7 @@ class Application
                 $message .= implode("\n    ", $alternatives);
             }
 
-            throw new CommandNotFoundException($message, $alternatives);
+            throw new CommandNotFoundException($message, array_values($alternatives));
         }
 
         // filter out aliases for commands which are already on the list
@@ -654,13 +663,18 @@ class Application
             }
             $abbrevs = array_map(function ($cmd) use ($commandList, $usableWidth, $maxLen) {
                 if (!$commandList[$cmd] instanceof Command) {
-                    return $cmd;
+                    $commandList[$cmd] = $this->commandLoader->get($cmd);
                 }
+
+                if ($commandList[$cmd]->isHidden()) {
+                    return false;
+                }
+
                 $abbrev = str_pad($cmd, $maxLen, ' ').' '.$commandList[$cmd]->getDescription();
 
                 return Helper::strlen($abbrev) > $usableWidth ? Helper::substr($abbrev, 0, $usableWidth - 3).'...' : $abbrev;
             }, array_values($commands));
-            $suggestions = $this->getAbbreviationSuggestions($abbrevs);
+            $suggestions = $this->getAbbreviationSuggestions(array_filter($abbrevs));
 
             throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $name, $suggestions), array_values($commands));
         }

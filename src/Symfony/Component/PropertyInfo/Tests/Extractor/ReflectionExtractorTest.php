@@ -16,6 +16,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\ImmutableTest;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
@@ -338,6 +339,7 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider constructorTypesProvider
+     * @dataProvider constructorOnlyTypesProvider
      */
     public function testExtractTypeConstructor(string $class, string $property, array $type = null)
     {
@@ -345,10 +347,24 @@ class ReflectionExtractorTest extends TestCase
            Check that null is returned if constructor extraction is disabled */
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => true]));
+    }
+
+    /**
+     * @dataProvider constructorOnlyTypesProvider
+     */
+    public function testExtractTypeConstructorOnly(string $class, string $property, array $type = null)
+    {
         $this->assertNull($this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => false]));
     }
 
     public function constructorTypesProvider(): array
+    {
+        return [
+            [ImmutableTest::class, 'test', [new Type(Type::BUILTIN_TYPE_INT, true)]],
+        ];
+    }
+
+    public function constructorOnlyTypesProvider(): array
     {
         return [
             // php71 dummy has following constructor: __construct(string $string, int $intPrivate)

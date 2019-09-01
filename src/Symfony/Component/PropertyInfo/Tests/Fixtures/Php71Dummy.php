@@ -51,3 +51,14 @@ class Php71DummyExtended2 extends Php71Dummy
     {
     }
 }
+
+class ImmutableTest
+{
+    public function __construct(int $test = null)
+    {
+    }
+
+    public function getTest(): int
+    {
+    }
+}

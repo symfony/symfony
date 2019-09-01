@@ -133,19 +133,18 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function getTypes($class, $property, array $context = [])
     {
+        $useConstructor = $context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction;
+
+        if ($useConstructor && $fromConstructor = $this->extractFromConstructor($class, $property)) {
+            return $fromConstructor;
+        }
+
         if ($fromMutator = $this->extractFromMutator($class, $property)) {
             return $fromMutator;
         }
 
         if ($fromAccessor = $this->extractFromAccessor($class, $property)) {
             return $fromAccessor;
-        }
-
-        if (
-            ($context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction) &&
-            $fromConstructor = $this->extractFromConstructor($class, $property)
-        ) {
-            return $fromConstructor;
         }
 
         if ($fromDefaultValue = $this->extractFromDefaultValue($class, $property)) {

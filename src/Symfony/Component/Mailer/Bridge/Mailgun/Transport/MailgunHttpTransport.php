@@ -40,7 +40,7 @@ class MailgunHttpTransport extends AbstractHttpTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         return sprintf('http://%s@mailgun?region=%s', $this->domain, $this->region);
     }

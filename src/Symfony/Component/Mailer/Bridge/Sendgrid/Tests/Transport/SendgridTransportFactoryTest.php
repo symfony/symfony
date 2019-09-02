@@ -76,4 +76,9 @@ class SendgridTransportFactoryTest extends TransportFactoryTestCase
             'The "foo" scheme is not supported for mailer "sendgrid". Supported schemes are: "api", "smtp", "smtps".',
         ];
     }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield [new Dsn('api', 'sendgrid')];
+    }
 }

@@ -56,10 +56,10 @@ class RoundRobinTransport implements TransportInterface
         throw new TransportException('All transports failed.');
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         return implode(' '.$this->getNameSymbol().' ', array_map(function (TransportInterface $transport) {
-            return $transport->getName();
+            return (string) $transport;
         }, $this->transports));
     }
 

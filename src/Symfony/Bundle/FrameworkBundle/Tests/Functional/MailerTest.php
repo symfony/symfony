@@ -43,7 +43,7 @@ class MailerTest extends AbstractWebTestCase
                 $this->onDoSend = $onDoSend;
             }
 
-            public function getName(): string
+            public function __toString(): string
             {
                 return 'dummy://local';
             }

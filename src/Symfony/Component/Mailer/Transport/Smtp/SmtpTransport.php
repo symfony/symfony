@@ -126,7 +126,7 @@ class SmtpTransport extends AbstractTransport
         return $message;
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         if ($this->stream instanceof SocketStream) {
             $name = sprintf('smtp%s://%s', ($tls = $this->stream->isTLS()) ? 's' : '', $this->stream->getHost());

@@ -29,14 +29,14 @@ class FailoverTransportTest extends TestCase
         new FailoverTransport([]);
     }
 
-    public function testGetName()
+    public function testToString()
     {
         $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->once())->method('getName')->willReturn('t1://local');
+        $t1->expects($this->once())->method('__toString')->willReturn('t1://local');
         $t2 = $this->createMock(TransportInterface::class);
-        $t2->expects($this->once())->method('getName')->willReturn('t2://local');
+        $t2->expects($this->once())->method('__toString')->willReturn('t2://local');
         $t = new FailoverTransport([$t1, $t2]);
-        $this->assertEquals('t1://local || t2://local', $t->getName());
+        $this->assertEquals('t1://local || t2://local', (string) $t);
     }
 
     public function testSendFirstWork()

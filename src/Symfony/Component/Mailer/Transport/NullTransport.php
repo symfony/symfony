@@ -24,7 +24,7 @@ final class NullTransport extends AbstractTransport
     {
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         return 'smtp://null';
     }

@@ -16,28 +16,28 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 class EsmtpTransportTest extends TestCase
 {
-    public function testName()
+    public function testToString()
     {
         $t = new EsmtpTransport();
-        $this->assertEquals('smtp://localhost', $t->getName());
+        $this->assertEquals('smtp://localhost', (string) $t);
 
         $t = new EsmtpTransport('example.com');
         if (\defined('OPENSSL_VERSION_NUMBER')) {
-            $this->assertEquals('smtps://example.com', $t->getName());
+            $this->assertEquals('smtps://example.com', (string) $t);
         } else {
-            $this->assertEquals('smtp://example.com', $t->getName());
+            $this->assertEquals('smtp://example.com', (string) $t);
         }
 
         $t = new EsmtpTransport('example.com', 2525);
-        $this->assertEquals('smtp://example.com:2525', $t->getName());
+        $this->assertEquals('smtp://example.com:2525', (string) $t);
 
         $t = new EsmtpTransport('example.com', 0, true);
-        $this->assertEquals('smtps://example.com', $t->getName());
+        $this->assertEquals('smtps://example.com', (string) $t);
 
         $t = new EsmtpTransport('example.com', 0, false);
-        $this->assertEquals('smtp://example.com', $t->getName());
+        $this->assertEquals('smtp://example.com', (string) $t);
 
         $t = new EsmtpTransport('example.com', 466, true);
-        $this->assertEquals('smtps://example.com:466', $t->getName());
+        $this->assertEquals('smtps://example.com:466', (string) $t);
     }
 }

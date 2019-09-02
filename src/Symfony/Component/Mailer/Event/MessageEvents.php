@@ -24,7 +24,7 @@ class MessageEvents
     public function add(MessageEvent $event): void
     {
         $this->events[] = $event;
-        $this->transports[$event->getTransportName()] = true;
+        $this->transports[$event->getTransport()] = true;
     }
 
     public function getTransports(): array
@@ -43,7 +43,7 @@ class MessageEvents
 
         $events = [];
         foreach ($this->events as $event) {
-            if ($name === $event->getTransportName()) {
+            if ($name === $event->getTransport()) {
                 $events[] = $event;
             }
         }

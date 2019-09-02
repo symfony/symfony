@@ -42,7 +42,7 @@ class SesHttpTransport extends AbstractHttpTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         return sprintf('http://%s@ses?region=%s', $this->accessKey, $this->region);
     }

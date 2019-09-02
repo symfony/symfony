@@ -43,7 +43,7 @@ class SesApiTransport extends AbstractApiTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         return sprintf('api://%s@ses?region=%s', $this->accessKey, $this->region);
     }

@@ -24,14 +24,14 @@ final class MessageEvent extends Event
 {
     private $message;
     private $envelope;
-    private $transportName;
+    private $transport;
     private $queued;
 
-    public function __construct(RawMessage $message, SmtpEnvelope $envelope, string $transportName, bool $queued = false)
+    public function __construct(RawMessage $message, SmtpEnvelope $envelope, string $transport, bool $queued = false)
     {
         $this->message = $message;
         $this->envelope = $envelope;
-        $this->transportName = $transportName;
+        $this->transport = $transport;
         $this->queued = $queued;
     }
 
@@ -55,9 +55,9 @@ final class MessageEvent extends Event
         $this->envelope = $envelope;
     }
 
-    public function getTransportName(): string
+    public function getTransport(): string
     {
-        return $this->transportName;
+        return $this->transport;
     }
 
     public function isQueued(): bool

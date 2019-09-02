@@ -91,10 +91,11 @@ foreach ($defaultEnvs as $envName => $envValue) {
     }
 }
 
-$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
+$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar')
+    || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
+    || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer`) : `which composer 2> /dev/null`))
     ? $PHP.' '.escapeshellarg($COMPOSER)
     : 'composer';
-
 
 $SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy'.($PHPUNIT_VERSION < 6.0 ? ' symfony/yaml': ''));
 

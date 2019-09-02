@@ -30,6 +30,10 @@ trait BlockingStoreTestTrait
      *
      * This test is time sensible: the $clockDelay could be adjust.
      *
+     * It also fails when run with the global ./phpunit test suite.
+     *
+     * @group transient
+     *
      * @requires extension pcntl
      * @requires extension posix
      * @requires function pcntl_sigwaitinfo

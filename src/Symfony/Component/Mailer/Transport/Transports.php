@@ -52,7 +52,7 @@ class Transports implements TransportInterface
         }
 
         $headers = $message->getHeaders();
-        $transport = $headers->get('X-Transport');
+        $transport = $headers->get('X-Transport')->getBody();
         $headers->remove('X-Transport');
 
         if (!isset($this->transports[$transport])) {

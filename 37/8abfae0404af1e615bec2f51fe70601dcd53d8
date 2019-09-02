@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-09-02T13:21:22Z
+
+to make it easier to upgrade, should we deprecate the old syntax instead of dropping it directly (which would even transform them to supported `smtp` DSNs using an invalid host for some of them, instead of failing cleanly to warn people) ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-02T13:39:20Z
+
+@stof The component is marked as experimental. Moving to the next syntax is easy enough IMHO.

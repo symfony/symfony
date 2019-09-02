@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-09-01T16:57:14Z
+
+You wrote mailgun instead of important in the PR header example code
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-01T17:02:20Z
+
+@OskarStark fixed :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-02T05:46:30Z
+
+ > by default, the first one is used)
+
+is this convention sensible? should we support an explicit option? i.e.
+
+```yaml
+default_transport: some
+````
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-09-02T06:02:01Z
+
+> is this convention sensible? should we support an explicit option? i.e.
+
+Yes much better, doctrine or messenger are doing the same 👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-02T06:17:03Z
+
+In which case this convention would be a problem? The sort does not matter except for the first one which is the default. Less configuration is better, right?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-02T06:30:10Z
+
+> The sort does not matter except for the first one which is the default.
+
+so the sorting matters :)
+
+> Less configuration is better, right?
+
+yes :) but im not sure we should ignore the configuration part in  "convention over configuration" otherwise it's just a magic convention.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-02T06:31:07Z
+
+I fail to see the magic here. The first one is the default one. That's all.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-02T06:42:32Z
+
+both work :) it's a doc issue eventually. To me the magic is, updating the ordering (i.e. to "alpha order") might change the default implicitly.
+
+however, that's the case anyway as long as someone relies on the "first is default" convention, without knowing about `default_transport`.
+
+Let's keep it simple then :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-02T06:45:28Z
+
+note the messenger section does enforce 100% explicit configuration:
+
+https://github.com/symfony/symfony/blob/bcb91eadf04631cb13834312c1123bc9b3c4276c/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Configuration.php#L1129-L1130
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-02T10:14:29Z
+
+New (simpler/better?) implementation without BC breaks.

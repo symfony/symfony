@@ -369,7 +369,8 @@ class ConfigurationTest extends TestCase
                 'scoped_clients' => [],
             ],
             'mailer' => [
-                'dsn' => 'smtp://null',
+                'dsn' => null,
+                'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
             ],
         ];

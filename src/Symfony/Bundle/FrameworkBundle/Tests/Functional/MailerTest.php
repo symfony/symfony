@@ -55,7 +55,7 @@ class MailerTest extends AbstractWebTestCase
             }
         };
 
-        $mailer = new Mailer($testTransport, null);
+        $mailer = new Mailer($testTransport);
 
         $message = (new Email())
             ->subject('Test subject')

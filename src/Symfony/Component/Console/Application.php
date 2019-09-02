@@ -625,7 +625,7 @@ class Application implements ResetInterface
         $aliases = [];
         $threshold = 80;
 
-        /**
+        /*
          * @var Command
          */
         foreach ($this->commands as $command) {

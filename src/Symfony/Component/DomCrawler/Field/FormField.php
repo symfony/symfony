@@ -101,7 +101,7 @@ abstract class FormField
      */
     public function setValue(?string $value)
     {
-        $this->value = (string) $value;
+        $this->value = $value ?? '';
     }
 
     /**

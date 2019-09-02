@@ -128,7 +128,7 @@ class KernelTest extends TestCase
     public function testBootSetsTheBootedFlagToTrue()
     {
         // use test kernel to access isBooted()
-        $kernel = $this->getKernelForTest(['initializeBundles', 'initializeContainer']);
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer']);
         $kernel->boot();
 
         $this->assertTrue($kernel->isBooted());
@@ -519,7 +519,7 @@ EOF;
      */
     public function testKernelStartTimeIsResetWhileBootingAlreadyBootedKernel()
     {
-        $kernel = $this->getKernelForTest(['initializeBundles'], true);
+        $kernel = $this->getKernel(['initializeBundles'], [], true);
         $kernel->boot();
         $preReBoot = $kernel->getStartTime();
 
@@ -567,30 +567,20 @@ EOF;
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
      */
-    protected function getKernel(array $methods = [], array $bundles = []): Kernel
+    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false): Kernel
     {
         $methods[] = 'registerBundles';
 
         $kernel = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+            ->getMockBuilder(KernelForTest::class)
             ->setMethods($methods)
-            ->setConstructorArgs(['test', false])
-            ->getMockForAbstractClass()
+            ->setConstructorArgs(['test', $debug])
+            ->getMock()
         ;
         $kernel->expects($this->any())
             ->method('registerBundles')
             ->willReturn($bundles)
         ;
-
-        return $kernel;
-    }
-
-    protected function getKernelForTest(array $methods = [], bool $debug = false)
-    {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setConstructorArgs(['test', $debug])
-            ->setMethods($methods)
-            ->getMock();
 
         return $kernel;
     }
@@ -607,6 +597,11 @@ class TestKernel implements HttpKernelInterface
 
     public function handle(Request $request, int $type = self::MASTER_REQUEST, bool $catch = true): Response
     {
+    }
+
+    public function getProjectDir(): string
+    {
+        return __DIR__.'/Fixtures';
     }
 }
 

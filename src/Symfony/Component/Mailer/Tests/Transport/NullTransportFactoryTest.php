@@ -27,29 +27,16 @@ class NullTransportFactoryTest extends TransportFactoryTestCase
     public function supportsProvider(): iterable
     {
         yield [
-            new Dsn('smtp', 'null'),
+            new Dsn('null', ''),
             true,
-        ];
-
-        yield [
-            new Dsn('smtp', 'example.com'),
-            false,
         ];
     }
 
     public function createProvider(): iterable
     {
         yield [
-            new Dsn('smtp', 'null'),
+            new Dsn('null', 'null'),
             new NullTransport($this->getDispatcher(), $this->getLogger()),
-        ];
-    }
-
-    public function unsupportedSchemeProvider(): iterable
-    {
-        yield [
-            new Dsn('foo', 'null'),
-            'The "foo" scheme is not supported for mailer "null". Supported schemes are: "smtp".',
         ];
     }
 }

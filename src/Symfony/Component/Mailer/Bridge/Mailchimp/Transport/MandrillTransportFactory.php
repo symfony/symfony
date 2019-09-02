@@ -25,26 +25,28 @@ final class MandrillTransportFactory extends AbstractTransportFactory
     {
         $scheme = $dsn->getScheme();
         $user = $this->getUser($dsn);
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
 
-        if ('api' === $scheme) {
-            return new MandrillApiTransport($user, $this->client, $this->dispatcher, $this->logger);
+        if ('mandrill+api' === $scheme) {
+            return (new MandrillApiTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('http' === $scheme) {
-            return new MandrillHttpTransport($user, $this->client, $this->dispatcher, $this->logger);
+        if ('mandrill+https' === $scheme || 'mandrill' === $scheme) {
+            return (new MandrillHttpTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('smtp' === $scheme || 'smtps' === $scheme) {
+        if ('mandrill+smtp' === $scheme || 'mandrill+smtps' === $scheme) {
             $password = $this->getPassword($dsn);
 
             return new MandrillSmtpTransport($user, $password, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp', 'smtps']);
+        throw new UnsupportedSchemeException($dsn, 'mandrill', $this->getSupportedSchemes());
     }
 
-    public function supports(Dsn $dsn): bool
+    protected function getSupportedSchemes(): array
     {
-        return 'mandrill' === $dsn->getHost();
+        return ['mandrill', 'mandrill+api', 'mandrill+https', 'mandrill+smtp', 'mandrill+smtps'];
     }
 }

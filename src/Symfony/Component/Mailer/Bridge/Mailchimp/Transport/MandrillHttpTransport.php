@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MandrillHttpTransport extends AbstractHttpTransport
 {
-    private const ENDPOINT = 'https://mandrillapp.com/api/1.0/messages/send-raw.json';
+    private const HOST = 'mandrillapp.com';
     private $key;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
@@ -36,13 +36,13 @@ class MandrillHttpTransport extends AbstractHttpTransport
 
     public function __toString(): string
     {
-        return sprintf('http://mandrill');
+        return sprintf('mandrill+https://%s', $this->getEndpoint());
     }
 
     protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         $envelope = $message->getEnvelope();
-        $response = $this->client->request('POST', self::ENDPOINT, [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/send-raw.json', [
             'json' => [
                 'key' => $this->key,
                 'to' => $this->stringifyAddresses($envelope->getRecipients()),
@@ -61,5 +61,10 @@ class MandrillHttpTransport extends AbstractHttpTransport
         }
 
         return $response;
+    }
+
+    private function getEndpoint(): ?string
+    {
+        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
     }
 }

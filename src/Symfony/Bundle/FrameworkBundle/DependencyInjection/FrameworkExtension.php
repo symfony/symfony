@@ -1812,7 +1812,12 @@ class FrameworkExtension extends Extension
 
         $loader->load('mailer.xml');
         $loader->load('mailer_transports.xml');
-        $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
+        if (!\count($config['transports']) && null === $config['dsn']) {
+            $config['dsn'] = 'smtp://null';
+        }
+        $transports = $config['dsn'] ? ['main' => $config['dsn']] : $config['transports'];
+        $container->getDefinition('mailer.transports')->setArgument(0, $transports);
+        $container->getDefinition('mailer.default_transport')->setArgument(0, current($transports));
 
         $classToServices = [
             SesTransportFactory::class => 'mailer.transport_factory.amazon',

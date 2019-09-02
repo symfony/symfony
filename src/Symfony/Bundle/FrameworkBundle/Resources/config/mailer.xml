@@ -6,12 +6,17 @@
 
     <services>
         <service id="mailer.mailer" class="Symfony\Component\Mailer\Mailer">
-            <argument type="service" id="mailer.default_transport" />
+            <argument type="service" id="mailer.transports" />
             <argument type="service" id="messenger.default_bus" on-invalid="ignore" />
             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
         </service>
         <service id="mailer" alias="mailer.mailer" />
         <service id="Symfony\Component\Mailer\MailerInterface" alias="mailer.mailer" />
+
+        <service id="mailer.transports" class="Symfony\Component\Mailer\Transports">
+            <factory service="mailer.transport_factory" method="fromStrings" />
+            <argument type="collection" /> <!-- transports -->
+        </service>
 
         <service id="mailer.transport_factory" class="Symfony\Component\Mailer\Transport">
             <argument type="tagged_iterator" tag="mailer.transport_factory" />
@@ -24,7 +29,7 @@
         <service id="Symfony\Component\Mailer\Transport\TransportInterface" alias="mailer.default_transport" />
 
         <service id="mailer.messenger.message_handler" class="Symfony\Component\Mailer\Messenger\MessageHandler">
-            <argument type="service" id="mailer.default_transport" />
+            <argument type="service" id="mailer.transports" />
             <tag name="messenger.message_handler" />
         </service>
 

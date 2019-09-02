@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class PostmarkApiTransport extends AbstractApiTransport
 {
-    private const ENDPOINT = 'http://api.postmarkapp.com/email';
+    private const HOST = 'api.postmarkapp.com';
 
     private $key;
 
@@ -38,12 +38,12 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('api://postmark');
+        return sprintf('postmark+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', self::ENDPOINT, [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/email', [
             'headers' => [
                 'Accept' => 'application/json',
                 'X-Postmark-Server-Token' => $this->key,
@@ -110,5 +110,10 @@ class PostmarkApiTransport extends AbstractApiTransport
         }
 
         return $attachments;
+    }
+
+    private function getEndpoint(): ?string
+    {
+        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
     }
 }

@@ -23,15 +23,15 @@ final class GmailTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
-        if ('smtp' === $dsn->getScheme() || 'smtps' === $dsn->getScheme()) {
+        if (\in_array($dsn->getScheme(), $this->getSupportedSchemes())) {
             return new GmailSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['smtp', 'smtps']);
+        throw new UnsupportedSchemeException($dsn, 'gmail', $this->getSupportedSchemes());
     }
 
-    public function supports(Dsn $dsn): bool
+    protected function getSupportedSchemes(): array
     {
-        return 'gmail' === $dsn->getHost();
+        return ['gmail', 'gmail+smtp', 'gmail+smtps'];
     }
 }

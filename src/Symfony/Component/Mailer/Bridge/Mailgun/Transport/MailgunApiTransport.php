@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MailgunApiTransport extends AbstractApiTransport
 {
-    private const ENDPOINT = 'https://api.%region_dot%mailgun.net/v3/%domain%/messages';
+    private const HOST = 'api.%region_dot%mailgun.net';
 
     private $key;
     private $domain;
@@ -43,7 +43,7 @@ class MailgunApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('api://%s@mailgun?region=%s', $this->domain, $this->region);
+        return sprintf('mailgun+api://%s?domain=%s', $this->getEndpoint(), $this->domain);
     }
 
     protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
@@ -54,8 +54,8 @@ class MailgunApiTransport extends AbstractApiTransport
             $headers[] = $header->toString();
         }
 
-        $endpoint = str_replace(['%domain%', '%region_dot%'], [urlencode($this->domain), 'us' !== ($this->region ?: 'us') ? $this->region.'.' : ''], self::ENDPOINT);
-        $response = $this->client->request('POST', $endpoint, [
+        $endpoint = str_replace('%domain%', urlencode($this->domain), $this->getEndpoint()).'/v3/%domain%/messages';
+        $response = $this->client->request('POST', 'https://'.$endpoint, [
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,
             'body' => $body->bodyToIterable(),
@@ -136,5 +136,12 @@ class MailgunApiTransport extends AbstractApiTransport
         }
 
         return [$attachments, $inlines, $html];
+    }
+
+    private function getEndpoint(): ?string
+    {
+        $host = $this->host ?: str_replace('%region_dot%', 'us' !== ($this->region ?: 'us') ? $this->region.'.' : '', self::HOST);
+
+        return $host.($this->port ? ':'.$this->port : '');
     }
 }

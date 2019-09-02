@@ -25,19 +25,22 @@ final class SendgridTransportFactory extends AbstractTransportFactory
     {
         $key = $this->getUser($dsn);
 
-        if ('api' === $dsn->getScheme()) {
-            return new SendgridApiTransport($key, $this->client, $this->dispatcher, $this->logger);
+        if ('sendgrid+api' === $dsn->getScheme()) {
+            $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+            $port = $dsn->getPort();
+
+            return (new SendgridApiTransport($key, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('smtp' === $dsn->getScheme() || 'smtps' === $dsn->getScheme()) {
+        if ('sendgrid+smtp' === $dsn->getScheme() || 'sendgrid+smtps' === $dsn->getScheme() || 'sendgrid' === $dsn->getScheme()) {
             return new SendgridSmtpTransport($key, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['api', 'smtp', 'smtps']);
+        throw new UnsupportedSchemeException($dsn, 'sendgrid', $this->getSupportedSchemes());
     }
 
-    public function supports(Dsn $dsn): bool
+    protected function getSupportedSchemes(): array
     {
-        return 'sendgrid' === $dsn->getHost();
+        return ['sendgrid', 'sendgrid+api', 'sendgrid+smtp', 'sendgrid+smtps'];
     }
 }

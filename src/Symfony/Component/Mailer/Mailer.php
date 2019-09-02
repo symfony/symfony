@@ -22,7 +22,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Mailer implements MailerInterface
+final class Mailer implements MailerInterface
 {
     private $transport;
     private $bus;

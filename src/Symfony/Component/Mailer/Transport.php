@@ -27,6 +27,7 @@ use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mailer\Transport\Transports;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -54,12 +55,29 @@ class Transport
         return $factory->fromString($dsn);
     }
 
+    public static function fromDsns(array $dsns, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
+    {
+        $factory = new self(iterator_to_array(self::getDefaultFactories($dispatcher, $client, $logger)));
+
+        return $factory->fromStrings($dsns);
+    }
+
     /**
      * @param TransportFactoryInterface[] $factories
      */
     public function __construct(iterable $factories)
     {
         $this->factories = $factories;
+    }
+
+    public function fromStrings(array $dsns): Transports
+    {
+        $transports = [];
+        foreach ($dsns as $name => $dsn) {
+            $transports[$name] = $this->fromString($dsn);
+        }
+
+        return new Transports($transports);
     }
 
     public function fromString(string $dsn): TransportInterface

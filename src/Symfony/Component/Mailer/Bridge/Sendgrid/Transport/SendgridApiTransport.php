@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class SendgridApiTransport extends AbstractApiTransport
 {
-    private const ENDPOINT = 'https://api.sendgrid.com/v3/mail/send';
+    private const HOST = 'api.sendgrid.com';
 
     private $key;
 
@@ -39,12 +39,12 @@ class SendgridApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('api://sendgrid');
+        return sprintf('sendgrid+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', self::ENDPOINT, [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/mail/send', [
             'json' => $this->getPayload($email, $envelope),
             'auth_bearer' => $this->key,
         ]);
@@ -135,5 +135,10 @@ class SendgridApiTransport extends AbstractApiTransport
         }
 
         return $attachments;
+    }
+
+    private function getEndpoint(): ?string
+    {
+        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
     }
 }

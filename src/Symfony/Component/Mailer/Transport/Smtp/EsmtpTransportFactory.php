@@ -39,8 +39,8 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
         return $transport;
     }
 
-    public function supports(Dsn $dsn): bool
+    protected function getSupportedSchemes(): array
     {
-        return 'smtp' === $dsn->getScheme() || 'smtps' === $dsn->getScheme();
+        return ['smtp', 'smtps'];
     }
 }

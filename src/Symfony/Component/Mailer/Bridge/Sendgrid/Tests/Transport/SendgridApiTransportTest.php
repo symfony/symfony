@@ -19,6 +19,32 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class SendgridApiTransportTest extends TestCase
 {
+    /**
+     * @dataProvider getTransportData
+     */
+    public function testToString(SendgridApiTransport $transport, string $expected)
+    {
+        $this->assertSame($expected, (string) $transport);
+    }
+
+    public function getTransportData()
+    {
+        return [
+            [
+                new SendgridApiTransport('KEY'),
+                'sendgrid+api://api.sendgrid.com',
+            ],
+            [
+                (new SendgridApiTransport('KEY'))->setHost('example.com'),
+                'sendgrid+api://example.com',
+            ],
+            [
+                (new SendgridApiTransport('KEY'))->setHost('example.com')->setPort(99),
+                'sendgrid+api://example.com:99',
+            ],
+        ];
+    }
+
     public function testSend()
     {
         $email = new Email();

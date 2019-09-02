@@ -654,7 +654,7 @@ EOF;
      *
      * @return Kernel
      */
-    protected function getKernel(array $methods = [], array $bundles = [], $debug = false)
+    protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false): Kernel
     {
         $methods[] = 'registerBundles';
 
@@ -668,9 +668,6 @@ EOF;
             ->method('registerBundles')
             ->willReturn($bundles)
         ;
-        $p = new \ReflectionProperty($kernel, 'rootDir');
-        $p->setAccessible(true);
-        $p->setValue($kernel, __DIR__.'/Fixtures');
 
         return $kernel;
     }
@@ -689,7 +686,7 @@ class TestKernel implements HttpKernelInterface
     {
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__.'/Fixtures';
     }

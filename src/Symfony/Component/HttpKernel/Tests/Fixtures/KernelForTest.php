@@ -35,7 +35,7 @@ class KernelForTest extends Kernel
         return $this->booted;
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }

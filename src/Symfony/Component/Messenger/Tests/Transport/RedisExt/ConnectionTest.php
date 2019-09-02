@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Transport\RedisExt\Connection;
  */
 class ConnectionTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $redis = Connection::fromDsn('redis://localhost/queue');
 

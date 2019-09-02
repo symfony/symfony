@@ -31,5 +31,5 @@ interface TransportInterface
      */
     public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage;
 
-    public function getName(): string;
+    public function __toString(): string;
 }

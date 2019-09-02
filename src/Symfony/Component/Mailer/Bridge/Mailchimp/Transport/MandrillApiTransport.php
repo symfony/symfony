@@ -36,7 +36,7 @@ class MandrillApiTransport extends AbstractApiTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         return sprintf('api://mandrill');
     }

@@ -17,12 +17,12 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 class SmtpTransportTest extends TestCase
 {
-    public function testName()
+    public function testToString()
     {
         $t = new SmtpTransport();
-        $this->assertEquals('smtps://localhost', $t->getName());
+        $this->assertEquals('smtps://localhost', (string) $t);
 
         $t = new SmtpTransport((new SocketStream())->setHost('127.0.0.1')->setPort(2525)->disableTls());
-        $this->assertEquals('smtp://127.0.0.1:2525', $t->getName());
+        $this->assertEquals('smtp://127.0.0.1:2525', (string) $t);
     }
 }

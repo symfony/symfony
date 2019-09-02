@@ -41,15 +41,15 @@ class SortableIterator implements \IteratorAggregate
         $order = $reverseOrder ? -1 : 1;
 
         if (self::SORT_BY_NAME === $sort) {
-            $this->sort = function ($a, $b) use ($order) {
+            $this->sort = static function ($a, $b) use ($order) {
                 return $order * strcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_NAME_NATURAL === $sort) {
-            $this->sort = function ($a, $b) use ($order) {
+            $this->sort = static function ($a, $b) use ($order) {
                 return $order * strnatcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_TYPE === $sort) {
-            $this->sort = function ($a, $b) use ($order) {
+            $this->sort = static function ($a, $b) use ($order) {
                 if ($a->isDir() && $b->isFile()) {
                     return -$order;
                 } elseif ($a->isFile() && $b->isDir()) {
@@ -59,15 +59,15 @@ class SortableIterator implements \IteratorAggregate
                 return $order * strcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_ACCESSED_TIME === $sort) {
-            $this->sort = function ($a, $b) use ($order) {
+            $this->sort = static function ($a, $b) use ($order) {
                 return $order * ($a->getATime() - $b->getATime());
             };
         } elseif (self::SORT_BY_CHANGED_TIME === $sort) {
-            $this->sort = function ($a, $b) use ($order) {
+            $this->sort = static function ($a, $b) use ($order) {
                 return $order * ($a->getCTime() - $b->getCTime());
             };
         } elseif (self::SORT_BY_MODIFIED_TIME === $sort) {
-            $this->sort = function ($a, $b) use ($order) {
+            $this->sort = static function ($a, $b) use ($order) {
                 return $order * ($a->getMTime() - $b->getMTime());
             };
         } elseif (self::SORT_BY_NONE === $sort) {

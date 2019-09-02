@@ -13,7 +13,6 @@ namespace Symfony\Component\Mailer\Transport;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\DelayedSmtpEnvelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -35,7 +34,7 @@ abstract class AbstractTransport implements TransportInterface
 
     public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        $this->dispatcher = $dispatcher ?: new EventDispatcher();
+        $this->dispatcher = $dispatcher;
         $this->logger = $logger ?: new NullLogger();
     }
 
@@ -67,14 +66,17 @@ abstract class AbstractTransport implements TransportInterface
             }
         }
 
-        $event = new MessageEvent($message, $envelope, (string) $this);
-        $this->dispatcher->dispatch($event);
-        $envelope = $event->getEnvelope();
+        if (null !== $this->dispatcher) {
+            $event = new MessageEvent($message, $envelope, (string) $this);
+            $this->dispatcher->dispatch($event);
+            $envelope = $event->getEnvelope();
+        }
+
         if (!$envelope->getRecipients()) {
             return null;
         }
 
-        $message = new SentMessage($event->getMessage(), $envelope);
+        $message = new SentMessage($message, $envelope);
         $this->doSend($message);
 
         $this->checkThrottling();

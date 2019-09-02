@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MandrillApiTransport extends AbstractApiTransport
 {
-    private const ENDPOINT = 'https://mandrillapp.com/api/1.0/messages/send.json';
+    private const HOST = 'mandrillapp.com';
 
     private $key;
 
@@ -38,12 +38,12 @@ class MandrillApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('api://mandrill');
+        return sprintf('mandrill+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', self::ENDPOINT, [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/send.json', [
             'json' => $this->getPayload($email, $envelope),
         ]);
 
@@ -57,6 +57,11 @@ class MandrillApiTransport extends AbstractApiTransport
         }
 
         return $response;
+    }
+
+    private function getEndpoint(): ?string
+    {
+        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
     }
 
     private function getPayload(Email $email, SmtpEnvelope $envelope): array

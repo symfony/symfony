@@ -18,8 +18,8 @@ use Symfony\Component\Mailer\Transport\Dsn;
  */
 class UnsupportedSchemeException extends LogicException
 {
-    public function __construct(Dsn $dsn, array $supported)
+    public function __construct(Dsn $dsn, string $name, array $supported)
     {
-        parent::__construct(sprintf('The "%s" scheme is not supported for mailer "%s". Supported schemes are: "%s".', $dsn->getScheme(), $dsn->getHost(), implode('", "', $supported)));
+        parent::__construct(sprintf('The "%s" scheme is not supported. Supported schemes for mailer "%s" are: "%s".', $dsn->getScheme(), $name, implode('", "', $supported)));
     }
 }

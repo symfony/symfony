@@ -20,15 +20,15 @@ final class NullTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
-        if ('smtp' === $dsn->getScheme()) {
+        if ('null' === $dsn->getScheme()) {
             return new NullTransport($this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['smtp']);
+        throw new UnsupportedSchemeException($dsn, 'null', $this->getSupportedSchemes());
     }
 
-    public function supports(Dsn $dsn): bool
+    protected function getSupportedSchemes(): array
     {
-        return 'null' === $dsn->getHost();
+        return ['null'];
     }
 }

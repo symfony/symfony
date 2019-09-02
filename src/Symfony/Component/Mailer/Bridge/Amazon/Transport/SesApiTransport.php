@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class SesApiTransport extends AbstractApiTransport
 {
-    private const ENDPOINT = 'https://email.%region%.amazonaws.com';
+    private const HOST = 'email.%region%.amazonaws.com';
 
     private $accessKey;
     private $secretKey;
@@ -45,7 +45,7 @@ class SesApiTransport extends AbstractApiTransport
 
     public function __toString(): string
     {
-        return sprintf('api://%s@ses?region=%s', $this->accessKey, $this->region);
+        return sprintf('ses+api://%s@%s', $this->accessKey, $this->getEndpoint());
     }
 
     protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
@@ -53,8 +53,7 @@ class SesApiTransport extends AbstractApiTransport
         $date = gmdate('D, d M Y H:i:s e');
         $auth = sprintf('AWS3-HTTPS AWSAccessKeyId=%s,Algorithm=HmacSHA256,Signature=%s', $this->accessKey, $this->getSignature($date));
 
-        $endpoint = str_replace('%region%', $this->region, self::ENDPOINT);
-        $response = $this->client->request('POST', $endpoint, [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), [
             'headers' => [
                 'X-Amzn-Authorization' => $auth,
                 'Date' => $date,
@@ -70,6 +69,11 @@ class SesApiTransport extends AbstractApiTransport
         }
 
         return $response;
+    }
+
+    private function getEndpoint(): ?string
+    {
+        return ($this->host ?: str_replace('%region%', $this->region, self::HOST)).($this->port ? ':'.$this->port : '');
     }
 
     private function getSignature(string $string): string

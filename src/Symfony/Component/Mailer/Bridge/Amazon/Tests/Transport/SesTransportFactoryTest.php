@@ -29,28 +29,33 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
     public function supportsProvider(): iterable
     {
         yield [
-            new Dsn('api', 'ses'),
+            new Dsn('ses+api', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('http', 'ses'),
+            new Dsn('ses+https', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtp', 'ses'),
+            new Dsn('ses', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtps', 'ses'),
+            new Dsn('ses+smtp', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtp', 'example.com'),
-            false,
+            new Dsn('ses+smtps', 'default'),
+            true,
+        ];
+
+        yield [
+            new Dsn('ses+smtp', 'example.com'),
+            true,
         ];
     }
 
@@ -61,37 +66,52 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
         $logger = $this->getLogger();
 
         yield [
-            new Dsn('api', 'ses', self::USER, self::PASSWORD),
+            new Dsn('ses+api', 'default', self::USER, self::PASSWORD),
             new SesApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('api', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
+            new Dsn('ses+api', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
             new SesApiTransport(self::USER, self::PASSWORD, 'eu-west-1', $client, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('http', 'ses', self::USER, self::PASSWORD),
+            new Dsn('ses+api', 'example.com', self::USER, self::PASSWORD, 8080),
+            (new SesApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+        ];
+
+        yield [
+            new Dsn('ses+https', 'default', self::USER, self::PASSWORD),
             new SesHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('http', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
+            new Dsn('ses', 'default', self::USER, self::PASSWORD),
+            new SesHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('ses+https', 'example.com', self::USER, self::PASSWORD, 8080),
+            (new SesHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+        ];
+
+        yield [
+            new Dsn('ses+https', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
             new SesHttpTransport(self::USER, self::PASSWORD, 'eu-west-1', $client, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('smtp', 'ses', self::USER, self::PASSWORD),
+            new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD),
             new SesSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('smtp', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
+            new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
             new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('smtps', 'ses', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
+            new Dsn('ses+smtps', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
             new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', $dispatcher, $logger),
         ];
     }
@@ -99,15 +119,15 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
-            new Dsn('foo', 'ses', self::USER, self::PASSWORD),
-            'The "foo" scheme is not supported for mailer "ses". Supported schemes are: "api", "http", "smtp", "smtps".',
+            new Dsn('ses+foo', 'default', self::USER, self::PASSWORD),
+            'The "ses+foo" scheme is not supported. Supported schemes for mailer "ses" are: "ses", "ses+api", "ses+https", "ses+smtp", "ses+smtps".',
         ];
     }
 
     public function incompleteDsnProvider(): iterable
     {
-        yield [new Dsn('smtp', 'ses', self::USER)];
+        yield [new Dsn('ses+smtp', 'default', self::USER)];
 
-        yield [new Dsn('smtp', 'ses', null, self::PASSWORD)];
+        yield [new Dsn('ses+smtp', 'default', null, self::PASSWORD)];
     }
 }

@@ -48,14 +48,17 @@ class UnsupportedHostException extends LogicException
 
     public function __construct(Dsn $dsn)
     {
-        $host = $dsn->getHost();
-        $package = self::HOST_TO_PACKAGE_MAP[$host] ?? null;
+        $provider = $dsn->getScheme();
+        if (false !== $pos = strpos($provider, '+')) {
+            $provider = substr($provider, 0, $pos);
+        }
+        $package = self::HOST_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
             parent::__construct(sprintf('Unable to send emails via "%s" as the bridge is not installed. Try running "composer require %s".', $host, $package['package']));
 
             return;
         }
 
-        parent::__construct(sprintf('The "%s" mailer is not supported.', $host));
+        parent::__construct(sprintf('The "%s" scheme is not supported.', $dsn->getScheme()));
     }
 }

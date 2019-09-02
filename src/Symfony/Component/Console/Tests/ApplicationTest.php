@@ -1749,6 +1749,21 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foo']);
     }
+
+    public function testShouldRunCommandWithSimilarName()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+
+        $application->register('baz:foobar')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->writeln('foobar.');
+        });
+
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'baz:foo']);
+        $this->assertStringContainsString('foobar.', $tester->getDisplay(true));
+    }
 }
 
 class CustomApplication extends Application

@@ -623,12 +623,21 @@ class Application implements ResetInterface
         $this->init();
 
         $aliases = [];
+        $threshold = 80;
 
+        /**
+         * @var Command $command
+         */
         foreach ($this->commands as $command) {
             foreach ($command->getAliases() as $alias) {
                 if (!$this->has($alias)) {
                     $this->commands[$alias] = $command;
                 }
+            }
+
+            similar_text($name, $command->getName(), $percent);
+            if ($percent >= $threshold) {
+                return $this->get($command->getName());
             }
         }
 

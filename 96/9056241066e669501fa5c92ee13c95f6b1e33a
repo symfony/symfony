@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-27T14:28:40Z
+
+The private method has been typed correctly but it is called from a public method that in practice allows to pass `null` values. I've fixed the code around it, but I'm not sure if should we deprecating to pass `null` first? and relax the argument to `?string $id` by now? then in 5.0 go back to `string $id` again?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-09-02T18:21:35Z
+
+Instead of deprecating to pass `null` I've implemented a soft solution without deprecation, wdyt?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-02T18:28:29Z
+
+Works for me. We'd need a test case to ensure we don't break this by mistake.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-09-02T19:43:47Z
+
+@nicolas-grekas test case added.

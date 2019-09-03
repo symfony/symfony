@@ -14,6 +14,9 @@ services:
     foo_service_tagged_locator:
         class: Bar
         arguments: [!tagged_locator { tag: foo, index_by: barfoo, default_index_method: foobar }]
+    bar_service_tagged_locator:
+        class: Bar
+        arguments: [!tagged_locator foo]
     Psr\Container\ContainerInterface:
         alias: service_container
         public: false

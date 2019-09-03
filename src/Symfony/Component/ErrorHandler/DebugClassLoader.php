@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\ErrorHandler;
 
+use Doctrine\Common\Persistence\Proxy;
 use PHPUnit\Framework\MockObject\Matcher\StatelessInvocation;
+use PHPUnit\Framework\MockObject\MockObject;
+use Prophecy\Prophecy\ProphecySubjectInterface;
+use ProxyManager\Proxy\ProxyInterface;
 
 /**
  * Autoloader checking if the class is really defined in the file found.
@@ -230,22 +234,57 @@ class DebugClassLoader
             spl_autoload_unregister($function);
         }
 
-        $loader = null;
-
         foreach ($functions as $function) {
             if (\is_array($function) && $function[0] instanceof self) {
-                $loader = $function[0];
                 $function = $function[0]->getClassLoader();
             }
 
             spl_autoload_register($function);
         }
+    }
 
-        if (null !== $loader) {
-            foreach (array_merge(get_declared_interfaces(), get_declared_traits(), get_declared_classes()) as $class) {
-                $loader->checkClass($class);
+    public static function checkClasses(): bool
+    {
+        if (!\is_array($functions = spl_autoload_functions())) {
+            return false;
+        }
+
+        $loader = null;
+
+        foreach ($functions as $function) {
+            if (\is_array($function) && $function[0] instanceof self) {
+                $loader = $function[0];
+                break;
             }
         }
+
+        if (null === $loader) {
+            return false;
+        }
+
+        static $offsets = [
+            'get_declared_interfaces' => 0,
+            'get_declared_traits' => 0,
+            'get_declared_classes' => 0,
+        ];
+
+        foreach ($offsets as $getSymbols => $i) {
+            $symbols = $getSymbols();
+
+            for (; $i < \count($symbols); ++$i) {
+                if (!is_subclass_of($symbols[$i], MockObject::class)
+                    && !is_subclass_of($symbols[$i], ProphecySubjectInterface::class)
+                    && !is_subclass_of($symbols[$i], Proxy::class)
+                    && !is_subclass_of($symbols[$i], ProxyInterface::class)
+                ) {
+                    $loader->checkClass($symbols[$i]);
+                }
+            }
+
+            $offsets[$getSymbols] = $i;
+        }
+
+        return true;
     }
 
     public function findFile(string $class): ?string

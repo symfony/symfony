@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestResult;
 use PHPUnit\Util\ErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 /**
  * Catch deprecation notices and print a summary report at the end of the test suite.
@@ -178,6 +179,9 @@ class DeprecationErrorHandler
             return;
         }
 
+        if (method_exists(DebugClassLoader::class, 'checkClasses')) {
+            DebugClassLoader::checkClasses();
+        }
         $currErrorHandler = set_error_handler('var_dump');
         restore_error_handler();
 

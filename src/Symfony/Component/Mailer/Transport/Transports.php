@@ -56,7 +56,7 @@ class Transports implements TransportInterface
         $headers->remove('X-Transport');
 
         if (!isset($this->transports[$transport])) {
-            throw new InvalidArgumentException(sprintf('The "%s" transport does not exist.', $transport));
+            throw new InvalidArgumentException(sprintf('The "%s" transport does not exist (available transports: "%s").', $transport, implode('", "', array_keys($this->transports))));
         }
 
         return $this->transports[$transport]->send($message, $envelope);

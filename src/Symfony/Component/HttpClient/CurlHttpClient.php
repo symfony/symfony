@@ -106,8 +106,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         $url = implode('', $url);
 
         if (!isset($options['normalized_headers']['user-agent'])) {
-            $options['normalized_headers']['user-agent'][] = 'Symfony HttpClient/Curl';
-            $options['headers'][] = 'User-Agent: Symfony HttpClient/Curl';
+            $options['normalized_headers']['user-agent'][] = $options['headers'][] = 'User-Agent: Symfony HttpClient/Curl';
         }
 
         if ($pushedResponse = $this->multi->pushedResponses[$url] ?? null) {
@@ -364,7 +363,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         }
 
         foreach (['authorization', 'cookie', 'range', 'proxy-authorization'] as $k) {
-            if (($pushedResponse->requestHeaders[$k] ?? null) !== ($options['normalized_headers'][$k] ?? null)) {
+            $normalizedHeaders = $options['normalized_headers'][$k] ?? [];
+            foreach ($normalizedHeaders as $i => $v) {
+                $normalizedHeaders[$i] = substr($v, \strlen($k) + 2);
+            }
+
+            if (($pushedResponse->requestHeaders[$k] ?? []) !== $normalizedHeaders) {
                 return false;
             }
         }

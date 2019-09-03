@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-09-03T15:18:58Z
+
+@fabpot this is the same fix that https://github.com/symfony/symfony/pull/33260 but when we make a mistake in a custom ExceptionListener or custom ErrorRenderer, (currently a blank page is displayed).

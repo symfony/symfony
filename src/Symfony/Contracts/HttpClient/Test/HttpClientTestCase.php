@@ -754,6 +754,27 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    public function testInformationalResponseStream()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/103');
+
+        $chunks = [];
+        foreach ($client->stream($response) as $chunk) {
+            $chunks[] = $chunk;
+        }
+
+        $this->assertSame(103, $chunks[0]->getInformationalStatus()[0]);
+        $this->assertSame(['</style.css>; rel=preload; as=style', '</script.js>; rel=preload; as=script'], $chunks[0]->getInformationalStatus()[1]['link']);
+        $this->assertTrue($chunks[1]->isFirst());
+        $this->assertSame('Here the body', $chunks[2]->getContent());
+        $this->assertTrue($chunks[3]->isLast());
+        $this->assertNull($chunks[3]->getInformationalStatus());
+
+        $this->assertSame(['date', 'content-length'], array_keys($response->getHeaders()));
+        $this->assertContains('Link: </style.css>; rel=preload; as=style', $response->getInfo('response_headers'));
+    }
+
     /**
      * @requires extension zlib
      */

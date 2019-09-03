@@ -311,6 +311,12 @@ class YamlFileLoaderTest extends TestCase
 
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', true);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_service_tagged_locator')->getArgument(0));
+
+        if (is_subclass_of('Symfony\Component\Yaml\Exception\ExceptionInterface', 'Throwable')) {
+            // this test is not compatible with Yaml v3
+            $taggedIterator = new TaggedIteratorArgument('foo', null, null, true);
+            $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
+        }
     }
 
     public function testNameOnlyTagsAreAllowedAsString()

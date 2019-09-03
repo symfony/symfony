@@ -83,6 +83,10 @@
             <tag name="kernel.reset" method="reset" />
         </service>
 
+        <service id="messenger.transport.doctrine.factory" class="Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory">
+            <tag name="messenger.transport_factory" />
+        </service>
+
         <!-- retry -->
         <service id="messenger.retry_strategy_locator">
             <tag name="container.service_locator" />

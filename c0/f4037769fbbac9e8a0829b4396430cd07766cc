@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-09-03T07:48:48Z
+
+Now the only problem with it is that the values can be transformed in the `AbstractComparisonValidator` class, meaning that the message can be incoherent with what is actually passed by the developer to the constraint. I wonder if we should not add a `protected function supportsValue($value): bool` in the abstract class to throw from here with the real value?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-03T08:03:02Z
+
+@fancyweb not sure i follow, the passed message still applies to numeric values. We get a different message/violation for type errors, like any other constraint does.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-09-03T08:10:26Z
+
+What I mean is that if my constraint is `@DivisibleBy("+10 days")` on a `\DateTime` value (totally not logical but still possible), the error message will be `Expected argument of type "numeric", "\DateTime" given` while I never provided a `\DateTime` instance in the first place. It was converted in the `AbstractComparisonValidator` class. The goal would be to have a better message with the initial passed value. Might not worth it though.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-03T09:13:26Z
+
+i see, IMHO that's a side effect we can live with yes.

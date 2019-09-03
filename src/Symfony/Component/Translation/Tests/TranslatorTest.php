@@ -491,6 +491,19 @@ class TranslatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testTransNullId()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => 'foofoo'], 'en');
+
+        $this->assertSame('', $translator->trans(null));
+
+        (\Closure::bind(function () use ($translator) {
+            $this->assertSame([], $translator->catalogues);
+        }, $this, Translator::class))();
+    }
+
     public function getTransFileTests()
     {
         return [
@@ -512,6 +525,7 @@ class TranslatorTest extends TestCase
             ['Symfony est super !', 'Symfony is great!', 'Symfony est super !', [], 'fr', ''],
             ['Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', ''],
             ['Symfony est super !', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', ''],
+            ['', null, '', [], 'fr', ''],
         ];
     }
 

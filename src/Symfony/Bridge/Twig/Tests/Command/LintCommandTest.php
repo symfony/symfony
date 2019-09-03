@@ -66,9 +66,18 @@ class LintCommandTest extends TestCase
         $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
+    public function testLintDefaultPaths()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute([], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        self::assertStringContainsString('OK in', trim($tester->getDisplay()));
+    }
+
     private function createCommandTester(): CommandTester
     {
-        $command = new LintCommand(new Environment(new FilesystemLoader()));
+        $command = new LintCommand(new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/')));
 
         $application = new Application();
         $application->add($command);

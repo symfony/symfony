@@ -15,6 +15,8 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\ResponseStream;
+use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -122,6 +124,41 @@ class MockHttpClientTest extends HttpClientTestCase
                 $body = ['<1>', '', '<2>'];
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
+
+            case 'testInformationalResponseStream':
+                $client = $this->createMock(HttpClientInterface::class);
+                $response = new MockResponse('Here the body', ['response_headers' => [
+                    'HTTP/1.1 103 ',
+                    'Link: </style.css>; rel=preload; as=style',
+                    'HTTP/1.1 200 ',
+                    'Date: foo',
+                    'Content-Length: 13',
+                ]]);
+                $client->method('request')->willReturn($response);
+                $client->method('stream')->willReturn(new ResponseStream((function () use ($response) {
+                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk->method('getInformationalStatus')
+                        ->willReturn([103, ['link' => ['</style.css>; rel=preload; as=style', '</script.js>; rel=preload; as=script']]]);
+
+                    yield $response => $chunk;
+
+                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk->method('isFirst')->willReturn(true);
+
+                    yield $response => $chunk;
+
+                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk->method('getContent')->willReturn('Here the body');
+
+                    yield $response => $chunk;
+
+                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk->method('isLast')->willReturn(true);
+
+                    yield $response => $chunk;
+                })()));
+
+                return $client;
         }
 
         return new MockHttpClient($responses);

@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Response;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
+use Symfony\Component\HttpClient\Chunk\InformationalChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -311,8 +312,11 @@ final class CurlResponse implements ResponseInterface
             return \strlen($data);
         }
 
-        // End of headers: handle redirects and add to the activity list
+        // End of headers: handle informational responses, redirects, etc.
+
         if (200 > $statusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE)) {
+            $multi->handlesActivity[$id][] = new InformationalChunk($statusCode, $headers);
+
             return \strlen($data);
         }
 
@@ -339,7 +343,7 @@ final class CurlResponse implements ResponseInterface
 
         if ($statusCode < 300 || 400 <= $statusCode || curl_getinfo($ch, CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {
             // Headers and redirects completed, time to get the response's body
-            $multi->handlesActivity[$id] = [new FirstChunk()];
+            $multi->handlesActivity[$id][] = new FirstChunk();
 
             if ('destruct' === $waitFor) {
                 return 0;

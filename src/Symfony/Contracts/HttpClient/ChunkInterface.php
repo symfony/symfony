@@ -48,6 +48,13 @@ interface ChunkInterface
     public function isLast(): bool;
 
     /**
+     * Returns a [status code, headers] tuple when a 1xx status code was just received.
+     *
+     * @throws TransportExceptionInterface on a network error or when the idle timeout is reached
+     */
+    public function getInformationalStatus(): ?array;
+
+    /**
      * Returns the content of the response chunk.
      *
      * @throws TransportExceptionInterface on a network error or when the idle timeout is reached

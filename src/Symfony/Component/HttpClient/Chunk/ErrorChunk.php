@@ -68,6 +68,15 @@ class ErrorChunk implements ChunkInterface
     /**
      * {@inheritdoc}
      */
+    public function getInformationalStatus(): ?array
+    {
+        $this->didThrow = true;
+        throw new TransportException($this->errorMessage, 0, $this->error);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getContent(): string
     {
         $this->didThrow = true;

@@ -23,6 +23,7 @@ use Symfony\Component\Finder\Finder;
 use Twig\Environment;
 use Twig\Error\Error;
 use Twig\Loader\ArrayLoader;
+use Twig\Loader\FilesystemLoader;
 use Twig\Source;
 
 /**
@@ -78,16 +79,27 @@ EOF
         $filenames = $input->getArgument('filename');
 
         if (0 === \count($filenames)) {
-            if (0 !== ftell(STDIN)) {
+            if (0 === ftell(STDIN)) {
+                $template = '';
+                while (!feof(STDIN)) {
+                    $template .= fread(STDIN, 1024);
+                }
+
+                return $this->display($input, $output, $io, [$this->validate($template, uniqid('sf_', true))]);
+            }
+
+            $loader = $this->twig->getLoader();
+            if ($loader instanceof FilesystemLoader) {
+                $paths = [];
+                foreach ($loader->getNamespaces() as $namespace) {
+                    $paths[] = $loader->getPaths($namespace);
+                }
+                $filenames = array_merge(...$paths);
+            }
+
+            if (0 === \count($filenames)) {
                 throw new RuntimeException('Please provide a filename or pipe template content to STDIN.');
             }
-
-            $template = '';
-            while (!feof(STDIN)) {
-                $template .= fread(STDIN, 1024);
-            }
-
-            return $this->display($input, $output, $io, [$this->validate($template, uniqid('sf_', true))]);
         }
 
         $filesInfo = $this->getFilesInfo($filenames);

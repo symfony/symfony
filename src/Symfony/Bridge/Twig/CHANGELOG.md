@@ -14,6 +14,7 @@ CHANGELOG
  * marked all classes extending twig as `@final`
  * deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
    `DebugCommand::__construct()` method, swap the variables position.
+ * the `LintCommand` lints all the templates stored in all configured Twig paths if none argument is provided
 
 4.3.0
 -----

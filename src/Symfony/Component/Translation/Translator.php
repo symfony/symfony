@@ -189,11 +189,14 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
+        if ('' === $id = (string) $id) {
+            return '';
+        }
+
         if (null === $domain) {
             $domain = 'messages';
         }
 
-        $id = (string) $id;
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();
         while (!$catalogue->defines($id, $domain)) {

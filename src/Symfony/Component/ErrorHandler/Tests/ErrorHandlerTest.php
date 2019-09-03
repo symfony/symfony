@@ -557,6 +557,18 @@ class ErrorHandlerTest extends TestCase
         $handler->handleException(new \Exception());
     }
 
+    public function testSendPhpResponse()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler([$handler, 'sendPhpResponse']);
+
+        ob_start();
+        $handler->handleException(new \RuntimeException('Class Foo not found'));
+        $response = ob_get_clean();
+
+        self::assertStringContainsString('Class Foo not found', $response);
+    }
+
     /**
      * @dataProvider errorHandlerWhenLoggingProvider
      */

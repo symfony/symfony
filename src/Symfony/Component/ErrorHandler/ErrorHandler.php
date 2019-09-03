@@ -592,7 +592,11 @@ class ErrorHandler
             }
         }
         $exceptionHandler = $this->exceptionHandler;
-        $this->exceptionHandler = null;
+        if ((!\is_array($exceptionHandler) || !$exceptionHandler[0] instanceof self || 'sendPhpResponse' !== $exceptionHandler[1]) && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+            $this->exceptionHandler = [$this, 'sendPhpResponse'];
+        } else {
+            $this->exceptionHandler = null;
+        }
         try {
             if (null !== $exceptionHandler) {
                 return $exceptionHandler($exception);
@@ -696,18 +700,28 @@ class ErrorHandler
     private function sendPhpResponse(\Throwable $exception)
     {
         $charset = ini_get('default_charset') ?: 'UTF-8';
-
-        if (!headers_sent()) {
-            header('HTTP/1.0 500');
-            header(sprintf('Content-Type: text/html; charset=%s', $charset));
-        }
+        $statusCode = 500;
+        $headers = [];
 
         if (class_exists(HtmlErrorRenderer::class)) {
-            echo (new HtmlErrorRenderer(true))->render(FlattenException::createFromThrowable($exception));
+            $exception = FlattenException::createFromThrowable($exception);
+            $statusCode = $exception->getStatusCode();
+            $headers = $exception->getHeaders();
+            $response = (new HtmlErrorRenderer(true))->render($exception);
         } else {
             $message = htmlspecialchars($exception->getMessage(), ENT_COMPAT | ENT_SUBSTITUTE, $charset);
-            echo sprintf('<!DOCTYPE html><html><head><meta charset="%s" /><meta name="robots" content="noindex,nofollow" /></head><body>%s</body></html>', $charset, $message);
+            $response = sprintf('<!DOCTYPE html><html><head><meta charset="%s" /><meta name="robots" content="noindex,nofollow" /></head><body>%s</body></html>', $charset, $message);
         }
+
+        if (!headers_sent()) {
+            header(sprintf('HTTP/1.0 %s', $statusCode));
+            foreach ($headers as $name => $value) {
+                header($name.': '.$value, false);
+            }
+            header('Content-Type: text/html; charset='.$charset);
+        }
+
+        echo $response;
     }
 
     /**

@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpClient\Internal;
 use Symfony\Component\HttpClient\Response\CurlResponse;
 
 /**
- * A pushed response with headers.
+ * A pushed response with its request headers.
  *
  * @author Alexander M. Turek <me@derrabus.de>
  *
@@ -22,15 +22,17 @@ use Symfony\Component\HttpClient\Response\CurlResponse;
  */
 final class PushedResponse
 {
-    /** @var CurlResponse */
     public $response;
 
     /** @var string[] */
-    public $headers;
+    public $requestHeaders;
 
-    public function __construct(CurlResponse $response, array $headers)
+    public $parentOptions = [];
+
+    public function __construct(CurlResponse $response, array $requestHeaders, array $parentOptions)
     {
         $this->response = $response;
-        $this->headers = $headers;
+        $this->requestHeaders = $requestHeaders;
+        $this->parentOptions = $parentOptions;
     }
 }

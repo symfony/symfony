@@ -120,9 +120,6 @@ final class CurlResponse implements ResponseInterface
 
             if (\in_array($waitFor, ['headers', 'destruct'], true)) {
                 try {
-                    if (\defined('CURLOPT_STREAM_WEIGHT')) {
-                        curl_setopt($ch, CURLOPT_STREAM_WEIGHT, 32);
-                    }
                     self::stream([$response])->current();
                 } catch (\Throwable $e) {
                     // Persist timeouts thrown during initialization
@@ -140,7 +137,7 @@ final class CurlResponse implements ResponseInterface
         };
 
         // Schedule the request in a non-blocking way
-        $multi->openHandles[$id] = $ch;
+        $multi->openHandles[$id] = [$ch, $options];
         curl_multi_add_handle($multi->handle, $ch);
         self::perform($multi);
     }

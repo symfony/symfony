@@ -1345,6 +1345,6 @@ class ClassThatInheritCrawler extends Crawler
      */
     public function children()
     {
-        parent::children();
+        return parent::children();
     }
 }

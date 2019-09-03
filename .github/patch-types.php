@@ -42,4 +42,4 @@ foreach ($loader->getClassMap() as $class => $file) {
     class_exists($class);
 }
 
-Symfony\Component\ErrorHandler\DebugClassLoader::disable();
+Symfony\Component\ErrorHandler\DebugClassLoader::checkClasses();

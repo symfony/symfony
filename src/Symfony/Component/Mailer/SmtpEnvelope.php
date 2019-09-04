@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer;
 
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
 
@@ -34,6 +35,10 @@ class SmtpEnvelope
 
     public static function create(RawMessage $message): self
     {
+        if (RawMessage::class === \get_class($message)) {
+            throw new LogicException('Cannot send a RawMessage instance without an explicit Envelope.');
+        }
+
         return new DelayedSmtpEnvelope($message);
     }
 

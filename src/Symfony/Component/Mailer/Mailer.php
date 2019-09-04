@@ -12,7 +12,6 @@
 namespace Symfony\Component\Mailer;
 
 use Symfony\Component\Mailer\Event\MessageEvent;
-use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -45,15 +44,7 @@ final class Mailer implements MailerInterface
 
         if (null !== $this->dispatcher) {
             $message = clone $message;
-            if (null !== $envelope) {
-                $envelope = clone $envelope;
-            } else {
-                try {
-                    $envelope = new DelayedSmtpEnvelope($message);
-                } catch (\Exception $e) {
-                    throw new TransportException('Cannot send message without a valid envelope.', 0, $e);
-                }
-            }
+            $envelope = null !== $envelope ? clone $envelope : SmtpEnvelope::create($message);
             $event = new MessageEvent($message, $envelope, (string) $this->transport, true);
             $this->dispatcher->dispatch($event);
         }

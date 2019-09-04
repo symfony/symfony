@@ -47,7 +47,7 @@ final class DelayedSmtpEnvelope extends SmtpEnvelope
             return parent::getSender();
         }
 
-        return new Address(self::getSenderFromHeaders($this->message->getHeaders())->getAddress());
+        return self::getSenderFromHeaders($this->message->getHeaders());
     }
 
     public function setRecipients(array $recipients): void
@@ -75,7 +75,7 @@ final class DelayedSmtpEnvelope extends SmtpEnvelope
         foreach (['to', 'cc', 'bcc'] as $name) {
             foreach ($headers->all($name) as $header) {
                 foreach ($header->getAddresses() as $address) {
-                    $recipients[] = new Address($address->getAddress());
+                    $recipients[] = $address;
                 }
             }
         }

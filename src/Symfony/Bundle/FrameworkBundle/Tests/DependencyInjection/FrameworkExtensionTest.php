@@ -908,8 +908,8 @@ abstract class FrameworkExtensionTest extends TestCase
         }
         $this->assertSame('addMethodMapping', $calls[++$i][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[$i][1]);
-        $this->assertSame('setMetadataCache', $calls[++$i][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.symfony')], $calls[$i][1]);
+        $this->assertSame('setMappingCache', $calls[++$i][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);
     }
 
     public function testValidationService()
@@ -951,8 +951,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals([new Reference('annotation_reader')], $calls[4][1]);
         $this->assertSame('addMethodMapping', $calls[5][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[5][1]);
-        $this->assertSame('setMetadataCache', $calls[6][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.symfony')], $calls[6][1]);
+        $this->assertSame('setMappingCache', $calls[6][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[6][1]);
         // no cache this time
     }
 
@@ -973,8 +973,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('enableAnnotationMapping', $calls[5][0]);
         $this->assertSame('addMethodMapping', $calls[6][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
-        $this->assertSame('setMetadataCache', $calls[7][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.symfony')], $calls[7][1]);
+        $this->assertSame('setMappingCache', $calls[7][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
 
         $xmlMappings = $calls[3][1][0];
         $this->assertCount(3, $xmlMappings);
@@ -1033,8 +1033,8 @@ abstract class FrameworkExtensionTest extends TestCase
         if ($annotations) {
             $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
         }
-        $this->assertSame('setMetadataCache', $calls[++$i][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.symfony')], $calls[$i][1]);
+        $this->assertSame('setMappingCache', $calls[++$i][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);
         // no cache, no annotations, no static methods
     }
 

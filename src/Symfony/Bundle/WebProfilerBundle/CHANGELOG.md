@@ -18,6 +18,7 @@ CHANGELOG
  * deprecated the `ExceptionController` in favor of `ExceptionPanelController`
  * marked all classes of the WebProfilerBundle as internal
  * added a section with the stamps of a message after it is dispatched in the Messenger panel
+ * added the template used in the toolbar
 
 4.3.0
 -----

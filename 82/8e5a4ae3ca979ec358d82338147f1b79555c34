@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-08-30T09:51:05Z
+
+The build failure is unrelated to the changes.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-08-30T12:32:43Z
+
+I found some more places. Ready to be reviewed now.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2019-08-30T13:03:35Z
+
+As `Address` is an immutable object, it should be better to use those as-is instead of creating new instances.
+
+Moreover, we are lacking some escaping to flawlessly use addresses names in email headers.
+
+AFAIK, commas and double quotes have to be escaped.
+
+I use the following code in my project which ATM use the official postmark client:
+```php
+        $name = preg_replace('/"/u', '\"', $name);
+        if (preg_match('/,/u', $name)) {
+            $name = sprintf('"%s"', $name);
+        }
+```
+
+I quickly looked at RFC, but address grammar can be found in https://tools.ietf.org/html/rfc2822#section-3.4.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-03T16:45:27Z
+
+I think this one needs to be rebased on 4.3 as this is a bug fix, right? @xabbuh Can you rebase?

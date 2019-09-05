@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-22T13:02:59Z
+
+I'm introducing here a default exception controller that will use the error rendering mechanism. If you've a completely different error rendering system you'll can to replace the default controller configuring it on `framework.error_controller` and done.
+
+That possibility is available with TwigBundle installed (deprecated here), now it'll be possible with FrameworkBundle only.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-24T12:39:10Z
+
+**Update**
+
+As there are two exception listeners when FrameworkBundle and TwigBundle are enabled, I've removed one conditionally: the `twig.exception_listener` service unless the option `twig.exception_listener.controller` contains a custom exception controller configured, in that case, I remove the `exception_listener` instead.
+
+This will be the migration path:
+```diff
+twig:
+-    exception_controller: 'App\Controller\ExceptionController'
++    exception_controller: null
+
+framework:
++    error_controller: 'App\Controller\ExceptionController'
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-24T12:49:08Z
+
+<del>Btw, with this new implementation we should revert https://github.com/symfony/recipes/pull/640.</del> not after https://github.com/symfony/symfony/pull/33271/commits/5a12b6d646114a2842e34c8226d7fab327eaf267
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-24T12:59:26Z
+
+This is ready for review!

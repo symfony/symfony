@@ -8,6 +8,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @group legacy
  */
 class Psr6CacheTest extends AbstractCacheTest
 {

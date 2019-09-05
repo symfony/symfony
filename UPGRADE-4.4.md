@@ -313,6 +313,8 @@ Validator
    Set it to `true` to keep the current behavior and `false` to reject empty strings.
    In 5.0, it'll become optional and will default to `false`.
  * Overriding the methods `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` without the `void` return-type is deprecated.
+ * deprecated `Symfony\Component\Validator\Mapping\Cache\CacheInterface` and all implementations in favor of PSR-6.
+ * deprecated `ValidatorBuilder::setMetadataCache`, use `ValidatorBuilder::setMappingCache` instead.
 
 WebProfilerBundle
 -----------------

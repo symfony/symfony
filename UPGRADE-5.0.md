@@ -567,6 +567,8 @@ Validator
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
  * Changed the default value of `Length::$allowEmptyString` to `false` and made it optional
  * Added support for PHPUnit 8. A `void` return-type was added to the `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` methods.
+ * The `Symfony\Component\Validator\Mapping\Cache\CacheInterface` and all its implementations have been removed.
+ * The `ValidatorBuilder::setMetadataCache` has been removed, use `ValidatorBuilder::setMappingCache` instead.
 
 WebProfilerBundle
 -----------------

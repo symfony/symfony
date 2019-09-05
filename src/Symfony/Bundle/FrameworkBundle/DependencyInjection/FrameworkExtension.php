@@ -1288,7 +1288,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!$container->getParameter('kernel.debug')) {
-            $validatorBuilder->addMethodCall('setMetadataCache', [new Reference('validator.mapping.cache.symfony')]);
+            $validatorBuilder->addMethodCall('setMappingCache', [new Reference('validator.mapping.cache.adapter')]);
         }
 
         $container->setParameter('validator.auto_mapping', $config['auto_mapping']);

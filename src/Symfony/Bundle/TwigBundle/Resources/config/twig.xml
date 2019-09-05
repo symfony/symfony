@@ -117,27 +117,6 @@
             <argument type="service" id="workflow.registry" />
         </service>
 
-        <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
-            <tag name="kernel.event_subscriber" />
-            <tag name="monolog.logger" channel="request" />
-            <argument>%twig.exception_listener.controller%</argument>
-            <argument type="service" id="logger" on-invalid="null" />
-            <argument>%kernel.debug%</argument>
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4.</deprecated>
-        </service>
-
-        <service id="twig.controller.exception" class="Symfony\Bundle\TwigBundle\Controller\ExceptionController" public="true">
-            <argument type="service" id="twig" />
-            <argument>%kernel.debug%</argument>
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4.</deprecated>
-        </service>
-
-        <service id="twig.controller.preview_error" class="Symfony\Bundle\TwigBundle\Controller\PreviewErrorController" public="true">
-            <argument type="service" id="http_kernel" />
-            <argument>%twig.exception_listener.controller%</argument>
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4.</deprecated>
-        </service>
-
         <service id="twig.configurator.environment" class="Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator">
             <argument /> <!-- date format, set in TwigExtension -->
             <argument /> <!-- interval format, set in TwigExtension -->

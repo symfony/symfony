@@ -29,6 +29,8 @@ class SentMessage
      */
     public function __construct(RawMessage $message, SmtpEnvelope $envelope)
     {
+        $message->ensureValidity();
+
         $this->raw = $message instanceof Message ? new RawMessage($message->toIterable()) : $message;
         $this->original = $message;
         $this->envelope = $envelope;

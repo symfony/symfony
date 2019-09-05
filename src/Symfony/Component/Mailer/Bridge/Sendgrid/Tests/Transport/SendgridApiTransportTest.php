@@ -50,7 +50,8 @@ class SendgridApiTransportTest extends TestCase
         $email = new Email();
         $email->from('foo@example.com')
             ->to('bar@example.com')
-            ->bcc('baz@example.com');
+            ->bcc('baz@example.com')
+            ->text('content');
 
         $response = $this->createMock(ResponseInterface::class);
 
@@ -74,14 +75,15 @@ class SendgridApiTransportTest extends TestCase
                         ],
                     ],
                     'from' => ['email' => 'foo@example.com'],
-                    'content' => [],
+                    'content' => [
+                        ['type' => 'text/plain', 'value' => 'content'],
+                    ],
                 ],
                 'auth_bearer' => 'foo',
             ])
             ->willReturn($response);
 
         $mailer = new SendgridApiTransport('foo', $httpClient);
-
         $mailer->send($email);
     }
 }

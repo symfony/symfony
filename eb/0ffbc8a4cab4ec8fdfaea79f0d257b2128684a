@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-04T18:48:30Z
+
+> it'd be great to not use Psr6Cache if possible: we usually try to make the code as close as possible to the target (v5 here)
+
+All right, I've inlined `Psr6Cache` with this PR already.

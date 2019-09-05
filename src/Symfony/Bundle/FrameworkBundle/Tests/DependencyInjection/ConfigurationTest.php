@@ -373,6 +373,7 @@ class ConfigurationTest extends TestCase
                 'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
             ],
+            'error_controller' => 'error_controller',
         ];
     }
 }

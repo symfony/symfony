@@ -134,6 +134,7 @@
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%kernel.debug%</argument>
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4.</deprecated>
         </service>
 
         <service id="twig.controller.exception" class="Symfony\Bundle\TwigBundle\Controller\ExceptionController" public="true">
@@ -145,7 +146,7 @@
         <service id="twig.controller.preview_error" class="Symfony\Bundle\TwigBundle\Controller\PreviewErrorController" public="true">
             <argument type="service" id="http_kernel" />
             <argument>%twig.exception_listener.controller%</argument>
-            <argument type="service" id="error_renderer" on-invalid="null" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4.</deprecated>
         </service>
 
         <service id="twig.configurator.environment" class="Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator">

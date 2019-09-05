@@ -13,7 +13,7 @@
         <service id="mailer" alias="mailer.mailer" />
         <service id="Symfony\Component\Mailer\MailerInterface" alias="mailer.mailer" />
 
-        <service id="mailer.transports" class="Symfony\Component\Mailer\Transports">
+        <service id="mailer.transports" class="Symfony\Component\Mailer\Transport\Transports">
             <factory service="mailer.transport_factory" method="fromStrings" />
             <argument type="collection" /> <!-- transports -->
         </service>

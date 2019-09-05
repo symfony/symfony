@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mime\Address;
@@ -45,5 +46,13 @@ class AbstractTransportTest extends TestCase
         $this->assertEqualsWithDelta(0, time() - $start, 1);
         $transport->send($message, $envelope);
         $this->assertEqualsWithDelta(0, time() - $start, 1);
+    }
+
+    public function testSendingRawMessages()
+    {
+        $this->expectException(LogicException::class);
+
+        $transport = new NullTransport();
+        $transport->send(new RawMessage('Some raw email message'));
     }
 }

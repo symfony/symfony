@@ -41,7 +41,7 @@ abstract class AbstractStream
         $bytesToWrite = \strlen($bytes);
         $totalBytesWritten = 0;
         while ($totalBytesWritten < $bytesToWrite) {
-            $bytesWritten = fwrite($this->in, substr($bytes, $totalBytesWritten));
+            $bytesWritten = @fwrite($this->in, substr($bytes, $totalBytesWritten));
             if (false === $bytesWritten || 0 === $bytesWritten) {
                 throw new TransportException('Unable to write bytes on the wire.');
             }

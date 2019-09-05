@@ -40,6 +40,7 @@
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
         <xsd:attribute name="test" type="xsd:boolean" />
+        <xsd:attribute name="error-controller" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form">

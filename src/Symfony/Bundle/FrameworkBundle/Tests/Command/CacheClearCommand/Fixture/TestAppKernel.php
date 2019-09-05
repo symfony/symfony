@@ -38,7 +38,7 @@ class TestAppKernel extends Kernel
 
     public function setAnnotatedClassCache(array $annotatedClasses)
     {
-        $annotatedClasses = array_diff($annotatedClasses, ['Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController', 'Symfony\Bundle\TwigBundle\Controller\ExceptionController']);
+        $annotatedClasses = array_diff($annotatedClasses, ['Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController', 'Symfony\Bundle\TwigBundle\Controller\ExceptionController', 'Symfony\Bundle\TwigBundle\Controller\PreviewErrorController']);
 
         parent::setAnnotatedClassCache($annotatedClasses);
     }

@@ -201,6 +201,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.http_method_override', $config['http_method_override']);
         $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
+        $container->setParameter('kernel.error_controller', $config['error_controller']);
 
         if (!$container->hasParameter('debug.file_link_format')) {
             $links = [
@@ -1136,7 +1137,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!$container->getParameter('kernel.debug')) {
-            $validatorBuilder->addMethodCall('setMetadataCache', [new Reference('validator.mapping.cache.symfony')]);
+            $validatorBuilder->addMethodCall('setMappingCache', [new Reference('validator.mapping.cache.adapter')]);
         }
 
         $container->setParameter('validator.auto_mapping', $config['auto_mapping']);

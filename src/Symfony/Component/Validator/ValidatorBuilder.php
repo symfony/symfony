@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -60,9 +61,9 @@ class ValidatorBuilder
     private $validatorFactory;
 
     /**
-     * @var CacheInterface|null
+     * @var CacheItemPoolInterface|null
      */
-    private $metadataCache;
+    private $mappingCache;
 
     /**
      * @var TranslatorInterface|null
@@ -261,13 +262,13 @@ class ValidatorBuilder
      *
      * @return $this
      */
-    public function setMetadataCache(CacheInterface $cache)
+    public function setMappingCache(CacheItemPoolInterface $cache)
     {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot set a custom metadata cache after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+        $this->mappingCache = $cache;
 
-        $this->metadataCache = $cache;
+        if (null !== $this->metadataFactory) {
+            throw new ValidatorException('You cannot set a custom mapping cache after setting a custom metadata factory. Configure your metadata factory instead.');
+        }
 
         return $this;
     }
@@ -367,7 +368,7 @@ class ValidatorBuilder
                 $loader = $loaders[0];
             }
 
-            $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->metadataCache);
+            $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->mappingCache);
         }
 
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();

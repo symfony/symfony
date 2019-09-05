@@ -16,14 +16,19 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\ErrorHandler\ErrorHandler;
+<<<<<<< HEAD
 use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException;
+=======
+use Symfony\Component\EventDispatcher\Event;
+>>>>>>> 4.4
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+<<<<<<< HEAD
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+=======
+>>>>>>> 4.4
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -43,8 +48,6 @@ class DebugHandlersListener implements EventSubscriberInterface
     private $scream;
     private $fileLinkFormat;
     private $scope;
-    private $charset;
-    private $errorRenderer;
     private $firstCall = true;
     private $hasTerminatedWithException;
 
@@ -56,7 +59,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param string|FileLinkFormatter|null $fileLinkFormat   The format for links to source files
      * @param bool                          $scope            Enables/disables scoping mode
      */
-    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, ?int $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true, string $charset = null, ErrorRenderer $errorRenderer = null)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, ?int $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
@@ -65,8 +68,6 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->scream = $scream;
         $this->fileLinkFormat = $fileLinkFormat;
         $this->scope = $scope;
-        $this->charset = $charset;
-        $this->errorRenderer = $errorRenderer;
     }
 
     /**
@@ -141,30 +142,6 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
     }
 
-    public function onKernelException(ExceptionEvent $event)
-    {
-        if (!$this->hasTerminatedWithException || !$event->isMasterRequest()) {
-            return;
-        }
-
-        $debug = $this->scream && $this->scope;
-        $controller = function (Request $request) use ($debug) {
-            if (null === $this->errorRenderer) {
-                $this->errorRenderer = new ErrorRenderer([new HtmlErrorRenderer($debug, $this->charset, $this->fileLinkFormat)]);
-            }
-
-            $e = $request->attributes->get('exception');
-
-            try {
-                return new Response($this->errorRenderer->render($e, $request->getPreferredFormat()), $e->getStatusCode(), $e->getHeaders());
-            } catch (ErrorRendererNotFoundException $_) {
-                return new Response($this->errorRenderer->render($e), $e->getStatusCode(), $e->getHeaders());
-            }
-        };
-
-        (new ExceptionListener($controller, $this->logger, $debug))->onKernelException($event);
-    }
-
     public static function getSubscribedEvents(): array
     {
         $events = [KernelEvents::REQUEST => ['configure', 2048]];
@@ -172,8 +149,6 @@ class DebugHandlersListener implements EventSubscriberInterface
         if ('cli' === \PHP_SAPI && \defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
             $events[ConsoleEvents::COMMAND] = ['configure', 2048];
         }
-
-        $events[KernelEvents::EXCEPTION] = ['onKernelException', -2048];
 
         return $events;
     }

@@ -39,13 +39,14 @@
         </service>
 
         <service id="validator.mapping.cache.symfony" class="Symfony\Component\Validator\Mapping\Cache\Psr6Cache">
-            <argument type="service">
-                <service class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
-                    <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
-                    <argument>%validator.mapping.cache.file%</argument>
-                    <argument type="service" id="cache.validator" />
-                </service>
-            </argument>
+            <argument type="service" id="validator.mapping.cache.adapter" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4. Use validator.mapping.cache.adapter instead.</deprecated>
+        </service>
+
+        <service id="validator.mapping.cache.adapter" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
+            <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
+            <argument>%validator.mapping.cache.file%</argument>
+            <argument type="service" id="cache.validator" />
         </service>
 
         <service id="validator.validator_factory" class="Symfony\Component\Validator\ContainerConstraintValidatorFactory">

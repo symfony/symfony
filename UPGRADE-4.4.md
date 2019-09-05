@@ -217,9 +217,25 @@ TwigBridge
 TwigBundle
 ----------
 
- * Deprecated default value `twig.controller.exception::showAction` of the `twig.exception_controller` configuration option, 
-   set it to `null` instead. This will also change the default error response format according to https://tools.ietf.org/html/rfc7807
-   for `json`, `xml`, `atom` and `txt` formats:
+ * Deprecated `twig.exception_controller` configuration option, set it to "null" and use `framework.error_controller` instead:
+ 
+   Before:
+   ```yaml
+   twig:
+       exception_controller: 'App\Controller\MyExceptionController'
+   ```
+   
+   After:
+   ```yaml
+   twig:
+       exception_controller: null
+
+   framework:
+       error_controller: 'App\Controller\MyExceptionController'
+   ```
+ 
+   The new default exception controller will also change the error response content according to 
+   https://tools.ietf.org/html/rfc7807 for `json`, `xml`, `atom` and `txt` formats:
    
    Before:
    ```json
@@ -240,7 +256,8 @@ TwigBundle
    }
    ```
    
- * Deprecated the `ExceptionController` and all built-in error templates, use the error renderer mechanism of the `ErrorRenderer` component
+ * Deprecated the `ExceptionController` and `PreviewErrorController` controllers, use `ErrorController` from the HttpKernel component instead
+ * Deprecated all built-in error templates, use the error renderer mechanism of the `ErrorRenderer` component
  * Deprecated loading custom error templates in non-html formats. Custom HTML error pages based on Twig keep working as before: 
 
    Before (`templates/bundles/TwigBundle/Exception/error.jsonld.twig`):
@@ -296,6 +313,8 @@ Validator
    Set it to `true` to keep the current behavior and `false` to reject empty strings.
    In 5.0, it'll become optional and will default to `false`.
  * Overriding the methods `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` without the `void` return-type is deprecated.
+ * deprecated `Symfony\Component\Validator\Mapping\Cache\CacheInterface` and all implementations in favor of PSR-6.
+ * deprecated `ValidatorBuilder::setMetadataCache`, use `ValidatorBuilder::setMappingCache` instead.
 
 WebProfilerBundle
 -----------------

@@ -14,10 +14,14 @@ namespace Symfony\Component\Validator\Mapping\Cache;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4.', Psr6Cache::class), E_USER_DEPRECATED);
+
 /**
  * PSR-6 adapter.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since Symfony 4.4.
  */
 class Psr6Cache implements CacheInterface
 {

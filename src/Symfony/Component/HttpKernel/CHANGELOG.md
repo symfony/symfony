@@ -39,6 +39,7 @@ CHANGELOG
    current directory or with a glob pattern. The fallback directories have never been advocated
    so you likely do not use those in any app based on the SF Standard or Flex edition.
  * Marked all dispatched event classes as `@final`
+ * Added `ErrorController` to enable the preview and error rendering mechanism
 
 4.3.0
 -----

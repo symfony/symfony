@@ -165,9 +165,9 @@ class SmtpTransport extends AbstractTransport
     {
         try {
             $envelope = $message->getEnvelope();
-            $this->doMailFromCommand($envelope->getSender()->toString());
+            $this->doMailFromCommand($envelope->getSender()->getAddress());
             foreach ($envelope->getRecipients() as $recipient) {
-                $this->doRcptToCommand($recipient->toString());
+                $this->doRcptToCommand($recipient->getAddress());
             }
 
             $this->executeCommand("DATA\r\n", [354]);

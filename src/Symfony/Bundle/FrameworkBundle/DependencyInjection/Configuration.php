@@ -83,6 +83,9 @@ class Configuration implements ConfigurationInterface
                     ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                     ->prototype('scalar')->end()
                 ->end()
+                ->scalarNode('error_controller')
+                    ->defaultValue('error_controller')
+                ->end()
             ->end()
         ;
 

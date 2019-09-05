@@ -38,11 +38,6 @@
             <tag name="kernel.cache_warmer" />
         </service>
 
-        <service id="validator.mapping.cache.symfony" class="Symfony\Component\Validator\Mapping\Cache\Psr6Cache">
-            <argument type="service" id="validator.mapping.cache.adapter" />
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4. Use validator.mapping.cache.adapter instead.</deprecated>
-        </service>
-
         <service id="validator.mapping.cache.adapter" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
             <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
             <argument>%validator.mapping.cache.file%</argument>

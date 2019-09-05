@@ -16,19 +16,8 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-<<<<<<< HEAD
-use Symfony\Component\ErrorRenderer\ErrorRenderer;
-use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException;
-=======
-use Symfony\Component\EventDispatcher\Event;
->>>>>>> 4.4
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
-<<<<<<< HEAD
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-=======
->>>>>>> 4.4
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 

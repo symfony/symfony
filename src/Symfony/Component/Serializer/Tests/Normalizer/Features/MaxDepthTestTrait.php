@@ -4,6 +4,8 @@ namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummyChild1;
+use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummyChild2;
 
 /**
  * Covers AbstractObjectNormalizer::ENABLE_MAX_DEPTH and AbstractObjectNormalizer::MAX_DEPTH_HANDLER.
@@ -30,6 +32,49 @@ trait MaxDepthTestTrait
         $level4 = new MaxDepthDummy();
         $level4->bar = 'level4';
         $level3->child = $level4;
+
+        $result = $normalizer->normalize($level1, null, ['enable_max_depth' => true]);
+
+        $expected = [
+            'bar' => 'level1',
+            'child' => [
+                'bar' => 'level2',
+                'child' => [
+                    'bar' => 'level3',
+                    'child' => [
+                        'child' => null,
+                    ],
+                ],
+                'foo' => null,
+            ],
+            'foo' => null,
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testMaxDepthWithDifferentClasses()
+    {
+        $normalizer = $this->getNormalizerForMaxDepth();
+
+        $level1 = new MaxDepthDummy();
+        $level1->bar = 'level1';
+
+        $level2 = new MaxDepthDummyChild1();
+        $level2->bar = 'level2';
+        $level1->child = $level2;
+
+        $level3 = new MaxDepthDummyChild2();
+        $level3->bar = 'level3';
+        $level2->child = $level3;
+
+        $level4 = new MaxDepthDummyChild1();
+        $level4->bar = 'level4';
+        $level3->child = $level4;
+
+        $level5 = new MaxDepthDummyChild2();
+        $level5->bar = 'level5';
+        $level4->child = $level5;
 
         $result = $normalizer->normalize($level1, null, ['enable_max_depth' => true]);
 

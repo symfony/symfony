@@ -143,6 +143,13 @@ final class User implements UserInterface, EquatableInterface, AdvancedUserInter
             return false;
         }
 
+        $currentRoles = array_map('strval', (array) $this->getRoles());
+        $newRoles = array_map('strval', (array) $user->getRoles());
+        $rolesChanged = \count($currentRoles) !== \count($newRoles) || \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
+        if ($rolesChanged) {
+            return false;
+        }
+
         if ($this->getUsername() !== $user->getUsername()) {
             return false;
         }

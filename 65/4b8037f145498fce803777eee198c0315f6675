@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-09-06T13:23:12Z
+
+I block this PR: It will need https://github.com/Seldaek/monolog/pull/1374 and a new monolog release
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-09-06T15:01:45Z
+
+Travis failures are not related

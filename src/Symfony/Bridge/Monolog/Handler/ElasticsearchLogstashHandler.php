@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Monolog\Handler;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LogstashFormatter;
 use Monolog\Handler\AbstractHandler;
+use Monolog\Handler\FormattableHandlerTrait;
+use Monolog\Handler\ProcessableHandlerTrait;
 use Monolog\Logger;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;

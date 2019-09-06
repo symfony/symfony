@@ -207,9 +207,6 @@ class ContextListenerTest extends TestCase
     {
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
-        $event = $this->getMockBuilder(ResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $listener = new ContextListener($tokenStorage, [], 'key123', null, $dispatcher);
 
@@ -218,12 +215,7 @@ class ContextListenerTest extends TestCase
             ->method('hasSession')
             ->willReturn(true);
 
-        $event->expects($this->any())
-            ->method('isMasterRequest')
-            ->willReturn(true);
-        $event->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request);
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
 
         $dispatcher->expects($this->once())
             ->method('removeListener')

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class RouteProcessorTest extends TestCase
 {
@@ -28,7 +29,7 @@ class RouteProcessorTest extends TestCase
     {
         $request = $this->mockFilledRequest();
         $processor = new RouteProcessor();
-        $processor->addRouteData($this->mockGetResponseEvent($request));
+        $processor->addRouteData($this->getRequestEvent($request));
 
         $record = $processor(['extra' => []]);
 
@@ -44,7 +45,7 @@ class RouteProcessorTest extends TestCase
     {
         $request = $this->mockFilledRequest();
         $processor = new RouteProcessor(false);
-        $processor->addRouteData($this->mockGetResponseEvent($request));
+        $processor->addRouteData($this->getRequestEvent($request));
 
         $record = $processor(['extra' => []]);
 
@@ -63,8 +64,8 @@ class RouteProcessorTest extends TestCase
         $subRequest = $this->mockFilledRequest($controllerFromSubRequest);
 
         $processor = new RouteProcessor(false);
-        $processor->addRouteData($this->mockGetResponseEvent($mainRequest));
-        $processor->addRouteData($this->mockGetResponseEvent($subRequest));
+        $processor->addRouteData($this->getRequestEvent($mainRequest));
+        $processor->addRouteData($this->getRequestEvent($subRequest, HttpKernelInterface::SUB_REQUEST));
 
         $record = $processor(['extra' => []]);
 
@@ -86,9 +87,9 @@ class RouteProcessorTest extends TestCase
         $subRequest = $this->mockFilledRequest('OtherController::otherMethod');
 
         $processor = new RouteProcessor(false);
-        $processor->addRouteData($this->mockGetResponseEvent($mainRequest));
-        $processor->addRouteData($this->mockGetResponseEvent($subRequest));
-        $processor->removeRouteData($this->mockFinishRequestEvent($subRequest));
+        $processor->addRouteData($this->getRequestEvent($mainRequest));
+        $processor->addRouteData($this->getRequestEvent($subRequest, HttpKernelInterface::SUB_REQUEST));
+        $processor->removeRouteData($this->getFinishRequestEvent($subRequest));
         $record = $processor(['extra' => []]);
 
         $this->assertArrayHasKey('requests', $record['extra']);
@@ -98,7 +99,7 @@ class RouteProcessorTest extends TestCase
             $record['extra']['requests'][0]
         );
 
-        $processor->removeRouteData($this->mockFinishRequestEvent($mainRequest));
+        $processor->removeRouteData($this->getFinishRequestEvent($mainRequest));
         $record = $processor(['extra' => []]);
 
         $this->assertArrayNotHasKey('requests', $record['extra']);
@@ -108,7 +109,7 @@ class RouteProcessorTest extends TestCase
     {
         $request = $this->mockEmptyRequest();
         $processor = new RouteProcessor();
-        $processor->addRouteData($this->mockGetResponseEvent($request));
+        $processor->addRouteData($this->getRequestEvent($request));
 
         $record = $processor(['extra' => []]);
         $this->assertEquals(['extra' => []], $record);
@@ -122,20 +123,14 @@ class RouteProcessorTest extends TestCase
         $this->assertEquals(['extra' => []], $record);
     }
 
-    private function mockGetResponseEvent(Request $request): RequestEvent
+    private function getRequestEvent(Request $request, int $requestType = HttpKernelInterface::MASTER_REQUEST): RequestEvent
     {
-        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
-        $event->method('getRequest')->willReturn($request);
-
-        return $event;
+        return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, $requestType);
     }
 
-    private function mockFinishRequestEvent(Request $request): FinishRequestEvent
+    private function getFinishRequestEvent(Request $request): FinishRequestEvent
     {
-        $event = $this->getMockBuilder(FinishRequestEvent::class)->disableOriginalConstructor()->getMock();
-        $event->method('getRequest')->willReturn($request);
-
-        return $event;
+        return new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
     }
 
     private function mockEmptyRequest(): Request

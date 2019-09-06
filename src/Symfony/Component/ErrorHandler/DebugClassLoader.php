@@ -374,13 +374,22 @@ class DebugClassLoader
 
     public function checkAnnotations(\ReflectionClass $refl, string $class): array
     {
-        if ('Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV7' === $class || 'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV6' === $class) {
+        if (
+            'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV7' === $class
+            || 'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV6' === $class
+            || 'Test\Symfony\Component\Debug\Tests' === $refl->getNamespaceName()
+        ) {
             return [];
         }
         $deprecations = [];
 
+        $className = isset($class[15]) && "\0" === $class[15] && 0 === strpos($class, "class@anonymous\x00") ? get_parent_class($class).'@anonymous' : $class;
+
         // Don't trigger deprecations for classes in the same vendor
-        if (2 > $vendorLen = 1 + (strpos($class, '\\') ?: strpos($class, '_'))) {
+        if ($class !== $className) {
+            $vendor = preg_match('/^namespace ([^;\\\\\s]++)[;\\\\]/m', @file_get_contents($refl->getFileName()), $vendor) ? $vendor[1].'\\' : '';
+            $vendorLen = \strlen($vendor);
+        } elseif (2 > $vendorLen = 1 + (strpos($class, '\\') ?: strpos($class, '_'))) {
             $vendorLen = 0;
             $vendor = '';
         } else {
@@ -424,7 +433,7 @@ class DebugClassLoader
             }
 
             if (isset(self::$final[$parent])) {
-                $deprecations[] = sprintf('The "%s" class is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $parent, self::$final[$parent], $class);
+                $deprecations[] = sprintf('The "%s" class is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $parent, self::$final[$parent], $className);
             }
         }
 
@@ -437,10 +446,10 @@ class DebugClassLoader
                 $type = class_exists($class, false) ? 'class' : (interface_exists($class, false) ? 'interface' : 'trait');
                 $verb = class_exists($use, false) || interface_exists($class, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
 
-                $deprecations[] = sprintf('The "%s" %s %s "%s" that is deprecated%s.', $class, $type, $verb, $use, self::$deprecated[$use]);
+                $deprecations[] = sprintf('The "%s" %s %s "%s" that is deprecated%s.', $className, $type, $verb, $use, self::$deprecated[$use]);
             }
             if (isset(self::$internal[$use]) && strncmp($vendor, str_replace('_', '\\', $use), $vendorLen)) {
-                $deprecations[] = sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $class);
+                $deprecations[] = sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $className);
             }
             if (isset(self::$method[$use])) {
                 if ($refl->isAbstract()) {
@@ -459,7 +468,7 @@ class DebugClassLoader
                         }
                         $realName = substr($name, 0, strpos($name, '('));
                         if (!$refl->hasMethod($realName) || !($methodRefl = $refl->getMethod($realName))->isPublic() || ($static && !$methodRefl->isStatic()) || (!$static && $methodRefl->isStatic())) {
-                            $deprecations[] = sprintf('Class "%s" should implement method "%s::%s"%s', $class, ($static ? 'static ' : '').$interface, $name, null == $description ? '.' : ': '.$description);
+                            $deprecations[] = sprintf('Class "%s" should implement method "%s::%s"%s', $className, ($static ? 'static ' : '').$interface, $name, null == $description ? '.' : ': '.$description);
                         }
                     }
                 }
@@ -516,13 +525,13 @@ class DebugClassLoader
 
             if ($parent && isset(self::$finalMethods[$parent][$method->name])) {
                 list($declaringClass, $message) = self::$finalMethods[$parent][$method->name];
-                $deprecations[] = sprintf('The "%s::%s()" method is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $declaringClass, $method->name, $message, $class);
+                $deprecations[] = sprintf('The "%s::%s()" method is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $declaringClass, $method->name, $message, $className);
             }
 
             if (isset(self::$internalMethods[$class][$method->name])) {
                 list($declaringClass, $message) = self::$internalMethods[$class][$method->name];
                 if (strncmp($ns, $declaringClass, $len)) {
-                    $deprecations[] = sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $class);
+                    $deprecations[] = sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $className);
                 }
             }
 
@@ -537,7 +546,7 @@ class DebugClassLoader
 
                 foreach (self::$annotatedParameters[$class][$method->name] as $parameterName => $deprecation) {
                     if (!isset($definedParameters[$parameterName]) && !($doc && preg_match("/\\n\\s+\\* @param +((?(?!callable *\().*?|callable *\(.*\).*?))(?<= )\\\${$parameterName}\\b/", $doc))) {
-                        $deprecations[] = sprintf($deprecation, $class);
+                        $deprecations[] = sprintf($deprecation, $className);
                     }
                 }
             }
@@ -575,7 +584,7 @@ class DebugClassLoader
                     if ($canAddReturnType && 'docblock' === ($this->patchTypes['force'] ?? false) && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                     } elseif ('' !== $declaringClass) {
-                        $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $normalizedType, $class);
+                        $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $normalizedType, $className);
                     }
                 }
             }
@@ -632,7 +641,7 @@ class DebugClassLoader
             foreach ($matches as list(, $parameterType, $parameterName)) {
                 if (!isset($definedParameters[$parameterName])) {
                     $parameterType = trim($parameterType);
-                    self::$annotatedParameters[$class][$method->name][$parameterName] = sprintf('The "%%s::%s()" method will require a new "%s$%s" argument in the next major version of its parent class "%s", not defining it is deprecated.', $method->name, $parameterType ? $parameterType.' ' : '', $parameterName, $class);
+                    self::$annotatedParameters[$class][$method->name][$parameterName] = sprintf('The "%%s::%s()" method will require a new "%s$%s" argument in the next major version of its parent class "%s", not defining it is deprecated.', $method->name, $parameterType ? $parameterType.' ' : '', $parameterName, $className);
                 }
             }
         }

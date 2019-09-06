@@ -245,6 +245,10 @@ class SymfonyTestsListenerTrait
 
     public function endTest($test, $time)
     {
+        if (class_exists(DebugClassLoader::class, false)) {
+            DebugClassLoader::checkClasses();
+        }
+
         $className = \get_class($test);
         $groups = Test::getGroups($className, $test->getName(false));
 

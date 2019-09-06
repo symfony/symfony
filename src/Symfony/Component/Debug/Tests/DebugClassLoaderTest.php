@@ -29,20 +29,22 @@ class DebugClassLoaderTest extends TestCase
     protected function setUp(): void
     {
         $this->errorReporting = error_reporting(E_ALL);
-        $this->loader = new ClassLoader();
-        spl_autoload_register([$this->loader, 'loadClass'], true, true);
-        DebugClassLoader::enable();
+        $this->loader = [new DebugClassLoader([new ClassLoader(), 'loadClass']), 'loadClass'];
+        spl_autoload_register($this->loader, true, true);
     }
 
     protected function tearDown(): void
     {
-        DebugClassLoader::disable();
-        spl_autoload_unregister([$this->loader, 'loadClass']);
+        spl_autoload_unregister($this->loader);
         error_reporting($this->errorReporting);
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testIdempotence()
     {
+        DebugClassLoader::enable();
         DebugClassLoader::enable();
 
         $functions = spl_autoload_functions();
@@ -441,7 +443,5 @@ class ClassLoader
             eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsVirtualMagicCall extends \\'.__NAMESPACE__.'\Fixtures\VirtualClassMagicCall implements \\'.__NAMESPACE__.'\Fixtures\VirtualInterface {
             }');
         }
-
-        return null;
     }
 }

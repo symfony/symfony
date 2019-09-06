@@ -207,12 +207,14 @@ Translation
 -----------
 
  * Deprecated support for using `null` as the locale in `Translator`.
+ * Deprecated accepting STDIN implicitly when using the `lint:xliff` command, use `lint:xliff -` (append a dash) instead to make it explicit.
 
 TwigBridge
 ----------
 
  * Deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the
    `DebugCommand::__construct()` method, swap the variables position.
+ * Deprecated accepting STDIN implicitly when using the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
    
 TwigBundle
 ----------
@@ -326,3 +328,8 @@ WebServerBundle
 ---------------
 
  * The bundle is deprecated and will be removed in 5.0.
+ 
+Yaml
+----
+
+* Deprecated accepting STDIN implicitly when using the `lint:yaml` command, use `lint:yaml -` (append a dash) instead to make it explicit.

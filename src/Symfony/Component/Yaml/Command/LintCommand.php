@@ -54,7 +54,7 @@ class LintCommand extends Command
     {
         $this
             ->setDescription('Lints a file and outputs encountered errors')
-            ->addArgument('filename', InputArgument::IS_ARRAY, 'A file or a directory or STDIN')
+            ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->addOption('parse-tags', null, InputOption::VALUE_NONE, 'Parse custom tags')
             ->setHelp(<<<EOF
@@ -86,13 +86,18 @@ EOF
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
         $flags = $input->getOption('parse-tags') ? Yaml::PARSE_CUSTOM_TAGS : 0;
+        $hasStdin = '-' === ($filenames[0] ?? '');
 
-        if (0 === \count($filenames)) {
-            if (!$stdin = $this->getStdin()) {
+        if ($hasStdin || 0 === \count($filenames)) {
+            if (!$hasStdin && 0 !== ftell(STDIN)) { // remove 0 !== ftell(STDIN) check in 5.0
                 throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
 
-            return $this->display($io, [$this->validate($stdin, $flags)]);
+            if (!$hasStdin) {
+                @trigger_error('Calling to the "lint:yaml" command providing pipe file content to STDIN without passing the dash symbol "-" explicitly is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
+            }
+
+            return $this->display($io, [$this->validate($this->getStdin(), $flags)]);
         }
 
         $filesInfo = [];
@@ -199,18 +204,14 @@ EOF
         }
     }
 
-    private function getStdin(): ?string
+    private function getStdin(): string
     {
-        if (0 !== ftell(STDIN)) {
-            return null;
-        }
-
-        $inputs = '';
+        $yaml = '';
         while (!feof(STDIN)) {
-            $inputs .= fread(STDIN, 1024);
+            $yaml .= fread(STDIN, 1024);
         }
 
-        return $inputs;
+        return $yaml;
     }
 
     private function getParser()

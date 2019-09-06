@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added `InvokableEventSubscriberTrait` helper trait for single-event subscription.
+
 4.3.0
 -----
 

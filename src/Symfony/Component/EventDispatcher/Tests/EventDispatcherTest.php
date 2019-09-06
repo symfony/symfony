@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\InvokableEventSubscriberTrait;
+use Symfony\Component\Workflow\Event\LeaveEvent;
 use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
 
 class EventDispatcherTest extends TestCase
@@ -437,6 +439,59 @@ class EventDispatcherTest extends TestCase
         $this->expectExceptionMessage('Argument 1 passed to "Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch()" must be an object, string given.');
         $this->dispatcher->dispatch('foo', new ContractsEvent());
     }
+
+    public function testInvokableEventSubsriberWithoutInvokeMethod()
+    {
+        $this->expectException('ReflectionException');
+        $this->expectExceptionMessage('Method Symfony\Component\EventDispatcher\Tests\TestInvokableEventSubscriberWithoutMethod::__invoke() does not exist');
+        $this->dispatcher->addSubscriber(new TestInvokableEventSubscriberWithoutMethod());
+    }
+
+    public function testInvokableEventSubsriberWithoutParameter()
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The Event name cannot be inferred from "Symfony\Component\EventDispatcher\Tests\TestInvokableEventSubscriberWithoutParameter::__invoke()" method without parameters, you must define one and type-hint the event class.');
+        $this->dispatcher->addSubscriber(new TestInvokableEventSubscriberWithoutParameter());
+    }
+
+    public function testInvokableEventSubsriberWithoutTypeHint()
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The Event name cannot be inferred from "Symfony\Component\EventDispatcher\Tests\TestInvokableEventSubscriberWithoutTypeHint::__invoke()" method without type-hint the "$event" parameter, you must type-hint the event class.');
+        $this->dispatcher->addSubscriber(new TestInvokableEventSubscriberWithoutTypeHint());
+    }
+
+    public function testInvokableEventSubsriberWithoutClassTypeHint()
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('The "$event" parameter defined in "Symfony\Component\EventDispatcher\Tests\TestInvokableEventSubscriberWithoutClassTypeHint::__invoke()" method must be a class, "string" given.');
+        $this->dispatcher->addSubscriber(new TestInvokableEventSubscriberWithoutClassTypeHint());
+    }
+
+    public function testInvokableEventSubsriberWithPriority()
+    {
+        $subscriber = new TestInvokableEventSubscriberWithPriority();
+        $this->dispatcher->addSubscriber($subscriber);
+        $this->assertTrue($this->dispatcher->hasListeners(MyEvent::class));
+        $this->assertSame(32, $this->dispatcher->getListenerPriority(MyEvent::class, [$subscriber, '__invoke']));
+    }
+
+    public function testInvokableEventSubsriberWithCustomEventName()
+    {
+        $subscriber = new TestInvokableEventSubscriberWithCustomEventName();
+        $this->dispatcher->addSubscriber($subscriber);
+        $this->assertTrue($this->dispatcher->hasListeners('workflow.blog_publishing.leave'));
+    }
+
+    public function testInvokableEventSubsriber()
+    {
+        $subscriber = new TestInvokableEventSubscriber();
+        $this->dispatcher->addSubscriber($subscriber);
+        $this->assertTrue($this->dispatcher->hasListeners(MyEvent::class));
+
+        $this->dispatcher->dispatch(new MyEvent());
+        $this->assertTrue($subscriber->invoked);
+    }
 }
 
 class CallableClass
@@ -477,6 +532,76 @@ class TestWithDispatcher
     {
         $this->name = $name;
         $this->dispatcher = $dispatcher;
+    }
+}
+
+class MyEvent extends ContractsEvent
+{
+}
+
+class TestInvokableEventSubscriber implements EventSubscriberInterface
+{
+    use InvokableEventSubscriberTrait;
+
+    public $invoked = false;
+
+    public function __invoke(MyEvent $event): void
+    {
+        $this->invoked = true;
+    }
+}
+
+class TestInvokableEventSubscriberWithoutMethod implements EventSubscriberInterface
+{
+    use InvokableEventSubscriberTrait;
+}
+
+class TestInvokableEventSubscriberWithoutParameter implements EventSubscriberInterface
+{
+    use InvokableEventSubscriberTrait;
+
+    public function __invoke()
+    {
+    }
+}
+
+class TestInvokableEventSubscriberWithoutTypeHint implements EventSubscriberInterface
+{
+    use InvokableEventSubscriberTrait;
+
+    public function __invoke($event)
+    {
+    }
+}
+
+class TestInvokableEventSubscriberWithoutClassTypeHint implements EventSubscriberInterface
+{
+    use InvokableEventSubscriberTrait;
+
+    public function __invoke(string $event)
+    {
+    }
+}
+
+class TestInvokableEventSubscriberWithPriority implements EventSubscriberInterface
+{
+    use InvokableEventSubscriberTrait;
+
+    private static $listenerPriority = 32;
+
+    public function __invoke(MyEvent $event): void
+    {
+    }
+}
+
+class TestInvokableEventSubscriberWithCustomEventName implements EventSubscriberInterface
+{
+    use InvokableEventSubscriberTrait;
+
+    private static $listenerEvent = 'workflow.blog_publishing.leave';
+
+    public function __invoke(LeaveEvent $event): void
+    {
     }
 }
 

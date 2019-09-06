@@ -26,20 +26,22 @@ class DebugClassLoaderTest extends TestCase
     protected function setUp(): void
     {
         $this->errorReporting = error_reporting(E_ALL);
-        $this->loader = new ClassLoader();
-        spl_autoload_register([$this->loader, 'loadClass'], true, true);
-        DebugClassLoader::enable();
+        $this->loader = [new DebugClassLoader([new ClassLoader(), 'loadClass']), 'loadClass'];
+        spl_autoload_register($this->loader, true, true);
     }
 
     protected function tearDown(): void
     {
-        DebugClassLoader::disable();
-        spl_autoload_unregister([$this->loader, 'loadClass']);
+        spl_autoload_unregister($this->loader);
         error_reporting($this->errorReporting);
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testIdempotence()
     {
+        DebugClassLoader::enable();
         DebugClassLoader::enable();
 
         $functions = spl_autoload_functions();
@@ -76,6 +78,7 @@ class DebugClassLoaderTest extends TestCase
     public function testNameCaseMismatch()
     {
         $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Case mismatch between loaded and declared class names');
         class_exists(__NAMESPACE__.'\TestingCaseMismatch', true);
     }
 
@@ -93,6 +96,7 @@ class DebugClassLoaderTest extends TestCase
     public function testPsr4CaseMismatch()
     {
         $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('Case mismatch between loaded and declared class names');
         class_exists(__NAMESPACE__.'\Fixtures\Psr4CaseMismatch', true);
     }
 

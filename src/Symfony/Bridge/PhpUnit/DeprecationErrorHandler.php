@@ -179,7 +179,7 @@ class DeprecationErrorHandler
             return;
         }
 
-        if (method_exists(DebugClassLoader::class, 'checkClasses')) {
+        if (class_exists(DebugClassLoader::class, false)) {
             DebugClassLoader::checkClasses();
         }
         $currErrorHandler = set_error_handler('var_dump');

@@ -12,12 +12,10 @@
 namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
-use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
 
 class AbstractBrowserTest extends TestCase
 {

@@ -388,7 +388,7 @@ class SerializerTest extends TestCase
 
             public function hasMetadataFor($value): bool
             {
-                return $value === AbstractDummy::class;
+                return AbstractDummy::class === $value;
             }
         };
 

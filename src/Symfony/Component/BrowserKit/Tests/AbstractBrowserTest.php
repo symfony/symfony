@@ -20,61 +20,6 @@ use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
 
-class SpecialResponse extends Response
-{
-}
-
-class TestClient extends AbstractBrowser
-{
-    protected $nextResponse = null;
-    protected $nextScript = null;
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    public function setNextScript($script)
-    {
-        $this->nextScript = $script;
-    }
-
-    protected function doRequest($request): Response
-    {
-        if (null === $this->nextResponse) {
-            return new Response();
-        }
-
-        $response = $this->nextResponse;
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    protected function filterResponse($response): Response
-    {
-        if ($response instanceof SpecialResponse) {
-            return new Response($response->getContent(), $response->getStatusCode(), $response->getHeaders());
-        }
-
-        return $response;
-    }
-
-    protected function getScript($request)
-    {
-        $r = new \ReflectionClass('Symfony\Component\BrowserKit\Response');
-        $path = $r->getFileName();
-
-        return <<<EOF
-<?php
-
-require_once('$path');
-
-echo serialize($this->nextScript);
-EOF;
-    }
-}
-
 class AbstractBrowserTest extends TestCase
 {
     public function getBrowser(array $server = [], History $history = null, CookieJar $cookieJar = null)
@@ -158,17 +103,6 @@ class AbstractBrowserTest extends TestCase
     {
         $client = $this->getBrowser();
         $this->assertNull($client->getResponse());
-    }
-
-    public function testGetInternalResponse()
-    {
-        $client = $this->getBrowser();
-        $client->setNextResponse(new SpecialResponse('foo'));
-        $client->request('GET', 'http://example.com/');
-
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
-        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getInternalResponse());
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getResponse());
     }
 
     /**

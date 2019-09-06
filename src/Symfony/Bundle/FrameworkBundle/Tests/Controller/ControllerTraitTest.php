@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
@@ -543,31 +542,5 @@ abstract class ControllerTraitTest extends TestCase
         $links = $request->attributes->get('_links')->getLinks();
         $this->assertContains($link1, $links);
         $this->assertContains($link2, $links);
-    }
-}
-
-trait TestControllerTrait
-{
-    use ControllerTrait {
-        generateUrl as public;
-        redirect as public;
-        forward as public;
-        getUser as public;
-        json as public;
-        file as public;
-        isGranted as public;
-        denyAccessUnlessGranted as public;
-        redirectToRoute as public;
-        addFlash as public;
-        isCsrfTokenValid as public;
-        renderView as public;
-        render as public;
-        stream as public;
-        createNotFoundException as public;
-        createAccessDeniedException as public;
-        createForm as public;
-        createFormBuilder as public;
-        getDoctrine as public;
-        addLink as public;
     }
 }

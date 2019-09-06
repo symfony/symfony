@@ -172,6 +172,10 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
+    public function getRoleNames(): array
+    {
+    }
+
     public function getCredentials()
     {
     }

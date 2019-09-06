@@ -1337,14 +1337,3 @@ HTML;
         return $domxpath->query('//div');
     }
 }
-
-class ClassThatInheritCrawler extends Crawler
-{
-    /**
-     * @return static
-     */
-    public function children()
-    {
-        return parent::children();
-    }
-}

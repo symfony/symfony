@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by dFayet at 2019-06-22T08:14:32Z
+
+@nicolas-grekas In #28865 the default router generator and matcher were changed to the new `CompiledUrl` classes. This leads to an exception if the router is used along with a custom generator/matcher build with the previous classes. This is what was faced in the issue #31807
+
+Rather than "force changing" the classes used by the router in case of mismatch, would it be better to revert the changes made on `Router::setOptions`, and add a deprecation warning(if needed)  if a legacy class is used?

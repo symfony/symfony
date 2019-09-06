@@ -343,6 +343,7 @@ Security
  * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
    `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
    `SimplePreAuthenticationListener` have been deprecated. Use Guard instead.
+ * **BC break note**: Upgrade to this version will log out all logged in users. See bug #33473.
 
 SecurityBundle
 --------------

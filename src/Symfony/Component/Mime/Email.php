@@ -399,6 +399,15 @@ class Email extends Message
         return $this->generateBody();
     }
 
+    public function ensureValidity()
+    {
+        if (null === $this->text && null === $this->html && !$this->attachments) {
+            throw new LogicException('A message must have a text or an HTML part or attachments.');
+        }
+
+        parent::ensureValidity();
+    }
+
     /**
      * Generates an AbstractPart based on the raw body of a message.
      *
@@ -421,10 +430,9 @@ class Email extends Message
      */
     private function generateBody(): AbstractPart
     {
+        $this->ensureValidity();
+
         [$htmlPart, $attachmentParts, $inlineParts] = $this->prepareParts();
-        if (null === $this->text && null === $this->html && !$attachmentParts) {
-            throw new LogicException('A message must have a text or an HTML part or attachments.');
-        }
 
         $part = null === $this->text ? null : new TextPart($this->text, $this->textCharset);
         if (null !== $htmlPart) {

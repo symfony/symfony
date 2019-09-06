@@ -104,18 +104,15 @@ class SmtpTransport extends AbstractTransport
 
     public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
     {
-        $this->ping();
-        if (!$this->started) {
-            $this->start();
-        }
-
         try {
             $message = parent::send($message, $envelope);
         } catch (TransportExceptionInterface $e) {
-            try {
-                $this->executeCommand("RSET\r\n", [250]);
-            } catch (TransportExceptionInterface $_) {
-                // ignore this exception as it probably means that the server error was final
+            if ($this->started) {
+                try {
+                    $this->executeCommand("RSET\r\n", [250]);
+                } catch (TransportExceptionInterface $_) {
+                    // ignore this exception as it probably means that the server error was final
+                }
             }
 
             throw $e;
@@ -163,6 +160,11 @@ class SmtpTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
+        $this->ping();
+        if (!$this->started) {
+            $this->start();
+        }
+
         try {
             $envelope = $message->getEnvelope();
             $this->doMailFromCommand($envelope->getSender()->getAddress());

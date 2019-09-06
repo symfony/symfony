@@ -26,7 +26,7 @@ final class SocketStream extends AbstractStream
     private $url;
     private $host = 'localhost';
     private $port = 465;
-    private $timeout = 15;
+    private $timeout = 5;
     private $tls = true;
     private $sourceIp;
     private $streamContextOptions = [];

@@ -123,6 +123,15 @@ class Message extends RawMessage
         yield from $body->toIterable();
     }
 
+    public function ensureValidity()
+    {
+        if (!$this->headers->has('From')) {
+            throw new LogicException('An email must have a "From" header.');
+        }
+
+        parent::ensureValidity();
+    }
+
     private function generateMessageId(string $email): string
     {
         return bin2hex(random_bytes(16)).strstr($email, '@');

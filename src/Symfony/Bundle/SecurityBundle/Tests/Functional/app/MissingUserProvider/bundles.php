@@ -16,5 +16,6 @@ use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\MissingUserProviderBun
 return [
     new FrameworkBundle(),
     new SecurityBundle(),
+    new Symfony\Bundle\TwigBundle\TwigBundle(),
     new MissingUserProviderBundle(),
 ];

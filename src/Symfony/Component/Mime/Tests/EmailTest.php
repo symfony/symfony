@@ -251,62 +251,62 @@ class EmailTest extends TestCase
         $att = new DataPart($file = fopen(__DIR__.'/Fixtures/mimetypes/test', 'r'));
         $img = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'test.gif');
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->text('text content');
         $this->assertEquals($text, $e->getBody());
         $this->assertEquals('text content', $e->getTextBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->html('html content');
         $this->assertEquals($html, $e->getBody());
         $this->assertEquals('html content', $e->getHtmlBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->html('html content');
         $e->text('text content');
         $this->assertEquals(new AlternativePart($text, $html), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->html('html content', 'iso-8859-1');
         $e->text('text content', 'iso-8859-1');
         $this->assertEquals('iso-8859-1', $e->getTextCharset());
         $this->assertEquals('iso-8859-1', $e->getHtmlCharset());
         $this->assertEquals(new AlternativePart(new TextPart('text content', 'iso-8859-1'), new TextPart('html content', 'iso-8859-1', 'html')), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->attach($file);
         $e->text('text content');
         $this->assertEquals(new MixedPart($text, $att), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->attach($file);
         $e->html('html content');
         $this->assertEquals(new MixedPart($html, $att), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->attach($file);
         $this->assertEquals(new MixedPart($att), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->html('html content');
         $e->text('text content');
         $e->attach($file);
         $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $att), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->html('html content');
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
         $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $att, $img), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
         $this->assertEquals(new MixedPart($text, $att, $img), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->html($content = 'html content <img src="test.gif">');
         $e->text('text content');
         $e->attach($file);
@@ -314,13 +314,12 @@ class EmailTest extends TestCase
         $fullhtml = new TextPart($content, 'utf-8', 'html');
         $this->assertEquals(new MixedPart(new AlternativePart($text, $fullhtml), $att, $img), $e->getBody());
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->html($content = 'html content <img src="cid:test.gif">');
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
         $fullhtml = new TextPart($content, 'utf-8', 'html');
-        $inlinedimg = (new DataPart($image, 'test.gif'))->asInline();
         $body = $e->getBody();
         $this->assertInstanceOf(MixedPart::class, $body);
         $this->assertCount(2, $related = $body->getParts());
@@ -336,7 +335,7 @@ class EmailTest extends TestCase
         fwrite($r, $content);
         rewind($r);
 
-        $e = new Email();
+        $e = (new Email())->from('me@example.com');
         $e->html($r);
         // embedding the same image twice results in one image only in the email
         $e->embed($image, 'test.gif');

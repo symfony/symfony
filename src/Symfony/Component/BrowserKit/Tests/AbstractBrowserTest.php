@@ -858,30 +858,3 @@ class AbstractBrowserTest extends TestCase
         $clientChild->submit($clientChild->request('GET', 'http://www.example.com/foo/foobar')->filter('input')->form());
     }
 }
-
-class ClassThatInheritClient extends AbstractBrowser
-{
-    protected $nextResponse = null;
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    protected function doRequest($request)
-    {
-        if (null === $this->nextResponse) {
-            return new Response();
-        }
-
-        $response = $this->nextResponse;
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    public function submit(DomCrawlerForm $form, array $values = [])
-    {
-        return parent::submit($form, $values);
-    }
-}

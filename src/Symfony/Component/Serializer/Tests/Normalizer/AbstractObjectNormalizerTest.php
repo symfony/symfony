@@ -171,12 +171,12 @@ class AbstractObjectNormalizerTest extends TestCase
                     );
                 }
 
-                throw new InvalidArgumentException;
+                throw new InvalidArgumentException();
             }
 
             public function hasMetadataFor($value): bool
             {
-                return $value === AbstractDummy::class;
+                return AbstractDummy::class === $value;
             }
         };
 

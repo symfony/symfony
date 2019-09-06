@@ -35,15 +35,15 @@ class ConstraintViolation implements ConstraintViolationInterface
      * @param string|object $message         The violation message as a string or a stringable object
      * @param string        $messageTemplate The raw violation message
      * @param array         $parameters      The parameters to substitute in the
-     *                                     raw violation message
+     *                                       raw violation message
      * @param mixed         $root            The value originally passed to the
-     *                                     validator
+     *                                       validator
      * @param string        $propertyPath    The property path from the root
-     *                                     value to the invalid value
+     *                                       value to the invalid value
      * @param mixed         $invalidValue    The invalid value that caused this
-     *                                     violation
+     *                                       violation
      * @param int|null      $plural          The number for determining the plural
-     *                                     form when translating the message
+     *                                       form when translating the message
      * @param string|null   $code            The error code of the violation
      * @param mixed         $cause           The cause of the violation
      */

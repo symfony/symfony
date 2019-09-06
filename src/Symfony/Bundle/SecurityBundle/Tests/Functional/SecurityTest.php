@@ -129,6 +129,7 @@ final class UserWithoutEquatable implements UserInterface
      */
     public function getSalt()
     {
+        return null;
     }
 
     /**

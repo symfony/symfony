@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-06T09:18:08Z
+
+PR updated. All reported but the ones about the `Debug` component are legit failures that need action.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-06T09:36:23Z
+
+TIL: I cannot approve my own pull request. 😅
+
+One question though: We’ve already had checks like this one in place:
+
+https://github.com/symfony/symfony/blob/5765539a3c798618b75bf79fe18181c4cd259a18/src/Symfony/Bridge/Monolog/Logger.php#L32-L34
+
+Are those obsolete now or do we intend to keep them?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-06T09:48:37Z
+
+> Are those obsolete now or do we intend to keep them?
+
+we intend to keep them, because there is no silver bullet (DebugClassLoader is not mandatory)

@@ -1,0 +1,160 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-15T07:04:49Z
+
+This looks like a new feature to me, I would target master.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-11T12:01:38Z
+
+> This looks like a new feature to me, I would target master.
+
+Changed to master
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-06-11T12:08:53Z
+
+> Changed to master
+
+Thank you, but now it should target `4.4`, as `master` is for Symfony 5 features now ;-)
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-11T14:41:45Z
+
+> Thank you, but now it should target `4.4`, as `master` is for Symfony 5 features now ;-)
+
+It seems that documentation needs to be improved https://symfony.com/doc/current/contributing/code/pull_requests.html#choose-the-right-branch
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-13T08:11:30Z
+
+> Thank you, but now it should target `4.4`, as `master` is for Symfony 5 features now ;-)
+
+@OskarStark can you please explain how it should be (I'd like to prepare PR):
+- bug fixes go to corresponded branch
+- new feature go to master branch (5.x)
+
+but why then this PR, should be pointed to 4.4?
+also it seems that it contradicts with @fabpot comment
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-06-13T09:09:54Z
+
+> https://symfony.com/doc/current/contributing/code/pull_requests.html#choose-the-right-branch
+
+Currently we are in state where `4.3` is stable, `4.4` will be the next version with new features and `master` will be the new 5.0 major version. So `4.4` should be the correct branch.
+
+> This looks like a new feature to me, I would target master.
+
+The [comment](https://github.com/symfony/symfony/pull/31177#issuecomment-492531191) by @fabpot was made before the new `4.4` branch was born, correct @fabpot ?
+
+cc @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-13T10:08:44Z
+
+New features should indeed target the 4.4 branch. It's not the master branch as we have 2 new versions at the same time: 4.4 and 5.0 (which is special as it happens only once every two years).
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-13T11:46:01Z
+
+Alright I've created https://github.com/symfony/symfony-docs/pull/11741, so this PR can be finally reviewed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-19T09:13:05Z
+
+Tests for low are broken, which means that some constraints need to be changed (SecurityBundle depends on the Security component).
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-19T15:20:23Z
+
+@fabpot the only way is to skip `SecurityTest::testUserWillBeMarkedAsChangedIfRolesHasChanged` for low, because it's a new test which was added in this PR.
+
+Or there is another solution for such case?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-19T15:21:40Z
+
+You can bump the minimum version for the dependency on SecurityBundle.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-19T15:45:30Z
+
+and it will pull changes from the current branch, right?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-19T15:58:27Z
+
+@oleg-andreyev yes :)
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-20T12:21:29Z
+
+@xabbuh thanks for explaining, didn't know that
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-22T23:05:26Z
+
+@fabpot @xabbuh @OskarStark @nicolas-grekas build is green 😃
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-06-22T23:08:48Z
+
+I think it would be awesome to add documentation about `rm-invalid-lowest-lock-files` and add notes about bumping minimal version for a bundle, when bundle is expecting "new" changes from component.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-07-14T14:12:50Z
+
+> Just some minor comments, but what I am more concerned about is that this will also log out users if they have been granted new roles. I suspect that this is something that is not expected.
+
+I can understand this concern but theoretically we can add new role which actually limits previous roles and because we can't detect it the easiest way to ensure that ROLE will be taken into account is to logout user and force them to login again.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-07-23T10:55:21Z
+
+Ready for review.
+
+Travis failed with:
+
+```
+1) Symfony\Component\Mailer\Tests\TransportTest::testFromDsnMailgun
+stream_get_meta_data() expects parameter 1 to be resource, string given
+```
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-09-06T10:50:48Z
+
+@nicolas-grekas @fabpot @xabbuh @OskarStark please take a look.
+Fail build is not related to changes in this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-06T12:32:02Z
+
+@oleg-andreyev Can you squash your commits please?
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2019-09-06T13:13:33Z
+
+> @oleg-andreyev Can you squash your commits please?
+
+Done.

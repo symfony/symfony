@@ -289,7 +289,7 @@ install:
               fi
 
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
-              tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
+              tfold src/Symfony/Component/Console.tty $PHPUNIT --group tty
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
                   export PHP=$MIN_PHP
                   tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/

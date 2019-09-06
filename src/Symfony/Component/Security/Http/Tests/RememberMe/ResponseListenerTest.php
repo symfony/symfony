@@ -90,16 +90,8 @@ class ResponseListenerTest extends TestCase
         return $response;
     }
 
-    private function getEvent($request, $response, $type = HttpKernelInterface::MASTER_REQUEST)
+    private function getEvent(Request $request, Response $response, int $type = HttpKernelInterface::MASTER_REQUEST): ResponseEvent
     {
-        $event = $this->getMockBuilder(ResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event->expects($this->any())->method('getRequest')->willReturn($request);
-        $event->expects($this->any())->method('isMasterRequest')->willReturn(HttpKernelInterface::MASTER_REQUEST === $type);
-        $event->expects($this->any())->method('getResponse')->willReturn($response);
-
-        return $event;
+        return new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, $type, $response);
     }
 }

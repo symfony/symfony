@@ -29,6 +29,7 @@
         "symfony/http-client-contracts": "^1.1",
         "symfony/mailgun-mailer": "^4.4|^5.0",
         "symfony/mailchimp-mailer": "^4.4|^5.0",
+        "symfony/messenger": "^4.4|^5.0",
         "symfony/postmark-mailer": "^4.4|^5.0",
         "symfony/sendgrid-mailer": "^4.4|^5.0"
     },

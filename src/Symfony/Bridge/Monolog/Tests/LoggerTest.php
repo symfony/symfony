@@ -137,16 +137,3 @@ class LoggerTest extends TestCase
         $this->assertEquals(0, $loggerChild->countErrors());
     }
 }
-
-class ClassThatInheritLogger extends Logger
-{
-    public function getLogs(Request $request = null): array
-    {
-        return parent::getLogs($request);
-    }
-
-    public function countErrors(Request $request = null): int
-    {
-        return parent::countErrors($request);
-    }
-}

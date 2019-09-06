@@ -19,53 +19,6 @@ use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
 
-class TestClient extends AbstractBrowser
-{
-    protected $nextResponse = null;
-    protected $nextScript = null;
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    public function setNextScript($script)
-    {
-        $this->nextScript = $script;
-    }
-
-    protected function doRequest($request): Response
-    {
-        if (null === $this->nextResponse) {
-            return new Response();
-        }
-
-        $response = $this->nextResponse;
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    protected function filterResponse($response): Response
-    {
-        return $response;
-    }
-
-    protected function getScript($request)
-    {
-        $r = new \ReflectionClass('Symfony\Component\BrowserKit\Response');
-        $path = $r->getFileName();
-
-        return <<<EOF
-<?php
-
-require_once('$path');
-
-echo serialize($this->nextScript);
-EOF;
-    }
-}
-
 class AbstractBrowserTest extends TestCase
 {
     public function getBrowser(array $server = [], History $history = null, CookieJar $cookieJar = null)
@@ -877,32 +830,5 @@ class AbstractBrowserTest extends TestCase
 
         $client = $this->getBrowser();
         $this->assertNull($client->getInternalRequest());
-    }
-}
-
-class ClassThatInheritClient extends AbstractBrowser
-{
-    protected $nextResponse = null;
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    protected function doRequest($request): Response
-    {
-        if (null === $this->nextResponse) {
-            return new Response();
-        }
-
-        $response = $this->nextResponse;
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    public function submit(DomCrawlerForm $form, array $values = [], array $serverParameters = []): Crawler
-    {
-        return parent::submit($form, $values, $serverParameters);
     }
 }

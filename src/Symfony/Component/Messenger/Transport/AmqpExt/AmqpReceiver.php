@@ -58,9 +58,11 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
             return;
         }
 
+        $body = $amqpEnvelope->getBody();
+
         try {
             $envelope = $this->serializer->decode([
-                'body' => $amqpEnvelope->getBody(),
+                'body' => false === $body ? '' : $body, // workaround https://github.com/pdezwart/php-amqp/issues/351
                 'headers' => $amqpEnvelope->getHeaders(),
             ]);
         } catch (MessageDecodingFailedException $exception) {

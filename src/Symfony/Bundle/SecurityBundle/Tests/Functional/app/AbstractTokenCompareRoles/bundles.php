@@ -11,11 +11,10 @@
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
-use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\MissingUserProviderBundle\MissingUserProviderBundle;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\SecuredPageBundle;
 
 return [
     new FrameworkBundle(),
     new SecurityBundle(),
-    new Symfony\Bundle\TwigBundle\TwigBundle(),
-    new MissingUserProviderBundle(),
+    new SecuredPageBundle(),
 ];

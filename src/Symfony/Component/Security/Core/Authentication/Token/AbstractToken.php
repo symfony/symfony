@@ -270,6 +270,13 @@ abstract class AbstractToken implements TokenInterface
             return true;
         }
 
+        $userRoles = array_map('strval', (array) $user->getRoles());
+        $rolesChanged = \count($userRoles) !== \count($this->getRoleNames()) || \count($userRoles) !== \count(array_intersect($userRoles, $this->getRoleNames()));
+
+        if ($rolesChanged) {
+            return true;
+        }
+
         if ($this->user->getUsername() !== $user->getUsername()) {
             return true;
         }

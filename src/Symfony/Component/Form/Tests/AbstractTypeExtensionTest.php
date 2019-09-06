@@ -12,12 +12,13 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class AbstractTypeExtensionTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testImplementingNeitherGetExtendedTypeNorExtendsTypeThrowsException()
     {
         $this->expectException('Symfony\Component\Form\Exception\LogicException');
@@ -28,6 +29,7 @@ class AbstractTypeExtensionTest extends TestCase
 
     /**
      * @group legacy
+     * @expectedDeprecation The Symfony\Component\Form\Tests\MultipleTypesExtension::getExtendedType() method is deprecated since Symfony 4.2 and will be removed in 5.0. Use getExtendedTypes() instead.
      */
     public function testGetExtendedTypeReturnsFirstConfiguredExtension()
     {
@@ -35,17 +37,4 @@ class AbstractTypeExtensionTest extends TestCase
 
         $this->assertSame(DateTimeType::class, $extension->getExtendedType());
     }
-}
-
-class MultipleTypesExtension extends AbstractTypeExtension
-{
-    public static function getExtendedTypes(): iterable
-    {
-        yield DateTimeType::class;
-        yield DateType::class;
-    }
-}
-
-class TypeExtensionWithoutExtendedTypes extends AbstractTypeExtension
-{
 }

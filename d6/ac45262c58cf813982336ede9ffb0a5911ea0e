@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-06T14:39:29Z
+
+This PR also allows to nest transports.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-06T16:33:58Z
+
+would be great to add tests covering the error cases of the parsing (unclosed parenthesis, nesting a parenthesis directly in the argument, passing an unknown function name, garbage at the end, etc...)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-07T06:34:43Z
+
+@stof I've added some more tests.

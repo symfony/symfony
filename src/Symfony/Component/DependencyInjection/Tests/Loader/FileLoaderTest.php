@@ -260,4 +260,10 @@ class TestFileLoader extends FileLoader
     {
         return false;
     }
+
+    public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null)
+    {
+        parent::registerClasses($prototype, $namespace, $resource, $exclude);
+        $this->registerAliasesForSinglyImplementedInterfaces();
+    }
 }

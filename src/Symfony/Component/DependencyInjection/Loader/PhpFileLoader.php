@@ -41,10 +41,15 @@ class PhpFileLoader extends FileLoader
             return include $path;
         }, $this, ProtectedPhpFileLoader::class);
 
-        $callback = $load($path);
+        try {
+            $callback = $load($path);
 
-        if (\is_object($callback) && \is_callable($callback)) {
-            $callback(new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource), $this->container, $this);
+            if (\is_object($callback) && \is_callable($callback)) {
+                $callback(new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource), $this->container, $this);
+            }
+        } finally {
+            $this->instanceof = [];
+            $this->registerAliasesForSinglyImplementedInterfaces();
         }
     }
 
@@ -62,18 +67,6 @@ class PhpFileLoader extends FileLoader
         }
 
         return 'php' === $type;
-    }
-
-    public function resetBeforeConfiguringServices(): void
-    {
-        $this->interfaces = [];
-        $this->singlyImplemented = [];
-        $this->singlyImplementedAliases = [];
-    }
-
-    public function removeSinglyImplementedAlias(string $alias): void
-    {
-        unset($this->singlyImplementedAliases[$alias]);
     }
 }
 

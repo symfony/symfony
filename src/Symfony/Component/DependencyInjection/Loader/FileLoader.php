@@ -31,7 +31,6 @@ abstract class FileLoader extends BaseFileLoader
     protected $instanceof = [];
     protected $interfaces = [];
     protected $singlyImplemented = [];
-    protected $singlyImplementedAliases = [];
 
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator)
     {
@@ -76,15 +75,17 @@ abstract class FileLoader extends BaseFileLoader
                 }
             }
         }
+    }
 
+    public function registerAliasesForSinglyImplementedInterfaces()
+    {
         foreach ($this->interfaces as $interface) {
             if (!empty($this->singlyImplemented[$interface]) && !$this->container->hasAlias($interface)) {
                 $this->container->setAlias($interface, $this->singlyImplemented[$interface])->setPublic(false);
-                $this->singlyImplementedAliases[$interface] = true;
-            } elseif ($this->singlyImplementedAliases[$interface] ?? false) {
-                $this->container->removeAlias($interface);
             }
         }
+
+        $this->interfaces = $this->singlyImplemented = [];
     }
 
     /**

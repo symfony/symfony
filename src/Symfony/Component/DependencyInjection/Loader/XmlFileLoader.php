@@ -66,9 +66,7 @@ class XmlFileLoader extends FileLoader
             $this->parseDefinitions($xml, $path, $defaults);
         } finally {
             $this->instanceof = [];
-            $this->interfaces = [];
-            $this->singlyImplemented = [];
-            $this->singlyImplementedAliases = [];
+            $this->registerAliasesForSinglyImplementedInterfaces();
         }
     }
 
@@ -197,7 +195,6 @@ class XmlFileLoader extends FileLoader
             $this->validateAlias($service, $file);
 
             $this->container->setAlias((string) $service->getAttribute('id'), $alias = new Alias($alias));
-            unset($this->singlyImplementedAliases[(string) $service->getAttribute('id')]);
             if ($publicAttr = $service->getAttribute('public')) {
                 $alias->setPublic(XmlUtils::phpize($publicAttr));
             } elseif (isset($defaults['public'])) {

@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedHostException;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
@@ -82,17 +83,59 @@ class Transport
 
     public function fromString(string $dsn): TransportInterface
     {
-        $dsns = preg_split('/\s++\|\|\s++/', $dsn);
-        if (\count($dsns) > 1) {
-            return new FailoverTransport($this->createFromDsns($dsns));
+        list($transport, $offset) = $this->parseDsn($dsn);
+        if ($offset !== \strlen($dsn)) {
+            throw new InvalidArgumentException(sprintf('The DSN has some garbage at the end: %s.', substr($dsn, $offset)));
         }
 
-        $dsns = preg_split('/\s++&&\s++/', $dsn);
-        if (\count($dsns) > 1) {
-            return new RoundRobinTransport($this->createFromDsns($dsns));
-        }
+        return $transport;
+    }
 
-        return $this->fromDsnObject(Dsn::fromString($dsn));
+    private function parseDsn(string $dsn, int $offset = 0): array
+    {
+        static $keywords = [
+            'failover' => FailoverTransport::class,
+            'roundrobin' => RoundRobinTransport::class,
+        ];
+
+        while (true) {
+            foreach ($keywords as $name => $class) {
+                $name .= '(';
+                if ($name === substr($dsn, $offset, \strlen($name))) {
+                    $offset += \strlen($name) - 1;
+                    preg_match('{\(([^()]|(?R))*\)}A', $dsn, $matches, 0, $offset);
+                    if (!isset($matches[0])) {
+                        continue;
+                    }
+
+                    ++$offset;
+                    $args = [];
+                    while (true) {
+                        list($arg, $offset) = $this->parseDsn($dsn, $offset);
+                        $args[] = $arg;
+                        if (\strlen($dsn) === $offset) {
+                            break;
+                        }
+                        ++$offset;
+                        if (')' === $dsn[$offset - 1]) {
+                            break;
+                        }
+                    }
+
+                    return [new $class($args), $offset];
+                }
+            }
+
+            if (preg_match('{(\w+)\(}A', $dsn, $matches, 0, $offset)) {
+                throw new InvalidArgumentException(sprintf('The "%s" keyword is not valid (valid ones are "%s"), ', $matches[1], implode('", "', array_keys($keywords))));
+            }
+
+            if ($pos = strcspn($dsn, ' )', $offset)) {
+                return [$this->fromDsnObject(Dsn::fromString(substr($dsn, $offset, $pos))), $offset + $pos];
+            }
+
+            return [$this->fromDsnObject(Dsn::fromString(substr($dsn, $offset))), \strlen($dsn)];
+        }
     }
 
     public function fromDsnObject(Dsn $dsn): TransportInterface
@@ -104,21 +147,6 @@ class Transport
         }
 
         throw new UnsupportedHostException($dsn);
-    }
-
-    /**
-     * @param string[] $dsns
-     *
-     * @return TransportInterface[]
-     */
-    private function createFromDsns(array $dsns): array
-    {
-        $transports = [];
-        foreach ($dsns as $dsn) {
-            $transports[] = $this->fromDsnObject(Dsn::fromString($dsn));
-        }
-
-        return $transports;
     }
 
     private static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): iterable

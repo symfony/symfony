@@ -13,7 +13,6 @@ namespace Symfony\Component\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use Symfony\Component\EventDispatcher\Debug\WrappedListener;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
@@ -46,12 +45,8 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($event, string $eventName = null): object
+    public function dispatch(object $event, string $eventName = null): object
     {
-        if (!\is_object($event)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an object, %s given.', EventDispatcherInterface::class, \gettype($event)));
-        }
-
         $eventName = $eventName ?? \get_class($event);
 
         if (null !== $this->optimized && null !== $eventName) {
@@ -226,7 +221,7 @@ class EventDispatcher implements EventDispatcherInterface
      */
     protected function callListeners(iterable $listeners, string $eventName, object $event)
     {
-        $stoppable = $event instanceof Event || $event instanceof StoppableEventInterface;
+        $stoppable = $event instanceof StoppableEventInterface;
 
         foreach ($listeners as $listener) {
             if ($stoppable && $event->isPropagationStopped()) {

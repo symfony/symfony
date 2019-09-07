@@ -21,8 +21,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * MUST be thrown by the destructor unless one was already thrown by another method.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 1.1
  */
 interface ChunkInterface
 {

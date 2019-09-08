@@ -197,7 +197,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertInstanceOf(\MongoDB\Client::class, $method->invoke($this->storage));
     }
 
-    private function createMongoCollectionMock()
+    private function createMongoCollectionMock(): \MongoDB\Collection
     {
         $collection = $this->getMockBuilder(\MongoDB\Collection::class)
             ->disableOriginalConstructor()

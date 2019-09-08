@@ -114,7 +114,7 @@ class MockFileSessionStorageTest extends TestCase
         $storage1->save();
     }
 
-    private function getStorage()
+    private function getStorage(): MockFileSessionStorage
     {
         $storage = new MockFileSessionStorage($this->sessionDir);
         $storage->registerBag(new FlashBag());

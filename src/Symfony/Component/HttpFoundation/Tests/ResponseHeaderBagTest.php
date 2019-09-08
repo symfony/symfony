@@ -299,7 +299,7 @@ class ResponseHeaderBagTest extends TestCase
         $this->assertTrue($bag->has('Date'));
     }
 
-    private function assertSetCookieHeader($expected, ResponseHeaderBag $actual)
+    private function assertSetCookieHeader(string $expected, ResponseHeaderBag $actual)
     {
         $this->assertRegExp('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));
     }

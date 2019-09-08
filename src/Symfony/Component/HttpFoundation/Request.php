@@ -1817,12 +1817,12 @@ class Request
             $requestUri = '/'.$requestUri;
         }
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
+        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
             // full $baseUrl matches
             return $prefix;
         }
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, rtrim(\dirname($baseUrl), '/'.\DIRECTORY_SEPARATOR).'/')) {
+        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, rtrim(\dirname($baseUrl), '/'.\DIRECTORY_SEPARATOR).'/')) {
             // directory portion of $baseUrl matches
             return rtrim($prefix, '/'.\DIRECTORY_SEPARATOR);
         }
@@ -1941,14 +1941,12 @@ class Request
 
     /**
      * Returns the prefix as encoded in the string when the string starts with
-     * the given prefix, false otherwise.
-     *
-     * @return string|false The prefix as it is encoded in $string, or false
+     * the given prefix, null otherwise.
      */
-    private function getUrlencodedPrefix(string $string, string $prefix)
+    private function getUrlencodedPrefix(string $string, string $prefix): ?string
     {
         if (0 !== strpos(rawurldecode($string), $prefix)) {
-            return false;
+            return null;
         }
 
         $len = \strlen($prefix);
@@ -1957,10 +1955,10 @@ class Request
             return $match[0];
         }
 
-        return false;
+        return null;
     }
 
-    private static function createRequestFromFactory(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
+    private static function createRequestFromFactory(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): self
     {
         if (self::$requestFactory) {
             $request = (self::$requestFactory)($query, $request, $attributes, $cookies, $files, $server, $content);

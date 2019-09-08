@@ -346,6 +346,9 @@ class PdoSessionHandlerTest extends TestCase
         yield ['mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test'];
     }
 
+    /**
+     * @return resource
+     */
     private function createStream($content)
     {
         $stream = tmpfile();
@@ -362,7 +365,7 @@ class MockPdo extends \PDO
     private $driverName;
     private $errorMode;
 
-    public function __construct($driverName = null, $errorMode = null)
+    public function __construct(string $driverName = null, int $errorMode = null)
     {
         $this->driverName = $driverName;
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;

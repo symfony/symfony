@@ -72,7 +72,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             curl_multi_setopt($this->multi->handle, CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX);
         }
         if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
-            curl_multi_setopt($this->multi->handle, CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX);
+            $maxHostConnections = curl_multi_setopt($this->multi->handle, CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX) ? 0 : $maxHostConnections;
+        }
+        if (\defined('CURLMOPT_MAXCONNECTS') && 0 < $maxHostConnections) {
+            curl_multi_setopt($this->multi->handle, CURLMOPT_MAXCONNECTS, $maxHostConnections);
         }
 
         // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/77535

@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-21T15:48:02Z
+
+Honestly, I'm not a big fan of adding `void`. e.g. on test cases, they are pure visual noise.
+Can you please rebase this PR, and maybe move the void return types to another PR if you want to push them forward?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-21T16:06:23Z
+
+> Honestly, I'm not a big fan of adding `void`. e.g. on test cases
+
+Hey, I could have added `void` to all `test*` methods, but I thought that might hurt your eyes a little too much. 😅
+
+As I already said on #33228, I might need a llittle guidance on when to add `void`. Sometimes you add `void` yourself, sometimes you state that you don't like `void`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-21T16:12:57Z
+
+> Sometimes you add void yourself, sometimes you state that you don't like void.
+
+:'D I did add them when a third-party dep encourages us to do so. I may have added more but I regret already :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-08-30T16:59:39Z
+
+If you've heard someone weeping, it was probably me reverting all the `void` declarations. PR is ready now. 😃

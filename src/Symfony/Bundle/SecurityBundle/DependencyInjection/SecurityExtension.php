@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
@@ -51,6 +52,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private $factories = [];
     private $userProviderFactories = [];
     private $statelessFirewallKeys = [];
+
+    private $guardAuthenticationManagerEnabled = false;
 
     public function __construct()
     {
@@ -134,6 +137,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
+
+        $this->guardAuthenticationManagerEnabled = $config['guard_authentication_manager'];
 
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
@@ -258,8 +263,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $authenticationProviders = array_map(function ($id) {
             return new Reference($id);
         }, array_values(array_unique($authenticationProviders)));
+        $authenticationManagerId = 'security.authentication.manager.provider';
+        if ($this->guardAuthenticationManagerEnabled) {
+            $authenticationManagerId = 'security.authentication.manager.guard';
+            $container->setAlias('security.authentication.manager', new Alias($authenticationManagerId));
+        }
         $container
-            ->getDefinition('security.authentication.manager')
+            ->getDefinition($authenticationManagerId)
             ->replaceArgument(0, new IteratorArgument($authenticationProviders))
         ;
 
@@ -467,31 +477,27 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $key = str_replace('-', '_', $factory->getKey());
 
                 if (isset($firewall[$key])) {
-                    if (isset($firewall[$key]['provider'])) {
-                        if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall[$key]['provider'])])) {
-                            throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$key]['provider']));
-                        }
-                        $userProvider = $providerIds[$normalizedName];
-                    } elseif ('remember_me' === $key || 'anonymous' === $key) {
-                        // RememberMeFactory will use the firewall secret when created, AnonymousAuthenticationListener does not load users.
-                        $userProvider = null;
+                    $userProvider = $this->getUserProvider($container, $id, $firewall, $key, $defaultProvider, $providerIds, $contextListenerId);
 
-                        if ('remember_me' === $key && $contextListenerId) {
-                            $container->getDefinition($contextListenerId)->addTag('security.remember_me_aware', ['id' => $id, 'provider' => 'none']);
+                    if ($this->guardAuthenticationManagerEnabled) {
+                        if (!$factory instanceof GuardFactoryInterface) {
+                            throw new InvalidConfigurationException(sprintf('Cannot configure GuardAuthenticationManager as %s authentication does not support it, set security.guard_authentication_manager to `false`.', $key));
                         }
-                    } elseif ($defaultProvider) {
-                        $userProvider = $defaultProvider;
-                    } elseif (empty($providerIds)) {
-                        $userProvider = sprintf('security.user.provider.missing.%s', $key);
-                        $container->setDefinition($userProvider, (new ChildDefinition('security.user.provider.missing'))->replaceArgument(0, $id));
+
+                        $authenticators = $factory->createGuard($container, $id, $firewall[$key], $userProvider);
+                        if (\is_array($authenticators)) {
+                            foreach ($authenticators as $i => $authenticator) {
+                                $authenticationProviders[$id.'_'.$key.$i] = $authenticator;
+                            }
+                        } else {
+                            $authenticationProviders[$id.'_'.$key] = $authenticators;
+                        }
                     } else {
-                        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $key, $id));
+                        list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
+
+                        $listeners[] = new Reference($listenerId);
+                        $authenticationProviders[] = $provider;
                     }
-
-                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
-
-                    $listeners[] = new Reference($listenerId);
-                    $authenticationProviders[] = $provider;
                     $hasListeners = true;
                 }
             }
@@ -502,6 +508,42 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         return [$listeners, $defaultEntryPoint];
+    }
+
+    private function getUserProvider(ContainerBuilder $container, string $id, array $firewall, string $factoryKey, ?string $defaultProvider, array $providerIds, ?string $contextListenerId): ?string
+    {
+        if (isset($firewall[$factoryKey]['provider'])) {
+            if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall[$factoryKey]['provider'])])) {
+                throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$factoryKey]['provider']));
+            }
+
+            return $providerIds[$normalizedName];
+        }
+
+        if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey) {
+            if ('remember_me' === $factoryKey && $contextListenerId) {
+                $container->getDefinition($contextListenerId)->addTag('security.remember_me_aware', ['id' => $id, 'provider' => 'none']);
+            }
+
+            // RememberMeFactory will use the firewall secret when created
+            return null;
+        }
+
+        if ($defaultProvider) {
+            return $defaultProvider;
+        }
+
+        if (!$providerIds) {
+            $userProvider = sprintf('security.user.provider.missing.%s', $factoryKey);
+            $container->setDefinition(
+                $userProvider,
+                (new ChildDefinition('security.user.provider.missing'))->replaceArgument(0, $id)
+            );
+
+            return $userProvider;
+        }
+
+        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $factoryKey, $id));
     }
 
     private function createEncoders(array $encoders, ContainerBuilder $container)

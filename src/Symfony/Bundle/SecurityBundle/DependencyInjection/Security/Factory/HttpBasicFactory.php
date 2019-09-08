@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpBasicFactory implements SecurityFactoryInterface
+class HttpBasicFactory implements SecurityFactoryInterface, GuardFactoryInterface
 {
     public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint)
     {
@@ -44,6 +44,17 @@ class HttpBasicFactory implements SecurityFactoryInterface
         $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
 
         return [$provider, $listenerId, $entryPointId];
+    }
+
+    public function createGuard(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
+    {
+        $authenticatorId = 'security.authenticator.http_basic.'.$id;
+        $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.http_basic'))
+            ->replaceArgument(0, $config['realm'])
+            ->replaceArgument(1, new Reference($userProviderId));
+
+        return $authenticatorId;
     }
 
     public function getPosition()

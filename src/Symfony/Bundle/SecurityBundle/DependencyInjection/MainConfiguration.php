@@ -73,6 +73,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
+                ->booleanNode('guard_authentication_manager')->defaultFalse()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()

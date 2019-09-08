@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-26T14:11:14Z
+
+I would change the proposed usage by the following:
+
+```php
+$io->table(['a', 'b', 'c'], [[1, 2, 3], [4, 5, 6]]);
+
+$io->horizontalTable(['a', 'b', 'c'], [[1, 2, 3], [4, 5, 6]]);
+
+$io->horizontalTable(['id', 'title', 'foo'], [[123, 'My title', 'bar']]);
+```
+
+The boolean param of `table()` is replace by a new method called `horizontalTable()`. The `definitionList()` method is replaced by `horizontalTable()` too because is the same.
+
+What if I have an associative array with the "definition list" information? do this:
+
+```php
+$io->horizontalTable(array_keys($foo), [array_values($foo)]);
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-26T15:24:19Z
+
+> The `definitionList()` method is replaced by `horizontalTable()` too because is the same.
+
+Actually, it's way easier to write:
+```php
+$io->definitonList(['title' =>  'value', 'title2' => 'value2', /** very long list */]);
+```
+than
+```php
+$io->definitonList(['title', 'title2', /* very long list*/], [[1, 2, , /* very long list*/]]);
+```
+because you will be lost at some point. see [this command](https://github.com/symfony/symfony/blob/4.4/src/Symfony/Bundle/FrameworkBundle/Command/AboutCommand.php#L65-L89) for instance
+
+> What if I have an associative array with the "definition list" information? do this:
+
+I did that as the first implementation. But it does not work well. See the [test suite](https://github.com/symfony/symfony/pull/32742/files#diff-ab2084dd7bc9fa3edef317a676a665b6R11) to understand what I want to achieve :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-28T16:32:55Z
+
+What about
+
+```php
+$output->definitionList(
+    ['foo' => 'bar'],
+    new TableSeparator(),
+    'this is a title',
+    new TableSeparator(),
+    ['foo' => 'bar2']
+);
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-28T20:52:29Z
+
+It's already supported and tested. Did I miss something?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-29T14:07:42Z
+
+> Did I miss something?
+
+Yes, the variadic api :)
+
+i see several advantages;
+- duplicate key support (i.e. repetitive sections with the same keys)
+- the expected argument types are clear, array (list), scalar (title) or TableSeparator. In favor of one magic structure
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-29T14:53:04Z
+
+Oh, indeed I miss-read your example :)
+This is a good idea, but it requires extra `[``]` :/
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-30T05:46:41Z
+
+it's still less than the current no. of brackets used https://github.com/symfony/symfony/blob/b2dadc110d4fea28ca981b66aef1d771f238bda5/src/Symfony/Bundle/FrameworkBundle/Command/AboutCommand.php#L64-L90 :} (here we also see multiple `Version` keys btw)
+
+in general i tend to avoid the mixed array structure. The 3rd advantage actually is it supports numeric/integer keys like any other, so less variance.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-30T08:29:20Z
+
+@ro0NL Actually, It will be the exact same number of brackets :)
+Anyway, I will try to implement your proposal
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-08-27T16:13:15Z
+
+@ro0NL I finished this PR. I hope you like it :)

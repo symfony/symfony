@@ -87,20 +87,24 @@ class TranslationUpdateCommand extends Command
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
-of a given bundle or the default translations directory. It can display them or merge the new ones into the translation files.
+of a given bundle or the default translations directory. It can display them or merge
+the new ones into the translation files.
 
 When new translation strings are found it can automatically add a prefix to the translation
 message.
 
 Example running against a Bundle (AcmeBundle)
+
   <info>php %command.full_name% --dump-messages en AcmeBundle</info>
   <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
 
 Example running against default messages directory
+
   <info>php %command.full_name% --dump-messages en</info>
   <info>php %command.full_name% --force --prefix="new_" fr</info>
-  
-Example running with sorting option
+
+You can sort the output with the <comment>--sort</> flag:
+
     <info>php %command.full_name% --dump-messages --sort=asc en AcmeBundle</info>
     <info>php %command.full_name% --dump-messages --sort=desc fr</info>
 EOF

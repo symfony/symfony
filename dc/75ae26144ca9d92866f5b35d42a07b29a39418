@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-08-16T07:03:31Z
+
+I'm on a smartphone so I can't review this properly, but I want to tell that I absolutely love this proposal. Yonel, what an amazing work you did here. I couldn't like it more ♥️
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-08-16T07:50:36Z
+
+I really love the proposal !
+
+---------------------------------------------------------------------------
+
+by alanpoulain at 2019-08-16T08:43:54Z
+
+Wouldn't it be even greater if the "sea" was slowly moving with some CSS animation? 😃
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-16T13:09:30Z
+
+> Wouldn't it be even greater if the "sea" was slowly moving with some CSS animation? smiley
+
+Yes, that would be super nice! I was tempted since I started working on this to give a subtle animation to some of the elements, the stars or the sea or the texts, but I'd need to look for some examples. Do you know how to do it right?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-16T13:30:15Z
+
+If we decide add some animation, it shouldn't be a distraction, perhaps a limited animation (not infinite) of some element (not all) should be enough.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-08-16T13:37:14Z
+
+First of all: :heart_eyes:  :heart_eyes:  it looks amazing!
+
+I would not add to much noise (I think the current changing hue's might be already too much, but that might have more to do with the GIF than the actual result).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-17T01:23:04Z
+
+I've created an **inverted** version too, **what do you like more?**
+
+| vote :tada: => initial | vote :heart: => inverted |
+| --- | --- |
+| ![welcome-initial](https://user-images.githubusercontent.com/2028198/63206680-211a4b00-c087-11e9-8b33-ca24d4be7117.png) | ![welcome-inverted](https://user-images.githubusercontent.com/2028198/63206810-af8fcc00-c089-11e9-84ad-31bd0d47a23a.png) |
+
+Note: Still the HUE value changes on every F5.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-17T01:25:42Z
+
+I've also removed the :star: element from the **initial** version:
+ * vote :+1: to remove it.
+ * vote :-1: to keep it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-08-17T21:28:00Z
+
+I really like the night sky with the stars. The Symfony logo totally reminded me of the moon. It would be funny to put the SF text on an allusion of a moon and add some glow. Something like https://www.vectorstock.com/royalty-free-vector/realistic-beautiful-moon-on-transparent-vector-19727271
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2019-08-24T13:21:37Z
+
+I think it's the best design cleanup the Symfony default page could ever hope for 😄
+
+I'd be okay to ship it as-is! 🚀
+
+---------------------------------------------------------------------------
+
+by gmponos at 2019-08-24T15:13:57Z
+
+I liked the star element and maybe there could be a wordplay somewhere like "Star the symfony project". Not sure if it will make it worse though...
+
+Anyway really great result.

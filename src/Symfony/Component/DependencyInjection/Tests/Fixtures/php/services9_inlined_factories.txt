@@ -90,8 +90,8 @@ class ProjectServiceContainer extends Container
             'decorated' => 'decorator_service_with_name',
         ];
 
-        $this->privates['service_container'] = function () {
-            include_once $this->targetDirs[0].'/Fixtures/includes/foo.php';
+        $this->privates['service_container'] = static function () {
+            include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/foo.php';
         };
     }
 
@@ -287,7 +287,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFoo_BazService()
     {
-        include_once $this->targetDirs[0].'/Fixtures/includes/classes.php';
+        include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/classes.php';
 
         $this->services['foo.baz'] = $instance = \BazClass::getInstance();
 
@@ -331,7 +331,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getLazyContextService()
     {
-        include_once $this->targetDirs[0].'/Fixtures/includes/classes.php';
+        include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/classes.php';
 
         return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
             yield 'k1' => ($this->services['foo.baz'] ?? $this->getFoo_BazService());
@@ -348,7 +348,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getLazyContextIgnoreInvalidRefService()
     {
-        include_once $this->targetDirs[0].'/Fixtures/includes/classes.php';
+        include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/classes.php';
 
         return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () {
             yield 0 => ($this->services['foo.baz'] ?? $this->getFoo_BazService());
@@ -364,7 +364,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getMethodCall1Service()
     {
-        include_once ($this->targetDirs[0].'/Fixtures/includes/foo.php');
+        include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/foo.php';
 
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
@@ -399,7 +399,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getNonSharedFooService()
     {
-        include_once ($this->targetDirs[0].'/Fixtures/includes/foo.php');
+        include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/foo.php';
 
         return new \Bar\FooClass();
     }
@@ -533,6 +533,14 @@ class ProjectServiceContainer extends Container
         throw new RuntimeException($message);
     }
 }
+
+    [ProjectServiceContainer.preload.php] => <?php
+%A
+
+$classes = [];
+$classes[] = 'Bar\FooClass';
+
+%A
 
     [ProjectServiceContainer.php] => <?php
 

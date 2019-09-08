@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-09-06T07:53:08Z
+
+You can already see the FQCN when you move your mouse cursor over the class short name (thanks to the `title` HTML attr), so not sure it's really needed. Most of the time you know the class you are dumping.
+
+---------------------------------------------------------------------------
+
+by pavinthan at 2019-09-06T08:00:15Z
+
+@fancyweb Yes We can able to see the title, could you able to copy that? ( you may need to inspect the element to copy that ) and sometime we are not sure about class we dumping ( eg: think about external libraries ), please advice me feather.
+
+Thanks.

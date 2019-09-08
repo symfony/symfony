@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by alediator at 2019-08-01T12:52:00Z
+
+I have added some additional fixes and a test in the normalizer
+
+---------------------------------------------------------------------------
+
+by alediator at 2019-08-01T13:18:16Z
+
+I could fix the test just switching the type of the intMatrix to 'array', but then we are saying that typing as `int[][]` is not possible.
+
+What do you think?

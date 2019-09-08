@@ -1098,8 +1098,7 @@ class Application
      */
     public function extractNamespace($name, $limit = null)
     {
-        $parts = explode(':', $name);
-        array_pop($parts);
+        $parts = explode(':', $name, -1);
 
         return implode(':', null === $limit ? $parts : \array_slice($parts, 0, $limit));
     }

@@ -4,6 +4,18 @@ CHANGELOG
 4.4.0
 -----
 
+ * [BC BREAK] changed the syntax for failover and roundrobin DSNs
+
+   Before:
+
+   dummy://a || dummy://b (for failover)
+   dummy://a && dummy://b (for roundrobin)
+
+   After:
+
+   failover(dummy://a dummy://b)
+   roundrobin(dummy://a dummy://b)
+
  * added support for multiple transports on a `Mailer` instance
  * [BC BREAK] removed the `auth_mode` DSN option (it is now always determined automatically)
  * STARTTLS cannot be enabled anymore (it is used automatically if TLS is disabled and the server supports STARTTLS)

@@ -201,6 +201,8 @@ class YamlDumper extends Dumper
      * Dumps callable to YAML format.
      *
      * @param mixed $callable
+     *
+     * @return mixed
      */
     private function dumpCallable($callable)
     {
@@ -299,7 +301,7 @@ class YamlDumper extends Dumper
         return sprintf('%%%s%%', $id);
     }
 
-    private function getExpressionCall(string $expression)
+    private function getExpressionCall(string $expression): string
     {
         return sprintf('@=%s', $expression);
     }

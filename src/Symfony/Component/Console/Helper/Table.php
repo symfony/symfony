@@ -48,6 +48,7 @@ class Table
      * Table rows.
      */
     private $rows = [];
+    private $horizontal = false;
 
     /**
      * Column widths cache.
@@ -310,6 +311,13 @@ class Table
         return $this;
     }
 
+    public function setHorizontal(bool $horizontal = true): self
+    {
+        $this->horizontal = $horizontal;
+
+        return $this;
+    }
+
     /**
      * Renders table to output.
      *
@@ -325,14 +333,35 @@ class Table
      */
     public function render()
     {
-        $rows = array_merge($this->headers, [$divider = new TableSeparator()], $this->rows);
+        $divider = new TableSeparator();
+        if ($this->horizontal) {
+            $rows = [];
+            foreach ($this->headers[0] ?? [] as $i => $header) {
+                $rows[$i] = [$header];
+                foreach ($this->rows as $row) {
+                    if ($row instanceof TableSeparator) {
+                        continue;
+                    }
+                    if (isset($row[$i])) {
+                        $rows[$i][] = $row[$i];
+                    } elseif ($rows[$i][0] instanceof TableCell && $rows[$i][0]->getColspan() >= 2) {
+                        // Noop, there is a "title"
+                    } else {
+                        $rows[$i][] = null;
+                    }
+                }
+            }
+        } else {
+            $rows = array_merge($this->headers, [$divider], $this->rows);
+        }
+
         $this->calculateNumberOfColumns($rows);
 
         $rows = $this->buildTableRows($rows);
         $this->calculateColumnsWidth($rows);
 
-        $isHeader = true;
-        $isFirstRow = false;
+        $isHeader = !$this->horizontal;
+        $isFirstRow = $this->horizontal;
         foreach ($rows as $row) {
             if ($divider === $row) {
                 $isHeader = false;
@@ -357,8 +386,11 @@ class Table
                     $this->renderRowSeparator(self::SEPARATOR_TOP, $this->headerTitle, $this->style->getHeaderTitleFormat());
                 }
             }
-
-            $this->renderRow($row, $isHeader ? $this->style->getCellHeaderFormat() : $this->style->getCellRowFormat());
+            if ($this->horizontal) {
+                $this->renderRow($row, $this->style->getCellRowFormat(), $this->style->getCellHeaderFormat());
+            } else {
+                $this->renderRow($row, $isHeader ? $this->style->getCellHeaderFormat() : $this->style->getCellRowFormat());
+            }
         }
         $this->renderRowSeparator(self::SEPARATOR_BOTTOM, $this->footerTitle, $this->style->getFooterTitleFormat());
 
@@ -438,13 +470,17 @@ class Table
      *
      *     | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
      */
-    private function renderRow(array $row, string $cellFormat)
+    private function renderRow(array $row, string $cellFormat, string $firstCellFormat = null)
     {
         $rowContent = $this->renderColumnSeparator(self::BORDER_OUTSIDE);
         $columns = $this->getRowColumns($row);
         $last = \count($columns) - 1;
         foreach ($columns as $i => $column) {
-            $rowContent .= $this->renderCell($row, $column, $cellFormat);
+            if ($firstCellFormat && 0 === $i) {
+                $rowContent .= $this->renderCell($row, $column, $firstCellFormat);
+            } else {
+                $rowContent .= $this->renderCell($row, $column, $cellFormat);
+            }
             $rowContent .= $this->renderColumnSeparator($last === $i ? self::BORDER_OUTSIDE : self::BORDER_INSIDE);
         }
         $this->output->writeln($rowContent);

@@ -1786,7 +1786,7 @@ class RequestTest extends TestCase
         $property->setValue(false);
     }
 
-    private function getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies)
+    private function getRequestInstanceForClientIpTests(string $remoteAddr, ?string $httpForwardedFor, ?array $trustedProxies): Request
     {
         $request = new Request();
 
@@ -1804,7 +1804,7 @@ class RequestTest extends TestCase
         return $request;
     }
 
-    private function getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies)
+    private function getRequestInstanceForClientIpsForwardedTests(string $remoteAddr, ?string $httpForwarded, ?array $trustedProxies): Request
     {
         $request = new Request();
 

@@ -531,6 +531,7 @@ Translation
  * The `MessageSelector`, `Interval` and `PluralizationRules` classes have been removed, use `IdentityTranslator` instead
  * The `Translator::getFallbackLocales()` and `TranslationDataCollector::getFallbackLocales()` method are now internal
  * The `Translator::transChoice()` method has been removed in favor of using `Translator::trans()` with "%count%" as the parameter driving plurals
+ * Removed support for implicit STDIN usage in the `lint:xliff` command, use `lint:xliff -` (append a dash) instead to make it explicit.
 
 TwigBundle
 ----------
@@ -548,6 +549,7 @@ TwigBridge
  * removed the `$requestStack` and `$requestContext` arguments of the
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
    instance as the only argument instead
+ * Removed support for implicit STDIN usage in the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
 
 Validator
 --------
@@ -653,6 +655,7 @@ Yaml
 
  * The parser is now stricter and will throw a `ParseException` when a
    mapping is found inside a multi-line string.
+ * Removed support for implicit STDIN usage in the `lint:yaml` command, use `lint:yaml -` (append a dash) instead to make it explicit.
 
 WebProfilerBundle
 -----------------

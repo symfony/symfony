@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport;
@@ -44,14 +45,42 @@ class TransportTest extends TestCase
         ];
 
         yield 'failover transport' => [
-            'dummy://a || dummy://b',
+            'failover(dummy://a dummy://b)',
             new FailoverTransport([$transportA, $transportB]),
         ];
 
         yield 'round robin transport' => [
-            'dummy://a && dummy://b',
+            'roundrobin(dummy://a dummy://b)',
             new RoundRobinTransport([$transportA, $transportB]),
         ];
+
+        yield 'mixed transport' => [
+            'roundrobin(dummy://a failover(dummy://b dummy://a) dummy://b)',
+            new RoundRobinTransport([$transportA, new FailoverTransport([$transportB, $transportA]), $transportB]),
+        ];
+    }
+
+    /**
+     * @dataProvider fromWrongStringProvider
+     */
+    public function testFromWrongString(string $dsn, string $error): void
+    {
+        $transportFactory = new Transport([new DummyTransportFactory()]);
+
+        $this->expectExceptionMessage($error);
+        $this->expectException(InvalidArgumentException::class);
+        $transportFactory->fromString($dsn);
+    }
+
+    public function fromWrongStringProvider(): iterable
+    {
+        yield 'garbage at the end' => ['dummy://a some garbage here', 'The DSN has some garbage at the end:  some garbage here.'];
+
+        yield 'not a valid DSN' => ['something not a dsn', 'The "something" mailer DSN must contain a scheme.'];
+
+        yield 'failover not closed' => ['failover(dummy://a', 'The "(dummy://a" mailer DSN must contain a scheme.'];
+
+        yield 'not a valid keyword' => ['foobar(dummy://a)', 'The "foobar" keyword is not valid (valid ones are "failover", "roundrobin")'];
     }
 }
 

@@ -15,6 +15,7 @@ CHANGELOG
  * deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
    `DebugCommand::__construct()` method, swap the variables position.
  * the `LintCommand` lints all the templates stored in all configured Twig paths if none argument is provided
+ * deprecated accepting STDIN implicitly when using the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
 
 4.3.0
 -----

@@ -37,11 +37,11 @@ class ProjectServiceContainer extends Container
 
         $this->aliases = [];
 
-        $this->privates['service_container'] = function () {
-            include_once $this->targetDirs[1].'/includes/HotPath/I1.php';
-            include_once $this->targetDirs[1].'/includes/HotPath/P1.php';
-            include_once $this->targetDirs[1].'/includes/HotPath/T1.php';
-            include_once $this->targetDirs[1].'/includes/HotPath/C1.php';
+        $this->privates['service_container'] = static function () {
+            include_once \dirname(__DIR__, 0 + 1).'/includes/HotPath/I1.php';
+            include_once \dirname(__DIR__, 0 + 1).'/includes/HotPath/P1.php';
+            include_once \dirname(__DIR__, 0 + 1).'/includes/HotPath/T1.php';
+            include_once \dirname(__DIR__, 0 + 1).'/includes/HotPath/C1.php';
         };
     }
 
@@ -91,8 +91,8 @@ class ProjectServiceContainer extends Container
      */
     protected function getC2Service()
     {
-        include_once $this->targetDirs[1].'/includes/HotPath/C2.php';
-        include_once $this->targetDirs[1].'/includes/HotPath/C3.php';
+        include_once \dirname(__DIR__, 0 + 1).'/includes/HotPath/C2.php';
+        include_once \dirname(__DIR__, 0 + 1).'/includes/HotPath/C3.php';
 
         return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3());
     }

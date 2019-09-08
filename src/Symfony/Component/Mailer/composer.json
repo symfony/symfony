@@ -21,12 +21,12 @@
         "psr/log": "~1.0",
         "symfony/event-dispatcher": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
-        "symfony/service-contracts": "^1.1"
+        "symfony/service-contracts": "^1.1|^2"
     },
     "require-dev": {
         "symfony/amazon-mailer": "^4.4|^5.0",
         "symfony/google-mailer": "^4.4|^5.0",
-        "symfony/http-client-contracts": "^1.1",
+        "symfony/http-client-contracts": "^1.1|^2",
         "symfony/mailgun-mailer": "^4.4|^5.0",
         "symfony/mailchimp-mailer": "^4.4|^5.0",
         "symfony/messenger": "^4.4|^5.0",

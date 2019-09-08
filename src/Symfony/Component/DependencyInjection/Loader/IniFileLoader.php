@@ -66,6 +66,8 @@ class IniFileLoader extends FileLoader
      * Note that the following features are not supported:
      *  * strings with escaped quotes are not supported "foo\"bar";
      *  * string concatenation ("foo" "bar").
+     *
+     * @return mixed
      */
     private function phpize(string $value)
     {

@@ -183,7 +183,7 @@ class GraphvizDumper extends Dumper
         return $nodes;
     }
 
-    private function cloneContainer()
+    private function cloneContainer(): ContainerBuilder
     {
         $parameterBag = new ParameterBag($this->container->getParameterBag()->all());
 

@@ -109,7 +109,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     /**
      * @internal
      */
-    final public function getProcessedConfigs()
+    final public function getProcessedConfigs(): array
     {
         try {
             return $this->processedConfigs;

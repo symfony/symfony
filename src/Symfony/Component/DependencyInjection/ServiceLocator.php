@@ -64,6 +64,8 @@ class ServiceLocator implements ServiceProviderInterface
 
     /**
      * @internal
+     *
+     * @return static
      */
     public function withContext(string $externalId, Container $container)
     {
@@ -127,7 +129,7 @@ class ServiceLocator implements ServiceProviderInterface
         return new ServiceCircularReferenceException($id, $path);
     }
 
-    private function formatAlternatives(array $alternatives = null, string $separator = 'and')
+    private function formatAlternatives(array $alternatives = null, string $separator = 'and'): string
     {
         $format = '"%s"%s';
         if (null === $alternatives) {

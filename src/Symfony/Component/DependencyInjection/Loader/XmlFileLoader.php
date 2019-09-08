@@ -435,7 +435,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    private function getArgumentsAsPhp(\DOMElement $node, string $name, string $file, bool $isChildDefinition = false)
+    private function getArgumentsAsPhp(\DOMElement $node, string $name, string $file, bool $isChildDefinition = false): array
     {
         $arguments = [];
         foreach ($this->getChildren($node, $name) as $arg) {

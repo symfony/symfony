@@ -338,11 +338,9 @@ class XmlDumper extends Dumper
      *
      * @param mixed $value Value to convert
      *
-     * @return string
-     *
      * @throws RuntimeException When trying to dump object or resource
      */
-    public static function phpToXml($value)
+    public static function phpToXml($value): string
     {
         switch (true) {
             case null === $value:

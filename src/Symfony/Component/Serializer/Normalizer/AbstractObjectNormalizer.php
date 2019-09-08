@@ -383,6 +383,26 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
                     $context['key_type'] = $collectionKeyType;
                 }
+            } elseif ($type->isCollection() && null !== ($collectionValueType = $type->getCollectionValueType()) && Type::BUILTIN_TYPE_ARRAY === $collectionValueType->getBuiltinType()) {
+                // get inner type for any nested array
+                $innerType = $collectionValueType;
+
+                // note that it will break for any other builtinType
+                $dimensions = '[]';
+                while (null !== $innerType->getCollectionValueType() && Type::BUILTIN_TYPE_ARRAY === $innerType->getBuiltinType()) {
+                    $dimensions .= '[]';
+                    $innerType = $innerType->getCollectionValueType();
+                }
+
+                if (null !== $innerType->getClassName()) {
+                    // the builtinType is the inner one and the class is the class followed by []...[]
+                    $builtinType = $innerType->getBuiltinType();
+                    $class = $innerType->getClassName().$dimensions;
+                } else {
+                    // default fallback (keep it as array)
+                    $builtinType = $type->getBuiltinType();
+                    $class = $type->getClassName();
+                }
             } else {
                 $builtinType = $type->getBuiltinType();
                 $class = $type->getClassName();

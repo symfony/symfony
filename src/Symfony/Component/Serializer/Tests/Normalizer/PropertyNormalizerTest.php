@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyChild;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
@@ -339,6 +340,52 @@ class PropertyNormalizerTest extends TestCase
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new PropertyChildDummy()));
     }
+
+    public function testMultiDimensionObject()
+    {
+        $normalizer = $this->getDenormalizerForTypeEnforcement();
+        $root = $normalizer->denormalize([
+                'children' => [[
+                    ['foo' => 'one', 'bar' => 'two'],
+                    ['foo' => 'three', 'bar' => 'four'],
+                ]],
+                'grandChildren' => [[[
+                    ['foo' => 'five', 'bar' => 'six'],
+                    ['foo' => 'seven', 'bar' => 'eight'],
+                ]]],
+                'intMatrix' => [
+                    [0, 1, 2],
+                    [3, 4, 5],
+                ],
+            ],
+            RootDummy::class,
+            'any'
+        );
+        $this->assertEquals(\get_class($root), RootDummy::class);
+
+        // children (two dimension array)
+        $this->assertCount(1, $root->children);
+        $this->assertCount(2, $root->children[0]);
+        $firstChild = $root->children[0][0];
+        $this->assertInstanceOf(Dummy::class, $firstChild);
+        $this->assertSame('one', $firstChild->foo);
+        $this->assertSame('two', $firstChild->bar);
+
+        // grand children (three dimension array)
+        $this->assertCount(1, $root->grandChildren);
+        $this->assertCount(1, $root->grandChildren[0]);
+        $this->assertCount(2, $root->grandChildren[0][0]);
+        $firstGrandChild = $root->grandChildren[0][0][0];
+        $this->assertInstanceOf(Dummy::class, $firstGrandChild);
+        $this->assertSame('five', $firstGrandChild->foo);
+        $this->assertSame('six', $firstGrandChild->bar);
+
+        // int matrix
+        $this->assertSame([
+            [0, 1, 2],
+            [3, 4, 5],
+        ], $root->intMatrix);
+    }
 }
 
 class PropertyDummy
@@ -403,4 +450,35 @@ class PropertyParentDummy
 
 class PropertyChildDummy extends PropertyParentDummy
 {
+}
+
+class RootDummy
+{
+    public $children;
+    public $grandChildren;
+    public $intMatrix;
+
+    /**
+     * @return Dummy[][]
+     */
+    public function getChildren(): array
+    {
+        return $this->children;
+    }
+
+    /**
+     * @return Dummy[][][]
+     */
+    public function getGrandChildren()
+    {
+        return $this->grandChildren;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIntMatrix()
+    {
+        return $this->intMatrix;
+    }
 }

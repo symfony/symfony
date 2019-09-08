@@ -58,9 +58,9 @@ class RoundRobinTransport implements TransportInterface
 
     public function __toString(): string
     {
-        return implode(' '.$this->getNameSymbol().' ', array_map(function (TransportInterface $transport) {
+        return $this->getNameSymbol().'('.implode(' ', array_map(function (TransportInterface $transport) {
             return (string) $transport;
-        }, $this->transports));
+        }, $this->transports)).')';
     }
 
     /**
@@ -99,7 +99,7 @@ class RoundRobinTransport implements TransportInterface
 
     protected function getNameSymbol(): string
     {
-        return '&&';
+        return 'roundrobin';
     }
 
     private function moveCursor(int $cursor): int

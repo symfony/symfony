@@ -34,7 +34,8 @@ CHANGELOG
  * Not tagging service route loaders with `routing.route_loader` has been deprecated.
  * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
  * Added new `error_controller` configuration to handle system exceptions
-
+ * Added sort option for `translation:update` command.
+ 
 4.3.0
 -----
 

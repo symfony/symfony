@@ -50,7 +50,7 @@ class LintCommand extends Command
         $this
             ->setDescription('Lints a template and outputs encountered errors')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
-            ->addArgument('filename', InputArgument::IS_ARRAY)
+            ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lints a template and outputs to STDOUT
 the first encountered syntax error.
@@ -77,15 +77,15 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
+        $hasStdin = '-' === ($filenames[0] ?? '');
 
-        if (0 === \count($filenames)) {
-            if (0 === ftell(STDIN)) {
-                $template = '';
-                while (!feof(STDIN)) {
-                    $template .= fread(STDIN, 1024);
+        if ($hasStdin || 0 === \count($filenames)) {
+            if ($hasStdin || 0 === ftell(STDIN)) { // remove 0 === ftell(STDIN) check in 5.0
+                if (!$hasStdin) {
+                    @trigger_error('Calling to the "lint:twig" command providing pipe file content to STDIN without passing the dash symbol "-" explicitly is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
                 }
 
-                return $this->display($input, $output, $io, [$this->validate($template, uniqid('sf_', true))]);
+                return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
             }
 
             $loader = $this->twig->getLoader();
@@ -105,6 +105,16 @@ EOF
         $filesInfo = $this->getFilesInfo($filenames);
 
         return $this->display($input, $output, $io, $filesInfo);
+    }
+
+    private function getStdin(): string
+    {
+        $template = '';
+        while (!feof(STDIN)) {
+            $template .= fread(STDIN, 1024);
+        }
+
+        return $template;
     }
 
     private function getFilesInfo(array $filenames)

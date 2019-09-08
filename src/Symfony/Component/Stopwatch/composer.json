@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^7.2.9",
-        "symfony/service-contracts": "^1.0"
+        "symfony/service-contracts": "^1.0|^2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Stopwatch\\": "" },

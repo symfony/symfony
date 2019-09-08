@@ -1993,7 +1993,7 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfUndefinedNestedOption()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
-        $this->expectExceptionMessage('The option "foo" does not exist. Defined options are: "host", "port".');
+        $this->expectExceptionMessage('The option "database[foo]" does not exist. Defined options are: "host", "port".');
         $this->resolver->setDefaults([
             'name' => 'default',
             'database' => function (OptionsResolver $resolver) {
@@ -2008,7 +2008,7 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfMissingRequiredNestedOption()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
-        $this->expectExceptionMessage('The required option "host" is missing.');
+        $this->expectExceptionMessage('The required option "database[host]" is missing.');
         $this->resolver->setDefaults([
             'name' => 'default',
             'database' => function (OptionsResolver $resolver) {
@@ -2023,7 +2023,7 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfInvalidTypeNestedOption()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "logging" with value null is expected to be of type "bool", but is of type "NULL".');
+        $this->expectExceptionMessage('The option "database[logging]" with value null is expected to be of type "bool", but is of type "NULL".');
         $this->resolver->setDefaults([
             'name' => 'default',
             'database' => function (OptionsResolver $resolver) {

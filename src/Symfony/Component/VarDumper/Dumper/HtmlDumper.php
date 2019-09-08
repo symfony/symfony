@@ -319,12 +319,16 @@ return function (root, x) {
                 f(e.target, e);
             } else if ('A' == e.target.parentNode.tagName) {
                 f(e.target.parentNode, e);
-            } else if ((n = e.target.nextElementSibling) && 'A' == n.tagName) {
-                if (!/\bsf-dump-toggle\b/.test(n.className)) {
-                    n = n.nextElementSibling;
-                }
+            } else {
+                n = /\bsf-dump-ellipsis\b/.test(e.target.className) ? e.target.parentNode : e.target;
 
-                f(n, e, true);
+                if ((n = n.nextElementSibling) && 'A' == n.tagName) {
+                    if (!/\bsf-dump-toggle\b/.test(n.className)) {
+                        n = n.nextElementSibling || n;
+                    }
+
+                    f(n, e, true);
+                }
             }
         });
     };
@@ -670,11 +674,6 @@ pre.sf-dump span {
 pre.sf-dump .sf-dump-compact {
     display: none;
 }
-pre.sf-dump abbr {
-    text-decoration: none;
-    border: none;
-    cursor: help;
-}
 pre.sf-dump a {
     text-decoration: none;
     cursor: pointer;
@@ -795,6 +794,7 @@ EOHTML
         foreach ($this->styles as $class => $style) {
             $line .= 'pre.sf-dump'.('default' === $class ? ', pre.sf-dump' : '').' .sf-dump-'.$class.'{'.$style.'}';
         }
+        $line .= 'pre.sf-dump .sf-dump-ellipsis-note{'.$this->styles['note'].'}';
 
         return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
     }
@@ -821,6 +821,9 @@ EOHTML
      */
     public function enterHash(Cursor $cursor, int $type, $class, bool $hasChild)
     {
+        if (Cursor::HASH_OBJECT === $type) {
+            $cursor->attr['depth'] = $cursor->depth;
+        }
         parent::enterHash($cursor, $type, $class, false);
 
         if ($cursor->skipChildren) {
@@ -884,14 +887,13 @@ EOHTML
             $style .= sprintf(' title="%s"', empty($attr['dynamic']) ? 'Public property' : 'Runtime added dynamic property');
         } elseif ('str' === $style && 1 < $attr['length']) {
             $style .= sprintf(' title="%d%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
-        } elseif ('note' === $style && false !== $c = strrpos($v, '\\')) {
-            if (isset($attr['file']) && $link = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
-                $link = sprintf('<a href="%s" rel="noopener noreferrer">^</a>', esc($this->utf8Encode($link)));
-            } else {
-                $link = '';
-            }
-
-            return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>%s', $v, $style, substr($v, $c + 1), $link);
+        } elseif ('note' === $style && 0 < ($attr['depth'] ?? 0) && false !== $c = strrpos($value, '\\')) {
+            $style .= ' title=""';
+            $attr += [
+                'ellipsis' => \strlen($value) - $c,
+                'ellipsis-type' => 'note',
+                'ellipsis-tail' => 1,
+            ];
         } elseif ('protected' === $style) {
             $style .= ' title="Protected property"';
         } elseif ('meta' === $style && isset($attr['title'])) {
@@ -912,7 +914,7 @@ EOHTML
 
             if (!empty($attr['ellipsis-tail'])) {
                 $tail = \strlen(esc(substr($value, -$attr['ellipsis'], $attr['ellipsis-tail'])));
-                $v .= sprintf('<span class=sf-dump-ellipsis>%s</span>%s', substr($label, 0, $tail), substr($label, $tail));
+                $v .= sprintf('<span class=%s>%s</span>%s', $class, substr($label, 0, $tail), substr($label, $tail));
             } else {
                 $v .= $label;
             }

@@ -110,7 +110,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_tagged_argument.yml', $dumper->dump());
     }
 
-    private function assertEqualYamlStructure($expected, $yaml, $message = '')
+    private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')
     {
         $parser = new Parser();
 

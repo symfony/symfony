@@ -96,7 +96,7 @@ class FileLinkFormatter
 
             if ($request instanceof Request && (!$this->urlFormat instanceof \Closure || $this->urlFormat = ($this->urlFormat)())) {
                 return [
-                    $request->getSchemeAndHttpHost().$request->getBasePath().$this->urlFormat,
+                    $request->getSchemeAndHttpHost().$this->urlFormat,
                     $this->baseDir.\DIRECTORY_SEPARATOR, '',
                 ];
             }

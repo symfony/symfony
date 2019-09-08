@@ -20,10 +20,8 @@ use Symfony\Component\Workflow\WorkflowInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
- *
- * @final since Symfony 4.4
  */
-class GuardEvent extends Event
+final class GuardEvent extends Event
 {
     private $transitionBlockerList;
 
@@ -37,12 +35,12 @@ class GuardEvent extends Event
         $this->transitionBlockerList = new TransitionBlockerList();
     }
 
-    public function isBlocked()
+    public function isBlocked(): bool
     {
         return !$this->transitionBlockerList->isEmpty();
     }
 
-    public function setBlocked(bool $blocked)
+    public function setBlocked(bool $blocked): void
     {
         if (!$blocked) {
             $this->transitionBlockerList->clear();

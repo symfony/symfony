@@ -24,10 +24,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * Controllers should be callables.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @final since Symfony 4.4
  */
-class ControllerEvent extends KernelEvent
+final class ControllerEvent extends KernelEvent
 {
     private $controller;
 
@@ -38,17 +36,12 @@ class ControllerEvent extends KernelEvent
         $this->setController($controller);
     }
 
-    /**
-     * Returns the current controller.
-     *
-     * @return callable
-     */
-    public function getController()
+    public function getController(): callable
     {
         return $this->controller;
     }
 
-    public function setController(callable $controller)
+    public function setController(callable $controller): void
     {
         $this->controller = $controller;
     }

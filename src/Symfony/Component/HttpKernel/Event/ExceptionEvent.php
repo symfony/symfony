@@ -26,10 +26,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * event.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @final since Symfony 4.4
  */
-class ExceptionEvent extends RequestEvent
+final class ExceptionEvent extends RequestEvent
 {
     /**
      * The exception object.
@@ -50,12 +48,7 @@ class ExceptionEvent extends RequestEvent
         $this->setException($e);
     }
 
-    /**
-     * Returns the thrown exception.
-     *
-     * @return \Exception The thrown exception
-     */
-    public function getException()
+    public function getException(): \Exception
     {
         return $this->exception;
     }
@@ -64,10 +57,8 @@ class ExceptionEvent extends RequestEvent
      * Replaces the thrown exception.
      *
      * This exception will be thrown if no response is set in the event.
-     *
-     * @param \Exception $exception The thrown exception
      */
-    public function setException(\Exception $exception)
+    public function setException(\Exception $exception): void
     {
         $this->exception = $exception;
     }
@@ -75,17 +66,15 @@ class ExceptionEvent extends RequestEvent
     /**
      * Mark the event as allowing a custom response code.
      */
-    public function allowCustomResponseCode()
+    public function allowCustomResponseCode(): void
     {
         $this->allowCustomResponseCode = true;
     }
 
     /**
      * Returns true if the event allows a custom response code.
-     *
-     * @return bool
      */
-    public function isAllowingCustomResponseCode()
+    public function isAllowingCustomResponseCode(): bool
     {
         return $this->allowCustomResponseCode;
     }

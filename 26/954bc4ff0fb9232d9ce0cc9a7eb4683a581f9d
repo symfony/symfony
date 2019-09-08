@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-01T21:43:51Z
+
+If you plan to do one PR per component, I'd prefer one PR to update them all instead if possible :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-02T14:20:05Z
+
+Smaller PRs are mainly easier for me to handle at the moment. But if that’s jamming up the PR tracker, I’ll make larger ones. I doubt that one single gigantic PR for everything would be a good idea though.

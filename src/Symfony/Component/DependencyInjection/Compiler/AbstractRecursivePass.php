@@ -192,7 +192,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         return $r;
     }
 
-    private function getExpressionLanguage()
+    private function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists(ExpressionLanguage::class)) {
@@ -200,7 +200,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
             }
 
             $providers = $this->container->getExpressionLanguageProviders();
-            $this->expressionLanguage = new ExpressionLanguage(null, $providers, function ($arg) {
+            $this->expressionLanguage = new ExpressionLanguage(null, $providers, function (string $arg): string {
                 if ('""' === substr_replace($arg, '', 1, -1)) {
                     $id = stripcslashes(substr($arg, 1, -1));
                     $this->inExpression = true;

@@ -88,9 +88,8 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
 
     /**
      * @param Reference[] $refMap
-     * @param string|null $callerId
      */
-    public static function register(ContainerBuilder $container, array $refMap, $callerId = null): Reference
+    public static function register(ContainerBuilder $container, array $refMap, string $callerId = null): Reference
     {
         foreach ($refMap as $id => $ref) {
             if (!$ref instanceof Reference) {

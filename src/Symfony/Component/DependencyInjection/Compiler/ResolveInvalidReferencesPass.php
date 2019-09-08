@@ -51,6 +51,8 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
     /**
      * Processes arguments to determine invalid references.
      *
+     * @return mixed
+     *
      * @throws RuntimeException When an invalid reference is found
      */
     private function processValue($value, int $rootLevel = 0, int $level = 0)

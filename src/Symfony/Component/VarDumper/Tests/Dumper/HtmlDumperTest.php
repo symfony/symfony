@@ -78,16 +78,18 @@ class HtmlDumperTest extends TestCase
     <span class=sf-dump-meta>seekable</span>: <span class=sf-dump-const>true</span>
 %A  <span class=sf-dump-meta>options</span>: []
   </samp>}
-  "<span class=sf-dump-key>obj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a><samp id={$dumpId}-ref2%d>
+  "<span class=sf-dump-key>obj</span>" => <span class=sf-dump-note title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo
+"><span class="sf-dump-ellipsis sf-dump-ellipsis-note">Symfony\Component\VarDumper\Tests\Fixture</span><span class="sf-dump-ellipsis sf-dump-ellipsis-note">\</span>DumbFoo</span> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a><samp id={$dumpId}-ref2%d>
     +<span class=sf-dump-public title="Public property">foo</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
     +"<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
   </samp>}
   "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure(\$a, PDO &amp;\$b = null)</span> {<a class=sf-dump-ref>#%d</a><samp>
     <span class=sf-dump-meta>class</span>: "<span class=sf-dump-str title="Symfony\Component\VarDumper\Tests\Dumper\HtmlDumperTest
-55 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Dumper</span><span class=sf-dump-ellipsis>\</span>HtmlDumperTest</span>"
-    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\Dumper\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {<a class=sf-dump-ref>#%d</a> &%s;}
+55 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Dumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-class">\</span>HtmlDumperTest</span>"
+    <span class=sf-dump-meta>this</span>: <span class=sf-dump-note title="Symfony\Component\VarDumper\Tests\Dumper\HtmlDumperTest
+"><span class="sf-dump-ellipsis sf-dump-ellipsis-note">Symfony\Component\VarDumper\Tests\Dumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-note">\</span>HtmlDumperTest</span> {<a class=sf-dump-ref>#%d</a> &%s;}
     <span class=sf-dump-meta>file</span>: "<span class=sf-dump-str title="{$var['file']}
-%d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class=sf-dump-ellipsis>%e</span>Tests%eFixtures%edumb-var.php</span>"
+%d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eFixtures%edumb-var.php</span>"
     <span class=sf-dump-meta>line</span>: "<span class=sf-dump-str title="%d characters">{$var['line']} to {$var['line']}</span>"
   </samp>}
   "<span class=sf-dump-key>line</span>" => <span class=sf-dump-num>{$var['line']}</span>
@@ -98,7 +100,8 @@ class HtmlDumperTest extends TestCase
     <span class=sf-dump-index>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a>]
   </samp>]
   <span class=sf-dump-key>8</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
-  "<span class=sf-dump-key>sobj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a>}
+  "<span class=sf-dump-key>sobj</span>" => <span class=sf-dump-note title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo
+"><span class="sf-dump-ellipsis sf-dump-ellipsis-note">Symfony\Component\VarDumper\Tests\Fixture</span><span class="sf-dump-ellipsis sf-dump-ellipsis-note">\</span>DumbFoo</span> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a>}
   "<span class=sf-dump-key>snobj</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   "<span class=sf-dump-key>snobj2</span>" => {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   "<span class=sf-dump-key>file</span>" => "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"

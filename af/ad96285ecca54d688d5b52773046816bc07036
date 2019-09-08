@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-14T14:26:41Z
+
+For reference, here is some previous work by @BenMorel that shows that loading only the hot classes (vs everything) is what provides the best boost. Identifying these hot classes is what I'm trying to achieve here.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-06-14T17:11:40Z
+
+Is it really worth it to preload only hot classes? Doesn't that increase the complexity a lot, vs just preloading everything?
+
+---------------------------------------------------------------------------
+
+by BenMorel at 2019-06-14T17:38:09Z
+
+There's a slight performance improvement vs preloading everything when preloading hot classes **that were selected using actual runtime data**, as reported by opcache after a few runs of the application:
+
+| Benchmark | Requests per second | Diff |
+| --- | --- | --- |
+| No preloading | 631 rq/s | - |
+| Preload hot classes | 738 rq/s | +17% |
+| Preload everything | 712 rq/s | +13% |
+
+(original benchmark in [this thread](https://github.com/composer/composer/issues/7777))
+
+Any other pre-computed list would need to be benchmarked again, as the results may be very different (and could even be slower than preloading everything, as the list may be missing classes that will need to be linked at runtime).
+
+All in all, the difference between a carefully optimized preloader and an eager preloader is small, I'd personally be in favour of preloading everything by default, and let users create their own preloading script *if* they need the extra few % of performance.
+
+What could be interesting however, is shipping Symfony with a tool (like the one I used in [this post](https://github.com/composer/composer/issues/7777#issuecomment-440268416)) to generate the preloading file from opcache, together with some instructions on how to:
+
+- restart the server
+- navigate the website / use as many features of the app as possible
+- then dump the preloading script
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-14T20:52:12Z
+
+Identifying the hot classes using runtime data from opcache has a big drawback: rebooting the fpm pool on prod servers. Not sure it's calling for good ops practices.
+Without having working numbers, it's way too early to draw any conclusions or close any doors.
+You may be right though, but please allow me to do the experiment :)
+
+---------------------------------------------------------------------------
+
+by BenMorel at 2019-06-14T21:29:44Z
+
+I did not have in mind to gather runtime data from the prod environment, but from the dev one!
+
+No worries, I just wanted to give a bit of warning here, I'm looking forward to your numbers!
+
+---------------------------------------------------------------------------
+
+by k00ni at 2019-06-18T11:09:52Z
+
+*I am not sure, if this is the right place to ask.*
+
+In the related [RFC](https://wiki.php.net/rfc/preload) they say:
+
+> The traded-in flexibility would include the inability to update these files once the server has been started (updating these files on the filesystem will not do anything; **A server restart will be required to apply the changes**); And also, this approach will not be compatible with servers that host multiple applications, or multiple versions of applications [...]
+
+How do you plan to manage updates in the `vendor` folder, if you have to restart the server to apply changes? If am on a shared hosting environment, would that affect me when using Symfony in the future?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-18T11:26:31Z
+
+Preloading is fundamentally incompatible with shared hosting yes, so you wouldn't use this on your provider. The added file is totally opt-in so one won't use it if one isn't able to restart the FPM server when deploying new code, that's correct.
+
+---------------------------------------------------------------------------
+
+by BenMorel at 2019-06-18T11:26:59Z
+
+> If am on a shared hosting environment, would that affect me when using Symfony in the future?
+
+Nope, preloading requires setup at server level (`opcache.preload`), which will never be enabled on shared hosting environments.
+
+Most likely any preloading script shipped with Symfony or Composer will be opt-in, and the choice to include it or not will be left to the server administrator.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-06-18T11:57:34Z
+
+It's 2019, so hopefully the population of developers who unfortunately still have to deal with shared hosting is shrinking rapidly...
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2019-06-26T10:19:31Z
+
+Hi @nicolas-grekas, if we have this feature in composer we could configure the classes directly on `composer.json` file and it could work for vendor/package level as well. Makes sense?
+
+HttpFoundation composer.json file:
+
+```json
+{
+    "preload": [
+         "Symfony\\HttpFoundation\\{Request,Response}",
+         "Symfony\\EntireNamespace\\*",
+         "Symfony\\{NS1,NS2}\\*"
+    ]
+}
+```
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2019-06-26T13:22:56Z
+
+I've just read the RFC at https://github.com/composer/composer/issues/7777 and seems that is not an easy decision to put such feature on composer.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-08T15:52:30Z
+
+I rebased this PR and I think it's time to merge it.
+
+Preloading doesn't work yet, but that's on PHP's side.
+The patch also fines tune the generated container even when preloading is not in use.
+
+Status: needs review

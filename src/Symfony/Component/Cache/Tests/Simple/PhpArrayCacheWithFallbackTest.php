@@ -50,7 +50,7 @@ class PhpArrayCacheWithFallbackTest extends CacheTestCase
         }
     }
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new PhpArrayCache(self::$file, new FilesystemCache('php-array-fallback', $defaultLifetime));
     }

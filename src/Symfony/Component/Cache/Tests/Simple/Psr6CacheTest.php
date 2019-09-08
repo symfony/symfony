@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\Psr6Cache;
 
@@ -23,10 +24,10 @@ abstract class Psr6CacheTest extends CacheTestCase
         'testPrune' => 'Psr6Cache just proxies',
     ];
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new Psr6Cache($this->createCacheItemPool($defaultLifetime));
     }
 
-    abstract protected function createCacheItemPool($defaultLifetime = 0);
+    abstract protected function createCacheItemPool(int $defaultLifetime = 0): CacheItemPoolInterface;
 }

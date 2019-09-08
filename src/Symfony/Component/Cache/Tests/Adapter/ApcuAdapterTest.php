@@ -23,7 +23,7 @@ class ApcuAdapterTest extends AdapterTestCase
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
     ];
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         if (!\function_exists('apcu_fetch') || !filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN)) {
             $this->markTestSkipped('APCu extension is required.');

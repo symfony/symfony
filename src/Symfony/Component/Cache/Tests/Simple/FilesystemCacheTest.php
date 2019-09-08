@@ -20,12 +20,12 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
  */
 class FilesystemCacheTest extends CacheTestCase
 {
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new FilesystemCache('', $defaultLifetime);
     }
 
-    protected function isPruned(CacheInterface $cache, $name)
+    protected function isPruned(CacheInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');
         $getFileMethod->setAccessible(true);

@@ -31,7 +31,7 @@ class CacheItemTest extends TestCase
         CacheItem::validateKey($key);
     }
 
-    public function provideInvalidKey()
+    public function provideInvalidKey(): array
     {
         return [
             [''],

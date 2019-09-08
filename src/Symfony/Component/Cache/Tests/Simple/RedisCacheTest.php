@@ -49,14 +49,14 @@ class RedisCacheTest extends AbstractRedisCacheTest
     /**
      * @dataProvider provideFailedCreateConnection
      */
-    public function testFailedCreateConnection($dsn)
+    public function testFailedCreateConnection(string $dsn)
     {
         $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
         $this->expectExceptionMessage('Redis connection failed');
         RedisCache::createConnection($dsn);
     }
 
-    public function provideFailedCreateConnection()
+    public function provideFailedCreateConnection(): array
     {
         return [
             ['redis://localhost:1234'],
@@ -68,14 +68,14 @@ class RedisCacheTest extends AbstractRedisCacheTest
     /**
      * @dataProvider provideInvalidCreateConnection
      */
-    public function testInvalidCreateConnection($dsn)
+    public function testInvalidCreateConnection(string $dsn)
     {
         $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
         $this->expectExceptionMessage('Invalid Redis DSN');
         RedisCache::createConnection($dsn);
     }
 
-    public function provideInvalidCreateConnection()
+    public function provideInvalidCreateConnection(): array
     {
         return [
             ['foo://localhost'],

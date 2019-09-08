@@ -26,7 +26,7 @@ class RedisTagAwareClusterAdapterTest extends RedisClusterAdapterTest
         $this->skippedTests['testTagItemExpiry'] = 'Testing expiration slows down the test suite';
     }
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         $this->assertInstanceOf(RedisClusterProxy::class, self::$redis);
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);

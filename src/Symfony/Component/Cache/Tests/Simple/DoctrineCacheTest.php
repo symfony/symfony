@@ -26,7 +26,7 @@ class DoctrineCacheTest extends CacheTestCase
         'testNotUnserializable' => 'ArrayCache does not use serialize/unserialize',
     ];
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new DoctrineCache(new ArrayCache($defaultLifetime), '', $defaultLifetime);
     }

@@ -24,12 +24,12 @@ class PhpFilesCacheTest extends CacheTestCase
         'testDefaultLifeTime' => 'PhpFilesCache does not allow configuring a default lifetime.',
     ];
 
-    public function createSimpleCache(): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new PhpFilesCache('sf-cache');
     }
 
-    protected function isPruned(CacheInterface $cache, $name)
+    protected function isPruned(CacheInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');
         $getFileMethod->setAccessible(true);

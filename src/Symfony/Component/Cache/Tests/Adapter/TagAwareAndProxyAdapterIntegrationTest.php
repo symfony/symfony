@@ -26,7 +26,7 @@ class TagAwareAndProxyAdapterIntegrationTest extends TestCase
         $this->assertSame('bar', $cache->getItem('foo')->get());
     }
 
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             [new ArrayAdapter()],

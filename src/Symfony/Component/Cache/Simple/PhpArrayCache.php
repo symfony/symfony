@@ -229,7 +229,7 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
         return $saved;
     }
 
-    private function generateItems(array $keys, $default)
+    private function generateItems(array $keys, $default): iterable
     {
         $fallbackKeys = [];
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
  */
 class Psr6CacheWithoutAdapterTest extends Psr6CacheTest
 {
-    protected function createCacheItemPool($defaultLifetime = 0)
+    protected function createCacheItemPool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new ExternalAdapter($defaultLifetime);
     }

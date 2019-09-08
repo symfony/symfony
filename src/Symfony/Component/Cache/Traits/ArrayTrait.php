@@ -113,7 +113,7 @@ trait ArrayTrait
         $this->clear();
     }
 
-    private function generateItems(array $keys, float $now, callable $f)
+    private function generateItems(array $keys, float $now, callable $f): iterable
     {
         foreach ($keys as $i => $key) {
             if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] > $now || !$this->deleteItem($key))) {

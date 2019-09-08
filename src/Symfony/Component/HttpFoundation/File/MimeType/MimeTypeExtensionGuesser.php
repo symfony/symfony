@@ -768,6 +768,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'text/x-uuencode' => 'uu',
         'text/x-vcalendar' => 'vcs',
         'text/x-vcard' => 'vcf',
+        'video/avi' => 'avi',
         'video/3gpp' => '3gp',
         'video/3gpp2' => '3g2',
         'video/h261' => 'h261',

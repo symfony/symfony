@@ -75,6 +75,9 @@ class SessionListenerTest extends TestCase
         $this->assertTrue($response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
+
+        $this->assertTrue($response->headers->has('Expires'));
+        $this->assertLessThanOrEqual((new \DateTime('now', new \DateTimeZone('UTC'))), (new \DateTime($response->headers->get('Expires'))));
     }
 
     public function testSurrogateMasterRequestIsPublic()
@@ -104,10 +107,15 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertSame('30', $response->headers->getCacheControlDirective('max-age'));
 
+        $this->assertFalse($response->headers->has('Expires'));
+
         $listener->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
 
         $this->assertTrue($response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
+
+        $this->assertTrue($response->headers->has('Expires'));
+        $this->assertLessThanOrEqual((new \DateTime('now', new \DateTimeZone('UTC'))), (new \DateTime($response->headers->get('Expires'))));
     }
 }

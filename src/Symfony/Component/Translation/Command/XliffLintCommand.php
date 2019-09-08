@@ -53,7 +53,7 @@ class XliffLintCommand extends Command
     {
         $this
             ->setDescription('Lints a XLIFF file and outputs encountered errors')
-            ->addArgument('filename', InputArgument::IS_ARRAY, 'A file or a directory or STDIN')
+            ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a XLIFF file and outputs to STDOUT
@@ -83,13 +83,18 @@ EOF
         $filenames = (array) $input->getArgument('filename');
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
+        $hasStdin = '-' === ($filenames[0] ?? '');
 
-        if (0 === \count($filenames)) {
-            if (!$stdin = $this->getStdin()) {
+        if ($hasStdin || 0 === \count($filenames)) {
+            if (!$hasStdin && 0 !== ftell(STDIN)) { // remove 0 !== ftell(STDIN) check in 5.0
                 throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
 
-            return $this->display($io, [$this->validate($stdin)]);
+            if (!$hasStdin) {
+                @trigger_error('Calling to the "lint:xliff" command providing pipe file content to STDIN without passing the dash symbol "-" explicitly is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
+            }
+
+            return $this->display($io, [$this->validate($this->getStdin())]);
         }
 
         $filesInfo = [];
@@ -223,18 +228,14 @@ EOF
         }
     }
 
-    private function getStdin(): ?string
+    private function getStdin(): string
     {
-        if (0 !== ftell(STDIN)) {
-            return null;
-        }
-
-        $inputs = '';
+        $xliff = '';
         while (!feof(STDIN)) {
-            $inputs .= fread(STDIN, 1024);
+            $xliff .= fread(STDIN, 1024);
         }
 
-        return $inputs;
+        return $xliff;
     }
 
     private function getDirectoryIterator(string $directory)

@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-30T18:01:09Z
+
+![Cover](https://img.techpowerup.org/190730/2019-07-30-222438-1440x900-scrot.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T18:01:16Z
+
+I'm not sure this is the correct fix. Can you check what "urlFormat" is in the constructor, when this happens? Maybe a callback is passed, and this callback has the bug?
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-30T19:56:11Z
+
+I've already reviewed it @nicolas-grekas
+The base path was previously created by "FileLinkFormatter::generateUrlFormat" method.
+
+You can also see the "urlFormat" in the following path:
+`symfony/symfony/src/Symfony/Bundle/WebProfilerBundle/Resources/config/profiler.xml#63`
+
+        <service id="debug.file_link_formatter.url_format" class="string">
+            <factory class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter" method="generateUrlFormat" />
+            <argument type="service" id="router" />
+            <argument>_profiler_open_file</argument>
+            <argument>?file=%%f&amp;line=%%l#line%%l</argument>
+        </service>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T20:02:58Z
+
+OK, thanks for the reminder, works for me.
+Could you add a test case please?
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-07-30T20:08:46Z
+
+A test case with PHPUnit ?
+@nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T20:41:17Z
+
+Yes please
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-31T07:18:44Z
+
+@Arman-Hosseini creating a test for this is not a trivial thing so, if you need help, you can copy+paste this test and make the needed changes to test your feature: https://github.com/symfony/symfony/blob/f1cb4b59b9ec3700d820dcb3b78054c5b4e02b6b/src/Symfony/Component/HttpKernel/Tests/Debug/FileLinkFormatterTest.php#L49
+
+---------------------------------------------------------------------------
+
+by Arman-Hosseini at 2019-08-08T17:18:29Z
+
+Hello @nicolas-grekas and @javiereguiluz .
+I apologize. I am involved in a project and after that I only register a pull request in free time.
+Do I have to create a separate class to do this, or is it enough to do a few tests within that class?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-08T17:57:46Z
+
+Yes, please do add a method on the class that'd be perfect.

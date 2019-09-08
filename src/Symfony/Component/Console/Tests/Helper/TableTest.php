@@ -1125,6 +1125,61 @@ TABLE;
         $this->assertSame($expected, $this->getOutputContent($output));
     }
 
+    public function provideRenderHorizontalTests()
+    {
+        $headers = ['foo', 'bar', 'baz'];
+        $rows = [['one', 'two', 'tree'], ['1', '2', '3']];
+        $expected = <<<EOTXT
++-----+------+---+
+| foo | one  | 1 |
+| bar | two  | 2 |
+| baz | tree | 3 |
++-----+------+---+
+
+EOTXT;
+        yield [$headers, $rows, $expected];
+
+        $headers = ['foo', 'bar', 'baz'];
+        $rows = [['one', 'two'], ['1']];
+        $expected = <<<EOTXT
++-----+-----+---+
+| foo | one | 1 |
+| bar | two |   |
+| baz |     |   |
++-----+-----+---+
+
+EOTXT;
+        yield [$headers, $rows, $expected];
+
+        $headers = ['foo', 'bar', 'baz'];
+        $rows = [['one', 'two', 'tree'], new TableSeparator(), ['1', '2', '3']];
+        $expected = <<<EOTXT
++-----+------+---+
+| foo | one  | 1 |
+| bar | two  | 2 |
+| baz | tree | 3 |
++-----+------+---+
+
+EOTXT;
+        yield [$headers, $rows, $expected];
+    }
+
+    /**
+     * @dataProvider provideRenderHorizontalTests
+     */
+    public function testRenderHorizontal(array $headers, array $rows, string $expected)
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders($headers)
+            ->setRows($rows)
+            ->setHorizontal()
+        ;
+        $table->render();
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     protected function getOutputStream($decorated = false)
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, $decorated);

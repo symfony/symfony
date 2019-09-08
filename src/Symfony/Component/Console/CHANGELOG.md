@@ -8,6 +8,7 @@ CHANGELOG
  * added method `preventRedrawFasterThan()` and `forceRedrawSlowerThan()` on `ProgressBar`
  * `Application` implements `ResetInterface`
  * marked all dispatched event classes as `@final`
+ * added support for displaying table horizontally
 
 4.3.0
 -----

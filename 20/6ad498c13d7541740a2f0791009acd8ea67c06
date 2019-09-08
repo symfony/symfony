@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-07T09:33:11Z
+
+That's for 3.4, right? Could you please add a test case also?
+
+---------------------------------------------------------------------------
+
+by pbowyer at 2019-09-07T09:36:04Z
+
+Yes, will redo against 3.4. The code didn't apply to both versions, so it needs a separate patch for each.
+
+---------------------------------------------------------------------------
+
+by pbowyer at 2019-09-07T14:37:15Z
+
+@nicolas-grekas ✔️ Now against 3.4  ✔️ Test coverage added
+
+Had to force-push a second time to get Appveyor to rerun, as I force-pushed the first time before changing the base branch for the PR.

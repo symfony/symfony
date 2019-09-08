@@ -32,6 +32,29 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpSortedMessagesAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'asc']);
+        $this->assertRegExp("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
+    public function testDumpReverseSortedMessagesAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'desc']);
+        $this->assertRegExp("/\*test\*foo\*bar/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
+    public function testDumpWrongSortAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'test']);
+        $this->assertRegExp('/\[ERROR\] Wrong sort order/', $tester->getDisplay());
+    }
+
     public function testDumpMessagesAndCleanInRootDirectory()
     {
         $this->fs->remove($this->translationDir);
@@ -118,7 +141,10 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], HttpKernel\KernelInterface $kernel = null, array $transPaths = [], array $viewsPaths = []): CommandTester
+    /**
+     * @return CommandTester
+     */
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], HttpKernel\KernelInterface $kernel = null, array $transPaths = [], array $viewsPaths = [])
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()

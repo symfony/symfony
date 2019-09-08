@@ -36,6 +36,10 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  */
 class TranslationUpdateCommand extends Command
 {
+    private const ASC = 'asc';
+    private const DESC = 'desc';
+    private const SORT_ORDERS = [self::ASC, self::DESC];
+
     protected static $defaultName = 'translation:update';
 
     private $writer;
@@ -78,6 +82,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
                 new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version', '1.2'),
+                new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically'),
             ])
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
@@ -94,6 +99,10 @@ Example running against a Bundle (AcmeBundle)
 Example running against default messages directory
   <info>php %command.full_name% --dump-messages en</info>
   <info>php %command.full_name% --force --prefix="new_" fr</info>
+  
+Example running with sorting option
+    <info>php %command.full_name% --dump-messages --sort=asc en AcmeBundle</info>
+    <info>php %command.full_name% --dump-messages --sort=desc fr</info>
 EOF
             )
         ;
@@ -260,6 +269,21 @@ EOF
                 );
 
                 $domainMessagesCount = \count($list);
+
+                if ($sort = $input->getOption('sort')) {
+                    $sort = strtolower($sort);
+                    if (!\in_array($sort, self::SORT_ORDERS, true)) {
+                        $errorIo->error(['Wrong sort order', 'Supported formats are: '.implode(', ', self::SORT_ORDERS).'.']);
+
+                        return 1;
+                    }
+
+                    if (self::DESC === $sort) {
+                        rsort($list);
+                    } else {
+                        sort($list);
+                    }
+                }
 
                 $io->section(sprintf('Messages extracted for domain "<info>%s</info>" (%d message%s)', $domain, $domainMessagesCount, $domainMessagesCount > 1 ? 's' : ''));
                 $io->listing($list);

@@ -14,6 +14,7 @@ CHANGELOG
  * removed `FileDumper::setBackup()` and `TranslationWriter::disableBackup()`
  * removed `MessageFormatter::choiceFormat()`
  * added argument `$filename` to `PhpExtractor::parseTokens()`
+ * removed support for implicit STDIN usage in the `lint:xliff` command, use `lint:xliff -` (append a dash) instead to make it explicit.
 
 4.4.0
 -----

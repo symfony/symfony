@@ -86,18 +86,13 @@ EOF
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
         $flags = $input->getOption('parse-tags') ? Yaml::PARSE_CUSTOM_TAGS : 0;
-        $hasStdin = '-' === ($filenames[0] ?? '');
 
-        if ($hasStdin || 0 === \count($filenames)) {
-            if (!$hasStdin && 0 !== ftell(STDIN)) { // remove 0 !== ftell(STDIN) check in 5.0
-                throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
-            }
-
-            if (!$hasStdin) {
-                @trigger_error('Calling to the "lint:yaml" command providing pipe file content to STDIN without passing the dash symbol "-" explicitly is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
-            }
-
+        if ('-' === ($filenames[0] ?? '')) {
             return $this->display($io, [$this->validate($this->getStdin(), $flags)]);
+        }
+
+        if (0 === \count($filenames)) {
+            throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
         }
 
         $filesInfo = [];

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Removed support for mappings inside multi-line strings.
+ * removed support for implicit STDIN usage in the `lint:yaml` command, use `lint:yaml -` (append a dash) instead to make it explicit.
 
 4.4.0
 -----

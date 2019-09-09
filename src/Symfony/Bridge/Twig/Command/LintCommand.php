@@ -77,17 +77,12 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
-        $hasStdin = '-' === ($filenames[0] ?? '');
 
-        if ($hasStdin || 0 === \count($filenames)) {
-            if ($hasStdin || 0 === ftell(STDIN)) { // remove 0 === ftell(STDIN) check in 5.0
-                if (!$hasStdin) {
-                    @trigger_error('Calling to the "lint:twig" command providing pipe file content to STDIN without passing the dash symbol "-" explicitly is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
-                }
+        if ('-' === ($filenames[0] ?? '')) {
+            return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
+        }
 
-                return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
-            }
-
+        if (0 === \count($filenames)) {
             $loader = $this->twig->getLoader();
             if ($loader instanceof FilesystemLoader) {
                 $paths = [];

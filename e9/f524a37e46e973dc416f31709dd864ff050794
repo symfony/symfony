@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-07-18T20:14:31Z
+
+@nicolas-grekas
+
+Could you please give me some tips to make sure the tests pass? I'm not sure how to fix them
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-25T20:56:47Z
+
+Thanks, LGTM for the component.
+Note that the PR should target 4.4, can you rebase+retarget?
+If not, don't worry we can do it while merging.
+
+Could you please have a look at the configuration for the component in FrameworkBundle?
+I think the option "buffer" is defined as boolean there, so we should relax this now, and add a regexp check to ensure it is valid at compile time.
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-07-25T21:54:30Z
+
+Right now the default value of the buffer option is true, defined in `Symfony\Contracts\HttpClient\HttpClientInterface`. There's no buffer option configured in the frameworkbundle yet.
+
+Should I add this option in the configuration (both default_options and scoped_clients?) and validate it in the configuration?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-25T21:59:32Z
+
+I'd say yes :)
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-07-27T06:51:35Z
+
+I added the buffer configuration option for both the default_options as the scoped_clients.
+
+Also updated the documentation in a PR
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-08-02T14:19:38Z
+
+Regex is nice to cover a lot of use case, I'm just wondering about the DX if this is the best option ?
+
+If i want to create the regex that cover all of the text types it's not an easy one to create but this may be resolve by providing good examples in the documentation ?
+
+(And providing some regex as constant to help for common use cases would even be better, but i think it's too soon to provide this, let's see how it is used before providing this)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-04T15:57:15Z
+
+can you please rebase to get rid of the conflict? we removed the ForwardCompatTestTrait recently.
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-08-04T16:28:21Z
+
+Should be ok now
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-09T06:28:38Z
+
+I would not make the regex configurable (as I don't see the use cases but I can see how one can mess up with changing the regex). The `buffer` option should be `true`, `false`,  `auto` IMHO.
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-08-09T15:33:56Z
+
+Ok. So what should happen with this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-09T17:54:31Z
+
+We are on the right track. The configuration option should only allow `true`, `false`, `auto` (which is going to use you regex).
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-08-13T09:25:14Z
+
+Ok. Any idea which content types we'll allow to be buffered automatically? I need this one to be able to build a regex
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-20T09:43:57Z
+
+Why not the following solution:
+
+```yaml
+buffer: true
+buffer_regex: '/([a-z]+\/json)/'
+```
+
+buffer regex is containing the default one which could be overridden and is used if buffer is `true`... 🤔 The type mixing (`bool`/`string`) is not so the best option IMHO
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-01T14:49:48Z
+
+I figured out we could make this much more powerful by accepting a `Closure` to enable/disable buffering based on response headers. So there we are, PR updated.
+
+@rjwebdev could you please sync the PR description and the documentation PR?
+
+---------------------------------------------------------------------------
+
+by rjwebdev at 2019-09-07T10:01:00Z
+
+@nicolas-grekas
+
+Since you removed the `buffer` option from the Framework bundle, shouldn't the PR for the docs be closed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-07T10:08:44Z
+
+We'd need a new PR, to explain the option, in the doc for the component: `components/http_client.rst`

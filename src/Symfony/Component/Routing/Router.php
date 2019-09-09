@@ -23,11 +23,13 @@ use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper;
 use Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface;
+use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -394,6 +396,11 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     protected function getGeneratorDumperInstance()
     {
+        // For BC, fallback to PhpGeneratorDumper if the UrlGenerator and UrlGeneratorDumper are not consistent with each other
+        if (is_a($this->options['generator_class'], CompiledUrlGenerator::class, true) !== is_a($this->options['generator_dumper_class'], CompiledUrlGeneratorDumper::class, true)) {
+            return new PhpGeneratorDumper($this->getRouteCollection());
+        }
+
         return new $this->options['generator_dumper_class']($this->getRouteCollection());
     }
 
@@ -402,6 +409,11 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     protected function getMatcherDumperInstance()
     {
+        // For BC, fallback to PhpMatcherDumper if the UrlMatcher and UrlMatcherDumper are not consistent with each other
+        if (is_a($this->options['matcher_class'], CompiledUrlMatcher::class, true) !== is_a($this->options['matcher_dumper_class'], CompiledUrlMatcherDumper::class, true)) {
+            return new PhpMatcherDumper($this->getRouteCollection());
+        }
+
         return new $this->options['matcher_dumper_class']($this->getRouteCollection());
     }
 

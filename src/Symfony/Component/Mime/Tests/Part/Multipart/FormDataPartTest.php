@@ -26,7 +26,7 @@ class FormDataPartTest extends TestCase
         $b = new TextPart('content');
         $c = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
         $f = new FormDataPart([
-            'foo' => $content = 'very very long content that will not be cut even if the length i way more than 76 characters, ok?',
+            'foo' => $content = 'very very long content that will not be cut even if the length is way more than 76 characters, ok?',
             'bar' => clone $b,
             'baz' => clone $c,
         ]);

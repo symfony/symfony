@@ -81,13 +81,16 @@ class AbstractControllerTest extends ControllerTraitTest
 
 class TestAbstractController extends AbstractController
 {
-    use TestControllerTrait;
-
     private $throwOnUnexpectedService;
 
     public function __construct($throwOnUnexpectedService = true)
     {
         $this->throwOnUnexpectedService = $throwOnUnexpectedService;
+    }
+
+    public function __call(string $method, array $arguments)
+    {
+        return $this->$method(...$arguments);
     }
 
     public function setContainer(ContainerInterface $container)
@@ -112,11 +115,6 @@ class TestAbstractController extends AbstractController
         }
 
         return parent::setContainer($container);
-    }
-
-    public function getParameter(string $name)
-    {
-        return parent::getParameter($name);
     }
 
     public function fooAction()

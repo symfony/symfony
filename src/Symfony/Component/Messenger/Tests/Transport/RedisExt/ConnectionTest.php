@@ -20,6 +20,21 @@ use Symfony\Component\Messenger\Transport\RedisExt\Connection;
  */
 class ConnectionTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        $redis = Connection::fromDsn('redis://localhost/queue');
+
+        try {
+            $redis->get();
+        } catch (TransportException $e) {
+            if (0 === strpos($e->getMessage(), 'ERR unknown command \'X')) {
+                self::markTestSkipped('Redis server >= 5 is required');
+            }
+
+            throw $e;
+        }
+    }
+
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);

@@ -85,6 +85,10 @@ class Dumper
                     } else {
                         $output .= "\n";
                         $output .= $this->dump($value->getValue(), $inline - 1, $dumpAsMap ? $indent + $this->indentation : $indent + 2, $flags);
+
+                        if (is_scalar($value->getValue())) {
+                            $output .= "\n";
+                        }
                     }
 
                     continue;

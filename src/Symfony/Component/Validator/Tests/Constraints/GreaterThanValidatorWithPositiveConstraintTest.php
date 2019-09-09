@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Constraints\Positive;
 
 /**
@@ -101,10 +102,10 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     }
 
     /**
-     * @dataProvider provideValidComparisonsToPropertyPath
+     * @dataProvider throwsOnInvalidStringDatesProvider
      */
-    public function testValidComparisonToPropertyPathOnArray($comparedValue)
+    public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
     {
-        $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
+        $this->markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
     }
 }

@@ -929,6 +929,17 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'b', 'b' => ''], $matcher->match('/en-en/'));
     }
 
+    public function testRestrictiveTrailingRequirementWithStaticRouteAfter()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/hello{_}', [], ['_' => '/(?!/)']));
+        $coll->add('b', new Route('/hello'));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'a', '_' => '/'], $matcher->match('/hello/'));
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

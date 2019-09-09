@@ -35,13 +35,8 @@ class KernelForTest extends Kernel
         return $this->booted;
     }
 
-    public function getCacheDir()
+    public function getProjectDir(): string
     {
-        return $this->getProjectDir().'/Tests/Fixtures/cache.'.$this->environment;
-    }
-
-    public function getLogDir()
-    {
-        return $this->getProjectDir().'/Tests/Fixtures/logs';
+        return __DIR__;
     }
 }

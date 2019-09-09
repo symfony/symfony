@@ -47,27 +47,22 @@ class CurlHttpClientTest extends HttpClientTestCase
             }
         };
 
-        $client = new CurlHttpClient();
+        $client = new CurlHttpClient([], 6, 2);
         $client->setLogger($logger);
 
-        $index = $client->request('GET', 'https://http2-push.io');
+        $index = $client->request('GET', 'https://http2.akamai.com/');
         $index->getContent();
 
-        $css = $client->request('GET', 'https://http2-push.io/css/style.css');
-        $js = $client->request('GET', 'https://http2-push.io/js/http2-push.js');
+        $css = $client->request('GET', 'https://http2.akamai.com/resources/push.css');
 
         $css->getHeaders();
-        $js->getHeaders();
 
         $expected = [
-            'Request: "GET https://http2-push.io/"',
-            'Queueing pushed response: "https://http2-push.io/css/style.css"',
-            'Queueing pushed response: "https://http2-push.io/js/http2-push.js"',
-            'Response: "200 https://http2-push.io/"',
-            'Connecting request to pushed response: "GET https://http2-push.io/css/style.css"',
-            'Connecting request to pushed response: "GET https://http2-push.io/js/http2-push.js"',
-            'Response: "200 https://http2-push.io/css/style.css"',
-            'Response: "200 https://http2-push.io/js/http2-push.js"',
+            'Request: "GET https://http2.akamai.com/"',
+            'Queueing pushed response: "https://http2.akamai.com/resources/push.css"',
+            'Response: "200 https://http2.akamai.com/"',
+            'Accepting pushed response: "GET https://http2.akamai.com/resources/push.css"',
+            'Response: "200 https://http2.akamai.com/resources/push.css"',
         ];
         $this->assertSame($expected, $logger->logs);
     }

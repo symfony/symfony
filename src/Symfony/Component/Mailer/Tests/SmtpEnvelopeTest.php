@@ -56,19 +56,19 @@ class SmtpEnvelopeTest extends TestCase
         $headers->addPathHeader('Return-Path', new NamedAddress('return@symfony.com', 'return'));
         $headers->addMailboxListHeader('To', ['from@symfony.com']);
         $e = SmtpEnvelope::create(new Message($headers));
-        $this->assertEquals('return@symfony.com', $e->getSender()->getAddress());
+        $this->assertEquals(new NamedAddress('return@symfony.com', 'return'), $e->getSender());
 
         $headers = new Headers();
         $headers->addMailboxHeader('Sender', new NamedAddress('sender@symfony.com', 'sender'));
         $headers->addMailboxListHeader('To', ['from@symfony.com']);
         $e = SmtpEnvelope::create(new Message($headers));
-        $this->assertEquals('sender@symfony.com', $e->getSender()->getAddress());
+        $this->assertEquals(new NamedAddress('sender@symfony.com', 'sender'), $e->getSender());
 
         $headers = new Headers();
         $headers->addMailboxListHeader('From', [new NamedAddress('from@symfony.com', 'from'), 'some@symfony.com']);
         $headers->addMailboxListHeader('To', ['from@symfony.com']);
         $e = SmtpEnvelope::create(new Message($headers));
-        $this->assertEquals('from@symfony.com', $e->getSender()->getAddress());
+        $this->assertEquals(new NamedAddress('from@symfony.com', 'from'), $e->getSender());
     }
 
     public function testSenderFromHeadersWithoutFrom()
@@ -77,10 +77,21 @@ class SmtpEnvelopeTest extends TestCase
         $headers->addMailboxListHeader('To', ['from@symfony.com']);
         $e = SmtpEnvelope::create($message = new Message($headers));
         $message->getHeaders()->addMailboxListHeader('From', [new NamedAddress('from@symfony.com', 'from')]);
-        $this->assertEquals('from@symfony.com', $e->getSender()->getAddress());
+        $this->assertEquals(new NamedAddress('from@symfony.com', 'from'), $e->getSender());
     }
 
     public function testRecipientsFromHeaders()
+    {
+        $headers = new Headers();
+        $headers->addPathHeader('Return-Path', 'return@symfony.com');
+        $headers->addMailboxListHeader('To', [new Address('to@symfony.com')]);
+        $headers->addMailboxListHeader('Cc', [new Address('cc@symfony.com')]);
+        $headers->addMailboxListHeader('Bcc', [new Address('bcc@symfony.com')]);
+        $e = SmtpEnvelope::create(new Message($headers));
+        $this->assertEquals([new Address('to@symfony.com'), new Address('cc@symfony.com'), new Address('bcc@symfony.com')], $e->getRecipients());
+    }
+
+    public function testRecipientsFromHeadersWithNames()
     {
         $headers = new Headers();
         $headers->addPathHeader('Return-Path', 'return@symfony.com');
@@ -88,6 +99,6 @@ class SmtpEnvelopeTest extends TestCase
         $headers->addMailboxListHeader('Cc', [new NamedAddress('cc@symfony.com', 'cc')]);
         $headers->addMailboxListHeader('Bcc', [new NamedAddress('bcc@symfony.com', 'bcc')]);
         $e = SmtpEnvelope::create(new Message($headers));
-        $this->assertEquals([new Address('to@symfony.com'), new Address('cc@symfony.com'), new Address('bcc@symfony.com')], $e->getRecipients());
+        $this->assertEquals([new NamedAddress('to@symfony.com', 'to'), new NamedAddress('cc@symfony.com', 'cc'), new NamedAddress('bcc@symfony.com', 'bcc')], $e->getRecipients());
     }
 }

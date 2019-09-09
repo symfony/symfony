@@ -66,9 +66,6 @@ class LintCommandTest extends TestCase
         $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
-    /**
-     * @group tty
-     */
     public function testLintDefaultPaths()
     {
         $tester = $this->createCommandTester();

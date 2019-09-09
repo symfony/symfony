@@ -7,6 +7,7 @@ CHANGELOG
  * removed `TwigEngine` class, use `\Twig\Environment` instead.
  * removed `transChoice` filter and token
  * `HttpFoundationExtension` requires a `UrlHelper` on instantiation
+ * removed support for implicit STDIN usage in the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
 
 4.4.0
 -----

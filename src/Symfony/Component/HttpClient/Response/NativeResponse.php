@@ -35,6 +35,7 @@ final class NativeResponse implements ResponseInterface
     private $inflate;
     private $multi;
     private $debugBuffer;
+    private $shouldBuffer;
 
     /**
      * @internal
@@ -50,7 +51,8 @@ final class NativeResponse implements ResponseInterface
         $this->info = &$info;
         $this->resolveRedirect = $resolveRedirect;
         $this->onProgress = $onProgress;
-        $this->content = $options['buffer'] ? fopen('php://temp', 'w+') : null;
+        $this->content = true === $options['buffer'] ? fopen('php://temp', 'w+') : null;
+        $this->shouldBuffer = $options['buffer'] instanceof \Closure ? $options['buffer'] : null;
 
         // Temporary resources to dechunk/inflate the response stream
         $this->buffer = fopen('php://temp', 'w+');
@@ -92,6 +94,8 @@ final class NativeResponse implements ResponseInterface
 
     public function __destruct()
     {
+        $this->shouldBuffer = null;
+
         try {
             $this->doDestruct();
         } finally {
@@ -151,6 +155,10 @@ final class NativeResponse implements ResponseInterface
 
         stream_set_blocking($h, false);
         $this->context = $this->resolveRedirect = null;
+
+        if (null !== $this->shouldBuffer && null === $this->content && ($this->shouldBuffer)($this->headers)) {
+            $this->content = fopen('php://temp', 'w+');
+        }
 
         if (isset($context['ssl']['peer_certificate_chain'])) {
             $this->info['peer_certificate_chain'] = $context['ssl']['peer_certificate_chain'];

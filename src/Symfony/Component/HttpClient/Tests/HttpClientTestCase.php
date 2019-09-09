@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
@@ -36,5 +37,22 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertIsArray(json_decode(fread($stream, 1024), true));
         $this->assertSame('', fread($stream, 1));
         $this->assertTrue(feof($stream));
+    }
+
+    public function testConditionalBuffering()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057');
+        $firstContent = $response->getContent();
+        $secondContent = $response->getContent();
+
+        $this->assertSame($firstContent, $secondContent);
+
+        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () { return false; }]);
+        $response->getContent();
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Cannot get the content of the response twice: buffering is disabled.');
+        $response->getContent();
     }
 }

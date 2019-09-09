@@ -117,7 +117,7 @@ trait ResponseTrait
             }
 
             if (null === $content) {
-                throw new TransportException('Cannot get the content of the response twice: the request was issued with option "buffer" set to false.');
+                throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
             }
 
             return $content;

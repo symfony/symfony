@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -26,7 +25,7 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
  */
 class ChainAdapterTest extends AdapterTestCase
 {
-    public function createCachePool($defaultLifetime = 0, $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
     {
         if ('testGetMetadata' === $testMethod) {
             return new ChainAdapter([new FilesystemAdapter('', $defaultLifetime)], $defaultLifetime);
@@ -70,14 +69,9 @@ class ChainAdapterTest extends AdapterTestCase
         $this->assertFalse($cache->prune());
     }
 
-    /**
-     * @return MockObject|PruneableCacheInterface
-     */
-    private function getPruneableMock(): object
+    private function getPruneableMock(): AdapterInterface
     {
-        $pruneable = $this
-            ->getMockBuilder(PruneableCacheInterface::class)
-            ->getMock();
+        $pruneable = $this->createMock([PruneableInterface::class, AdapterInterface::class]);
 
         $pruneable
             ->expects($this->atLeastOnce())
@@ -87,14 +81,9 @@ class ChainAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    /**
-     * @return MockObject|PruneableCacheInterface
-     */
-    private function getFailingPruneableMock(): object
+    private function getFailingPruneableMock(): AdapterInterface
     {
-        $pruneable = $this
-            ->getMockBuilder(PruneableCacheInterface::class)
-            ->getMock();
+        $pruneable = $this->createMock([PruneableInterface::class, AdapterInterface::class]);
 
         $pruneable
             ->expects($this->atLeastOnce())
@@ -104,17 +93,8 @@ class ChainAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    /**
-     * @return MockObject|AdapterInterface
-     */
-    private function getNonPruneableMock(): object
+    private function getNonPruneableMock(): AdapterInterface
     {
-        return $this
-            ->getMockBuilder(AdapterInterface::class)
-            ->getMock();
+        return $this->createMock(AdapterInterface::class);
     }
-}
-
-interface PruneableCacheInterface extends PruneableInterface, AdapterInterface
-{
 }

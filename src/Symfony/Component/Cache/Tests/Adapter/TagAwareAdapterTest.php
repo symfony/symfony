@@ -16,6 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
 
 /**
@@ -66,14 +67,9 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($cache->prune());
     }
 
-    /**
-     * @return MockObject|PruneableCacheInterface
-     */
-    private function getPruneableMock(): object
+    private function getPruneableMock(): AdapterInterface
     {
-        $pruneable = $this
-            ->getMockBuilder(PruneableCacheInterface::class)
-            ->getMock();
+        $pruneable = $this->createMock([PruneableInterface::class, AdapterInterface::class]);
 
         $pruneable
             ->expects($this->atLeastOnce())
@@ -83,14 +79,9 @@ class TagAwareAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    /**
-     * @return MockObject|PruneableCacheInterface
-     */
-    private function getFailingPruneableMock(): object
+    private function getFailingPruneableMock(): AdapterInterface
     {
-        $pruneable = $this
-            ->getMockBuilder(PruneableCacheInterface::class)
-            ->getMock();
+        $pruneable = $this->createMock([PruneableInterface::class, AdapterInterface::class]);
 
         $pruneable
             ->expects($this->atLeastOnce())
@@ -100,13 +91,8 @@ class TagAwareAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    /**
-     * @return MockObject|AdapterInterface
-     */
-    private function getNonPruneableMock(): object
+    private function getNonPruneableMock(): AdapterInterface
     {
-        return $this
-            ->getMockBuilder(AdapterInterface::class)
-            ->getMock();
+        return $this->createMock(AdapterInterface::class);
     }
 }

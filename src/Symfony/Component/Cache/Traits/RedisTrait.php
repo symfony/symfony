@@ -423,7 +423,7 @@ trait RedisTrait
         return $failed;
     }
 
-    private function pipeline(\Closure $generator)
+    private function pipeline(\Closure $generator): \Generator
     {
         $ids = [];
 

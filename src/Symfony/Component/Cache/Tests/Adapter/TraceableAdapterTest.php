@@ -24,7 +24,7 @@ class TraceableAdapterTest extends AdapterTestCase
         'testPrune' => 'TraceableAdapter just proxies',
     ];
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new TraceableAdapter(new FilesystemAdapter('', $defaultLifetime));
     }

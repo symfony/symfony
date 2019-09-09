@@ -27,7 +27,7 @@ class Psr16AdapterTest extends AdapterTestCase
         'testClearPrefix' => 'SimpleCache cannot clear by prefix',
     ];
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new Psr16Adapter(new Psr16Cache(new FilesystemAdapter()), '', $defaultLifetime);
     }

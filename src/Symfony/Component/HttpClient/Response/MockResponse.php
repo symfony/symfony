@@ -104,7 +104,12 @@ class MockResponse implements ResponseInterface
         $response = new self([]);
         $response->requestOptions = $options;
         $response->id = ++self::$idSequence;
-        $response->content = ($options['buffer'] ?? true) ? fopen('php://temp', 'w+') : null;
+
+        if (($options['buffer'] ?? null) instanceof \Closure) {
+            $response->content = $options['buffer']($mock->getHeaders(false)) ? fopen('php://temp', 'w+') : null;
+        } else {
+            $response->content = true === ($options['buffer'] ?? true) ? fopen('php://temp', 'w+') : null;
+        }
         $response->initializer = static function (self $response) {
             if (null !== $response->info['error']) {
                 throw new TransportException($response->info['error']);

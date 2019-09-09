@@ -27,7 +27,7 @@ class DoctrineAdapterTest extends AdapterTestCase
         'testClearPrefix' => 'Doctrine cannot clear by prefix',
     ];
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new DoctrineAdapter(new ArrayCache($defaultLifetime), '', $defaultLifetime);
     }

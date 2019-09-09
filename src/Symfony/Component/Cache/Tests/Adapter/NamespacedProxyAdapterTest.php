@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
  */
 class NamespacedProxyAdapterTest extends ProxyAdapterTest
 {
-    public function createCachePool($defaultLifetime = 0, $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
     {
         if ('testGetMetadata' === $testMethod) {
             return new ProxyAdapter(new FilesystemAdapter(), 'foo', $defaultLifetime);

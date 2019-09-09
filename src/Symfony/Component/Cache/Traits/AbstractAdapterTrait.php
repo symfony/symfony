@@ -313,7 +313,7 @@ trait AbstractAdapterTrait
         }
     }
 
-    private function generateItems(iterable $items, array &$keys)
+    private function generateItems(iterable $items, array &$keys): iterable
     {
         $f = $this->createCacheItem;
 

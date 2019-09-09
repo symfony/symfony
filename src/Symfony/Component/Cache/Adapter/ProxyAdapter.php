@@ -256,7 +256,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         }
     }
 
-    private function getId($key)
+    private function getId($key): string
     {
         CacheItem::validateKey($key);
 

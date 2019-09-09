@@ -57,7 +57,7 @@ the first encountered syntax error.
 
 You can validate the syntax of contents passed from STDIN:
 
-  <info>cat filename | php %command.full_name%</info>
+  <info>cat filename | php %command.full_name% -</info>
 
 Or the syntax of a file:
 
@@ -77,13 +77,15 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
-        $hasStdin = ['-'] === $filenames;
 
-        if ($hasStdin || !$filenames) {
-            if ($hasStdin || 0 === ftell(STDIN)) { // remove 0 === ftell(STDIN) check in 5.0
-                if (!$hasStdin) {
-                    @trigger_error('Calling to the "lint:twig" command providing pipe file content to STDIN without passing the dash symbol "-" explicitly is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
-                }
+        if (['-'] === $filenames) {
+            return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
+        }
+
+        if (!$filenames) {
+            // @deprecated to be removed in 5.0
+            if (0 === ftell(STDIN)) {
+                @trigger_error('Piping content from STDIN to the "lint:twig" command without passing the dash symbol "-" as argument is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
 
                 return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
             }
@@ -97,7 +99,7 @@ EOF
                 $filenames = array_merge(...$paths);
             }
 
-            if (0 === \count($filenames)) {
+            if (!$filenames) {
                 throw new RuntimeException('Please provide a filename or pipe template content to STDIN.');
             }
         }

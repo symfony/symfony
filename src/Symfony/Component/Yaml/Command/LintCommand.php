@@ -63,7 +63,7 @@ the first encountered syntax error.
 
 You can validates YAML contents passed from STDIN:
 
-  <info>cat filename | php %command.full_name%</info>
+  <info>cat filename | php %command.full_name% -</info>
 
 You can also validate the syntax of a file:
 
@@ -86,18 +86,20 @@ EOF
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
         $flags = $input->getOption('parse-tags') ? Yaml::PARSE_CUSTOM_TAGS : 0;
-        $hasStdin = ['-'] === $filenames;
 
-        if ($hasStdin || !$filenames) {
-            if (!$hasStdin && 0 !== ftell(STDIN)) { // remove 0 !== ftell(STDIN) check in 5.0
-                throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
-            }
-
-            if (!$hasStdin) {
-                @trigger_error('Calling to the "lint:yaml" command providing pipe file content to STDIN without passing the dash symbol "-" explicitly is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
-            }
-
+        if (['-'] === $filenames) {
             return $this->display($io, [$this->validate($this->getStdin(), $flags)]);
+        }
+
+        // @deprecated to be removed in 5.0
+        if (!$filenames) {
+            if (0 === ftell(STDIN)) {
+                @trigger_error('Piping content from STDIN to the "lint:yaml" command without passing the dash symbol "-" as argument is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
+
+                return $this->display($io, [$this->validate($this->getStdin(), $flags)]);
+            }
+
+            throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
         }
 
         $filesInfo = [];

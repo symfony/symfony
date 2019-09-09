@@ -61,7 +61,7 @@ the first encountered syntax error.
 
 You can validates XLIFF contents passed from STDIN:
 
-  <info>cat filename | php %command.full_name%</info>
+  <info>cat filename | php %command.full_name% -</info>
 
 You can also validate the syntax of a file:
 
@@ -83,16 +83,18 @@ EOF
         $filenames = (array) $input->getArgument('filename');
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
-        $hasStdin = ['-'] === $filenames;
 
-        if ($hasStdin || !$filenames) {
-            if (!$hasStdin && 0 !== ftell(STDIN)) { // remove 0 !== ftell(STDIN) check in 5.0
+        if (['-'] === $filenames) {
+            return $this->display($io, [$this->validate($this->getStdin())]);
+        }
+
+        // @deprecated to be removed in 5.0
+        if (!$filenames) {
+            if (0 !== ftell(STDIN)) {
                 throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
 
-            if (!$hasStdin) {
-                @trigger_error('Calling to the "lint:xliff" command providing pipe file content to STDIN without passing the dash symbol "-" explicitly is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
-            }
+            @trigger_error('Piping content from STDIN to the "lint:xliff" command without passing the dash symbol "-" as argument is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
 
             return $this->display($io, [$this->validate($this->getStdin())]);
         }

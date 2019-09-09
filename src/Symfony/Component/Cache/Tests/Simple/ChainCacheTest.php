@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Simple\ArrayCache;
@@ -24,7 +23,7 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
  */
 class ChainCacheTest extends CacheTestCase
 {
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new ChainCache([new ArrayCache($defaultLifetime), new FilesystemCache('', $defaultLifetime)], $defaultLifetime);
     }
@@ -64,14 +63,9 @@ class ChainCacheTest extends CacheTestCase
         $this->assertFalse($cache->prune());
     }
 
-    /**
-     * @return MockObject|PruneableCacheInterface
-     */
-    private function getPruneableMock()
+    private function getPruneableMock(): CacheInterface
     {
-        $pruneable = $this
-            ->getMockBuilder(PruneableCacheInterface::class)
-            ->getMock();
+        $pruneable = $this->createMock([CacheInterface::class, PruneableInterface::class]);
 
         $pruneable
             ->expects($this->atLeastOnce())
@@ -81,14 +75,9 @@ class ChainCacheTest extends CacheTestCase
         return $pruneable;
     }
 
-    /**
-     * @return MockObject|PruneableCacheInterface
-     */
-    private function getFailingPruneableMock()
+    private function getFailingPruneableMock(): CacheInterface
     {
-        $pruneable = $this
-            ->getMockBuilder(PruneableCacheInterface::class)
-            ->getMock();
+        $pruneable = $this->createMock([CacheInterface::class, PruneableInterface::class]);
 
         $pruneable
             ->expects($this->atLeastOnce())
@@ -98,17 +87,8 @@ class ChainCacheTest extends CacheTestCase
         return $pruneable;
     }
 
-    /**
-     * @return MockObject|CacheInterface
-     */
-    private function getNonPruneableMock()
+    private function getNonPruneableMock(): CacheInterface
     {
-        return $this
-            ->getMockBuilder(CacheInterface::class)
-            ->getMock();
+        return $this->createMock(CacheInterface::class);
     }
-}
-
-interface PruneableCacheInterface extends PruneableInterface, CacheInterface
-{
 }

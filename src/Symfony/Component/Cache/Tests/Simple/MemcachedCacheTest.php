@@ -42,7 +42,7 @@ class MemcachedCacheTest extends CacheTestCase
         }
     }
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]) : self::$client;
 
@@ -78,14 +78,14 @@ class MemcachedCacheTest extends CacheTestCase
     /**
      * @dataProvider provideBadOptions
      */
-    public function testBadOptions($name, $value)
+    public function testBadOptions(string $name, $value)
     {
         $this->expectException('ErrorException');
         $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
         MemcachedCache::createConnection([], [$name => $value]);
     }
 
-    public function provideBadOptions()
+    public function provideBadOptions(): array
     {
         return [
             ['foo', 'bar'],
@@ -120,7 +120,7 @@ class MemcachedCacheTest extends CacheTestCase
     /**
      * @dataProvider provideServersSetting
      */
-    public function testServersSetting($dsn, $host, $port)
+    public function testServersSetting(string $dsn, string $host, int $port)
     {
         $client1 = MemcachedCache::createConnection($dsn);
         $client2 = MemcachedCache::createConnection([$dsn]);
@@ -136,7 +136,7 @@ class MemcachedCacheTest extends CacheTestCase
         $this->assertSame([$expect], array_map($f, $client3->getServerList()));
     }
 
-    public function provideServersSetting()
+    public function provideServersSetting(): iterable
     {
         yield [
             'memcached://127.0.0.1/50',

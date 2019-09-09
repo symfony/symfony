@@ -24,7 +24,7 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
 
     protected static $redis;
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }

@@ -43,7 +43,7 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new PhpArrayAdapter(self::$file, new FilesystemAdapter('php-array-fallback', $defaultLifetime));
     }

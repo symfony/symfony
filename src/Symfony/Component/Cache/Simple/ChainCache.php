@@ -92,7 +92,7 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
         return $this->generateItems($this->caches[0]->getMultiple($keys, $miss), 0, $miss, $default);
     }
 
-    private function generateItems(iterable $values, int $cacheIndex, $miss, $default)
+    private function generateItems(iterable $values, int $cacheIndex, $miss, $default): iterable
     {
         $missing = [];
         $nextCacheIndex = $cacheIndex + 1;

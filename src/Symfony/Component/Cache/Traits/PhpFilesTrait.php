@@ -289,7 +289,7 @@ class LazyValue
 {
     public $file;
 
-    public function __construct($file)
+    public function __construct(string $file)
     {
         $this->file = $file;
     }

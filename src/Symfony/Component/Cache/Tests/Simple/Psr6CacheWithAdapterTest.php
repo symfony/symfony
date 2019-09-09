@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
  */
 class Psr6CacheWithAdapterTest extends Psr6CacheTest
 {
-    protected function createCacheItemPool($defaultLifetime = 0)
+    protected function createCacheItemPool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new FilesystemAdapter('', $defaultLifetime);
     }

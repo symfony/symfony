@@ -131,6 +131,8 @@ final class LockRegistry
                 $logger && $logger->info('Item "{key}" not found while lock was released, now retrying', ['key' => $item->getKey()]);
             }
         }
+
+        return null;
     }
 
     private static function open(int $key)

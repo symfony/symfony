@@ -16,7 +16,7 @@ use Symfony\Component\Cache\CacheItem;
 /**
  * Common assertions for TagAware adapters.
  *
- * @method \Symfony\Component\Cache\Adapter\TagAwareAdapterInterface createCachePool() Must be implemented by TestCase
+ * @method \Symfony\Component\Cache\Adapter\TagAwareAdapterInterface createCachePool(int $defaultLifetime = 0) Must be implemented by TestCase
  */
 trait TagAwareTestTrait
 {

@@ -250,7 +250,7 @@ trait AbstractTrait
         }
     }
 
-    private function getId($key)
+    private function getId($key): string
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = [];

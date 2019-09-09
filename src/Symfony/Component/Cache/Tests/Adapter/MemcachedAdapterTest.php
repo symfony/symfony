@@ -39,7 +39,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
 
@@ -73,7 +73,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         MemcachedAdapter::createConnection([], [$name => $value]);
     }
 
-    public function provideBadOptions()
+    public function provideBadOptions(): array
     {
         return [
             ['foo', 'bar'],
@@ -109,7 +109,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideServersSetting
      */
-    public function testServersSetting($dsn, $host, $port)
+    public function testServersSetting(string $dsn, string $host, int $port)
     {
         $client1 = MemcachedAdapter::createConnection($dsn);
         $client2 = MemcachedAdapter::createConnection([$dsn]);
@@ -125,7 +125,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame([$expect], array_map($f, $client3->getServerList()));
     }
 
-    public function provideServersSetting()
+    public function provideServersSetting(): iterable
     {
         yield [
             'memcached://127.0.0.1/50',
@@ -166,7 +166,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideDsnWithOptions
      */
-    public function testDsnWithOptions($dsn, array $options, array $expectedOptions)
+    public function testDsnWithOptions(string $dsn, array $options, array $expectedOptions)
     {
         $client = MemcachedAdapter::createConnection($dsn, $options);
 
@@ -175,7 +175,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         }
     }
 
-    public function provideDsnWithOptions()
+    public function provideDsnWithOptions(): iterable
     {
         if (!class_exists('\Memcached')) {
             self::markTestSkipped('Extension memcached required.');

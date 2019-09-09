@@ -27,7 +27,7 @@ abstract class AbstractRedisCacheTest extends CacheTestCase
 
     protected static $redis;
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new RedisCache(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }

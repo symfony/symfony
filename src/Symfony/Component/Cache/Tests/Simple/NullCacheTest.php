@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Simple\NullCache;
  */
 class NullCacheTest extends TestCase
 {
-    public function createCachePool()
+    public function createCachePool(): NullCache
     {
         return new NullCache();
     }

@@ -80,7 +80,7 @@ abstract class MaxIdLengthAdapter extends AbstractAdapter
 {
     protected $maxIdLength = 50;
 
-    public function __construct($ns)
+    public function __construct(string $ns)
     {
         parent::__construct($ns);
     }

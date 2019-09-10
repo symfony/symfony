@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Inline_Self_Ref extends Container
 {
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct()
     {

@@ -84,11 +84,11 @@ EOF
         $this->format = $input->getOption('format');
         $this->displayCorrectFiles = $output->isVerbose();
 
-        if ('-' === ($filenames[0] ?? '')) {
+        if (['-'] === $filenames) {
             return $this->display($io, [$this->validate($this->getStdin())]);
         }
 
-        if (0 === \count($filenames)) {
+        if (!$filenames) {
             throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
         }
 

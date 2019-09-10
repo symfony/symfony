@@ -87,11 +87,11 @@ EOF
         $this->displayCorrectFiles = $output->isVerbose();
         $flags = $input->getOption('parse-tags') ? Yaml::PARSE_CUSTOM_TAGS : 0;
 
-        if ('-' === ($filenames[0] ?? '')) {
+        if (['-'] === $filenames) {
             return $this->display($io, [$this->validate($this->getStdin(), $flags)]);
         }
 
-        if (0 === \count($filenames)) {
+        if (!$filenames) {
             throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
         }
 

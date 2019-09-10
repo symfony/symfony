@@ -64,7 +64,7 @@ class CacheClearCommandTest extends TestCase
         // check that app kernel file present in meta file of container's cache
         $containerClass = $this->kernel->getContainer()->getParameter('kernel.container_class');
         $containerRef = new \ReflectionClass($containerClass);
-        $containerFile = \dirname(\dirname($containerRef->getFileName())).'/'.$containerClass.'.php';
+        $containerFile = \dirname($containerRef->getFileName(), 2).'/'.$containerClass.'.php';
         $containerMetaFile = $containerFile.'.meta';
         $kernelRef = new \ReflectionObject($this->kernel);
         $kernelFile = $kernelRef->getFileName();

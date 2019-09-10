@@ -18,14 +18,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct()
     {
-        $dir = __DIR__;
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = \dirname($dir);
-        }
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -63,7 +58,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['bar'] = $instance = new \BarClass();
 
-        $instance->setBaz($this->parameters['array_1'], $this->getParameter('array_2'), '%array_1%', $this->parameters['array_1']);
+        $instance->setBaz($this->parameters['array_1'], $this->parameters['array_2'], '%array_1%', $this->parameters['array_1']);
 
         return $instance;
     }
@@ -103,22 +98,12 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = [
-        'array_2' => false,
-    ];
+    private $loadedDynamicParameters = [];
     private $dynamicParameters = [];
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'array_2': $value = [
-                0 => ($this->targetDirs[2].'/Dumper'),
-            ]; break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
-        $this->loadedDynamicParameters[$name] = true;
-
-        return $this->dynamicParameters[$name] = $value;
+        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
 
     protected function getDefaultParameters(): array
@@ -126,6 +111,9 @@ class ProjectServiceContainer extends Container
         return [
             'array_1' => [
                 0 => 123,
+            ],
+            'array_2' => [
+                0 => (\dirname(__DIR__, 2).'/Dumper'),
             ],
         ];
     }

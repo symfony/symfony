@@ -107,7 +107,7 @@ class PhpDumperTest extends TestCase
         $container->setParameter('foo', 'wiz'.\dirname(__DIR__));
         $container->setParameter('bar', __DIR__);
         $container->setParameter('baz', '%bar%/PhpDumperTest.php');
-        $container->setParameter('buz', \dirname(\dirname(__DIR__)));
+        $container->setParameter('buz', \dirname(__DIR__, 2));
         $container->compile();
 
         $dumper = new PhpDumper($container);

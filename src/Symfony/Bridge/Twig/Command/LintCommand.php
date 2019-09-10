@@ -78,11 +78,11 @@ EOF
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
 
-        if ('-' === ($filenames[0] ?? '')) {
+        if (['-'] === $filenames) {
             return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
         }
 
-        if (0 === \count($filenames)) {
+        if (!$filenames) {
             $loader = $this->twig->getLoader();
             if ($loader instanceof FilesystemLoader) {
                 $paths = [];

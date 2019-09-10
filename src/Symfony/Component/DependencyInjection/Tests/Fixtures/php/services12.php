@@ -18,14 +18,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends Container
 {
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct()
     {
-        $dir = __DIR__;
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = \dirname($dir);
-        }
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -61,7 +56,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), [('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')]);
+        return $this->services['test'] = new \stdClass(('wiz'.\dirname(__DIR__, 1)), [('wiz'.\dirname(__DIR__, 1)) => (\dirname(__DIR__, 2).'/')]);
     }
 
     public function getParameter(string $name)
@@ -99,29 +94,21 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = [
-        'foo' => false,
-        'buz' => false,
-    ];
+    private $loadedDynamicParameters = [];
     private $dynamicParameters = [];
 
     private function getDynamicParameter(string $name)
     {
-        switch ($name) {
-            case 'foo': $value = ('wiz'.$this->targetDirs[1]); break;
-            case 'buz': $value = $this->targetDirs[2]; break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
-        $this->loadedDynamicParameters[$name] = true;
-
-        return $this->dynamicParameters[$name] = $value;
+        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
 
     protected function getDefaultParameters(): array
     {
         return [
+            'foo' => ('wiz'.\dirname(__DIR__, 1)),
             'bar' => __DIR__,
             'baz' => (__DIR__.'/PhpDumperTest.php'),
+            'buz' => \dirname(__DIR__, 2),
         ];
     }
 }

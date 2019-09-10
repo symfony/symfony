@@ -506,7 +506,9 @@ trait HttpClientTrait
 
     private static function shouldBuffer(array $headers): bool
     {
-        $contentType = $headers['content-type'][0] ?? null;
+        if (null === $contentType = $headers['content-type'][0] ?? null) {
+            return false;
+        }
 
         if (false !== $i = strpos($contentType, ';')) {
             $contentType = substr($contentType, 0, $i);

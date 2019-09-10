@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Service_Wither extends Container
 {
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct()
     {

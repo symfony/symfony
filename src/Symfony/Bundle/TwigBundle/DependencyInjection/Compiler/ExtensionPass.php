@@ -44,7 +44,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
 
-            $coreThemePath = \dirname(\dirname($reflClass->getFileName())).'/Resources/views/Form';
+            $coreThemePath = \dirname($reflClass->getFileName(), 2).'/Resources/views/Form';
             $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', [$coreThemePath]);
 
             $paths = $container->getDefinition('twig.template_iterator')->getArgument(2);

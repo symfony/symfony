@@ -32,7 +32,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
             }
 
             if ($function[0] instanceof ComposerClassLoader) {
-                $function[0]->add('Symfony_Component_Debug_Tests_Fixtures', \dirname(\dirname(\dirname(\dirname(\dirname(__DIR__))))));
+                $function[0]->add('Symfony_Component_Debug_Tests_Fixtures', \dirname(__DIR__, 5));
                 break;
             }
         }

@@ -1114,7 +1114,7 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = $transPaths[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
+            $dirs[] = $transPaths[] = \dirname($r->getFileName(), 2).'/Resources/translations';
         }
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         $rootDir = $container->getParameter('kernel.root_dir');

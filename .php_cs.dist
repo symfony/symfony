@@ -21,6 +21,7 @@ return PhpCsFixer\Config::create()
         'native_function_invocation' => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced', 'strict' => true],
         // Part of future @Symfony ruleset in PHP-CS-Fixer To be removed from the config file once upgrading
         'phpdoc_types_order' => ['null_adjustment' => 'always_last', 'sort_algorithm' => 'none'],
+        'combine_nested_dirname' => true,
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

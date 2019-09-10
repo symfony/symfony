@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Composer\Autoload\ClassLoader;
+use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
@@ -90,7 +91,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
                 continue;
             }
 
-            if ($function[0] instanceof DebugClassLoader) {
+            if ($function[0] instanceof DebugClassLoader || $function[0] instanceof LegacyDebugClassLoader) {
                 $function = $function[0]->getClassLoader();
             }
 

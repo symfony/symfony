@@ -2047,7 +2047,7 @@ EOF;
 
             foreach (get_declared_classes() as $class) {
                 if (0 === strpos($class, 'ComposerAutoloaderInit') && $class::getLoader() === $autoloader[0]) {
-                    $file = (new \ReflectionClass($class))->getFileName();
+                    $file = \dirname((new \ReflectionClass($class))->getFileName(), 2).'/autoload.php';
 
                     if (preg_match($this->targetDirRegex.'A', $file)) {
                         return $file;

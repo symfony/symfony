@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-09-10T08:40:00Z
+
+Please add some tests covering this to prevent regressions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-10T08:51:53Z
+
+@stoff That's not possible, we don't have testing infrastructure for pushed responses.

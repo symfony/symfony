@@ -2,16 +2,6 @@
 
 {% import _self as helper %}
 
-{% set classnames = {
-    'default': 'timeline-category-default',
-    'section': 'timeline-category-section',
-    'event_listener': 'timeline-category-event-listener',
-    'template': 'timeline-category-template',
-    'doctrine': 'timeline-category-doctrine',
-    'messenger.middleware': 'timeline-category-messenger-middleware',
-    'controller.argument_value_resolver': 'timeline-category-controller-argument-value-resolver',
-} %}
-
 {% block toolbar %}
     {% set has_time_events = collector.events|length > 0 %}
     {% set total_time = has_time_events ? '%.0f'|format(collector.duration) : 'n/a' %}
@@ -128,7 +118,7 @@
         </h3>
     {% endif %}
 
-    {{ helper.display_timeline(token, classnames, collector.events, collector.events.__section__.origin) }}
+    {{ helper.display_timeline(token, collector.events, collector.events.__section__.origin) }}
 
     {% if profile.children|length %}
         <p class="help">Note: sections with a striped background correspond to sub-requests.</p>
@@ -142,7 +132,7 @@
                 <small>{{ events.__section__.duration }} ms</small>
             </h4>
 
-            {{ helper.display_timeline(child.token, classnames, events, collector.events.__section__.origin) }}
+            {{ helper.display_timeline(child.token, events, collector.events.__section__.origin) }}
         {% endfor %}
     {% endif %}
 
@@ -154,7 +144,7 @@
   </defs>
 </svg>
 <style type="text/css">
-{% include '@WebProfiler/Collector/time.css.twig' with classnames %}
+{% include '@WebProfiler/Collector/time.css.twig' %}
 </style>
 <script>
 {% include '@WebProfiler/Collector/time.js' %}
@@ -202,16 +192,19 @@
 {% endautoescape %}
 {% endmacro %}
 
-{% macro display_timeline(token, classnames, events, origin) %}
+{% macro display_timeline(token, events, origin) %}
 {% import _self as helper %}
     <div class="sf-profiler-timeline">
         <div id="legend-{{ token }}" class="legends"></div>
         <svg id="timeline-{{ token }}" class="timeline-graph"></svg>
         <script>{% autoescape 'js' %}
             window.addEventListener('load', function onLoad() {
+                const theme = new Theme();
+
                 new TimelineEngine(
+                    theme,
                     new SvgRenderer(document.getElementById('timeline-{{ token }}')),
-                    new Legend(document.getElementById('legend-{{ token }}'), {{ classnames|json_encode|raw }}),
+                    new Legend(document.getElementById('legend-{{ token }}'), theme),
                     document.getElementById('threshold'),
                     {{ helper.dump_request_data(token, events, origin) }}
                 );

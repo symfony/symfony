@@ -67,14 +67,14 @@ class Preloader
             $r->getDefaultProperties();
 
             if (\PHP_VERSION_ID >= 70400) {
-                foreach ($r->getProperties() as $p) {
+                foreach ($r->getProperties(\ReflectionProperty::IS_PUBLIC) as $p) {
                     if (($t = $p->getType()) && !$t->isBuiltin()) {
                         self::doPreload($t->getName(), $preloaded);
                     }
                 }
             }
 
-            foreach ($r->getMethods() as $m) {
+            foreach ($r->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
                 foreach ($m->getParameters() as $p) {
                     if ($p->isDefaultValueAvailable() && $p->isDefaultValueConstant()) {
                         $c = $p->getDefaultValueConstantName();

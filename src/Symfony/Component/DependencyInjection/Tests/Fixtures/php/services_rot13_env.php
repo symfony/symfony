@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 {
     private $parameters = [];
-    private $targetDirs = [];
     private $getService;
 
     public function __construct()

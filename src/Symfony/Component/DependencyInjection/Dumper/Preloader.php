@@ -38,8 +38,7 @@ class Preloader
                 $prev = $classes;
                 foreach ($classes as $c) {
                     if (!isset($preloaded[$c])) {
-                        $preloaded[$c] = true;
-                        self::doPreload($c);
+                        self::doPreload($c, $preloaded);
                     }
                 }
                 $classes = array_merge(get_declared_classes(), get_declared_interfaces(), get_declared_traits());
@@ -49,11 +48,13 @@ class Preloader
         }
     }
 
-    private static function doPreload(string $class)
+    private static function doPreload(string $class, array &$preloaded)
     {
-        if (\in_array($class, ['self', 'static', 'parent'], true)) {
+        if (isset($preloaded[$class]) || \in_array($class, ['self', 'static', 'parent'], true)) {
             return;
         }
+
+        $preloaded[$class] = true;
 
         try {
             $r = new \ReflectionClass($class);
@@ -68,7 +69,7 @@ class Preloader
             if (\PHP_VERSION_ID >= 70400) {
                 foreach ($r->getProperties() as $p) {
                     if (($t = $p->getType()) && !$t->isBuiltin()) {
-                        self::doPreload($t->getName());
+                        self::doPreload($t->getName(), $preloaded);
                     }
                 }
             }
@@ -79,17 +80,17 @@ class Preloader
                         $c = $p->getDefaultValueConstantName();
 
                         if ($i = strpos($c, '::')) {
-                            self::doPreload(substr($c, 0, $i));
+                            self::doPreload(substr($c, 0, $i), $preloaded);
                         }
                     }
 
                     if (($t = $p->getType()) && !$t->isBuiltin()) {
-                        self::doPreload($t->getName());
+                        self::doPreload($t->getName(), $preloaded);
                     }
                 }
 
                 if (($t = $m->getReturnType()) && !$t->isBuiltin()) {
-                    self::doPreload($t->getName());
+                    self::doPreload($t->getName(), $preloaded);
                 }
             }
         } catch (\ReflectionException $e) {

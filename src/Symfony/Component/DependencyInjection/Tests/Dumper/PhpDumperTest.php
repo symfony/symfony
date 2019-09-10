@@ -625,6 +625,27 @@ class PhpDumperTest extends TestCase
         $this->assertNull($container->getParameter('hello-bar'));
     }
 
+    public function testDumpedYamlEnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', '["foo","bar"]');
+        $container->setParameter('env(bar)', 'null');
+        $container->setParameter('hello', '%env(yaml:foo)%');
+        $container->setParameter('hello-bar', '%env(yaml:bar)%');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_yaml_env.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_YamlParameters']));
+
+        putenv('foobar="hello"');
+        require self::$fixturesPath.'/php/services_yaml_env.php';
+        $container = new \Symfony_DI_PhpDumper_Test_YamlParameters();
+        $this->assertSame(['foo', 'bar'], $container->getParameter('hello'));
+        $this->assertNull($container->getParameter('hello-bar'));
+    }
+
     public function testCustomEnvParameters()
     {
         $container = new ContainerBuilder();

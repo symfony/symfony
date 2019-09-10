@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -40,6 +42,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'float' => 'float',
             'int' => 'int',
             'json' => 'array',
+            'yaml' => 'array',
             'key' => 'bool|int|float|string|array',
             'url' => 'array',
             'query_string' => 'array',
@@ -188,6 +191,24 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             return $env;
+        }
+
+        if ('yaml' === $prefix) {
+            if (!class_exists(Yaml::class)) {
+                throw new RuntimeException(sprintf('You cannot use "yaml" as an envvar processor as component is not installed. Try running "composer require symfony/yaml".'));
+            }
+
+            try {
+                $env = Yaml::parse($env);
+
+                if (null !== $env && !\is_array($env)) {
+                    throw new RuntimeException(sprintf('Invalid YAML env var "%s": array or null expected, %s given.', $name, \gettype($env)));
+                }
+
+                return $env;
+            } catch (ParseException $e) {
+                throw new RuntimeException(sprintf('Invalid YAML in env var "%s": %s', $name, $e->getMessage()), 0, $e);
+            }
         }
 
         if ('url' === $prefix) {

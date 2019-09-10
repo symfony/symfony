@@ -311,6 +311,45 @@ class EnvVarProcessorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider validYaml
+     */
+    public function testGetEnvYaml($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('yaml', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+
+        $this->assertSame($processed, $result);
+    }
+
+    public function validYaml()
+    {
+        return [
+            ['[1]', [1]],
+            ['{"key": "value"}', ['key' => 'value']],
+            ['~', null],
+            [null, null],
+        ];
+    }
+
+    public function testGetEnvInvalidYaml()
+    {
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Malformed inline YAML');
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('yaml', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return '\'';
+        });
+    }
+
     public function testGetEnvUnknown()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');

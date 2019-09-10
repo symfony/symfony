@@ -466,10 +466,21 @@ YAML;
             'user2' => new TaggedValue('user', 'john'),
         ];
         $expected = <<<YAML
-user1: !user
-    jane
-user2: !user
-    john
+user1: !user jane
+user2: !user john
+
+YAML;
+
+        $this->assertSame($expected, $this->dumper->dump($data, 2));
+    }
+
+    public function testDumpingNotInlinedNullTaggedValue()
+    {
+        $data = [
+            'foo' => new TaggedValue('bar', null),
+        ];
+        $expected = <<<YAML
+foo: !bar null
 
 YAML;
 

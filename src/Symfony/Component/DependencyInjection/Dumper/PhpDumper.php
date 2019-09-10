@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Composer\Autoload\ClassLoader;
+use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -36,6 +38,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator as BaseServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Variable;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -296,8 +299,11 @@ EOF;
             $namespaceLine = $this->namespace ? "\nnamespace {$this->namespace};\n" : '';
             $time = $options['build_time'];
             $id = hash('crc32', $hash.$time);
+            $this->asFiles = false;
 
-            if ($preload) {
+            if ($preload && null !== $autoloadFile = $this->getAutoloadFile()) {
+                $autoloadFile = substr($this->export($autoloadFile), 2, -1);
+
                 $code[$options['class'].'.preload.php'] = <<<EOF
 <?php
 
@@ -306,7 +312,7 @@ EOF;
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-require dirname(__DIR__, 3).'/vendor/autoload.php';
+require $autoloadFile;
 require __DIR__.'/Container{$hash}/{$options['class']}.php';
 
 \$classes = [];
@@ -511,7 +517,6 @@ EOF;
                     if ($this->inlineFactories) {
                         $this->inlinedRequires[$file] = true;
                     }
-                    $file = preg_replace('#^\\$this->targetDirs\[(\d++)\]#', sprintf('\dirname(__DIR__, %d + $1)', $this->asFiles), $file);
                     $code .= sprintf("include_once %s;\n", $file);
                 }
 
@@ -553,7 +558,6 @@ EOF;
             }
 
             foreach (array_diff_key(array_flip($lineage), $this->inlinedRequires) as $file => $class) {
-                $file = preg_replace('#^\\$this->targetDirs\[(\d++)\]#', sprintf('\dirname(__DIR__, %d + $1)', $this->asFiles), $file);
                 $code .= sprintf("        include_once %s;\n", $file);
             }
         }
@@ -562,7 +566,6 @@ EOF;
             if ($file = $def->getFile()) {
                 $file = $this->dumpValue($file);
                 $file = '(' === $file[0] ? substr($file, 1, -1) : $file;
-                $file = preg_replace('#^\\$this->targetDirs\[(\d++)\]#', sprintf('\dirname(__DIR__, %d + $1)', $this->asFiles), $file);
                 $code .= sprintf("        include_once %s;\n", $file);
             }
         }
@@ -1076,27 +1079,21 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class $class extends $baseClass
 {
     private \$parameters = [];
-    private \$targetDirs = [];
 
     public function __construct()
     {
 
 EOF;
-        if (null !== $this->targetDirRegex) {
-            $dir = $this->asFiles ? '$this->targetDirs[0] = \\dirname($containerDir)' : '__DIR__';
-            $code .= <<<EOF
-        \$dir = {$dir};
-        for (\$i = 1; \$i <= {$this->targetDirMaxMatches}; ++\$i) {
-            \$this->targetDirs[\$i] = \$dir = \\dirname(\$dir);
-        }
-
-EOF;
-        }
         if ($this->asFiles) {
             $code = str_replace('$parameters', "\$buildParameters;\n    private \$containerDir;\n    private \$parameters", $code);
             $code = str_replace('__construct()', '__construct(array $buildParameters = [], $containerDir = __DIR__)', $code);
             $code .= "        \$this->buildParameters = \$buildParameters;\n";
             $code .= "        \$this->containerDir = \$containerDir;\n";
+
+            if (null !== $this->targetDirRegex) {
+                $code = str_replace('$parameters', "\$targetDir;\n    private \$parameters", $code);
+                $code .= '        $this->targetDir = \\dirname($containerDir);'."\n";
+            }
         }
 
         if (Container::class !== $this->baseClass) {
@@ -1350,12 +1347,11 @@ EOF;
         foreach ($lineage as $file) {
             if (!isset($this->inlinedRequires[$file])) {
                 $this->inlinedRequires[$file] = true;
-                $file = preg_replace('#^\\$this->targetDirs\[(\d++)\]#', sprintf('\dirname(__DIR__, %d + $1)', $this->asFiles), $file);
                 $code .= sprintf("\n            include_once %s;", $file);
             }
         }
 
-        return $code ? sprintf("\n        \$this->privates['service_container'] = static function () {%s\n        };\n", $code) : '';
+        return $code ? sprintf("\n        \$this->privates['service_container'] = function () {%s\n        };\n", $code) : '';
     }
 
     private function addDefaultParametersMethod(): string
@@ -1374,7 +1370,7 @@ EOF;
             $export = $this->exportParameters([$value]);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
 
-            if (preg_match("/\\\$this->(?:getEnv\('(?:\w++:)*+\w++'\)|targetDirs\[\d++\])/", $export[1])) {
+            if (preg_match("/\\\$this->(?:getEnv\('(?:\w++:)*+\w++'\)|targetDir\.'')/", $export[1])) {
                 $dynamicPhp[$key] = sprintf('%scase %s: $value = %s; break;', $export[0], $this->export($key), $export[1]);
             } else {
                 $php[] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
@@ -1776,7 +1772,7 @@ EOF;
                 return $dumpedValue;
             }
 
-            if (!preg_match("/\\\$this->(?:getEnv\('(?:\w++:)*+\w++'\)|targetDirs\[\d++\])/", $dumpedValue)) {
+            if (!preg_match("/\\\$this->(?:getEnv\('(?:\w++:)*+\w++'\)|targetDir\.'')/", $dumpedValue)) {
                 return sprintf('$this->parameters[%s]', $this->doExport($name));
             }
         }
@@ -1977,8 +1973,10 @@ EOF;
             $dirname = $this->asFiles ? '$this->containerDir' : '__DIR__';
             $offset = 1 + $this->targetDirMaxMatches - \count($matches);
 
-            if ($this->asFiles || 0 < $offset) {
-                $dirname = sprintf('$this->targetDirs[%d]', $offset);
+            if (0 < $offset) {
+                $dirname = sprintf('\dirname(__DIR__, %d)', $offset + (int) $this->asFiles);
+            } elseif ($this->asFiles) {
+                $dirname = "\$this->targetDir.''"; // empty string concatenation on purpose
             }
 
             if ($prefix || $suffix) {
@@ -2026,5 +2024,38 @@ EOF;
         }
 
         return $export;
+    }
+
+    private function getAutoloadFile(): ?string
+    {
+        if (null === $this->targetDirRegex) {
+            return null;
+        }
+
+        foreach (spl_autoload_functions() as $autoloader) {
+            if (!\is_array($autoloader)) {
+                continue;
+            }
+
+            if ($autoloader[0] instanceof DebugClassLoader || $autoloader[0] instanceof LegacyDebugClassLoader) {
+                $autoloader = $autoloader[0]->getClassLoader();
+            }
+
+            if (!\is_array($autoloader) || !$autoloader[0] instanceof ClassLoader || !$autoloader[0]->findFile(__CLASS__)) {
+                continue;
+            }
+
+            foreach (get_declared_classes() as $class) {
+                if (0 === strpos($class, 'ComposerAutoloaderInit') && $class::getLoader() === $autoloader[0]) {
+                    $file = (new \ReflectionClass($class))->getFileName();
+
+                    if (preg_match($this->targetDirRegex.'A', $file)) {
+                        return $file;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -15,7 +15,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 
 if (!class_exists(BaseExpressionLanguage::class)) {
-    throw new \ReflectionException(BaseExpressionLanguage::class.' not found.');
+    return;
 }
 
 /**

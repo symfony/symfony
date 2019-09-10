@@ -64,7 +64,7 @@ final class CurlResponse implements ResponseInterface
         }
 
         if (null === $content = &$this->content) {
-            $content = true === $options['buffer'] ? fopen('php://temp', 'w+') : null;
+            $content = null === $options || true === $options['buffer'] ? fopen('php://temp', 'w+') : null;
         } else {
             // Move the pushed response to the activity list
             if (ftell($content)) {
@@ -349,7 +349,7 @@ final class CurlResponse implements ResponseInterface
                 return 0;
             }
 
-            if ($options['buffer'] instanceof \Closure && !$content && $options['buffer']($headers)) {
+            if (null !== $options && $options['buffer'] instanceof \Closure && !$content && $options['buffer']($headers)) {
                 $content = fopen('php://temp', 'w+');
             }
 

@@ -91,7 +91,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     public function getValidRelativeUrls()
     {
         return [
-            ['//google.com'],
+            ['//example.com'],
             ['//symfony.fake/blog/'],
             ['//symfony.com/search?type=&q=url+validator'],
         ];
@@ -166,11 +166,11 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     public function getValidUrlsWithWhitespaces()
     {
         return [
-            ["\x20http://www.google.com"],
-            ["\x09\x09http://www.google.com."],
+            ["\x20http://www.example.com"],
+            ["\x09\x09http://www.example.com."],
             ["http://symfony.fake/blog/\x0A"],
             ["http://symfony.com/search?type=&q=url+validator\x0D\x0D"],
-            ["\x00https://google.com:80\x00"],
+            ["\x00https://example.com:80\x00"],
             ["\x0B\x0Bhttp://username:password@symfony.com\x0B\x0B"],
         ];
     }
@@ -214,10 +214,10 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     public function getInvalidRelativeUrls()
     {
         return [
-            ['/google.com'],
-            ['//goog_le.com'],
-            ['//google.com::aa'],
-            ['//google.com:aa'],
+            ['/example.com'],
+            ['//examp_le.com'],
+            ['//example.com::aa'],
+            ['//example.com:aa'],
             ['//127.0.0.1:aa/'],
             ['//[::1'],
             ['//hello.☎/'],

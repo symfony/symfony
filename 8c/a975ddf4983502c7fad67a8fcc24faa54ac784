@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-09-10T14:58:29Z
+
+https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/HttpKernel/Kernel.php#L547 needs to check for the legacy one too I guess?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-10T15:04:48Z
+
+Updated thanks!

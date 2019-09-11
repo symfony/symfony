@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -150,6 +151,19 @@ class ResolveNamedArgumentsPassTest extends TestCase
 
         $pass = new ResolveNamedArgumentsPass();
         $pass->process($container);
+    }
+
+    public function testInterfaceTypedArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArgument(ContainerInterface::class, $expected = new Reference('foo'));
+
+        $pass = new ResolveNamedArgumentsPass();
+        $pass->process($container);
+
+        $this->assertSame($expected, $definition->getArgument(3));
     }
 
     public function testResolvesMultipleArgumentsOfTheSameType()

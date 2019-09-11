@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -46,7 +45,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private $requestMatchers = [];
     private $expressions = [];
     private $contextListeners = [];
-    private $listenerPositions = ['pre_auth', 'form', 'http', 'remember_me'];
+    private $listenerPositions = ['pre_auth', 'form', 'http', 'remember_me', 'anonymous'];
     private $factories = [];
     private $userProviderFactories = [];
     private $statelessFirewallKeys = [];
@@ -423,10 +422,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
         }
 
-        if (isset($firewall['anonymous'])) {
-            $listenerKeys[] = 'anonymous';
-        }
-
         $config->replaceArgument(10, $listenerKeys);
         $config->replaceArgument(11, isset($firewall['switch_user']) ? $firewall['switch_user'] : null);
 
@@ -480,30 +475,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     $hasListeners = true;
                 }
             }
-        }
-
-        // Anonymous
-        if (isset($firewall['anonymous'])) {
-            if (null === $firewall['anonymous']['secret']) {
-                $firewall['anonymous']['secret'] = new Parameter('container.build_hash');
-            }
-
-            $listenerId = 'security.authentication.listener.anonymous.'.$id;
-            $container
-                ->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.anonymous'))
-                ->replaceArgument(1, $firewall['anonymous']['secret'])
-            ;
-
-            $listeners[] = new Reference($listenerId);
-
-            $providerId = 'security.authentication.provider.anonymous.'.$id;
-            $container
-                ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.anonymous'))
-                ->replaceArgument(0, $firewall['anonymous']['secret'])
-            ;
-
-            $authenticationProviders[] = $providerId;
-            $hasListeners = true;
         }
 
         if (false === $hasListeners) {

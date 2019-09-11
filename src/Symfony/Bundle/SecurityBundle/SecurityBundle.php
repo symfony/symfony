@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLang
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainConstraintPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfTokenClearingLogoutHandlerPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AnonymousFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginLdapFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
@@ -53,6 +54,7 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new X509Factory());
         $extension->addSecurityListenerFactory(new RemoteUserFactory());
         $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
+        $extension->addSecurityListenerFactory(new AnonymousFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());

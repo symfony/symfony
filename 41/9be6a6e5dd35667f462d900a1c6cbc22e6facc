@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-10T21:41:21Z
+
+> One question though, what if after this factory, a custom factory is added?
+
+Given no listener/provider from the earlier factories could authenticate the request, there are 2 cases: If anonymous is enabled in the firewall, the listener/provider of that factory would not be called (anonymous is able to authenticate any request). If anonymous is disabled, it'll just be called at the end.

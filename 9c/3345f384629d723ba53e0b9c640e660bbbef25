@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-09T12:59:29Z
+
+On second thought: Those reserved characters are not implementation-specific, right? Maybe we could add them to the contracts' `CacheItemInterface` instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-10T16:47:13Z
+
+On `ItemInterface` in contracts, good idea.
+Don't miss bumping the minimum version of the cache-contracts to `^1.1.7` for the component.
+
+---------------------------------------------------------------------------
+
+by andyexeter at 2019-09-10T19:51:52Z
+
+> Don't miss bumping the minimum version of the cache-contracts to `^1.1.7` for the component.
+
+@nicolas-grekas Could you confirm you are saying I should change the following:
+
+https://github.com/symfony/symfony/blob/f0aff8c4d58d71b769045bdc2cec1cfbb1d3207e/src/Symfony/Component/Cache/composer.json#L27
+
+To this:
+
+```json
+"symfony/cache-contracts": "^1.1.7|^2",
+```
+
+---------------------------------------------------------------------------
+
+by andyexeter at 2019-09-10T20:11:38Z
+
+The constant has been moved to `ItemInterface` and composer.json has been updated to bump the cache-contracts minimum version.

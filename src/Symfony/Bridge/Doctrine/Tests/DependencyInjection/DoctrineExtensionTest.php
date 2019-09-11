@@ -37,6 +37,7 @@ class DoctrineExtensionTest extends TestCase
                 'getObjectManagerElementName',
                 'getMappingObjectDefaultName',
                 'getMappingResourceExtension',
+                'getMetadataDriverClass',
                 'load',
             ])
             ->getMock()

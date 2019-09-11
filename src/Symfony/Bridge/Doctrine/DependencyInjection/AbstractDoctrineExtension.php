@@ -417,12 +417,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * The class name used by the various mapping drivers.
      */
-    protected function getMetadataDriverClass(string $driverType): string
-    {
-        @trigger_error(sprintf('Not declaring the "%s" method in class "%s" is deprecated since Symfony 4.4. This method will be abstract in Symfony 5.0.', __METHOD__, static::class), E_USER_DEPRECATED);
-
-        return '%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%');
-    }
+    abstract protected function getMetadataDriverClass(string $driverType): string;
 
     /**
      * Search for a manager that is declared as 'auto_mapping' = true.

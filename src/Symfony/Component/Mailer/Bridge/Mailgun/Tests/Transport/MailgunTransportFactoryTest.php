@@ -110,7 +110,7 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('mailgun+foo', 'default', self::USER, self::PASSWORD),
-            'The "mailgun+foo" scheme is not supported. Supported schemes for mailer "mailgun" are: "mailgun", "mailgun+api", "mailgun+https", "mailgun+smtp", "mailgun+smtps".',
+            'The "mailgun+foo" scheme is not supported; supported schemes for mailer "mailgun" are: "mailgun", "mailgun+api", "mailgun+https", "mailgun+smtp", "mailgun+smtps".',
         ];
     }
 

@@ -44,7 +44,7 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('sendmail+http', 'default'),
-            'The "sendmail+http" scheme is not supported. Supported schemes for mailer "sendmail" are: "sendmail", "sendmail+smtp".',
+            'The "sendmail+http" scheme is not supported; supported schemes for mailer "sendmail" are: "sendmail", "sendmail+smtp".',
         ];
     }
 }

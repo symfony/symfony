@@ -88,7 +88,7 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('postmark+foo', 'default', self::USER),
-            'The "postmark+foo" scheme is not supported. Supported schemes for mailer "postmark" are: "postmark", "postmark+api", "postmark+smtp", "postmark+smtps".',
+            'The "postmark+foo" scheme is not supported; supported schemes for mailer "postmark" are: "postmark", "postmark+api", "postmark+smtp", "postmark+smtps".',
         ];
     }
 

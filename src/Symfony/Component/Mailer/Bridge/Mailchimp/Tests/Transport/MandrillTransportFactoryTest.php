@@ -105,7 +105,7 @@ class MandrillTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('mandrill+foo', 'default', self::USER),
-            'The "mandrill+foo" scheme is not supported. Supported schemes for mailer "mandrill" are: "mandrill", "mandrill+api", "mandrill+https", "mandrill+smtp", "mandrill+smtps".',
+            'The "mandrill+foo" scheme is not supported; supported schemes for mailer "mandrill" are: "mandrill", "mandrill+api", "mandrill+https", "mandrill+smtp", "mandrill+smtps".',
         ];
     }
 

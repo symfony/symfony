@@ -60,7 +60,7 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('gmail+foo', 'default', self::USER, self::PASSWORD),
-            'The "gmail+foo" scheme is not supported. Supported schemes for mailer "gmail" are: "gmail", "gmail+smtp", "gmail+smtps".',
+            'The "gmail+foo" scheme is not supported; supported schemes for mailer "gmail" are: "gmail", "gmail+smtp", "gmail+smtps".',
         ];
     }
 

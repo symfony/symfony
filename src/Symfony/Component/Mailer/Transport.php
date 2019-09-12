@@ -19,7 +19,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
-use Symfony\Component\Mailer\Exception\UnsupportedHostException;
+use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
@@ -146,7 +146,7 @@ class Transport
             }
         }
 
-        throw new UnsupportedHostException($dsn);
+        throw new UnsupportedSchemeException($dsn);
     }
 
     private static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): iterable

@@ -64,14 +64,26 @@ final class CurlResponse implements ResponseInterface
         }
 
         if (null === $content = &$this->content) {
-            $content = true === $options['buffer'] ? fopen('php://temp', 'w+') : null;
+            $content = null === $options || true === $options['buffer'] ? fopen('php://temp', 'w+') : null;
         } else {
             // Move the pushed response to the activity list
-            if (ftell($content)) {
-                rewind($content);
-                $multi->handlesActivity[$id][] = stream_get_contents($content);
+            $buffer = $options['buffer'];
+
+            if ('headers' !== curl_getinfo($ch, CURLINFO_PRIVATE)) {
+                if ($options['buffer'] instanceof \Closure) {
+                    [$content, $buffer] = [null, $content];
+                    [$content, $buffer] = [$buffer, (bool) $options['buffer']($headers)];
+                }
+
+                if (ftell($content)) {
+                    rewind($content);
+                    $multi->handlesActivity[$id][] = stream_get_contents($content);
+                }
             }
-            $content = true === $options['buffer'] ? $content : null;
+
+            if (true !== $buffer) {
+                $content = null;
+            }
         }
 
         curl_setopt($ch, CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect, $logger, &$content): int {
@@ -349,11 +361,11 @@ final class CurlResponse implements ResponseInterface
                 return 0;
             }
 
-            if ($options['buffer'] instanceof \Closure && !$content && $options['buffer']($headers)) {
+            curl_setopt($ch, CURLOPT_PRIVATE, 'content');
+
+            if (!$content && $options['buffer'] instanceof \Closure && $options['buffer']($headers)) {
                 $content = fopen('php://temp', 'w+');
             }
-
-            curl_setopt($ch, CURLOPT_PRIVATE, 'content');
         } elseif (null !== $info['redirect_url'] && $logger) {
             $logger->info(sprintf('Redirecting: "%s %s"', $info['http_code'], $info['redirect_url']));
         }

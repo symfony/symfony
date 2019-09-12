@@ -30,17 +30,14 @@ class ProjectServiceContainer extends Container
 {
     private $buildParameters;
     private $containerDir;
+    private $targetDir;
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct(array $buildParameters = [], $containerDir = __DIR__)
     {
-        $dir = $this->targetDirs[0] = \dirname($containerDir);
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = \dirname($dir);
-        }
         $this->buildParameters = $buildParameters;
         $this->containerDir = $containerDir;
+        $this->targetDir = \dirname($containerDir);
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = [];
@@ -92,7 +89,7 @@ class ProjectServiceContainer extends Container
             });
         }
 
-        include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/foo_lazy.php';
+        include_once $this->targetDir.''.'/Fixtures/includes/foo_lazy.php';
 
         return new \Bar\FooClass(new \Bar\FooLazyClass());
     }
@@ -161,7 +158,7 @@ class ProjectServiceContainer extends Container
         ];
     }
 }
-include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/foo.php';
+include_once $this->targetDir.''.'/Fixtures/includes/foo.php';
 
 class FooClass_%s extends \Bar\FooClass implements \ProxyManager\Proxy\VirtualProxyInterface
 {

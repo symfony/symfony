@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
 {
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct()
     {

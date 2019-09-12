@@ -13,9 +13,9 @@ namespace Symfony\Component\Mailer\Transport;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -51,10 +51,10 @@ abstract class AbstractTransport implements TransportInterface
         return $this;
     }
 
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         $message = clone $message;
-        $envelope = null !== $envelope ? clone $envelope : SmtpEnvelope::create($message);
+        $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
 
         if (null !== $this->dispatcher) {
             $event = new MessageEvent($message, $envelope, (string) $this);

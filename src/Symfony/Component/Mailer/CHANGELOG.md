@@ -4,6 +4,8 @@ CHANGELOG
 4.4.0
 -----
 
+ * [BC BREAK] renamed `SmtpEnvelope` to `Envelope`, renamed `DelayedSmtpEnvelope` to
+   `DelayedEnvelope`
  * [BC BREAK] changed the syntax for failover and roundrobin DSNs
 
    Before:

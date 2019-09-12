@@ -12,8 +12,8 @@
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Transport;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -42,7 +42,7 @@ class SendgridApiTransport extends AbstractApiTransport
         return sprintf('sendgrid+api://%s', $this->getEndpoint());
     }
 
-    protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
+    protected function doSendApi(Email $email, Envelope $envelope): ResponseInterface
     {
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/mail/send', [
             'json' => $this->getPayload($email, $envelope),
@@ -58,7 +58,7 @@ class SendgridApiTransport extends AbstractApiTransport
         return $response;
     }
 
-    private function getPayload(Email $email, SmtpEnvelope $envelope): array
+    private function getPayload(Email $email, Envelope $envelope): array
     {
         $addressStringifier = function (Address $address) {return ['email' => $address->toString()]; };
 

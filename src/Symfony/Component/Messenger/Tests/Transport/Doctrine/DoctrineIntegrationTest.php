@@ -40,7 +40,6 @@ class DoctrineIntegrationTest extends TestCase
         $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'sqlite:///'.sys_get_temp_dir().'/symfony.messenger.sqlite';
         $this->driverConnection = DriverManager::getConnection(['url' => $dsn]);
         $this->connection = new Connection([], $this->driverConnection);
-        // call send to auto-setup the table
         $this->connection->setup();
         // ensure the table is clean for tests
         $this->driverConnection->exec('DELETE FROM messenger_messages');

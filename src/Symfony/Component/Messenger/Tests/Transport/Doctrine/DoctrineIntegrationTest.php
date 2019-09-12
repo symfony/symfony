@@ -183,4 +183,15 @@ class DoctrineIntegrationTest extends TestCase
         $envelope = $this->connection->get();
         $this->assertEquals('the body', $envelope['body']);
     }
+
+    public function testTheTransportIsSetupOnSend()
+    {
+        // If the table does not exist and we call send the table must be setup
+        // so first delete the tables
+        $this->driverConnection->exec('DROP TABLE messenger_messages');
+
+        $this->connection->send('sent this', ['my' => 'header']);
+        $envelope = $this->connection->get();
+        $this->assertEquals('sent this', $envelope['body']);
+    }
 }

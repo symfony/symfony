@@ -105,6 +105,9 @@ class Connection
      */
     public function send(string $body, array $headers, int $delay = 0): string
     {
+        if ($this->configuration['auto_setup']) {
+            $this->setup();
+        }
         $now = new \DateTime();
         $availableAt = (clone $now)->modify(sprintf('+%d seconds', $delay / 1000));
 

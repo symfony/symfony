@@ -21,6 +21,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Terminal;
 
 /**
  * The QuestionHelper class provides helpers to interact with the user.
@@ -157,7 +158,7 @@ class QuestionHelper extends Helper
         $inputStream = $this->inputStream ?: STDIN;
         $autocomplete = $question->getAutocompleterValues();
 
-        if (null === $autocomplete || !$this->hasSttyAvailable()) {
+        if (null === $autocomplete || !Terminal::hasSttyAvailable()) {
             $ret = false;
             if ($question->isHidden()) {
                 try {
@@ -409,7 +410,7 @@ class QuestionHelper extends Helper
             return $value;
         }
 
-        if ($this->hasSttyAvailable()) {
+        if (Terminal::hasSttyAvailable()) {
             $sttyMode = shell_exec('stty -g');
 
             shell_exec('stty -echo');
@@ -494,21 +495,5 @@ class QuestionHelper extends Helper
         }
 
         return self::$shell;
-    }
-
-    /**
-     * Returns whether Stty is available or not.
-     *
-     * @return bool
-     */
-    private function hasSttyAvailable()
-    {
-        if (null !== self::$stty) {
-            return self::$stty;
-        }
-
-        exec('stty 2>&1', $output, $exitcode);
-
-        return self::$stty = 0 === $exitcode;
     }
 }

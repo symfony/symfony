@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-09T05:25:06Z
+
+It's better, thank you.
+
+Some more comments:
+
+ * On Safari, there is no margin at the bottom
+
+<img width="684" alt="image" src="https://user-images.githubusercontent.com/47313/64505029-b13c6080-d2d2-11e9-98f5-580cd359c216.png">
+
+ * The path is now correct but it looks like it's not aligned/centered (Safari and Firefox)
+
+<img width="372" alt="image" src="https://user-images.githubusercontent.com/47313/64505046-bf8a7c80-d2d2-11e9-8d15-0ac9ba56d980.png">
+
+ * On my screen, the warning about the fact that this page is displayed because there is no controllers yet is not displayed. I'm wondering if we should not move it just after "Your application is now ready and you can start working on it.". And/or perhaps makes the design a bit more compact vertically.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-09-09T13:44:18Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-09T16:10:20Z
+
+I'm testing this in Safari, Chrome and Firefox. I still cannot make it work with Firefox, but I'll keep trying to fix this:
+
+![browser-comparison](https://user-images.githubusercontent.com/73419/64547542-0d33d300-d32d-11e9-8e02-2fabd5b2029a.png)
+
+---------------------------------------------------------------------------
+
+by michaelperrin at 2019-09-09T16:48:04Z
+
+@javiereguiluz @yceruto First, thanks for this new project page design, it's awesome! Concerning the alignment issues, I could solve them for all browsers quite easily using Flex (not talking about Symfony's one 😄). Is there any reason you didn't use these CSS properties? It also makes CSS code cleaner in my opinion. I would be happy to share it if you wish.
+
+Please note that I didn't test it on IE11 (if we really need this...), but that should be doable to make it work anyway if it doesn't already.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-09T16:53:52Z
+
+I don't think supporting IE 11 for this page is needed. Hopefully web developers don't use it as their main browser.
+We already stopped supporting for the web profiler UI IIRC (keeping IE support for the web debug toolbar, as this one gets injected in the project UI, which may have a need to support IE)
+
+---------------------------------------------------------------------------
+
+by michaelperrin at 2019-09-09T16:56:42Z
+
+Yeah I totally agree as we are targeting developers. I will have a quick look just by curiosity.
+
+_UPDATE:_ removed my diff post as I was comparing to the current 4.4 branch, and not this PR branch.
+_UPDATE 2:_ the current changes in this PR works well on Firefox on my side. So I am not sure that Flex is necessary.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-09T17:54:52Z
+
+@michaelperrin I can't see it correctly with Firefox. Look at how different is the vertical align of the monospaced text.
+
+Firefox:
+![firefox](https://user-images.githubusercontent.com/73419/64554307-73bfed80-d33b-11e9-9d9a-975464dbd261.png)
+
+Chrome:
+![chrome](https://user-images.githubusercontent.com/73419/64554314-76224780-d33b-11e9-9732-392369b117c5.png)
+
+-----
+
+The problem is that both browsers are using different fonts ... because we don't define the font family explicitly, so `'monospace'` is used.
+
+I could solve the problem by setting the font family explicitly. I used the same font stack as Bootstrap's monospace:
+
+```
+SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace
+```
+
+---------------------------------------------------------------------------
+
+by michaelperrin at 2019-09-09T18:39:54Z
+
+You're right. My CSS flex solution wouldn't help for this. I checked with the Bootstrap's monospace font family and it makes the correctly aligned indeed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-10T11:40:22Z
+
+@javiereguiluz Let's use the same font everywhere as done with Bootstrap. I don't see any drawback.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-13T15:42:56Z
+
+I've committed some changes. I share some screenshots using Firefox, which was the browser where we had some issues ... and now it looks the same as Chrome and Safari:
+
+**Desktop**
+
+![desktop](https://user-images.githubusercontent.com/73419/64875634-cd7f2b00-d64d-11e9-8d8c-3a0e97edfda9.png)
+
+**Smartphone**
+
+![smartphone](https://user-images.githubusercontent.com/73419/64875640-cfe18500-d64d-11e9-9007-57ba92d24be6.png)

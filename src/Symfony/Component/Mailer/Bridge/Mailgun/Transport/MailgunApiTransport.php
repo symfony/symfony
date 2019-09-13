@@ -12,8 +12,8 @@
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -46,7 +46,7 @@ class MailgunApiTransport extends AbstractApiTransport
         return sprintf('mailgun+api://%s?domain=%s', $this->getEndpoint(), $this->domain);
     }
 
-    protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
+    protected function doSendApi(Email $email, Envelope $envelope): ResponseInterface
     {
         $body = new FormDataPart($this->getPayload($email, $envelope));
         $headers = [];
@@ -72,7 +72,7 @@ class MailgunApiTransport extends AbstractApiTransport
         return $response;
     }
 
-    private function getPayload(Email $email, SmtpEnvelope $envelope): array
+    private function getPayload(Email $email, Envelope $envelope): array
     {
         $headers = $email->getHeaders();
         $html = $email->getHtmlBody();

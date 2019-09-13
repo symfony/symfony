@@ -12,8 +12,8 @@
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -41,7 +41,7 @@ class MandrillApiTransport extends AbstractApiTransport
         return sprintf('mandrill+api://%s', $this->getEndpoint());
     }
 
-    protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
+    protected function doSendApi(Email $email, Envelope $envelope): ResponseInterface
     {
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/send.json', [
             'json' => $this->getPayload($email, $envelope),
@@ -64,7 +64,7 @@ class MandrillApiTransport extends AbstractApiTransport
         return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
     }
 
-    private function getPayload(Email $email, SmtpEnvelope $envelope): array
+    private function getPayload(Email $email, Envelope $envelope): array
     {
         $payload = [
             'key' => $this->key,
@@ -105,7 +105,7 @@ class MandrillApiTransport extends AbstractApiTransport
         return $payload;
     }
 
-    protected function getRecipients(Email $email, SmtpEnvelope $envelope): array
+    protected function getRecipients(Email $email, Envelope $envelope): array
     {
         $recipients = [];
         foreach ($envelope->getRecipients() as $recipient) {

@@ -21,7 +21,7 @@ use Symfony\Component\Mime\Message;
  *
  * @internal
  */
-final class DelayedSmtpEnvelope extends SmtpEnvelope
+final class DelayedEnvelope extends Envelope
 {
     private $senderSet = false;
     private $recipientsSet = false;

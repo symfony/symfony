@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
@@ -44,7 +44,7 @@ class Transports implements TransportInterface
         }
     }
 
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         /** @var Message $message */
         if (RawMessage::class === \get_class($message) || !$message->getHeaders()->has('X-Transport')) {

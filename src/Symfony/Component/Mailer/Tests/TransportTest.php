@@ -12,9 +12,9 @@
 namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
@@ -93,7 +93,7 @@ class DummyTransport implements Transport\TransportInterface
         $this->host = $host;
     }
 
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         throw new \BadMethodCallException('This method newer should be called.');
     }

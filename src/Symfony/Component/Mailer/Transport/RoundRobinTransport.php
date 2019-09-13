@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\RawMessage;
 
 /**
@@ -43,7 +43,7 @@ class RoundRobinTransport implements TransportInterface
         $this->retryPeriod = $retryPeriod;
     }
 
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         while ($transport = $this->getNextTransport()) {
             try {

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by roed at 2019-09-13T11:13:47Z
+
+@xabbuh The build is failing on a different component. Is that an issue for this PR?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-09-13T11:17:47Z
+
+The failures don't look related to your changes to me.
+
+---------------------------------------------------------------------------
+
+by roed at 2019-09-13T11:19:33Z
+
+Ok, then I won't focus on them. Thanks!

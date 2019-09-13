@@ -13,7 +13,7 @@
             <tag name="error_renderer.renderer" />
             <argument>%kernel.debug%</argument>
             <argument>%kernel.charset%</argument>
-            <argument>%debug.file_link_format%</argument>
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <argument>%kernel.project_dir%</argument>
             <argument type="service" id="request_stack" />
             <argument type="service" id="logger" on-invalid="null" />

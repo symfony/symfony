@@ -120,7 +120,7 @@ class SesTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             new Dsn('ses+foo', 'default', self::USER, self::PASSWORD),
-            'The "ses+foo" scheme is not supported. Supported schemes for mailer "ses" are: "ses", "ses+api", "ses+https", "ses+smtp", "ses+smtps".',
+            'The "ses+foo" scheme is not supported; supported schemes for mailer "ses" are: "ses", "ses+api", "ses+https", "ses+smtp", "ses+smtps".',
         ];
     }
 

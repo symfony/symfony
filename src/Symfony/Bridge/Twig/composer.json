@@ -26,7 +26,7 @@
         "symfony/asset": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
-        "symfony/form": "^4.3.4",
+        "symfony/form": "^4.3.5",
         "symfony/http-foundation": "~4.3",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/mime": "~4.3",
@@ -48,7 +48,7 @@
     },
     "conflict": {
         "symfony/console": "<3.4",
-        "symfony/form": "<4.3.4",
+        "symfony/form": "<4.3.5",
         "symfony/http-foundation": "<4.3",
         "symfony/translation": "<4.2",
         "symfony/workflow": "<4.3"

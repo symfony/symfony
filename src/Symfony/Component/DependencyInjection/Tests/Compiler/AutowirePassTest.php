@@ -377,11 +377,6 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testParentClassNotFoundThrowsException()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');
@@ -693,11 +688,6 @@ class AutowirePassTest extends TestCase
         ];
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testIgnoreServiceWithClassNotExisting()
     {
         $container = new ContainerBuilder();
@@ -896,11 +886,6 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testExceptionWhenAliasDoesNotExist()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');

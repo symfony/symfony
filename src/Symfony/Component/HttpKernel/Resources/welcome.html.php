@@ -13,7 +13,7 @@
         h2 { font-size: 21px; margin-bottom: 1em; }
         a { color: <?= $darkColor(0.75); ?> }
         a:hover { text-decoration: none; }
-        code { box-shadow: 0 0 45px -15px hsl(<?= $hue; ?>, 20%, 2%); position: relative; background: <?= $lightColor(); ?>; color: <?= $darkColor(); ?>; padding: 10px 20px 10px 7px; word-wrap: break-word; border-radius: 25px; z-index: 1; }
+        code { border-radius: 25px; background: <?= $lightColor(); ?>; box-shadow: 0 0 45px -15px hsl(<?= $hue; ?>, 20%, 2%); color: <?= $darkColor(); ?>; font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; padding: 10px 20px 10px 7px; position: relative; word-wrap: break-word; z-index: 1; }
         svg { overflow: hidden; vertical-align: text-bottom; }
         .wrapper { text-align: center; width: 100%; }
         .container { position: relative; background: radial-gradient(ellipse at bottom, <?= $darkColor(); ?> 0%, hsl(<?= $hue; ?>, 20%, 13%) 100%); background-attachment: fixed; color: <?= $lightColor(); ?>; }
@@ -23,27 +23,39 @@
         .container .logo svg { fill: hsl(<?= $hue; ?>, 20%, 26%); }
         .welcome-to { display: block; font-size: 85%; }
         .welcome { padding-top: 4em; margin-bottom: 4em; }
-        .status { padding-bottom: 4em; }
+        .status { padding-bottom: 2em; }
+        .status code, .status .code-ready { display: none; }
         .version { font-size: 34px; }
-        .check { display: inline-block; background: <?= $darkColor(); ?>; border-radius: 20px; width: 54px; }
+        .check { display: inline-block; background: <?= $darkColor(); ?>; border-radius: 20px; margin: 0 10px; width: 54px; }
         .check svg { fill: <?= $lightColor(); ?>; }
         .code-ready { margin-top: 28px; }
         .next { position: relative; padding: 3.5em 0; background: <?= $lightColor(); ?>; }
-        .next .row { margin-left: 50px; margin-right: 50px; display: flex; justify-content: space-around; }
-        .doc svg { height: 64px; width: 64px; fill: <?= $darkColor(); ?>; margin-bottom: 5px; }
+        .next .row { margin-left: 30px; margin-right: 30px; display: flex; justify-content: space-around; }
+        .doc svg { height: 48px; width: 48px; fill: <?= $darkColor(); ?>; margin-bottom: 5px; }
         .doc p { margin-top: 5px; }
-        .col { font-size: 22px; }
-        .col div { margin-bottom: -5px; }
-        .col a { font-size: 16px; }
+        .col { padding: 0 10px; }
+        .col h2 { font-size: 18px; font-weight: normal; margin-bottom: 5px; }
+        .col a { display: block; font-size: 14px; lline-height: 1.2; }
         .footer { background: hsl(<?= $hue; ?>, 20%, 98%); }
         .footer .divider { pointer-events: none; background: <?= $lightColor(); ?>; fill: hsla(<?= $hue; ?>, 20%, 98%, 1); }
         .footer svg.logo { width: 35px; height: 35px; margin-right: 10px; fill:<?= $darkColor(); ?>; vertical-align: middle; }
-        .footer p { font-size: 1vw; }
+        .footer p { font-size: 16px; margin: 0 45px; }
 
         @media (min-width: 768px) {
             @-webkit-keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
             @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
             .sf-toolbar { opacity: 0; -webkit-animation: fade-in 1s .2s forwards; animation: fade-in 1s .2s forwards;}
+
+            .next .row { margin-left: 50px; margin-right: 50px; }
+
+            .status { padding-bottom: 4em; }
+            .status code { display: inline-flex; }
+            .status .code-ready { display: block; }
+
+            .doc svg { height: 64px; width: 64px; }
+
+            .col h2 { font-size: 22px; }
+            .col a { font-size: 16px; margin-top: 0; }
         }
     </style>
 </head>
@@ -74,21 +86,21 @@
         <div class="row">
             <div class="doc col">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 11.55C9.64 9.35 6.48 8 3 8v11c3.48 0 6.64 1.35 9 3.55 2.36-2.19 5.52-3.55 9-3.55V8c-3.48 0-6.64 1.35-9 3.55zM12 8c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/></svg>
-                <div>Documentation</div>
+                <h2>Documentation</h2>
                 <a href="https://symfony.com/doc/<?= $docVersion; ?>/index.html">
                     Guides, components, references
                 </a>
             </div>
             <div class="doc col">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-                <div>Tutorials</div>
+                <h2>Tutorials</h2>
                 <a href="https://symfony.com/doc/<?= $docVersion; ?>/page_creation.html">
                     Create your first page
                 </a>
             </div>
             <div class="doc col">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                <div>Community</div>
+                <h2>Community</h2>
                 <a href="https://symfony.com/community">
                     Connect, get help, or contribute
                 </a>

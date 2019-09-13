@@ -2324,6 +2324,26 @@ class RequestTest extends TestCase
 
         $this->assertSame(80, $request->getPort());
     }
+
+    /**
+     * @dataProvider trustedProxiesRemoteAddr
+     */
+    public function testTrustedProxiesRemoteAddr($serverRemoteAddr, $trustedProxies, $result)
+    {
+        $_SERVER['REMOTE_ADDR'] = $serverRemoteAddr;
+        Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_ALL);
+        $this->assertSame($result, Request::getTrustedProxies());
+    }
+
+    public function trustedProxiesRemoteAddr()
+    {
+        return [
+            ['1.1.1.1', ['REMOTE_ADDR'], ['1.1.1.1']],
+            ['1.1.1.1', ['REMOTE_ADDR', '2.2.2.2'], ['1.1.1.1', '2.2.2.2']],
+            [null, ['REMOTE_ADDR'], []],
+            [null, ['REMOTE_ADDR', '2.2.2.2'], ['2.2.2.2']],
+        ];
+    }
 }
 
 class RequestContentProxy extends Request

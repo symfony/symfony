@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mailer\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Mailer\SmtpEnvelope;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\RawMessage;
 
 /**
@@ -27,7 +27,7 @@ final class MessageEvent extends Event
     private $transport;
     private $queued;
 
-    public function __construct(RawMessage $message, SmtpEnvelope $envelope, string $transport, bool $queued = false)
+    public function __construct(RawMessage $message, Envelope $envelope, string $transport, bool $queued = false)
     {
         $this->message = $message;
         $this->envelope = $envelope;

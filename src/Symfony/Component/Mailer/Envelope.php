@@ -19,7 +19,7 @@ use Symfony\Component\Mime\RawMessage;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SmtpEnvelope
+class Envelope
 {
     private $sender;
     private $recipients = [];
@@ -39,7 +39,7 @@ class SmtpEnvelope
             throw new LogicException('Cannot send a RawMessage instance without an explicit Envelope.');
         }
 
-        return new DelayedSmtpEnvelope($message);
+        return new DelayedEnvelope($message);
     }
 
     public function setSender(Address $sender): void

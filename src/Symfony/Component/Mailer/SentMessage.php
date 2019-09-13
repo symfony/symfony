@@ -27,7 +27,7 @@ class SentMessage
     /**
      * @internal
      */
-    public function __construct(RawMessage $message, SmtpEnvelope $envelope)
+    public function __construct(RawMessage $message, Envelope $envelope)
     {
         $message->ensureValidity();
 
@@ -46,7 +46,7 @@ class SentMessage
         return $this->original;
     }
 
-    public function getEnvelope(): SmtpEnvelope
+    public function getEnvelope(): Envelope
     {
         return $this->envelope;
     }

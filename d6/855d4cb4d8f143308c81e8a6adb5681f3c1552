@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by rtek at 2019-07-26T16:29:41Z
+
+Had to refactor Terminal into a singleton otherwise it couldn't be tested when mocking out the env. It was practically one already due to the static properties.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-27T08:30:20Z
+
+@rtek Tests must not impact our code. I would highly suggest to remove the singleton and find a way to test the code in another way.
+
+---------------------------------------------------------------------------
+
+by rtek at 2019-07-27T15:56:30Z
+
+@fabpot Understood - reverted the public API changes.
+
+Re `master`, `Terminal` appears to be short-circuited via envvars after application initialization [Application.php:117](https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Console/Application.php#L117) [Terminal.php:26](https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Console/Terminal.php#L26) so it's basically global state. It's used by various classes which contain their own terminal capability check as well, so it's a candidate for consolidation. I offer to put some effort into this if there is an appetite.
+
+---------------------------------------------------------------------------
+
+by rtek at 2019-08-17T15:37:04Z
+
+Reverted to maintain the static cache convention and used reflection to test. Test failures on unrelated component.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-09-13T12:39:53Z
+
+PR target changed from 4.3 to 3.4 as the bug also exists there.
+Also updated `QuestionHelper` to make it uses the internal `Terminal::hasSttyAvailable()` so that we don't have duplication.

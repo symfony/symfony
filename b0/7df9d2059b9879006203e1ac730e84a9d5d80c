@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-09-12T14:02:11Z
+
+/cc @fbourigault
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-12T19:23:13Z
+
+@xabbuh You forgot some renamings (see tests)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-09-13T08:11:19Z
+
+@fabpot This seems to be related to how the mailer bridges tests are executed. The classes are actually updated.

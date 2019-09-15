@@ -220,7 +220,9 @@ class Legend {
         this.toggle = this.toggle.bind(this);
         this.createCategory = this.createCategory.bind(this);
 
-        this.categories = Array.from(Object.keys(classnames)).map(this.createCategory);
+        this.categories = [];
+
+        Object.keys(classnames).forEach(this.createCategory);
     }
 
     add(category) {
@@ -237,6 +239,8 @@ class Legend {
         element.addEventListener('click', this.toggle);
 
         this.element.appendChild(element);
+
+        this.categories.push(element);
 
         return element;
     }

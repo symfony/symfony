@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
@@ -1839,6 +1840,14 @@ YAML;
         ];
 
         $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
+    public function testDeprecatedPhpConstantSyntax()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Missing value for tag "php/const:App\Kernel::SEMART_VERSION" at line 1 (near "!php/const:App\Kernel::SEMART_VERSION").');
+
+        $this->parser->parse('!php/const:App\Kernel::SEMART_VERSION', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
     }
 
     public function testMergeKeysWhenMappingsAreParsedAsObjects()

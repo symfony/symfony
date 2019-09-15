@@ -12,6 +12,7 @@ CHANGELOG
    for "guard" authenticators that deal with user passwords
  * Marked all dispatched event classes as `@final`
  * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`.
+ * Deprecated passing more than one attribute to `AccessDecisionManager::decide()` and `AuthorizationChecker::isGranted()`
 
 4.3.0
 -----

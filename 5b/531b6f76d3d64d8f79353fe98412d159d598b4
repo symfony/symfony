@@ -1,0 +1,228 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2019-09-14T15:03:20Z
+
+Another argument in favor of removing them is that it will prevent people from depending on Symfony tests. Since we don't have a BC policy for them it's a good thing to prevent people from using them (it would prevent issues like #29426).
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2019-09-14T15:08:53Z
+
+Could we see the size of all tests and the size of the whole repository?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-09-14T15:34:47Z
+
+Good question. I gathered some numbers. Tests are about 35% of the file size of the package.
+
+Component | Size (B) | Test size (B) | Percent
+-- | -- | -- | --
+src/Symfony/Bundle/DebugBundle | 144 | 16 | 11%
+src/Symfony/Bundle/FrameworkBundle | 7888 | 5176 | 66%
+src/Symfony/Bundle/SecurityBundle | 2280 | 1584 | 69%
+src/Symfony/Bundle/TwigBundle | 1048 | 344 | 33%
+src/Symfony/Bundle/WebProfilerBundle | 1336 | 128 | 10%
+src/Symfony/Bundle/WebServerBundle | 192 | 16 | 8%
+src/Symfony/Component/Asset | 272 | 96 | 35%
+src/Symfony/Component/BrowserKit | 416 | 208 | 50%
+src/Symfony/Component/Cache | 1664 | 688 | 41%
+src/Symfony/Component/Config | 1416 | 568 | 40%
+src/Symfony/Component/Console | 3864 | 2648 | 69%
+src/Symfony/Component/CssSelector | 808 | 320 | 40%
+src/Symfony/Component/Debug | 832 | 480 | 58%
+src/Symfony/Component/DependencyInjection | 6472 | 4392 | 68%
+src/Symfony/Component/DomCrawler | 696 | 392 | 56%
+src/Symfony/Component/Dotenv | 168 | 40 | 24%
+src/Symfony/Component/ErrorHandler | 824 | 504 | 61%
+src/Symfony/Component/ErrorRenderer | 528 | 96 | 18%
+src/Symfony/Component/EventDispatcher | 352 | 136 | 39%
+src/Symfony/Component/ExpressionLanguage | 472 | 184 | 39%
+src/Symfony/Component/Filesystem | 312 | 152 | 49%
+src/Symfony/Component/Finder | 576 | 312 | 54%
+src/Symfony/Component/Form | 6048 | 3208 | 53%
+src/Symfony/Component/HttpClient | 872 | 152 | 17%
+src/Symfony/Component/HttpFoundation | 2576 | 1328 | 52%
+src/Symfony/Component/HttpKernel | 3216 | 1512 | 47%
+src/Symfony/Component/Inflector | 96 | 24 | 25%
+src/Symfony/Component/Intl | 33400 | 1056 | 3%
+src/Symfony/Component/Ldap | 432 | 120 | 28%
+src/Symfony/Component/Lock | 568 | 208 | 37%
+src/Symfony/Component/Mailer | 1216 | 296 | 24%
+src/Symfony/Component/Messenger | 2280 | 984 | 43%
+src/Symfony/Component/Mime | 1640 | 656 | 40%
+src/Symfony/Component/OptionsResolver | 424 | 192 | 45%
+src/Symfony/Component/Process | 488 | 184 | 38%
+src/Symfony/Component/PropertyAccess | 608 | 304 | 50%
+src/Symfony/Component/PropertyInfo | 408 | 200 | 49%
+src/Symfony/Component/Routing | 3720 | 2872 | 77%
+src/Symfony/Component/Security | 3760 | 1384 | 37%
+src/Symfony/Component/Serializer | 2248 | 1160 | 52%
+src/Symfony/Component/Stopwatch | 152 | 40 | 26%
+src/Symfony/Component/Templating | 376 | 144 | 38%
+src/Symfony/Component/Translation | 2048 | 952 | 46%
+src/Symfony/Component/Validator | 6208 | 1896 | 31%
+src/Symfony/Component/VarDumper | 1288 | 408 | 32%
+src/Symfony/Component/VarExporter | 472 | 296 | 63%
+src/Symfony/Component/WebLink | 120 | 32 | 27%
+src/Symfony/Component/Workflow | 832 | 320 | 38%
+src/Symfony/Component/Yaml | 2224 | 544 | 24%
+**Total** | **110.280** | **38.952** | **35%**
+
+### Update 1
+
+I made a mistake when I first posted this. Numbers are correct now. 2019-09-14 17.52 CET
+
+### Update 2
+
+If we exclude the Intl component the average is about 49%. So almost half file size of the component is tests.
+
+---------------------------------------------------------------------------
+
+by Zarcox at 2019-09-14T16:13:28Z
+
+Finally ! I think open source does lack a real normalized way to exclude files from distributions.
+
+According to me, test files shouldn't be included in packages we ship in production since they won't be of any use there. Just like I wouldn't include documentation files either, which are doomed to permanent obsolescence.
+
+And among all the good arguments I can think of, there's also the fact that your IDE's autocomplete will be free from these being suggested tirelessly 👍 !
+
+---------------------------------------------------------------------------
+
+by ruudk at 2019-09-14T16:13:43Z
+
+Yes please, this dramatically reduces the size of our packaged Docker deployments. On our large application I discovered that tests inside the vendor directory were responsible for +-30MB. When deploying 10+ times a day this will save bandwidth and deployment times.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-09-14T17:41:07Z
+
+Thread from before
+https://twitter.com/dkarlovi/status/1098495571214692352?s=09
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-09-14T18:05:05Z
+
+![Please!](https://media.giphy.com/media/3osxYv6bZUlrCEtYkw/giphy.gif)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-14T18:29:17Z
+
+Here are interesting considerations on the topic I fully agree with and tried (failed) to explain before: https://github.com/sebastianbergmann/diff/pull/84
+
+To me, as the linked issue suggests also, a composer plugin should exists to deal with this and maybe other installation steps. I'm surprised nobody did write one actually given how important this seems to be by looking at the support it gathers.
+
+Note this is not a formal objection against merging this PR: I'm just going to abstain from voting and let the decision to the rest of the core team.
+
+---------------------------------------------------------------------------
+
+by thib92 at 2019-09-14T18:34:31Z
+
+On the argument of « users can look at tests to see how it works », users can also do that on GitHub on the Symfony repo.
+
+Thanks to the [code navigation feature](https://help.github.com/en/articles/navigating-code-on-github), it has become pretty easy to do so!
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2019-09-14T19:33:42Z
+
+I agree for all reasons already listed above that are in favor of removing tests from the tarball 👍
+
+Another reason is that when you use your IDE to search for a vendor class, you end up having test classes too, which can disturb our search:
+![image](https://user-images.githubusercontent.com/3369266/64912884-fed32600-d735-11e9-91d6-571375cc277b.png)
+
+And by the way, removing 25% of the size of the package itself means 25% less bandwidth consumption. Don't forget we're in an era where bandwidth has a tough cost, and the more we can diminuish it, the better. Can mean nothing for certain people, but I think it's still a valid reason. Especially when Symfony is downloaded thousands of times per day.
+
+---------------------------------------------------------------------------
+
+by iquito at 2019-09-15T09:03:58Z
+
+"Polluting" the results in IDEs when searching for usages of a class would be my major factor to exclude tests. I often find that 90% or more of where a class is used in the Symfony directories is in tests, covering up the important results (like the service definitions or actual usages in executed code). In addition to having to download the tests even if you never need them, IDEs also have to analyze them, which takes time, and having them suggested as type hints is never useful. Sure, the IDE could solve much of that with custom features, but it would be much easier to solve it for all IDEs and tools by excluding the tests by default.
+
+---------------------------------------------------------------------------
+
+by weshooper at 2019-09-15T13:40:27Z
+
+Also reduces CO2 emissions ✅
+
+Almost impossible to calculate, but I had a go while removing tests from Codeception @ https://github.com/Codeception/Codeception/pull/5527 🤓
+
+---------------------------------------------------------------------------
+
+by xuanquynh at 2019-09-16T02:25:45Z
+
+I hope the Symfony core team will change their mind and approve this PR.
+
+---------------------------------------------------------------------------
+
+by rbaarsma at 2019-09-16T06:48:57Z
+
+I think it's a no-brainer that we should optimize for production. Especially for CI, to maximize build speed. With CI/CD and docker becoming increasingly popular, we should help get fastest build speeds for the probably millions of builds per day.
+
+That said it's perhaps questionable if using  `--prefer-dist` and `.gitattributes` is the best solution.
+
+The biggest problem I have lies in that fact that I do like to have the Test sources available locally (when developing). I occasionally look at Symfony test sources for inspiration.
+
+Of course this can be done by using `--prefer-source` locally, as Nyholm suggests, but the problem is that it is much slower than --prefer-dist (the default, since we use stable packages) even in the current situation.
+
+I was going to upvote this issue and simply suggest to ensure that symfony installs / has documentation that helps you use `--prefer-source`, but then I did some performance tests on a recent symfony 4.3 project..
+
+```bash
+# with using cache
+SECONDS=0; rm -rf vendor; composer install --prefer-dist --no-scripts; echo $SECONDS
+6 seconds
+SECONDS=0; rm -rf vendor; composer install --prefer-source --no-scripts; echo $SECONDS
+33 seconds
+
+# without cache
+SECONDS=0; composer clearcache; rm -rf vendor; composer install --prefer-dist --no-scripts; echo $SECONDS
+58 seconds
+SECONDS=0; composer clearcache; rm -rf vendor; composer install --prefer-source --no-scripts; echo $SECONDS
+341 seconds
+```
+
+My question is: instead of 'misusing' the `--prefer-dist` and `--prefer-source` flags, that obviously do more than simply use the `.gitattributes` to ignore stuff, can't we create a better solution?
+
+I have not dived into what `--prefer-source` does internally to make it this much slower, but if it can't be optimized, then perhaps we should introduce a `--include-optional` or similar tag and define the "optional" parts of a package in `composer.json` instead?
+
+Also this whole post makes me think about the following: if my argument is that for the CI/CD/docker builds we should improve speed, will we really significantly improve the speed by changing the 6 seconds composer install from cache to perhaps 3 or 4 seconds? In the end it doesn't matter much if the first build takes a bit longer.. but it's annoying on development if everything with composer takes 6 times longer because I'd like to get the Test files too..
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-09-16T07:16:58Z
+
+The speed of installation doesn't matter as much, so a decrease from 6s to 4s is not the point of this issue.
+
+This extends to the opposite direction too: increase from 6s to 33s doesn't invalidate this issue, having vendor tests locally (as opposed to looking them up on Github) is a personal preference which shouldn't be paid for by twice the install size by all.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2019-09-16T07:22:29Z
+
+Definitely a 👍 for me as it might also considerably reduce the number of files DockerForMac has to watch thus reducing the need for tools such as `docker-sync`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-16T07:56:30Z
+
+@Nyholm I would keep the `.git*` files for clarity. They are really tiny anyway and they  allow to understand what’s going on. Let's stay focused on remove tests.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-09-16T07:59:33Z
+
+Thank you. PR is updated
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-16T08:07:59Z
+
+@Nyholm It seems that you forgot the Bridge sub-namespaces for the Mailer component.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-09-16T08:14:26Z
+
+PR is squashed and updated.

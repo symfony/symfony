@@ -64,6 +64,11 @@ final class PhpDocTypeHelper
                 continue;
             }
 
+            if ($type instanceof Nullable) {
+                $nullable = true;
+                $type = $type->getActualType();
+            }
+
             $varTypes[] = $type;
         }
 

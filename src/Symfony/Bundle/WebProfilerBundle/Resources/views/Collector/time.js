@@ -223,7 +223,7 @@ class Legend {
         this.createCategory = this.createCategory.bind(this);
 
         this.categories = [];
-        this.theme.getDefaultCategories().forEach(this.createCategory)
+        this.theme.getDefaultCategories().forEach(this.createCategory);
     }
 
     add(category) {
@@ -258,23 +258,6 @@ class Legend {
 
     get(category) {
         return this.categories.find(element => element.value === category) || this.createCategory(category);
-    }
-
-    getClassname(category) {
-        return this.classnames[category] || '';
-    }
-
-    getSectionClassname() {
-        return this.classnames.section;
-    }
-
-    getDefaultClassname() {
-        return this.classnames.default;
-    }
-
-    getStandardClassenames() {
-        return Array.from(Object.values(this.classnames))
-            .filter(className => className !== this.getSectionClassname());
     }
 
     emit(name) {

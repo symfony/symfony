@@ -323,6 +323,8 @@ WebProfilerBundle
 
  * Deprecated the `ExceptionController` class in favor of `ExceptionErrorController`
  * Deprecated the `TemplateManager::templateExists()` method
+ * Deprecated the `web_profiler.intercept_redirects` config option,
+   toolbar for the redirected resource contains a link to the redirect response profile instead.
 
 WebServerBundle
 ---------------

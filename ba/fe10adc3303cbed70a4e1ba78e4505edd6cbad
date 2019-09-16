@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-09-16T08:05:15Z
+
+With release 4.3.2 `phpdocumentor/reflection-docblock` doesn't limit usages of `phpdocumentor/type-resolver` to 0.4 anymore.

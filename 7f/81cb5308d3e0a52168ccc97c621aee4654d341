@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-08-18T17:13:16Z
+
+I agree that this should be for 4.4.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-09-13T12:17:59Z
+
+PR updated to only disable deep merging for the `framework.messenger.routing.senders` prototype and fix the related ticket. Also rebased on 4.4 with CHANGELOG entry.
+
+As @nicolas-grekas suggests, we need to discuss other parts of the config tree case by case, let's move forward on this one.

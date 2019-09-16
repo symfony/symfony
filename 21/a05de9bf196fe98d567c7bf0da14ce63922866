@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by dorumd at 2019-09-09T07:54:10Z
+
+@fabpot @ro0NL Indeed, good point about deprecating it using `Configuration` tooling. Please check my latest changes.
+
+---------------------------------------------------------------------------
+
+by dorumd at 2019-09-12T20:35:33Z
+
+@stof I have split the tests. Can you please review?

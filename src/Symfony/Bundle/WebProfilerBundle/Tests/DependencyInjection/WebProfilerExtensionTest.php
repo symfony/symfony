@@ -99,13 +99,21 @@ class WebProfilerExtensionTest extends TestCase
         self::assertSaneContainer($this->getCompiledContainer());
     }
 
+    public function getDebugModes()
+    {
+        return [
+            ['debug' => false],
+            ['debug' => true],
+        ];
+    }
+
     /**
-     * @dataProvider getDebugModes
+     * @dataProvider getToolbarConfig
      */
-    public function testToolbarConfig($toolbarEnabled, $interceptRedirects, $listenerInjected, $listenerEnabled)
+    public function testToolbarConfig(bool $toolbarEnabled, bool $listenerInjected, bool $listenerEnabled)
     {
         $extension = new WebProfilerExtension();
-        $extension->load([['toolbar' => $toolbarEnabled, 'intercept_redirects' => $interceptRedirects]], $this->container);
+        $extension->load([['toolbar' => $toolbarEnabled]], $this->container);
         $this->container->removeDefinition('web_profiler.controller.exception');
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
@@ -117,13 +125,70 @@ class WebProfilerExtensionTest extends TestCase
         }
     }
 
-    public function getDebugModes()
+    public function getToolbarConfig()
     {
         return [
-            [false, false, false, false],
-            [true,  false, true,  true],
-            [false, true,  true,  false],
-            [true,  true,  true,  true],
+            [
+                'toolbarEnabled' => false,
+                'listenerInjected' => false,
+                'listenerEnabled' => false,
+            ],
+            [
+                'toolbarEnabled' => true,
+                'listenerInjected' => true,
+                'listenerEnabled' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @group legacy
+     *
+     * @dataProvider getInterceptRedirectsToolbarConfig
+     */
+    public function testToolbarConfigUsingInterceptRedirects(
+        bool $toolbarEnabled,
+        bool $interceptRedirects,
+        bool $listenerInjected,
+        bool $listenerEnabled
+    ) {
+        $extension = new WebProfilerExtension();
+        $extension->load(
+            [['toolbar' => $toolbarEnabled, 'intercept_redirects' => $interceptRedirects]],
+            $this->container
+        );
+        $this->container->removeDefinition('web_profiler.controller.exception');
+
+        $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
+
+        self::assertSaneContainer($this->getCompiledContainer(), '', ['web_profiler.csp.handler']);
+
+        if ($listenerInjected) {
+            $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
+        }
+    }
+
+    public function getInterceptRedirectsToolbarConfig()
+    {
+        return [
+             [
+                 'toolbarEnabled' => false,
+                 'interceptRedirects' => true,
+                 'listenerInjected' => true,
+                 'listenerEnabled' => false,
+            ],
+            [
+                'toolbarEnabled' => false,
+                'interceptRedirects' => false,
+                'listenerInjected' => false,
+                'listenerEnabled' => false,
+            ],
+            [
+                'toolbarEnabled' => true,
+                'interceptRedirects' => true,
+                'listenerInjected' => true,
+                'listenerEnabled' => true,
+            ],
         ];
     }
 

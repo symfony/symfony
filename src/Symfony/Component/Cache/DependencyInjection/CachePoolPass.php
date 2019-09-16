@@ -79,11 +79,12 @@ class CachePoolPass implements CompilerPassInterface
             }
             $name = $tags[0]['name'] ?? $id;
             if (!isset($tags[0]['namespace'])) {
+                $namespaceSeed = $seed;
                 if (null !== $class) {
-                    $seed .= '.'.$class;
+                    $namespaceSeed .= '.'.$class;
                 }
 
-                $tags[0]['namespace'] = $this->getNamespace($seed, $name);
+                $tags[0]['namespace'] = $this->getNamespace($namespaceSeed, $name);
             }
             if (isset($tags[0]['clearer'])) {
                 $clearer = $tags[0]['clearer'];

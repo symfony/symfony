@@ -263,11 +263,11 @@ class ValidatorBuilder
      */
     public function setMappingCache(CacheItemPoolInterface $cache)
     {
-        $this->mappingCache = $cache;
-
         if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot set a custom mapping cache after setting a custom metadata factory. Configure your metadata factory instead.');
         }
+
+        $this->mappingCache = $cache;
 
         return $this;
     }

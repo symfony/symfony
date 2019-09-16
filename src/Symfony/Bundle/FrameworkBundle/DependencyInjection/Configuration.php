@@ -1031,6 +1031,7 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->prototype('array')
+                                ->performNoDeepMerging()
                                 ->children()
                                     ->arrayNode('senders')
                                         ->requiresAtLeastOneElement()

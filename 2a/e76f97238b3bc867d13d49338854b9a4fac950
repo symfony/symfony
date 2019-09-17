@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by tienvx at 2019-09-16T17:09:45Z
+
+**NOTE**: The test case will failed on Symfony 4.4, because component `Debug` is removed from dependencies of the component `Messenger`

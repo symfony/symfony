@@ -25,7 +25,7 @@ class Gitignore
      */
     public static function toRegex(string $gitignoreFileContent): string
     {
-        $gitignoreFileContent = preg_replace('/^[^\\\\]*#.*/', '', $gitignoreFileContent);
+        $gitignoreFileContent = preg_replace('/^[^\\\r\n]*#.*/m', '', $gitignoreFileContent);
         $gitignoreLines = preg_split('/\r\n|\r|\n/', $gitignoreFileContent);
         $gitignoreLines = array_map('trim', $gitignoreLines);
         $gitignoreLines = array_filter($gitignoreLines);

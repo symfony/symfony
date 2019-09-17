@@ -56,6 +56,10 @@ trait HttpClientTrait
             }
         }
 
+        if (!isset($options['normalized_headers']['accept'])) {
+            $options['normalized_headers']['accept'] = [$options['headers'][] = 'Accept: *'];
+        }
+
         if (isset($options['body'])) {
             $options['body'] = self::normalizeBody($options['body']);
         }

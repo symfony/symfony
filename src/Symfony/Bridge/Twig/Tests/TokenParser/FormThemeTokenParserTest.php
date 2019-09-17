@@ -34,9 +34,7 @@ class FormThemeTokenParserTest extends TestCase
         $stream = $env->tokenize($source);
         $parser = new Parser($env);
 
-        if (method_exists($expected, 'setSourceContext')) {
-            $expected->setSourceContext($source);
-        }
+        $expected->setSourceContext($source);
 
         $this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode(0));
     }

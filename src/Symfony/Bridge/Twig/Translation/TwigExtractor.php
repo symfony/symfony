@@ -61,11 +61,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
                 if ($file instanceof \SplFileInfo) {
                     $path = $file->getRealPath() ?: $file->getPathname();
                     $name = $file instanceof SplFileInfo ? $file->getRelativePathname() : $path;
-                    if (method_exists($e, 'setSourceContext')) {
-                        $e->setSourceContext(new Source('', $name, $path));
-                    } else {
-                        $e->setTemplateName($name);
-                    }
+                    $e->setSourceContext(new Source('', $name, $path));
                 }
 
                 throw $e;

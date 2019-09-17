@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Terminal;
 
 /**
  * @group tty
@@ -165,23 +166,9 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
     }
 
-    public function testAskNonTrimmed()
-    {
-        $dialog = new QuestionHelper();
-
-        $inputStream = $this->getInputStream(' 8AM ');
-
-        $question = new Question('What time is it?', '2PM');
-        $question->setTrimmable(false);
-        $this->assertEquals(' 8AM ', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
-
-        rewind($output->getStream());
-        $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
-    }
-
     public function testAskWithAutocomplete()
     {
-        if (!$this->hasSttyAvailable()) {
+        if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
@@ -212,86 +199,9 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAskWithAutocompleteTrimmable()
-    {
-        if (!$this->hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
-        }
-
-        // Acm<NEWLINE>
-        // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
-        // <NEWLINE>
-        // <UP ARROW><UP ARROW><NEWLINE>
-        // <UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><TAB>Test<NEWLINE>
-        // <DOWN ARROW><NEWLINE>
-        // S<BACKSPACE><BACKSPACE><DOWN ARROW><DOWN ARROW><NEWLINE>
-        // F00<BACKSPACE><BACKSPACE>oo<TAB><NEWLINE>
-        $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\n");
-
-        $dialog = new QuestionHelper();
-        $helperSet = new HelperSet([new FormatterHelper()]);
-        $dialog->setHelperSet($helperSet);
-
-        $question = new Question('Please select a bundle', 'FrameworkBundle');
-        $question->setAutocompleterValues(['AcmeDemoBundle ', 'AsseticBundle', ' SecurityBundle ', 'FooBundle']);
-        $question->setTrimmable(false);
-
-        $this->assertEquals('AcmeDemoBundle ', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals('AsseticBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals('FrameworkBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals(' SecurityBundle ', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals('FooBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals('AcmeDemoBundle ', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-        $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-    }
-
-    public function testAskWithAutocompleteCallback()
-    {
-        if (!$this->hasSttyAvailable()) {
-            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
-        }
-
-        // Po<TAB>Cr<TAB>P<DOWN ARROW><DOWN ARROW><NEWLINE>
-        $inputStream = $this->getInputStream("Pa\177\177o\tCr\tP\033[A\033[A\n");
-
-        $dialog = new QuestionHelper();
-        $helperSet = new HelperSet([new FormatterHelper()]);
-        $dialog->setHelperSet($helperSet);
-
-        $question = new Question('What\'s for dinner?');
-
-        // A simple test callback - return an array containing the words the
-        // user has already completed, suffixed with all known words.
-        //
-        // Eg: If the user inputs "Potato C", the return will be:
-        //
-        //     ["Potato Carrot ", "Potato Creme ", "Potato Curry ", ...]
-        //
-        // No effort is made to avoid irrelevant suggestions, as this is handled
-        // by the autocomplete function.
-        $callback = function ($input) {
-            $knownWords = ['Carrot', 'Creme', 'Curry', 'Parsnip', 'Pie', 'Potato', 'Tart'];
-            $inputWords = explode(' ', $input);
-            array_pop($inputWords);
-            $suggestionBase = $inputWords ? implode(' ', $inputWords).' ' : '';
-
-            return array_map(
-                function ($word) use ($suggestionBase) {
-                    return $suggestionBase.$word.' ';
-                },
-                $knownWords
-            );
-        };
-
-        $question->setAutocompleterCallback($callback);
-
-        $this->assertSame('Potato Creme Pie', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
-    }
-
     public function testAskWithAutocompleteWithNonSequentialKeys()
     {
-        if (!$this->hasSttyAvailable()) {
+        if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
@@ -310,7 +220,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskWithAutocompleteWithExactMatch()
     {
-        if (!$this->hasSttyAvailable()) {
+        if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
@@ -346,7 +256,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
      */
     public function testAskWithAutocompleteWithMultiByteCharacter($character)
     {
-        if (!$this->hasSttyAvailable()) {
+        if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
@@ -370,7 +280,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAutocompleteWithTrailingBackslash()
     {
-        if (!$this->hasSttyAvailable()) {
+        if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
@@ -419,21 +329,6 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $question->setHidden(true);
 
         $this->assertEquals('8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("8AM\n")), $this->createOutputInterface(), $question));
-    }
-
-    public function testAskHiddenResponseTrimmed()
-    {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('This test is not supported on Windows');
-        }
-
-        $dialog = new QuestionHelper();
-
-        $question = new Question('What time is it?');
-        $question->setHidden(true);
-        $question->setTrimmable(false);
-
-        $this->assertEquals(' 8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream(' 8AM')), $this->createOutputInterface(), $question));
     }
 
     /**
@@ -691,6 +586,357 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $output, $question);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyAskChoice()
+    {
+        $questionHelper = new QuestionHelper();
+
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $questionHelper->setHelperSet($helperSet);
+
+        $heroes = ['Superman', 'Batman', 'Spiderman'];
+
+        $questionHelper->setInputStream($this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n"));
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '2');
+        $question->setMaxAttempts(1);
+        // first answer is an empty answer, we're supposed to receive the default value
+        $this->assertEquals('Spiderman', $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes);
+        $question->setMaxAttempts(1);
+        $this->assertEquals('Batman', $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('Batman', $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes);
+        $question->setErrorMessage('Input "%s" is not a superhero!');
+        $question->setMaxAttempts(2);
+        $this->assertEquals('Batman', $questionHelper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), $question));
+
+        rewind($output->getStream());
+        $stream = stream_get_contents($output->getStream());
+        $this->assertStringContainsString('Input "Fabien" is not a superhero!', $stream);
+
+        try {
+            $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '1');
+            $question->setMaxAttempts(1);
+            $questionHelper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), $question);
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('Value "Fabien" is invalid', $e->getMessage());
+        }
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, null);
+        $question->setMaxAttempts(1);
+        $question->setMultiselect(true);
+
+        $this->assertEquals(['Batman'], $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals(['Superman', 'Spiderman'], $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals(['Superman', 'Spiderman'], $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '0,1');
+        $question->setMaxAttempts(1);
+        $question->setMultiselect(true);
+
+        $this->assertEquals(['Superman', 'Batman'], $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, ' 0 , 1 ');
+        $question->setMaxAttempts(1);
+        $question->setMultiselect(true);
+
+        $this->assertEquals(['Superman', 'Batman'], $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyAsk()
+    {
+        $dialog = new QuestionHelper();
+
+        $dialog->setInputStream($this->getInputStream("\n8AM\n"));
+
+        $question = new Question('What time is it?', '2PM');
+        $this->assertEquals('2PM', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        $question = new Question('What time is it?', '2PM');
+        $this->assertEquals('8AM', $dialog->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), $question));
+
+        rewind($output->getStream());
+        $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyAskWithAutocomplete()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        // Acm<NEWLINE>
+        // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
+        // <NEWLINE>
+        // <UP ARROW><UP ARROW><NEWLINE>
+        // <UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><TAB>Test<NEWLINE>
+        // <DOWN ARROW><NEWLINE>
+        // S<BACKSPACE><BACKSPACE><DOWN ARROW><DOWN ARROW><NEWLINE>
+        // F00<BACKSPACE><BACKSPACE>oo<TAB><NEWLINE>
+        $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\n");
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($inputStream);
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new Question('Please select a bundle', 'FrameworkBundle');
+        $question->setAutocompleterValues(['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle']);
+
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('AsseticBundleTest', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('FrameworkBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('SecurityBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('FooBundleTest', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('AsseticBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('FooBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyAskWithAutocompleteWithNonSequentialKeys()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        // <UP ARROW><UP ARROW><NEWLINE><DOWN ARROW><DOWN ARROW><NEWLINE>
+        $inputStream = $this->getInputStream("\033[A\033[A\n\033[B\033[B\n");
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($inputStream);
+        $dialog->setHelperSet(new HelperSet([new FormatterHelper()]));
+
+        $question = new ChoiceQuestion('Please select a bundle', [1 => 'AcmeDemoBundle', 4 => 'AsseticBundle']);
+        $question->setMaxAttempts(1);
+
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('AsseticBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyAskHiddenResponse()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test is not supported on Windows');
+        }
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream("8AM\n"));
+
+        $question = new Question('What time is it?');
+        $question->setHidden(true);
+
+        $this->assertEquals('8AM', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getAskConfirmationData
+     */
+    public function testLegacyAskConfirmation($question, $expected, $default = true)
+    {
+        $dialog = new QuestionHelper();
+
+        $dialog->setInputStream($this->getInputStream($question."\n"));
+        $question = new ConfirmationQuestion('Do you like French fries?', $default);
+        $this->assertEquals($expected, $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question), 'confirmation question should '.($expected ? 'pass' : 'cancel'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyAskConfirmationWithCustomTrueAnswer()
+    {
+        $dialog = new QuestionHelper();
+
+        $dialog->setInputStream($this->getInputStream("j\ny\n"));
+        $question = new ConfirmationQuestion('Do you like French fries?', false, '/^(j|y)/i');
+        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $question = new ConfirmationQuestion('Do you like French fries?', false, '/^(j|y)/i');
+        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyAskAndValidate()
+    {
+        $dialog = new QuestionHelper();
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $error = 'This is not a color!';
+        $validator = function ($color) use ($error) {
+            if (!\in_array($color, ['white', 'black'])) {
+                throw new \InvalidArgumentException($error);
+            }
+
+            return $color;
+        };
+
+        $question = new Question('What color was the white horse of Henry IV?', 'white');
+        $question->setValidator($validator);
+        $question->setMaxAttempts(2);
+
+        $dialog->setInputStream($this->getInputStream("\nblack\n"));
+        $this->assertEquals('white', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $this->assertEquals('black', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        $dialog->setInputStream($this->getInputStream("green\nyellow\norange\n"));
+        try {
+            $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals($error, $e->getMessage());
+        }
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider simpleAnswerProvider
+     */
+    public function testLegacySelectChoiceFromSimpleChoices($providedAnswer, $expectedValue)
+    {
+        $possibleChoices = [
+            'My environment 1',
+            'My environment 2',
+            'My environment 3',
+        ];
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream($providedAnswer."\n"));
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $question->setMaxAttempts(1);
+        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+
+        $this->assertSame($expectedValue, $answer);
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider mixedKeysChoiceListAnswerProvider
+     */
+    public function testLegacyChoiceFromChoicelistWithMixedKeys($providedAnswer, $expectedValue)
+    {
+        $possibleChoices = [
+            '0' => 'No environment',
+            '1' => 'My environment 1',
+            'env_2' => 'My environment 2',
+            3 => 'My environment 3',
+        ];
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream($providedAnswer."\n"));
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $question->setMaxAttempts(1);
+        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+
+        $this->assertSame($expectedValue, $answer);
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider answerProvider
+     */
+    public function testLegacySelectChoiceFromChoiceList($providedAnswer, $expectedValue)
+    {
+        $possibleChoices = [
+            'env_1' => 'My environment 1',
+            'env_2' => 'My environment',
+            'env_3' => 'My environment',
+        ];
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream($providedAnswer."\n"));
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $question->setMaxAttempts(1);
+        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+
+        $this->assertSame($expectedValue, $answer);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyAmbiguousChoiceFromChoicelist()
+    {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of env_2 or env_3.');
+        $possibleChoices = [
+            'env_1' => 'My first environment',
+            'env_2' => 'My environment',
+            'env_3' => 'My environment',
+        ];
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream("My environment\n"));
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $question->setMaxAttempts(1);
+
+        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+    }
+
+    /**
+     * @requires function mb_strwidth
+     * @group legacy
+     */
+    public function testLegacyChoiceOutputFormattingQuestionForUtf8Keys()
+    {
+        $question = 'Lorem ipsum?';
+        $possibleChoices = [
+            'foo' => 'foo',
+            'żółw' => 'bar',
+            'łabądź' => 'baz',
+        ];
+        $outputShown = [
+            $question,
+            '  [<info>foo   </info>] foo',
+            '  [<info>żółw  </info>] bar',
+            '  [<info>łabądź</info>] baz',
+        ];
+        $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
+        $output->method('getFormatter')->willReturn(new OutputFormatter());
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream("\n"));
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $output->expects($this->once())->method('writeln')->with($this->equalTo($outputShown));
+
+        $question = new ChoiceQuestion($question, $possibleChoices, 'foo');
+        $dialog->ask($this->createInputInterfaceMock(), $output, $question);
+    }
+
     public function testAskThrowsExceptionOnMissingInput()
     {
         $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
@@ -732,7 +978,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testTraversableAutocomplete()
     {
-        if (!$this->hasSttyAvailable()) {
+        if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
@@ -771,7 +1017,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         // F00<BACKSPACE><BACKSPACE>o<TAB>,A<DOWN ARROW>,<SPACE>SecurityBundle<NEWLINE>
         // Acme<TAB>,<SPACE>As<TAB><29x BACKSPACE>S<TAB><NEWLINE>
         // Ac<TAB>,As<TAB><3x BACKSPACE>d<TAB><NEWLINE>
-        $inputStream = $this->getInputStream("\nF\t\nA\033[A\033[A\033[A\t,F\t\nF00\177\177o\t,A\033[B\t, SecurityBundle\nSecurityBundle\nAcme\t, As\t\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177S\t\nAc\t,As\t\177\177\177d\t\n");
+        $inputStream = $this->getInputStream("\nF\t\nA\033[A\033[A\033[A\t,F\t\nF00\177\177o\t,A\033[B\t, SecurityBundle\nAcme\t, As\t\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177S\t\nAc\t,As\t\177\177\177d\t\n");
 
         $dialog = new QuestionHelper();
         $helperSet = new HelperSet([new FormatterHelper()]);
@@ -817,13 +1063,6 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
         return $mock;
     }
-
-    private function hasSttyAvailable()
-    {
-        exec('stty 2>&1', $output, $exitcode);
-
-        return 0 === $exitcode;
-    }
 }
 
 class AutocompleteValues implements \IteratorAggregate
@@ -835,7 +1074,7 @@ class AutocompleteValues implements \IteratorAggregate
         $this->values = $values;
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator()
     {
         return new \ArrayIterator($this->values);
     }

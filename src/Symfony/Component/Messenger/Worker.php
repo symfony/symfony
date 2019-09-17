@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;

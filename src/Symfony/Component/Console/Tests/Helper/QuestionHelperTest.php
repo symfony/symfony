@@ -215,7 +215,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskWithAutocompleteTrimmable()
     {
-        if (!$this->hasSttyAvailable()) {
+        if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 
@@ -249,7 +249,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskWithAutocompleteCallback()
     {
-        if (!$this->hasSttyAvailable()) {
+        if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
         }
 

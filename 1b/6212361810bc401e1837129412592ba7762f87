@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-09-17T08:50:05Z
+
+Could you check if other components should be fixed too? Thanks
+(Hint: at least the http-client)
+
+---------------------------------------------------------------------------
+
+by ValentineBoineau at 2019-09-17T09:00:21Z
+
+That's what I do since yesterday :) HttpClient is done

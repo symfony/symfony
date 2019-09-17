@@ -172,7 +172,7 @@ class HttpClientTraitTest extends TestCase
     public function testAuthBearerOption()
     {
         [, $options] = self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foobar'], HttpClientInterface::OPTIONS_DEFAULTS);
-        $this->assertSame(['Authorization: Bearer foobar'], $options['headers']);
+        $this->assertSame(['Accept: *', 'Authorization: Bearer foobar'], $options['headers']);
         $this->assertSame(['Authorization: Bearer foobar'], $options['normalized_headers']['authorization']);
     }
 

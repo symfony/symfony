@@ -46,10 +46,9 @@ class WebProfilerExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('profiler.xml');
 
-        if ($config['toolbar'] || $config['intercept_redirects']) {
+        if ($config['toolbar']) {
             $loader->load('toolbar.xml');
-            $container->getDefinition('web_profiler.debug_toolbar')->replaceArgument(4, $config['excluded_ajax_paths']);
-            $container->setParameter('web_profiler.debug_toolbar.intercept_redirects', $config['intercept_redirects']);
+            $container->getDefinition('web_profiler.debug_toolbar')->replaceArgument(3, $config['excluded_ajax_paths']);
             $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
         }
 

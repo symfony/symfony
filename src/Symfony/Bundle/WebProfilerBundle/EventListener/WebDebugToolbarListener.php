@@ -15,7 +15,6 @@ use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -40,16 +39,14 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
     protected $twig;
     protected $urlGenerator;
-    protected $interceptRedirects;
     protected $mode;
     protected $excludedAjaxPaths;
     private $cspHandler;
 
-    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null)
+    public function __construct(Environment $twig, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null)
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
-        $this->interceptRedirects = $interceptRedirects;
         $this->mode = $mode;
         $this->excludedAjaxPaths = $excludedAjaxPaths;
         $this->cspHandler = $cspHandler;
@@ -85,17 +82,6 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {
             return;
-        }
-
-        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects && 'html' === $request->getRequestFormat()) {
-            if ($request->hasSession() && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
-                // keep current flashes for one more request if using AutoExpireFlashBag
-                $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
-            }
-
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location')]));
-            $response->setStatusCode(200);
-            $response->headers->remove('Location');
         }
 
         if (self::DISABLED === $this->mode

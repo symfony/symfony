@@ -35,7 +35,6 @@ class ConfigurationTest extends TestCase
             [
                 'options' => [],
                 'expectedResult' => [
-                    'intercept_redirects' => false,
                     'toolbar' => false,
                     'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
                 ],
@@ -43,7 +42,6 @@ class ConfigurationTest extends TestCase
             [
                 'options' => ['toolbar' => true],
                 'expectedResult' => [
-                    'intercept_redirects' => false,
                     'toolbar' => true,
                     'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
                 ],
@@ -51,45 +49,8 @@ class ConfigurationTest extends TestCase
             [
                 'options' => ['excluded_ajax_paths' => 'test'],
                 'expectedResult' => [
-                    'intercept_redirects' => false,
                     'toolbar' => false,
                     'excluded_ajax_paths' => 'test',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @group legacy
-     *
-     * @dataProvider getInterceptRedirectsConfiguration
-     */
-    public function testConfigTreeUsingInterceptRedirects(bool $interceptRedirects, array $expectedResult)
-    {
-        $processor = new Processor();
-        $configuration = new Configuration();
-        $config = $processor->processConfiguration($configuration, [['intercept_redirects' => $interceptRedirects]]);
-
-        $this->assertEquals($expectedResult, $config);
-    }
-
-    public function getInterceptRedirectsConfiguration()
-    {
-        return [
-            [
-                'interceptRedirects' => true,
-                'expectedResult' => [
-                    'intercept_redirects' => true,
-                    'toolbar' => false,
-                    'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
-                ],
-            ],
-            [
-                'interceptRedirects' => false,
-                'expectedResult' => [
-                    'intercept_redirects' => false,
-                    'toolbar' => false,
-                    'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt',
                 ],
             ],
         ];

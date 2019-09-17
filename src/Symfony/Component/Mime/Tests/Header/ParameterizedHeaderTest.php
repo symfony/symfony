@@ -205,16 +205,25 @@ class ParameterizedHeaderTest extends TestCase
         $header = new ParameterizedHeader('X-Foo', $value);
         $header->setCharset('iso-8859-1');
         $header->setParameters(['says' => $value]);
-        $this->assertEquals('X-Foo: =?'.$header->getCharset().'?Q?fo=8Fbar?=; says="=?'.$header->getCharset().'?Q?fo=8Fbar?="', $header->toString());
+        $this->assertEquals('X-Foo: =?'.$header->getCharset().'?Q?fo=8Fbar?=; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
     }
 
-    public function testParamsAreEncodedWithEncodedWordsIfNoParamEncoderSet()
+    public function testParamsAreEncodedIfNonAscii()
     {
         $value = 'fo'.pack('C', 0x8F).'bar';
         $header = new ParameterizedHeader('X-Foo', 'bar');
         $header->setCharset('iso-8859-1');
         $header->setParameters(['says' => $value]);
-        $this->assertEquals('X-Foo: bar; says="=?'.$header->getCharset().'?Q?fo=8Fbar?="', $header->toString());
+        $this->assertEquals('X-Foo: bar; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
+    }
+
+    public function testParamsAreEncodedWithLegacyEncodingEnabled()
+    {
+        $value = 'fo'.pack('C', 0x8F).'bar';
+        $header = new ParameterizedHeader('Content-Type', 'bar');
+        $header->setCharset('iso-8859-1');
+        $header->setParameters(['says' => $value]);
+        $this->assertEquals('Content-Type: bar; says="=?'.$header->getCharset().'?Q?fo=8Fbar?="', $header->toString());
     }
 
     public function testLanguageInformationAppearsInEncodedWords()
@@ -234,6 +243,18 @@ class ParameterizedHeaderTest extends TestCase
         tag.  For example:
 
                     From: =?US-ASCII*EN?Q?Keith_Moore?= <moore@cs.utk.edu>
+
+        -- RFC 2047, 5. Use of encoded-words in message headers
+          ...
+        + An 'encoded-word' MUST NOT be used in parameter of a MIME
+          Content-Type or Content-Disposition field, or in any structured
+          field body except within a 'comment' or 'phrase'.
+
+        -- RFC 2047, Appendix - changes since RFC 1522
+          ...
+        + clarify that encoded-words are allowed in '*text' fields in both
+          RFC822 headers and MIME body part headers, but NOT as parameter
+          values.
         */
 
         $value = 'fo'.pack('C', 0x8F).'bar';
@@ -241,7 +262,7 @@ class ParameterizedHeaderTest extends TestCase
         $header->setCharset('iso-8859-1');
         $header->setLanguage('en');
         $header->setParameters(['says' => $value]);
-        $this->assertEquals('X-Foo: =?'.$header->getCharset().'*en?Q?fo=8Fbar?=; says="=?'.$header->getCharset().'*en?Q?fo=8Fbar?="', $header->toString());
+        $this->assertEquals('X-Foo: =?'.$header->getCharset().'*en?Q?fo=8Fbar?=; says*='.$header->getCharset()."'en'fo%8Fbar", $header->toString());
     }
 
     public function testSetBody()

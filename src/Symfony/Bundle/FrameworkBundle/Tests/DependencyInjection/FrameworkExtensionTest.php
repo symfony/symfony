@@ -1232,11 +1232,11 @@ abstract class FrameworkExtensionTest extends TestCase
                 (new ChildDefinition('cache.adapter.array'))
                     ->replaceArgument(0, 12),
                 (new ChildDefinition('cache.adapter.filesystem'))
-                    ->replaceArgument(0, 'x5nX4TVTWn')
+                    ->replaceArgument(0, 'xctxZ1lyiH')
                     ->replaceArgument(1, 12),
                 (new ChildDefinition('cache.adapter.redis'))
                     ->replaceArgument(0, new Reference('.cache_connection.kYdiLgf'))
-                    ->replaceArgument(1, 'x5nX4TVTWn')
+                    ->replaceArgument(1, 'xctxZ1lyiH')
                     ->replaceArgument(2, 12),
             ],
             12,

@@ -28,6 +28,9 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class FlattenExceptionTest extends TestCase
 {
@@ -293,6 +296,42 @@ class FlattenExceptionTest extends TestCase
 
         $this->assertStringContainsString('*SKIPPED over 10000 entries*', $serializeTrace);
         $this->assertStringNotContainsString('*value1*', $serializeTrace);
+    }
+
+    public function testInstancesCreatedWithConstructorAreDeserializable()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $flattened = new FlattenException();
+        /** @var FlattenException $serialized */
+        $serialized = $serializer->deserialize($serializer->serialize($flattened, 'json'), FlattenException::class, 'json');
+
+        $this->assertSame($flattened->getMessage(), $serialized->getMessage());
+        $this->assertSame($flattened->getCode(), $serialized->getCode());
+        $this->assertSame($flattened->getStatusCode(), $serialized->getStatusCode());
+        $this->assertSame($flattened->getClass(), $serialized->getClass());
+        $this->assertSame($flattened->getFile(), $serialized->getFile());
+        $this->assertSame($flattened->getLine(), $serialized->getLine());
+        $this->assertSame($flattened->getPrevious(), $serialized->getPrevious());
+        $this->assertSame($flattened->getTrace(), $serialized->getTrace());
+    }
+
+    public function testInstancesCreatedFromExceptionAreDeserializable()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $flattened = FlattenException::create($this->createException(42), 404, ['Content-Type' => 'application/json']);
+        /** @var FlattenException $serialized */
+        $serialized = $serializer->deserialize($serializer->serialize($flattened, 'json'), FlattenException::class, 'json');
+
+        $this->assertSame($flattened->getMessage(), $serialized->getMessage());
+        $this->assertSame($flattened->getCode(), $serialized->getCode());
+        $this->assertSame($flattened->getStatusCode(), $serialized->getStatusCode());
+        $this->assertSame($flattened->getClass(), $serialized->getClass());
+        $this->assertSame($flattened->getFile(), $serialized->getFile());
+        $this->assertSame($flattened->getLine(), $serialized->getLine());
+        $this->assertSame($flattened->getPrevious(), $serialized->getPrevious());
+        $this->assertSame($flattened->getTrace(), $serialized->getTrace());
     }
 
     private function createException($foo)

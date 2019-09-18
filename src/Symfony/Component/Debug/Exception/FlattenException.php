@@ -97,7 +97,7 @@ class FlattenException
         return $this->headers;
     }
 
-    public function setHeaders(array $headers)
+    public function setHeaders($headers)
     {
         $this->headers = $headers;
     }
@@ -157,7 +157,7 @@ class FlattenException
         return $this->previous;
     }
 
-    public function setPrevious(self $previous)
+    public function setPrevious($previous)
     {
         $this->previous = $previous;
     }
@@ -183,8 +183,13 @@ class FlattenException
         $this->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
     }
 
-    public function setTrace($trace, $file, $line)
+    public function setTrace($trace, $file = null, $line = null)
     {
+        if (null === $file && null === $line && (null === $trace || isset($trace[0], $trace[0]['namespace']))) {
+            $this->trace = $trace;
+
+            return;
+        }
         $this->trace = [];
         $this->trace[] = [
             'namespace' => '',

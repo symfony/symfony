@@ -9,8 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests;
+namespace Symfony\Component\Form\Test;
 
+/**
+ * @internal
+ */
 trait VersionAwareTest
 {
     protected static $supportedFeatureSetVersion = 304;

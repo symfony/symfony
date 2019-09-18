@@ -20,10 +20,10 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Test\Fixtures\Controller\NullableController;
+use Symfony\Component\HttpKernel\Test\Fixtures\Controller\VariadicController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingSession;
-use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
-use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
 class ArgumentResolverTest extends TestCase
 {

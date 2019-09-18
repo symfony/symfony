@@ -9,6 +9,7 @@ CHANGELOG
  * deprecated support for short factories and short configurators in Yaml
  * deprecated `tagged` in favor of `tagged_iterator`
  * deprecated passing an instance of `Symfony\Component\DependencyInjection\Parameter` as class name to `Symfony\Component\DependencyInjection\Definition`
+ * added support for binding iterable and tagged services
 
 4.3.0
 -----

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-09T17:34:42Z
+
+~This is wrong, hanging is normal behavior, the command waits for EOF, which is CTRL+D. That's exactly the same with any Unix command that reads from stdin.~
+
+The fact it works is relying on a race condition. Don't be fooled.
+
+For 4.4 only, master shouldn't rely on ftell()
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-09-09T20:50:04Z
+
+Sure, but it's a behavior change which might give false positives in a CI. Take e.g:
+```sh
+cat unexisting | bin/console lint:yaml
+```
+
+On 4.3 the output is an error message and exit code is 1. On 4.4-dev it succeeds with code 0.

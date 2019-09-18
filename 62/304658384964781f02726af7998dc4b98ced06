@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-17T14:15:52Z
+
+New iteration: I've replaced the default templates by a theme. One can set a default theme (`setDefaultTheme()`, this is configurable globally in the `mailer.yaml` file) and/or set a theme for one email via `theme()`. I've also renamed the default Zurb theme to reflect the change and to allow adding more.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-18T08:02:32Z
+
+I've also changed the naming scheme so that we can add more built-in templates over time (`notification` being just the first one).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-18T14:20:04Z
+
+I think  this one is ready now.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-09-18T14:29:51Z
+
+AppVeyor's failure is related https://ci.appveyor.com/project/fabpot/symfony/builds/27497465#L71
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-18T15:22:50Z
+
+Tests are now as green as possible :)

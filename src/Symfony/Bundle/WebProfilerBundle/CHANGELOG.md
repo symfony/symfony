@@ -12,8 +12,6 @@ CHANGELOG
  * deprecated the `ExceptionController` in favor of `ExceptionPanelController`
  * marked all classes of the WebProfilerBundle as internal
  * added a section with the stamps of a message after it is dispatched in the Messenger panel
- * deprecated the `web_profiler.intercept_redirects` config option,
-   toolbar for the redirected resource contains a link to the redirect response profile instead.
 
 4.3.0
 -----

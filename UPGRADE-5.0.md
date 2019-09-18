@@ -577,8 +577,6 @@ WebProfilerBundle
 
  * Removed the `ExceptionController::templateExists()` method
  * Removed the `TemplateManager::templateExists()` method
- * Removed the `web_profiler.intercept_redirects` config option,
-   toolbar for the redirected resource contains a link to the redirect response profile instead.
 
 Workflow
 --------

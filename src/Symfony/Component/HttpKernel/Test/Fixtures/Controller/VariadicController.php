@@ -9,11 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\Fixtures\Controller;
+namespace Symfony\Component\HttpKernel\Test\Fixtures\Controller;
 
-class NullableController
+/**
+ * @internal
+ */
+class VariadicController
 {
-    public function action(?string $foo, ?\stdClass $bar, ?string $baz = 'value', $mandatory)
+    public function action($foo, ...$bar)
     {
     }
 }

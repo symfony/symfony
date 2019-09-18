@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Form\Test\VersionAwareTest;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {

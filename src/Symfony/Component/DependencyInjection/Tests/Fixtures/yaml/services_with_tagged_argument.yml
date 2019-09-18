@@ -10,10 +10,10 @@ services:
             - { name: foo }
     foo_service_tagged_iterator:
         class: Bar
-        arguments: [!tagged_iterator { tag: foo, index_by: barfoo, default_index_method: foobar }]
+        arguments: [!tagged_iterator { tag: foo, index_by: barfoo, default_index_method: foobar, default_priority_method: getPriority }]
     foo_service_tagged_locator:
         class: Bar
-        arguments: [!tagged_locator { tag: foo, index_by: barfoo, default_index_method: foobar }]
+        arguments: [!tagged_locator { tag: foo, index_by: barfoo, default_index_method: foobar, default_priority_method: getPriority }]
     bar_service_tagged_locator:
         class: Bar
         arguments: [!tagged_locator foo]

@@ -20,4 +20,14 @@ class BinaryStringTest extends AbstractAsciiTestCase
     {
         return new BinaryString($string);
     }
+
+    public static function provideLength(): array
+    {
+        return array_merge(
+            parent::provideLength(),
+            [
+                [2, 'ä'],
+            ]
+        );
+    }
 }

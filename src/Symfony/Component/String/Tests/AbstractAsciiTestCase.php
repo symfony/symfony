@@ -4,7 +4,10 @@ namespace Symfony\Component\String\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\AbstractString;
+use Symfony\Component\String\BinaryString;
 use Symfony\Component\String\Exception\InvalidArgumentException;
+use Symfony\Component\String\GraphemeString;
+use Symfony\Component\String\Utf8String;
 
 abstract class AbstractAsciiTestCase extends TestCase
 {
@@ -79,6 +82,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             [0, 'abc', 'a', 0],
             [1, 'abc', 'b', 1],
             [2, 'abc', 'c', 1],
+            [4, 'abacabab', 'ab', 1],
             [4, '123abc', 'b', -3],
         ];
     }
@@ -109,6 +113,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             [1, 'ABC', 'b', 1],
             [2, 'ABC', 'c', 0],
             [2, 'ABC', 'c', 2],
+            [4, 'ABACaBAB', 'Ab', 1],
             [4, '123abc', 'B', -3],
         ];
     }
@@ -116,7 +121,7 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideIndexOfLast
      */
-    public function testIndexOfLast(?int $result, string $string, string $needle, int $offset)
+    public function testIndexOfLast(?int $result, string $string, $needle, int $offset)
     {
         $instance = static::createFromString($string);
 
@@ -129,6 +134,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             [null, 'abc', '', 0],
             [null, 'abc', '', -2],
             [null, 'elegant', 'z', -1],
+            [0, 'abc', ['abc'], 0],
             [5, 'DEJAAAA', 'A', -2],
             [74, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'i', 0],
             [19, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'i', -40],
@@ -173,9 +179,9 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideSplit
      */
-    public function testSplit(string $string, string $delimiter, array $chunks, ?int $limit)
+    public function testSplit(string $string, string $delimiter, array $chunks, ?int $limit, int $flags = null)
     {
-        $this->assertEquals($chunks, static::createFromString($string)->split($delimiter, $limit));
+        $this->assertEquals($chunks, static::createFromString($string)->split($delimiter, $limit, $flags));
     }
 
     public static function provideSplit(): array
@@ -239,6 +245,44 @@ abstract class AbstractAsciiTestCase extends TestCase
                     static::createFromString(' suscipit cursus.'),
                 ],
                 null,
+            ],
+            [
+                'foo,,bar, baz , qux,kix',
+                '/\s*,\s*/',
+                [
+                    static::createFromString('foo'),
+                    static::createFromString(''),
+                    static::createFromString('bar'),
+                    static::createFromString('baz'),
+                    static::createFromString('qux,kix'),
+                ],
+                5,
+                AbstractString::PREG_SPLIT,
+            ],
+            [
+                'foo ,,bar, baz',
+                '/\s*(,)\s*/',
+                [
+                    static::createFromString('foo'),
+                    static::createFromString(','),
+                    static::createFromString(','),
+                    static::createFromString('bar'),
+                    static::createFromString(','),
+                    static::createFromString('baz'),
+                ],
+                null,
+                AbstractString::PREG_SPLIT_NO_EMPTY | AbstractString::PREG_SPLIT_DELIM_CAPTURE,
+            ],
+            [
+                'foo, bar,baz',
+                '/\s*(,)\s*/',
+                [
+                    [static::createFromString('foo'), 0],
+                    [static::createFromString('bar'), 5],
+                    [static::createFromString('baz'), 9],
+                ],
+                null,
+                AbstractString::PREG_SPLIT_OFFSET_CAPTURE,
             ],
         ];
     }
@@ -351,7 +395,7 @@ abstract class AbstractAsciiTestCase extends TestCase
         return [
             ['hello world', 'hello world'],
             ['hello world', 'HELLO WORLD'],
-            ['hello world', 'Hello World'],
+            ['hello world!', 'Hello World!'],
             ['symfony', 'symfony'],
             ['symfony', 'Symfony'],
             ['symfony', 'sYmFOny'],
@@ -375,7 +419,7 @@ abstract class AbstractAsciiTestCase extends TestCase
         return [
             ['HELLO WORLD', 'hello world'],
             ['HELLO WORLD', 'HELLO WORLD'],
-            ['HELLO WORLD', 'Hello World'],
+            ['HELLO WORLD!', 'Hello World!'],
             ['SYMFONY', 'symfony'],
             ['SYMFONY', 'Symfony'],
             ['SYMFONY', 'sYmFOny'],
@@ -425,8 +469,11 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['Symfony', 'Symfony is awesome', 0, 7],
             [' ', 'Symfony is awesome', 7, 1],
             ['is', 'Symfony is awesome', 8, 2],
+            ['is awesome', 'Symfony is awesome', 8, null],
             [' ', 'Symfony is awesome', 10, 1],
             ['awesome', 'Symfony is awesome', 11, 7],
+            ['awesome', 'Symfony is awesome', -7, null],
+            ['awe', 'Symfony is awesome', -7, -4],
         ];
     }
 
@@ -450,6 +497,10 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideAppend()
     {
         return [
+            [
+                '',
+                [],
+            ],
             [
                 'Symfony',
                 ['Sym', 'fony'],
@@ -512,6 +563,11 @@ abstract class AbstractAsciiTestCase extends TestCase
                 "    Symfony     IS GREAT\t!!!\n",
                 " \n!",
             ],
+            [
+                "Symfony     IS GREAT\t!!!  \n",
+                "    Symfony     IS GREAT\t!!!  \n",
+                ' ',
+            ],
         ];
     }
 
@@ -566,102 +622,125 @@ abstract class AbstractAsciiTestCase extends TestCase
                 "\n\t<span>Symfony is a PHP framework</span>  \n",
                 "\n",
             ],
+            [
+                "\n\t<span>Symfony is a PHP framework</span>  \n",
+                "\n\t<span>Symfony is a PHP framework</span>  \n",
+                ' ',
+            ],
         ];
     }
 
     /**
      * @dataProvider provideBeforeAfter
      */
-    public function testBeforeAfter(string $expected, string $needle, string $origin, bool $before)
+    public function testBeforeAfter(string $expected, string $needle, string $origin, int $offset, bool $before)
     {
         $result = static::createFromString($origin);
-        $result = $before ? $result->before($needle, false) : $result->after($needle, true);
+        $result = $before ? $result->before($needle, false, $offset) : $result->after($needle, true, $offset);
         $this->assertEquals(static::createFromString($expected), $result);
     }
 
     public static function provideBeforeAfter()
     {
         return [
-            ['', '', 'hello world', true],
-            ['', '', 'hello world', false],
-            ['', 'w', 'hello World', true],
-            ['', 'w', 'hello World', false],
-            ['hello ', 'w', 'hello world', true],
-            ['world', 'w', 'hello world', false],
+            ['', '', 'hello world', 0, true],
+            ['', '', 'hello world', 0, false],
+            ['', 'w', 'hello World', 0, true],
+            ['', 'w', 'hello World', 0, false],
+            ['', 'o', 'hello world', 10, true],
+            ['', 'o', 'hello world', 10, false],
+            ['hello ', 'w', 'hello world', 0, true],
+            ['world', 'w', 'hello world', 0, false],
+            ['hello W', 'O', 'hello WORLD', 0, true],
+            ['ORLD', 'O', 'hello WORLD', 0, false],
+            ['abac', 'ab', 'abacabab', 1, true],
+            ['abab', 'ab', 'abacabab', 1, false],
         ];
     }
 
     /**
      * @dataProvider provideBeforeAfterIgnoreCase
      */
-    public function testBeforeAfterIgnoreCase(string $expected, string $needle, string $origin, bool $before)
+    public function testBeforeAfterIgnoreCase(string $expected, string $needle, string $origin, int $offset, bool $before)
     {
         $result = static::createFromString($origin)->ignoreCase();
-        $result = $before ? $result->before($needle, false) : $result->after($needle, true);
+        $result = $before ? $result->before($needle, false, $offset) : $result->after($needle, true, $offset);
         $this->assertEquals(static::createFromString($expected), $result);
     }
 
     public static function provideBeforeAfterIgnoreCase()
     {
         return [
-            ['', '', 'hello world', true],
-            ['', '', 'hello world', false],
-            ['', 'foo', 'hello world', true],
-            ['', 'foo', 'hello world', false],
-            ['hello ', 'w', 'hello world', true],
-            ['world', 'w', 'hello world', false],
-            ['hello ', 'W', 'hello world', true],
-            ['world', 'W', 'hello world', false],
+            ['', '', 'hello world', 0, true],
+            ['', '', 'hello world', 0, false],
+            ['', 'foo', 'hello world', 0, true],
+            ['', 'foo', 'hello world', 0, false],
+            ['', 'o', 'hello world', 10, true],
+            ['', 'o', 'hello world', 10, false],
+            ['hello ', 'w', 'hello world', 0, true],
+            ['world', 'w', 'hello world', 0, false],
+            ['hello ', 'W', 'hello world', 0, true],
+            ['world', 'W', 'hello world', 0, false],
+            ['Abac', 'Ab', 'AbacaBAb', 1, true],
+            ['aBAb', 'Ab', 'AbacaBAb', 1, false],
         ];
     }
 
     /**
      * @dataProvider provideBeforeAfterLast
      */
-    public function testBeforeAfterLast(string $expected, string $needle, string $origin, bool $before)
+    public function testBeforeAfterLast(string $expected, string $needle, string $origin, int $offset, bool $before)
     {
         $result = static::createFromString($origin);
-        $result = $before ? $result->beforeLast($needle, false) : $result->afterLast($needle, true);
+        $result = $before ? $result->beforeLast($needle, false, $offset) : $result->afterLast($needle, true, $offset);
         $this->assertEquals(static::createFromString($expected), $result);
     }
 
     public static function provideBeforeAfterLast()
     {
         return [
-            ['', '', 'hello world', true],
-            ['', '', 'hello world', false],
-            ['', 'L', 'hello world', true],
-            ['', 'L', 'hello world', false],
-            ['hello wor', 'l', 'hello world', true],
-            ['ld', 'l', 'hello world', false],
-            ['hello w', 'o', 'hello world', true],
-            ['orld', 'o', 'hello world', false],
+            ['', '', 'hello world', 0, true],
+            ['', '', 'hello world', 0, false],
+            ['', 'L', 'hello world', 0, true],
+            ['', 'L', 'hello world', 0, false],
+            ['', 'o', 'hello world', 10, true],
+            ['', 'o', 'hello world', 10, false],
+            ['hello wor', 'l', 'hello world', 0, true],
+            ['ld', 'l', 'hello world', 0, false],
+            ['hello w', 'o', 'hello world', 0, true],
+            ['orld', 'o', 'hello world', 0, false],
+            ['abacab', 'ab', 'abacabab', 1, true],
+            ['ab', 'ab', 'abacabab', 1, false],
         ];
     }
 
     /**
      * @dataProvider provideBeforeAfterLastIgnoreCase
      */
-    public function testBeforeAfterLastIgnoreCase(string $expected, string $needle, string $origin, bool $before)
+    public function testBeforeAfterLastIgnoreCase(string $expected, string $needle, string $origin, int $offset, bool $before)
     {
         $result = static::createFromString($origin)->ignoreCase();
-        $result = $before ? $result->beforeLast($needle, false) : $result->afterLast($needle, true);
+        $result = $before ? $result->beforeLast($needle, false, $offset) : $result->afterLast($needle, true, $offset);
         $this->assertEquals(static::createFromString($expected), $result);
     }
 
     public static function provideBeforeAfterLastIgnoreCase()
     {
         return [
-            ['', '', 'hello world', true],
-            ['', '', 'hello world', false],
-            ['', 'FOO', 'hello world', true],
-            ['', 'FOO', 'hello world', false],
-            ['hello wor', 'l', 'hello world', true],
-            ['ld', 'l', 'hello world', false],
-            ['hello wor', 'L', 'hello world', true],
-            ['ld', 'L', 'hello world', false],
-            ['hello w', 'O', 'hello world', true],
-            ['orld', 'O', 'hello world', false],
+            ['', '', 'hello world', 0, true],
+            ['', '', 'hello world', 0, false],
+            ['', 'FOO', 'hello world', 0, true],
+            ['', 'FOO', 'hello world', 0, false],
+            ['', 'o', 'hello world', 10, true],
+            ['', 'o', 'hello world', 10, false],
+            ['hello wor', 'l', 'hello world', 0, true],
+            ['ld', 'l', 'hello world', 0, false],
+            ['hello wor', 'L', 'hello world', 0, true],
+            ['ld', 'L', 'hello world', 0, false],
+            ['hello w', 'O', 'hello world', 0, true],
+            ['orld', 'O', 'hello world', 0, false],
+            ['AbacaB', 'Ab', 'AbacaBaB', 1, true],
+            ['aB', 'Ab', 'AbacaBaB', 1, false],
         ];
     }
 
@@ -727,6 +806,482 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['hello_world', 1, 'hello world', ' ', '_'],
             ['hemmo wormd', 3, 'hello world', 'l', 'm'],
             ['heMMo worMd', 3, 'hello world', 'L', 'M'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideCamel
+     */
+    public function testCamel(string $expectedString, string $origin)
+    {
+        $instance = static::createFromString($origin)->camel();
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+    }
+
+    public static function provideCamel()
+    {
+        return [
+            ['', ''],
+            ['symfonyIsGreat', 'symfony_is_great'],
+            ['symfony5IsGreat', 'symfony_5_is_great'],
+            ['symfonyIsGreat', 'Symfony is great'],
+            ['symfonyIsAGreatFramework', 'Symfony is a great framework'],
+            ['symfonyIsGREAT', '*Symfony* is GREAT!!'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideSnake
+     */
+    public function testSnake(string $expectedString, string $origin)
+    {
+        $instance = static::createFromString($origin)->snake();
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+    }
+
+    public static function provideSnake()
+    {
+        return [
+            ['', ''],
+            ['symfony_is_great', 'symfonyIsGreat'],
+            ['symfony5_is_great', 'symfony5IsGreat'],
+            ['symfony5is_great', 'symfony5isGreat'],
+            ['symfony_is_great', 'Symfony is great'],
+            ['symfony_is_a_great_framework', 'symfonyIsAGreatFramework'],
+            ['symfony_is_great', 'symfonyIsGREAT'],
+            ['symfony_is_really_great', 'symfonyIsREALLYGreat'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideStartsWith
+     */
+    public function testStartsWith(bool $expected, string $origin, $prefix)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->startsWith($prefix));
+    }
+
+    public static function provideStartsWith()
+    {
+        return [
+            [false, '', ''],
+            [false, '', 'foo'],
+            [false, 'foo', ''],
+            [false, 'foo', 'o'],
+            [false, 'foo', 'F'],
+            [false, "\nfoo", 'f'],
+            [true, 'foo', 'f'],
+            [true, 'foo', 'fo'],
+            [true, 'foo', new BinaryString('f')],
+            [true, 'foo', new Utf8String('f')],
+            [true, 'foo', new GraphemeString('f')],
+            [true, 'foo', ['e', 'f', 'g']],
+        ];
+    }
+
+    /**
+     * @dataProvider provideStartsWithIgnoreCase
+     */
+    public function testStartsWithIgnoreCase(bool $expected, string $origin, $prefix)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->ignoreCase()->startsWith($prefix));
+    }
+
+    public static function provideStartsWithIgnoreCase()
+    {
+        return [
+            [false, '', ''],
+            [false, '', 'foo'],
+            [false, 'foo', ''],
+            [false, 'foo', 'o'],
+            [false, "\nfoo", 'f'],
+            [true, 'foo', 'F'],
+            [true, 'FoO', 'foo'],
+            [true, 'foo', new BinaryString('F')],
+            [true, 'foo', new Utf8String('F')],
+            [true, 'foo', new GraphemeString('F')],
+            [true, 'foo', ['E', 'F', 'G']],
+        ];
+    }
+
+    /**
+     * @dataProvider provideEndsWith
+     */
+    public function testEndsWith(bool $expected, string $origin, $suffix)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->endsWith($suffix));
+    }
+
+    public static function provideEndsWith()
+    {
+        return [
+            [false, '', ''],
+            [false, '', 'foo'],
+            [false, 'foo', ''],
+            [false, 'foo', 'f'],
+            [false, 'foo', 'O'],
+            [false, "foo\n", 'o'],
+            [true, 'foo', 'o'],
+            [true, 'foo', 'foo'],
+            [true, 'foo', new BinaryString('o')],
+            [true, 'foo', new Utf8String('o')],
+            [true, 'foo', new GraphemeString('o')],
+            [true, 'foo', ['a', 'o', 'u']],
+        ];
+    }
+
+    /**
+     * @dataProvider provideEndsWithIgnoreCase
+     */
+    public function testEndsWithIgnoreCase(bool $expected, string $origin, $suffix)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->ignoreCase()->endsWith($suffix));
+    }
+
+    public static function provideEndsWithIgnoreCase()
+    {
+        return [
+            [false, '', ''],
+            [false, '', 'foo'],
+            [false, 'foo', ''],
+            [false, 'foo', 'f'],
+            [false, "foo\n", 'o'],
+            [true, 'foo', 'O'],
+            [true, 'Foo', 'foo'],
+            [true, 'foo', new BinaryString('O')],
+            [true, 'foo', new Utf8String('O')],
+            [true, 'foo', new GraphemeString('O')],
+            [true, 'foo', ['A', 'O', 'U']],
+        ];
+    }
+
+    /**
+     * @dataProvider provideEnsureStart
+     */
+    public function testEnsureStart(string $expectedString, string $origin, $prefix)
+    {
+        $instance = static::createFromString($origin)->ensureStart($prefix);
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+    }
+
+    public static function provideEnsureStart()
+    {
+        return [
+            ['', '', ''],
+            ['foo', 'foo', ''],
+            ['foo', '', 'foo'],
+            ['foo', 'foo', 'foo'],
+            ['foobar', 'foobar', 'foo'],
+            ['foobar', 'bar', 'foo'],
+            ['foo', 'foofoofoo', 'foo'],
+            ['foobar', 'foofoofoobar', 'foo'],
+            ['fooFoobar', 'Foobar', 'foo'],
+            ["foo\nfoo", "\nfoo", 'foo'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideEnsureStartIgnoreCase
+     */
+    public function testEnsureStartIgnoreCase(string $expectedString, string $origin, $prefix)
+    {
+        $instance = static::createFromString($origin)->ignoreCase()->ensureStart($prefix);
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+    }
+
+    public static function provideEnsureStartIgnoreCase()
+    {
+        return [
+            ['', '', ''],
+            ['foo', 'foo', ''],
+            ['foo', '', 'foo'],
+            ['Foo', 'Foo', 'foo'],
+            ['Foobar', 'Foobar', 'foo'],
+            ['foobar', 'bar', 'foo'],
+            ['Foo', 'fOofoOFoo', 'foo'],
+            ['Foobar', 'fOofoOFoobar', 'foo'],
+            ["foo\nfoo", "\nfoo", 'foo'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideEnsureEnd
+     */
+    public function testEnsureEnd(string $expectedString, string $origin, $suffix)
+    {
+        $instance = static::createFromString($origin)->ensureEnd($suffix);
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+    }
+
+    public static function provideEnsureEnd()
+    {
+        return [
+            ['', '', ''],
+            ['foo', 'foo', ''],
+            ['foo', '', 'foo'],
+            ['foo', 'foo', 'foo'],
+            ['foobar', 'foobar', 'bar'],
+            ['foobar', 'foo', 'bar'],
+            ['foo', 'foofoofoo', 'foo'],
+            ['foobar', 'foobarbarbar', 'bar'],
+            ['fooBarbar', 'fooBar', 'bar'],
+            ["foo\nfoo", "foo\n", 'foo'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideEnsureEndIgnoreCase
+     */
+    public function testEnsureEndIgnoreCase(string $expectedString, string $origin, $suffix)
+    {
+        $instance = static::createFromString($origin)->ignoreCase()->ensureEnd($suffix);
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+    }
+
+    public static function provideEnsureEndIgnoreCase()
+    {
+        return [
+            ['', '', ''],
+            ['foo', 'foo', ''],
+            ['foo', '', 'foo'],
+            ['foo', 'foo', 'foo'],
+            ['fooBar', 'fooBar', 'bar'],
+            ['foobar', 'foo', 'bar'],
+            ['fOo', 'fOofoOFoo', 'foo'],
+            ['fooBar', 'fooBarbArbaR', 'bar'],
+            ["foo\nfoo", "foo\n", 'foo'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideCollapseWhitespace
+     */
+    public function testCollapseWhitespace(string $expectedString, string $origin)
+    {
+        $instance = static::createFromString($origin)->collapseWhitespace();
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+    }
+
+    public static function provideCollapseWhitespace()
+    {
+        return [
+            ['', ''],
+            ['', " \t\r\n"],
+            ['foo bar', 'foo bar'],
+            ['foo bar baz', ' foo   bar baz'],
+            ['foo bar baz', " foo\nbar \t baz\n"],
+        ];
+    }
+
+    /**
+     * @dataProvider provideEqualsTo
+     */
+    public function testEqualsTo(bool $expected, string $origin, $other)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->equalsTo($other));
+    }
+
+    public static function provideEqualsTo()
+    {
+        return [
+            [true, '', ''],
+            [false, '', 'foo'],
+            [false, 'foo', ''],
+            [false, 'foo', 'Foo'],
+            [false, "foo\n", 'foo'],
+            [true, 'Foo bar', 'Foo bar'],
+            [true, 'Foo bar', new BinaryString('Foo bar')],
+            [true, 'Foo bar', new Utf8String('Foo bar')],
+            [true, 'Foo bar', new GraphemeString('Foo bar')],
+            [false, '', []],
+            [false, 'foo', ['bar', 'baz']],
+            [true, 'foo', ['bar', 'foo', 'baz']],
+        ];
+    }
+
+    /**
+     * @dataProvider provideEqualsToIgnoreCase
+     */
+    public function testEqualsToIgnoreCase(bool $expected, string $origin, $other)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->ignoreCase()->equalsTo($other));
+    }
+
+    public static function provideEqualsToIgnoreCase()
+    {
+        return [
+            [true, '', ''],
+            [false, '', 'foo'],
+            [false, 'foo', ''],
+            [false, "foo\n", 'foo'],
+            [true, 'foo Bar', 'FOO bar'],
+            [true, 'foo Bar', new BinaryString('FOO bar')],
+            [true, 'foo Bar', new Utf8String('FOO bar')],
+            [true, 'foo Bar', new GraphemeString('FOO bar')],
+            [false, '', []],
+            [false, 'Foo', ['bar', 'baz']],
+            [true, 'Foo', ['bar', 'foo', 'baz']],
+        ];
+    }
+
+    /**
+     * @dataProvider provideIsEmpty
+     */
+    public function testIsEmpty(bool $expected, string $origin)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->isEmpty());
+    }
+
+    public static function provideIsEmpty()
+    {
+        return [
+            [true, ''],
+            [false, ' '],
+            [false, "\n"],
+            [false, 'Foo bar'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideJoin
+     */
+    public function testJoin(string $expected, string $origin, array $join)
+    {
+        $instance = static::createFromString($origin)->join($join);
+
+        $this->assertEquals(static::createFromString($expected), $instance);
+    }
+
+    public static function provideJoin()
+    {
+        return [
+            ['', '', []],
+            ['', ',', []],
+            ['foo', ',', ['foo']],
+            ['foobar', '', ['foo', 'bar']],
+            ['foo, bar', ', ', ['foo', 'bar']],
+        ];
+    }
+
+    /**
+     * @dataProvider provideRepeat
+     */
+    public function testRepeat(string $expected, string $origin, int $multiplier)
+    {
+        $instance = static::createFromString($origin)->repeat($multiplier);
+
+        $this->assertEquals(static::createFromString($expected), $instance);
+    }
+
+    public static function provideRepeat()
+    {
+        return [
+            ['', '', 0],
+            ['', '', 5],
+            ['', 'foo', 0],
+            ['foo', 'foo', 1],
+            ['foofoofoo', 'foo', 3],
+        ];
+    }
+
+    /**
+     * @dataProvider providePadBoth
+     */
+    public function testPadBoth(string $expected, string $origin, int $length, string $padStr)
+    {
+        $instance = static::createFromString($origin)->padBoth($length, $padStr);
+
+        $this->assertEquals(static::createFromString($expected), $instance);
+    }
+
+    public static function providePadBoth()
+    {
+        return [
+            ['', '', 0, '_'],
+            ['###', '', 3, '#'],
+            ['foo', 'foo', 2, '#'],
+            ['foo', 'foo', 3, '#'],
+            ['foo#', 'foo', 4, '#'],
+            ['#foo#', 'foo', 5, '#'],
+            ['##foo###', 'foo', 8, '#'],
+            ['#+#foo#+#', 'foo', 9, '#+'],
+        ];
+    }
+
+    /**
+     * @dataProvider providePadEnd
+     */
+    public function testPadEnd(string $expected, string $origin, int $length, string $padStr)
+    {
+        $instance = static::createFromString($origin)->padEnd($length, $padStr);
+
+        $this->assertEquals(static::createFromString($expected), $instance);
+    }
+
+    public static function providePadEnd()
+    {
+        return [
+            ['', '', 0, '_'],
+            ['###', '', 3, '#'],
+            ['foo', 'foo', 2, '#'],
+            ['foo', 'foo', 3, '#'],
+            ['foo#', 'foo', 4, '#'],
+            ['foo###', 'foo', 6, '#'],
+            ['foo#+#', 'foo', 6, '#+'],
+        ];
+    }
+
+    /**
+     * @dataProvider providePadStart
+     */
+    public function testPadStart(string $expected, string $origin, int $length, string $padStr)
+    {
+        $instance = static::createFromString($origin)->padStart($length, $padStr);
+
+        $this->assertEquals(static::createFromString($expected), $instance);
+    }
+
+    public static function providePadStart()
+    {
+        return [
+            ['', '', 0, '_'],
+            ['###', '', 3, '#'],
+            ['foo', 'foo', 2, '#'],
+            ['foo', 'foo', 3, '#'],
+            ['#foo', 'foo', 4, '#'],
+            ['###foo', 'foo', 6, '#'],
+            ['#+#foo', 'foo', 6, '#+'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideTruncate
+     */
+    public function testTruncate(string $expected, string $origin, int $length, string $ellipsis)
+    {
+        $instance = static::createFromString($origin)->truncate($length, $ellipsis);
+
+        $this->assertEquals(static::createFromString($expected), $instance);
+    }
+
+    public static function provideTruncate()
+    {
+        return [
+            ['', '', 3, ''],
+            ['', 'foo', 0, '...'],
+            ['fo', 'foobar', 2, ''],
+            ['foobar', 'foobar', 10, ''],
+            ['foo', 'foo', 3, '...'],
+            ['fo', 'foobar', 2, '...'],
+            ['...', 'foobar', 3, '...'],
+            ['fo...', 'foobar', 5, '...'],
         ];
     }
 }

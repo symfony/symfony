@@ -226,6 +226,9 @@ abstract class AbstractUtf8TestCase extends AbstractAsciiTestCase
                 ['GARÇON', 'GARÇON'],
                 ["ŒUVRE D'ART", "Œuvre d'Art"],
 
+                // German
+                ['ÄUSSERST', 'äußerst'],
+
                 // Spanish
                 ['EL NIÑO', 'El Niño'],
 
@@ -324,8 +327,8 @@ abstract class AbstractUtf8TestCase extends AbstractAsciiTestCase
         return array_merge(
             parent::provideBeforeAfter(),
             [
-                ['jàdéjà', 'jà', 'déjàdéjà', false],
-                ['dé', 'jà', 'déjàdéjà', true],
+                ['jàdéjà', 'jà', 'déjàdéjà', 0, false],
+                ['dé', 'jà', 'déjàdéjà', 0, true],
             ]
         );
     }
@@ -335,12 +338,12 @@ abstract class AbstractUtf8TestCase extends AbstractAsciiTestCase
         return array_merge(
             parent::provideBeforeAfterIgnoreCase(),
             [
-                ['jàdéjà', 'JÀ', 'déjàdéjà', false],
-                ['dé', 'jÀ', 'déjàdéjà', true],
-                ['éjàdéjà', 'é', 'déjàdéjà', false],
-                ['d', 'é', 'déjàdéjà', true],
-                ['', 'Ç', 'déjàdéjà', false],
-                ['', 'Ç', 'déjàdéjà', true],
+                ['jàdéjà', 'JÀ', 'déjàdéjà', 0, false],
+                ['dé', 'jÀ', 'déjàdéjà', 0, true],
+                ['éjàdéjà', 'é', 'déjàdéjà', 0, false],
+                ['d', 'é', 'déjàdéjà', 0, true],
+                ['', 'Ç', 'déjàdéjà', 0, false],
+                ['', 'Ç', 'déjàdéjà', 0, true],
             ]
         );
     }
@@ -350,10 +353,10 @@ abstract class AbstractUtf8TestCase extends AbstractAsciiTestCase
         return array_merge(
             parent::provideBeforeAfterLast(),
             [
-                ['', 'Ç', 'déjàdéjà', false],
-                ['', 'Ç', 'déjàdéjà', true],
-                ['éjà', 'é', 'déjàdéjà', false],
-                ['déjàd', 'é', 'déjàdéjà', true],
+                ['', 'Ç', 'déjàdéjà', 0, false],
+                ['', 'Ç', 'déjàdéjà', 0, true],
+                ['éjà', 'é', 'déjàdéjà', 0, false],
+                ['déjàd', 'é', 'déjàdéjà', 0, true],
             ]
         );
     }
@@ -363,9 +366,9 @@ abstract class AbstractUtf8TestCase extends AbstractAsciiTestCase
         return array_merge(
             parent::provideBeforeAfterLastIgnoreCase(),
             [
-                ['', 'Ç', 'déjàdéjà', false],
-                ['éjà', 'é', 'déjàdéjà', false],
-                ['éjà', 'É', 'déjàdéjà', false],
+                ['', 'Ç', 'déjàdéjà', 0, false],
+                ['éjà', 'é', 'déjàdéjà', 0, false],
+                ['éjà', 'É', 'déjàdéjà', 0, false],
             ]
         );
     }
@@ -421,5 +424,84 @@ abstract class AbstractUtf8TestCase extends AbstractAsciiTestCase
         $this->expectException(InvalidArgumentException::class);
 
         static::createFromString('Symfony')->replace('f', "\xE9");
+    }
+
+    public static function provideCamel()
+    {
+        return array_merge(
+            parent::provideCamel(),
+            [
+                ['symfonyIstÄußerstCool', 'symfony_ist_äußerst_cool'],
+            ]
+        );
+    }
+
+    public static function provideSnake()
+    {
+        return array_merge(
+            parent::provideSnake(),
+            [
+                ['symfony_ist_äußerst_cool', 'symfonyIstÄußerstCool'],
+            ]
+        );
+    }
+
+    public static function provideEqualsTo()
+    {
+        return array_merge(
+            parent::provideEqualsTo(),
+            [
+                [true, 'äußerst', 'äußerst'],
+                [false, 'BÄR', 'bär'],
+                [false, 'Bär', 'Bar'],
+            ]
+        );
+    }
+
+    public static function provideEqualsToIgnoreCase()
+    {
+        return array_merge(
+            parent::provideEqualsToIgnoreCase(),
+            [
+                [true, 'Äußerst', 'äußerst'],
+                [false, 'Bär', 'Bar'],
+            ]
+        );
+    }
+
+    public static function providePadBoth(): array
+    {
+        return array_merge(
+            parent::providePadBoth(),
+            [
+                ['äußerst', 'äußerst', 7, '+'],
+                ['+äußerst+', 'äußerst', 9, '+'],
+                ['äö.äöä', '.', 6, 'äö'],
+            ]
+        );
+    }
+
+    public static function providePadEnd(): array
+    {
+        return array_merge(
+            parent::providePadEnd(),
+            [
+                ['äußerst', 'äußerst', 7, '+'],
+                ['äußerst+', 'äußerst', 8, '+'],
+                ['.äöä', '.', 4, 'äö'],
+            ]
+        );
+    }
+
+    public static function providePadStart(): array
+    {
+        return array_merge(
+            parent::providePadStart(),
+            [
+                ['äußerst', 'äußerst', 7, '+'],
+                ['+äußerst', 'äußerst', 8, '+'],
+                ['äöä.', '.', 4, 'äö'],
+            ]
+        );
     }
 }

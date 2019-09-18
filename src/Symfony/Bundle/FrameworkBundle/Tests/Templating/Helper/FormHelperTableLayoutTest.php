@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplate
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
 use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Tests\AbstractTableLayoutTest;
+use Symfony\Component\Form\Test\AbstractTableLayoutTest;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\PhpEngine;
 

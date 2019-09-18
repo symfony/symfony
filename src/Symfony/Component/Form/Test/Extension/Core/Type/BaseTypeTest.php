@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Extension\Core\Type;
+namespace Symfony\Component\Form\Test\Extension\Core\Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Test\VersionAwareTest;
+use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

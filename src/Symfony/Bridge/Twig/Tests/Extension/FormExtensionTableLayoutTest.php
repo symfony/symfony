@@ -18,7 +18,7 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Tests\AbstractTableLayoutTest;
+use Symfony\Component\Form\Test\AbstractTableLayoutTest;
 use Twig\Environment;
 
 class FormExtensionTableLayoutTest extends AbstractTableLayoutTest

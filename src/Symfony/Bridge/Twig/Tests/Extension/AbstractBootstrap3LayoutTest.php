@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Tests\AbstractLayoutTest;
+use Symfony\Component\Form\Test\AbstractLayoutTest;
 
 abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 {

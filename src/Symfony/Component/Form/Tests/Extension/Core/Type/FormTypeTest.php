@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Test\Extension\Core\Type\BaseTypeTest;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\PropertyAccess\PropertyPath;

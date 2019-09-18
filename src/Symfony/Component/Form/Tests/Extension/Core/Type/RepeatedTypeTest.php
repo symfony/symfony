@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Test\Extension\Core\Type\BaseTypeTest;
 
 class RepeatedTypeTest extends BaseTypeTest
 {

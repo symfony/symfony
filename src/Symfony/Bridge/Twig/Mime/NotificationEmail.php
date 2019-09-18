@@ -89,7 +89,7 @@ class NotificationEmail extends TemplatedEmail
     }
 
     /**
-     * @return self
+     * @return $this
      */
     public function importance(string $importance)
     {
@@ -99,7 +99,7 @@ class NotificationEmail extends TemplatedEmail
     }
 
     /**
-     * @param \Throwable|FlattenException
+     * @param \Throwable|FlattenException $exception
      *
      * @return $this
      */
@@ -155,7 +155,7 @@ class NotificationEmail extends TemplatedEmail
     {
         $headers = parent::getPreparedHeaders();
 
-        $importance = $this->context['importance'] ?? IMPORTANCE_LOW;
+        $importance = $this->context['importance'] ?? self::IMPORTANCE_LOW;
         $this->priority($this->determinePriority($importance));
         $headers->setHeaderBody('Text', 'Subject', sprintf('[%s] %s', strtoupper($importance), $this->getSubject()));
 
@@ -186,7 +186,7 @@ class NotificationEmail extends TemplatedEmail
         }
 
         $message = \get_class($exception);
-        if ('' != $exception->getMessage()) {
+        if ('' !== $exception->getMessage()) {
             $message .= ': '.$exception->getMessage();
         }
 

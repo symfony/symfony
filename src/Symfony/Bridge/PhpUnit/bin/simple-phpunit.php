@@ -116,19 +116,20 @@ $argv = array_filter($argv, function ($v) use (&$argc,&$IGNORE) {
 });
 
 $SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy'.($PHPUNIT_VERSION < 6.0 ? ' symfony/yaml' : ''));
-
-if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
+$configurationHash = md5(implode(PHP_EOL, [md5_file(__FILE__), $SYMFONY_PHPUNIT_REMOVE, (int) $PHPUNIT_REMOVE_RETURN_TYPEHINT]));
+$PHPUNIT_VERSION_DIR = sprintf('phpunit-%s-%d', $PHPUNIT_VERSION, $PHPUNIT_REMOVE_RETURN_TYPEHINT);
+if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationHash !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION_DIR.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default
 
     @mkdir($PHPUNIT_DIR, 0777, true);
     chdir($PHPUNIT_DIR);
-    if (file_exists("phpunit-$PHPUNIT_VERSION")) {
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s > NUL' : 'rm -rf %s', "phpunit-$PHPUNIT_VERSION.old"));
-        rename("phpunit-$PHPUNIT_VERSION", "phpunit-$PHPUNIT_VERSION.old");
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s' : 'rm -rf %s', "phpunit-$PHPUNIT_VERSION.old"));
+    if (file_exists("$PHPUNIT_VERSION_DIR")) {
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s > NUL' : 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
+        rename("$PHPUNIT_VERSION_DIR", "$PHPUNIT_VERSION_DIR.old");
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s' : 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
     }
-    passthru("$COMPOSER create-project $IGNORE --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit phpunit-$PHPUNIT_VERSION \"$PHPUNIT_VERSION.*\"");
-    chdir("phpunit-$PHPUNIT_VERSION");
+    passthru("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
+    chdir("$PHPUNIT_VERSION_DIR");
     if ($SYMFONY_PHPUNIT_REMOVE) {
         passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
     }

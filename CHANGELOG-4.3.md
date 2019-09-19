@@ -569,4 +569,4 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #28976 [DI] Add a "default" EnvProcessor (jderusse)
  * feature #29127 [DomCrawler] Added return of element name in `extract()` method (andrey-helldar)
  * feature #29145 [Workflow] Trigger `entered` event for subject entering in the Workflow for the first time (lyrixx)
-
+ * feature #33592 [PhpUnitBridge] allow install of PHPUnit with option --ignore-platform-reqs (mazarini)

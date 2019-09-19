@@ -27,7 +27,7 @@
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/config": "^4.2",
         "symfony/dependency-injection": "~3.4|~4.0",
-        "symfony/form": "^4.3.5",
+        "symfony/form": "~4.3",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/messenger": "~4.3",
         "symfony/property-access": "~3.4|~4.0",

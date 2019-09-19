@@ -252,16 +252,6 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'qux'));
     }
-
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
-    public function testSavingObject()
-    {
-        parent::testSavingObject();
-    }
 }
 
 class NotUnserializable

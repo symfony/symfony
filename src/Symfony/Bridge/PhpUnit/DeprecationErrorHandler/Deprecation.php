@@ -28,29 +28,10 @@ class Deprecation
     const TYPE_INDIRECT = 'type_indirect';
     const TYPE_UNDETERMINED = 'type_undetermined';
 
-    /**
-     * @var array
-     */
-    private $trace;
-
-    /**
-     * @var string
-     */
+    private $trace = [];
     private $message;
-
-    /**
-     * @var ?string
-     */
     private $originClass;
-
-    /**
-     * @var ?string
-     */
     private $originMethod;
-
-    /**
-     * @var string
-     */
     private $triggeringFile;
 
     /** @var string[] Absolute paths to vendor directories */
@@ -262,7 +243,7 @@ class Deprecation
     private static function getVendors()
     {
         if (null === self::$vendors) {
-            self::$vendors = [];
+            self::$vendors = $paths = [];
             foreach (get_declared_classes() as $class) {
                 if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
                     $r = new \ReflectionClass($class);

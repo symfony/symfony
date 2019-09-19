@@ -10,7 +10,7 @@
  */
 
 // Please update when phpunit needs to be reinstalled with fresh deps:
-// Cache-Id: 2019-08-09 13:00 UTC
+// Cache-Id-Version: 2019-09-19 01:00 UTC
 
 error_reporting(-1);
 
@@ -97,6 +97,24 @@ $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar')
     ? $PHP.' '.escapeshellarg($COMPOSER)
     : 'composer';
 
+/*
+ * detect flag --ignore-platform-reqs and suppress it
+ */
+global $argv, $argc;
+$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
+$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
+$IGNORE = '';
+
+$argv = array_filter($argv, function ($v) use (&$argc,&$IGNORE) {
+    if ('--ignore-platform-reqs' !== $v) {
+        return true;
+    }
+    $IGNORE = '--ignore-platform-reqs';
+    --$argc;
+
+    return false;
+});
+
 $SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy'.($PHPUNIT_VERSION < 6.0 ? ' symfony/yaml' : ''));
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
@@ -109,7 +127,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
         rename("phpunit-$PHPUNIT_VERSION", "phpunit-$PHPUNIT_VERSION.old");
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s' : 'rm -rf %s', "phpunit-$PHPUNIT_VERSION.old"));
     }
-    passthru("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit phpunit-$PHPUNIT_VERSION \"$PHPUNIT_VERSION.*\"");
+    passthru("$COMPOSER create-project $IGNORE --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit phpunit-$PHPUNIT_VERSION \"$PHPUNIT_VERSION.*\"");
     chdir("phpunit-$PHPUNIT_VERSION");
     if ($SYMFONY_PHPUNIT_REMOVE) {
         passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
@@ -132,7 +150,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
     $q = '\\' === DIRECTORY_SEPARATOR ? '"' : '';
     // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
-    $exit = proc_close(proc_open("$q$COMPOSER install --no-dev --prefer-dist --no-progress --ansi$q", [], $p, getcwd()));
+    $exit = proc_close(proc_open("$q$COMPOSER install $IGNORE --no-dev --prefer-dist --no-progress --ansi$q", [], $p, getcwd()));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
     if ($exit) {
         exit($exit);

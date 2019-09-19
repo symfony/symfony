@@ -105,6 +105,10 @@ class NotificationEmail extends TemplatedEmail
      */
     public function exception($exception)
     {
+        if (!$exception instanceof \Throwable && !$exception instanceof FlattenException) {
+            throw new \LogicException(sprintf('"%s" accepts "%s" or "%s" instances.', __METHOD__, \Throwable::class, FlattenException::class));
+        }
+
         $exceptionAsString = $this->getExceptionAsString($exception);
 
         $this->context['exception'] = true;

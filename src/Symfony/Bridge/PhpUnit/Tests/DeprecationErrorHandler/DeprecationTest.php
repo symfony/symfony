@@ -29,7 +29,7 @@ class DeprecationTest extends TestCase
     {
         $r = new \ReflectionClass(Deprecation::class);
 
-        if (dirname($r->getFileName(), 2) !== dirname(__DIR__, 2)) {
+        if (\dirname(\dirname($r->getFileName())) !== \dirname(\dirname(__DIR__))) {
             $this->markTestSkipped('Test case is not compatible with having the bridge in vendor/');
         }
 

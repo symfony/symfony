@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Form\Test\VersionAwareTest;
+use Symfony\Component\Form\Tests\VersionAwareTest;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

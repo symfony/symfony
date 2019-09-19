@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -31,7 +32,10 @@ class ResolveBindingsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $bindings = [CaseSensitiveClass::class => new BoundArgument(new Reference('foo'))];
+        $bindings = [
+            CaseSensitiveClass::class => new BoundArgument(new Reference('foo')),
+            'iterable $objects' => new BoundArgument(new TaggedIteratorArgument('tag.name'), true, BoundArgument::INSTANCEOF_BINDING),
+        ];
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
         $definition->setArguments([1 => '123']);
@@ -44,7 +48,7 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $this->assertEquals([new Reference('foo'), '123'], $definition->getArguments());
+        $this->assertEquals([0 => new Reference('foo'), 1 => '123', 4 => new TaggedIteratorArgument('tag.name')], $definition->getArguments());
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
@@ -61,11 +65,6 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testMissingParent()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');

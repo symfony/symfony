@@ -349,11 +349,6 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testParentClassNotFoundThrowsException()
     {
         $container = new ContainerBuilder();
@@ -627,11 +622,6 @@ class AutowirePassTest extends TestCase
         ];
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testIgnoreServiceWithClassNotExisting()
     {
         $container = new ContainerBuilder();
@@ -834,11 +824,6 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testExceptionWhenAliasDoesNotExist()
     {
         $container = new ContainerBuilder();

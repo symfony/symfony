@@ -79,10 +79,6 @@ before_install:
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       find ~/.phpenv -name xdebug.ini -delete
 
-      if [[ $TRAVIS_PHP_VERSION = 7.4* ]]; then
-          export PHPUNIT_X="$PHPUNIT_X,issue-32995"
-      fi
-
       nanoseconds () {
           local cmd="date"
           local format="+%s%N"
@@ -269,12 +265,12 @@ install:
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
-              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'"
+              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP --prefer-source && $PHPUNIT_X$LEGACY'"
           elif [[ $deps = low ]]; then
               [[ -e ~/php-ext/composer-lowest.lock.tar ]] && tar -xf ~/php-ext/composer-lowest.lock.tar
               tar -cf ~/php-ext/composer-lowest.lock.tar --files-from /dev/null
               php .github/rm-invalid-lowest-lock-files.php $COMPONENTS
-              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable) && $PHPUNIT_X'"
+              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable --prefer-source) && $PHPUNIT_X'"
               echo "$COMPONENTS" | xargs -n1 -I{} tar --append -f ~/php-ext/composer-lowest.lock.tar {}/composer.lock
           else
               if [[ $PHP = 7.4* ]]; then

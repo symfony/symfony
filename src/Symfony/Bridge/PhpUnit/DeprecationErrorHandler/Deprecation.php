@@ -53,16 +53,15 @@ class Deprecation
      */
     private $triggeringFile;
 
-    /** @var string[] absolute paths to vendor directories */
+    /** @var string[] Absolute paths to vendor directories */
     private static $vendors;
 
     /**
-     * @var string[] absolute paths to source or tests of the project. This
-     *               excludes cache directories, because it is based on
-     *               autoloading rules and cache systems typically do not use
-     *               those.
+     * @var string[] Absolute paths to source or tests of the project, cache
+     *               directories exlcuded because it is based on autoloading
+     *               rules and cache systems typically do not use those
      */
-    private static $internalPaths;
+    private static $internalPaths = [];
 
     /**
      * @param string $message

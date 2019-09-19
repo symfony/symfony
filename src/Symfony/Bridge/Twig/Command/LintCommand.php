@@ -57,7 +57,7 @@ the first encountered syntax error.
 
 You can validate the syntax of contents passed from STDIN:
 
-  <info>cat filename | php %command.full_name%</info>
+  <info>cat filename | php %command.full_name% -</info>
 
 Or the syntax of a file:
 
@@ -92,7 +92,7 @@ EOF
                 $filenames = array_merge(...$paths);
             }
 
-            if (0 === \count($filenames)) {
+            if (!$filenames) {
                 throw new RuntimeException('Please provide a filename or pipe template content to STDIN.');
             }
         }

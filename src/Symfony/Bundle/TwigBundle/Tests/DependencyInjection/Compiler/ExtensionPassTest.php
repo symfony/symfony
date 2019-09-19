@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
+use Symfony\Bundle\TwigBundle\TemplateIterator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -31,6 +32,9 @@ class ExtensionPassTest extends TestCase
         $nativeTwigLoader = new Definition('\Twig\Loader\FilesystemLoader');
         $nativeTwigLoader->addMethodCall('addPath', []);
         $container->setDefinition('twig.loader.native_filesystem', $nativeTwigLoader);
+
+        $templateIterator = new Definition(TemplateIterator::class, [null, null, null]);
+        $container->setDefinition('twig.template_iterator', $templateIterator);
 
         $extensionPass = new ExtensionPass();
         $extensionPass->process($container);

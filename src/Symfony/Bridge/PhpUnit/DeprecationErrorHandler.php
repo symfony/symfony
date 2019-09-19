@@ -109,7 +109,7 @@ class DeprecationErrorHandler
             'remaining vendor' => array(),
         );
         $deprecationHandler = function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, $getMode, $UtilPrefix, $inVendors) {
-            if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || DeprecationErrorHandler::MODE_DISABLED === $mode = $getMode()) {
+            if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type && (E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) || DeprecationErrorHandler::MODE_DISABLED === $mode = $getMode()) {
                 return \call_user_func(DeprecationErrorHandler::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
             }
 
@@ -285,7 +285,7 @@ class DeprecationErrorHandler
     {
         $deprecations = array();
         $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, &$previousErrorHandler) {
-            if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
+            if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type && (E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) {
                 if ($previousErrorHandler) {
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
                 }

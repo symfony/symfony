@@ -107,11 +107,6 @@ class FileLoaderTest extends TestCase
         );
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testRegisterClassesWithExclude()
     {
         $container = new ContainerBuilder();
@@ -141,11 +136,6 @@ class FileLoaderTest extends TestCase
         );
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testNestedRegisterClasses()
     {
         $container = new ContainerBuilder();
@@ -174,11 +164,6 @@ class FileLoaderTest extends TestCase
         $this->assertFalse($alias->isPrivate());
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testMissingParentClass()
     {
         $container = new ContainerBuilder();

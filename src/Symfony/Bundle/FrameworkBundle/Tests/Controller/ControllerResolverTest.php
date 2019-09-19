@@ -20,9 +20,9 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Test\Controller\ContainerControllerResolverTestCase;
+use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
 
-class ControllerResolverTest extends ContainerControllerResolverTestCase
+class ControllerResolverTest extends ContainerControllerResolverTest
 {
     public function testGetControllerOnContainerAware()
     {

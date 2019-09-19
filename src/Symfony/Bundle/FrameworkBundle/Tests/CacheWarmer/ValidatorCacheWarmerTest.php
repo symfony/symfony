@@ -20,11 +20,6 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 class ValidatorCacheWarmerTest extends TestCase
 {
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testWarmUp()
     {
         $validatorBuilder = new ValidatorBuilder();

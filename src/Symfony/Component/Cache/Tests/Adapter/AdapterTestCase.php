@@ -253,16 +253,6 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertTrue($this->isPruned($cache, 'qux'));
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
-    public function testSavingObject()
-    {
-        parent::testSavingObject();
-    }
-
     public function testClearPrefix()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

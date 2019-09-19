@@ -75,7 +75,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('sleep(3)');
         $process->run();
         $actualError = error_get_last();
-        $this->assertEquals('Test Error', $actualError['message'], print_r($actualError, true));
+        $this->assertEquals('Test Error', $actualError['message']);
         $this->assertEquals(E_USER_NOTICE, $actualError['type']);
     }
 

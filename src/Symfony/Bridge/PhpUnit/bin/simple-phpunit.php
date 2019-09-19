@@ -61,6 +61,7 @@ if (PHP_VERSION_ID >= 70100) {
 }
 
 $COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json';
+$PHPUNIT_REMOVE_RETURN_TYPEHINT = filter_var($getEnvVar('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT', '0'), FILTER_VALIDATE_BOOLEAN);
 
 $root = __DIR__;
 while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/DeprecationErrorHandler.php')) {

@@ -16,7 +16,10 @@
         } elseif ($log['priority'] >= 300) {
             $status = 'warning';
         } else {
-            $severity = $log['context']['exception']['severity'] ?? false;
+            $severity = 0;
+            if (($exception = $log['context']['exception'] ?? null) instanceof \ErrorException) {
+                $severity = $exception->getSeverity();
+            }
             $status = E_DEPRECATED === $severity || E_USER_DEPRECATED === $severity ? 'warning' : 'normal';
         } ?>
         <tr class="status-<?= $status; ?>" data-filter-level="<?= strtolower($this->escape($log['priorityName'])); ?>"<?php if ($channelIsDefined) { ?> data-filter-channel="<?= $this->escape($log['channel']); ?>"<?php } ?>>

@@ -129,7 +129,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         rename("$PHPUNIT_VERSION_DIR", "$PHPUNIT_VERSION_DIR.old");
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s': 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
     }
-    passthru("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
+    passthru("$COMPOSER create-project $IGNORE --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
     chdir("$PHPUNIT_VERSION_DIR");
     if ($SYMFONY_PHPUNIT_REMOVE) {
         passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
@@ -182,10 +182,6 @@ EOPHP
     file_put_contents(".$PHPUNIT_VERSION.md5", md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE);
     chdir($oldPwd);
 }
-
-global $argv, $argc;
-$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
-$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
 
 if ($PHPUNIT_VERSION < 8.0) {
     $argv = array_filter($argv, function ($v) use (&$argc) {

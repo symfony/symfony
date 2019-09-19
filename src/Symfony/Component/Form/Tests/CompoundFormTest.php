@@ -997,7 +997,7 @@ class CompoundFormTest extends AbstractFormTest
     public function testNoClickedButton()
     {
         $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
-            ->setConstructorArgs([new SubmitButtonBuilder('submit')])
+            ->setConstructorArgs([new SubmitButtonBuilder('submit', new EventDispatcher())])
             ->setMethods(['isClicked'])
             ->getMock();
 
@@ -1019,7 +1019,7 @@ class CompoundFormTest extends AbstractFormTest
     public function testClickedButton()
     {
         $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
-            ->setConstructorArgs([new SubmitButtonBuilder('submit')])
+            ->setConstructorArgs([new SubmitButtonBuilder('submit', new EventDispatcher())])
             ->setMethods(['isClicked'])
             ->getMock();
 
@@ -1073,7 +1073,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testDisabledButtonIsNotSubmitted()
     {
-        $button = new SubmitButtonBuilder('submit');
+        $button = new SubmitButtonBuilder('submit', new EventDispatcher());
         $submit = $button
             ->setDisabled(true)
             ->getForm();

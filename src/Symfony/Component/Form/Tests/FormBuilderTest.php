@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilder;
@@ -154,8 +155,8 @@ class FormBuilderTest extends TestCase
 
     public function testAddButton()
     {
-        $this->builder->add(new ButtonBuilder('reset'));
-        $this->builder->add(new SubmitButtonBuilder('submit'));
+        $this->builder->add(new ButtonBuilder('reset', new EventDispatcher()));
+        $this->builder->add(new SubmitButtonBuilder('submit', new EventDispatcher()));
 
         $this->assertCount(2, $this->builder->all());
     }

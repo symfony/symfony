@@ -206,11 +206,11 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     protected function newBuilder($name, $dataClass, FormFactoryInterface $factory, array $options)
     {
         if ($this->innerType instanceof ButtonTypeInterface) {
-            return new ButtonBuilder($name, $options);
+            return new ButtonBuilder($name, new EventDispatcher(), $options);
         }
 
         if ($this->innerType instanceof SubmitButtonTypeInterface) {
-            return new SubmitButtonBuilder($name, $options);
+            return new SubmitButtonBuilder($name, new EventDispatcher(), $options);
         }
 
         return new FormBuilder($name, $dataClass, new EventDispatcher(), $factory, $options);

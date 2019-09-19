@@ -12,8 +12,12 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\ButtonBuilder;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -73,9 +77,37 @@ class ButtonTest extends TestCase
         ];
     }
 
+    public function testEvents()
+    {
+        $dispatchedEvents = [];
+
+        $buttonBuilder = $this->getButtonBuilder('button');
+
+        foreach ($expected = [
+            FormEvents::POST_SET_DATA => null,
+            FormEvents::PRE_SUBMIT => 'foo',
+            FormEvents::POST_SUBMIT => 'foo',
+        ] as $eventName => $_) {
+            $buttonBuilder->addEventListener($eventName, function (FormEvent $event) use ($eventName, &$dispatchedEvents): void {
+                $dispatchedEvents[$eventName] = $event->getData();
+            });
+        }
+
+        $form = $this
+            ->getFormBuilder()
+            ->setCompound(true)
+            ->setDataMapper(new PropertyPathMapper())
+            ->add($buttonBuilder)
+            ->getForm();
+
+        $form->submit(['button' => 'foo']);
+
+        $this->assertSame($expected, $dispatchedEvents);
+    }
+
     private function getButtonBuilder($name)
     {
-        return new ButtonBuilder($name);
+        return new ButtonBuilder($name, new EventDispatcher());
     }
 
     private function getFormBuilder()

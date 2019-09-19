@@ -13,6 +13,8 @@ CHANGELOG
  * marked all dispatched event classes as `@final`
  * Added the `validate` option to `SubmitType` to toggle the browser built-in form validation.
  * Added the `alpha3` option to `LanguageType` and `CountryType` to use alpha3 instead of alpha2 codes
+ * The `ButtonBuilder::__construct()` method second argument should be an `EventDispatcherInterface` instance. The existing array `$options` argument has been moved to the third position.
+ * Added support for event listeners on buttons.
 
 4.3.0
 -----

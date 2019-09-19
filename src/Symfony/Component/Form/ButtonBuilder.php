@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
@@ -22,6 +25,11 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 {
+    private const UNSUPPORTED_FORM_EVENTS = [
+        FormEvents::PRE_SET_DATA => [FormEvents::POST_SET_DATA],
+        FormEvents::SUBMIT => [FormEvents::PRE_SUBMIT, FormEvents::POST_SUBMIT],
+    ];
+
     protected $locked = false;
 
     /**
@@ -49,16 +57,36 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     private $options;
 
+    private $dispatcher;
+
     /**
      * @throws InvalidArgumentException if the name is empty
      */
-    public function __construct(?string $name, array $options = [])
+    public function __construct(?string $name, /*EventDispatcherInterface*/ $dispatcher = null, array $options = [])
     {
+        if (\func_num_args() > 1) {
+            if (!$dispatcher instanceof EventDispatcherInterface) {
+                @trigger_error(sprintf('The "%s" method second argument must be an instance of "%s" since Symfony 4.4. The existing array "$options" argument has been moved to the third position.', __METHOD__, EventDispatcherInterface::class), E_USER_DEPRECATED);
+
+                if (!\is_array($dispatcher)) {
+                    throw new \TypeError(sprintf('The second argument passed to the "%s" method must be an instance of "%s", "%s" given.', __METHOD__, EventDispatcherInterface::class, \is_object($dispatcher) ? \get_class($dispatcher) : \gettype($dispatcher)));
+                }
+
+                $options = $dispatcher;
+                $dispatcher = new EventDispatcher();
+            }
+        } else {
+            @trigger_error(sprintf('The "%s" method requires an instance of "%s" as its second argument since Symfony 4.4.', __METHOD__, EventDispatcherInterface::class), E_USER_DEPRECATED);
+
+            $dispatcher = new EventDispatcher();
+        }
+
         if ('' === $name || null === $name) {
             throw new InvalidArgumentException('Buttons cannot have empty names.');
         }
 
         $this->name = $name;
+        $this->dispatcher = $dispatcher;
         $this->options = $options;
 
         if (preg_match('/^([^a-z0-9_].*)?(.*[^a-zA-Z0-9_\-:].*)?$/D', $name, $matches)) {
@@ -159,31 +187,45 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     }
 
     /**
-     * Unsupported method.
-     *
-     * This method should not be invoked.
-     *
-     * @param string   $eventName
-     * @param callable $listener
-     * @param int      $priority
+     * {@inheritdoc}
      *
      * @throws BadMethodCallException
      */
     public function addEventListener($eventName, $listener, $priority = 0)
     {
-        throw new BadMethodCallException('Buttons do not support event listeners.');
+        if ($this->locked) {
+            throw new BadMethodCallException('ButtonBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
+
+        if (isset(self::UNSUPPORTED_FORM_EVENTS[$eventName])) {
+            throw new BadMethodCallException(sprintf('Buttons do not support the "%s" form event. Use "%s" instead.', $eventName, implode('" or "', self::UNSUPPORTED_FORM_EVENTS[$eventName])));
+        }
+
+        $this->dispatcher->addListener($eventName, $listener, $priority);
+
+        return $this;
     }
 
     /**
-     * Unsupported method.
-     *
-     * This method should not be invoked.
+     * {@inheritdoc}
      *
      * @throws BadMethodCallException
      */
     public function addEventSubscriber(EventSubscriberInterface $subscriber)
     {
-        throw new BadMethodCallException('Buttons do not support event subscribers.');
+        if ($this->locked) {
+            throw new BadMethodCallException('ButtonBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
+
+        foreach ($subscriber::getSubscribedEvents() as $eventName => $_) {
+            if (isset(self::UNSUPPORTED_FORM_EVENTS[$eventName])) {
+                throw new BadMethodCallException(sprintf('Buttons do not support the "%s" form event. Use "%s" instead.', $eventName, implode('" or "', self::UNSUPPORTED_FORM_EVENTS[$eventName])));
+            }
+        }
+
+        $this->dispatcher->addSubscriber($subscriber);
+
+        return $this;
     }
 
     /**
@@ -513,11 +555,15 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     }
 
     /**
-     * Unsupported method.
+     * {@inheritdoc}
      */
     public function getEventDispatcher()
     {
-        return null;
+        if ($this->locked && !$this->dispatcher instanceof ImmutableEventDispatcher) {
+            $this->dispatcher = new ImmutableEventDispatcher($this->dispatcher);
+        }
+
+        return $this->dispatcher;
     }
 
     /**

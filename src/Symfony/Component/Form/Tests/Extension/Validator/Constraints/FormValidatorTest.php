@@ -803,7 +803,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
     private function getSubmitButton($name = 'name', array $options = [])
     {
-        $builder = new SubmitButtonBuilder($name, $options);
+        $builder = new SubmitButtonBuilder($name, new EventDispatcher(), $options);
 
         return $builder->getForm();
     }

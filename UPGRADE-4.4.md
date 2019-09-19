@@ -89,6 +89,7 @@ Form
    reference date is deprecated.
  * Using `int` or `float` as data for the `NumberType` when the `input` option is set to `string` is deprecated.
  * Overriding the methods `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` without the `void` return-type is deprecated.
+ * The `ButtonBuilder::__construct()` method second argument should be an `EventDispatcherInterface` instance. The existing array `$options` argument has been moved to the third position.
 
 FrameworkBundle
 ---------------

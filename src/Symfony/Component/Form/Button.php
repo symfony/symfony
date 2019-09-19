@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
+use Symfony\Component\Form\Event\PostSetDataEvent;
+use Symfony\Component\Form\Event\PostSubmitEvent;
+use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 
@@ -200,6 +204,11 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function setData($modelData)
     {
+        $dispatcher = LegacyEventDispatcherProxy::decorate($this->config->getEventDispatcher());
+        if ($dispatcher->hasListeners(FormEvents::POST_SET_DATA)) {
+            $dispatcher->dispatch(new PostSetDataEvent($this, $modelData), FormEvents::POST_SET_DATA);
+        }
+
         // no-op, called during initialization of the form tree
         return $this;
     }
@@ -384,7 +393,16 @@ class Button implements \IteratorAggregate, FormInterface
             throw new AlreadySubmittedException('A form can only be submitted once');
         }
 
+        $dispatcher = LegacyEventDispatcherProxy::decorate($this->config->getEventDispatcher());
+        if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
+            $dispatcher->dispatch(new PreSubmitEvent($this, $submittedData), FormEvents::PRE_SUBMIT);
+        }
+
         $this->submitted = true;
+
+        if ($dispatcher->hasListeners(FormEvents::POST_SUBMIT)) {
+            $dispatcher->dispatch(new PostSubmitEvent($this, $submittedData), FormEvents::POST_SUBMIT);
+        }
 
         return $this;
     }

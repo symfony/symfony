@@ -13,7 +13,8 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
@@ -71,7 +72,7 @@ class FailedMessagesRetryCommandTest extends TestCase
 
                 return $lastRedeliveryStamp instanceof RedeliveryStamp &&
                     \is_string($lastRedeliveryStamp->getExceptionMessage()) &&
-                    $lastRedeliveryStamp->getFlattenException() instanceof FlattenException;
+                    ($lastRedeliveryStamp->getFlattenException() instanceof FlattenException || $lastRedeliveryStamp->getFlattenException() instanceof LegacyFlattenException);
             }))
             ->willReturn(new Envelope(new \stdClass()));
 

@@ -25,6 +25,7 @@
         "symfony/property-access": "~3.4|~4.0",
         "symfony/http-foundation": "~3.4|~4.0",
         "symfony/cache": "~3.4|~4.0",
+        "symfony/debug": "~3.4|~4.0",
         "symfony/property-info": "^3.4.13|~4.0",
         "symfony/validator": "~3.4|~4.0",
         "doctrine/annotations": "~1.0",

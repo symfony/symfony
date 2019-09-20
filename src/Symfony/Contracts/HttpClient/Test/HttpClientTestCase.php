@@ -152,6 +152,16 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(404, $response->getStatusCode());
         $this->assertSame(['application/json'], $response->getHeaders(false)['content-type']);
         $this->assertNotEmpty($response->getContent(false));
+
+        $response = $client->request('GET', 'http://localhost:8057/404');
+
+        try {
+            foreach ($client->stream($response) as $chunk) {
+                $this->assertTrue($chunk->isFirst());
+            }
+            $this->fail(ClientExceptionInterface::class.' expected');
+        } catch (ClientExceptionInterface $e) {
+        }
     }
 
     public function testIgnoreErrors()

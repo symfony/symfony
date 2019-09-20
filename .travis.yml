@@ -281,7 +281,7 @@ install:
                   composer install --optimize-autoloader
                   php .github/patch-types.php
                   php .github/patch-types.php # ensure the script is idempotent
-                  export PHPUNIT_X="$PHPUNIT_X,issue-32995,legacy"
+                  export PHPUNIT_X="$PHPUNIT_X,legacy"
               fi
 
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"

@@ -15,8 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
-use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
-use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
 class ControllerResolverTest extends TestCase
 {
@@ -43,51 +41,55 @@ class ControllerResolverTest extends TestCase
     public function testGetControllerWithObjectAndInvokeMethod()
     {
         $resolver = $this->createControllerResolver();
+        $object = new InvokableController();
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', $this);
+        $request->attributes->set('_controller', $object);
         $controller = $resolver->getController($request);
-        $this->assertSame($this, $controller);
+        $this->assertSame($object, $controller);
     }
 
     public function testGetControllerWithObjectAndMethod()
     {
         $resolver = $this->createControllerResolver();
+        $object = new ControllerTest();
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', [$this, 'controllerMethod1']);
+        $request->attributes->set('_controller', [$object, 'publicAction']);
         $controller = $resolver->getController($request);
-        $this->assertSame([$this, 'controllerMethod1'], $controller);
+        $this->assertSame([$object, 'publicAction'], $controller);
     }
 
-    public function testGetControllerWithClassAndMethod()
+    public function testGetControllerWithClassAndMethodAsArray()
     {
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', ['Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', 'controllerMethod4']);
+        $request->attributes->set('_controller', [ControllerTest::class, 'publicAction']);
         $controller = $resolver->getController($request);
-        $this->assertSame(['Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', 'controllerMethod4'], $controller);
+        $this->assertInstanceOf(ControllerTest::class, $controller[0]);
+        $this->assertSame('publicAction', $controller[1]);
     }
 
-    public function testGetControllerWithObjectAndMethodAsString()
+    public function testGetControllerWithClassAndMethodAsString()
     {
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::controllerMethod1');
+        $request->attributes->set('_controller', ControllerTest::class.'::publicAction');
         $controller = $resolver->getController($request);
-        $this->assertInstanceOf('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', $controller[0], '->getController() returns a PHP callable');
+        $this->assertInstanceOf(ControllerTest::class, $controller[0]);
+        $this->assertSame('publicAction', $controller[1]);
     }
 
-    public function testGetControllerWithClassAndInvokeMethod()
+    public function testGetControllerWithInvokableClass()
     {
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest');
+        $request->attributes->set('_controller', InvokableController::class);
         $controller = $resolver->getController($request);
-        $this->assertInstanceOf('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', $controller);
+        $this->assertInstanceOf(InvokableController::class, $controller);
     }
 
     public function testGetControllerOnObjectWithoutInvokeMethod()
@@ -110,10 +112,49 @@ class ControllerResolverTest extends TestCase
         $this->assertSame('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function', $controller);
     }
 
+    public function testGetControllerWithClosure()
+    {
+        $resolver = $this->createControllerResolver();
+
+        $closure = function () {
+            return 'test';
+        };
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', $closure);
+        $controller = $resolver->getController($request);
+        $this->assertInstanceOf(\Closure::class, $controller);
+        $this->assertSame('test', $controller());
+    }
+
+    /**
+     * @dataProvider getStaticControllers
+     */
+    public function testGetControllerWithStaticController($staticController, $returnValue)
+    {
+        $resolver = $this->createControllerResolver();
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', $staticController);
+        $controller = $resolver->getController($request);
+        $this->assertSame($staticController, $controller);
+        $this->assertSame($returnValue, $controller());
+    }
+
+    public function getStaticControllers()
+    {
+        return [
+            [TestAbstractController::class.'::staticAction', 'foo'],
+            [[TestAbstractController::class, 'staticAction'], 'foo'],
+            [PrivateConstructorController::class.'::staticAction', 'bar'],
+            [[PrivateConstructorController::class, 'staticAction'], 'bar'],
+        ];
+    }
+
     /**
      * @dataProvider getUndefinedControllers
      */
-    public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null)
+    public function testGetControllerWithUndefinedController($controller, $exceptionName = null, $exceptionMessage = null)
     {
         $resolver = $this->createControllerResolver();
         $this->expectException($exceptionName);
@@ -126,178 +167,29 @@ class ControllerResolverTest extends TestCase
 
     public function getUndefinedControllers()
     {
+        $controller = new ControllerTest();
+
         return [
-            [1, 'InvalidArgumentException', 'Unable to find controller "1".'],
-            ['foo', 'InvalidArgumentException', 'Unable to find controller "foo".'],
-            ['oof::bar', 'InvalidArgumentException', 'Class "oof" does not exist.'],
-            ['stdClass', 'InvalidArgumentException', 'Unable to find controller "stdClass".'],
-            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::staticsAction', 'InvalidArgumentException', 'The controller for URI "/" is not callable. Expected method "staticsAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest", did you mean "staticAction"?'],
-            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::privateAction', 'InvalidArgumentException', 'The controller for URI "/" is not callable. Method "privateAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
-            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::protectedAction', 'InvalidArgumentException', 'The controller for URI "/" is not callable. Method "protectedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
-            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::undefinedAction', 'InvalidArgumentException', 'The controller for URI "/" is not callable. Expected method "undefinedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest". Available methods: "publicAction", "staticAction"'],
+            ['foo', \Error::class, 'Class \'foo\' not found'],
+            ['oof::bar', \Error::class, 'Class \'oof\' not found'],
+            [['oof', 'bar'], \Error::class, 'Class \'oof\' not found'],
+            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::staticsAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Expected method "staticsAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest", did you mean "staticAction"?'],
+            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::privateAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Method "privateAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
+            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::protectedAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Method "protectedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
+            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::undefinedAction', \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Expected method "undefinedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest". Available methods: "publicAction", "staticAction"'],
+            ['Symfony\Component\HttpKernel\Tests\Controller\ControllerTest', \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Controller class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" cannot be called without a method name. You need to implement "__invoke" or use one of the available methods: "publicAction", "staticAction".'],
+            [[$controller, 'staticsAction'], \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Expected method "staticsAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest", did you mean "staticAction"?'],
+            [[$controller, 'privateAction'], \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Method "privateAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
+            [[$controller, 'protectedAction'], \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Method "protectedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'],
+            [[$controller, 'undefinedAction'], \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Expected method "undefinedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest". Available methods: "publicAction", "staticAction"'],
+            [$controller, \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Controller class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" cannot be called without a method name. You need to implement "__invoke" or use one of the available methods: "publicAction", "staticAction".'],
+            [['a' => 'foo', 'b' => 'bar'], \InvalidArgumentException::class, 'The controller for URI "/" is not callable. Invalid array callable, expected [controller, method].'],
         ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetArguments()
-    {
-        $resolver = $this->createControllerResolver();
-
-        $request = Request::create('/');
-        $controller = [new self(), 'testGetArguments'];
-        $this->assertEquals([], $resolver->getArguments($request, $controller), '->getArguments() returns an empty array if the method takes no arguments');
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $controller = [new self(), 'controllerMethod1'];
-        $this->assertEquals(['foo'], $resolver->getArguments($request, $controller), '->getArguments() returns an array of arguments for the controller method');
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $controller = [new self(), 'controllerMethod2'];
-        $this->assertEquals(['foo', null], $resolver->getArguments($request, $controller), '->getArguments() uses default values if present');
-
-        $request->attributes->set('bar', 'bar');
-        $this->assertEquals(['foo', 'bar'], $resolver->getArguments($request, $controller), '->getArguments() overrides default values if provided in the request attributes');
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $controller = function ($foo) {};
-        $this->assertEquals(['foo'], $resolver->getArguments($request, $controller));
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $controller = function ($foo, $bar = 'bar') {};
-        $this->assertEquals(['foo', 'bar'], $resolver->getArguments($request, $controller));
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $controller = new self();
-        $this->assertEquals(['foo', null], $resolver->getArguments($request, $controller));
-        $request->attributes->set('bar', 'bar');
-        $this->assertEquals(['foo', 'bar'], $resolver->getArguments($request, $controller));
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $request->attributes->set('foobar', 'foobar');
-        $controller = 'Symfony\Component\HttpKernel\Tests\Controller\some_controller_function';
-        $this->assertEquals(['foo', 'foobar'], $resolver->getArguments($request, $controller));
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $request->attributes->set('foobar', 'foobar');
-        $controller = [new self(), 'controllerMethod3'];
-
-        try {
-            $resolver->getArguments($request, $controller);
-            $this->fail('->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
-        }
-
-        $request = Request::create('/');
-        $controller = [new self(), 'controllerMethod5'];
-        $this->assertEquals([$request], $resolver->getArguments($request, $controller), '->getArguments() injects the request');
-    }
-
-    /**
-     * @requires PHP 5.6
-     * @group legacy
-     */
-    public function testGetVariadicArguments()
-    {
-        $resolver = new ControllerResolver();
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $request->attributes->set('bar', ['foo', 'bar']);
-        $controller = [new VariadicController(), 'action'];
-        $this->assertEquals(['foo', 'foo', 'bar'], $resolver->getArguments($request, $controller));
-    }
-
-    public function testCreateControllerCanReturnAnyCallable()
-    {
-        $mock = $this->getMockBuilder('Symfony\Component\HttpKernel\Controller\ControllerResolver')->setMethods(['createController'])->getMock();
-        $mock->expects($this->once())->method('createController')->willReturn('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function');
-
-        $request = Request::create('/');
-        $request->attributes->set('_controller', 'foobar');
-        $mock->getController($request);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testIfExceptionIsThrownWhenMissingAnArgument()
-    {
-        $this->expectException('RuntimeException');
-        $resolver = new ControllerResolver();
-        $request = Request::create('/');
-
-        $controller = [$this, 'controllerMethod1'];
-
-        $resolver->getArguments($request, $controller);
-    }
-
-    /**
-     * @requires PHP 7.1
-     * @group legacy
-     */
-    public function testGetNullableArguments()
-    {
-        $resolver = new ControllerResolver();
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $request->attributes->set('bar', new \stdClass());
-        $request->attributes->set('mandatory', 'mandatory');
-        $controller = [new NullableController(), 'action'];
-        $this->assertEquals(['foo', new \stdClass(), 'value', 'mandatory'], $resolver->getArguments($request, $controller));
-    }
-
-    /**
-     * @requires PHP 7.1
-     * @group legacy
-     */
-    public function testGetNullableArgumentsWithDefaults()
-    {
-        $resolver = new ControllerResolver();
-
-        $request = Request::create('/');
-        $request->attributes->set('mandatory', 'mandatory');
-        $controller = [new NullableController(), 'action'];
-        $this->assertEquals([null, null, 'value', 'mandatory'], $resolver->getArguments($request, $controller));
     }
 
     protected function createControllerResolver(LoggerInterface $logger = null)
     {
         return new ControllerResolver($logger);
-    }
-
-    public function __invoke($foo, $bar = null)
-    {
-    }
-
-    public function controllerMethod1($foo)
-    {
-    }
-
-    protected function controllerMethod2($foo, $bar = null)
-    {
-    }
-
-    protected function controllerMethod3($foo, $bar, $foobar)
-    {
-    }
-
-    protected static function controllerMethod4()
-    {
-    }
-
-    protected function controllerMethod5(Request $request)
-    {
     }
 }
 
@@ -307,6 +199,15 @@ function some_controller_function($foo, $foobar)
 
 class ControllerTest
 {
+    public function __construct()
+    {
+    }
+
+    public function __toString()
+    {
+        return '';
+    }
+
     public function publicAction()
     {
     }
@@ -321,5 +222,32 @@ class ControllerTest
 
     public static function staticAction()
     {
+    }
+}
+
+class InvokableController
+{
+    public function __invoke($foo, $bar = null)
+    {
+    }
+}
+
+abstract class TestAbstractController
+{
+    public static function staticAction()
+    {
+        return 'foo';
+    }
+}
+
+class PrivateConstructorController
+{
+    private function __construct()
+    {
+    }
+
+    public static function staticAction()
+    {
+        return 'bar';
     }
 }

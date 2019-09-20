@@ -1,0 +1,10 @@
+{
+    "config": {
+        "preferred-install": {
+            "symfony/form": "source",
+            "symfony/http-kernel": "source",
+            "symfony/validator": "source",
+            "*": "dist"
+        }
+    }
+}

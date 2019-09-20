@@ -60,7 +60,7 @@ if (PHP_VERSION_ID >= 70100) {
     $PHPUNIT_VERSION = '4.8';
 }
 
-$COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json';
+$COMPOSER_JSON = getenv('COMPOSER') ? : 'composer.json';
 $PHPUNIT_REMOVE_RETURN_TYPEHINT = filter_var($getEnvVar('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT', '0'), FILTER_VALIDATE_BOOLEAN);
 
 $root = __DIR__;
@@ -118,16 +118,16 @@ $argv = array_filter($argv, function ($v) use (&$argc,&$IGNORE) {
 
 $SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy'.($PHPUNIT_VERSION < 6.0 ? ' symfony/yaml': ''));
 $configurationHash = md5(implode(PHP_EOL, array(md5_file(__FILE__), $SYMFONY_PHPUNIT_REMOVE, (int) $PHPUNIT_REMOVE_RETURN_TYPEHINT)));
-$PHPUNIT_VERSION_DIR=sprintf('phpunit-%s-%d', $PHPUNIT_VERSION, $PHPUNIT_REMOVE_RETURN_TYPEHINT);
+$PHPUNIT_VERSION_DIR = sprintf('phpunit-%s-%d', $PHPUNIT_VERSION, $PHPUNIT_REMOVE_RETURN_TYPEHINT);
 if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationHash !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION_DIR.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default
 
     @mkdir($PHPUNIT_DIR, 0777, true);
     chdir($PHPUNIT_DIR);
     if (file_exists("$PHPUNIT_VERSION_DIR")) {
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s > NUL': 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s > NUL' : 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
         rename("$PHPUNIT_VERSION_DIR", "$PHPUNIT_VERSION_DIR.old");
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s': 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s' : 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
     }
     passthru("$COMPOSER create-project $IGNORE --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
     chdir("$PHPUNIT_VERSION_DIR");
@@ -143,7 +143,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
         passthru("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', DIRECTORY_SEPARATOR, $path)));
         if ('\\' === DIRECTORY_SEPARATOR) {
-            file_put_contents('composer.json', preg_replace('/^( {8})"phpunit-bridge": \{$/m', "$0\n$1    ".'"options": {"symlink": false},', file_get_contents('composer.json')));
+            file_put_contents('composer.json', preg_replace('/^( {8})"phpunit-bridge" : \{$/m', "$0\n$1    ".'"options": {"symlink": false},', file_get_contents('composer.json')));
         }
     } else {
         passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"*\"");
@@ -179,7 +179,7 @@ Symfony\Bridge\PhpUnit\TextUI\Command::main();
 EOPHP
     );
     chdir('..');
-    file_put_contents(".$PHPUNIT_VERSION.md5", md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE);
+    file_put_contents(".$PHPUNIT_VERSION_DIR.md5", $configurationHash);
     chdir($oldPwd);
 }
 

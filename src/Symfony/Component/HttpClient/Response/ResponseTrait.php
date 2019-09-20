@@ -317,9 +317,20 @@ trait ResponseTrait
                         } elseif ($chunk instanceof ErrorChunk) {
                             unset($responses[$j]);
                             $isTimeout = true;
-                        } elseif ($chunk instanceof FirstChunk && $response->logger) {
-                            $info = $response->getInfo();
-                            $response->logger->info(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
+                        } elseif ($chunk instanceof FirstChunk) {
+                            if ($response->logger) {
+                                $info = $response->getInfo();
+                                $response->logger->info(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
+                            }
+
+                            yield $response => $chunk;
+
+                            if ($response->initializer && null === $response->info['error']) {
+                                // Ensure the HTTP status code is always checked
+                                $response->getHeaders(true);
+                            }
+
+                            continue;
                         }
 
                         yield $response => $chunk;
@@ -327,10 +338,7 @@ trait ResponseTrait
 
                     unset($multi->handlesActivity[$j]);
 
-                    if ($chunk instanceof FirstChunk && null === $response->initializer && null === $response->info['error']) {
-                        // Ensure the HTTP status code is always checked
-                        $response->getHeaders(true);
-                    } elseif ($chunk instanceof ErrorChunk && !$chunk->didThrow()) {
+                    if ($chunk instanceof ErrorChunk && !$chunk->didThrow()) {
                         // Ensure transport exceptions are always thrown
                         $chunk->getContent();
                     }

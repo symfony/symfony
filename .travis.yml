@@ -72,7 +72,7 @@ before_install:
       fi
       slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
       [ -d ~/.composer ] || mkdir ~/.composer
-      cp .composer/* ~/.composer/
+      cp .github/composer-config.json ~/.composer/config.json
       export PHPUNIT=$(readlink -f ./phpunit)
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
@@ -94,7 +94,7 @@ before_install:
 
       # tfold is a helper to create folded reports
       tfold () {
-          local title="🐘 $PHP $1"
+          local title="🐘 $SWAP$PHP $1"
           local fold=$(echo $title | sed -r 's/[^-_A-Za-z0-9]+/./g')
           shift
           local id=$(printf %08x $(( RANDOM * RANDOM )))
@@ -192,7 +192,7 @@ install:
       #SYMFONY_PHPUNIT_BRIDGE_PR=32886
 
       if [[ $SYMFONY_PHPUNIT_BRIDGE_PR ]]; then
-          git fetch origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
+          git fetch --depth=2 origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
           git rm -rq src/Symfony/Bridge/PhpUnit
           git checkout -q FETCH_HEAD -- src/Symfony/Bridge/PhpUnit
           SYMFONY_VERSION=$(cat src/Symfony/Bridge/PhpUnit/composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*')
@@ -220,8 +220,9 @@ install:
     - |
       # For the master branch, when deps=high, the version before master is checked out and tested with the locally patched components
       if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then
+          export SWAP='🙃'
           SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//) &&
-          git fetch origin $SYMFONY_VERSION &&
+          git fetch --depth=2 origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
           COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       else
@@ -257,15 +258,32 @@ install:
           set -e
           export PHP=$1
           if [[ $PHP != 7.4* && $PHP != $TRAVIS_PHP_VERSION && $TRAVIS_PULL_REQUEST != false ]]; then
-              echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"
+              echo -e "\\n\\e[33;1mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"
               break
           fi
           phpenv global $PHP
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
-              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP --prefer-source && $PHPUNIT_X$LEGACY'"
+              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP --prefer-source && $PHPUNIT_X$LEGACY'" || X=1
+              (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
+              COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
+
+              if [[ $COMPONENTS && $LEGACY && $TRAVIS_PULL_REQUEST != false ]]; then
+                  export SWAP='🙃'
+                  COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | sort)
+                  SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
+                  export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
+                  export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
+                  echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
+                  git fetch --depth=2 origin $SYMFONY_VERSION
+                  git checkout -m FETCH_HEAD
+                  (cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
+                  echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP --prefer-source && $PHPUNIT_X$LEGACY'" || X=1
+              fi
+
+              [[ ! $X ]] || (exit 1)
           elif [[ $deps = low ]]; then
               [[ -e ~/php-ext/composer-lowest.lock.tar ]] && tar -xf ~/php-ext/composer-lowest.lock.tar
               tar -cf ~/php-ext/composer-lowest.lock.tar --files-from /dev/null
@@ -294,4 +312,8 @@ install:
       }
 
 script:
-    - for PHP in $TRAVIS_PHP_VERSION $php_extra; do (run_tests $PHP); done
+    - for PHP in $TRAVIS_PHP_VERSION $php_extra; do
+          (run_tests $PHP) || X=1;
+      done
+
+      [[ ! $X ]] || (exit 1)

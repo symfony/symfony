@@ -74,7 +74,9 @@ interface ResponseInterface
     public function toArray(bool $throw = true): array;
 
     /**
-     * Cancels the response.
+     * Closes the response stream and all related buffers.
+     *
+     * No further chunk will be yielded after this method has been called.
      */
     public function cancel(): void;
 

@@ -94,7 +94,7 @@ before_install:
 
       # tfold is a helper to create folded reports
       tfold () {
-          local title="🐘 $SWAP$PHP $1"
+          local title="🐘 $PHP $1 $FLIP"
           local fold=$(echo $title | sed -r 's/[^-_A-Za-z0-9]+/./g')
           shift
           local id=$(printf %08x $(( RANDOM * RANDOM )))
@@ -220,7 +220,7 @@ install:
     - |
       # For the master branch, when deps=high, the version before master is checked out and tested with the locally patched components
       if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then
-          export SWAP='🙃'
+          export FLIP='🙃'
           SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//) &&
           git fetch --depth=2 origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
@@ -266,12 +266,12 @@ install:
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
-              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP --prefer-source && $PHPUNIT_X$LEGACY'" || X=1
+              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'" || X=1
               (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
               COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
               if [[ $COMPONENTS && $LEGACY && $TRAVIS_PULL_REQUEST != false ]]; then
-                  export SWAP='🙃'
+                  export FLIP='🙃'
                   COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | sort)
                   SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
                   export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
@@ -280,7 +280,7 @@ install:
                   git fetch --depth=2 origin $SYMFONY_VERSION
                   git checkout -m FETCH_HEAD
                   (cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
-                  echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP --prefer-source && $PHPUNIT_X$LEGACY'" || X=1
+                  echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'" || X=1
               fi
 
               [[ ! $X ]] || (exit 1)
@@ -288,7 +288,7 @@ install:
               [[ -e ~/php-ext/composer-lowest.lock.tar ]] && tar -xf ~/php-ext/composer-lowest.lock.tar
               tar -cf ~/php-ext/composer-lowest.lock.tar --files-from /dev/null
               php .github/rm-invalid-lowest-lock-files.php $COMPONENTS
-              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable --prefer-source) && $PHPUNIT_X'"
+              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable) && $PHPUNIT_X'"
               echo "$COMPONENTS" | xargs -n1 -I{} tar --append -f ~/php-ext/composer-lowest.lock.tar {}/composer.lock
           else
               if [[ $PHP = 7.4* ]]; then

@@ -41,7 +41,7 @@ class ExtensionPass implements CompilerPassInterface
 
         $viewDir = \dirname((new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension'))->getFileName(), 2).'/Resources/views';
         $templateIterator = $container->getDefinition('twig.template_iterator');
-        $templatePaths = $templateIterator->getArgument(2);
+        $templatePaths = $templateIterator->getArgument(1);
         $cacheWarmer = null;
         if ($container->hasDefinition('twig.cache_warmer')) {
             $cacheWarmer = $container->getDefinition('twig.cache_warmer');
@@ -70,7 +70,7 @@ class ExtensionPass implements CompilerPassInterface
             }
         }
 
-        $templateIterator->replaceArgument(2, $templatePaths);
+        $templateIterator->replaceArgument(1, $templatePaths);
         if ($cacheWarmer) {
             $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $cacheWarmerPaths);
         }

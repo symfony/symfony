@@ -24,7 +24,7 @@ class DefaultMarshallerTest extends TestCase
             'b' => function () {},
         ];
 
-        $expected = ['a' => \extension_loaded('igbinary') ? igbinary_serialize(123) : serialize(123)];
+        $expected = ['a' => \extension_loaded('igbinary') && \PHP_VERSION_ID !== 70400 ? igbinary_serialize(123) : serialize(123)];
         $this->assertSame($expected, $marshaller->marshall($values, $failed));
         $this->assertSame(['b'], $failed);
     }
@@ -43,6 +43,10 @@ class DefaultMarshallerTest extends TestCase
      */
     public function testIgbinaryUnserialize()
     {
+        if (\PHP_VERSION_ID === 70400) {
+            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.0.');
+        }
+
         $marshaller = new DefaultMarshaller();
         $this->assertNull($marshaller->unmarshall(igbinary_serialize(null)));
         $this->assertFalse($marshaller->unmarshall(igbinary_serialize(false)));
@@ -63,6 +67,10 @@ class DefaultMarshallerTest extends TestCase
      */
     public function testIgbinaryUnserializeNotFoundClass()
     {
+        if (\PHP_VERSION_ID === 70400) {
+            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.0.');
+        }
+
         $this->expectException('DomainException');
         $this->expectExceptionMessage('Class not found: NotExistingClass');
         $marshaller = new DefaultMarshaller();
@@ -87,6 +95,10 @@ class DefaultMarshallerTest extends TestCase
      */
     public function testIgbinaryUnserializeInvalid()
     {
+        if (\PHP_VERSION_ID === 70400) {
+            $this->markTestSkipped('igbinary is not compatible with PHP 7.4.0');
+        }
+
         $this->expectException('DomainException');
         $this->expectExceptionMessage('igbinary_unserialize_zval: unknown type \'61\', position 5');
         $marshaller = new DefaultMarshaller();

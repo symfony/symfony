@@ -15,6 +15,7 @@ use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Twig\Environment;
+use Twig\Source;
 
 /**
  * Test for TemplateManager class.
@@ -107,6 +108,7 @@ class TemplateManagerTest extends TestCase
             $loader = $this->getMockBuilder('Twig\Loader\SourceContextLoaderInterface')->getMock();
         } else {
             $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
+            $loader->method('getSourceContext')->willReturn(new Source('source-code', 'source-name'));
         }
         $this->twigEnvironment->expects($this->any())->method('getLoader')->willReturn($loader);
 

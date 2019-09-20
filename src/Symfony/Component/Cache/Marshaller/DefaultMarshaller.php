@@ -25,9 +25,9 @@ class DefaultMarshaller implements MarshallerInterface
     public function __construct(bool $useIgbinarySerialize = null)
     {
         if (null === $useIgbinarySerialize) {
-            $useIgbinarySerialize = \extension_loaded('igbinary');
-        } elseif ($useIgbinarySerialize && !\extension_loaded('igbinary')) {
-            throw new CacheException('The "igbinary" PHP extension is not loaded.');
+            $useIgbinarySerialize = \extension_loaded('igbinary') && \PHP_VERSION_ID !== 70400;
+        } elseif ($useIgbinarySerialize && (!\extension_loaded('igbinary') || \PHP_VERSION_ID === 70400)) {
+            throw new CacheException('The "igbinary" PHP extension is not '.(\PHP_VERSION_ID === 70400 ? 'compatible with PHP 7.4.0.' : 'loaded.'));
         }
         $this->useIgbinarySerialize = $useIgbinarySerialize;
     }
@@ -66,7 +66,7 @@ class DefaultMarshaller implements MarshallerInterface
             return null;
         }
         static $igbinaryNull;
-        if ($value === ($igbinaryNull ?? $igbinaryNull = \extension_loaded('igbinary') ? igbinary_serialize(null) : false)) {
+        if ($value === ($igbinaryNull ?? $igbinaryNull = \extension_loaded('igbinary') && \PHP_VERSION_ID !== 70400 ? igbinary_serialize(null) : false)) {
             return null;
         }
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');

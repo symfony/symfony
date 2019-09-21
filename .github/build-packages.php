@@ -17,6 +17,7 @@ $mergeBase = trim(shell_exec(sprintf('git merge-base "%s" HEAD', array_shift($di
 
 $packages = array();
 $flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+$preferredInstall = json_decode(file_get_contents(__DIR__.'/composer-config.json'), true)['config']['preferred-install'];
 
 foreach ($dirs as $k => $dir) {
     if (!system("git diff --name-only $mergeBase -- $dir", $exitStatus)) {
@@ -42,7 +43,12 @@ foreach ($dirs as $k => $dir) {
         $json = rtrim(json_encode(array('repositories' => $package->repositories), $flags), "\n}").','.substr($json, 1);
         file_put_contents($dir.'/composer.json', $json);
     }
-    passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
+
+    if (isset($preferredInstall[$package->name]) && 'source' === $preferredInstall[$package->name]) {
+        passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
+    } else {
+        passthru("cd $dir && git init && git add . && git commit -m - && git archive -o package.tar HEAD && rm .git/ -Rf");
+    }
 
     if (!isset($package->extra->{'branch-alias'}->{'dev-master'})) {
         echo "Missing \"dev-master\" branch-alias in composer.json extra.\n";

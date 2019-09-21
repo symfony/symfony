@@ -272,15 +272,16 @@ install:
 
               if [[ $COMPONENTS && $LEGACY && $TRAVIS_PULL_REQUEST != false ]]; then
                   export FLIP='🙃'
-                  COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | sort)
                   SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
+                  echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
                   export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
                   export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
-                  echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
                   git fetch --depth=2 origin $SYMFONY_VERSION
                   git checkout -m FETCH_HEAD
+                  COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort)
                   (cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
-                  echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'" || X=1
+                  [[ ! $COMPONENTS ]] || tfold 'phpunit install' SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1 ./phpunit install
+                  [[ ! $COMPONENTS ]] || echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'" || X=1
               fi
 
               [[ ! $X ]] || (exit 1)

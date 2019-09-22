@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class DoctrineDataCollectorTest extends TestCase
 {
@@ -96,9 +97,11 @@ class DoctrineDataCollectorTest extends TestCase
         $c->collect(new Request(), new Response());
 
         $collectedQueries = $c->getQueries();
-        $this->assertEquals([], $collectedQueries['default'][0]['params']);
+        $this->assertInstanceOf(Data::class, $collectedQueries['default'][0]['params']);
+        $this->assertEquals([], $collectedQueries['default'][0]['params']->getValue());
         $this->assertTrue($collectedQueries['default'][0]['explainable']);
-        $this->assertEquals([], $collectedQueries['default'][1]['params']);
+        $this->assertInstanceOf(Data::class, $collectedQueries['default'][1]['params']);
+        $this->assertEquals([], $collectedQueries['default'][1]['params']->getValue());
         $this->assertTrue($collectedQueries['default'][1]['explainable']);
     }
 

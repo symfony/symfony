@@ -48,11 +48,17 @@ class WebProfilerExtension extends ProfilerExtension
         $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
     }
 
+    /**
+     * @return void
+     */
     public function enter(Profile $profile)
     {
         ++$this->stackLevel;
     }
 
+    /**
+     * @return void
+     */
     public function leave(Profile $profile)
     {
         if (0 === --$this->stackLevel) {

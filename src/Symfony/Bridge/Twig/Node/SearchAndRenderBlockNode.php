@@ -23,6 +23,9 @@ use Twig\Node\Expression\FunctionExpression;
  */
 class SearchAndRenderBlockNode extends FunctionExpression
 {
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         $compiler->addDebugInfo($this);

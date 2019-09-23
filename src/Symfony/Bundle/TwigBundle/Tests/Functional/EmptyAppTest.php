@@ -30,12 +30,12 @@ class EmptyAppTest extends TestCase
         $this->assertNotEmpty($kernel->getContainer()->getParameter('twig.default_path'));
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deleteTempDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteTempDir();
     }

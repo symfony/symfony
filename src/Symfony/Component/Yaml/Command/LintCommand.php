@@ -153,6 +153,7 @@ EOF
     {
         $countFiles = \count($filesInfo);
         $erroredFiles = 0;
+        $suggestTagOption = false;
 
         foreach ($filesInfo as $info) {
             if ($info['valid'] && $this->displayCorrectFiles) {
@@ -161,13 +162,17 @@ EOF
                 ++$erroredFiles;
                 $io->text('<error> ERROR </error>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
                 $io->text(sprintf('<error> >> %s</error>', $info['message']));
+
+                if (false !== strpos($info['message'], 'PARSE_CUSTOM_TAGS')) {
+                    $suggestTagOption = true;
+                }
             }
         }
 
         if (0 === $erroredFiles) {
             $io->success(sprintf('All %d YAML files contain valid syntax.', $countFiles));
         } else {
-            $io->warning(sprintf('%d YAML files have valid syntax and %d contain errors.', $countFiles - $erroredFiles, $erroredFiles));
+            $io->warning(sprintf('%d YAML files have valid syntax and %d contain errors.%s', $countFiles - $erroredFiles, $erroredFiles, $suggestTagOption ? ' Use the --parse-tags option if you want parse custom tags.' : ''));
         }
 
         return min($erroredFiles, 1);
@@ -181,6 +186,10 @@ EOF
             $v['file'] = (string) $v['file'];
             if (!$v['valid']) {
                 ++$errors;
+            }
+
+            if (isset($v['message']) && false !== strpos($v['message'], 'PARSE_CUSTOM_TAGS')) {
+                $v['message'] .= ' Use the --parse-tags option if you want parse custom tags.';
             }
         });
 

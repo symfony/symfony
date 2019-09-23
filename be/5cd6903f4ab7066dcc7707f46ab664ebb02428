@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-09-23T09:06:36Z
+
+Should we add a test rendering a notification email ? This way, the testsuite would catch such deprecation, as well as any issue in the template.

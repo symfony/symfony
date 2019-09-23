@@ -603,7 +603,7 @@ class ErrorHandler
             $handlerException = $handlerException ?: $exception;
         } catch (\Throwable $handlerException) {
         }
-        if ($exception === $handlerException) {
+        if ($exception === $handlerException && null === $this->exceptionHandler) {
             self::$reservedMemory = null; // Disable the fatal error handler
             throw $exception; // Give back $exception to the native handler
         }
@@ -706,7 +706,7 @@ class ErrorHandler
             $exception = FlattenException::createFromThrowable($exception);
             $statusCode = $exception->getStatusCode();
             $headers = $exception->getHeaders();
-            $response = (new HtmlErrorRenderer(true))->render($exception);
+            $response = (new HtmlErrorRenderer(0 !== $this->scopedErrors))->render($exception);
         } else {
             $message = htmlspecialchars($exception->getMessage(), ENT_COMPAT | ENT_SUBSTITUTE, $charset);
             $response = sprintf('<!DOCTYPE html><html><head><meta charset="%s" /><meta name="robots" content="noindex,nofollow" /></head><body>%s</body></html>', $charset, $message);

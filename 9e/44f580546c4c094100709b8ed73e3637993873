@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-22T07:15:56Z
+
+The white background for the warning was on purpose to make it more visible and stand out in the page.
+
+The separation between icons on wide screen can be made wider ... but I think it's too wide now :(
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-09-23T13:15:46Z
+
+Hi @javiereguiluz, I'm sorry I didn't discuss it earlier.
+
+> The white background for the warning was on purpose to make it more visible and stand out in the page.
+
+I agree with that, and I think still it's super visible at top of the page and even has a large font size, I don't think making it consistent with the light color `#F1F0F5` would detract from his visibility.
+
+> The separation between icons on wide screen can be made wider ... but I think it's too wide now :(
+
+I've added the `max-width` again, but my initial motivation was distribute items evenly, items have equal space around them (regardless of screen width):
+![wide](https://user-images.githubusercontent.com/2028198/65427493-677a6c80-dde0-11e9-9f89-5c3022fe5043.gif)

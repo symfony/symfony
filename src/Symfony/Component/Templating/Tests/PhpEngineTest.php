@@ -93,7 +93,7 @@ class PhpEngineTest extends TestCase
 
     public function testExtendRender()
     {
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, [], [new SlotsHelper()]);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, []);
         try {
             $engine->render('name');
             $this->fail('->render() throws an InvalidArgumentException if the template does not exist');

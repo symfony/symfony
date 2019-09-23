@@ -37,11 +37,6 @@ class ProjectTemplateLoader4 extends Loader
         return $this->logger;
     }
 
-    public function getDebugger()
-    {
-        return $this->debugger;
-    }
-
     public function isFresh(TemplateReferenceInterface $template, $time)
     {
         return false;

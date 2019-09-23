@@ -22,13 +22,13 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 class StoreFactory
 {
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached $connection
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|\Memcached $connection
      *
      * @return RedisStore|MemcachedStore
      */
     public static function createStore($connection)
     {
-        if ($connection instanceof \Redis || $connection instanceof \RedisArray || $connection instanceof \RedisCluster || $connection instanceof \Predis\Client || $connection instanceof RedisProxy) {
+        if ($connection instanceof \Redis || $connection instanceof \RedisArray || $connection instanceof \RedisCluster || $connection instanceof \Predis\ClientInterface || $connection instanceof RedisProxy) {
             return new RedisStore($connection);
         }
         if ($connection instanceof \Memcached) {

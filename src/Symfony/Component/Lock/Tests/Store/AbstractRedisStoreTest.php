@@ -31,7 +31,7 @@ abstract class AbstractRedisStoreTest extends AbstractStoreTest
     /**
      * Return a RedisConnection.
      *
-     * @return \Redis|\RedisArray|\RedisCluster|\Predis\Client
+     * @return \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface
      */
     abstract protected function getRedisConnection();
 

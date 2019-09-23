@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-23T09:09:59Z
+
+`grep '@param .*Predis.Client' src/ -r` yields more results, let's update them all.

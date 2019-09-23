@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\SkippedTestError;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
@@ -2729,5 +2730,39 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [.="[trans]Submit to ACME Ltd.[/trans]"]
 '
         );
+    }
+
+    /**
+     * @dataProvider submitFormNoValidateProvider
+     */
+    public function testSubmitFormNoValidate(bool $validate)
+    {
+        $this->requiresFeatureSet(404);
+
+        $form = $this->factory->create(SubmitType::class, null, [
+            'validate' => $validate,
+        ]);
+
+        $html = $this->renderWidget($form->createView());
+
+        $xpath = '/button
+    [@type="submit"]
+    ';
+
+        if (!$validate) {
+            $xpath .= '[@formnovalidate="formnovalidate"]';
+        } else {
+            $xpath .= '[not(@formnovalidate="formnovalidate")]';
+        }
+
+        $this->assertMatchesXpath($html, $xpath);
+    }
+
+    public function submitFormNoValidateProvider()
+    {
+        return [
+            [false],
+            [true],
+        ];
     }
 }

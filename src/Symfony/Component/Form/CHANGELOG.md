@@ -11,6 +11,7 @@ CHANGELOG
  * The type guesser guesses the HTML accept attribute when a mime type is configured in the File or Image constraint.
  * Overriding the methods `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` without the `void` return-type is deprecated.
  * marked all dispatched event classes as `@final`
+ * Added the `validate` option to `SubmitType` to toggle the browser built-in form validation.
 
 4.3.0
 -----

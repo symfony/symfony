@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * This class tests the integration of the different compiler passes.
@@ -140,6 +141,29 @@ class IntegrationTest extends TestCase
         $container->compile();
 
         $this->assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
+    }
+
+    public function testCanDecorateServiceLocator()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')->setPublic(true);
+
+        $container->register(ServiceLocator::class)
+            ->addTag('container.service_locator')
+            ->setArguments([[new Reference('foo')]])
+        ;
+
+        $container->register(DecoratedServiceLocator::class)
+            ->setDecoratedService(ServiceLocator::class)
+            ->setPublic(true)
+            ->setArguments([new Reference(DecoratedServiceLocator::class.'.inner')])
+        ;
+
+        $container->compile();
+
+        $this->assertInstanceOf(DecoratedServiceLocator::class, $container->get(DecoratedServiceLocator::class));
+        $this->assertSame($container->get('foo'), $container->get(DecoratedServiceLocator::class)->get('foo'));
     }
 
     /**
@@ -414,6 +438,34 @@ class ServiceSubscriberStub implements ServiceSubscriberInterface
 
 class DecoratedServiceSubscriber
 {
+}
+
+class DecoratedServiceLocator implements ServiceProviderInterface
+{
+    /**
+     * @var ServiceLocator
+     */
+    private $locator;
+
+    public function __construct(ServiceLocator $locator)
+    {
+        $this->locator = $locator;
+    }
+
+    public function get($id)
+    {
+        return $this->locator->get($id);
+    }
+
+    public function has($id): bool
+    {
+        return $this->locator->has($id);
+    }
+
+    public function getProvidedServices(): array
+    {
+        return $this->locator->getProvidedServices();
+    }
 }
 
 class IntegrationTestStub extends IntegrationTestStubParent

@@ -26,7 +26,7 @@ class RedisCache extends AbstractCache
     use RedisTrait;
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redisClient
      */
     public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {

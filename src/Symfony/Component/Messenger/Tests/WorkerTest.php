@@ -378,7 +378,7 @@ class WorkerTest extends TestCase
         $worker = new Worker([$receiver], $bus);
         $workerWithDecorator = new StopWhenMessageCountIsExceededWorker($worker, 2);
         $processedEnvelopes = [];
-        $workerWithDecorator->run([], function (?Envelope $envelope) use ($worker, &$processedEnvelopes) {
+        $workerWithDecorator->run([], function (?Envelope $envelope) use (&$processedEnvelopes) {
             if (null !== $envelope) {
                 $processedEnvelopes[] = $envelope;
             }

@@ -14,6 +14,9 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(CacheItem::class);
+
 /**
  * Interface for adapters managing instances of Symfony's CacheItem.
  *

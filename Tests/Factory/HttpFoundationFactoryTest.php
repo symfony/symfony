@@ -83,6 +83,27 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertEquals(['a', 'b'], $symfonyRequest->headers->get('X-data', null, false));
     }
 
+    public function testCreateRequestWithStreamedBody()
+    {
+        $serverRequest = new ServerRequest(
+            '1.1',
+            [],
+            new Stream('The body'),
+            '/',
+            'GET',
+            null,
+            [],
+            [],
+            [],
+            [],
+            null,
+            []
+        );
+
+        $symfonyRequest = $this->factory->createRequest($serverRequest, true);
+        $this->assertEquals('The body', $symfonyRequest->getContent());
+    }
+
     public function testCreateRequestWithNullParsedBody()
     {
         $serverRequest = new ServerRequest(

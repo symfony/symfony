@@ -84,8 +84,6 @@ class DiactorosFactory implements HttpMessageFactoryInterface
     /**
      * Converts Symfony uploaded files array to the PSR one.
      *
-     * @param array $uploadedFiles
-     *
      * @return array
      */
     private function getFiles(array $uploadedFiles)
@@ -109,8 +107,6 @@ class DiactorosFactory implements HttpMessageFactoryInterface
 
     /**
      * Creates a PSR-7 UploadedFile instance from a Symfony one.
-     *
-     * @param UploadedFile $symfonyUploadedFile
      *
      * @return UploadedFileInterface
      */

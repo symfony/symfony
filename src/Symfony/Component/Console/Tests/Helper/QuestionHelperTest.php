@@ -960,7 +960,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $dialog = new QuestionHelper();
 
         $question = new Question('What\'s your name?');
-        $question->setValidator(function () {
+        $question->setValidator(function ($value) {
             if (!$value) {
                 throw new \Exception('A value is required.');
             }

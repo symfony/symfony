@@ -16,15 +16,16 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Sets the classes to compile in the cache for the container.
+ * Collects the classes to list in the preloading script.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-class AddAnnotatedClassesToCachePass implements CompilerPassInterface
+class AddClassesToPreloadPass implements CompilerPassInterface
 {
     use ClassMatchingTrait;
 
     private $kernel;
+    private $classesToPreload = [];
 
     public function __construct(Kernel $kernel)
     {
@@ -36,16 +37,21 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $annotatedClasses = $this->kernel->getAnnotatedClassesToCompile();
+        $preloadedClasses = $this->kernel->getClassesToPreload();
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof Extension) {
-                $annotatedClasses = array_merge($annotatedClasses, $extension->getAnnotatedClassesToCompile());
+                $preloadedClasses = array_merge($preloadedClasses, $extension->getClassesToPreload());
             }
         }
 
         $existingClasses = $this->getClassesInComposerClassMaps();
 
-        $annotatedClasses = $container->getParameterBag()->resolveValue($annotatedClasses);
-        $this->kernel->setAnnotatedClassCache($this->expandClasses($annotatedClasses, $existingClasses));
+        $preloadedClasses = $container->getParameterBag()->resolveValue($preloadedClasses);
+        $this->classesToPreload = $this->expandClasses($preloadedClasses, $existingClasses);
+    }
+
+    public function getClassesToPreload(): array
+    {
+        return $this->classesToPreload;
     }
 }

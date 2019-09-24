@@ -453,6 +453,37 @@ class FrameworkExtension extends Extension
 
         $container->registerForAutoconfiguration(RouteLoaderInterface::class)
             ->addTag('routing.route_loader');
+
+        $this->addClassesToPreload([
+            'Psr\Log\LogLevel',
+            'Symfony\Component\Cache\Adapter\ApcuAdapter',
+            'Symfony\Component\Cache\Adapter\ArrayAdapter',
+            'Symfony\Component\Cache\Adapter\PhpArrayAdapter',
+            'Symfony\Component\Cache\Adapter\PhpFilesAdapter',
+            'Symfony\Component\Cache\CacheItem',
+            'Symfony\Component\DependencyInjection\Argument\RewindableGenerator',
+            'Symfony\Component\DependencyInjection\Argument\ServiceLocator',
+            'Symfony\Component\DependencyInjection\ContainerAwareInterface',
+            'Symfony\Component\DependencyInjection\ContainerAwareTrait',
+            'Symfony\Component\Dotenv\Dotenv',
+            'Symfony\Component\ErrorHandler\ErrorHandler',
+            'Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy',
+            'Symfony\Component\HttpFoundation\AcceptHeader',
+            'Symfony\Component\HttpFoundation\AcceptHeaderItem',
+            'Symfony\Component\HttpFoundation\FileBag',
+            'Symfony\Component\HttpFoundation\HeaderBag',
+            'Symfony\Component\HttpFoundation\HeaderUtils',
+            'Symfony\Component\HttpFoundation\ParameterBag',
+            'Symfony\Component\HttpFoundation\ResponseHeaderBag',
+            'Symfony\Component\HttpFoundation\ServerBag',
+            'Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent',
+            'Symfony\Component\HttpKernel\Event\ControllerEvent',
+            'Symfony\Component\HttpKernel\Event\TerminateEvent',
+            'Symfony\Component\HttpKernel\KernelEvents',
+            'Symfony\Component\VarExporter\Internal\Hydrator',
+            'Symfony\Component\VarExporter\Internal\Registry',
+            'Symfony\Component\WebLink\HttpHeaderSerializer',
+        ]);
     }
 
     /**
@@ -850,6 +881,15 @@ class FrameworkExtension extends Extension
 
         $loader->load('routing.xml');
 
+        $this->addClassesToPreload([
+            'Symfony\Bundle\FrameworkBundle\Routing\RedirectableCompiledUrlMatcher',
+            'Symfony\Component\Routing\Annotation\Route',
+            'Symfony\Component\Routing\Matcher\CompiledUrlMatcher',
+            'Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherTrait',
+            'Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface',
+            'Symfony\Component\Routing\Matcher\UrlMatcher',
+        ]);
+
         if ($config['utf8']) {
             $container->getDefinition('routing.loader')->replaceArgument(2, ['utf8' => true]);
         }
@@ -900,6 +940,14 @@ class FrameworkExtension extends Extension
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('session.xml');
+
+        $this->addClassesToPreload([
+            'Symfony\Component\HttpFoundation\Session\SessionBagProxy',
+            'Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler',
+            'Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler',
+            'Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy',
+            'Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy',
+        ]);
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
@@ -1117,6 +1165,10 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('translation.xml');
+
+        $this->addClassesToPreload([
+            'Symfony\Component\Translation\Formatter\IntlFormatter',
+        ]);
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default')->setPublic(true);

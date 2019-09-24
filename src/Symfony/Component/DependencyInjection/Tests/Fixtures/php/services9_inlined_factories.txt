@@ -536,6 +536,16 @@ class ProjectServiceContainer extends Container
 
 $classes = [];
 $classes[] = 'Bar\FooClass';
+$classes[] = 'Baz';
+$classes[] = 'ConfClass';
+$classes[] = 'Bar';
+$classes[] = 'BazClass';
+$classes[] = 'Foo';
+$classes[] = 'LazyContext';
+$classes[] = 'FooBarBaz';
+$classes[] = 'FactoryClass';
+$classes[] = 'Request';
+$classes[] = 'Symfony\Component\DependencyInjection\ContainerInterface';
 
 %A
 

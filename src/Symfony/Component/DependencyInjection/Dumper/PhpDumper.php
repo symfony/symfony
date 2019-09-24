@@ -80,6 +80,7 @@ class PhpDumper extends Dumper
     private $inlinedRequires = [];
     private $circularReferences = [];
     private $singleUsePrivateIds = [];
+    private $preload = [];
     private $addThrow = false;
     private $addGetService = false;
     private $locatedIds = [];
@@ -141,6 +142,7 @@ class PhpDumper extends Dumper
             'hot_path_tag' => 'container.hot_path',
             'inline_factories_parameter' => 'container.dumper.inline_factories',
             'inline_class_loader_parameter' => 'container.dumper.inline_class_loader',
+            'preload_classes' => [],
             'service_locator_tag' => 'container.service_locator',
             'build_time' => time(),
         ], $options);
@@ -225,8 +227,12 @@ class PhpDumper extends Dumper
 
         $proxyClasses = $this->inlineFactories ? $this->generateProxyClasses() : null;
 
+        if ($options['preload_classes']) {
+            $this->preload = array_combine($options['preload_classes'], $options['preload_classes']);
+        }
+
         $code =
-            $this->startClass($options['class'], $baseClass, $preload).
+            $this->startClass($options['class'], $baseClass).
             $this->addServices($services).
             $this->addDeprecatedAliases().
             $this->addDefaultParametersMethod()
@@ -301,7 +307,7 @@ EOF;
             $id = hash('crc32', $hash.$time);
             $this->asFiles = false;
 
-            if ($preload && null !== $autoloadFile = $this->getAutoloadFile()) {
+            if ($this->preload && null !== $autoloadFile = $this->getAutoloadFile()) {
                 $autoloadFile = substr($this->export($autoloadFile), 2, -1);
 
                 $code[$options['class'].'.preload.php'] = <<<EOF
@@ -319,8 +325,10 @@ require __DIR__.'/Container{$hash}/{$options['class']}.php';
 
 EOF;
 
-                foreach ($preload as $class) {
-                    $code[$options['class'].'.preload.php'] .= sprintf("\$classes[] = '%s';\n", $class);
+                foreach ($this->preload as $class) {
+                    if ($class && (!(class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) || (new \ReflectionClass($class))->isUserDefined())) {
+                        $code[$options['class'].'.preload.php'] .= sprintf("\$classes[] = '%s';\n", $class);
+                    }
                 }
 
                 $code[$options['class'].'.preload.php'] .= <<<'EOF'
@@ -366,6 +374,7 @@ EOF;
         $this->circularReferences = [];
         $this->locatedIds = [];
         $this->exportedVariables = [];
+        $this->preload = [];
 
         $unusedEnvs = [];
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -541,8 +550,13 @@ EOF;
         if ($this->inlineRequires && (!$this->isHotPath($definition) || $this->getProxyDumper()->isProxyCandidate($definition))) {
             $lineage = [];
             foreach ($this->inlinedDefinitions as $def) {
-                if (!$def->isDeprecated() && \is_string($class = \is_array($factory = $def->getFactory()) && \is_string($factory[0]) ? $factory[0] : $def->getClass())) {
-                    $this->collectLineage($class, $lineage);
+                if (!$def->isDeprecated()) {
+                    if ($class = $this->getFactoryClass($def)) {
+                        $this->collectLineage($class, $lineage);
+                    }
+                    if ($class = $def->getClass()) {
+                        $this->collectLineage($class, $lineage);
+                    }
                 }
             }
 
@@ -551,9 +565,13 @@ EOF;
                     && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $behavior
                     && $this->container->has($id)
                     && $this->isTrivialInstance($def = $this->container->findDefinition($id))
-                    && \is_string($class = \is_array($factory = $def->getFactory()) && \is_string($factory[0]) ? $factory[0] : $def->getClass())
                 ) {
-                    $this->collectLineage($class, $lineage);
+                    if ($class = $this->getFactoryClass($def)) {
+                        $this->collectLineage($class, $lineage);
+                    }
+                    if ($class = $def->getClass()) {
+                        $this->collectLineage($class, $lineage);
+                    }
                 }
             }
 
@@ -798,6 +816,15 @@ EOF;
 
         if ($definition->isDeprecated()) {
             $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
+        } else {
+            foreach ($this->inlinedDefinitions as $def) {
+                if ($class = $this->getFactoryClass($def)) {
+                    $this->preload[$class] = $class;
+                }
+                if ($class = ltrim($def->getClass(), '\\')) {
+                    $this->preload[$class] = $class;
+                }
+            }
         }
 
         if ($this->getProxyDumper()->isProxyCandidate($definition)) {
@@ -953,7 +980,18 @@ EOTXT
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            $services[$id] = $definition->isSynthetic() ? null : $this->addService($id, $definition);
+            if (!$definition->isSynthetic()) {
+                $services[$id] = $this->addService($id, $definition);
+            } else {
+                $services[$id] = null;
+
+                if ($class = $this->getFactoryClass($definition)) {
+                    $this->preload[$class] = $class;
+                }
+                if ($class = ltrim($definition->getClass(), '\\')) {
+                    $this->preload[$class] = $class;
+                }
+            }
         }
 
         foreach ($definitions as $id => $definition) {
@@ -1054,7 +1092,7 @@ EOTXT
         return $return.sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments)).$tail;
     }
 
-    private function startClass(string $class, string $baseClass, ?array &$preload): string
+    private function startClass(string $class, string $baseClass): string
     {
         $namespaceLine = !$this->asFiles && $this->namespace ? "\nnamespace {$this->namespace};\n" : '';
 
@@ -1117,7 +1155,7 @@ EOF;
         $code .= $this->addMethodMap();
         $code .= $this->asFiles && !$this->inlineFactories ? $this->addFileMap() : '';
         $code .= $this->addAliases();
-        $code .= $this->addInlineRequires($preload);
+        $code .= $this->addInlineRequires();
         $code .= <<<EOF
     }
 
@@ -1317,7 +1355,7 @@ EOF;
         return $code;
     }
 
-    private function addInlineRequires(?array &$preload): string
+    private function addInlineRequires(): string
     {
         if (!$this->hotPathTag || !$this->inlineRequires) {
             return '';
@@ -1335,8 +1373,10 @@ EOF;
             $inlinedDefinitions = $this->getDefinitionsFromArguments([$definition]);
 
             foreach ($inlinedDefinitions as $def) {
-                if (\is_string($class = \is_array($factory = $def->getFactory()) && \is_string($factory[0]) ? $factory[0] : $def->getClass())) {
-                    $preload[$class] = $class;
+                if ($class = $this->getFactoryClass($def)) {
+                    $this->collectLineage($class, $lineage);
+                }
+                if ($class = $def->getClass()) {
                     $this->collectLineage($class, $lineage);
                 }
             }
@@ -2054,6 +2094,19 @@ EOF;
                     }
                 }
             }
+        }
+
+        return null;
+    }
+
+    private function getFactoryClass(Definition $definition): ?string
+    {
+        while ($definition instanceof Definition && \is_array($factory = $definition->getFactory())) {
+            if (\is_string($factory[0])) {
+                return ltrim($factory[0], '\\');
+            }
+
+            $definition = $factory[0];
         }
 
         return null;

@@ -36,6 +36,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
+use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToPreloadPass;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 
 /**
@@ -73,6 +74,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $warmupDir;
     private $requestStackSize = 0;
     private $resetServices = false;
+    private $addClassesToPreloadPass;
 
     const VERSION = '4.4.0-DEV';
     const VERSION_ID = 40400;
@@ -424,6 +426,25 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     }
 
     /**
+     * Gets the classes to list in the preloading script.
+     *
+     * When a class is listed, all its parent classes or interfaces are automatically listed too.
+     * Service classes are also automatically preloaded and don't need to be listed explicitly.
+     */
+    public function getClassesToPreload(): array
+    {
+        $ns = strrpos(\get_class($this), '\\');
+        $preload = $ns ? [substr_replace(\get_class($this), '\\**', $ns)] : [];
+        $preload[] = ConfigCache::class;
+
+        foreach ($this->getBundles() as $bundle) {
+            $preload[] = \get_class($bundle);
+        }
+
+        return $preload;
+    }
+
+    /**
      * Gets the patterns defining the classes to parse and cache for annotations.
      */
     public function getAnnotatedClassesToCompile(): array
@@ -589,6 +610,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $oldContainer = \is_object($oldContainer) ? new \ReflectionClass($oldContainer) : false;
 
         $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
+        $this->addClassesToPreloadPass = null;
         $this->container = require $cache->getPath();
         $this->container->set('kernel', $this);
 
@@ -680,6 +702,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         $container->addCompilerPass(new AddAnnotatedClassesToCachePass($this));
+        $container->addCompilerPass($this->addClassesToPreloadPass = new AddClassesToPreloadPass($this));
 
         return $container;
     }
@@ -756,6 +779,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'as_files' => true,
             'debug' => $this->debug,
             'build_time' => $container->hasParameter('kernel.container_build_time') ? $container->getParameter('kernel.container_build_time') : time(),
+            'preload_classes' => $this->addClassesToPreloadPass ? $this->addClassesToPreloadPass->getClassesToPreload() : [],
         ]);
 
         $rootCode = array_pop($content);

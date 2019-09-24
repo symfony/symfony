@@ -161,6 +161,18 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');
+
+        $this->addClassesToPreload([
+            'Symfony\Component\HttpFoundation\RequestMatcher',
+            'Symfony\Component\Security\Core\Authorization\ExpressionLanguageProvider',
+            'Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider',
+            'Symfony\Component\Security\Core\Authentication\Token\AbstractToken',
+            'Symfony\Component\Security\Core\Authentication\Token\AnonymousToken',
+            'Symfony\Component\Security\Core\AuthenticationEvents',
+            'Symfony\Component\Security\Core\Event\AuthenticationEvent',
+            'Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent',
+            'Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface',
+        ]);
     }
 
     private function createRoleHierarchy(array $config, ContainerBuilder $container)

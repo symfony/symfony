@@ -14,6 +14,7 @@ CHANGELOG
    so you likely do not use those in any app based on the SF Standard or Flex edition.
  * Marked all dispatched event classes as `@final`
  * Added `ErrorController` to enable the preview and error rendering mechanism
+ * Added `Kernel::getClassesToPreload()` and `Extension::addClassesToPreload()` to hint PHP 7.4's `opcache.preload`
 
 4.3.0
 -----

@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
 abstract class Extension extends BaseExtension
 {
     private $annotatedClasses = [];
+    private $preloadedClasses = [];
 
     /**
      * Gets the annotated classes to cache.
@@ -40,5 +41,24 @@ abstract class Extension extends BaseExtension
     public function addAnnotatedClassesToCompile(array $annotatedClasses)
     {
         $this->annotatedClasses = array_merge($this->annotatedClasses, $annotatedClasses);
+    }
+
+    /**
+     * Gets the classes to list in the preloading script.
+     */
+    public function getClassesToPreload(): array
+    {
+        return $this->preloadedClasses;
+    }
+
+    /**
+     * Adds classes to list in the preloading script.
+     *
+     * When a class is listed, all its parent classes or interfaces are automatically listed too.
+     * Service classes are also automatically preloaded and don't need to be listed explicitly.
+     */
+    public function addClassesToPreload(array $preloadedClasses): void
+    {
+        $this->preloadedClasses = array_merge($this->preloadedClasses, $preloadedClasses);
     }
 }

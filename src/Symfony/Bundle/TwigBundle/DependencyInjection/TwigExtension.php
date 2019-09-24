@@ -170,6 +170,18 @@ class TwigExtension extends Extension
             $container->removeDefinition('twig.cache_warmer');
             $container->removeDefinition('twig.template_cache_warmer');
         }
+
+        $this->addClassesToPreload([
+            'Symfony\Component\Stopwatch\Section',
+            'Twig\Cache\FilesystemCache',
+            'Twig\Extension\CoreExtension',
+            'Twig\Extension\EscaperExtension',
+            'Twig\Extension\OptimizerExtension',
+            'Twig\Extension\StagingExtension',
+            'Twig\ExtensionSet',
+            'Twig\Template',
+            'Twig\TemplateWrapper',
+        ]);
     }
 
     private function getBundleTemplatePaths(ContainerBuilder $container, array $config)

@@ -25,7 +25,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 class StoreFactory
 {
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached|\Zookeeper|string $connection Connection or DSN or Store short name
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|\Memcached|\Zookeeper|string $connection Connection or DSN or Store short name
      *
      * @return PersistingStoreInterface
      */
@@ -35,7 +35,7 @@ class StoreFactory
             $connection instanceof \Redis ||
             $connection instanceof \RedisArray ||
             $connection instanceof \RedisCluster ||
-            $connection instanceof \Predis\Client ||
+            $connection instanceof \Predis\ClientInterface ||
             $connection instanceof RedisProxy ||
             $connection instanceof RedisClusterProxy
         ) {

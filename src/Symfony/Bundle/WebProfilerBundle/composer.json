@@ -23,7 +23,7 @@
         "symfony/routing": "^4.4|^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0",
-        "twig/twig": "^2.10|^3"
+        "twig/twig": "^2.10|^3.0"
     },
     "require-dev": {
         "symfony/console": "^4.4|^5.0",

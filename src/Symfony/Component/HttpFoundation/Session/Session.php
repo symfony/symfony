@@ -136,10 +136,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
         return \count($this->getAttributeBag()->all());
     }
 
-    /**
-     * @internal
-     */
-    public function getUsageIndex(): int
+    public function &getUsageIndex(): int
     {
         return $this->usageIndex;
     }

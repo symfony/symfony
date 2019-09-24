@@ -23,7 +23,7 @@ use Twig\TwigFunction;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @internal since Symfony 4.4
+ * @internal
  */
 class WebProfilerExtension extends ProfilerExtension
 {

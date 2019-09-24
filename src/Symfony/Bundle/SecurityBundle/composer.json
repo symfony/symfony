@@ -44,7 +44,7 @@
         "symfony/yaml": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "doctrine/doctrine-bundle": "^1.5|^2.0",
-        "twig/twig": "^2.10|^3"
+        "twig/twig": "^2.10|^3.0"
     },
     "conflict": {
         "symfony/browser-kit": "<4.4",

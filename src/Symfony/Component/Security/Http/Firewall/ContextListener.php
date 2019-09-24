@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -46,11 +47,12 @@ class ContextListener
     private $dispatcher;
     private $registered;
     private $trustResolver;
+    private $sessionTrackerEnabler;
 
     /**
      * @param iterable|UserProviderInterface[] $userProviders
      */
-    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
+    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null, callable $sessionTrackerEnabler = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -62,6 +64,7 @@ class ContextListener
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+        $this->sessionTrackerEnabler = $sessionTrackerEnabler;
     }
 
     /**
@@ -77,7 +80,21 @@ class ContextListener
         $request = $event->getRequest();
         $session = $request->hasPreviousSession() && $request->hasSession() ? $request->getSession() : null;
 
-        if (null === $session || null === $token = $session->get($this->sessionKey)) {
+        if (null !== $session) {
+            $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
+            $sessionId = $session->getId();
+            $token = $session->get($this->sessionKey);
+
+            if ($this->sessionTrackerEnabler && $session->getId() === $sessionId) {
+                $usageIndexReference = $usageIndexValue;
+            }
+        }
+
+        if (null === $session || null === $token) {
+            if ($this->sessionTrackerEnabler) {
+                ($this->sessionTrackerEnabler)();
+            }
+
             $this->tokenStorage->setToken(null);
 
             return;
@@ -102,6 +119,10 @@ class ContextListener
             $token = null;
         }
 
+        if ($this->sessionTrackerEnabler) {
+            ($this->sessionTrackerEnabler)();
+        }
+
         $this->tokenStorage->setToken($token);
     }
 
@@ -122,18 +143,25 @@ class ContextListener
 
         $this->dispatcher->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
         $this->registered = false;
+        $session = $request->getSession();
+        $sessionId = $session->getId();
+        $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : null;
         $token = $this->tokenStorage->getToken();
 
         if (null === $token || $this->trustResolver->isAnonymous($token)) {
-            if ($request->hasPreviousSession() && $request->hasSession()) {
-                $request->getSession()->remove($this->sessionKey);
+            if ($request->hasPreviousSession()) {
+                $session->remove($this->sessionKey);
             }
         } else {
-            $request->getSession()->set($this->sessionKey, serialize($token));
+            $session->set($this->sessionKey, serialize($token));
 
             if (null !== $this->logger) {
                 $this->logger->debug('Stored the security token in the session.', ['key' => $this->sessionKey]);
             }
+        }
+
+        if ($this->sessionTrackerEnabler && $session->getId() === $sessionId) {
+            $usageIndexReference = $usageIndexValue;
         }
     }
 

@@ -49,16 +49,16 @@ class AccessListener
      */
     public function __invoke(RequestEvent $event)
     {
-        if (null === $token = $this->tokenStorage->getToken()) {
-            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
-        }
-
         $request = $event->getRequest();
 
         list($attributes) = $this->map->getPatterns($request);
 
-        if (null === $attributes) {
+        if (!$attributes) {
             return;
+        }
+
+        if (null === $token = $this->tokenStorage->getToken()) {
+            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
         }
 
         if (!$token->isAuthenticated()) {

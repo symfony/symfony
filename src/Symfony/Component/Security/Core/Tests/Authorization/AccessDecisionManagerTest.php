@@ -37,7 +37,7 @@ class AccessDecisionManagerTest extends TestCase
     /**
      * @dataProvider getStrategiesWith2RolesTests
      */
-    public function testStrategiesWith2Roles($token, $strategy, $voter, $expected)
+    public function testLegacyStrategiesWith2Roles($token, $strategy, $voter, $expected)
     {
         $manager = new AccessDecisionManager([$voter], $strategy);
 

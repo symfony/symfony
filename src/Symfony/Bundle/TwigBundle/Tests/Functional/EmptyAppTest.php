@@ -16,6 +16,7 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorRenderer\ErrorRenderer;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
 class EmptyAppTest extends TestCase
@@ -27,6 +28,26 @@ class EmptyAppTest extends TestCase
 
         $this->assertTrue($kernel->getContainer()->hasParameter('twig.default_path'));
         $this->assertNotEmpty($kernel->getContainer()->getParameter('twig.default_path'));
+    }
+
+    protected function setUp(): void
+    {
+        $this->deleteTempDir();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->deleteTempDir();
+    }
+
+    private function deleteTempDir()
+    {
+        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/EmptyAppKernel')) {
+            return;
+        }
+
+        $fs = new Filesystem();
+        $fs->remove($dir);
     }
 }
 

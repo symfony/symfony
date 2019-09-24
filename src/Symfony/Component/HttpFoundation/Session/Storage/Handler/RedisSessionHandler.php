@@ -34,7 +34,7 @@ class RedisSessionHandler extends AbstractSessionHandler
      * List of available options:
      *  * prefix: The prefix to use for the keys in order to avoid collision on the Redis server.
      *
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|RedisProxy $redis
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy $redis
      *
      * @throws \InvalidArgumentException When unsupported client or options are passed
      */
@@ -44,11 +44,11 @@ class RedisSessionHandler extends AbstractSessionHandler
             !$redis instanceof \Redis &&
             !$redis instanceof \RedisArray &&
             !$redis instanceof \RedisCluster &&
-            !$redis instanceof \Predis\Client &&
+            !$redis instanceof \Predis\ClientInterface &&
             !$redis instanceof RedisProxy &&
             !$redis instanceof RedisClusterProxy
         ) {
-            throw new \InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, \is_object($redis) ? \get_class($redis) : \gettype($redis)));
+            throw new \InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\ClientInterface, %s given', __METHOD__, \is_object($redis) ? \get_class($redis) : \gettype($redis)));
         }
 
         if ($diff = array_diff(array_keys($options), ['prefix'])) {

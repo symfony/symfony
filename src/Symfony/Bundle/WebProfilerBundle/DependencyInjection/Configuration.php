@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->getRootNode()
             ->children()
                 ->booleanNode('toolbar')->defaultFalse()->end()
-                ->booleanNode('intercept_redirects')->defaultFalse()->setDeprecated('The "intercept_redirects" option is deprecated since version 4.4 and will be removed in 5.0.')->end()
+                ->booleanNode('intercept_redirects')->defaultFalse()->end()
                 ->scalarNode('excluded_ajax_paths')->defaultValue('^/((index|app(_[\w]+)?)\.php/)?_wdt')->end()
             ->end()
         ;

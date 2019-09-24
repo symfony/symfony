@@ -185,7 +185,7 @@ EOF
 
         $count = 0;
         try {
-            $worker->run([], function (?Envelope $envelope) use ($worker, $io, &$count) {
+            $worker->run([], function (?Envelope $envelope) use ($worker, &$count) {
                 ++$count;
                 if (null === $envelope) {
                     $worker->stop();

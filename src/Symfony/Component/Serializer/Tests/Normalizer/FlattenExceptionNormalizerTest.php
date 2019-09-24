@@ -46,9 +46,13 @@ class FlattenExceptionNormalizerTest extends TestCase
         $normalized = $this->normalizer->normalize($exception);
         $previous = null === $exception->getPrevious() ? null : $this->normalizer->normalize($exception->getPrevious());
 
-        $this->assertSame($exception->getMessage(), $normalized['message']);
+        $this->assertSame($exception->getMessage(), $normalized['detail']);
         $this->assertSame($exception->getCode(), $normalized['code']);
-        $this->assertSame($exception->getStatusCode(), $normalized['status_code']);
+        if (null !== $exception->getStatusCode()) {
+            $this->assertSame($exception->getStatusCode(), $normalized['status']);
+        } else {
+            $this->assertArrayNotHasKey('status', $normalized);
+        }
         $this->assertSame($exception->getHeaders(), $normalized['headers']);
         $this->assertSame($exception->getClass(), $normalized['class']);
         $this->assertSame($exception->getFile(), $normalized['file']);
@@ -98,15 +102,15 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->assertNull($exception->getTraceAsString());
 
         $normalized = [
-            'message' => 'Something went foobar.',
+            'detail' => 'Something went foobar.',
             'code' => 42,
-            'status_code' => 404,
+            'status' => 404,
             'headers' => ['Content-Type' => 'application/json'],
             'class' => \get_class($this),
             'file' => 'foo.php',
             'line' => 123,
             'previous' => [
-                'message' => 'Previous exception',
+                'detail' => 'Previous exception',
                 'code' => 0,
             ],
             'trace' => [
@@ -119,9 +123,9 @@ class FlattenExceptionNormalizerTest extends TestCase
         $exception = $this->normalizer->denormalize($normalized, FlattenException::class);
 
         $this->assertInstanceOf(FlattenException::class, $exception);
-        $this->assertSame($normalized['message'], $exception->getMessage());
+        $this->assertSame($normalized['detail'], $exception->getMessage());
         $this->assertSame($normalized['code'], $exception->getCode());
-        $this->assertSame($normalized['status_code'], $exception->getStatusCode());
+        $this->assertSame($normalized['status'], $exception->getStatusCode());
         $this->assertSame($normalized['headers'], $exception->getHeaders());
         $this->assertSame($normalized['class'], $exception->getClass());
         $this->assertSame($normalized['file'], $exception->getFile());
@@ -130,7 +134,7 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->assertSame($normalized['trace_as_string'], $exception->getTraceAsString());
 
         $this->assertInstanceOf(FlattenException::class, $previous = $exception->getPrevious());
-        $this->assertSame($normalized['previous']['message'], $previous->getMessage());
+        $this->assertSame($normalized['previous']['detail'], $previous->getMessage());
         $this->assertSame($normalized['previous']['code'], $previous->getCode());
     }
 

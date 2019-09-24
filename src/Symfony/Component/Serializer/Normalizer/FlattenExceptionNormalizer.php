@@ -34,10 +34,9 @@ class FlattenExceptionNormalizer implements NormalizerInterface, DenormalizerInt
         }
         /* @var FlattenException $object */
 
-        return [
-            'message' => $object->getMessage(),
+        $normalized = [
+            'detail' => $object->getMessage(),
             'code' => $object->getCode(),
-            'status_code' => $object->getStatusCode(),
             'headers' => $object->getHeaders(),
             'class' => $object->getClass(),
             'file' => $object->getFile(),
@@ -46,6 +45,11 @@ class FlattenExceptionNormalizer implements NormalizerInterface, DenormalizerInt
             'trace' => $object->getTrace(),
             'trace_as_string' => $object->getTraceAsString(),
         ];
+        if (null !== $status = $object->getStatusCode()) {
+            $normalized['status'] = $status;
+        }
+
+        return $normalized;
     }
 
     /**
@@ -70,9 +74,9 @@ class FlattenExceptionNormalizer implements NormalizerInterface, DenormalizerInt
 
         $object = new FlattenException();
 
-        $object->setMessage($data['message'] ?? null);
+        $object->setMessage($data['detail'] ?? null);
         $object->setCode($data['code'] ?? null);
-        $object->setStatusCode($data['status_code'] ?? null);
+        $object->setStatusCode($data['status'] ?? null);
         $object->setClass($data['class'] ?? null);
         $object->setFile($data['file'] ?? null);
         $object->setLine($data['line'] ?? null);

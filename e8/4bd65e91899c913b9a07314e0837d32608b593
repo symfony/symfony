@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-23T13:53:14Z
+
+PR ready. I verified locally that `deps=high` failure is going to be fixed once this is merged into master.

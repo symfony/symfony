@@ -1,0 +1,350 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-15T15:00:42Z
+
+Looks like the build failures are not a result of the changes in this PR
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-09-15T16:17:41Z
+
+For me, this pull request is not acceptable. I use myself in many projects just such a form in which a lot of ROLE_ is transmitted.
+
+For me it is just clear because I know who has access to the controller.
+
+I think calling multiple functions is definitely slower and using the `has_role or has_role` expression is illegible.
+
+I completely disagree, although it is not my decision - if it comes into 4.4 - instead of upgrading, I will have to stay with version 4.3 SF.
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-09-15T18:51:37Z
+
+I don't think deprecating this is possible, or even wanted for some cases. But I would given that the ExpressionLanguage is the most advanced, recommend this over using strings.
+
+The biggest issues is the ambiguity of the attributes, it's confusing documentation, and how voters receive the information, the subject (ahem, object, wait is it subject? *) can be null while the `$attributes` is always an array (that was passed as the first argument of `isGranted()`).
+
+The PHPDoc states that `$attributes` is `An array of attributes associated with the method being invoked.` This however might not be case, and doesn't tell my anything useful. Secondly the subject (or object) is declared as both `mixed` and as `object`. Which doesn't make this any more clear either.
+
+Historically the `$attributes` can be about roles or fields for ACL, but now it can be anything.
+Which is properly why the `Role` class exists 😄 to make it explicit you want to ask about roles, and nothing else.
+
+Moving forward I think we first need clearly identify and clarify how voters should be used, is the subject/object a mixed type or object type? What are the attributes really about. Then we can think about deprecating some accepted value types.
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-09-15T20:51:45Z
+
+> I completely disagree, although it is not my decision - if it comes into 4.4 - instead of upgrading, I will have to stay with version 4.3 SF.
+
+@michaljusiega You would really stay on an old version for such a minor "feature"? I'd rather see this feature removed as it makes the life of a developer more difficult. As mentioned in the PR, this is confusing as you can't predict the behavior.
+
+> For me, this pull request is not acceptable. I use myself in many projects just such a form in which a lot of ROLE_ is transmitted.
+
+I'd argue that you're not using the voter system correctly then. Voting on roles is an implementation detail that should be hidden in a voter, not done in the code directly. For more information, you can read this blog post: https://stovepipe.systems/post/symfony-security-roles-vs-voters
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-16T06:28:35Z
+
+I fully agree removing this behavior ... but I also understand people using/needing it today.
+
+Here's an alternative proposal: change `isGranted()` to accept only 1 string permission. Add two helper methods called `isGrantedAll()` and `isGrantedAny()` which accept an array of permissions ... and their behavior is clearly explained by their names.
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-09-16T09:33:56Z
+
+@javiereguiluz:
+But what about of `@IsGranted` annotation from FrameworkExtraBundle ? Add too `@IsGrantedAll` and `@IsGrantedAny` annotations and same functions in Twig `is_granted_all()` and `is_granted_any()` ?
+
+Then such a change would make sense.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-16T10:15:54Z
+
+@michaljusiega yes, that would be the idea. However, we need to think carefully about this. For example, using role hierarchy you could define a single special role that includes two or more ... and then we could get rid of `isGrantedAll()`.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-09-16T22:00:21Z
+
+I don’t like the idea of adding more getters 😟
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-20T17:56:38Z
+
+Thanks for the discussion! I think there are now 2 proposals on how to continue this PR:
+
+1. Merge the PR as-is, meaning `isGranted()` with only one attribute
+2. Add `isGrantedAll()` and `isGrantedAny()` to this PR
+
+I'm in favor of (1). Using (2) has, if any, exactly the same drawbacks as (1) and introduces syntax sugar for something that is just boolean PHP logic (`&&`/`and` and `||`/`or`).
+
+/cc @weaverryan @nicolas-grekas can you please share your opinion on a proposal? This way, I can finish this before the feature-freeze 😃
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2019-09-20T20:49:25Z
+
+@wouterj Can we imagine a system "strategy" that would be passed in parameter ?
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-09-20T20:56:52Z
+
+@maxhelias if you mean the voting strategy, I don't think that's a good idea as it would make it impossible to use the existing methods for this. If you mean a separate setting, it would make authorization even more complex due to the amount of permutations you can have.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-22T11:10:29Z
+
+I'm in favor of option 1 as well.
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-09-22T17:50:01Z
+
+Hello, I will describe your problem again. I suggest the second option.
+
+Many of you probably have applications that claim permissions based on the @IsGranted annotation or the is_granted function in Twig. Many of these applications are probably not based on basic roles such as: ROLE_USER, ROLE_ADMIN ...
+
+In my case, I have several applications for which I check if the logged in user HAS ANY permission for which he has access to the module / controller / view, so in the case of an array it looks like this:
+`@IsGranted(["ROLE_SECTION_A", "ROLE_SECTION_B"])`
+or
+`is_granted(["ROLE_SECTION_A", "ROLE_SECTION_B"])`.
+
+For me, this way is the clearest, because the expression `@IsGranted("has_role ('ROLE_SECTION_A') or has_role ('ROLE_SECTION_B')")` IS NOT CLEAR.
+
+And what about 40 or more elements in the array for which the permissions are checked. In exchange for some silly expression, the code will be completely illegible ...
+
+Look also from the perspective of ordinary mortals who use Symfony. There are applications for which this pull-request may be a fiasco for further updates.
+
+I am asking for your understanding. I would prefer to stay with the option for which:
+`is_granted (string $role), is_granted_any (array $roles), is_granted_all (array $roles) `
+and
+`annotations @IsGranted("ROLE"), @IsGrantedAny([]), @IsGrantedAll([])`.
+
+Or leave it as it is and don't look for a hole in the whole.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-22T18:10:06Z
+
+Hi @michaljusiega! Thanks for explaining and sharing your usage of the feature!
+
+I would argue in that case that [creating a custom voter](https://symfony.com/doc/current/security/voters.html) is the best possible solution, even when this PR is not merged in any version. The RoleVoter is just a basic one provided by Symfony to help people start using the authorization. It implements user roles. The definition of a role is "the function assumed or part played by a person or thing in a particular situation."
+
+You are instead wanting to grant access based on what sections a user can visit. That asks for a custom voter that implements such logic, for instance like this:
+```php
+if ($this->isGranted('SECTION_ACCESS', ['SECTION_A', 'SECTION_B'])) {
+   // ...
+}
+```
+
+With a voter that accepts the `ACCESS` security attribute and then checks if the user has access to any section mentioned in it's `$subject`:
+```php
+class SectionVoter extends Voter
+{
+    protected function supports($attribute, $subject)
+    {
+        return 'SECTION_ACCESS' === $attribute;
+    }
+
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    {
+        $user = $token->getUser();
+        $sections = (array) $subject;
+
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        foreach ($sections as $section) {
+            if ($user->hasAccessToSection($section)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-22T18:20:34Z
+
+> I'm in favor of option 1 as well.
+
+Alright, I've rebased the PR and fixed some things mentioned by @jvasseur. That leaves only the BC problem with `VoterInterface::vote()` to be solved (also asked for some help in #contribs on Slack).
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-09-22T19:06:32Z
+
+I understand that you need to develop ... but this way you will slow down people's work. I totally disagree with these changes ... having 300 controllers, I have a permission scheme for which I allow people to be granted permissions.
+
+As I mentioned, I don't have a simple application that does something ... connects over 30 databases, connects to 30 HTTP servers, has 200 users a day, the access system is also important ...
+
+If I were to adapt the application to these changes, it would take a lot of time because ... you decided something about yourself ...
+
+If something works, do not change it ... give an alternative for which the change will be pleasant, not through torment.
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-09-22T20:11:57Z
+
+> As I mentioned, I don't have a simple application that does something ... connects over 30 databases, connects to 30 HTTP servers, has 200 users a day, the access system is also important ...
+
+This current behavior is just asking for trouble for big applications. I work for a company that has hundreds of tenants, high activity through API and webinterface, one mistake because of not knowing if it does `OR` or `AND` can be a big security risk. This is something that developers should be protected against.
+
+> If I were to adapt the application to these changes, it would take a lot of time because ... you decided something about yourself ...
+
+This is a change that should help reduce the amount of unknown and confusing behavior. I've never used this feature **because** I can't tell what it does by looking at it. This is not a selfish decision, this is cleaning up a confusing public API. The fact that you've used this feature through 300+ controllers, makes me wonder how many hidden security related issues you have because a developer implemented it wrongly, or a voter that caused undesired behavior.
+
+> If something works, do not change it ... give an alternative for which the change will be pleasant, not through torment.
+
+It doesn't work (well), that's why there's a proposal to change it and reduce the complexity of the public API.
+
+> I am asking for your understanding. I would prefer to stay with the option for which: `is_granted (string $role), is_granted_any (array $roles), is_granted_all (array $roles)` and annotations `@IsGranted("ROLE")`, `@IsGrantedAny([])`, `@IsGrantedAll([])`.
+
+You can propose the annotation feature in the SensioFrameworkExtra bundle.
+
+In regards of the public API of the authorization checker, imo it should stay the same as it will only increase complexity. In regards of twig, new functions **could** be added, though I'm not sure that's the best idea. As compromise the security bundle could register two new functions with the expression language: `has_role_any()` and `has_role_all()`, though I'm not sure this is the best approach.
+
+I rather advice you to create a voter and handle permissions in those. You can read why in the blog post I linked you in: https://github.com/symfony/symfony/pull/33584#issuecomment-531598303
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-09-22T20:33:31Z
+
+I am not talking about the security issue here, but about the readability for the developer.
+
+I do not intend to modify the code because someone does not understand how is_granted work ... and as I mentioned - changing into an expression as string is unreadable ... isn't ?
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2019-09-22T21:17:27Z
+
+For voting on multiple attributes isn't there access decision strategy. https://symfony.com/doc/current/security/voters.html#changing-the-access-decision-strategy
+
+I don't understand why would it confuse a developer whether multiple attributes are ORed or ANDed
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-22T22:36:12Z
+
+@faizanakram99 no, that's for multiple voters. You can have multiple voters voting on the same security attribute (the first argument of `isGranted()`). The access decision strategy decides when it should grant access: if all voters say "allowed!", if most of the voters says "allowed!" or if just one allows.
+
+What a voter does to decide whether it allows multiple attributes is up to the logic in the voter. A voter just gets all attributes at the same time (e.g. `['ROLE_USER', 'ROLE_ADMIN']`) and it's up to the logic in the voter whether all attributes should pass or only one.
+
+This creates confusion, see for instance https://github.com/LeaseWeb/LswSecureControllerBundle/issues/4 for a real example: The voter in that bundle only says "allowed!" if all attributes pass. This is exactly different from the voters in core (RoleVoter, RoleHierarchyVoter, AuthenticationVoter), which allow as soon as one attribute passes. The decision strategy has nothing to do with this.
+
+Can you see how this is confusing? :wink:
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-09-22T22:39:10Z
+
+> I do not intend to modify the code because someone does not understand how is_granted work ... and as I mentioned - changing into an expression as string is unreadable ... isn't ?
+
+I'm sorry, but you keep skipping the good alternative (which is far better than voting on multiple attributes in the first place). A blog post, documentation and an example has been provided to you in the past comments by @linaori and me. I don't think it's worth repeating my and your arguments again, they are clear enough.
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-09-23T03:23:41Z
+
+Nevermind. Keep these changes.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-23T07:32:22Z
+
+@michaljusiega I know that you are a bit disappointed by this, but please, let me tell you something.
+
+The new proposed way of working is worse than your current way of working. However, Wouter has shown you [in this comment](https://github.com/symfony/symfony/pull/33584#issuecomment-533904263) a better way of working which you can use today and also when these changes are implemented:
+
+Before:
+
+```
+@IsGranted(["ROLE_SECTION_A", "ROLE_SECTION_B"])
+is_granted(["ROLE_SECTION_A", "ROLE_SECTION_B"])
+```
+
+After:
+
+```
+@IsGranted('SECTION_ACCESS', ['SECTION_A', 'SECTION_B'])
+is_granted('SECTION_ACCESS', ['SECTION_A', 'SECTION_B'])
+```
+
+Also, the good thing about [Security Voters](https://symfony.com/doc/current/security/voters.html) is that they give you a lot of power and flexibility. You can inject for example the entity manager to make database requests. You may store the permissions of each user and/or section in the database and further simplify your templates, etc.
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2019-09-23T11:39:09Z
+
+@wouterj
+Oh sorry, i confused multiple voters with multiple attributes, my bad.
+Now I see how confusing it is.
+
+So it won't affect `@Security("is_granted('attribute','subject')")` , right ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-09-23T12:28:48Z
+
+I'm for option 1 as well, good move!
+
+Don't forget the entry in UPGRADE-5.0.md ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-23T12:30:05Z
+
+@faizanakram99 no, as you are passing a single attribute in this `is_granted` call.
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2019-09-24T10:32:07Z
+
+:confused:
+
+@stof
+How would `AbstractVoter::voteOnAttribute($attribute, $subject, $token)` work then ?
+or would that be deprecated as well ?
+
+atm we are using custom voter for permission checks, we pass access level (edit, view, erase) in $attribute and permission name in $subject.
+
+In our controllers we then check permissions via `is_granted` annotation
+
+e.g.  `@Security("is_granted('view', constant('Foo\\Bar\\Permission::MUTATION_CONTRACT'))")`
+
+So with this change, we would have to create separate voters (say for each permission or attribute)
+
+Am i missing something ?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-24T10:38:14Z
+
+@faizanakram99 I don't understand what you are asking for. `voteOnAttribute` is **already** voting on a single attribute (as the handling of receiving multiple attributes is abstracted in AbstractVoter). Removing support for voting on multiple attributes at once will have no impact on custom voters extending AbstractVoter.
+this whole discussion is about deprecated passing an array as the argument of `is_granted`. **All** your examples so far are passing a string, not an array
+
+---------------------------------------------------------------------------
+
+by faizanakram99 at 2019-09-24T10:47:17Z
+
+@stof
+
+Thanks, i got it.
+
+sorry, my bad, I confused single attribute with single parameter here :frowning_face:  ( also the message started with a *no*, so i thought i did something wrong :smile: )
+> @faizanakram99 no, as you are passing a single attribute in this is_granted call.
+
+nvm, all is good.
+
+Thanks again

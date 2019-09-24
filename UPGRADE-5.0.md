@@ -56,7 +56,7 @@ Debug
 
  * Removed the `Debug` class, use the one from the `ErrorRenderer` component instead
  * Removed the `FlattenException` class, use the one from the `ErrorRenderer` component instead
- * Removed the component component in favor of the `ErrorHandler` component
+ * Removed the component in favor of the `ErrorHandler` component
 
 DependencyInjection
 -------------------
@@ -122,7 +122,7 @@ DoctrineBridge
  * Passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field will throw an exception, pass `null` instead
  * Not passing an `IdReader` to the `DoctrineChoiceLoader` when the query can be optimized with single id field will not apply any optimization
  * The `RegistryInterface` has been removed.
- * Added a new `getMetadataDriverClass` method in `AbstractDoctrineExtension` to replace class parameters. 
+ * Added a new `getMetadataDriverClass` method in `AbstractDoctrineExtension` to replace class parameters.
 
 DomCrawler
 ----------
@@ -332,7 +332,7 @@ HttpKernel
     }
     ```
 
-   As many bundles must be compatible with a range of Symfony versions, the current 
+   As many bundles must be compatible with a range of Symfony versions, the current
    directory convention is not deprecated yet, but it will be in the future.
  * Removed the second and third argument of `KernelInterface::locateResource`
  * Removed the second and third argument of `FileLocator::__construct`

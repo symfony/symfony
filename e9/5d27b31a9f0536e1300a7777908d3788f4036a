@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-09-24T14:02:55Z
+
+@javiereguiluz The one in the `4.4` branch should contain the same entries as in the `4.3` branch plus all the changes that are forced by deprecations introduced in 4.4.

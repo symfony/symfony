@@ -45,6 +45,8 @@ switch ($vars['REQUEST_URI']) {
         header('HTTP/1.1 103 Early Hints');
         header('Link: </style.css>; rel=preload; as=style', false);
         header('Link: </script.js>; rel=preload; as=script', false);
+        flush();
+        usleep(1000);
         echo "HTTP/1.1 200 OK\r\n";
         echo "Date: Fri, 26 May 2017 10:02:11 GMT\r\n";
         echo "Content-Length: 13\r\n";

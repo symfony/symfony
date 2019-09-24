@@ -65,7 +65,11 @@ final class NativeResponse implements ResponseInterface
             }
 
             if (null === $response->remaining) {
-                self::stream([$response])->current();
+                foreach (self::stream([$response]) as $chunk) {
+                    if ($chunk->isFirst()) {
+                        break;
+                    }
+                }
             }
         };
     }

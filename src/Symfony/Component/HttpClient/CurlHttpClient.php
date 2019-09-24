@@ -355,7 +355,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
      */
     private static function acceptPushForRequest(string $method, array $options, PushedResponse $pushedResponse): bool
     {
-        if ($options['body'] || $method !== $pushedResponse->requestHeaders[':method'][0]) {
+        if ('' !== $options['body'] || $method !== $pushedResponse->requestHeaders[':method'][0]) {
             return false;
         }
 

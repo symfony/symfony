@@ -1615,6 +1615,206 @@ EOF;
         return $tests;
     }
 
+    /**
+     * @dataProvider inlineNotationSpanningMultipleLinesProvider
+     */
+    public function testInlineNotationSpanningMultipleLines($expected, string $yaml)
+    {
+        $this->assertEquals($expected, $this->parser->parse($yaml));
+    }
+
+    public function inlineNotationSpanningMultipleLinesProvider(): array
+    {
+        return [
+            'mapping' => [
+                ['foo' => 'bar', 'bar' => 'baz'],
+                <<<YAML
+{
+    'foo': 'bar',
+    'bar': 'baz'
+}
+YAML
+                ,
+            ],
+            'sequence' => [
+                ['foo', 'bar'],
+                <<<YAML
+[
+    'foo',
+    'bar'
+]
+YAML
+                ,
+            ],
+            'sequence nested in mapping' => [
+                ['foo' => ['bar', 'foobar'], 'bar' => ['baz']],
+                <<<YAML
+{
+    'foo': ['bar', 'foobar'],
+    'bar': ['baz']
+}
+YAML
+                ,
+            ],
+            'sequence spanning multiple lines nested in mapping' => [
+                [
+                    'foobar' => [
+                        'foo',
+                        'bar',
+                        'baz',
+                    ],
+                ],
+                <<<YAML
+foobar: [foo,
+    bar,
+    baz
+]
+YAML
+                ,
+            ],
+            'nested sequence nested in mapping starting on the same line' => [
+                [
+                    'foo' => [
+                        'foobar',
+                        [
+                            'bar',
+                            'baz',
+                        ],
+                    ],
+                ],
+                <<<YAML
+foo: [foobar, [
+    bar,
+    baz
+]]
+YAML
+                ,
+            ],
+            'nested sequence nested in mapping starting on the following line' => [
+                [
+                    'foo' => [
+                        'foobar',
+                        [
+                            'bar',
+                            'baz',
+                        ],
+                    ],
+                ],
+                <<<YAML
+foo: [foobar,
+    [
+        bar,
+        baz
+]]
+YAML
+                ,
+            ],
+            'mapping nested in sequence' => [
+                ['foo', ['bar' => 'baz']],
+                <<<YAML
+[
+    'foo',
+    {
+        'bar': 'baz'
+    }
+]
+YAML
+                ,
+            ],
+            'mapping spanning multiple lines nested in sequence' => [
+                [
+                    [
+                        'foo' => 'bar',
+                        'bar' => 'baz',
+                    ],
+                ],
+                <<<YAML
+- {
+    foo: bar,
+    bar: baz
+}
+YAML
+                ,
+            ],
+            'nested mapping nested in sequence starting on the same line' => [
+                [
+                    [
+                        'foo' => [
+                            'bar' => 'foobar',
+                        ],
+                        'bar' => 'baz',
+                    ],
+                ],
+                <<<YAML
+- { foo: {
+        bar: foobar
+    },
+    bar: baz
+}
+YAML
+                ,
+            ],
+            'nested mapping nested in sequence starting on the following line' => [
+                [
+                    [
+                        'foo' => [
+                            'bar' => 'foobar',
+                        ],
+                        'bar' => 'baz',
+                    ],
+                ],
+                <<<YAML
+- { foo:
+    {
+        bar: foobar
+    },
+    bar: baz
+}
+YAML
+                ,
+            ],
+            'single quoted multi-line string' => [
+                "foo\nbar",
+                <<<YAML
+'foo
+
+bar'
+YAML
+                ,
+            ],
+            'double quoted multi-line string' => [
+                "foo\nbar",
+                <<<YAML
+'foo
+
+bar'
+YAML
+                ,
+            ],
+            'single-quoted multi-line mapping value' => [
+                ['foo' => "bar\nbaz"],
+                <<<YAML
+foo: 'bar
+
+baz'
+YAML
+            ],
+        ];
+    }
+
+    public function testRootLevelInlineMappingFollowedByMoreContentIsInvalid()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unable to parse at line 2 (near "foobar").');
+
+        $yaml = <<<YAML
+{ foo: bar }
+foobar
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
     public function testTaggedInlineMapping()
     {
         $this->assertEquals(new TaggedValue('foo', ['foo' => 'bar']), $this->parser->parse('!foo {foo: bar}', Yaml::PARSE_CUSTOM_TAGS));
@@ -1750,7 +1950,7 @@ YAML;
     public function testParsingIniThrowsException()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessage('Unable to parse at line 1 (near "[parameters]").');
+        $this->expectExceptionMessage('Unable to parse at line 2 (near "  foo = bar").');
         $ini = <<<INI
 [parameters]
   foo = bar

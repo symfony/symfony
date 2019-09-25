@@ -56,7 +56,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         if (!\is_array($attributes)) {
             $attributes = [$attributes];
         } else {
-            @trigger_error('Passing an array of Security attributes to '.__METHOD__.' is deprecated since Symfony 4.4. Use multiple isGranted() calls or the expression language (e.g. "has_role(...) or has_role(...)") instead.', \E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an array of Security attributes to %s() is deprecated since Symfony 4.4. Use multiple isGranted() calls or the expression language (e.g. "has_role(...) or has_role(...)") instead.', __METHOD__), E_USER_DEPRECATED);
         }
 
         return $this->accessDecisionManager->decide($token, $attributes, $subject);

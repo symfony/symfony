@@ -27,11 +27,14 @@ use ProxyManager\Proxy\ProxyInterface;
  * It can also patch classes to turn docblocks into actual return types.
  * This behavior is controlled by the SYMFONY_PATCH_TYPE_DECLARATIONS env var,
  * which is a url-encoded array with the follow parameters:
- *  - force: any value enables deprecation notices - can be any of:
+ *  - "force": any value enables deprecation notices - can be any of:
  *      - "docblock" to patch only docblock annotations
  *      - "object" to turn union types to the "object" type when possible (not recommended)
- *      - "1"/"0" to enable/disable patching of return types
- *  - php: the target version of PHP - e.g. "7.1" doesn't generate "object" types
+ *      - "1" to add all possible return types including magic methods
+ *      - "0" to add possible return types excluding magic methods
+ *  - "php": the target version of PHP - e.g. "7.1" doesn't generate "object" types
+ *  - "deprecations": "1" to trigger a deprecation notice when a child class misses a
+ *                    return type while the parent declares an "@return" annotation
  *
  * Note that patching doesn't care about any coding style so you'd better to run
  * php-cs-fixer after, with rules "phpdoc_trim_consecutive_blank_line_separation"
@@ -177,6 +180,7 @@ class DebugClassLoader
         $this->patchTypes += [
             'force' => null,
             'php' => null,
+            'deprecations' => false,
         ];
 
         if (!isset(self::$caseCheck)) {
@@ -571,7 +575,7 @@ class DebugClassLoader
 
             $forcePatchTypes = $this->patchTypes['force'];
 
-            if ($canAddReturnType = $forcePatchTypes && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
+            if ($canAddReturnType = null !== $forcePatchTypes && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
                 if ('void' !== (self::MAGIC_METHODS[$method->name] ?? 'void')) {
                     $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
                 }
@@ -600,7 +604,7 @@ class DebugClassLoader
                 if (strncmp($ns, $declaringClass, $len)) {
                     if ($canAddReturnType && 'docblock' === $this->patchTypes['force'] && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
-                    } elseif ('' !== $declaringClass && null !== $this->patchTypes['force']) {
+                    } elseif ('' !== $declaringClass && $this->patchTypes['deprecations']) {
                         $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $normalizedType, $className);
                     }
                 }

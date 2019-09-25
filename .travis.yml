@@ -22,7 +22,6 @@ env:
         - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
         - MESSENGER_REDIS_DSN=redis://127.0.0.1:7001/messages
         - SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
-        - SYMFONY_PATCH_TYPE_DECLARATIONS=force=0
 
 matrix:
     include:
@@ -299,9 +298,8 @@ install:
                   ln -sd $(realpath src/Symfony/Contracts) vendor/symfony/contracts
                   sed -i 's/"\*\*\/Tests\/"//' composer.json
                   composer install --optimize-autoloader
-                  export SYMFONY_PATCH_TYPE_DECLARATIONS=force=object
-                  php .github/patch-types.php
-                  php .github/patch-types.php # ensure the script is idempotent
+                  SYMFONY_PATCH_TYPE_DECLARATIONS=force=object php .github/patch-types.php
+                  SYMFONY_PATCH_TYPE_DECLARATIONS=force=object php .github/patch-types.php # ensure the script is idempotent
                   PHPUNIT_X="$PHPUNIT_X,legacy"
               fi
 

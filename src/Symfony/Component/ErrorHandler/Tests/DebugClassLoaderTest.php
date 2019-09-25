@@ -24,7 +24,7 @@ class DebugClassLoaderTest extends TestCase
     {
         $this->patchTypes = getenv('SYMFONY_PATCH_TYPE_DECLARATIONS');
         $this->errorReporting = error_reporting(E_ALL);
-        putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=force=0');
+        putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
         $this->loader = [new DebugClassLoader([new ClassLoader(), 'loadClass']), 'loadClass'];
         spl_autoload_register($this->loader, true, true);
     }

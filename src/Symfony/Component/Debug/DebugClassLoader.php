@@ -444,7 +444,7 @@ class DebugClassLoader
     /**
      * `realpath` on MacOSX doesn't normalize the case of characters.
      */
-    private function darwinRealpath(string $real)
+    private function darwinRealpath(string $real): string
     {
         $i = 1 + strrpos($real, '/');
         $file = substr($real, $i);

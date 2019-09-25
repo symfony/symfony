@@ -227,7 +227,7 @@ class FlattenExceptionTest extends TestCase
         );
     }
 
-    public function flattenDataProvider()
+    public function flattenDataProvider(): array
     {
         return [
             [new \Exception('test', 123), 'Exception'],
@@ -381,7 +381,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame($exception->__toString(), $flattened->getAsString());
     }
 
-    private function createException($foo)
+    private function createException($foo): \Exception
     {
         return new \Exception();
     }

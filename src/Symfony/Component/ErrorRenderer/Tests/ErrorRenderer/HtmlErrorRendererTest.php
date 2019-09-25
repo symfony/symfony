@@ -26,7 +26,7 @@ class HtmlErrorRendererTest extends TestCase
         $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception));
     }
 
-    public function getRenderData()
+    public function getRenderData(): iterable
     {
         $expectedDebug = <<<HTML
 <!-- Foo (500 Internal Server Error) -->

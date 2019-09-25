@@ -468,7 +468,7 @@ class Table
     /**
      * Renders vertical column separator.
      */
-    private function renderColumnSeparator(int $type = self::BORDER_OUTSIDE)
+    private function renderColumnSeparator(int $type = self::BORDER_OUTSIDE): string
     {
         $borders = $this->style->getBorderChars();
 
@@ -501,7 +501,7 @@ class Table
     /**
      * Renders table cell with padding.
      */
-    private function renderCell(array $row, int $column, string $cellFormat)
+    private function renderCell(array $row, int $column, string $cellFormat): string
     {
         $cell = isset($row[$column]) ? $row[$column] : '';
         $width = $this->effectiveColumnWidths[$column];
@@ -546,7 +546,7 @@ class Table
         $this->numberOfColumns = max($columns);
     }
 
-    private function buildTableRows(array $rows)
+    private function buildTableRows(array $rows): TableRows
     {
         /** @var WrappableOutputFormatterInterface $formatter */
         $formatter = $this->output->getFormatter();
@@ -580,7 +580,7 @@ class Table
             }
         }
 
-        return new TableRows(function () use ($rows, $unmergedRows) {
+        return new TableRows(function () use ($rows, $unmergedRows): \Traversable {
             foreach ($rows as $rowKey => $row) {
                 yield $this->fillCells($row);
 
@@ -784,7 +784,7 @@ class Table
         $this->numberOfColumns = null;
     }
 
-    private static function initStyles()
+    private static function initStyles(): array
     {
         $borderless = new TableStyle();
         $borderless
@@ -831,7 +831,7 @@ class Table
         ];
     }
 
-    private function resolveStyle($name)
+    private function resolveStyle($name): TableStyle
     {
         if ($name instanceof TableStyle) {
             return $name;

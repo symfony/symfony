@@ -1125,12 +1125,12 @@ class Application implements ResetInterface
     /**
      * @internal
      */
-    public function isSingleCommand()
+    public function isSingleCommand(): bool
     {
         return $this->singleCommand;
     }
 
-    private function splitStringByWidth(string $string, int $width)
+    private function splitStringByWidth(string $string, int $width): array
     {
         // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
         // additionally, array_slice() is not enough as some character has doubled width.

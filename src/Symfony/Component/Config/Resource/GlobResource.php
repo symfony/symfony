@@ -174,7 +174,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         }
     }
 
-    private function computeHash()
+    private function computeHash(): string
     {
         $hash = hash_init('md5');
 

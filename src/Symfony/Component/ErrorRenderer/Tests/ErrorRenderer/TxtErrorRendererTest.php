@@ -26,7 +26,7 @@ class TxtErrorRendererTest extends TestCase
         $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception));
     }
 
-    public function getRenderData()
+    public function getRenderData(): iterable
     {
         $expectedDebug = <<<TXT
 [title] Internal Server Error

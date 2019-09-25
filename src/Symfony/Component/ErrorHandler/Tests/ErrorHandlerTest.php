@@ -572,7 +572,7 @@ class ErrorHandlerTest extends TestCase
     /**
      * @dataProvider errorHandlerWhenLoggingProvider
      */
-    public function testErrorHandlerWhenLogging($previousHandlerWasDefined, $loggerSetsAnotherHandler, $nextHandlerIsDefined)
+    public function testErrorHandlerWhenLogging(bool $previousHandlerWasDefined, bool $loggerSetsAnotherHandler, bool $nextHandlerIsDefined)
     {
         try {
             if ($previousHandlerWasDefined) {
@@ -612,7 +612,7 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
-    public function errorHandlerWhenLoggingProvider()
+    public function errorHandlerWhenLoggingProvider(): iterable
     {
         foreach ([false, true] as $previousHandlerWasDefined) {
             foreach ([false, true] as $loggerSetsAnotherHandler) {

@@ -76,10 +76,7 @@ EOF
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    private function createDefinition()
+    private function createDefinition(): InputDefinition
     {
         return new InputDefinition([
             new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),

@@ -710,7 +710,7 @@ abstract class Client
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
 
-    private function updateServerFromUri(array $server, string $uri)
+    private function updateServerFromUri(array $server, string $uri): array
     {
         $server['HTTP_HOST'] = $this->extractHost($uri);
         $scheme = parse_url($uri, PHP_URL_SCHEME);
@@ -720,7 +720,7 @@ abstract class Client
         return $server;
     }
 
-    private function extractHost(string $uri)
+    private function extractHost(string $uri): ?string
     {
         $host = parse_url($uri, PHP_URL_HOST);
 

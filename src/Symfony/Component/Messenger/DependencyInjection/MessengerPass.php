@@ -70,6 +70,7 @@ class MessengerPass implements CompilerPassInterface
     {
         $definitions = [];
         $handlersByBusAndMessage = [];
+        $handlerToOriginalServiceIdMapping = [];
 
         foreach ($container->findTaggedServiceIds($this->handlerTag, true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
@@ -144,6 +145,8 @@ class MessengerPass implements CompilerPassInterface
                         $definitionId = $serviceId;
                     }
 
+                    $handlerToOriginalServiceIdMapping[$definitionId] = $serviceId;
+
                     foreach ($buses as $handlerBus) {
                         $handlersByBusAndMessage[$handlerBus][$message][$priority][] = [$definitionId, $options];
                     }
@@ -192,6 +195,12 @@ class MessengerPass implements CompilerPassInterface
             foreach ($busIds as $bus) {
                 if (!isset($debugCommandMapping[$bus])) {
                     $debugCommandMapping[$bus] = [];
+                }
+
+                foreach ($debugCommandMapping[$bus] as $message => $handlers) {
+                    foreach ($handlers as $key => $handler) {
+                        $debugCommandMapping[$bus][$message][$key][0] = $handlerToOriginalServiceIdMapping[$handler[0]];
+                    }
                 }
             }
             $container->getDefinition('console.command.messenger_debug')->replaceArgument(0, $debugCommandMapping);

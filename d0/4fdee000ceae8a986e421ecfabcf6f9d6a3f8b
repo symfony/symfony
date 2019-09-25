@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-03T10:32:53Z
+
+The HTML standard allows anything for the `name` attribute: see https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fe-name
+
+But I guess we're restricting here because this name is used as part of things like Twig block names? In any case, the no-uppercase-for-first-character restriction looks odd.

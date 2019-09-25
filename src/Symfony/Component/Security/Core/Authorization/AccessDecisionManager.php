@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 
 /**
  * AccessDecisionManager is the base class for all access decision managers
@@ -58,7 +59,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
         if (\count($attributes) > 1) {
-            @trigger_error('Passing more than one Security attribute to '.__METHOD__.' is deprecated since Symfony 4.4. Use multiple decide() calls or the expression language (e.g. "has_role(...) or has_role(...)") instead.', \E_USER_DEPRECATED);
+            throw new InvalidArgumentException(sprintf('Passing more than one Security attribute to %s() is not supported.', __METHOD__));
         }
 
         return $this->{$this->strategy}($token, $attributes, $object);

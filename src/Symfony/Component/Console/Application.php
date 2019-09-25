@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
@@ -39,6 +40,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -76,6 +78,7 @@ class Application implements ResetInterface
     private $defaultCommand;
     private $singleCommand = false;
     private $initialized;
+    private $signalRegistry;
 
     public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
     {
@@ -96,6 +99,11 @@ class Application implements ResetInterface
     public function setCommandLoader(CommandLoaderInterface $commandLoader)
     {
         $this->commandLoader = $commandLoader;
+    }
+
+    public function setSignalRegistry(SignalRegistry $signalRegistry)
+    {
+        $this->signalRegistry = $signalRegistry;
     }
 
     /**
@@ -258,6 +266,17 @@ class Application implements ResetInterface
             }
 
             $command = $this->find($alternative);
+        }
+
+        if ($this->signalRegistry) {
+            foreach ($this->signalRegistry->getHandlingSignals() as $handlingSignal) {
+                $event = new ConsoleSignalEvent($command, $input, $output, $handlingSignal);
+                $onSignalHandler = function () use ($event) {
+                    $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
+                };
+
+                $this->signalRegistry->register($handlingSignal, $onSignalHandler);
+            }
         }
 
         $this->runningCommand = $command;

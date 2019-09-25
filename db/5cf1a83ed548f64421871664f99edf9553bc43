@@ -1,0 +1,294 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-27T03:37:25Z
+
+The current logic is on purpose: it makes the aliasing local, while the attached patch makes it global. Each set of resources forms a group, and the "singly implemented" property is defined *per-group* only. If this matters to you, you need to group loading resources together with a glob pattern.
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-08-27T06:37:45Z
+
+* **What would be the purpose of it?**
+It rather seems like a poor excuse made at hand to justify not risking bc break or even not putting effort for too few Symfony users.
+* Documentation does not mention it
+It event looks like there is no documentation except for one green box at the end of https://symfony.com/doc/master/service_container/autowiring.html#working-with-interfaces which point to a blog article which doesn't even mention singly implemented interfaces. This whole *singly implemented* logic looks like a quick win/hack implemented without any broader considerations.
+* Not every project is simple Symfony app
+For example, I'm working on a more complex project where Symfony acts as strangler pattern and also as merely one of web UI/presentation layer, whereas the rest of the code is framework independent. It is not practically feasible for me to just import everything (everything that I want that is) at once with glob. This only further reinforces the notion that this whole *Component* concept is only for show (conferences?) and it doesn't really mean much, because Symfony only works properly for the most generic use case.
+* This magic works wrong
+As I said before current implementation leads to cases where interfaces are registered as services even if there is more than one **implementation**. Then Symfony will inject this to services with dependencies type hinted with an interface. This is magic (not even properly documented, I must add) gone wrong. My point is that resources aren't really autonomous - they still import services into *one* container.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-27T06:55:57Z
+
+I respect your opinion, but locality is not an excuse, it's a core design principle of the automation features of the DI component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-27T07:22:54Z
+
+I checked the doc, there is a tip note on this page about this:
+https://symfony.com/doc/current/service_container/autowiring.html#working-with-interfaces
+
+PR welcome to improve it!
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-08-27T07:25:34Z
+
+> current implementation leads to cases where interfaces are registered as services even if there is more than one **implementation** (...) resources aren't really autonomous - they still import services into one container.
+
+*"Autonomous"*, in other words: *"local"*
+How in your opinion is current implementataion *local*? Resources affect the *whole* container.
+
+---
+
+Yeah, your second comment only shows you didn't read what I wrote - I posted the same link.
+
+The green box:
+> When using a service definition prototype, if only one service is discovered that implements an interface, and that interface is also discovered at the same time, configuring the alias is not mandatory and Symfony will automatically create one.
+
+It links to a blog post.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-27T07:31:33Z
+
+Could you please open a doc issue? I agree a link to a blog post is not the best.
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-08-27T08:14:59Z
+
+No, sorry - green box in documentation isn't the way to fix this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-27T08:40:53Z
+
+That's why a doc issue would be great: to figure out the best way to document this. But anyway, things escalated pretty quickly here so better move on I agree.
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-08-29T22:11:02Z
+
+It doesn't matter how it is documented. Consider this abstract, simple example:
+
+```
+daniel@box:~/dir$ tree
+.
+├── Bar
+│   └── FooImplementation2.php
+├── Foo
+│   ├── FooImplementation1.php
+│   └── FooInterface.php
+└── Service
+    └── Service.php
+
+3 directories, 4 files
+```
+Then for some reason I have this configuration (notice that this is technically allowed)
+```yaml
+services:
+    _defaults:
+        autowire: true
+
+    Foo\:
+        resource: './Foo/*'
+
+    Bar\:
+        resource: './Bar/*'
+```
+Then after some development/time I decide to add this:
+```yaml
+Service\Service:
+    arguments:
+        $foo: '@Foo\FooInterface'
+```
+And magically it works and the injected implementation is FooImplementation1, even though it is implied that it should work magically only if there is only one implementation, because if there is more than one it is unclear which one should be used.
+
+You are probably not inclined to see this because the most generic use case is to use one resource fo src (aka everything) and then this issue doesn't exist. But there are more advanced use cases and/or ones not utilizing whole framework (only DI component).
+
+Besides it is also not looking good in the light of this:
+
+> Isn't that magic? How does it know which service to pass me exactly? What if I have multiple services of the same instance?
+> The autowiring system was designed to be super predictable.
+
+> Ok, but autowiring makes your applications less stable. If you change one thing or make a mistake, unexpected things might happen. Isn't that a problem?
+> Symfony has always valued stability, security and predictability first. Autowiring was designed with that in mind. Specifically:
+>
+> If there is a problem wiring any argument to any service, a clear exception is thrown on the next refresh of any page, even if you don't use that service on that page. That's powerful: it is not possible to make an autowiring mistake and not realize it.
+
+source: https://symfony.com/doc/current/service_container/3.3-di-changes.html
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-30T08:57:11Z
+
+There might be away: as I mentioned before, a critical design principle is that things remain local. But local to what? E.g. rules defined under `_defaults` apply only to the very file where they are found. For singly implemented interfaces, the scope is the `resource` group. I think we could consider broadening this scope and making it match a file.
+
+The current implementation has a blurry scope ("`$this`" can span many files, but not all of them), but we can improve it to make the scope *per file*. See the `$this->instanceof` property, which already implements the appropriate initialization/reset steps.
+
+Another issue in the implementation is the call to `removeAlias()`: right now, it could remove an alias that was defined prior to considering interfaces. I'm not sure this is what we would need, but it should be fixable.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-01T12:23:58Z
+
+I'm reopening so we can consider the proposal with the precisions above.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-01T23:13:16Z
+
+I addressed the issues in second commit:
+* The scope should now be _per file_
+* Aliases won't be removed because if we assume _per file_ scope then it is not needed
+
+Let me know if this is what you meant.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-02T07:32:50Z
+
+Thank. I think we still need to remove aliases when a 2nd implementation is discovered when calling registerClasses more than one time (which corresponds to your example above.) A test case would help highlight the issue :)
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-02T07:43:16Z
+
+Yes, I also realized that it still needs to be removed - I will think about implementation soon.
+I agree about the test case, I just didn't want to add one until I'm more sure about implementation.
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-02T23:05:06Z
+
+Adding aliases is now done at the end of parsing file (aka _parseDefinitions_).
+Old test for _registerClasses_ are failing because of that.
+Test which I added are passing.
+
+* Should I also cover php config files? (I think I should)
+* Should adding aliases be in those 3 implementations, or maybe move it into another protected method in abstract file loader and call that method in implementations/tests?
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-03T19:31:49Z
+
+It took some time but I managed to make it work.
+
+* I realized that PHP file loading is tested by abstract file loader tests, so I didn't add new test cases.
+* YAML and XML file loading now have new test cases.
+* Old test cases work because I encapsulated all logic related to aliases in _registerClasses_ method.
+
+Let me know if this is enough.
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-03T20:36:03Z
+
+I have added:
+*  tests to check if previously registered aliases won't be deleted,
+* resetting logic for PHP file loader.
+
+I encapsulated resetting logic in method because I didn't want to pass down an additional 3 arrays/parameters.
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-04T10:41:49Z
+
+I know CI checks have failed but I think it is due to reasons unrelated to these changes.
+Let me know if it still needs work.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-04T17:17:33Z
+
+As we can spot during the review, moving the scope to the file level is opening new fancy edge cases. I'm not sure this is really an improvement.
+
+But I have an alternative proposal: what about allowing `resource` to be an array?
+
+Instead of:
+```yaml
+App\Adapter\:
+    resource: '../src/Adapter/*'
+App\Port\:
+    resource: '../src/Port/*'
+```
+
+you would do:
+```yaml
+App\:
+    resource:
+        - '../src/Adapter/*'
+        - '../src/Port/*'
+```
+
+?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-04T17:56:00Z
+
+Hum, my proposal wouldn't work, because the static prefix is used as the PSR-4 prefix.
+This would:
+```yaml
+App\:
+    resource:
+        - '../src/{Adapter}'
+        - '../src/{Port}'
+```
+
+this does already:
+```yaml
+App\:
+    resource: '../src/{Adapter,Port}'
+```
+
+I'm stopping here for this idea :)
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-04T19:13:23Z
+
+* I resolved the issue by checking first if an alias is already set - _I think this could be an issue even prior to these changes when automatically/implicitly registered alias for interface would override previously explicitly registered alias._
+* File loaders now also are aware when explicitly registered alias is no longer implicitly registered.
+* I updated/added tests to reflect that.
+
+CI checks failed, but again it doesn't seem to be relevant.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-04T20:22:18Z
+
+> registered alias for interface would override previously explicitly registered alias.
+
+That was on consistent with the policy that last declared rules win over previously declared ones.
+But for singly implemented interfaces, we could consider it too implicit.
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-08T21:29:59Z
+
+Looks good to me - it better models the intention/better encapsulates logic 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-09T07:11:40Z
+
+@daniel-iwaniec could you please check how we could improve the doc in relation to this PR and send one there?
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-09T21:19:41Z
+
+Documentation pull request https://github.com/symfony/symfony-docs/pull/12294
+The change is rather minimalistic but I think this is probably the only place where automatically registering singly implemented interfaces is referenced.
+
+---------------------------------------------------------------------------
+
+by daniel-iwaniec at 2019-09-12T07:55:52Z
+
+What's the state of it? Are we waiting for some release cycle, appveyor check or something else?

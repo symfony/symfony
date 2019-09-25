@@ -21,7 +21,7 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @deprecated since Symfony 4.2, use CompiledUrlMatcherDumper instead.
+ * @deprecated since Symfony 4.3, use CompiledUrlMatcherDumper instead.
  */
 class PhpMatcherDumper extends CompiledUrlMatcherDumper
 {

@@ -6,6 +6,8 @@ CHANGELOG
 
  * added support for connecting to Redis Sentinel clusters
  * added argument `$prefix` to `AdapterInterface::clear()`
+ * improved `RedisTagAwareAdapter` to support Redis server >= 2.8 and up to 4B items per tag
+ * [BC BREAK] `RedisTagAwareAdapter` is not compatible with `RedisCluster` from `Predis` anymore, use `phpredis` instead
 
 4.3.0
 -----

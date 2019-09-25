@@ -1,7 +1,8 @@
 <?php
 
 if (false === getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
-    putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=force=1&php71-compat=0');
+    echo "Please define the SYMFONY_PATCH_TYPE_DECLARATIONS env var when running this script.\n";
+    exit(1);
 }
 
 require __DIR__.'/../.phpunit/phpunit-8.3-0/vendor/autoload.php';

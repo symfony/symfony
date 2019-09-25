@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-09-24T15:29:39Z
+
+This should actually be added in BaseType, so that ButtonType also benefits from it, not only FormType.
+
+---------------------------------------------------------------------------
+
+by mcsky at 2019-09-24T15:39:26Z
+
+Good catch, PR updated
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-09-24T18:01:56Z
+
+Noticed this while working on https://github.com/symfony/symfony/pull/33573. Didn't change it because I thought it was like this on purpose and it is justified for me to offer this feature only in the theme. But by looking at https://github.com/symfony/symfony/pull/30320, it's clear the initial idea was to add the form option as well. Not really a fan of adding another theming form option though. Also, if we had this one, why don't we add the others ?

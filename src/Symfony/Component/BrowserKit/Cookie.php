@@ -55,8 +55,17 @@ class Cookie
      * @param bool        $encodedValue Whether the value is encoded or not
      * @param string|null $samesite     The cookie samesite attribute
      */
-    public function __construct(string $name, ?string $value, string $expires = null, string $path = null, string $domain = '', bool $secure = false, bool $httponly = true, bool $encodedValue = false, string $samesite = null)
-    {
+    public function __construct(
+        string $name,
+        ?string $value,
+        string $expires = null,
+        string $path = null,
+        string $domain = '',
+        bool $secure = false,
+        bool $httponly = true,
+        bool $encodedValue = false,
+        string $samesite = null
+    ) {
         if ($encodedValue) {
             $this->value = urldecode($value);
             $this->rawValue = $value;
@@ -201,6 +210,11 @@ class Cookie
         );
     }
 
+    /**
+     * @param string $dateValue
+     *
+     * @return string|null
+     */
     private static function parseDate(string $dateValue): ?string
     {
         // trim single quotes around date if present

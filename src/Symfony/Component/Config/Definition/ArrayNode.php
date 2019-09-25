@@ -55,7 +55,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $normalized = [];
 
         foreach ($value as $k => $v) {
-            if (false !== strpos($k, '-') && false === strpos($k, '_') && !\array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)) {
+            if (
+                false !== strpos($k, '-')
+                && false === strpos($k, '_')
+                && !\array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)
+            ) {
                 $normalized[$normalizedKey] = $v;
             } else {
                 $normalized[$k] = $v;

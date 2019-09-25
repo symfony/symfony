@@ -50,7 +50,9 @@ abstract class Client
     private $isMainRequest = true;
 
     /**
-     * @param array $server The server parameters (equivalent of $_SERVER)
+     * @param array          $server The server parameters (equivalent of $_SERVER)
+     * @param History|null   $history
+     * @param CookieJar|null $cookieJar
      */
     public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
@@ -71,6 +73,7 @@ abstract class Client
 
     /**
      * Sets whether to automatically follow meta refresh redirects or not.
+     * @param bool $followMetaRefresh
      */
     public function followMetaRefresh(bool $followMetaRefresh = true)
     {
@@ -160,8 +163,26 @@ abstract class Client
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
-    public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
-    {
+    /**
+     * @param string      $method
+     * @param string      $uri
+     * @param array       $parameters
+     * @param array       $files
+     * @param array       $server
+     * @param string|null $content
+     * @param bool        $changeHistory
+     *
+     * @return Crawler
+     */
+    public function xmlHttpRequest(
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $files = [],
+        array $server = [],
+        string $content = null,
+        bool $changeHistory = true
+    ): Crawler {
         $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
 
         try {
@@ -279,7 +300,10 @@ abstract class Client
     /**
      * Clicks on a given link.
      *
+     * @param Link $link
+     *
      * @return Crawler
+     * @throws \ReflectionException
      */
     public function click(Link $link)
     {
@@ -294,6 +318,9 @@ abstract class Client
      * Clicks the first link (or clickable image) that contains the given text.
      *
      * @param string $linkText The text of the link or the alt attribute of the clickable image
+     *
+     * @return Crawler
+     * @throws \ReflectionException
      */
     public function clickLink(string $linkText): Crawler
     {
@@ -307,10 +334,11 @@ abstract class Client
     /**
      * Submits a form.
      *
-     * @param array $values           An array of form field values
-     * @param array $serverParameters An array of server parameters
+     * @param Form  $form
+     * @param array $values An array of form field values
      *
      * @return Crawler
+     * @throws \ReflectionException
      */
     public function submit(Form $form, array $values = []/*, array $serverParameters = []*/)
     {
@@ -332,11 +360,19 @@ abstract class Client
      * @param array  $fieldValues      Use this syntax: ['my_form[name]' => '...', 'my_form[email]' => '...']
      * @param string $method           The HTTP method used to submit the form
      * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include a HTTP_ prefix as PHP does)
+     *
+     * @return Crawler
+     * @throws \ReflectionException
      */
-    public function submitForm(string $button, array $fieldValues = [], string $method = 'POST', array $serverParameters = []): Crawler
-    {
+    public function submitForm(
+        string $button,
+        array $fieldValues = [],
+        string $method = 'POST',
+        array $serverParameters = []
+    ): Crawler {
         if (null === $this->crawler) {
-            throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
+            throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".',
+                __METHOD__));
         }
 
         $buttonNode = $this->crawler->selectButton($button);
@@ -358,8 +394,15 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true)
-    {
+    public function request(
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $files = [],
+        array $server = [],
+        string $content = null,
+        bool $changeHistory = true
+    ) {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;
         } else {
@@ -373,11 +416,13 @@ abstract class Client
         $server = array_merge($this->server, $server);
 
         if (!empty($server['HTTP_HOST']) && null === parse_url($originalUri, PHP_URL_HOST)) {
-            $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
+            $uri = preg_replace('{^(https?\://)' . preg_quote($this->extractHost($uri)) . '}',
+                '${1}' . $server['HTTP_HOST'], $uri);
         }
 
         if (isset($server['HTTPS']) && null === parse_url($originalUri, PHP_URL_SCHEME)) {
-            $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
+            $uri = preg_replace('{^' . parse_url($uri, PHP_URL_SCHEME) . '}', $server['HTTPS'] ? 'https' : 'http',
+                $uri);
         }
 
         if (!$this->history->isEmpty()) {
@@ -390,7 +435,8 @@ abstract class Client
 
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
-        $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
+        $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri),
+            $server, $content);
 
         $this->request = $this->filterRequest($this->internalRequest);
 
@@ -422,7 +468,8 @@ abstract class Client
             return $this->crawler = $this->followRedirect();
         }
 
-        $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
+        $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(),
+            $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
 
         // Check for meta refresh redirect
         if ($this->followMetaRefresh && null !== $redirect = $this->getMetaRefreshUrl()) {
@@ -494,6 +541,8 @@ abstract class Client
 
     /**
      * Filters the BrowserKit request to the origin one.
+     *
+     * @param Request $request
      *
      * @return object An origin request instance
      */
@@ -701,7 +750,8 @@ abstract class Client
     /**
      * Makes a request from a Request object directly.
      *
-     * @param bool $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param Request $request
+     * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      */

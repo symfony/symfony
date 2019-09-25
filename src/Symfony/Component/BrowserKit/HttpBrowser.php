@@ -28,10 +28,21 @@ class HttpBrowser extends AbstractBrowser
 {
     private $client;
 
-    public function __construct(HttpClientInterface $client = null, History $history = null, CookieJar $cookieJar = null)
-    {
+    /**
+     * HttpBrowser constructor.
+     *
+     * @param HttpClientInterface|null $client
+     * @param History|null             $history
+     * @param CookieJar|null           $cookieJar
+     */
+    public function __construct(
+        HttpClientInterface $client = null,
+        History $history = null,
+        CookieJar $cookieJar = null
+    ) {
         if (!$client && !class_exists(HttpClient::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".', __CLASS__));
+            throw new \LogicException(sprintf('You cannot use "%s" as the HttpClient component is not installed. Try running "composer require symfony/http-client".',
+                __CLASS__));
         }
 
         $this->client = $client ?? HttpClient::create();
@@ -54,6 +65,8 @@ class HttpBrowser extends AbstractBrowser
     }
 
     /**
+     * @param Request $request
+     *
      * @return array [$body, $headers]
      */
     private function getBodyAndExtraHeaders(Request $request): array
@@ -96,6 +109,11 @@ class HttpBrowser extends AbstractBrowser
         return [http_build_query($fields, '', '&', PHP_QUERY_RFC1738), ['Content-Type' => 'application/x-www-form-urlencoded']];
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
     private function getHeaders(Request $request): array
     {
         $headers = [];

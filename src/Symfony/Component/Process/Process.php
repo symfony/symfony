@@ -363,7 +363,7 @@ class Process implements \IteratorAggregate
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @return $this
+     * @return static
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running

@@ -99,7 +99,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         return $this->authenticateViaGuard($guardAuthenticator, $token);
     }
 
-    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)
+    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token): GuardTokenInterface
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
@@ -134,7 +134,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         return $authenticatedToken;
     }
 
-    private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token)
+    private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token): ?AuthenticatorInterface
     {
         // find the *one* GuardAuthenticator that this token originated from
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {

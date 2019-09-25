@@ -90,7 +90,7 @@ class SendersLocatorTest extends TestCase
         $this->assertSame(['dummy' => $sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
     }
 
-    private function createContainer(array $senders)
+    private function createContainer(array $senders): ContainerInterface
     {
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->any())

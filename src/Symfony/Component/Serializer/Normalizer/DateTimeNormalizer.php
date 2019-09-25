@@ -154,7 +154,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         return $formattedErrors;
     }
 
-    private function getTimezone(array $context)
+    private function getTimezone(array $context): ?\DateTimeZone
     {
         $dateTimeZone = $context[self::TIMEZONE_KEY] ?? $this->defaultContext[self::TIMEZONE_KEY];
 

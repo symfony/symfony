@@ -119,7 +119,7 @@ class DoctrineReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelope->getMessage());
     }
 
-    private function createDoctrineEnvelope()
+    private function createDoctrineEnvelope(): array
     {
         return [
             'id' => 1,

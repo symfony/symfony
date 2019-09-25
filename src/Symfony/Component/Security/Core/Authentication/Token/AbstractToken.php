@@ -299,7 +299,7 @@ abstract class AbstractToken implements TokenInterface
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
     }
 
-    private function hasUserChanged(UserInterface $user)
+    private function hasUserChanged(UserInterface $user): bool
     {
         if (!($this->user instanceof UserInterface)) {
             throw new \BadMethodCallException('Method "hasUserChanged" should be called when current user class is instance of "UserInterface".');

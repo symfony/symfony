@@ -73,7 +73,7 @@ class AmqpReceiverTest extends TestCase
         $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
     }
 
-    private function createAMQPEnvelope()
+    private function createAMQPEnvelope(): \AMQPEnvelope
     {
         $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');

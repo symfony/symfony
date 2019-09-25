@@ -164,7 +164,7 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertEquals(0, $sut->getRequestCount());
     }
 
-    private function httpClientThatHasTracedRequests($tracedRequests)
+    private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient
     {
         $httpClient = new TraceableHttpClient(new NativeHttpClient());
 

@@ -276,7 +276,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     /**
      * @internal
      */
-    protected function createRequest($pathinfo)
+    protected function createRequest(string $pathinfo): ?Request
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             return null;

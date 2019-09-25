@@ -82,7 +82,7 @@ class IcuResFileDumper extends FileDumper
         return $header.$root.$data;
     }
 
-    private function writePadding(string $data)
+    private function writePadding(string $data): ?string
     {
         $padding = \strlen($data) % 4;
 

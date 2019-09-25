@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Doctrine;
 
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
@@ -63,7 +64,7 @@ class Connection
         return $this->configuration;
     }
 
-    public static function buildConfiguration($dsn, array $options = [])
+    public static function buildConfiguration(string $dsn, array $options = []): array
     {
         if (false === $components = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The given Doctrine Messenger DSN "%s" is invalid.', $dsn));
@@ -279,7 +280,7 @@ class Connection
             ->from($this->configuration['table_name'], 'm');
     }
 
-    private function executeQuery(string $sql, array $parameters = [])
+    private function executeQuery(string $sql, array $parameters = []): Statement
     {
         $stmt = null;
         try {
@@ -327,7 +328,7 @@ class Connection
         return $schema;
     }
 
-    public static function formatDateTime(\DateTimeInterface $dateTime)
+    public static function formatDateTime(\DateTimeInterface $dateTime): string
     {
         return $dateTime->format('Y-m-d\TH:i:s');
     }

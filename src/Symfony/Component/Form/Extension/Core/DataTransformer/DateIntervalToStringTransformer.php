@@ -94,7 +94,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
         return $dateInterval;
     }
 
-    private function isISO8601(string $string)
+    private function isISO8601(string $string): bool
     {
         return preg_match('/^P(?=\w*(?:\d|%\w))(?:\d+Y|%[yY]Y)?(?:\d+M|%[mM]M)?(?:(?:\d+D|%[dD]D)|(?:\d+W|%[wW]W))?(?:T(?:\d+H|[hH]H)?(?:\d+M|[iI]M)?(?:\d+S|[sS]S)?)?$/', $string);
     }

@@ -202,7 +202,7 @@ class CsrfTokenManagerTest extends TestCase
         return $data;
     }
 
-    private function getGeneratorAndStorage()
+    private function getGeneratorAndStorage(): array
     {
         return [
             $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface')->getMock(),

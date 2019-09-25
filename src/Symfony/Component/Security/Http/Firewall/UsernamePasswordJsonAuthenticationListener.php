@@ -168,7 +168,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         return $response;
     }
 
-    private function onFailure(Request $request, AuthenticationException $failed)
+    private function onFailure(Request $request, AuthenticationException $failed): Response
     {
         if (null !== $this->logger) {
             $this->logger->info('Authentication request failed.', ['exception' => $failed]);

@@ -34,48 +34,6 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertSame($expected, $manager->decide($token, ['ROLE_FOO']));
     }
 
-    /**
-     * @dataProvider getStrategiesWith2RolesTests
-     */
-    public function testLegacyStrategiesWith2Roles($token, $strategy, $voter, $expected)
-    {
-        $manager = new AccessDecisionManager([$voter], $strategy);
-
-        $this->assertSame($expected, $manager->decide($token, ['ROLE_FOO', 'ROLE_BAR']));
-    }
-
-    public function getStrategiesWith2RolesTests()
-    {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
-
-        return [
-            [$token, 'affirmative', $this->getVoter(VoterInterface::ACCESS_DENIED), false],
-            [$token, 'affirmative', $this->getVoter(VoterInterface::ACCESS_GRANTED), true],
-
-            [$token, 'consensus', $this->getVoter(VoterInterface::ACCESS_DENIED), false],
-            [$token, 'consensus', $this->getVoter(VoterInterface::ACCESS_GRANTED), true],
-
-            [$token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_DENIED), false],
-            [$token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_GRANTED), false],
-            [$token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_DENIED), false],
-            [$token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_GRANTED), true],
-        ];
-    }
-
-    protected function getVoterFor2Roles($token, $vote1, $vote2)
-    {
-        $voter = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface')->getMock();
-        $voter->expects($this->any())
-              ->method('vote')
-              ->willReturnMap([
-                  [$token, null, ['ROLE_FOO'], $vote1],
-                  [$token, null, ['ROLE_BAR'], $vote2],
-              ])
-        ;
-
-        return $voter;
-    }
-
     public function getStrategyTests()
     {
         return [

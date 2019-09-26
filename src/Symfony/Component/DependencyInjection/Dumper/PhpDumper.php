@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArguments;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphNode;
@@ -1614,6 +1615,26 @@ EOF;
             $this->definitionVariables = $this->referenceVariables = null;
 
             try {
+                if ($value instanceof TaggedVariadicArguments) {
+                    $code = '';
+                    foreach ($value->getValues() as $r) {
+                        $id = (string) $r;
+
+                        while ($this->container->hasAlias($id)) {
+                            $id = (string) $this->container->getAlias($id);
+                        }
+
+                        if (null !== $this->referenceVariables && isset($this->referenceVariables[$id])) {
+                            $code .= $this->dumpValue($this->referenceVariables[$id], $interpolate);
+                        } else {
+                            $code .= $this->getServiceCall($id, $r);
+                        }
+
+                        $code .= ', ';
+                    }
+
+                    return rtrim($code, ', ');
+                }
                 if ($value instanceof ServiceClosureArgument) {
                     $value = $value->getValues()[0];
                     $code = $this->dumpValue($value, $interpolate);

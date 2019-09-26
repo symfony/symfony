@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedVariadicArguments;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -713,6 +714,20 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('"!service_locator" tag only accepts maps of "@service" references in "%s".', $file));
                 }
             }
+            if ('tagged_variadic' === $value->getTag()) {
+                if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {
+                    if ($diff = array_diff(array_keys($argument), ['tag'])) {
+                        throw new InvalidArgumentException(sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "tag".', $value->getTag(), implode('"", "', $diff)));
+                    }
+
+                    return new TaggedVariadicArguments($argument['tag']);
+                } elseif (\is_string($argument) && $argument) {
+                    return new TaggedVariadicArguments($argument);
+                } else {
+                    throw new InvalidArgumentException(sprintf('"!%s" tags only accept a non empty string or an array with a key "tag" in "%s".', $value->getTag(), $file));
+                }
+            }
+
             if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator'], true)) {
                 if ('tagged' === $value->getTag()) {
                     @trigger_error('"!tagged" is deprecated since Symfony 4.4 and will be removed in 5.0, use "!tagged_iterator" instead.', E_USER_DEPRECATED);

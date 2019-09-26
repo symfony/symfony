@@ -160,7 +160,7 @@ Form
    without configuring a reference date.
  * Removed support for using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`.
  * Removed support for using the `format` option of `DateType` and `DateTimeType` when the `html5` option is enabled.
- * Using names for buttons that do not start with a letter, a digit, or an underscore leads to an exception.
+ * Using names for buttons that do not start with a lowercase letter, a digit, or an underscore leads to an exception.
  * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons leads to an
    exception.
  * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is

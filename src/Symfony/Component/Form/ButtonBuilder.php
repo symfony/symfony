@@ -63,7 +63,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
         if (preg_match('/^([^a-z0-9_].*)?(.*[^a-zA-Z0-9_\-:].*)?$/D', $name, $matches)) {
             if (isset($matches[1])) {
-                @trigger_error(sprintf('Using names for buttons that do not start with a letter, a digit, or an underscore is deprecated since Symfony 4.3 and will throw an exception in 5.0 ("%s" given).', $name), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Using names for buttons that do not start with a lowercase letter, a digit, or an underscore is deprecated since Symfony 4.3 and will throw an exception in 5.0 ("%s" given).', $name), E_USER_DEPRECATED);
             }
             if (isset($matches[2])) {
                 @trigger_error(sprintf('Using names for buttons that do not contain only letters, digits, underscores ("_"), hyphens ("-") and colons (":") ("%s" given) is deprecated since Symfony 4.3 and will throw an exception in 5.0.', $name), E_USER_DEPRECATED);

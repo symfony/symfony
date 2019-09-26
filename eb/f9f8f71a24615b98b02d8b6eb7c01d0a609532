@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ed-fruty at 2019-09-25T20:42:18Z
+
+We can't allow `string` type.
+```bash
+php -a
+php > $e = new Exception('message', 'string');
+
+PHP Warning:  Uncaught Error: Wrong parameters for Exception([string $message [, long $code [, Throwable $previous = NULL]]]) in php shell code:1
+Stack trace:
+#0 php shell code(1): Exception->__construct('message', 'string')
+#1 {main}
+  thrown in php shell code on line 1
+```
+
+PHP does not allow it.

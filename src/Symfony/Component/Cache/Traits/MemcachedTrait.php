@@ -28,7 +28,7 @@ trait MemcachedTrait
         'persistent_id' => null,
         'username' => null,
         'password' => null,
-        'serializer' => 'php',
+        \Memcached::OPT_SERIALIZER => \Memcached::SERIALIZER_PHP,
     ];
 
     private $marshaller;

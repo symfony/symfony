@@ -78,6 +78,25 @@ class MessengerPassTest extends TestCase
         );
     }
 
+    public function testFromTransportViaTagAttribute()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container
+            ->register(DummyHandler::class, DummyHandler::class)
+            ->addTag('messenger.message_handler', ['from_transport' => 'async'])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $handlersLocatorDefinition = $container->getDefinition($busId.'.messenger.handlers_locator');
+        $this->assertSame(HandlersLocator::class, $handlersLocatorDefinition->getClass());
+
+        $handlerDescriptionMapping = $handlersLocatorDefinition->getArgument(0);
+        $this->assertCount(1, $handlerDescriptionMapping);
+
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, [DummyHandler::class], [['from_transport' => 'async']]);
+    }
+
     public function testProcessHandlersByBus()
     {
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');

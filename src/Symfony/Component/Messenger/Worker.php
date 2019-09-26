@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
@@ -49,7 +50,7 @@ class Worker implements WorkerInterface
         $this->receivers = $receivers;
         $this->bus = $bus;
         $this->retryStrategies = $retryStrategies;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
         $this->logger = $logger;
     }
 

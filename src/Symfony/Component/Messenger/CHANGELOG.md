@@ -15,6 +15,7 @@ CHANGELOG
  * Added support for auto trimming of Redis streams.
  * `InMemoryTransport` handle acknowledged and rejected messages.
  * Made all dispatched worker event classes final.
+ * Added support for `from_transport` attribute on `messenger.message_handler` tag.
 
 4.3.0
 -----

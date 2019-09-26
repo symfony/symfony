@@ -267,6 +267,25 @@ abstract class Descriptor implements DescriptorInterface
         return $serviceIds;
     }
 
+    protected function sortTaggedServicesByPriority(array $services): array
+    {
+        $maxPriority = [];
+        foreach ($services as $service => $tags) {
+            $maxPriority[$service] = 0;
+            foreach ($tags as $tag) {
+                $currentPriority = $tag['priority'] ?? 0;
+                if ($maxPriority[$service] < $currentPriority) {
+                    $maxPriority[$service] = $currentPriority;
+                }
+            }
+        }
+        uasort($maxPriority, function ($a, $b) {
+            return $b <=> $a;
+        });
+
+        return array_keys($maxPriority);
+    }
+
     /**
      * Gets class description from a docblock.
      */

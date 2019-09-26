@@ -31,6 +31,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
                                                    post_max_size_message                                 
                                                    property_path                                         
                                                    required                                              
+                                                   row_attr                                              
                                                    translation_domain                                    
                                                    upload_max_size_message                               
  --------------------------- -------------------- ------------------------------ ----------------------- 

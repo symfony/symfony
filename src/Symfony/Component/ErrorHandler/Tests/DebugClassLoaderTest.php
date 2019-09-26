@@ -16,16 +16,15 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 class DebugClassLoaderTest extends TestCase
 {
-    /**
-     * @var int Error reporting level before running tests
-     */
+    private $patchTypes;
     private $errorReporting;
-
     private $loader;
 
     protected function setUp(): void
     {
+        $this->patchTypes = getenv('SYMFONY_PATCH_TYPE_DECLARATIONS');
         $this->errorReporting = error_reporting(E_ALL);
+        putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
         $this->loader = [new DebugClassLoader([new ClassLoader(), 'loadClass']), 'loadClass'];
         spl_autoload_register($this->loader, true, true);
     }
@@ -34,6 +33,7 @@ class DebugClassLoaderTest extends TestCase
     {
         spl_autoload_unregister($this->loader);
         error_reporting($this->errorReporting);
+        putenv('SYMFONY_PATCH_TYPE_DECLARATIONS'.(false !== $this->patchTypes ? '='.$this->patchTypes : ''));
     }
 
     /**

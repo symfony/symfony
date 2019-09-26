@@ -150,6 +150,7 @@ class YamlFileLoader extends FileLoader
             $this->parseDefinitions($content, $path);
         } finally {
             $this->instanceof = [];
+            $this->registerAliasesForSinglyImplementedInterfaces();
         }
     }
 

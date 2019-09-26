@@ -101,6 +101,7 @@ abstract class BaseType extends AbstractType
             'attr' => $options['attr'],
             'block_prefixes' => $blockPrefixes,
             'unique_block_prefix' => $uniqueBlockPrefix,
+            'row_attr' => $options['row_attr'],
             'translation_domain' => $translationDomain,
             'label_translation_parameters' => $labelTranslationParameters,
             'attr_translation_parameters' => $attrTranslationParameters,
@@ -125,6 +126,7 @@ abstract class BaseType extends AbstractType
             'disabled' => false,
             'label' => null,
             'label_format' => null,
+            'row_attr' => [],
             'label_translation_parameters' => [],
             'attr_translation_parameters' => [],
             'attr' => [],
@@ -134,5 +136,6 @@ abstract class BaseType extends AbstractType
 
         $resolver->setAllowedTypes('block_prefix', ['null', 'string']);
         $resolver->setAllowedTypes('attr', 'array');
+        $resolver->setAllowedTypes('row_attr', 'array');
     }
 }

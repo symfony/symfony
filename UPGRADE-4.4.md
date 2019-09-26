@@ -16,41 +16,37 @@ Debug
 DependencyInjection
 -------------------
 
+ * Made singly-implemented interfaces detection be scoped by file
  * Deprecated support for short factories and short configurators in Yaml
 
    Before:
    ```yaml
    services:
-     my_service:
-       factory: factory_service:method
+       my_service:
+           factory: factory_service:method
    ```
 
    After:
    ```yaml
    services:
-     my_service:
-       factory: ['@factory_service', method]
+       my_service:
+           factory: ['@factory_service', method]
    ```
+
  * Deprecated `tagged` in favor of `tagged_iterator`
 
    Before:
    ```yaml
    services:
-       App\Handler:
-           tags: ['app.handler']
-
        App\HandlerCollection:
-           arguments: [!tagged app.handler]
+           arguments: [!tagged my_tag]
    ```
 
    After:
    ```yaml
    services:
-       App\Handler:
-       tags: ['app.handler']
-
-   App\HandlerCollection:
-       arguments: [!tagged_iterator app.handler]
+       App\HandlerCollection:
+           arguments: [!tagged_iterator my_tag]
    ```
 
  * Passing an instance of `Symfony\Component\DependencyInjection\Parameter` as class name to `Symfony\Component\DependencyInjection\Definition` is deprecated.
@@ -145,6 +141,7 @@ HttpKernel
 
    As many bundles must be compatible with a range of Symfony versions, the current 
    directory convention is not deprecated yet, but it will be in the future.
+
  * Deprecated the second and third argument of `KernelInterface::locateResource`
  * Deprecated the second and third argument of `FileLocator::__construct`
  * Deprecated loading resources from `%kernel.root_dir%/Resources` and `%kernel.root_dir%` as
@@ -283,13 +280,13 @@ TwigBundle
    Before (`templates/bundles/TwigBundle/Exception/error.jsonld.twig`):
    ```twig
    { 
-     "@id": "https://example.com",
-     "@type": "error",
-     "@context": {
-         "title": "{{ status_text }}",
-         "code": {{ status_code }},
-         "message": "{{ exception.message }}"
-     }
+       "@id": "https://example.com",
+       "@type": "error",
+       "@context": {
+           "title": "{{ status_text }}",
+           "code": {{ status_code }},
+           "message": "{{ exception.message }}"
+       }
    }
    ```
    
@@ -297,23 +294,23 @@ TwigBundle
    ```php
    class JsonLdErrorRenderer implements ErrorRendererInterface
    {
-     public static function getFormat(): string
-     {
-         return 'jsonld';
-     }
+       public static function getFormat(): string
+       {
+           return 'jsonld';
+       }
    
-     public function render(FlattenException $exception): string
-     {
-         return json_encode([
-             '@id' => 'https://example.com',
-             '@type' => 'error',
-             '@context' => [
-                 'title' => $exception->getTitle(),
-                 'code' => $exception->getStatusCode(),
-                 'message' => $exception->getMessage(),
-             ],
-         ]);
-     }
+       public function render(FlattenException $exception): string
+       {
+           return json_encode([
+               '@id' => 'https://example.com',
+               '@type' => 'error',
+               '@context' => [
+                   'title' => $exception->getTitle(),
+                   'code' => $exception->getStatusCode(),
+                   'message' => $exception->getMessage(),
+               ],
+           ]);
+       }
    }
    ```
 

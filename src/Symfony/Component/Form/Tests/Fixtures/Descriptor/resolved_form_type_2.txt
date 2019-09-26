@@ -33,6 +33,7 @@ Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
   post_max_size_message         
   property_path                 
   required                      
+  row_attr                      
   translation_domain            
   trim                          
   upload_max_size_message       

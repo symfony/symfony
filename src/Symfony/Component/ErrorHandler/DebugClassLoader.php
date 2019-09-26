@@ -24,6 +24,22 @@ use ProxyManager\Proxy\ProxyInterface;
  * and will throw an exception if a file is found but does
  * not declare the class.
  *
+ * It can also patch classes to turn docblocks into actual return types.
+ * This behavior is controlled by the SYMFONY_PATCH_TYPE_DECLARATIONS env var,
+ * which is a url-encoded array with the follow parameters:
+ *  - "force": any value enables deprecation notices - can be any of:
+ *      - "docblock" to patch only docblock annotations
+ *      - "object" to turn union types to the "object" type when possible (not recommended)
+ *      - "1" to add all possible return types including magic methods
+ *      - "0" to add possible return types excluding magic methods
+ *  - "php": the target version of PHP - e.g. "7.1" doesn't generate "object" types
+ *  - "deprecations": "1" to trigger a deprecation notice when a child class misses a
+ *                    return type while the parent declares an "@return" annotation
+ *
+ * Note that patching doesn't care about any coding style so you'd better to run
+ * php-cs-fixer after, with rules "phpdoc_trim_consecutive_blank_line_separation"
+ * and "no_superfluous_phpdoc_tags" enabled typically.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>
  * @author Nicolas Grekas <p@tchwork.com>
@@ -141,6 +157,7 @@ class DebugClassLoader
     private $isFinder;
     private $loaded = [];
     private $patchTypes;
+
     private static $caseCheck;
     private static $checkedClasses = [];
     private static $final = [];
@@ -160,6 +177,11 @@ class DebugClassLoader
         $this->classLoader = $classLoader;
         $this->isFinder = \is_array($classLoader) && method_exists($classLoader[0], 'findFile');
         parse_str(getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') ?: '', $this->patchTypes);
+        $this->patchTypes += [
+            'force' => null,
+            'php' => null,
+            'deprecations' => false,
+        ];
 
         if (!isset(self::$caseCheck)) {
             $file = file_exists(__FILE__) ? __FILE__ : rtrim(realpath('.'), \DIRECTORY_SEPARATOR);
@@ -551,15 +573,14 @@ class DebugClassLoader
                 }
             }
 
-            $forcePatchTypes = $this->patchTypes['force'] ?? null;
+            $forcePatchTypes = $this->patchTypes['force'];
 
             if ($canAddReturnType = null !== $forcePatchTypes && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
                 if ('void' !== (self::MAGIC_METHODS[$method->name] ?? 'void')) {
                     $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
                 }
 
-                $canAddReturnType = ($this->patchTypes['force'] ?? false)
-                    || false !== strpos($refl->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
+                $canAddReturnType = false !== strpos($refl->getFileName(), \DIRECTORY_SEPARATOR.'Tests'.\DIRECTORY_SEPARATOR)
                     || $refl->isFinal()
                     || $method->isFinal()
                     || $method->isPrivate()
@@ -570,20 +591,20 @@ class DebugClassLoader
             }
 
             if (null !== ($returnType = self::$returnTypes[$class][$method->name] ?? self::MAGIC_METHODS[$method->name] ?? null) && !$method->hasReturnType() && !($doc && preg_match('/\n\s+\* @return +(\S+)/', $doc))) {
-                if ('void' === $returnType) {
+                list($normalizedType, $returnType, $declaringClass, $declaringFile) = \is_string($returnType) ? [$returnType, $returnType, '', ''] : $returnType;
+
+                if ('void' === $normalizedType) {
                     $canAddReturnType = false;
                 }
 
-                list($normalizedType, $returnType, $declaringClass, $declaringFile) = \is_string($returnType) ? [$returnType, $returnType, '', ''] : $returnType;
-
-                if ($canAddReturnType && 'docblock' !== ($this->patchTypes['force'] ?? false)) {
+                if ($canAddReturnType && 'docblock' !== $this->patchTypes['force']) {
                     $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                 }
 
                 if (strncmp($ns, $declaringClass, $len)) {
-                    if ($canAddReturnType && 'docblock' === ($this->patchTypes['force'] ?? false) && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
+                    if ($canAddReturnType && 'docblock' === $this->patchTypes['force'] && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
-                    } elseif ('' !== $declaringClass) {
+                    } elseif ('' !== $declaringClass && $this->patchTypes['deprecations']) {
                         $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $normalizedType, $className);
                     }
                 }
@@ -820,7 +841,7 @@ class DebugClassLoader
             } elseif ($n !== $normalizedType || !preg_match('/^\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $n)) {
                 if ($iterable) {
                     $normalizedType = $returnType = 'iterable';
-                } elseif ($object) {
+                } elseif ($object && 'object' === $this->patchTypes['force']) {
                     $normalizedType = $returnType = 'object';
                 } else {
                     // ignore multi-types return declarations
@@ -947,7 +968,7 @@ class DebugClassLoader
             }
         }
 
-        if ('docblock' === ($this->patchTypes['force'] ?? null) || ('object' === $normalizedType && ($this->patchTypes['php71-compat'] ?? false))) {
+        if ('docblock' === $this->patchTypes['force'] || ('object' === $normalizedType && '7.1' === $this->patchTypes['php'])) {
             $returnType = implode('|', $returnType);
 
             if ($method->getDocComment()) {
@@ -1015,7 +1036,7 @@ EOTXT;
 
     private function fixReturnStatements(\ReflectionMethod $method, string $returnType)
     {
-        if (($this->patchTypes['php71-compat'] ?? false) && 'object' === ltrim($returnType, '?') && 'docblock' !== ($this->patchTypes['force'] ?? null)) {
+        if ('7.1' === $this->patchTypes['php'] && 'object' === ltrim($returnType, '?') && 'docblock' !== $this->patchTypes['force']) {
             return;
         }
 
@@ -1026,7 +1047,7 @@ EOTXT;
         $fixedCode = $code = file($file);
         $i = (self::$fileOffsets[$file] ?? 0) + $method->getStartLine();
 
-        if ('?' !== $returnType && 'docblock' !== ($this->patchTypes['force'] ?? null)) {
+        if ('?' !== $returnType && 'docblock' !== $this->patchTypes['force']) {
             $fixedCode[$i - 1] = preg_replace('/\)(;?\n)/', "): $returnType\\1", $code[$i - 1]);
         }
 

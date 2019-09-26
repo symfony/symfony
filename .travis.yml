@@ -298,8 +298,8 @@ install:
                   ln -sd $(realpath src/Symfony/Contracts) vendor/symfony/contracts
                   sed -i 's/"\*\*\/Tests\/"//' composer.json
                   composer install --optimize-autoloader
-                  php .github/patch-types.php
-                  php .github/patch-types.php # ensure the script is idempotent
+                  SYMFONY_PATCH_TYPE_DECLARATIONS=force=object php .github/patch-types.php
+                  SYMFONY_PATCH_TYPE_DECLARATIONS=force=object php .github/patch-types.php # ensure the script is idempotent
                   PHPUNIT_X="$PHPUNIT_X,legacy"
               fi
 

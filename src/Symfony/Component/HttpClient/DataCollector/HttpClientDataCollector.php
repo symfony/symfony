@@ -113,7 +113,7 @@ final class HttpClientDataCollector extends DataCollector
             }
 
             $info = $trace['info'];
-            $traces[$i]['http_code'] = $info['http_code'];
+            $traces[$i]['http_code'] = $info['http_code'] ?? 0;
 
             unset($info['filetime'], $info['http_code'], $info['ssl_verify_result'], $info['content_type']);
 

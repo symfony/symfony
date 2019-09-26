@@ -166,6 +166,8 @@ class DoctrineDataCollector extends DataCollector
             }
         }
 
+        $query['params'] = $this->cloneVar($query['params']);
+
         return $query;
     }
 

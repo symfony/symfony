@@ -58,6 +58,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             throw new InvalidArgumentException(sprintf('Passing an array of Security attributes to %s() is not supported.', __METHOD__));
         }
 
-        return $this->accessDecisionManager->decide($token, (array) $attributes, $subject);
+        return $this->accessDecisionManager->decide($token, [$attributes], $subject);
     }
 }

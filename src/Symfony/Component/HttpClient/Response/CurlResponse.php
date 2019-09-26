@@ -121,15 +121,17 @@ final class CurlResponse implements ResponseInterface
 
             if (\in_array($waitFor, ['headers', 'destruct'], true)) {
                 try {
-                    self::stream([$response])->current();
+                    foreach (self::stream([$response]) as $chunk) {
+                        if ($chunk->isFirst()) {
+                            break;
+                        }
+                    }
                 } catch (\Throwable $e) {
                     // Persist timeouts thrown during initialization
                     $response->info['error'] = $e->getMessage();
                     $response->close();
                     throw $e;
                 }
-            } elseif ('content' === $waitFor && ($response->multi->handlesActivity[$response->id][0] ?? null) instanceof FirstChunk) {
-                self::stream([$response])->current();
             }
 
             curl_setopt($ch, CURLOPT_HEADERFUNCTION, null);

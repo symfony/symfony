@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-23T08:31:20Z
+
+ping @jderusse
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2019-04-23T12:58:17Z
+
+@jderusse Yep, I agree with you, this is pretty much a re-implementation of fixXmlConfig + useAttributeAsKey('name'), however because of the beforeNormalization rules that were here before, I haven't been able to find a better solution. If anyone has any ideas please, let me know. Regardless, the fact remains that currently xml configurations don't work at all.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-07-18T07:42:36Z
+
+I would rather add a check for the singular `resource` key in the existing normalization condition rather than reimplementing all other features.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2019-07-25T21:18:26Z
+
+@stof Tried your approach & you were right, the end result is now a bit cleaner https://github.com/HypeMC/symfony/commit/662d394c34b2575f9f33802f9bd56f1a292d67a4 . Not sure whether to update this PR since it's already approved or to open a new one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-25T21:19:06Z
+
+Please update!
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2019-07-25T21:34:05Z
+
+@nicolas-grekas Done.

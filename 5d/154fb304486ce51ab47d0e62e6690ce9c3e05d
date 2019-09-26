@@ -1,0 +1,574 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-09-11T10:29:39Z
+
+no way to unignore case ? and no way to know whether the current object is ignoring case ? This makes the API unusable for code wanting to deal with the string in a case sensitive way while accepting an external string object.
+
+Also should we merge this new component in 4.4, which would mean that its first release is already non-experimental ? We are not allowed to have experimental components in LTS versions, per our LTS policy.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-11T10:32:57Z
+
+> no way to unignore case ? and no way to know whether the current object is ignoring case ?
+
+`->ignoreCase()` applies only to the very next call in the fluent API chain. This should answer both your questions. See `AbstractString::__clone()`
+
+> Also should we merge this new component in 4.4
+
+That's something we need to decide indeed. On my side, I think we can make it non-experimental.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-11T10:33:08Z
+
+and what happens for all methods accepting a string as argument, when passing non-UTF-8 strings to the method on a `Utf8String` or `GraphemeString` ?
+
+Regarding the naming, should `Utf8String` be renamed to highlight it is about code points ? AFAIK, `GraphemeString` also expects the string to be in UTF-8.
+
+Note that these comments are based purely on your PR description. I haven't looked at the code yet.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-11T10:37:51Z
+
+> what happens for all methods accepting a string as argument, when passing non-UTF-8 strings to the method on a Utf8String or GraphemeString ?
+
+an `InvalidArgumentException` is thrown
+
+> should Utf8String be renamed to highlight it is about code points ?
+
+I think UTF-8 is more common vocabulary. The previous PR used `CodePoint` indeed, but this is cryptic to many, and doesn't convey the technical encoding scheme (it could use UTF-16BE/LE, etc., nothing would tell). That's why I think `Utf8String` is better.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-11T10:40:47Z
+
+@nicolas-grekas but the whole component is about UTF-8 strings. AFAICT, even BinaryString is not meant to operate on other encodings, as it does not validate that the string is valid UTF-8 before converting it to other implementations.
+Btw, this means that naming the component `String` might also be too generic.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-11T10:43:36Z
+
+> BinaryString is not meant to operate on other encodings, as it does not validate that the string is valid UTF-8 before converting it to other implementations
+
+It does, dunno why you think otherwise. If you try to convert a random binary string to UTF-8/Grapheme, you'll get an `InvalidArgumentException` too.
+
+`BinaryString` is what it tells: it can handle any binary strings and doesn't care about the encoding, like the native PHP string functions, just using an OOP API.
+
+Thus the name of the component.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-11T10:44:32Z
+
+To me, this should go as experimental in 5.0.
+
+---------------------------------------------------------------------------
+
+by drupol at 2019-09-11T10:44:36Z
+
+Definitely supporting this :-) Nice !
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-11T10:46:37Z
+
+Sorry to sound naive, but I can't find in this pull request or the previous one, some brief explanation about when/where should developers use this.
+
+Why/when should we use these classes/methods instead of the normal str_ PHP functions or the mb_str UTF8 functions? Thanks!
+
+Note: I'm not questioning this ... I just want to know where this fits in Symfony developers and Symfony itself. Thanks a lot!
+
+edit: see https://github.com/symfony/symfony/pull/33553#issuecomment-530333469
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-11T10:56:34Z
+
+For your consideration, we could turn these 4 methods:
+
+```php
+function ensureLeft(string $prefix): self
+function ensureRight(string $suffix): self
+function padLeft(int $length, string $padStr = ' '): self
+function padRight(int $length, string $padStr = ' '): self
+```
+
+Into these 2 methods if we change the order of the arguments:
+
+```php
+function padLeft(string $padStr = ' ', int $length = null): self
+function padRight(string $padStr = ' ', int $length = null): self
+```
+
+Example:
+
+```php
+// BEFORE
+$s1 = u('lorem')->ensureLeft('abc');
+// $s1 = 'abclorem'
+
+$s2 = u('lorem')->ensureRight('abc');
+// $s2 = 'loremabc'
+
+$s3 = u('lorem')->padLeft(8, 'abc');
+// $s3 = 'abcabcablorem'
+
+$s4 = u('lorem')->padRight(8, 'abc');
+// $s4 = 'loremabcabcab'
+
+// AFTER
+$s1 = u('lorem')->padLeft('abc');
+// $s1 = 'abclorem'
+
+$s2 = u('lorem')->padRight('abc');
+// $s2 = 'loremabc'
+
+$s3 = u('lorem')->padLeft('abc', 8);
+// $s3 = 'abcabcablorem'
+
+$s4 = u('lorem')->padRight('abc', 8);
+// $s4 = 'loremabcabcab'
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-11T11:08:59Z
+
+> when/where should developers use this.
+
+All the time would be fine. e.g. `$matches = $string->match('/some-regexp/)` is a much more friendly API than `preg_match('/some-regexp/', $string, $matches)` (even more if you consider error handling).
+
+More specifically, I've observed ppl randomly add an `mb_` prefix to string functions and magically expect this to fix their encoding issues. This is way too complex right now, doing it correctly is hard. e.g. the Console component deals with utf-8 strings everywhere, it's not pretty. This component would help a lot there. Twig is another place where strings are heavily manipulated and where graphemes are missing actually. It would benefit from the component too.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-11T11:11:55Z
+
+> For your consideration, we could turn these 4 methods:
+> Into these 2 methods if we change the order of the arguments:
+
+This would be totally unexpected to me. I've seen no other libraries have this API and I'm not sure it works actually.
+
+> is in your plans that the methods returning self return a new mutated reference keeping the original one intact? If not/yes, why?
+
+Absolutely! That's critical design concern, not just an implementation detail :) I added a note about it in the desription. Thanks for asking.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-11T11:19:58Z
+
+@nicolas-grekas thanks for the explanation. It's perfectly clear now!
+
+Another question: some methods are called "left", "right" instead of "prefix/suffix" or "start/end". What happens when the text is Arabic/Persian/Hebrew and uses right-to-text direction? For example, `trimRight()` removes things at the end of English text ... but at the beginning of Arabic text?
+
+---------------------------------------------------------------------------
+
+by leofeyer at 2019-09-11T11:20:17Z
+
+We have been using `tchwork/utf8` in Contao for years and it really is essential if you work with multiple languages beyond the ASCII character range. So +1 for adding this in Symfony and keep up the good work @nicolas-grekas. 👍
+
+---------------------------------------------------------------------------
+
+by Devristo at 2019-09-11T11:55:01Z
+
+It looks amazing. I am curious how it would work together with the rest of the ecosystem. Lets say compatibility with doctrine, intl, symfony/validator, etc? I am sure it will take time before it trickles down to other components, but the future seems bright ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-11T12:53:03Z
+
+> All the time would be fine. e.g. `$matches = $string->match('/some-regexp/)` is a much more friendly API than `preg_match('/some-regexp/', $string, $matches)` (even more if you consider error handling).
+>
+> More specifically, I've observed ppl randomly add an `mb_` prefix to string functions and magically expect this to fix their encoding issues. This is way too complex right now, doing it correctly is hard. e.g. the Console component deals with utf-8 strings everywhere, it's not pretty. This component would help a lot there. Twig is another place where strings are heavily manipulated and where graphemes are missing actually. It would benefit from the component too.
+
+What is the performance impact of instantiating objects to wrap the strings (hello boxing) ? Stating that Twig would be a good use case for this component leads me to that question. Twig is unlikely to switch to it if the performance impact would justify a revert soon after to optimize things.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2019-09-11T12:59:33Z
+
+One small comment about the `*Left()` and `*Right()` methods: as a lot of languages are not LTR, maybe these methods should be rather named `*Start()` and `*End()`.
+
+That would be match with `startsWith()`, and that's also the way ECMAScript has implemented this in `padStart()` and `padEnd()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-11T13:29:01Z
+
+> We have been using tchwork/utf8 in Contao for years and it really is essential
+
+@leofeyer I'm super interested in your feedback: not all methods of tchwork/utf8 are found here. Which one would you miss if any? Or could you replace the dependency by this one?
+
+> some methods are called "left", "right" instead of "prefix/suffix" or "start/end". What happens when the text is Arabic/Persian/Hebrew and uses right-to-text direction? For example, trimRight() removes things at the end of English text ... but at the beginning of Arabic text?
+
+@javiereguiluz @apfelbox I borrowed naming from other libs/languages. I think this is common enough and that we won't be smarter than our predecessors on the topic. Which means I'm recommending *not* trying to imagine new names (naming is hard) and building on the precedents.
+
+> What is the performance impact of instantiating objects to wrap the strings
+
+@stof with PHP7 getting more and more performant (honestly, I'm amazed at its speed), and PHP8 providing JIT, the performance delta is going to become ever thinner. Which means this is a consideration that will become less and less relevant. Note that I'm not suggesting Twig should migrate now :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-11T13:36:07Z
+
+@nicolas-grekas I agree to look what our predecessors did. But, beware that Python and Java were created more than 20 years ago ... so some of their ideas are not OK today. For example, modern languages like Rust do this:
+
+1) They have a `trim_right` and `trim_left` methods ... but explain that this is confusing for some languages:
+
+```
+A string is a sequence of bytes. 'Right' in this context means the last
+position of that byte string; for a language like Arabic or Hebrew which
+are 'right to left' rather than 'left to right', this will be the left
+side, not the right.
+```
+
+2) They also define `trim_start` and `trim_end`, which are easier to understand in my opinion because they trim from the beginning or from the end whatever your language is:
+
+```
+A string is a sequence of bytes. start in this context means the first
+position of that byte string; for a left-to-right language like English
+or Russian, this will be left side, and for right-to-left languages
+like Arabic or Hebrew, this will be the right side.
+```
+
+edit: see thread for follow-up https://github.com/symfony/symfony/pull/33553#discussion_r323268787
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-11T16:36:49Z
+
+Now using `folded`/`lower`/`title`/`upper` instead of `to*Case`
+
+---------------------------------------------------------------------------
+
+by kuraobi at 2019-09-11T22:01:21Z
+
+Thanks for this contribution, I'm considering switching from Laravel's `Str` to this new string API, and a Symfony alternative is very welcome in my opinon. Almost all my use cases would be covered by this API, except for one: conversion to ASCII-only characters.
+I use it mainly for string comparison where accents should be stripped, as well as for generating normalized strings in CSV output, but I think stripping accents is quite a common need.
+Laravel's `Str` used to implement it, and they very recently switched to simply wrapping [voku/portable-ascii](https://github.com/voku/portable-ascii) implementation. It's an interesting implementation for a framework because it doesn't require any specific PHP extension, though I don't know if it's the best solution (performance wise).
+Do you plan on supporting a similar method in `symfony/string` eventually, or do you consider it out of scope?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-12T07:59:06Z
+
+A little comment to mention that I think this renaming is not needed and make things confusing (except for `lower()` and `upper()`):
+
+```
+folded()/lower()/title()/upper()/camel()/snake()
+```
+
+If you want to make methods a bit shorter than `toXXXCase()`, you could use `xxxCase()`:
+
+```
+foldedCase()/lowerCase()/titleCase()/upperCase()/camelCase()/snakeCase()
+```
+
+Or even keep the original method names because they are not that long and are very expressive.
+
+---------------------------------------------------------------------------
+
+by tomasfejfar at 2019-09-12T10:34:12Z
+
+@Isinlor that's not responsibility of this class. That could be a part of `Symfony\Filesystem`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-12T19:09:24Z
+
+> folded()/lower()/title()/upper()/camel()/snake()
+
+Python is using these short names. Laravel is also using short names everywhere. And both are pretty well recognized for their DX. I think short names are better too.
+
+Thank you, everyone, for the great reviews and suggestions!
+
+---------------------------------------------------------------------------
+
+by Sarke at 2019-09-13T01:16:30Z
+
+Please consider making this compatible with https://github.com/nikic/scalar_objects
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-13T07:20:03Z
+
+For those of you like me that have difficult understanding what this "grapheme" thing is, the Rust documentation has this nice example:
+
+Consider this Hindi word: “नमस्ते”
+
+The word has these 18 bytes:
+[224, 164, 168, 224, 164, 174, 224, 164, 184, 224, 165, 141, 224, 164, 164, 224, 165, 135]
+
+The word has 6 characters (fourth and sixth are not letters):
+['न', 'म', 'स', '्', 'त', 'े']
+
+The word has 4 "grapheme clusters":
+["न", "म", "स्", "ते"]
+
+So, "grapheme cluster" is the closest concept to what a normal person would call "a letter" (although is not technically precise).
+
+- - - - -
+
+If I understand [Rust documentation about strings](https://doc.rust-lang.org/book/ch08-02-strings.html) right, there are 3 different things (bytes, utf8 and graphemes) and they chose UTF-8 as "the default thing". And strings have methods to get bytes (`.bytes()`) and utf8 chars (`.chars()`) but they don't provide a method to get "grapheme clusters" because it's too complex.
+
+- - - - -
+
+We also have "3 things": bytes, utf8 and graphemes. Could we make some of them "the default thing" to simplify everything?
+
+Moreover, even "grapheme" is the 100% correct term ... is pretty obtuse. Think of a normal web developer: they don't care about linguistics or obscure standards. They just want a very simple and concise way of working with any kind of strings, whatever their language, without any issues and in a standardized way.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-13T09:15:37Z
+
+About these method names `folded()/lower()/title()/upper()/camel()/snake()` ... after checking what other languages and techs do ... there's not a universal consensus on this ... but the shortest names are used by techs like Python and Laravel, so they are well-known among developers.
+
+I guess we'll get used to any method name pretty quickly once we start using them ... so I've changed my mind about this and I think the current names are OK 👍
+
+---------------------------------------------------------------------------
+
+by TinoDidriksen at 2019-09-13T09:56:48Z
+
+Please don't confuse the encoding UTF-8 with Unicode code points.
+
+>> should Utf8String be renamed to highlight it is about code points ?
+
+> I think UTF-8 is more common vocabulary
+
+If that is true, then it is so worryingly wrong that you must take a stance against it. Don't perpetuate this problem. UnicodeString would be correct. CodePointString would also be correct, but weird.
+
+> UTF-8 is not an implementation detail: that's the encoding that you get when you'll cast the object to a string, which is public API. Putting the encoding in the name is done on purpose, to make this explicit.
+
+Is that even in question? Everything uses UTF-8 for interchange these days. I would frankly be surprised if UnicodeString and GraphemeString did not provide UTF-8 buffers when cast to string. In the exceptionally rare case someone wants UTF-16 or UTF-32, functions can be provided for those.
+
+> If I understand [Rust documentation about strings](https://doc.rust-lang.org/book/ch08-02-strings.html) right, there are 3 different things (bytes, utf8 and graphemes) and they chose UTF-8 as "the default thing". And strings have methods to get bytes (`.bytes()`) and utf8 chars (`.chars()`) but they don't provide a method to get "grapheme clusters" because it's too complex.
+
+Rust's `.chars()` does NOT return UTF-8 chars - that's a nonsensical term. `.chars()` returns Unicode code points. It just so happens code points are identical to UTF-32 code units (not UTF-8!), but code points are not identical to graphemes.
+
+It is interesting to provide a GraphemeString that handles grapheme indexing correctly. Having a UnicodeString that handles code points correctly would also be useful. But terminology-wise Utf8String == BinaryString == plain PHP string, because UTF-8 is an encoding where Unicode code points are encoded as 1-4 code units.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-13T10:08:46Z
+
+> Rust's `.chars()` does NOT return UTF-8 chars - that's a nonsensical term. `.chars()` returns Unicode code points.
+
+Yet, the method is called `.chars()` instead of `.unicodeCodePoints()` to make it a bit human-friendly. That's the problem some of us we see here: the terminology is vast and complex. We'll need to make a great work to educate users and make all this "lingo" understandable. It will be hard 💪 ... but we'll do it 🎉
+
+---------------------------------------------------------------------------
+
+by kuraobi at 2019-09-13T10:18:28Z
+
+> > Rust's `.chars()` does NOT return UTF-8 chars - that's a nonsensical term. `.chars()` returns Unicode code points.
+>
+> Yet, the method is called `.chars()` instead of `.unicodeCodePoints()` to make it a bit human-friendly. That's the problem some of us we see here: the terminology is vast and complex. We'll need to make a great work to educate users and make all this "lingo" understandable. It will be hard 💪 ... but we'll do it 🎉
+
+I would add that if a PHP developer is willing to use a string lib instead of just basic strings, he/she probably has a use case that requires doing things properly, so he/she will probably be willing to understand exactly what he/she is doing with precise method names. Of course we must keep it as simple as possible, but not by sacrificing correctness.
+
+---------------------------------------------------------------------------
+
+by TinoDidriksen at 2019-09-13T10:28:09Z
+
+> Yet, the method is called `.chars()` instead of `.unicodeCodePoints()` to make it a bit human-friendly.
+
+Right, I forgot to elaborate that bit. A [Unicode character](https://unicode.org/glossary/#character) is a code point, so `.chars()` is perfectly fine. Characters as opposed to [graphemes](https://unicode.org/glossary/#grapheme).
+
+I fully agree the terminology is overlapping and confusing to the general public and even most of us who work with it, but perpetuating the conflation of `UTF-8/16/32 code units` with `code points/characters` is actively wrong. If the masses don't know any better, take this opportunity to educate them.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-13T13:15:55Z
+
+> `BinaryString` is what it tells: it can handle any binary strings and doesn't care about the encoding, like the native PHP string functions, just using an OOP API.
+
+Yet it can for example perform case conversions which is something you cannot do without making assumptions about the encoding. In that context, I find the name `BinaryString` confusing.
+
+A binary string in my understanding would be a rendered PNG image, a PDF document or A ZIP archive for example. But that does not seem to be the purpose of that class.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-13T14:05:42Z
+
+`BinaryString` -> `ByteString` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-15T15:21:40Z
+
+PR updated:
+- added method `contains()`
+- made `indexOf*()`, `after/before*()`, `equalsTo()`, `starts/endsWith()` accept `string|array`
+- fixed issues spotted by reviews (thanks)
+
+About the name of classes, I'm going to stick with the current ones: the proposed alternatives aren't better to me (we already considered other names in #22184 but they were more abstract, thus harder to grasp.)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-16T08:17:51Z
+
+@nicolas-grekas Don't forget to add a `.gitattributes` files with the following content:
+
+```
+/Tests export-ignore
+/phpunit.xml.dist export-ignore
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-16T19:17:25Z
+
+Now with:
+- `ascii()` and `slug()` on `Utf8String` and `GraphemeString`,
+- encoding conversion via `AbstractString::toBinary($toEncoding)` and `BinaryString::toUtf8/toGrapheme($fromEncoding)`
+- `AbstractString::width()` with ANSI escape sequences discarding logic (could be used to improve `truncate()` and `wordwrap()`.)
+
+This could deserve more tests, PRs welcome on my fork or after merge!
+We now need to investigate the failures on appveyor.
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2019-09-16T21:27:10Z
+
+> Don't forget to add a .gitattributes files with the following content:
+
+Maybe there should be a test that checks the .gitattributes files are setup correctly?
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2019-09-16T21:33:46Z
+
+Nice work. Some comments from me:
+
+1. The interface on `ascii` seems a bit clunky, and also `slug` doesn't allow someone to specify the rules they want. Maybe we need a "more automatic" version of the function that behaves like the `voku/portable-ascii` one, where you just specify the language, and go.
+2. What was the motivation behind the default wordwrap size of 75? Why not 80?
+3. What was the reason for having the constructor have a default value of the empty string. What would the use case be for a user not supplying a string?
+
+---------------------------------------------------------------------------
+
+by ausi at 2019-09-16T22:30:10Z
+
+I’m not sure if creating slugs should be part of a component that is meant for object-oriented string management. The overhead of parsing and loading huge sets of character replacement arrays, especially if they don’t get used, seems like a bad trade-off to me.
+
+How about using existing libraries for that like [cocur/slugify](https://github.com/cocur/slugify) or [ausi/slug-generator](https://github.com/ausi/slug-generator)?
+Or moving the code for creating slugs into its own class?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-17T07:54:23Z
+
+@GrahamCampbell:
+
+> The interface on ascii seems a bit clunky
+
+If by "clunky" you mean "exposes the full capabilities and semantics of the underlying ICU library", then I agree and that's on purpose ;) A low-level string library must expose these; up to other classes to make it higher level (eg providing a mapping of locales to rules)
+
+> slug doesn't allow someone to specify the rules they want.
+
+`$s->ascii($rules)->slug()` and done, do we need more?
+
+> Maybe we need a "more automatic" version of the function that behaves like the voku/portable-ascii one, where you just specify the language, and go.
+
+we could, but that should *not* prevent using the lower level capabilities (see above)
+
+> What was the motivation behind the default wordwrap size of 75? Why not 80?
+
+see defaults on https://php.net/wordwrap - but we could increase, 120 maybe?
+
+> What was the reason for having the constructor have a default value of the empty string.
+
+`(new GraphemeString())->append('foo');` - useful in programatic use cases e.g. + no downside allowing so.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-17T07:57:10Z
+
+@ausi:
+
+> I’m not sure if creating slugs should be part of a component that is meant for object-oriented string management. The overhead of parsing and loading huge sets of character replacement arrays, especially if they don’t get used, seems like a bad trade-off to me.
+
+One of my goals here is to abandon patchwork/utf8. Yet its "toAscii" method is useful to many. That's two reasons. The overhead you mention exists only when actually using the method and also only when the origin string needs advanced transliterations (basic latin transliterations don't use intl's transliterators on purpose).
+
+> How about using existing libraries for that like cocur/slugify or ausi/slug-generator?
+
+I know only about patchwork/utf8, see above :)
+But I'm happy you came here to comment and share your experience.
+
+> Or moving the code for creating slugs into its own class?
+
+Yes, that'd make sense. I think the `ascii()` method belongs to the string value objects, but the `slug()` method would be best as a locale-aware slugger service. Let's do this after merge if you don't mind?
+
+---------------------------------------------------------------------------
+
+by er1z at 2019-09-17T09:47:31Z
+
+Having a slugger inside String class would be not convenient because you cannot tweak it for your needs — eg. how does the developer specify if he wants national characters to be stripped out, transliterated or anything else?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-17T09:49:21Z
+
+Now with a base `AbstractUnicodeString` type, implemented by `Utf8String` and `GraphemeString`.
+See updated PR description.
+
+(@er1z please review the last two comments before yours, this is being discussed and answered already)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-17T11:00:26Z
+
+@symfony/mergers PR ready, tests are green as far as the component is concerned.
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2019-09-17T11:33:21Z
+
+> What was the reason for having the constructor have a default value of the empty string. What would the use case be for a user not supplying a string?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-20T08:26:26Z
+
+The PR now targets master and has `@experimental` annotations. Having PHP 7.2 as the minimum version allows using `PREG_UNMATCHED_AS_NULL`, that's been my main motivation here :)
+
+PR ready.
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2019-09-20T10:51:54Z
+
+<img width="206" alt="image" src="https://user-images.githubusercontent.com/2829600/65321787-044cc800-db9d-11e9-874f-b354faac1b90.png">
+
+This should probs be updated then. ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-20T15:45:02Z
+
+I figured out we could remove the `g()` helper and keep only `u()` and `b()`, by making `u()` (for Unicode) return a `GraphemeString`. PR updated (and green).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-20T15:47:19Z
+
+- :+1: `BinaryString` + `Utf8String` + `GraphemeString`
+- :heart: `ByteString` + `CodePointString` + `UnicodeString`
+- another combo? (which one?)
+
+:field_hockey:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-20T15:52:00Z
+
+Would you consider a third option?
+
+`ByteString` + `Utf8String` + `GraphemeString`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-23T10:27:34Z
+
+Now with more tests in the 3rd commit, courtesy of @gharlan, who spotted issues while working on it, all solved now. Thank you!

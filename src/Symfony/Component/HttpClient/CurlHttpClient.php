@@ -245,7 +245,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             if ('POST' !== $method) {
                 $curlopts[CURLOPT_UPLOAD] = true;
             }
-        } elseif ('' !== $body) {
+        } elseif ('' !== $body || 'POST' === $method) {
             $curlopts[CURLOPT_POSTFIELDS] = $body;
         }
 

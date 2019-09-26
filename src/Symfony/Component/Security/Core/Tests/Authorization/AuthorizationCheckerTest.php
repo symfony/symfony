@@ -92,4 +92,19 @@ class AuthorizationCheckerTest extends TestCase
     {
         return [[true], [false]];
     }
+
+    public function testIsGrantedWithObjectAttribute()
+    {
+        $attribute = new \stdClass();
+
+        $token = new UsernamePasswordToken('username', 'password', 'provider', ['ROLE_USER']);
+
+        $this->accessDecisionManager
+            ->expects($this->once())
+            ->method('decide')
+            ->with($this->identicalTo($token), $this->identicalTo([$attribute]))
+            ->willReturn(true);
+        $this->tokenStorage->setToken($token);
+        $this->assertTrue($this->authorizationChecker->isGranted($attribute));
+    }
 }

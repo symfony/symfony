@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
  * @author Thomas Schulz <mail@king2500.net>
  * @author Théo Fidry <theo.fidry@gmail.com>
  *
- * @experimental in 4.4
+ * @experimental in 5.0
  */
 final class Path
 {

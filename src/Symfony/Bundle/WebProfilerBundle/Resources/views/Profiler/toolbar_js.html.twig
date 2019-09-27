@@ -15,7 +15,7 @@
 
         Sfjs.load(
             'sfwdt{{ token }}',
-            '{{ path("_wdt", { "token": token }) }}',
+            '{{ path("_wdt", { "token": token })|escape('js') }}',
             function(xhr, el) {
 
                 /* Evaluate embedded scripts inside the toolbar */

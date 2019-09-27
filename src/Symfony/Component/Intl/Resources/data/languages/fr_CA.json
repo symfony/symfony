@@ -38,7 +38,6 @@
         "mwr": "marwari",
         "mwv": "mentawai",
         "nds": "bas allemand",
-        "nds_NL": "bas saxon",
         "njo": "ao naga",
         "nmg": "kwasio",
         "nwc": "newari classique",
@@ -57,8 +56,11 @@
         "sga": "vieil irlandais",
         "sly": "selayar",
         "smn": "sami d’Inari",
-        "sw_CD": "swahili congolais",
         "tru": "turoyo",
         "tzm": "tamazight"
+    },
+    "LocalizedNames": {
+        "nds_NL": "bas saxon",
+        "sw_CD": "swahili congolais"
     }
 }

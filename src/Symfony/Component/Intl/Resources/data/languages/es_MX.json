@@ -8,7 +8,6 @@
         "bho": "bhoshpuri",
         "bla": "siksika",
         "bua": "buriat",
-        "de_AT": "alemán austriaco",
         "dum": "neerlandés medieval",
         "enm": "inglés medieval",
         "eu": "euskera",
@@ -36,7 +35,6 @@
         "ss": "siswati",
         "st": "sesotho meridional",
         "sw": "suajili",
-        "sw_CD": "suajili del Congo",
         "syr": "siriaco",
         "tet": "tetún",
         "tn": "setswana",
@@ -45,5 +43,9 @@
         "wuu": "wuu",
         "xal": "kalmyk",
         "zgh": "tamazight marroquí estándar"
+    },
+    "LocalizedNames": {
+        "de_AT": "alemán austriaco",
+        "sw_CD": "suajili del Congo"
     }
 }

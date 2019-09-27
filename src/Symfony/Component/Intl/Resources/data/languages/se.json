@@ -105,7 +105,9 @@
         "vi": "vietnamgiella",
         "wa": "vallonagiella",
         "yue": "kantongiella",
-        "zh": "kiinnágiella",
+        "zh": "kiinnágiella"
+    },
+    "LocalizedNames": {
         "zh_Hans": "álki kiinágiella",
         "zh_Hant": "árbevirolaš kiinnágiella"
     }

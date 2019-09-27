@@ -52,11 +52,25 @@ final class Languages extends ResourceBundle
     /**
      * Gets the language name from its alpha2 code.
      *
+     * A full locale may be passed to obtain a more localized language name, e.g. "American English" for "en_US".
+     *
      * @throws MissingResourceException if the language code does not exist
      */
     public static function getName(string $language, string $displayLocale = null): string
     {
-        return self::readEntry(['Names', $language], $displayLocale);
+        try {
+            return self::readEntry(['Names', $language], $displayLocale);
+        } catch (MissingResourceException $e) {
+            try {
+                return self::readEntry(['LocalizedNames', $language], $displayLocale);
+            } catch (MissingResourceException $e) {
+                if (false !== $i = strrpos($language, '_')) {
+                    return self::getName(substr($language, 0, $i), $displayLocale);
+                }
+
+                throw $e;
+            }
+        }
     }
 
     /**

@@ -25,7 +25,6 @@
         "sma": "sami del sur",
         "st": "sesotho del sur",
         "sw": "swahili",
-        "sw_CD": "swahili (Congo)",
         "syr": "siríaco",
         "tet": "tetun",
         "tyv": "tuvano",
@@ -35,5 +34,8 @@
         "wuu": "wu",
         "xal": "calmuco",
         "zun": "zuni"
+    },
+    "LocalizedNames": {
+        "sw_CD": "swahili (Congo)"
     }
 }

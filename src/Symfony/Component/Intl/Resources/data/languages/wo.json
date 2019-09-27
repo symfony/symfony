@@ -32,7 +32,6 @@
         "en": "Àngale",
         "eo": "Esperantoo",
         "es": "Español",
-        "es_419": "Español (Amerik Latin)",
         "et": "Estoñiye",
         "eu": "Bask",
         "fa": "Pers",
@@ -147,7 +146,10 @@
         "wo": "Wolof",
         "yi": "Yidis",
         "yo": "Yoruba",
-        "zh": "Sinuwaa",
+        "zh": "Sinuwaa"
+    },
+    "LocalizedNames": {
+        "es_419": "Español (Amerik Latin)",
         "zh_Hans": "Sinuwaa buñ woyofal",
         "zh_Hant": "Sinuwaa bu cosaan"
     }

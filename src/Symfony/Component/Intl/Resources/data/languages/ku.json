@@ -11,7 +11,6 @@
         "am": "amharî",
         "an": "aragonî",
         "ar": "erebî",
-        "ar_001": "erebiya standard",
         "as": "asamî",
         "ast": "astûrî",
         "av": "avarî",
@@ -150,7 +149,6 @@
         "ne": "nepalî",
         "niu": "nîwî",
         "nl": "holendî",
-        "nl_BE": "flamî",
         "nn": "norwecî (nynorsk)",
         "nso": "sotoyiya bakur",
         "nv": "navajoyî",
@@ -232,5 +230,9 @@
         "yue": "kantonî",
         "zu": "zuluyî",
         "zza": "zazakî"
+    },
+    "LocalizedNames": {
+        "ar_001": "erebiya standard",
+        "nl_BE": "flamî"
     }
 }

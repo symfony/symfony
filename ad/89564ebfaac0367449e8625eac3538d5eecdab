@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by battye at 2019-07-18T11:43:25Z
+
+One important thing to consider is that it will be quite difficult to determine what constitutes a subdomain and what constitutes a root domain. Consider `google.com` vs `google.co.uk` for example. Using regex we can't assume that the second to last component is the root domain.
+
+Given that this class is `UrlValidator` and not a domain validator, I think the solution in this PR is likely to produce less false positives to users like @kptLucek than it will if it's left the way it is.
+
+https://github.com/symfony/symfony/blob/66e2cb607fe785473ff17f814af62eace6ef8275/src/Symfony/Component/Validator/Tests/Constraints/UrlValidatorTest.php#L89-L90
+
+As we already validate hostnames as `true`, and `goog_le.com` is a valid hostname (as the hosts file example shows), I don't even think it is a false positive anyway.
+
+Maybe a new domain validator would be a good feature though? I think having a domain validator is really the only way we can solve this problem in its entirety though, as a regex-only solution looks to be unfeasible. With a domain validator, we could maintain a list of known TLDs and fixed second-level domains. Perhaps it could allow for an integration with the URL validator, with an option of specifying a URL as belonging to a hostname or domain name before validating.

@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-10T16:41:44Z
+
+Do we really want to add types to `Tests`? I'm anticipating hours on merge conflicts here. On non-test classes, it's worth it, but on tests, I'd prefer doing anything else of my future contrib time...
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-10T16:44:24Z
+
+I agree with @nicolas-grekas here.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-10T17:08:58Z
+
+> Do we really want to add types to `Tests`?
+
+I find them helpful for understanding the tests.
+
+> I'm anticipating hours on merge conflicts here. On non-test classes, it's worth it, but on tests, I'd prefer doing anything else of my future contrib time...
+
+I understand. Suggestion: I‘m going to remove changes I‘ve made to test case classes that also exist on the 3.4 branch. We can hold them back until 3.4 is EOL.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-10T17:10:17Z
+
+>  I‘m going to remove changes I‘ve made to test case classes that also exist on the 3.4 branch. We can hold them back until 3.4 is EOL.
+
+that'd work for me (but if it's too tedious, you can surrender :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-18T11:45:50Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-25T09:41:59Z
+
+Changes to tests have been moved into a separate branch: https://github.com/derrabus/symfony/tree/improvement/typed-tests
+
+I've kept the changes to the Error* components though because those components are new and thus shouldn't cause merge conflicts.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-25T09:42:12Z
+
+Status: Needs Review

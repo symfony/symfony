@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-08T17:01:00Z
+
+The contribution header is the same as the other PR, should it be updated too ?
+
+Edit: updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-07T05:59:43Z
+
+Please update the test case to ensure double spaces+line breaks in the middle of the text are normalized too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-23T15:05:03Z
+
+@Simperfit Are you able to finish this PR?

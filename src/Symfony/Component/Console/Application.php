@@ -127,7 +127,7 @@ class Application implements ResetInterface
             $output = new ConsoleOutput();
         }
 
-        $renderException = function ($e) use ($output) {
+        $renderException = function (\Throwable $e) use ($output) {
             if (!$e instanceof \Exception) {
                 $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : (class_exists(LegacyFatalThrowableError::class) ? new LegacyFatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()));
             }

@@ -174,10 +174,8 @@ class Application extends BaseApplication
             if ($bundle instanceof Bundle) {
                 try {
                     $bundle->registerCommands($this);
-                } catch (\Exception $e) {
-                    $this->registrationErrors[] = $e;
                 } catch (\Throwable $e) {
-                    $this->registrationErrors[] = new FatalThrowableError($e);
+                    $this->registrationErrors[] = $e;
                 }
             }
         }
@@ -192,10 +190,8 @@ class Application extends BaseApplication
                 if (!isset($lazyCommandIds[$id])) {
                     try {
                         $this->add($container->get($id));
-                    } catch (\Exception $e) {
-                        $this->registrationErrors[] = $e;
                     } catch (\Throwable $e) {
-                        $this->registrationErrors[] = new FatalThrowableError($e);
+                        $this->registrationErrors[] = $e;
                     }
                 }
             }
@@ -211,6 +207,10 @@ class Application extends BaseApplication
         (new SymfonyStyle($input, $output))->warning('Some commands could not be registered:');
 
         foreach ($this->registrationErrors as $error) {
+            if (!$error instanceof \Exception) {
+                $error = new FatalThrowableError($error);
+            }
+
             $this->doRenderException($error, $output);
         }
     }

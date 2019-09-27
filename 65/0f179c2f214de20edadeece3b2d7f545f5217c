@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-04T10:57:29Z
+
+would it be useful to keep this information under e.g. `fallback_locale` for this state? And adjust the table to show both in this case.
+
+To further clarify i think the panel title should be `Default locale` actually
+
+https://github.com/symfony/symfony/blob/5d60221c5f5c0d448928c6e8df280ff275f878ce/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/translation.html.twig#L76
+
+---------------------------------------------------------------------------
+
+by digilist at 2019-08-11T11:55:36Z
+
+That's a good idea and I made the adjustments :)

@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by wadjeroudi at 2019-09-24T04:53:01Z
+
+with this option enabled, the untracked_token_storage becomes useless if I'm correct ?
+Does this PR really need to contains #33663 ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-24T05:11:41Z
+
+@wadjeroudi yes it's needed, we still need to be able to differentiate usages that affect the response from others. See eg penultimate sentence in the description above.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-24T09:06:23Z
+
+Now tested functionally, PR ready on my side, waiting for #33663.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-24T15:43:06Z
+
+Status: needs review

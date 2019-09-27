@@ -150,6 +150,7 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorIn
         $id = (string) $id;
         $catalogue = $this->translator->getCatalogue($locale);
         $locale = $catalogue->getLocale();
+        $fallbackLocale = null;
         if ($catalogue->defines($id, $domain)) {
             $state = self::MESSAGE_DEFINED;
         } elseif ($catalogue->has($id, $domain)) {
@@ -158,10 +159,9 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorIn
             $fallbackCatalogue = $catalogue->getFallbackCatalogue();
             while ($fallbackCatalogue) {
                 if ($fallbackCatalogue->defines($id, $domain)) {
-                    $locale = $fallbackCatalogue->getLocale();
+                    $fallbackLocale = $fallbackCatalogue->getLocale();
                     break;
                 }
-
                 $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
             }
         } else {
@@ -170,6 +170,7 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorIn
 
         $this->messages[] = [
             'locale' => $locale,
+            'fallbackLocale' => $fallbackLocale,
             'domain' => $domain,
             'id' => $id,
             'translation' => $translation,

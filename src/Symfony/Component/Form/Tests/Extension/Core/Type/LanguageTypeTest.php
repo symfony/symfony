@@ -32,8 +32,6 @@ class LanguageTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         $this->assertContainsEquals(new ChoiceView('en', 'en', 'English'), $choices);
-        $this->assertContainsEquals(new ChoiceView('en_GB', 'en_GB', 'British English'), $choices);
-        $this->assertContainsEquals(new ChoiceView('en_US', 'en_US', 'American English'), $choices);
         $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'French'), $choices);
         $this->assertContainsEquals(new ChoiceView('my', 'my', 'Burmese'), $choices);
     }
@@ -51,7 +49,6 @@ class LanguageTypeTest extends BaseTypeTest
 
         // Don't check objects for identity
         $this->assertContainsEquals(new ChoiceView('en', 'en', 'англійська'), $choices);
-        $this->assertContainsEquals(new ChoiceView('en_US', 'en_US', 'англійська (США)'), $choices);
         $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'французька'), $choices);
         $this->assertContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
     }

@@ -256,14 +256,14 @@ final class ProgressBar
         $this->redrawFreq = null !== $freq ? max(1, $freq) : null;
     }
 
-    public function preventRedrawFasterThan(float $intervalInSeconds): void
+    public function minSecondsBetweenRedraws(float $seconds): void
     {
-        $this->minSecondsBetweenRedraws = $intervalInSeconds;
+        $this->minSecondsBetweenRedraws = $seconds;
     }
 
-    public function forceRedrawSlowerThan(float $intervalInSeconds): void
+    public function maxSecondsBetweenRedraws(float $seconds): void
     {
-        $this->maxSecondsBetweenRedraws = $intervalInSeconds;
+        $this->maxSecondsBetweenRedraws = $seconds;
     }
 
     /**

@@ -92,6 +92,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['//example.com'],
+            ['//examp_le.com'],
             ['//symfony.fake/blog/'],
             ['//symfony.com/search?type=&q=url+validator'],
         ];
@@ -217,7 +218,6 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['/example.com'],
-            ['//examp_le.com'],
             ['//example.com::aa'],
             ['//example.com:aa'],
             ['//127.0.0.1:aa/'],

@@ -99,6 +99,7 @@ class DataCollectorTranslatorTest extends TestCase
               'id' => 'choice',
               'translation' => 'choice',
               'locale' => 'en',
+              'fallbackLocale' => null,
               'domain' => 'messages',
               'state' => DataCollectorTranslator::MESSAGE_MISSING,
               'parameters' => ['%count%' => 0],

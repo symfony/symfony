@@ -124,7 +124,7 @@ interface KernelInterface extends HttpKernelInterface
     /**
      * Gets the current container.
      *
-     * @return ContainerInterface|null A ContainerInterface instance or null when the Kernel is shutdown
+     * @return ContainerInterface
      */
     public function getContainer();
 

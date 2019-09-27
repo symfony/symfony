@@ -60,7 +60,7 @@ DependencyInjection
    ```php
    new Definition('%my_class%');
    ```
-   
+
 DoctrineBridge
 --------------
  * Deprecated injecting `ClassMetadataFactory` in `DoctrineExtractor`, an instance of `EntityManagerInterface` should be
@@ -96,7 +96,7 @@ FrameworkBundle
  * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
  * Not tagging service route loaders with `routing.route_loader` has been deprecated.
  * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
- 
+
 HttpClient
 ----------
 
@@ -139,7 +139,7 @@ HttpKernel
     }
     ```
 
-   As many bundles must be compatible with a range of Symfony versions, the current 
+   As many bundles must be compatible with a range of Symfony versions, the current
    directory convention is not deprecated yet, but it will be in the future.
 
  * Deprecated the second and third argument of `KernelInterface::locateResource`
@@ -148,6 +148,7 @@ HttpKernel
    fallback directories. Resources like service definitions are usually loaded relative to the
    current directory or with a glob pattern. The fallback directories have never been advocated
    so you likely do not use those in any app based on the SF Standard or Flex edition.
+ * Getting the container from a non-booted kernel is deprecated
 
 Lock
 ----
@@ -171,7 +172,7 @@ MonologBridge
 --------------
 
  * The `RouteProcessor` has been marked final.
- 
+
 Process
 -------
 
@@ -195,14 +196,14 @@ Security
  * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` should add a new `needsRehash()` method
  * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`. Please explicitly return `false` to indicate invalid credentials.
  * Deprecated passing more than one attribute to `AccessDecisionManager::decide()` and `AuthorizationChecker::isGranted()` (and indirectly the `is_granted()` Twig and ExpressionLanguage function)
- 
+
    **Before**
    ```php
    if ($this->authorizationChecker->isGranted(['ROLE_USER', 'ROLE_ADMIN'])) {
        // ...
    }
    ```
-   
+
    **After**
    ```php
    if ($this->authorizationChecker->isGranted(new Expression("has_role('ROLE_USER') or has_role('ROLE_ADMIN')"))) {}
@@ -230,18 +231,18 @@ TwigBridge
  * Deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the
    `DebugCommand::__construct()` method, swap the variables position.
  * Deprecated accepting STDIN implicitly when using the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
-   
+
 TwigBundle
 ----------
 
  * Deprecated `twig.exception_controller` configuration option, set it to "null" and use `framework.error_controller` instead:
- 
+
    Before:
    ```yaml
    twig:
        exception_controller: 'App\Controller\MyExceptionController'
    ```
-   
+
    After:
    ```yaml
    twig:
@@ -250,36 +251,36 @@ TwigBundle
    framework:
        error_controller: 'App\Controller\MyExceptionController'
    ```
- 
-   The new default exception controller will also change the error response content according to 
+
+   The new default exception controller will also change the error response content according to
    https://tools.ietf.org/html/rfc7807 for `json`, `xml`, `atom` and `txt` formats:
-   
+
    Before:
    ```json
-   { 
-       "error": { 
-           "code": 404, 
-           "message": "Sorry, the page you are looking for could not be found" 
-       } 
+   {
+       "error": {
+           "code": 404,
+           "message": "Sorry, the page you are looking for could not be found"
+       }
    }
    ```
-   
+
    After:
    ```json
-   { 
+   {
        "title": "Not Found",
-       "status": 404, 
+       "status": 404,
        "detail": "Sorry, the page you are looking for could not be found"
    }
    ```
-   
+
  * Deprecated the `ExceptionController` and `PreviewErrorController` controllers, use `ErrorController` from the HttpKernel component instead
  * Deprecated all built-in error templates, use the error renderer mechanism of the `ErrorRenderer` component
- * Deprecated loading custom error templates in non-html formats. Custom HTML error pages based on Twig keep working as before: 
+ * Deprecated loading custom error templates in non-html formats. Custom HTML error pages based on Twig keep working as before:
 
    Before (`templates/bundles/TwigBundle/Exception/error.jsonld.twig`):
    ```twig
-   { 
+   {
        "@id": "https://example.com",
        "@type": "error",
        "@context": {
@@ -289,7 +290,7 @@ TwigBundle
        }
    }
    ```
-   
+
    After (`App\ErrorRenderer\JsonLdErrorRenderer`):
    ```php
    class JsonLdErrorRenderer implements ErrorRendererInterface
@@ -298,7 +299,7 @@ TwigBundle
        {
            return 'jsonld';
        }
-   
+
        public function render(FlattenException $exception): string
        {
            return json_encode([
@@ -323,7 +324,7 @@ Validator
  * Deprecated using anything else than a `string` as the code of a `ConstraintViolation`, a `string` type-hint will
    be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`
    method in 5.0.
- * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. 
+ * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`.
    Pass it as the first argument instead.
  * The `Length` constraint expects the `allowEmptyString` option to be defined
    when the `min` option is used.
@@ -343,7 +344,7 @@ WebServerBundle
 ---------------
 
  * The bundle is deprecated and will be removed in 5.0.
- 
+
 Yaml
 ----
 

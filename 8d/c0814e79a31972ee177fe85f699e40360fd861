@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-08T15:14:05Z
+
+Can you provide a minimal application that reproduces the problem?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-27T08:45:07Z
+
+@Molkobain Can you tell us more about this issue?
+
+---------------------------------------------------------------------------
+
+by Molkobain at 2019-07-27T11:00:33Z
+
+Hello guys,
+
+What do you means by a *minimal app*?
+
+About the issue, we extended the base UrlGenerator to propagate some parameters to all generated URLs as you will see on the code snippet below. It works fine in the application, URLs are generated as expected.
+
+``` php
+<?php
+namespace Combodo\iTop\Portal\Routing;
+
+use utils;
+use Symfony\Component\Routing\Generator\UrlGenerator as BaseUrlGenerator;
+
+class UrlGenerator extends BaseUrlGenerator
+{
+	protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, array $requiredSchemes = array())
+	{
+		$parameters = $this->getExtraParams($parameters);
+
+		return parent::doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, $requiredSchemes);
+	}
+
+	private function getExtraParams($aParameters)
+	{
+		$sExecModule = utils::ReadParam('exec_module', '', false, 'string');
+		$sExecPage = utils::ReadParam('exec_page', '', false, 'string');
+		if ($sExecModule !== '' && $sExecPage !== '')
+		{
+			$aParameters['exec_module'] = $sExecModule;
+			$aParameters['exec_page'] = $sExecPage;
+		}
+
+		// Optional parameters
+		$sPortalId = utils::ReadParam('portal_id', '', false, 'string');
+		if ($sPortalId !== '')
+		{
+			$aParameters['portal_id'] = $sPortalId;
+		}
+		$sEnvSwitch = utils::ReadParam('env_switch', '', false, 'string');
+		if ($sEnvSwitch !== '')
+		{
+			$aParameters['env_switch'] = $sEnvSwitch;
+		}
+		$sDebug = utils::ReadParam('debug', '', false, 'string');
+		if ($sDebug !== '')
+		{
+			$aParameters['debug'] = $sDebug;
+		}
+
+		return $aParameters;
+	}
+}
+```
+
+The problem comes with the webprofiler in the webpage, when it tries to connect with the backend through XHR, the URL it calls is HTML entity encoded (check the "&"):
+
+```
+http://localhost/pages/exec.php/_wdt/5f220b?exec_module=itop-portal-base&amp;exec_page=index.php&amp;portal_id=itop-portal
+```
+
+The backend then cannot decode the parameters and returns an error.
+
+Edit: Pressed Alt+Enter by mistake. I'm completing the comment and poking you when its complete. Sorry
+
+---------------------------------------------------------------------------
+
+by Molkobain at 2019-07-27T11:10:17Z
+
+Edit complete @fabpot @derrabus

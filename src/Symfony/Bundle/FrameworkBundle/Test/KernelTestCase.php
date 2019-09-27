@@ -125,11 +125,15 @@ abstract class KernelTestCase extends TestCase
     protected static function ensureKernelShutdown()
     {
         if (null !== static::$kernel) {
-            $container = static::$kernel->getContainer();
-            static::$kernel->shutdown();
-            static::$booted = false;
-            if ($container instanceof ResetInterface) {
-                $container->reset();
+            $isBooted = (new \ReflectionClass(static::$kernel))->getProperty('booted');
+            $isBooted->setAccessible(true);
+            if ($isBooted->getValue(static::$kernel)) {
+                $container = static::$kernel->getContainer();
+                static::$kernel->shutdown();
+                static::$booted = false;
+                if ($container instanceof ResetInterface) {
+                    $container->reset();
+                }
             }
         }
         static::$container = null;

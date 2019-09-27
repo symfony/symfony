@@ -28,7 +28,6 @@
         "el": "Griego Simi",
         "en": "Ingles Simi",
         "es": "Español Simi",
-        "es_419": "Español Simi (Latino América)",
         "et": "Estonio Simi",
         "eu": "Euskera Simi",
         "fa": "Persa Simi",
@@ -111,7 +110,6 @@
         "sr": "Serbio Simi",
         "sv": "Sueco Simi",
         "sw": "Suajili Simi",
-        "sw_CD": "Suajili Simi (Congo (RDC))",
         "syr": "Siriaco Simi",
         "ta": "Tamil Simi",
         "te": "Telugu Simi",
@@ -132,5 +130,9 @@
         "yo": "Yoruba Simi",
         "zh": "Chino Simi",
         "zu": "Isizulu Simi"
+    },
+    "LocalizedNames": {
+        "es_419": "Español Simi (Latino América)",
+        "sw_CD": "Suajili Simi (Congo (RDC))"
     }
 }

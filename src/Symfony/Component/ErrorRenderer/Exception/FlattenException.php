@@ -292,7 +292,7 @@ class FlattenException
         return $this;
     }
 
-    private function flattenArgs(array $args, int $level = 0, int &$count = 0)
+    private function flattenArgs(array $args, int $level = 0, int &$count = 0): array
     {
         $result = [];
         foreach ($args as $key => $value) {
@@ -328,7 +328,7 @@ class FlattenException
         return $result;
     }
 
-    private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $value)
+    private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $value): string
     {
         $array = new \ArrayObject($value);
 

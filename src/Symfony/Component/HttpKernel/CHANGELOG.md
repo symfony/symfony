@@ -40,6 +40,7 @@ CHANGELOG
    so you likely do not use those in any app based on the SF Standard or Flex edition.
  * Marked all dispatched event classes as `@final`
  * Added `ErrorController` to enable the preview and error rendering mechanism
+ * Getting the container from a non-booted kernel is deprecated.
 
 4.3.0
 -----

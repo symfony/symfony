@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\RetryableException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -28,6 +29,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
+    private const MAX_RETRIES = 3;
+    private $retryingSafetyCounter = 0;
     private $connection;
     private $serializer;
 
@@ -44,6 +47,17 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
     {
         try {
             $doctrineEnvelope = $this->connection->get();
+            $this->retryingSafetyCounter = 0; // reset counter
+        } catch (RetryableException $exception) {
+            // Do nothing when RetryableException occurs less than "MAX_RETRIES"
+            // as it will likely be resolved on the next call to get()
+            // Problem with concurrent consumers and database deadlocks
+            if (++$this->retryingSafetyCounter >= self::MAX_RETRIES) {
+                $this->retryingSafetyCounter = 0; // reset counter
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
+
+            return [];
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

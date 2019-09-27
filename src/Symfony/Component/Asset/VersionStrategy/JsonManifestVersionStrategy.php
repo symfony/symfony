@@ -50,7 +50,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
         return $this->getManifestPath($path) ?: $path;
     }
 
-    private function getManifestPath(string $path)
+    private function getManifestPath(string $path): ?string
     {
         if (null === $this->manifestData) {
             if (!file_exists($this->manifestPath)) {

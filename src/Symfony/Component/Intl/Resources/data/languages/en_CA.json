@@ -3,7 +3,9 @@
     "Names": {
         "bn": "Bengali",
         "mfe": "Mauritian",
-        "ro_MD": "Moldovan",
         "tvl": "Tuvaluan"
+    },
+    "LocalizedNames": {
+        "ro_MD": "Moldovan"
     }
 }

@@ -18,6 +18,9 @@ namespace Symfony\Component\HttpFoundation;
  */
 class HeaderBag implements \IteratorAggregate, \Countable
 {
+    protected const UPPER = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    protected const LOWER = '-abcdefghijklmnopqrstuvwxyz';
+
     protected $headers = [];
     protected $cacheControl = [];
 
@@ -62,9 +65,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     public function all(string $key = null)
     {
         if (null !== $key) {
-            $key = str_replace('_', '-', strtolower($key));
-
-            return $this->headers[$key] ?? [];
+            return $this->headers[strtr($key, self::UPPER, self::LOWER)] ?? [];
         }
 
         return $this->headers;
@@ -127,7 +128,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function set(string $key, $values, bool $replace = true)
     {
-        $key = str_replace('_', '-', strtolower($key));
+        $key = strtr($key, self::UPPER, self::LOWER);
 
         if (\is_array($values)) {
             $values = array_values($values);
@@ -157,7 +158,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function has(string $key)
     {
-        return \array_key_exists(str_replace('_', '-', strtolower($key)), $this->all());
+        return \array_key_exists(strtr($key, self::UPPER, self::LOWER), $this->all());
     }
 
     /**
@@ -175,7 +176,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function remove(string $key)
     {
-        $key = str_replace('_', '-', strtolower($key));
+        $key = strtr($key, self::UPPER, self::LOWER);
 
         unset($this->headers[$key]);
 

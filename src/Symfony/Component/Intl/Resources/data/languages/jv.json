@@ -6,7 +6,6 @@
         "ak": "Akan",
         "am": "Amharik",
         "ar": "Arab",
-        "ar_001": "Arab Standar Anyar",
         "as": "Assam",
         "asa": "Asu",
         "ast": "Asturia",
@@ -47,9 +46,6 @@
         "en": "Inggris",
         "eo": "Esperanto",
         "es": "Spanyol",
-        "es_419": "Spanyol (Amerika Latin)",
-        "es_ES": "Spanyol (Eropah)",
-        "es_MX": "Spanyol (Meksiko)",
         "et": "Estonia",
         "eu": "Basque",
         "ewo": "Ewondo",
@@ -145,7 +141,6 @@
         "nds": "Jerman Non Standar",
         "ne": "Nepal",
         "nl": "Walanda",
-        "nl_BE": "Flemis",
         "nmg": "Kwasio",
         "nn": "Nynorsk Norwegia",
         "nnh": "Ngiemboon",
@@ -221,7 +216,14 @@
         "yue": "Kanton",
         "zgh": "Tamazight Moroko Standar",
         "zh": "Tyonghwa",
-        "zh_Hant": "Tyonghwa (Tradisional)",
         "zu": "Zulu"
+    },
+    "LocalizedNames": {
+        "ar_001": "Arab Standar Anyar",
+        "es_419": "Spanyol (Amerika Latin)",
+        "es_ES": "Spanyol (Eropah)",
+        "es_MX": "Spanyol (Meksiko)",
+        "nl_BE": "Flemis",
+        "zh_Hant": "Tyonghwa (Tradisional)"
     }
 }

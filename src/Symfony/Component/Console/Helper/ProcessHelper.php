@@ -129,7 +129,7 @@ class ProcessHelper extends Helper
         };
     }
 
-    private function escapeString(string $str)
+    private function escapeString(string $str): string
     {
         return str_replace('<', '\\<', $str);
     }

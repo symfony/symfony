@@ -132,12 +132,21 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Languages']) && null !== $localeBundle['Languages']) {
+            $names = [];
+            $localizedNames = [];
+            foreach (self::generateLanguageNames($localeBundle) as $language => $name) {
+                if (false === strpos($language, '_')) {
+                    $this->languageCodes[] = $language;
+                    $names[$language] = $name;
+                } else {
+                    $localizedNames[$language] = $name;
+                }
+            }
             $data = [
                 'Version' => $localeBundle['Version'],
-                'Names' => self::generateLanguageNames($localeBundle),
+                'Names' => $names,
+                'LocalizedNames' => $localizedNames,
             ];
-
-            $this->languageCodes = array_merge($this->languageCodes, array_keys($data['Names']));
 
             return $data;
         }
@@ -150,6 +159,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
+        return null;
     }
 
     /**

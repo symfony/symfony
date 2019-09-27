@@ -367,7 +367,7 @@ final class Dotenv
         }
     }
 
-    private function resolveCommands(string $value)
+    private function resolveCommands(string $value): string
     {
         if (false === strpos($value, '$')) {
             return $value;
@@ -414,7 +414,7 @@ final class Dotenv
         }, $value);
     }
 
-    private function resolveVariables(string $value)
+    private function resolveVariables(string $value): string
     {
         if (false === strpos($value, '$')) {
             return $value;

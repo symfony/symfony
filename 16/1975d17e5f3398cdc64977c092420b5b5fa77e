@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-08-14T09:58:29Z
+
+if this is decided for 3.4, then 4.4 needs another PR to patch `getAlpha3Name` as well
+
+edit: actually no, we should do 4.4 (we qualified excluding codes a new feature before as well (https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Intl/CHANGELOG.md)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-25T19:06:08Z
+
+@ro0NL Anything left in this PR before merging (a rebase is needed anyway)?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-27T10:07:12Z
+
+@fabpot done (also see #33734)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-27T10:11:30Z
+
+@ro0NL Can you rebase to get rid of #3374 commit?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-27T10:14:56Z
+
+done.

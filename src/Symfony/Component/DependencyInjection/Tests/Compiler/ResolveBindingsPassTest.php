@@ -14,9 +14,11 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
+use Symfony\Component\DependencyInjection\Compiler\DefinitionErrorExceptionPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
@@ -110,12 +112,10 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([['setDefaultLocale', ['fr']]], $definition->getMethodCalls());
     }
 
-    /**
-     * @exceptedExceptionMessage Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "setLogger()" does not exist.
-     */
     public function testWithNonExistingSetterAndBinding()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "setLogger()" does not exist.');
         $container = new ContainerBuilder();
 
         $bindings = [
@@ -128,5 +128,26 @@ class ResolveBindingsPassTest extends TestCase
 
         $pass = new ResolveBindingsPass();
         $pass->process($container);
+    }
+
+    public function testSyntheticServiceWithBind()
+    {
+        $container = new ContainerBuilder();
+        $argument = new BoundArgument('bar');
+
+        $container->register('foo', 'stdClass')
+            ->addArgument(new Reference('synthetic.service'));
+
+        $container->register('synthetic.service')
+            ->setSynthetic(true)
+            ->setBindings(['$apiKey' => $argument]);
+
+        $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class)
+            ->setBindings(['$apiKey' => $argument]);
+
+        (new ResolveBindingsPass())->process($container);
+        (new DefinitionErrorExceptionPass())->process($container);
+
+        $this->assertSame([1 => 'bar'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
     }
 }

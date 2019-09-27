@@ -135,6 +135,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
+        return null;
     }
 
     /**

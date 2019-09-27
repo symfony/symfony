@@ -595,7 +595,8 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * Pass true as the 2nd argument to normalize whitespaces.
      *
-     * @param mixed $default When provided and the current node is empty, this value is returned and no exception is thrown
+     * @param mixed $default             When provided and the current node is empty, this value is returned and no exception is thrown
+     * @param mixed $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      *
      * @return string The node value
      *

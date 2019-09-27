@@ -195,7 +195,7 @@ install:
       # To run a PR with a patched phpunit-bridge, first submit the path for the
       # phpunit-bridge as a separate PR against the next feature-branch then
       # uncomment and update the following line with that PR number
-      SYMFONY_PHPUNIT_BRIDGE_PR=ticket_33592
+      #SYMFONY_PHPUNIT_BRIDGE_PR=32886
 
       if [[ $SYMFONY_PHPUNIT_BRIDGE_PR ]]; then
           git fetch origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head

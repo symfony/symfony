@@ -338,7 +338,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #28846 [Intl] Simplify API (ro0NL)
  * feature #31093 [PhpUnitBridge] ClockMock does not mock gmdate() (Simperfit)
  * feature #29211 [PhpUnitBridge] Url encoded deprecations helper config (greg0ire)
- * feature #31062 [Dotenv] Deprecate usage of "putenv" (Nyholm)
+ * feature #31062 [Dotenv] Deprecate useage of "putenv" (Nyholm)
  * feature #31021 [Cache] Added command for list all available cache pools (Nyholm)
  * feature #31027 [Config] Deprecate TreeBuilder::root (gharlan)
  * feature #31019 [Security] Replace Argon2*PasswordEncoder by SodiumPasswordEncoder (chalasr)
@@ -443,7 +443,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #30652 Fixing a bug where messenger:consume could send message to wrong bus (weaverryan)
  * feature #30650 Dispatching two events when a message is sent & handled (weaverryan)
  * feature #30557 [Messenger] Worker events + global retry functionality (weaverryan)
- * feature #30468 [Workflow] Added support for many initial places (lyrixx)
+ * feature #30468 [Workflow] Added support for many inital places (lyrixx)
  * feature #30448  [Finder] Ignore paths from .gitignore #26714 (amaabdou)
  * feature #30625 [HttpKernel] add RealHttpKernel: handle requests with HttpClientInterface (fabpot)
  * feature #30508 [Routing] Exposed "utf8" option, defaults "locale" and "format" in configuration (Jules Pietri)
@@ -569,4 +569,4 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #28976 [DI] Add a "default" EnvProcessor (jderusse)
  * feature #29127 [DomCrawler] Added return of element name in `extract()` method (andrey-helldar)
  * feature #29145 [Workflow] Trigger `entered` event for subject entering in the Workflow for the first time (lyrixx)
- * feature #33592 [PhpUnitBridge] allow install of PHPUnit with option --ignore-platform-reqs (mazarini)
+

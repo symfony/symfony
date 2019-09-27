@@ -129,6 +129,16 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $client->request('GET', '/unprotected_resource');
     }
 
+    public function testPublicHomepage()
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml']);
+        $client->request('GET', '/en/');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
+        $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
+        $this->assertSame(0, self::$container->get('session')->getUsageIndex());
+    }
+
     private function assertAllowed($client, $path)
     {
         $client->request('GET', $path);

@@ -243,7 +243,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             list($matcher, $listeners, $exceptionListener, $logoutListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
 
             $contextId = 'security.firewall.map.context.'.$name;
-            $context = $container->setDefinition($contextId, new ChildDefinition('security.firewall.context'));
+            $context = new ChildDefinition($firewall['stateless'] || empty($firewall['anonymous']['lazy']) ? 'security.firewall.context' : 'security.firewall.lazy_context');
+            $context = $container->setDefinition($contextId, $context);
             $context
                 ->replaceArgument(0, new IteratorArgument($listeners))
                 ->replaceArgument(1, $exceptionListener)
@@ -409,7 +410,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         // Access listener
-        $listeners[] = new Reference('security.access_listener');
+        if ($firewall['stateless'] || empty($firewall['anonymous']['lazy'])) {
+            $listeners[] = new Reference('security.access_listener');
+        }
 
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));

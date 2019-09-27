@@ -1,0 +1,14 @@
+imports:
+    - { resource: ../config/default.yml }
+    - { resource: services.yml }
+
+framework:
+    secret: '%secret%'
+    default_locale: '%env(LOCALE)%'
+    translator:
+        fallbacks:
+            - '%env(LOCALE)%'
+
+parameters:
+    env(LOCALE): bg
+    secret: test

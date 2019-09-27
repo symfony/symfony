@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-04-27T09:32:28Z
+
+Wouldn't it make sense to move that deprecation into the kernel? 🤔
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-29T05:51:56Z
+
+PR Updated.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-29T16:43:38Z
+
+There are alot of deprecation with this being deprecated directly in the Kernel, I see 2 way of fixing this:
+- marking all test as expecting this deprecation ( :( )
+- Fixing all the test in this PR, but it seems like modify more than 90 test.
+
+WDYT ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-30T07:46:22Z
+
+> Fixing all the test in this PR, but it seems like modify more than 90 test.
+
+is there a legit case that relies on a nulled container? We should check before shipping :)
+
+in general i think tests should be fixed yes, unless it tests a behavior that becomes irrelevant in 5.0; then it's a legacy  test.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-30T11:33:00Z
+
+The deprecations seem to be triggered by the `TestContainer` that we use which calls the `getContainer()` method of the `Kernel` class even after the kernel was shut down when the `reset()` method is called.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-05-12T06:33:58Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-05-18T06:35:14Z
+
+Test fixed !
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-04T10:17:24Z
+
+@fabpot this is ready
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-07T11:53:06Z
+
+PR rebased
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-20T20:20:33Z
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-17T19:23:40Z
+
+@nicolas-grekas is this still neccesary with the update you've done ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-31T17:32:35Z
+
+test fixed
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-08-07T06:06:45Z
+
+@xabbuh Thanks for the review !
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-08-09T11:48:18Z
+
+PR Rebased
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-27T10:07:26Z
+
+PR rebased, ready.

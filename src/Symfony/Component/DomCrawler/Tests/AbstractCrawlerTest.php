@@ -253,6 +253,14 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertCount(0, $crawler->eq(100), '->eq() returns an empty crawler if the nth node does not exist');
     }
 
+    public function testNormalizeWhiteSpace()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//p');
+        $this->assertSame('Elsa <3', $crawler->text(null, true), '->text(null, true) returns the text with normalized whitespace');
+        $this->assertNotSame('Elsa <3', $crawler->text(null, false));
+        $this->assertNotSame('Elsa <3', $crawler->text());
+    }
+
     public function testEach()
     {
         $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
@@ -1235,6 +1243,10 @@ HTML;
                         <li>Two Bis</li>
                         <li>Three Bis</li>
                     </ul>
+                    <p class="whitespace">
+                        Elsa
+                        &lt;3
+                    </p>
                     <div id="parent">
                         <div id="child"></div>
                         <div id="child2" xmlns:foo="http://example.com"></div>

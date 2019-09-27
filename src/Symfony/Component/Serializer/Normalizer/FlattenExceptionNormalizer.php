@@ -19,6 +19,8 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  * Normalizes FlattenException instances.
  *
  * @author Pascal Luna <skalpa@zetareticuli.org>
+ *
+ * @experimental
  */
 class FlattenExceptionNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {

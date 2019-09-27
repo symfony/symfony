@@ -596,13 +596,13 @@ class Crawler implements \Countable, \IteratorAggregate
      * Pass true as the 2nd argument to normalize whitespaces.
      *
      * @param mixed $default             When provided and the current node is empty, this value is returned and no exception is thrown
-     * @param mixed $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
+     * @param bool  $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      *
      * @return string The node value
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function text(/* $default = null, $normalizeWhitespace = true */)
+    public function text(/* $default = null, bool $normalizeWhitespace = false */)
     {
         if (!$this->nodes) {
             if (0 < \func_num_args()) {

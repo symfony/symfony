@@ -26,7 +26,7 @@ class XmlErrorRendererTest extends TestCase
         $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception));
     }
 
-    public function getRenderData()
+    public function getRenderData(): iterable
     {
         $expectedDebug = <<<XML
 <?xml version="1.0" encoding="UTF-8" ?>

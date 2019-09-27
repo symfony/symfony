@@ -691,7 +691,7 @@ class ErrorHandler
     /**
      * Cleans the trace by removing function arguments and the frames added by the error handler and DebugClassLoader.
      */
-    private function cleanTrace(array $backtrace, int $type, string $file, int $line, bool $throw)
+    private function cleanTrace(array $backtrace, int $type, string $file, int $line, bool $throw): array
     {
         $lightTrace = $backtrace;
 

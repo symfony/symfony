@@ -26,7 +26,7 @@ class JsonErrorRendererTest extends TestCase
         $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception));
     }
 
-    public function getRenderData()
+    public function getRenderData(): iterable
     {
         $expectedDebug = <<<JSON
 {

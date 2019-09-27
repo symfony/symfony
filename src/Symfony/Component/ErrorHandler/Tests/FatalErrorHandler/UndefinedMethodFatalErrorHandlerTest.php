@@ -20,7 +20,7 @@ class UndefinedMethodFatalErrorHandlerTest extends TestCase
     /**
      * @dataProvider provideUndefinedMethodData
      */
-    public function testUndefinedMethod($error, $translatedMessage)
+    public function testUndefinedMethod(array $error, string $translatedMessage)
     {
         $handler = new UndefinedMethodFatalErrorHandler();
         $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
@@ -32,7 +32,7 @@ class UndefinedMethodFatalErrorHandlerTest extends TestCase
         $this->assertSame($error['line'], $exception->getLine());
     }
 
-    public function provideUndefinedMethodData()
+    public function provideUndefinedMethodData(): array
     {
         return [
             [

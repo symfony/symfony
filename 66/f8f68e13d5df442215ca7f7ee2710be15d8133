@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-18T11:38:16Z
+
+I don't think you need this: use `'0.0.0.0/0'` instead and that should provide what you want.
+I think we should update the documentation instead. Would you be up to submit a PR there?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-18T11:43:35Z
+
+@nicolas-grekas this is not equivalent. Proxies can be chained. Trusting `REMOTE_ADDR` is trusting the first level of proxy. Trusting the whole web allows anyone to spoof their IP address (as they can always send a `Forwarded` header to pretend that their actual IP is a proxy one)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-18T11:46:28Z
+
+@mcfedr can you check whether your ELB proxies appears as an remote address belonging to the private IP range ? If yes, maybe you could trust the private IP ranges for your use case (though I don't know how isolated your AWS instances are when not using an AWS VPC).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-18T12:23:02Z
+
+> Trusting REMOTE_ADDR is trusting the first level of proxy. Trusting the whole web allows anyone to spoof their IP address
+
+you may be right, but I'm missing the why:
+```
+    public function isFromTrustedProxy()
+    {
+        return self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR'), self::$trustedProxies);
+    }
+```
+
+This only reads the direct REMOTE_ADDR. When does the difference you describe apply?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-18T12:31:58Z
+
+@nicolas-grekas `getClientIp` cares about chained proxies. `isFromTrustedProxy` indeed only cares about the last hop. But that's not the only usage of `Request::$trustedProxies`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-18T12:35:29Z
+
+`getClientIp` uses `isFromTrustedProxy`, so looks safe to me. Do you have a specific example of what I'm missing?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-18T12:36:46Z
+
+@nicolas-grekas it *also* uses `$this->getTrustedValues` when you are from a trusted proxy, which is exactly the case I'm talking about.
+Trusting `0.0.0.0/0` will consider any (IPv4) value as trusted.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2019-09-18T12:53:55Z
+
+The chain is the problem with using `0.0.0.0/0` because the CDN/LB makes a request from a public IP address (in the case of cloudfront its from this massive range https://ip-ranges.amazonaws.com/ip-ranges.json that changes quite often) - so I always want to trust the first level, but if the client request to cloudfront already contains a `x-forwarded-for` header cloudfront just extends it, so if i put `0.0.0.0/0` as trusted - i've automatically trusted the proxy before cloudfront as well. (I've firewalled the servers so only CF can make requests to them)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-18T13:06:04Z
+
+> if the client request to cloudfront already contains a x-forwarded-for header cloudfront just extends it
+
+Oh, OK! Now I get the issue, it's related to `getTrustedValues` calling `normalizeAndFilterClientIps` itself using `self::$trustedProxies`. Thanks for your explanations and patience :)
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2019-09-18T13:31:06Z
+
+All done.

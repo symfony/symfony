@@ -1793,7 +1793,7 @@ class FrameworkExtension extends Extension
             // make sure senderAliases contains all senders
             foreach ($messageConfiguration['senders'] as $sender) {
                 if (!isset($senderReferences[$sender])) {
-                    throw new LogicException(sprintf('Invalid Messenger routing configuration: the "%s" class is being routed to a sender called "%s". This is not a valid transport or service id.', $message, $sender));
+                    throw new LogicException(sprintf('Invalid Messenger routing configuration: the "%s" class is being routed to a sender called "%s". This is not a valid transport or service ID.', $message, $sender));
                 }
             }
 

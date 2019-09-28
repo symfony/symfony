@@ -33,6 +33,8 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionals
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -768,15 +770,15 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testMessengerMiddlewareFactoryErroneousFormat()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, {"foo":["qux"],"bar":["baz"]} given.');
         $this->createContainerFromFile('messenger_middleware_factory_erroneous_format');
     }
 
     public function testMessengerInvalidTransportRouting()
     {
-        $this->expectException('LogicException');
-        $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service ID.');
         $this->createContainerFromFile('messenger_routing_invalid_transport');
     }
 

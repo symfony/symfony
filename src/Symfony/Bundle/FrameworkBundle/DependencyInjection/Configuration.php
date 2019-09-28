@@ -1147,6 +1147,7 @@ class Configuration implements ConfigurationInterface
                         ->ifTrue(function ($v) { return isset($v['buses']) && \count($v['buses']) > 1 && null === $v['default_bus']; })
                         ->thenInvalid('You must specify the "default_bus" if you define more than one bus.')
                     ->end()
+                    ->fixXmlConfig('routing', 'routing')
                     ->children()
                         ->arrayNode('routing')
                             ->normalizeKeys(false)

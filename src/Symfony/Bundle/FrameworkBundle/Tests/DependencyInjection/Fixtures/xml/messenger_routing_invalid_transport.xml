@@ -12,10 +12,6 @@
             <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage">
                 <framework:sender service="invalid" />
             </framework:routing>
-            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\SecondMessage">
-                <framework:sender service="amqp" />
-                <framework:sender service="audit" />
-            </framework:routing>
             <framework:transport name="amqp" dsn="amqp://localhost/%2f/messages" />
         </framework:messenger>
     </framework:config>

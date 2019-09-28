@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -83,6 +84,31 @@ class AbstractObjectNormalizerTest extends TestCase
             'any',
             ['allow_extra_attributes' => false]
         );
+    }
+
+    public function testDenormalizeDeepCollection()
+    {
+        $denormalizer = $this->getDenormalizerForDummyDeepCollection();
+
+        $dummyCollection = $denormalizer->denormalize(
+            [
+                'children' => [
+                    [
+                        [
+                            'bar' => 'first',
+                        ],
+                    ],
+                ],
+            ],
+            DummyDeepCollection::class
+        );
+
+        $this->assertInstanceOf(DummyDeepCollection::class, $dummyCollection);
+        $this->assertIsArray($dummyCollection->children);
+        $this->assertCount(1, $dummyCollection->children);
+        $this->assertIsArray($dummyCollection->children[0]);
+        $this->assertCount(1, $dummyCollection->children[0]);
+        $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[0][0]);
     }
 
     public function testDenormalizeCollectionDecodedFromXmlWithOneChild()
@@ -146,7 +172,41 @@ class AbstractObjectNormalizerTest extends TestCase
             ));
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
-        $arrayDenormalizer = new ArrayDenormalizerDummy();
+        $arrayDenormalizer = new ArrayDenormalizer();
+        $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
+        $arrayDenormalizer->setSerializer($serializer);
+        $denormalizer->setSerializer($serializer);
+
+        return $denormalizer;
+    }
+
+    private function getDenormalizerForDummyDeepCollection()
+    {
+        $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
+        $extractor->method('getTypes')
+            ->will($this->onConsecutiveCalls(
+                [
+                    new Type(
+                        'array',
+                        false,
+                        null,
+                        true,
+                        new Type('int'),
+                        new Type(
+                            'array',
+                            false,
+                            null,
+                            true,
+                            new Type('int'),
+                            new Type('object', false, DummyChild::class)
+                        )
+                    ),
+                ],
+                null
+            ));
+
+        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
+        $arrayDenormalizer = new ArrayDenormalizer();
         $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
         $arrayDenormalizer->setSerializer($serializer);
         $denormalizer->setSerializer($serializer);
@@ -261,6 +321,12 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
 class DummyCollection
 {
     /** @var DummyChild[] */
+    public $children;
+}
+
+class DummyDeepCollection
+{
+    /** @var DummyChild[][] */
     public $children;
 }
 

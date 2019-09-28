@@ -344,7 +344,7 @@ class Response
 
         // cookies
         foreach ($this->headers->getCookies() as $cookie) {
-            header('Set-Cookie: '.$cookie->getName().strstr($cookie, '='), false, $this->statusCode);
+            header('Set-Cookie: '.$cookie, false, $this->statusCode);
         }
 
         // status

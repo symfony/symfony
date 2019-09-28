@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-21T16:41:24Z
+
+The implementation relies on a statefull service. This should be avoided.
+If we need dumping some context, it should be added to the `Data` object to me.
+Then, dumpers could read it and do things appropriately.
+See also `SourceContextProvider` which has more intensive logic for extracting the stack trace.
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-05-24T14:10:42Z
+
+@nicolas-grekas Thank you for the feed back. I've changed the implementation.
+
+Do you have an idea on how can i insulate this new feature and set her only for CliDumper?
+
+Because currently, without forcing file and line to `null` in `getDump` method of `VarDumperTestTrait` it has impact on all other tests and so maybe on functionnalities.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-21T21:18:33Z
+
+@ktherage can we move forward on this ;) ?
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-06-25T15:46:53Z
+
+@Simperfit I'm stuck on unit tests. I this they are to much nested each other. Testing cli dumper makes HtmlDumper, ServerDumper and all the caster crashed.
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-07-01T13:14:16Z
+
+@Simperfit @nicolas-grekas, I did some work on that, tests are finally green.
+Could you, please, take a sometime to check those changes?
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-07-12T11:31:03Z
+
+@nicolas-grekas I've applied your recommendations (hoping i've not misread them).
+Can you review those changes please ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-16T16:39:07Z
+
+I push-forced on your fork to rebase+target 4.4, and do some changes.
+Can you please try if that works for you?
+Also, I think this doesn't work when dump is called from inside console commands.
+Can you also check that?
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-07-18T13:45:36Z
+
+> I push-forced on your fork to rebase+target 4.4, and do some changes.
+> Can you please try if that works for you?
+> Also, I think this doesn't work when dump is called from inside console commands.
+> Can you also check that?
+
+@nicolas-grekas i've adapter unit test according to your changes and i've added one test for console command. Can you check them and tell me if they are good for you?
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-07-19T09:15:06Z
+
+As we talked together, i've adapted tests to a smaller sample an removed the fix i made on CliDumper for tests.
+
+I've also tried to call dump in a command of a website-skeleton and, as you pre-minded it, it does not worked but i don't know why (see the GIF bellow).
+
+![Peek 18-07-2019 17-03](https://user-images.githubusercontent.com/35264408/61524265-6b6fc400-aa16-11e9-9f67-cdafec1e7752.gif)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-30T19:05:48Z
+
+@ktherage the reason is that we wire a service as a dumper. Look for cli_dumper/html_dumper I think in the code base
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-08-05T09:31:37Z
+
+> @ktherage the reason is that we wire a service as a dumper. Look for cli_dumper/html_dumper I think in the code base
+
+@nicolas-grekas Yes, [here it is](https://github.com/symfony/symfony/blob/4.4/src/Symfony/Bundle/DebugBundle/Resources/config/services.xml#L37).
+Do you mean that i shall add a service definition like that one below :
+```xml
+        <service id="var_dumper.contextualized_cli_dumper" class="Symfony\Component\VarDumper\Dumper\ContextualizedDumper">
+            <argument type="service" id="var_dumper.cli_dumper" />
+            <argument type="collection">
+                <argument type="service" key="source">
+                    <service class="Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider">
+                        <argument>%kernel.charset%</argument>
+                        <argument type="string">%kernel.project_dir%</argument>
+                        <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
+                    </service>
+                </argument>
+            </argument>
+        </service>
+```
+and use this new service in the debug bundle in place of the `var_dumper.cli_dumper` service ?
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-09-10T15:28:55Z
+
+@nicolas-grekas I've worked on that and fixed the error for commands (see bellow).
+
+I also tried to fix the tests. But for me the CI behave strangely (depending on the php version).
+
+![Peek 10-09-2019 15-05](https://user-images.githubusercontent.com/35264408/64619121-d2d83d80-d3e1-11e9-987b-c31589578f6e.gif)

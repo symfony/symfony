@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-01T22:09:46Z
+
+Shouldn't we do this on 4.4, to not break scripts that use a short alias into the wild?
+
+---------------------------------------------------------------------------
+
+by m-vo at 2019-09-02T08:16:58Z
+
+Agreed, that's probably a good idea as this issue is rather a cosmetic one.
+(I think commands in scripts should never be abbreviated though but who knows... :smile: )
+
+Do you want me to rebase on 4.4?*
+
+*) btw: Should I add return type hints for new functions in this case even though the other functions inside `Console/Application` don't?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-02T11:14:09Z
+
+Please rebase for 4.4 yes, and you can add types for sure.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-09-02T11:48:09Z
+
+> Hidden commands won't be shown anymore in the list of commands in a namespace as well as the list of suggestions ("Did you mean...") for invalid or ambiguous commands.
+
+This part should be for 3.4.
+
+---------------------------------------------------------------------------
+
+by m-vo at 2019-09-02T12:53:35Z
+
+@chalasr How would that work without the other changes? Assume you're input is ambiguous and you get a suggestion with two commands where one of them is hidden. Now stripping the hidden one would return a single command saying that it is ambiguous. Isn't that worse that leaving it as it is?
+
+---------------------------------------------------------------------------
+
+by m-vo at 2019-09-02T15:48:20Z
+
+rebased for 4.4
+
+fabbot reporting about CS seems unrelated to my changes (it's about unsorted use statements).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-02T16:04:03Z
+
+fabbot patch applied in 61dad16c9d
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-09-13T15:31:27Z
+
+I think resolving abbreviations for hidden commands should first be deprecated before stopping to work also, so that it doesn't break scripts when upgrading to 4.4.
+
+---------------------------------------------------------------------------
+
+by m-vo at 2019-09-16T14:37:40Z
+
+@chalasr, @fabpot Sorry for not responding earlier.
+
+Adding deprecation warnings sounds reasonable to me - how should we proceed from here? Shall I make a second PR against the LTS branch that adds a warning when executing an abbreviated hidden command?
+
+I will address the requested changes in this PR in the next days.
+
+---------------------------------------------------------------------------
+
+by m-vo at 2019-09-20T10:22:28Z
+
+I accidentally rebased against the wrong branch first and then against 4.4 again. ~~Not sure what went wrong there because github is showing lots of commits now.~~ Of course I know what happened. I am silly. I'm going to fix this (hopefully tomorrow). Shouldn't do things in passing... :man_facepalming:
+
+---------------------------------------------------------------------------
+
+by m-vo at 2019-09-20T10:29:03Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T21:47:34Z
+
+@chalasr we need your help to unlock here (you can also approve as is :) )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T21:48:24Z
+
+(rebase needed btw, to see tests green)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-09-28T14:51:01Z
+
+PR rebased + added 1 commit to turn the CommandNotFoundException into a deprecation notice in case one uses an abbreviation for finding an hidden command.
+Bugfix part moved to its own PR for 3.4: #33748

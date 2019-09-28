@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by Koc at 2019-06-02T20:43:38Z
+
+BTW, does anybody knows why Travis failed with error
+```
+  [ErrorException]
+  Undefined index: master
+```
+? Is this problem caused by Symfony Flex or what?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-03T07:02:28Z
+
+@Koc I think you just need to repush
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-07-02T20:21:28Z
+
+@Koc any chance you can rebase on `4.4`?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-14T14:45:32Z
+
+@Koc could you rebase please ?
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-07-15T09:05:07Z
+
+Rebase was done, now trying to fix tests
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-27T10:47:55Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-09-27T22:37:31Z
+
+rebased, tests are green

@@ -73,18 +73,21 @@ abstract class AbstractUnicodeString extends AbstractString
      *
      * Install the intl extension for best results.
      *
-     * @param string[] $rules See "*-Latin" rules from Transliterator::listIDs()
+     * @param string[]|\Transliterator[] $rules See "*-Latin" rules from Transliterator::listIDs()
      */
     public function ascii(array $rules = []): self
     {
         $str = clone $this;
         $s = $str->string;
         $str->string = '';
-        $step = 0;
+
+        $rules[] = 'nfkd';
+        $rules[] = '[:nonspacing mark:] remove';
 
         if (\function_exists('transliterator_transliterate')) {
+            $rules[] = 'any-latin/bgn';
+            $rules[] = 'nfkd';
             $rules[] = '[:nonspacing mark:] remove';
-            $rules[] = 'any-latin';
         }
 
         while (\strlen($s) !== $i = strspn($s, self::ASCII)) {
@@ -93,32 +96,48 @@ abstract class AbstractUnicodeString extends AbstractString
                 $s = substr($s, $i);
             }
 
-            if (1 === ++$step) {
-                if (!normalizer_is_normalized($s, self::NFKD)) {
-                    $s = normalizer_normalize($s, self::NFKD);
-                }
-            } elseif (2 === $step) {
-                $s = str_replace(self::TRANSLIT_FROM, self::TRANSLIT_TO, $s);
-            } elseif (3 === $step && '' !== $rule = strtolower(array_shift($rules))) {
-                $step = 2;
+            if ($rules && !$rule = array_shift($rules)) {
+                $rules = []; // An empty rule interrupts the next ones
+            }
 
-                if ('[:nonspacing mark:] remove' === $rule) {
+            if ($rules && $rule) {
+                if ($rule instanceof \Transliterator) {
+                    $s = $rule->transliterate($s);
+                    continue;
+                }
+
+                if ('nfkd' === $rule = strtolower($rule)) {
+                    if (!normalizer_is_normalized($s, self::NFKD)) {
+                        $s = normalizer_normalize($s, self::NFKD);
+                    }
+                } elseif ('[:nonspacing mark:] remove' === $rule) {
                     $s = preg_replace('/\p{Mn}++/u', '', $s);
                 } elseif ('de-ascii' === $rule) {
                     $s = preg_replace("/([AUO])\u{0308}(?=\p{Ll})/u", '$1e', $s);
                     $s = str_replace(["a\u{0308}", "o\u{0308}", "u\u{0308}", "A\u{0308}", "O\u{0308}", "U\u{0308}"], ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'], $s);
                 } elseif (\function_exists('transliterator_transliterate')) {
                     if (null === $transliterator = self::$transliterators[$rule] ?? self::$transliterators[$rule] = \Transliterator::create($rule)) {
-                        throw new InvalidArgumentException(sprintf('Unknown transliteration rule "%s".', $rule));
+                        if ('any-latin/bgn' === $rule) {
+                            $rule = 'any-latin';
+                            $transliterator = self::$transliterators[$rule] ?? self::$transliterators[$rule] = \Transliterator::create($rule);
+                        }
+
+                        if (null === $transliterator) {
+                            throw new InvalidArgumentException(sprintf('Unknown transliteration rule "%s".', $rule));
+                        }
+
+                        self::$transliterators['any-latin/bgn'] = $transliterator;
                     }
 
                     $s = $transliterator->transliterate($s);
                 }
             } elseif (!\function_exists('iconv')) {
+                $s = str_replace(self::TRANSLIT_FROM, self::TRANSLIT_TO, $s);
                 $s = preg_replace('/[^\x00-\x7F]/u', '?', $s);
             } elseif (\ICONV_IMPL === 'glibc') {
                 $s = iconv('UTF-8', 'ASCII//TRANSLIT', $s);
             } else {
+                $s = str_replace(self::TRANSLIT_FROM, self::TRANSLIT_TO, $s);
                 $s = preg_replace_callback('/[^\x00-\x7F]/u', static function ($c) {
                     $c = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $c[0]);
 

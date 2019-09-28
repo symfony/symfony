@@ -14,6 +14,9 @@
             <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage">
                 <framework:sender service="sender.foo" />
             </framework:routing>
+            <framework:transport name="sender.bar" dsn="null://" />
+            <framework:transport name="sender.biz" dsn="null://" />
+            <framework:transport name="sender.foo" dsn="null://" />
         </framework:messenger>
     </framework:config>
 </container>

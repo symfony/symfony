@@ -55,7 +55,12 @@ class AnonymousFactory implements SecurityFactoryInterface
     public function addConfiguration(NodeDefinition $builder)
     {
         $builder
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return 'lazy' === $v; })
+                ->then(function ($v) { return ['lazy' => true]; })
+            ->end()
             ->children()
+                ->booleanNode('lazy')->defaultFalse()->end()
                 ->scalarNode('secret')->defaultNull()->end()
             ->end()
         ;

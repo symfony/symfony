@@ -146,6 +146,16 @@
             <argument />  <!-- FirewallConfig -->
         </service>
 
+        <service id="security.firewall.lazy_context" class="Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext" abstract="true">
+            <argument type="collection" />
+            <argument type="service" id="security.exception_listener" />
+            <argument />  <!-- LogoutListener -->
+            <argument />  <!-- FirewallConfig -->
+            <argument type="service" id="security.access_listener" />
+            <argument type="service" id="security.untracked_token_storage" />
+            <argument type="service" id="security.access_map" />
+        </service>
+
         <service id="security.firewall.config" class="Symfony\Bundle\SecurityBundle\Security\FirewallConfig" abstract="true">
             <argument />                   <!-- name -->
             <argument />                   <!-- user_checker -->

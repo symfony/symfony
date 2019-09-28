@@ -24,6 +24,7 @@ CHANGELOG
 4.3.0
 -----
 
+ * Added `anonymous: lazy` mode to firewalls to make them (not) start the session as late as possible
  * Added new encoder types: `auto` (recommended), `native` and `sodium`
  * The normalization of the cookie names configured in the `logout.delete_cookies`
    option is deprecated and will be disabled in Symfony 5.0. This affects to cookies

@@ -1609,6 +1609,16 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $senderReferences = [];
+        // alias => service_id
+        foreach ($senderAliases as $alias => $serviceId) {
+            $senderReferences[$alias] = new Reference($serviceId);
+        }
+        // service_id => service_id
+        foreach ($senderAliases as $serviceId) {
+            $senderReferences[$serviceId] = new Reference($serviceId);
+        }
+
         $messageToSendersMapping = [];
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
@@ -1617,17 +1627,12 @@ class FrameworkExtension extends Extension
 
             // make sure senderAliases contains all senders
             foreach ($messageConfiguration['senders'] as $sender) {
-                if (!isset($senderAliases[$sender])) {
-                    $senderAliases[$sender] = $sender;
+                if (!isset($senderReferences[$sender])) {
+                    throw new LogicException(sprintf('Invalid Messenger routing configuration: the "%s" class is being routed to a sender called "%s". This is not a valid transport or service id.', $message, $sender));
                 }
             }
 
             $messageToSendersMapping[$message] = $messageConfiguration['senders'];
-        }
-
-        $senderReferences = [];
-        foreach ($senderAliases as $alias => $serviceId) {
-            $senderReferences[$alias] = new Reference($serviceId);
         }
 
         $container->getDefinition('messenger.senders_locator')

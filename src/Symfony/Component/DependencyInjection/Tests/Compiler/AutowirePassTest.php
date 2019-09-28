@@ -568,12 +568,10 @@ class AutowirePassTest extends TestCase
         );
     }
 
-    /**
-     * @exceptedExceptionMessage Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "setLogger()" does not exist.
-     */
     public function testWithNonExistingSetterAndAutowiring()
     {
         $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass": method "setLogger()" does not exist.');
         $container = new ContainerBuilder();
 
         $definition = $container->register(CaseSensitiveClass::class, CaseSensitiveClass::class)->setAutowired(true);

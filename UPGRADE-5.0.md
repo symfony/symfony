@@ -31,6 +31,7 @@ Config
 Console
 -------
 
+ * Removed support for finding hidden commands using an abbreviation, use the full name instead
  * Removed the `setCrossingChar()` method in favor of the `setDefaultCrossingChar()` method in `TableStyle`.
  * Removed the `setHorizontalBorderChar()` method in favor of the `setDefaultCrossingChars()` method in `TableStyle`.
  * Removed the `getHorizontalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.

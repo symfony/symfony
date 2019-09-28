@@ -570,8 +570,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('messenger');
         $this->assertTrue($container->hasAlias('messenger.default_bus'));
         $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
-        $this->assertFalse($container->hasDefinition('messenger.transport.amqp.factory'));
-        $this->assertFalse($container->hasDefinition('messenger.transport.redis.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
+        $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
     }
@@ -614,14 +614,11 @@ abstract class FrameworkExtensionTest extends TestCase
         $senderLocatorDefinition = $container->getDefinition('messenger.senders_locator');
 
         $sendersMapping = $senderLocatorDefinition->getArgument(0);
-        $this->assertEquals([
-            'amqp',
-            'audit',
-        ], $sendersMapping[DummyMessage::class]);
+        $this->assertEquals(['amqp', 'messenger.transport.audit'], $sendersMapping[DummyMessage::class]);
         $sendersLocator = $container->getDefinition((string) $senderLocatorDefinition->getArgument(1));
-        $this->assertSame(['amqp', 'audit'], array_keys($sendersLocator->getArgument(0)));
+        $this->assertSame(['amqp', 'audit', 'messenger.transport.amqp', 'messenger.transport.audit'], array_keys($sendersLocator->getArgument(0)));
         $this->assertEquals(new Reference('messenger.transport.amqp'), $sendersLocator->getArgument(0)['amqp']->getValues()[0]);
-        $this->assertEquals(new Reference('audit'), $sendersLocator->getArgument(0)['audit']->getValues()[0]);
+        $this->assertEquals(new Reference('messenger.transport.audit'), $sendersLocator->getArgument(0)['messenger.transport.audit']->getValues()[0]);
     }
 
     public function testMessengerTransportConfiguration()
@@ -674,6 +671,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, {"foo":["qux"],"bar":["baz"]} given.');
         $this->createContainerFromFile('messenger_middleware_factory_erroneous_format');
+    }
+
+    public function testMessengerInvalidTransportRouting()
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
+        $this->createContainerFromFile('messenger_routing_invalid_transport');
     }
 
     public function testTranslator()

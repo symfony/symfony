@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
@@ -107,7 +108,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             $logoutUrl = null;
             try {
-                if (null !== $this->logoutUrlGenerator) {
+                if (null !== $this->logoutUrlGenerator && !$token instanceof AnonymousToken) {
                     $logoutUrl = $this->logoutUrlGenerator->getLogoutPath();
                 }
             } catch (\Exception $e) {

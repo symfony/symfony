@@ -75,6 +75,8 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/FooWithoutAliasCommand.php';
         require_once self::$fixturesPath.'/TestAmbiguousCommandRegistering.php';
         require_once self::$fixturesPath.'/TestAmbiguousCommandRegistering2.php';
+        require_once self::$fixturesPath.'/FooHiddenCommand.php';
+        require_once self::$fixturesPath.'/BarHiddenCommand.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -440,6 +442,16 @@ class ApplicationTest extends TestCase
         ];
     }
 
+    public function testFindWithAmbiguousAbbreviationsFindsCommandIfAlternativesAreHidden()
+    {
+        $application = new Application();
+
+        $application->add(new \FooCommand());
+        $application->add(new \FooHiddenCommand());
+
+        $this->assertInstanceOf('FooCommand', $application->find('foo:'));
+    }
+
     public function testFindCommandEqualNamespace()
     {
         $application = new Application();
@@ -664,6 +676,7 @@ class ApplicationTest extends TestCase
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
         $application->add(new \Foo3Command());
+        $application->add(new \FooHiddenCommand());
 
         $expectedAlternatives = [
             'afoobar',
@@ -704,6 +717,49 @@ class ApplicationTest extends TestCase
         $application->add(new \FooCommand());
         $application->add(new \Foo4Command());
         $application->find('foo::bar');
+    }
+
+    public function testFindHiddenWithExactName()
+    {
+        $application = new Application();
+        $application->add(new \FooHiddenCommand());
+
+        $this->assertInstanceOf('FooHiddenCommand', $application->find('foo:hidden'));
+        $this->assertInstanceOf('FooHiddenCommand', $application->find('afoohidden'));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Command "%s:hidden" is hidden, finding it using an abbreviation is deprecated since Symfony 4.4, use its full name instead.
+     * @dataProvider provideAbbreviationsForHiddenCommands
+     */
+    public function testFindHiddenWithAbbreviatedName($name)
+    {
+        $application = new Application();
+
+        $application->add(new \FooHiddenCommand());
+        $application->add(new \BarHiddenCommand());
+
+        $application->find($name);
+    }
+
+    public function provideAbbreviationsForHiddenCommands()
+    {
+        return [
+            ['foo:hidde'],
+            ['afoohidd'],
+            ['bar:hidde'],
+        ];
+    }
+
+    public function testFindAmbiguousCommandsIfAllAlternativesAreHidden()
+    {
+        $application = new Application();
+
+        $application->add(new \FooCommand());
+        $application->add(new \FooHiddenCommand());
+
+        $this->assertInstanceOf('FooCommand', $application->find('foo:'));
     }
 
     public function testSetCatchExceptions()

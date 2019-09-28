@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by marie at 2019-09-21T13:54:35Z
+
+Hello!
+I have a question. In the fixtures expected values for sent cookies are:
+```
+    [3] => Set-Cookie: %3F%2A%28%29%3A%40%26%2B%24%2F%25%23%5B%5D=%3F%2A%28%29%3A%40%26%2B%24%2F%25%23%5B%5D; path=/
+    [4] => Set-Cookie: ?*():@&+$/%#[]=%3F%2A%28%29%3A%40%26%2B%24%2F%25%23%5B%5D; path=/
+```
+number 3 is for Symfony's function `$response->sendHeaders` and number 4 is for php's native function setcookie. Thus the symfony's function have different behaviour from setcookie function. Do you think this is alright?
+
+---------------------------------------------------------------------------
+
+by trvrnrth at 2019-09-23T09:58:31Z
+
+That looks like it could be problematic so I think it would be best to maintain full compatibility.
+
+@marie I've PR'ed to your branch at marie/symfony#1 with a proposed solution to only encode the required characters. The general approach is borrowed from the Guzzle PSR-7 Uri implementation.
+
+---------------------------------------------------------------------------
+
+by marie at 2019-09-23T16:30:18Z
+
+Does anybody know how to rebuild failed because of timeout pipeline? Probably I don't have rights
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-24T05:31:52Z
+
+@marie I've just restarted the job for you.
+
+---------------------------------------------------------------------------
+
+by marie at 2019-09-24T06:45:52Z
+
+@fabpot thank you!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-28T07:09:11Z
+
+@marie To help me merge this PR, can you squash the commits? Also, is it for 4.3 only, don't we have the same issue on 3.4?
+
+---------------------------------------------------------------------------
+
+by marie at 2019-09-28T14:56:59Z
+
+@fabpot yes, we have to merge it to 3.4 too. Should I create a new PR instead of this one?
+
+Do you know why one of builds failed with error -1073741819?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-28T14:59:21Z
+
+No worries, I'm going to take care of the rebase.

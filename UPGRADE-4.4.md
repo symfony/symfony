@@ -6,6 +6,11 @@ Cache
 
  * Added argument `$prefix` to `AdapterInterface::clear()`
 
+Console
+-------
+
+ * Deprecated finding hidden commands using an abbreviation, use the full name instead
+
 Debug
 -----
 

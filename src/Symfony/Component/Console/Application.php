@@ -692,12 +692,14 @@ class Application implements ResetInterface
             foreach ($abbrevs as $abbrev) {
                 $maxLen = max(Helper::strlen($abbrev), $maxLen);
             }
-            $abbrevs = array_map(function ($cmd) use ($commandList, $usableWidth, $maxLen) {
+            $abbrevs = array_map(function ($cmd) use ($commandList, $usableWidth, $maxLen, &$commands) {
                 if (!$commandList[$cmd] instanceof Command) {
                     $commandList[$cmd] = $this->commandLoader->get($cmd);
                 }
 
                 if ($commandList[$cmd]->isHidden()) {
+                    unset($commands[array_search($cmd, $commands)]);
+
                     return false;
                 }
 
@@ -705,12 +707,21 @@ class Application implements ResetInterface
 
                 return Helper::strlen($abbrev) > $usableWidth ? Helper::substr($abbrev, 0, $usableWidth - 3).'...' : $abbrev;
             }, array_values($commands));
-            $suggestions = $this->getAbbreviationSuggestions(array_filter($abbrevs));
 
-            throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $name, $suggestions), array_values($commands));
+            if (\count($commands) > 1) {
+                $suggestions = $this->getAbbreviationSuggestions(array_filter($abbrevs));
+
+                throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $name, $suggestions), array_values($commands));
+            }
         }
 
-        return $this->get(reset($commands));
+        $command = $this->get(reset($commands));
+
+        if ($command->isHidden()) {
+            @trigger_error(sprintf('Command "%s" is hidden, finding it using an abbreviation is deprecated since Symfony 4.4, use its full name instead.', $command->getName()), E_USER_DEPRECATED);
+        }
+
+        return $command;
     }
 
     /**

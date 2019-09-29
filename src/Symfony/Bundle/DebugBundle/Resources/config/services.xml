@@ -96,7 +96,7 @@
             <argument type="collection">
                 <argument type="service" key="cli">
                     <service class="Symfony\Component\VarDumper\Command\Descriptor\CliDescriptor">
-                        <argument type="service" id="var_dumper.cli_dumper" />
+                        <argument type="service" id="var_dumper.contextualized_cli_dumper.inner" />
                     </service>
                 </argument>
                 <argument type="service" key="html">

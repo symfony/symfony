@@ -125,7 +125,7 @@ EOF
         }
     }
 
-    private function getLogs($socket)
+    private function getLogs($socket): iterable
     {
         $sockets = [(int) $socket => $socket];
         $write = [];
@@ -148,7 +148,7 @@ EOF
         }
     }
 
-    private function displayLog(InputInterface $input, OutputInterface $output, $clientId, array $record)
+    private function displayLog(InputInterface $input, OutputInterface $output, int $clientId, array $record)
     {
         if (isset($record['log_id'])) {
             $clientId = unpack('H*', $record['log_id'])[1];

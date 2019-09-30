@@ -1134,7 +1134,7 @@ class Parser
         throw new ParseException(sprintf('Tags support is not enabled. You must use the flag "Yaml::PARSE_CUSTOM_TAGS" to use "%s".', $matches['tag']), $this->getRealCurrentLineNb() + 1, $value, $this->filename);
     }
 
-    private function parseQuotedString($yaml)
+    private function parseQuotedString(string $yaml): ?string
     {
         if ('' === $yaml || ('"' !== $yaml[0] && "'" !== $yaml[0])) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a quoted string.', $yaml));
@@ -1223,7 +1223,7 @@ class Parser
         return implode("\n", $lines);
     }
 
-    private function lexInlineSequence($yaml)
+    private function lexInlineSequence(string $yaml): string
     {
         if ('' === $yaml || '[' !== $yaml[0]) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a sequence.', $yaml));

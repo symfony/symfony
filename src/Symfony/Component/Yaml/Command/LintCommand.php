@@ -137,7 +137,7 @@ EOF
         return ['file' => $file, 'valid' => true];
     }
 
-    private function display(SymfonyStyle $io, array $files)
+    private function display(SymfonyStyle $io, array $files): int
     {
         switch ($this->format) {
             case 'txt':
@@ -149,7 +149,7 @@ EOF
         }
     }
 
-    private function displayTxt(SymfonyStyle $io, array $filesInfo)
+    private function displayTxt(SymfonyStyle $io, array $filesInfo): int
     {
         $countFiles = \count($filesInfo);
         $erroredFiles = 0;
@@ -178,7 +178,7 @@ EOF
         return min($erroredFiles, 1);
     }
 
-    private function displayJson(SymfonyStyle $io, array $filesInfo)
+    private function displayJson(SymfonyStyle $io, array $filesInfo): int
     {
         $errors = 0;
 
@@ -198,7 +198,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function getFiles(string $fileOrDirectory)
+    private function getFiles(string $fileOrDirectory): iterable
     {
         if (is_file($fileOrDirectory)) {
             yield new \SplFileInfo($fileOrDirectory);
@@ -225,7 +225,7 @@ EOF
         return $yaml;
     }
 
-    private function getParser()
+    private function getParser(): Parser
     {
         if (!$this->parser) {
             $this->parser = new Parser();
@@ -234,7 +234,7 @@ EOF
         return $this->parser;
     }
 
-    private function getDirectoryIterator(string $directory)
+    private function getDirectoryIterator(string $directory): iterable
     {
         $default = function ($directory) {
             return new \RecursiveIteratorIterator(
@@ -250,7 +250,7 @@ EOF
         return $default($directory);
     }
 
-    private function isReadable(string $fileOrDirectory)
+    private function isReadable(string $fileOrDirectory): bool
     {
         $default = function ($fileOrDirectory) {
             return is_readable($fileOrDirectory);

@@ -54,7 +54,7 @@
         "symfony/templating": "^3.4|^4.0|^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
         "symfony/validator": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.3|^5.0",
+        "symfony/var-dumper": "^4.4|^5.0",
         "symfony/workflow": "^4.3|^5.0",
         "symfony/yaml": "^3.4|^4.0|^5.0",
         "symfony/property-info": "^3.4|^4.0|^5.0",
@@ -84,6 +84,7 @@
         "symfony/twig-bridge": "<4.1.1",
         "symfony/twig-bundle": "<4.4",
         "symfony/validator": "<4.4",
+        "symfony/var-dumper": "<4.4",
         "symfony/workflow": "<4.3"
     },
     "suggest": {

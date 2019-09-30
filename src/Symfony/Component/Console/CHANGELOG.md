@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+ * removed support for finding hidden commands using an abbreviation, use the full name instead
  * removed `TableStyle::setCrossingChar()` method in favor of `TableStyle::setDefaultCrossingChar()`
  * removed `TableStyle::setHorizontalBorderChar()` method in favor of `TableStyle::setDefaultCrossingChars()`
  * removed `TableStyle::getHorizontalBorderChar()` method in favor of `TableStyle::getBorderChars()`

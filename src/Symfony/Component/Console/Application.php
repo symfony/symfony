@@ -693,7 +693,7 @@ class Application implements ResetInterface
         $command = $this->get(reset($commands));
 
         if ($command->isHidden()) {
-            @trigger_error(sprintf('Command "%s" is hidden, finding it using an abbreviation is deprecated since Symfony 4.4, use its full name instead.', $command->getName()), E_USER_DEPRECATED);
+            throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
         }
 
         return $command;

@@ -752,16 +752,6 @@ class ApplicationTest extends TestCase
         ];
     }
 
-    public function testFindAmbiguousCommandsIfAllAlternativesAreHidden()
-    {
-        $application = new Application();
-
-        $application->add(new \FooCommand());
-        $application->add(new \FooHiddenCommand());
-
-        $this->assertInstanceOf('FooCommand', $application->find('foo:'));
-    }
-
     public function testSetCatchExceptions()
     {
         $application = new Application();

@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-15T04:09:43Z
+
+cc @dunglas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-18T07:11:35Z
+
+What should we do with this PR?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-18T07:30:00Z
+
+we could merge as-is, maybe add the expected output using comments. Utimately this is broken in PHP: https://3v4l.org/reb5N
+
+however we may want to look at
+https://github.com/symfony/symfony/blob/ba988acaec83f5859ea2aecedf74864b14005327/src/Symfony/Component/Serializer/Encoder/CsvEncoder.php#L38 as well
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-18T07:30:32Z
+
+Oh, and here's the interesting part: as of 7.4 this seems fixed at the escape level:
+
+https://3v4l.org/fkQDt
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-18T07:33:02Z
+
+Im not sure what the point of `$escape_char` is
+
+> The optional escape_char parameter sets the escape character (at most one character). An empty string ("") disables the proprietary escape mechanism.
+
+> 7.4.0 | The escape_char parameter now also accepts an empty string to disable the proprietary escape mechanism.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-18T07:37:37Z
+
+I'm not for merging a PR that proves a PHP bug...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-18T07:57:37Z
+
+I agree with @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-18T08:05:59Z
+
+I think the solution is to change the default escape char from `\` to an empty string and see what current tests do.
+
+after #32289, we can test targeting php 7.4 as well.
+
+I'll look into this :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-18T08:36:27Z
+
+Right, we cant use 'empty string' on older PHP versions :)
+
+> If an enclosure character is contained in a field, it will be escaped by doubling it, unless it is immediately preceded by an escape_char. (https://php.net/fputcsv)
+
+we always hit the issue if the last char in a cell value is the escaping character
+
+https://3v4l.org/3NIb6 (fixes trailing slash by using tilde as escape char)
+https://3v4l.org/YE3ht (breaks again with trailing tilde)
+
+So i think the only way is to update the escape char in master for php 7.4 to an empty string.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-18T09:11:53Z
+
+Why not 3.4? PHP 7.4 will be supported there too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-25T19:21:26Z
+
+What's the status here?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-28T09:19:36Z
+
+@fabpot @nicolas-grekas all good :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-28T10:31:09Z
+
+note merging this in 4.3 requires a bit more work, let me know if you want a PR for that.

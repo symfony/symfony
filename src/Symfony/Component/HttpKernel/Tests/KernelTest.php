@@ -47,18 +47,6 @@ class KernelTest extends TestCase
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Getting the container from a non-booted kernel is deprecated since Symfony 4.4.
-     */
-    public function testGetContainerForANonBootedKernel()
-    {
-        $kernel = new KernelForTest('test_env', true);
-
-        $this->assertFalse($kernel->isBooted());
-        $this->assertNull($kernel->getContainer());
-    }
-
     public function testClone()
     {
         $env = 'test_env';
@@ -405,18 +393,6 @@ EOF;
             ->method('getHttpKernel');
 
         $kernel->terminate(Request::create('/'), new Response());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Getting the container from a non-booted kernel is deprecated since Symfony 4.4.
-     */
-    public function testDeprecatedNullKernel()
-    {
-        $kernel = $this->getKernel();
-        $kernel->shutdown();
-
-        $this->assertNull($kernel->getContainer());
     }
 
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()

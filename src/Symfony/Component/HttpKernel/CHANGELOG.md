@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+ * removed support for getting the container from a non-booted kernel
  * removed the first and second constructor argument of `ConfigDataCollector` 
  * removed `ConfigDataCollector::getApplicationName()` 
  * removed `ConfigDataCollector::getApplicationVersion()`

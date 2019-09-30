@@ -301,7 +301,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function getContainer()
     {
         if (!$this->booted) {
-            @trigger_error('Getting the container from a non-booted kernel is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
+            throw new \LogicException('Cannot retrieve the container from a non-booted kernel.');
         }
 
         return $this->container;

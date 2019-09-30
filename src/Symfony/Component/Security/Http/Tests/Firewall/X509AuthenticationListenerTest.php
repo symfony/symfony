@@ -81,6 +81,7 @@ class X509AuthenticationListenerTest extends TestCase
         yield ['cert+something@example.com', 'CN=Sample certificate DN,emailAddress=cert+something@example.com'];
         yield ['cert+something@example.com', 'emailAddress=cert+something@example.com,CN=Sample certificate DN'];
         yield ['cert+something@example.com', 'emailAddress=cert+something@example.com'];
+        yield ['firstname.lastname@mycompany.co.uk', 'emailAddress=firstname.lastname@mycompany.co.uk,CN=Firstname.Lastname,OU=london,OU=company design and engineering,OU=Issuer London,OU=Roaming,OU=Interactive,OU=Users,OU=Standard,OU=Business,DC=england,DC=core,DC=company,DC=co,DC=uk'];
     }
 
     public function testGetPreAuthenticatedDataNoData()

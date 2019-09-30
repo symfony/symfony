@@ -39,11 +39,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public const ENABLE_MAX_DEPTH = 'enable_max_depth';
 
     /**
-     * How to track the current depth in the context.
-     */
-    public const DEPTH_KEY_PATTERN = 'depth_%s::%s';
-
-    /**
      * While denormalizing, we can verify that types match.
      *
      * You can disable this by setting this flag to true.
@@ -89,6 +84,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public const DEEP_OBJECT_TO_POPULATE = 'deep_object_to_populate';
 
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
+
+    /**
+     * @internal
+     */
+    protected const MAX_DEPTH_COUNTER = 'max_depth_counter';
 
     private $propertyTypeExtractor;
     private $typesCache = [];
@@ -172,6 +172,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         } else {
             // already validated in constructor resp by type declaration of setMaxDepthHandler
             $maxDepthHandler = $this->defaultContext[self::MAX_DEPTH_HANDLER] ?? $this->maxDepthHandler;
+        }
+
+        if (!isset($context[self::MAX_DEPTH_COUNTER])) {
+            $context[self::MAX_DEPTH_COUNTER] = 1;
+        } else {
+            ++$context[self::MAX_DEPTH_COUNTER];
         }
 
         foreach ($attributes as $attribute) {
@@ -551,7 +557,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param AttributeMetadataInterface[] $attributesMetadata
      */
-    private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
+    private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array $context): bool
     {
         $enableMaxDepth = $context[self::ENABLE_MAX_DEPTH] ?? $this->defaultContext[self::ENABLE_MAX_DEPTH] ?? false;
         if (
@@ -562,18 +568,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return false;
         }
 
-        $key = sprintf(self::DEPTH_KEY_PATTERN, $class, $attribute);
-        if (!isset($context[$key])) {
-            $context[$key] = 1;
-
-            return false;
-        }
-
-        if ($context[$key] === $maxDepth) {
+        if ($context[self::MAX_DEPTH_COUNTER] > $maxDepth) {
             return true;
         }
-
-        ++$context[$key];
 
         return false;
     }

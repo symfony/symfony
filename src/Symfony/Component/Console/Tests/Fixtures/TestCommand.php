@@ -19,6 +19,8 @@ class TestCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('execute called');
+
+        return 0;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

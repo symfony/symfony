@@ -59,7 +59,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $container = $this->getApplication()->getKernel()->getContainer();
         $serviceId = $input->getArgument('name');
@@ -97,5 +97,7 @@ EOF
             ],
         ];
         $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));
+
+        return 0;
     }
 }

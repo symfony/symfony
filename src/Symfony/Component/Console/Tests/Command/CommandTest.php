@@ -300,20 +300,6 @@ class CommandTest extends TestCase
         $tester->execute(['--bar' => true]);
     }
 
-    public function testRunReturnsIntegerExitCode()
-    {
-        $command = new \TestCommand();
-        $exitCode = $command->run(new StringInput(''), new NullOutput());
-        $this->assertSame(0, $exitCode, '->run() returns integer exit code (treats null as 0)');
-
-        $command = $this->getMockBuilder('TestCommand')->setMethods(['execute'])->getMock();
-        $command->expects($this->once())
-            ->method('execute')
-            ->willReturn('2.3');
-        $exitCode = $command->run(new StringInput(''), new NullOutput());
-        $this->assertSame(2, $exitCode, '->run() returns integer exit code (casts numeric to int)');
-    }
-
     public function testRunWithApplication()
     {
         $command = new \TestCommand();

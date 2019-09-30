@@ -68,5 +68,7 @@ EOF
         $this->restartSignalCachePool->save($cacheItem);
 
         $io->success('Signal successfully sent to stop any running workers.');
+
+        return 0;
     }
 }

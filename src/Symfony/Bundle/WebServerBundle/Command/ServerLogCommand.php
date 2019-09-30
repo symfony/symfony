@@ -123,6 +123,8 @@ EOF
 
             $this->displayLog($input, $output, $clientId, $record);
         }
+
+        return 0;
     }
 
     private function getLogs($socket)

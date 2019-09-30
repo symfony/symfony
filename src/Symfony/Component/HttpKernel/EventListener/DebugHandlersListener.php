@@ -124,7 +124,11 @@ class DebugHandlersListener implements EventSubscriberInterface
                 if ($output instanceof ConsoleOutputInterface) {
                     $output = $output->getErrorOutput();
                 }
-                $this->exceptionHandler = function ($e) use ($app, $output) {
+                $this->exceptionHandler = static function (\Throwable $e) use ($app, $output) {
+                    if (!$e instanceof \Exception) {
+                        $e = new FatalThrowableError($e);
+                    }
+
                     $app->renderException($e, $output);
                 };
             }

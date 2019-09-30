@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Cloner;
 
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -24,6 +25,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     private $maxDepth = 20;
     private $maxItemsPerDepth = -1;
     private $useRefHandles = -1;
+    private $context = [];
 
     /**
      * @param array $data An array as returned by ClonerInterface::cloneVar()
@@ -224,6 +226,17 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
+     * @return static
+     */
+    public function withContext(array $context)
+    {
+        $data = clone $this;
+        $data->context = $context;
+
+        return $data;
+    }
+
+    /**
      * Seeks to a specific key in nested data structures.
      *
      * @param string|int $key The key to seek to
@@ -277,7 +290,18 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     public function dump(DumperInterface $dumper)
     {
         $refs = [0];
-        $this->dumpItem($dumper, new Cursor(), $refs, $this->data[$this->position][$this->key]);
+        $cursor = new Cursor();
+
+        if ($cursor->attr = $this->context[SourceContextProvider::class] ?? []) {
+            $cursor->attr['if_links'] = true;
+            $cursor->hashType = -1;
+            $dumper->dumpScalar($cursor, 'default', '^');
+            $cursor->attr = ['if_links' => true];
+            $dumper->dumpScalar($cursor, 'default', ' ');
+            $cursor->hashType = 0;
+        }
+
+        $this->dumpItem($dumper, $cursor, $refs, $this->data[$this->position][$this->key]);
     }
 
     /**

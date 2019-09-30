@@ -83,7 +83,7 @@ class CliDumper extends AbstractDumper
             ]);
         }
 
-        $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: 'file://%f';
+        $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: 'file://%f#L%l';
     }
 
     /**
@@ -486,6 +486,8 @@ class CliDumper extends AbstractDumper
             if (isset($attr['href'])) {
                 $value = "\033]8;;{$attr['href']}\033\\{$value}\033]8;;\033\\";
             }
+        } elseif ($attr['if_links'] ?? false) {
+            return '';
         }
 
         return $value;
@@ -544,6 +546,10 @@ class CliDumper extends AbstractDumper
 
     protected function endValue(Cursor $cursor)
     {
+        if (-1 === $cursor->hashType) {
+            return;
+        }
+
         if (Stub::ARRAY_INDEXED === $cursor->hashType || Stub::ARRAY_ASSOC === $cursor->hashType) {
             if (self::DUMP_TRAILING_COMMA & $this->flags && 0 < $cursor->depth) {
                 $this->line .= ',';
@@ -624,7 +630,7 @@ class CliDumper extends AbstractDumper
     private function getSourceLink(string $file, int $line)
     {
         if ($fmt = $this->displayOptions['fileLinkFormat']) {
-            return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : ($fmt->format($file, $line) ?: 'file://'.$file);
+            return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : ($fmt->format($file, $line) ?: 'file://'.$file.'#L'.$line);
         }
 
         return false;

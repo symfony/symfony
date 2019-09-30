@@ -53,6 +53,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;
@@ -141,6 +145,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;
@@ -309,6 +317,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;
@@ -327,7 +339,7 @@ EOTXT;
         $clone = $cloner->cloneVar($data);
 
         $expected = <<<'EOTXT'
-object(Symfony\Component\VarDumper\Cloner\Data)#%i (6) {
+object(Symfony\Component\VarDumper\Cloner\Data)#%d (7) {
   ["data":"Symfony\Component\VarDumper\Cloner\Data":private]=>
   array(2) {
     [0]=>
@@ -372,6 +384,9 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%i (6) {
   int(-1)
   ["useRefHandles":"Symfony\Component\VarDumper\Cloner\Data":private]=>
   int(-1)
+  ["context":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  array(0) {
+  }
 }
 
 EOTXT;
@@ -432,6 +447,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;
@@ -501,6 +520,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;

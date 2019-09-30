@@ -40,6 +40,19 @@
             <argument>0</argument> <!-- flags -->
         </service>
 
+        <service id="var_dumper.contextualized_cli_dumper" class="Symfony\Component\VarDumper\Dumper\ContextualizedDumper" decorates="var_dumper.cli_dumper">
+            <argument type="service" id="var_dumper.contextualized_cli_dumper.inner" />
+            <argument type="collection">
+                <argument type="service" key="source">
+                    <service class="Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider">
+                        <argument>%kernel.charset%</argument>
+                        <argument type="string">%kernel.project_dir%</argument>
+                        <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
+                    </service>
+                </argument>
+            </argument>
+        </service>
+
         <service id="var_dumper.html_dumper" class="Symfony\Component\VarDumper\Dumper\HtmlDumper">
             <argument>null</argument>
             <argument>%kernel.charset%</argument>
@@ -83,7 +96,7 @@
             <argument type="collection">
                 <argument type="service" key="cli">
                     <service class="Symfony\Component\VarDumper\Command\Descriptor\CliDescriptor">
-                        <argument type="service" id="var_dumper.cli_dumper" />
+                        <argument type="service" id="var_dumper.contextualized_cli_dumper.inner" />
                     </service>
                 </argument>
                 <argument type="service" key="html">

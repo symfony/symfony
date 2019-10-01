@@ -271,7 +271,7 @@ trait RedisTrait
             if (null !== $auth) {
                 $params['parameters']['password'] = $auth;
             }
-            if (1 === \count($hosts) && !$params['redis_cluster']) {
+            if (1 === \count($hosts) && !($params['redis_cluster'] || $params['redis_sentinel'])) {
                 $hosts = $hosts[0];
             } elseif (\in_array($params['failover'], ['slaves', 'distribute'], true) && !isset($params['replication'])) {
                 $params['replication'] = true;

@@ -21,7 +21,7 @@ use Symfony\Component\Mime\RawMessage;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Transports implements TransportInterface
+final class Transports implements TransportInterface
 {
     private $transports;
     private $default;
@@ -64,6 +64,6 @@ class Transports implements TransportInterface
 
     public function __toString(): string
     {
-        return 'all';
+        return '['.implode(',', array_keys($this->transports)).']';
     }
 }

@@ -267,7 +267,7 @@
             if (request.profilerUrl) {
                 profilerCell.textContent = '';
                 var profilerLink = document.createElement('a');
-                profilerLink.setAttribute('href', request.statusCode < 400 ? request.profilerUrl : request.profilerUrl + '?panel=exception');
+                profilerLink.setAttribute('href', request.profilerUrl);
                 profilerLink.textContent = request.profile;
                 profilerCell.appendChild(profilerLink);
             }

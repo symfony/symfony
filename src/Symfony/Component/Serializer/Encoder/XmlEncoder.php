@@ -51,7 +51,10 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     const REMOVE_EMPTY_TAGS = 'remove_empty_tags';
     const ROOT_NODE_NAME = 'xml_root_node_name';
     const STANDALONE = 'xml_standalone';
+
+    /** @deprecated The constant TYPE_CASE_ATTRIBUTES is deprecated since version 4.4 and will be removed in version 5. Use TYPE_CAST_ATTRIBUTES instead. */
     const TYPE_CASE_ATTRIBUTES = 'xml_type_cast_attributes';
+    const TYPE_CAST_ATTRIBUTES = 'xml_type_cast_attributes';
     const VERSION = 'xml_version';
 
     private $defaultContext = [
@@ -61,7 +64,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::LOAD_OPTIONS => LIBXML_NONET | LIBXML_NOBLANKS,
         self::REMOVE_EMPTY_TAGS => false,
         self::ROOT_NODE_NAME => 'response',
-        self::TYPE_CASE_ATTRIBUTES => true,
+        self::TYPE_CAST_ATTRIBUTES => true,
     ];
 
     /**
@@ -335,7 +338,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         $data = [];
-        $typeCastAttributes = (bool) ($context[self::TYPE_CASE_ATTRIBUTES] ?? $this->defaultContext[self::TYPE_CASE_ATTRIBUTES]);
+        $typeCastAttributes = (bool) ($context[self::TYPE_CAST_ATTRIBUTES] ?? $this->defaultContext[self::TYPE_CAST_ATTRIBUTES]);
 
         foreach ($node->attributes as $attr) {
             if (!is_numeric($attr->nodeValue) || !$typeCastAttributes || (isset($attr->nodeValue[1]) && '0' === $attr->nodeValue[0])) {

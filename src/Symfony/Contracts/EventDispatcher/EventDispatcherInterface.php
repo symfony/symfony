@@ -32,7 +32,7 @@ if (interface_exists(PsrEventDispatcherInterface::class)) {
          *
          * @return object The passed $event MUST be returned
          */
-        public function dispatch($event/*, string $eventName = null*/);
+        public function dispatch(object $event/*, string $eventName = null*/);
     }
 } else {
     /**

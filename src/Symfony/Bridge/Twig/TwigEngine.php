@@ -19,6 +19,7 @@ use Twig\Environment;
 use Twig\Error\Error;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
+use Twig\Loader\SourceContextLoaderInterface;
 use Twig\Template;
 
 /**
@@ -74,19 +75,24 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
 
         $loader = $this->environment->getLoader();
 
-        if ($loader instanceof ExistsLoaderInterface || method_exists($loader, 'exists')) {
-            return $loader->exists((string) $name);
-        }
+        if (1 === Environment::MAJOR_VERSION && !$loader instanceof ExistsLoaderInterface) {
+            try {
+                // cast possible TemplateReferenceInterface to string because the
+                // EngineInterface supports them but LoaderInterface does not
+                if ($loader instanceof SourceContextLoaderInterface) {
+                    $loader->getSourceContext((string) $name);
+                } else {
+                    $loader->getSource((string) $name);
+                }
 
-        try {
-            // cast possible TemplateReferenceInterface to string because the
-            // EngineInterface supports them but LoaderInterface does not
-            $loader->getSourceContext((string) $name)->getCode();
-        } catch (LoaderError $e) {
+                return true;
+            } catch (LoaderError $e) {
+            }
+
             return false;
         }
 
-        return true;
+        return $loader->exists((string) $name);
     }
 
     /**

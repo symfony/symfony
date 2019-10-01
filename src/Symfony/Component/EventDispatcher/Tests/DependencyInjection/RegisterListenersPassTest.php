@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RegisterListenersPassTest extends TestCase
 {
@@ -37,10 +38,6 @@ class RegisterListenersPassTest extends TestCase
 
     public function testValidEventSubscriber()
     {
-        $services = [
-            'my_event_subscriber' => [0 => []],
-        ];
-
         $builder = new ContainerBuilder();
         $eventDispatcherDefinition = $builder->register('event_dispatcher');
         $builder->register('my_event_subscriber', 'Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService')
@@ -60,6 +57,30 @@ class RegisterListenersPassTest extends TestCase
             ],
         ];
         $this->assertEquals($expectedCalls, $eventDispatcherDefinition->getMethodCalls());
+    }
+
+    public function testAliasedEventSubscriber(): void
+    {
+        $builder = new ContainerBuilder();
+        $builder->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
+        $builder->register('event_dispatcher');
+        $builder->register('my_event_subscriber', AliasedSubscriber::class)
+            ->addTag('kernel.event_subscriber');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($builder);
+
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    'aliased_event',
+                    [new ServiceClosureArgument(new Reference('my_event_subscriber')), 'onAliasedEvent'],
+                    0,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $builder->getDefinition('event_dispatcher')->getMethodCalls());
     }
 
     public function testAbstractEventListener()
@@ -175,9 +196,33 @@ class RegisterListenersPassTest extends TestCase
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
+
+    public function testAliasedEventListener(): void
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
+        $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => AliasedEvent::class, 'method' => 'onEvent']);
+        $container->register('event_dispatcher');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    'aliased_event',
+                    [new ServiceClosureArgument(new Reference('foo')), 'onEvent'],
+                    0,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
 }
 
-class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
+class SubscriberService implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
@@ -196,4 +241,18 @@ class InvokableListenerService
     public function onEvent()
     {
     }
+}
+
+final class AliasedSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            AliasedEvent::class => 'onAliasedEvent',
+        ];
+    }
+}
+
+final class AliasedEvent
+{
 }

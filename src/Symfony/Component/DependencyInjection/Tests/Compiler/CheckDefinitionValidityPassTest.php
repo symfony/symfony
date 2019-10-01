@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CheckDefinitionValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class CheckDefinitionValidityPassTest extends TestCase
 {
@@ -31,6 +32,19 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
+
+        $this->process($container);
+    }
+
+    public function testProcessDetectsFactoryWithoutClass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('.123_anonymous_service_id_should_not_throw_~1234567')->setFactory('factory');
+        $this->process($container);
+
+        $this->expectException(RuntimeException::class);
+        $container->register('.any_non_anonymous_id_throws')->setFactory('factory');
 
         $this->process($container);
     }

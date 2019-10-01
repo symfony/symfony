@@ -35,7 +35,7 @@ class RoundRobinTransport implements TransportInterface
     public function __construct(array $transports, int $retryPeriod = 60)
     {
         if (!$transports) {
-            throw new TransportException(__CLASS__.' must have at least one transport configured.');
+            throw new TransportException(sprintf('"%s" must have at least one transport configured.', static::class));
         }
 
         $this->transports = $transports;
@@ -58,9 +58,7 @@ class RoundRobinTransport implements TransportInterface
 
     public function __toString(): string
     {
-        return $this->getNameSymbol().'('.implode(' ', array_map(function (TransportInterface $transport) {
-            return (string) $transport;
-        }, $this->transports)).')';
+        return $this->getNameSymbol().'('.implode(' ', array_map('strval', $this->transports)).')';
     }
 
     /**

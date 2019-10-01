@@ -711,6 +711,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['orld', 'o', 'hello world', 0, false],
             ['abacab', 'ab', 'abacabab', 1, true],
             ['ab', 'ab', 'abacabab', 1, false],
+            ['hello world', 'hello', 'hello world', 0, false],
         ];
     }
 

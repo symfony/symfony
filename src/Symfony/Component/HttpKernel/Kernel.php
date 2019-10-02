@@ -505,25 +505,72 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $class = $this->getContainerClass();
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
-        $oldContainer = null;
-        if ($fresh = $cache->isFresh()) {
-            // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
-            $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
-            $fresh = $oldContainer = false;
-            try {
-                if (file_exists($cache->getPath()) && \is_object($this->container = include $cache->getPath())) {
-                    $this->container->set('kernel', $this);
-                    $oldContainer = $this->container;
-                    $fresh = true;
-                }
-            } catch (\Throwable $e) {
-            } finally {
+        $cachePath = $cache->getPath();
+
+        // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
+        $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
+
+        try {
+            if (file_exists($cachePath) && \is_object($this->container = include $cachePath) && (!$this->debug || $cache->isFresh())) {
+                $this->container->set('kernel', $this);
                 error_reporting($errorLevel);
+
+                return;
             }
+        } catch (\Throwable $e) {
         }
 
-        if ($fresh) {
-            return;
+        $oldContainer = \is_object($this->container) ? new \ReflectionClass($this->container) : $this->container = null;
+
+        try {
+            is_dir($cacheDir) ?: mkdir($cacheDir, 0777, true);
+
+            if ($lock = fopen($cachePath, 'w')) {
+                chmod($cachePath, 0666 & ~umask());
+                flock($lock, LOCK_EX | LOCK_NB, $wouldBlock);
+
+                if (!flock($lock, $wouldBlock ? LOCK_SH : LOCK_EX)) {
+                    fclose($lock);
+                } else {
+                    $cache = new class($cachePath, $this->debug) extends ConfigCache {
+                        public $lock;
+
+                        public function write($content, array $metadata = null)
+                        {
+                            rewind($this->lock);
+                            ftruncate($this->lock, 0);
+                            fwrite($this->lock, $content);
+
+                            if (null !== $metadata) {
+                                file_put_contents($this->getPath().'.meta', serialize($metadata));
+                                @chmod($this->getPath().'.meta', 0666 & ~umask());
+                            }
+
+                            if (\function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
+                                opcache_invalidate($this->getPath(), true);
+                            }
+                        }
+
+                        public function __destruct()
+                        {
+                            flock($this->lock, LOCK_UN);
+                            fclose($this->lock);
+                        }
+                    };
+                    $cache->lock = $lock;
+
+                    if (!\is_object($this->container = include $cachePath)) {
+                        $this->container = null;
+                    } elseif (!$oldContainer || \get_class($this->container) !== $oldContainer->name) {
+                        $this->container->set('kernel', $this);
+
+                        return;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+        } finally {
+            error_reporting($errorLevel);
         }
 
         if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
@@ -581,19 +628,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             }
         }
 
-        if (null === $oldContainer && file_exists($cache->getPath())) {
-            $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
-            try {
-                $oldContainer = include $cache->getPath();
-            } catch (\Throwable $e) {
-            } finally {
-                error_reporting($errorLevel);
-            }
-        }
-        $oldContainer = \is_object($oldContainer) ? new \ReflectionClass($oldContainer) : false;
-
         $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-        $this->container = require $cache->getPath();
+        unset($cache);
+        $this->container = require $cachePath;
         $this->container->set('kernel', $this);
 
         if ($oldContainer && \get_class($this->container) !== $oldContainer->name) {

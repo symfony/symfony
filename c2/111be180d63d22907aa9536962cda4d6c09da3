@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-30T23:07:06Z
+
+We need to fix the deprecations in this PR (as tests won't pass).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-01T05:12:45Z
+
+Don't miss updating the corresponding `@return` docblock also.

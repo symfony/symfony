@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-10-01T09:17:37Z
+
+Personally I still prefer https://github.com/symfony/symfony/pull/32491 btw because the profile link is directly the right one, there is no special magic panel name.
+
+However, I recognize the implementation here is more straightforward and easier to understand / maintain. It was such a great alternative thinking idea!
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T09:30:37Z
+
+Question here: should we reserve a `_best` name, or should we perform the guessing when no panel is specified in the query string (instead of defaulting to `request` in that case) ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-01T10:08:29Z
+
+If technically possible, my preference would be to guess when no param is passed. Otherwise, I'd prefer to rename `_best` to `_auto`. Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T10:17:41Z
+
+@javiereguiluz it is totally possible, by dropping the default panel when getting the panel from the request, and then performing guessing when `$panel` is `null` (and using `request` as the fallback for guessing, as already done here by reusing `$defaultPanel`)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-10-01T10:23:44Z
+
+@stof Your idea looks good to me, I just updated the code. And at least there is no debate on the name 😁
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-01T13:18:24Z
+
+There are some pending warnings https://travis-ci.org/symfony/symfony/jobs/591950102#L4498
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-10-01T13:43:21Z
+
+Tests will need https://github.com/symfony/symfony/pull/33792 to pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-02T08:49:32Z
+
+rebase unlocked, please apply the changes on src/Symfony/Bundle/WebProfilerBundle/Tests/Profiler/TemplateManagerTest.php as I didn't merge them from 3.4
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-10-02T09:31:26Z
+
+Done, failures are unrelated.

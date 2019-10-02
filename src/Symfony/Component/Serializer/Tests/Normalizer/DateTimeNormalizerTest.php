@@ -242,6 +242,16 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testDenormalizeUsingFormatPassedInConstructor()
+    {
+        $format = 'd/m/Y';
+        $string = '01/10/2018';
+        $date = \DateTime::createFromFormat($format, $string);
+        $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => $format]);
+        $denormalizedDate = $normalizer->denormalize($date->format($format), \DateTimeInterface::class);
+        $this->assertEquals($date->diff($denormalizedDate)->days, 0);
+    }
+
     public function denormalizeUsingTimezonePassedInContextProvider()
     {
         yield 'with timezone' => [

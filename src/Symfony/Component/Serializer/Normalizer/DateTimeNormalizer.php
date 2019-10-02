@@ -27,6 +27,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     private $defaultContext;
 
+    private $defaultDenormalizationFormat;
+
     private static $supportedTypes = [
         \DateTimeInterface::class => true,
         \DateTimeImmutable::class => true,
@@ -49,6 +51,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
             $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
             $defaultContext[self::TIMEZONE_KEY] = $timezone;
         }
+
+        $this->defaultDenormalizationFormat = $defaultContext[self::FORMAT_KEY] ?? null;
 
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -90,7 +94,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
-        $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
+        $dateTimeFormat = $context[self::FORMAT_KEY] ?? $this->defaultDenormalizationFormat;
         $timezone = $this->getTimezone($context);
 
         if ('' === $data || null === $data) {

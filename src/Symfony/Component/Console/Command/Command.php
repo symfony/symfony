@@ -255,7 +255,7 @@ class Command
             $statusCode = $this->execute($input, $output);
 
             if (!\is_int($statusCode)) {
-                @trigger_error(sprintf('Return value of "%s::execute()" should always be of the type int since Symfony 4.4, %s returned.', \get_class($this), \gettype($statusCode)), E_USER_DEPRECATED);
+                throw new \TypeError(sprintf('Return value of "%s::execute()" must be of the type int, %s returned.', \get_class($this), \gettype($statusCode)));
             }
         }
 

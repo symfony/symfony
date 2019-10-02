@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T08:52:41Z
+
+should this be covered by a test to prevent regressions ? I think the answer should be yes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-02T07:19:43Z
+
+Now with tests.

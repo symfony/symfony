@@ -478,4 +478,37 @@ class EnvVarProcessorTest extends TestCase
 
         $this->assertEquals('foo', $result);
     }
+
+    /**
+     * @dataProvider validCsv
+     */
+    public function testGetEnvCsv($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('csv', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+
+        $this->assertSame($processed, $result);
+    }
+
+    public function validCsv()
+    {
+        $complex = <<<'CSV'
+,"""","foo""","\""",\,foo\
+CSV;
+
+        return [
+            ['', [null]],
+            [',', ['', '']],
+            ['1', ['1']],
+            ['1,2," 3 "', ['1', '2', ' 3 ']],
+            ['\\,\\\\', ['\\', '\\\\']],
+            [$complex, \PHP_VERSION_ID >= 70400 ? ['', '"', 'foo"', '\\"', '\\', 'foo\\'] : ['', '"', 'foo"', '\\"",\\,foo\\']],
+            [null, null],
+        ];
+    }
 }

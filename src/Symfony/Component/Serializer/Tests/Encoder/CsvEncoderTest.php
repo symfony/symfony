@@ -55,7 +55,7 @@ CSV
             'true' => '1',
             'int_one' => '1',
             'string_one' => '1',
-        ], $this->encoder->decode($csv, 'csv'));
+        ], $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
     /**

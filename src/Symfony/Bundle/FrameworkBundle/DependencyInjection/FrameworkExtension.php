@@ -105,6 +105,7 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -192,6 +193,12 @@ class FrameworkExtension extends Extension
             if (class_exists(Translator::class)) {
                 $loader->load('identity_translator.xml');
             }
+        }
+
+        // If the slugger is used but the String component is not available, we should throw an error
+        if (!class_exists(SluggerInterface::class)) {
+            $container->register('slugger', 'stdClass')
+                ->addError('You cannot use the "slugger" since the String component is not installed. Try running "composer require symfony/string".');
         }
 
         if (isset($config['secret'])) {

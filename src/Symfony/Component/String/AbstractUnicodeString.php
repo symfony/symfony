@@ -331,18 +331,6 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
-    /**
-     * @return static
-     */
-    public function slug(string $separator = '-'): self
-    {
-        return $this
-            ->ascii()
-            ->replace('@', $separator.'at'.$separator)
-            ->replaceMatches('/[^A-Za-z0-9]++/', $separator)
-            ->trim($separator);
-    }
-
     public function snake(): parent
     {
         $str = $this->camel()->title();

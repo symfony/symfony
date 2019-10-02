@@ -120,5 +120,11 @@
             <argument type="service" id="request_stack" />
             <tag name="kernel.event_subscriber" />
         </service>
+
+        <service id="slugger" class="Symfony\Component\String\Slugger\AsciiSlugger">
+            <argument>%kernel.default_locale%</argument>
+            <tag name="kernel.locale_aware" />
+        </service>
+        <service id="Symfony\Component\String\Slugger\SluggerInterface" alias="slugger" />
     </services>
 </container>

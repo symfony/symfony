@@ -255,7 +255,7 @@ class Command
             $statusCode = $this->execute($input, $output);
 
             if (!\is_int($statusCode)) {
-                @trigger_error(sprintf('A non numeric or nullable $statusCode returned by Command::execute() is deprecated since Symfony 4.4, return an integer value instead.'), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Return value of "%s::execute()" should always be of the type int since Symfony 4.4, %s returned.', \get_class($this), \gettype($statusCode)), E_USER_DEPRECATED);
             }
         }
 

@@ -13,6 +13,13 @@ abstract class AbstractUtf8TestCase extends AbstractAsciiTestCase
         static::createFromString("\xE9");
     }
 
+    public function testAscii()
+    {
+        $s = static::createFromString('Dieser Wert sollte größer oder gleich');
+        $this->assertSame('Dieser Wert sollte grosser oder gleich', (string) $s->ascii());
+        $this->assertSame('Dieser Wert sollte groesser oder gleich', (string) $s->ascii(['de-ASCII']));
+    }
+
     public function provideCreateFromCodePoint(): array
     {
         return [

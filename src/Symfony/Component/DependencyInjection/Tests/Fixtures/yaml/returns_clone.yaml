@@ -1,0 +1,5 @@
+services:
+    foo:
+        calls:
+            - {method: bar, arguments: [1], returns_clone: true}
+            - [bar, [2], true]

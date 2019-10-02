@@ -901,4 +901,13 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertSame('overridden', $container->get('bar')->quz);
     }
+
+    public function testReturnsClone()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('returns_clone.xml');
+
+        $this->assertSame([['bar', [], true]], $container->getDefinition('foo')->getMethodCalls());
+    }
 }

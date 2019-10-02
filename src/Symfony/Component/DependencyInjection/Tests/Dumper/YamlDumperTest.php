@@ -99,7 +99,7 @@ class YamlDumperTest extends TestCase
 
     public function testTaggedArguments()
     {
-        $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar');
+        $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
         $container = new ContainerBuilder();
         $container->register('foo_service', 'Foo')->addTag('foo');
         $container->register('foo_service_tagged_iterator', 'Bar')->addArgument($taggedIterator);

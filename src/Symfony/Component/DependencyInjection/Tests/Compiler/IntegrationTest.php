@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
 
 /**
@@ -287,6 +288,30 @@ class IntegrationTest extends TestCase
 
         $param = iterator_to_array($s->getParam()->getIterator());
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
+    }
+
+    public function testTaggedServiceWithDefaultPriorityMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'foo'])
+        ;
+        $container->register(FooBarTaggedForDefaultPriorityClass::class)
+            ->addArgument(new TaggedIteratorArgument('foo_bar', null, null, false, 'getPriority'))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(FooBarTaggedForDefaultPriorityClass::class);
+
+        $param = iterator_to_array($s->getParam()->getIterator());
+        $this->assertSame([$container->get(FooTagClass::class), $container->get(BarTagClass::class)], $param);
     }
 
     public function testTaggedServiceLocatorWithIndexAttribute()

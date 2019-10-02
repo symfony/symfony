@@ -67,6 +67,7 @@ class LdapUser implements UserInterface, EquatableInterface
      */
     public function getSalt(): ?string
     {
+        return null;
     }
 
     /**

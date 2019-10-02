@@ -103,6 +103,6 @@ EOF
             }
         }
 
-        return null;
+        return 0;
     }
 }

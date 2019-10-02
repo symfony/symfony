@@ -150,7 +150,7 @@ class Command
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
-     * @return int|void void or 0 if everything went fine, or an exit code
+     * @return int 0 if everything went fine, or an exit code
      *
      * @throws LogicException When this abstract method is not implemented
      *
@@ -253,6 +253,10 @@ class Command
             $statusCode = ($this->code)($input, $output);
         } else {
             $statusCode = $this->execute($input, $output);
+
+            if (!\is_int($statusCode)) {
+                @trigger_error(sprintf('A non numeric or nullable $statusCode returned by Command::execute() is deprecated since Symfony 4.4, return an integer value instead.'), E_USER_DEPRECATED);
+            }
         }
 
         return is_numeric($statusCode) ? (int) $statusCode : 0;

@@ -96,6 +96,8 @@ EOF
                 $io->warning(sprintf('No handled message found in bus "%s".', $bus));
             }
         }
+
+        return 0;
     }
 
     private function formatConditions(array $options): string

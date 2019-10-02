@@ -10,6 +10,7 @@ Console
 -------
 
  * Deprecated finding hidden commands using an abbreviation, use the full name instead
+ * Deprecated returning `null` from `Command::execute()`, return `0` instead
 
 Debug
 -----

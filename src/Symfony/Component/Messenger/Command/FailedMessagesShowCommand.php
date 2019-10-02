@@ -71,6 +71,8 @@ EOF
         } else {
             $this->showMessage($id, $io);
         }
+
+        return 0;
     }
 
     private function listMessages(SymfonyStyle $io, int $max)

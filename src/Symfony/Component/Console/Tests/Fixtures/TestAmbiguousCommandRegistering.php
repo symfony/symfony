@@ -15,8 +15,10 @@ class TestAmbiguousCommandRegistering extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->write('test-ambiguous');
+
+        return 0;
     }
 }

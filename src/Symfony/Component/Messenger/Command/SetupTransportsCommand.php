@@ -76,5 +76,7 @@ EOF
                 $io->note(sprintf('The "%s" transport does not support setup.', $transportName));
             }
         }
+
+        return 0;
     }
 }

@@ -1837,9 +1837,11 @@ class CustomDefaultCommandApplication extends Application
 
 class LazyCommand extends Command
 {
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('lazy-command called');
+
+        return 0;
     }
 }
 

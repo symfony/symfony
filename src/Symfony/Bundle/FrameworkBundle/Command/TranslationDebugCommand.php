@@ -124,7 +124,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -246,7 +246,7 @@ EOF
 
             $io->getErrorStyle()->warning($outputMessage);
 
-            return;
+            return 0;
         }
 
         // Load the fallback catalogues
@@ -295,6 +295,8 @@ EOF
         }
 
         $io->table($headers, $rows);
+
+        return 0;
     }
 
     private function formatState(int $state): string

@@ -37,6 +37,7 @@ Console
  * Removed the `getHorizontalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
  * Removed the `setVerticalBorderChar()` method in favor of the `setVerticalBorderChars()` method in `TableStyle`.
  * Removed the `getVerticalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
+ * Removed support for returning `null` from `Command::execute()`, return `0` instead
  * The `ProcessHelper::run()` method takes the command as an array of arguments.
 
    Before:

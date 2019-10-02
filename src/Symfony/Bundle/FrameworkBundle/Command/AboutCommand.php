@@ -54,7 +54,7 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -100,6 +100,8 @@ EOT
         }
 
         $io->table([], $rows);
+
+        return 0;
     }
 
     private static function formatPath(string $path, string $baseDir): string

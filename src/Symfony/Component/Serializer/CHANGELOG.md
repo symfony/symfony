@@ -4,8 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
- * [DEPRECATION] The `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant is deprecated.
-   Use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead 
+ * deprecated the `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant, use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead 
  
 4.3.0
 -----

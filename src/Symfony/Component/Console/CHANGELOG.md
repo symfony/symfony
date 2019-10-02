@@ -23,6 +23,7 @@ CHANGELOG
  * `Application` implements `ResetInterface`
  * marked all dispatched event classes as `@final`
  * added support for displaying table horizontally
+ * deprecated returning `null` from `Command::execute()`, return `0` instead
 
 4.3.0
 -----

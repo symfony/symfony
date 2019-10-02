@@ -83,6 +83,7 @@
         "symfony/twig-bridge": "<4.4",
         "symfony/twig-bundle": "<4.4",
         "symfony/validator": "<4.4",
+        "symfony/var-dumper": "<4.4",
         "symfony/workflow": "<4.4"
     },
     "suggest": {

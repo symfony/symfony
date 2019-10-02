@@ -110,11 +110,13 @@ EOF
 
             $this->runInteractive($io, $shouldForce);
 
-            return;
+            return 0;
         }
 
         $this->retrySpecificIds($ids, $io, $shouldForce);
         $io->success('All done!');
+
+        return 0;
     }
 
     private function runInteractive(SymfonyStyle $io, bool $shouldForce)

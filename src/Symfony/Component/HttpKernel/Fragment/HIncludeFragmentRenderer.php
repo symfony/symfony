@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\UriSigner;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
+use Twig\Loader\SourceContextLoaderInterface;
 
 /**
  * Implements the Hinclude rendering strategy.
@@ -76,7 +77,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         $uri = str_replace('&', '&amp;', $uri);
 
         $template = isset($options['default']) ? $options['default'] : $this->globalDefaultTemplate;
-        if (null !== $this->twig && $template && $this->templateExists($template)) {
+        if (null !== $this->twig && $template && $this->twig->getLoader()->exists($template)) {
             $content = $this->twig->render($template);
         } else {
             $content = $template;
@@ -99,27 +100,6 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
 
         return new Response(sprintf('<hx:include src="%s"%s>%s</hx:include>', $uri, $renderedAttributes, $content));
-    }
-
-    private function templateExists(string $template): bool
-    {
-        $loader = $this->twig->getLoader();
-        if ($loader instanceof ExistsLoaderInterface || method_exists($loader, 'exists')) {
-            return $loader->exists($template);
-        }
-
-        try {
-            if (method_exists($loader, 'getSourceContext')) {
-                $loader->getSourceContext($template);
-            } else {
-                $loader->getSource($template);
-            }
-
-            return true;
-        } catch (LoaderError $e) {
-        }
-
-        return false;
     }
 
     /**

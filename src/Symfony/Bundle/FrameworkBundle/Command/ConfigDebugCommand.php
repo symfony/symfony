@@ -63,7 +63,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
@@ -73,7 +73,7 @@ EOF
             $errorIo->comment('Provide the name of a bundle as the first argument of this command to dump its configuration. (e.g. <comment>debug:config FrameworkBundle</comment>)');
             $errorIo->comment('For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>debug:config FrameworkBundle serializer</comment> to dump the <comment>framework.serializer</comment> configuration)');
 
-            return;
+            return 0;
         }
 
         $extension = $this->findExtension($name);
@@ -101,7 +101,7 @@ EOF
 
             $io->writeln(Yaml::dump([$extensionAlias => $config], 10));
 
-            return;
+            return 0;
         }
 
         try {
@@ -109,12 +109,14 @@ EOF
         } catch (LogicException $e) {
             $errorIo->error($e->getMessage());
 
-            return;
+            return 1;
         }
 
         $io->title(sprintf('Current configuration for "%s.%s"', $extensionAlias, $path));
 
         $io->writeln(Yaml::dump($config, 10));
+
+        return 0;
     }
 
     private function compileContainer(): ContainerBuilder

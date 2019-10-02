@@ -36,7 +36,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         self::AS_COLLECTION_KEY => true,
         self::DELIMITER_KEY => ',',
         self::ENCLOSURE_KEY => '"',
-        self::ESCAPE_CHAR_KEY => '\\',
+        self::ESCAPE_CHAR_KEY => '',
         self::ESCAPE_FORMULAS_KEY => false,
         self::HEADERS_KEY => [],
         self::KEY_SEPARATOR_KEY => '.',
@@ -46,6 +46,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public function __construct(array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+
+        if (\PHP_VERSION_ID < 70400 && '' === $this->defaultContext[self::ESCAPE_CHAR_KEY]) {
+            $this->defaultContext[self::ESCAPE_CHAR_KEY] = '\\';
+        }
     }
 
     /**

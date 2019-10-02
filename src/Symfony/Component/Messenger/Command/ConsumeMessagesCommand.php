@@ -205,6 +205,8 @@ EOF
         $worker->run([
             'sleep' => $input->getOption('sleep') * 1000000,
         ]);
+
+        return 0;
     }
 
     private function convertToBytes(string $memoryLimit): int

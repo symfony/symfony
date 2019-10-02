@@ -60,7 +60,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $kernel = $this->getApplication()->getKernel();
@@ -99,5 +99,7 @@ EOF
         }
 
         $io->success('Cache was successfully cleared.');
+
+        return 0;
     }
 }

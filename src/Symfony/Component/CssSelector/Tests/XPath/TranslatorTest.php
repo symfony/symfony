@@ -98,7 +98,7 @@ class TranslatorTest extends TestCase
         $elements = $document->xpath($translator->cssToXPath($css));
         $this->assertCount(\count($elementsId), $elements);
         foreach ($elements as $element) {
-            $this->assertTrue(\in_array($element->attributes()->id, $elementsId));
+            $this->assertContains((string) $element->attributes()->id, $elementsId);
         }
     }
 
@@ -116,7 +116,7 @@ class TranslatorTest extends TestCase
         $this->assertCount(\count($elementsId), $elementsId);
         foreach ($elements as $element) {
             if (null !== $element->attributes()->id) {
-                $this->assertTrue(\in_array($element->attributes()->id, $elementsId));
+                $this->assertContains((string) $element->attributes()->id, $elementsId);
             }
         }
         libxml_clear_errors();
@@ -135,6 +135,33 @@ class TranslatorTest extends TestCase
         $bodies = $document->xpath('//body');
         $elements = $bodies[0]->xpath($translator->cssToXPath($css));
         $this->assertCount($count, $elements);
+    }
+
+    public function testOnlyOfTypeFindsSingleChildrenOfGivenType()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $document = new \DOMDocument();
+        $document->loadHTML(<<<'HTML'
+<html>
+  <body>
+    <p>
+      <span>A</span>
+    </p>
+    <p>
+      <span>B</span>
+      <span>C</span>
+    </p>
+  </body>
+</html>
+HTML
+);
+
+        $xpath = new \DOMXPath($document);
+        $nodeList = $xpath->query($translator->cssToXPath('span:only-of-type'));
+
+        $this->assertSame(1, $nodeList->length);
+        $this->assertSame('A', $nodeList->item(0)->textContent);
     }
 
     public function getXpathLiteralTestData()
@@ -175,7 +202,7 @@ class TranslatorTest extends TestCase
             ['e:first-of-type', '*/e[position() = 1]'],
             ['e:last-of-type', '*/e[position() = last()]'],
             ['e:only-child', "*/*[(name() = 'e') and (last() = 1)]"],
-            ['e:only-of-type', 'e[last() = 1]'],
+            ['e:only-of-type', 'e[count(preceding-sibling::e)=0 and count(following-sibling::e)=0]'],
             ['e:empty', 'e[not(*) and not(string-length())]'],
             ['e:EmPTY', 'e[not(*) and not(string-length())]'],
             ['e:root', 'e[not(parent::*)]'],

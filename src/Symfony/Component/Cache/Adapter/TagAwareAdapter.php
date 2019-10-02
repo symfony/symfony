@@ -380,7 +380,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
                 continue;
             }
             $version -= $this->knownTagVersions[$tag][1];
-            if ((0 !== $version && 1 !== $version) || $this->knownTagVersionsTtl > $now - $this->knownTagVersions[$tag][0]) {
+            if ((0 !== $version && 1 !== $version) || $now - $this->knownTagVersions[$tag][0] >= $this->knownTagVersionsTtl) {
                 // reuse previously fetched tag versions up to the ttl, unless we are storing items or a potential miss arises
                 $fetchTagVersions = true;
             } else {

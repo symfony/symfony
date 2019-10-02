@@ -95,6 +95,8 @@ EOF
             $io->newLine();
             $io->table(['Format', 'Class'], $tableRows);
         }
+
+        return 0;
     }
 
     private function formatClassLink(string $class): string

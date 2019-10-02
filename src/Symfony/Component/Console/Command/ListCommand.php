@@ -74,6 +74,8 @@ EOF
             'raw_text' => $input->getOption('raw'),
             'namespace' => $input->getArgument('namespace'),
         ]);
+
+        return 0;
     }
 
     private function createDefinition(): InputDefinition

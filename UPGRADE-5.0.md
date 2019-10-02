@@ -37,6 +37,7 @@ Console
  * Removed the `getHorizontalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
  * Removed the `setVerticalBorderChar()` method in favor of the `setVerticalBorderChars()` method in `TableStyle`.
  * Removed the `getVerticalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
+ * Removed support for returning `null` from `Command::execute()`, return `0` instead
  * The `ProcessHelper::run()` method takes the command as an array of arguments.
 
    Before:
@@ -535,6 +536,11 @@ Serializer
    were removed, use the default context instead.
  * The `AbstractNormalizer::handleCircularReference()` method has two new `$format` and `$context` arguments.
  * Removed support for instantiating a `DataUriNormalizer` with a default MIME type guesser when the `symfony/mime` component isn't installed.
+
+Serializer
+----------
+
+* Removed the `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant. Use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead.
 
 Stopwatch
 ---------

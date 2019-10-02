@@ -15,7 +15,8 @@ use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Twig\Environment;
-use Twig\Source;
+use Twig\Loader\LoaderInterface;
+use Twig\Loader\SourceContextLoaderInterface;
 
 /**
  * Test for TemplateManager class.

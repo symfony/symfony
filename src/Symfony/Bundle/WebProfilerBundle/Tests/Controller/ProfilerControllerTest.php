@@ -15,8 +15,16 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
+use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Twig\Environment;
+use Twig\Loader\LoaderInterface;
+use Twig\Loader\SourceContextLoaderInterface;
 
 class ProfilerControllerTest extends TestCase
 {
@@ -185,7 +193,97 @@ class ProfilerControllerTest extends TestCase
         ];
     }
 
-    private function createController($profiler, $twig, $withCSP): ProfilerController
+    /**
+     * @dataProvider defaultPanelProvider
+     */
+    public function testDefaultPanel(string $expectedPanel, Profile $profile)
+    {
+        $profiler = $this->createMock(Profiler::class);
+        $profiler
+            ->expects($this->atLeastOnce())
+            ->method('loadProfile')
+            ->with($profile->getToken())
+            ->willReturn($profile);
+
+        $profiler
+            ->expects($this->atLeastOnce())
+            ->method('has')
+            ->with($this->logicalXor($collectorsNames = array_keys($profile->getCollectors())))
+            ->willReturn(true);
+
+        $expectedTemplate = 'expected_template.html.twig';
+
+        if (Environment::MAJOR_VERSION > 1) {
+            $loader = $this->createMock(LoaderInterface::class);
+            $loader
+                ->expects($this->atLeastOnce())
+                ->method('exists')
+                ->with($this->logicalXor($expectedTemplate, 'other_template.html.twig'))
+                ->willReturn(true);
+        } else {
+            $loader = $this->createMock(SourceContextLoaderInterface::class);
+        }
+
+        $twig = $this->createMock(Environment::class);
+        $twig
+            ->expects($this->atLeastOnce())
+            ->method('getLoader')
+            ->willReturn($loader);
+        $twig
+            ->expects($this->once())
+            ->method('render')
+            ->with($expectedTemplate);
+
+        $this
+            ->createController($profiler, $twig, false, array_map(function (string $collectorName) use ($expectedPanel, $expectedTemplate): array {
+                if ($collectorName === $expectedPanel) {
+                    return [$expectedPanel, $expectedTemplate];
+                }
+
+                return [$collectorName, 'other_template.html.twig'];
+            }, $collectorsNames))
+            ->panelAction(new Request(), $profile->getToken());
+    }
+
+    public function defaultPanelProvider(): \Generator
+    {
+        // Test default behavior
+        $profile = new Profile('xxxxxx');
+        $profile->addCollector($requestDataCollector = new RequestDataCollector());
+        yield [$requestDataCollector->getName(), $profile];
+
+        // Test exception
+        $profile = new Profile('xxxxxx');
+        $profile->addCollector($exceptionDataCollector = new ExceptionDataCollector());
+        $exceptionDataCollector->collect(new Request(), new Response(), new \DomainException());
+        yield [$exceptionDataCollector->getName(), $profile];
+
+        // Test exception priority
+        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector
+            ->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn('dump');
+        $dumpDataCollector
+            ->expects($this->atLeastOnce())
+            ->method('getDumpsCount')
+            ->willReturn(1);
+        $profile = new Profile('xxxxxx');
+        $profile->setCollectors([$exceptionDataCollector, $dumpDataCollector]);
+        yield [$exceptionDataCollector->getName(), $profile];
+
+        // Test exception priority when defined afterwards
+        $profile = new Profile('xxxxxx');
+        $profile->setCollectors([$dumpDataCollector, $exceptionDataCollector]);
+        yield [$exceptionDataCollector->getName(), $profile];
+
+        // Test dump
+        $profile = new Profile('xxxxxx');
+        $profile->addCollector($dumpDataCollector);
+        yield [$dumpDataCollector->getName(), $profile];
+    }
+
+    private function createController($profiler, $twig, $withCSP, array $templates = []): ProfilerController
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
 
@@ -193,9 +291,9 @@ class ProfilerControllerTest extends TestCase
             $nonceGenerator = $this->getMockBuilder('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator')->getMock();
             $nonceGenerator->method('generate')->willReturn('dummy_nonce');
 
-            return new ProfilerController($urlGenerator, $profiler, $twig, [], new ContentSecurityPolicyHandler($nonceGenerator));
+            return new ProfilerController($urlGenerator, $profiler, $twig, $templates, new ContentSecurityPolicyHandler($nonceGenerator));
         }
 
-        return new ProfilerController($urlGenerator, $profiler, $twig, []);
+        return new ProfilerController($urlGenerator, $profiler, $twig, $templates);
     }
 }

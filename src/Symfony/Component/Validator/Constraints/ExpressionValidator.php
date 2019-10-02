@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
@@ -39,7 +40,9 @@ class ExpressionValidator extends ConstraintValidator
             @trigger_error(sprintf('The "%s" first argument must be an instance of "%s" or null since 4.4. "%s" given', __METHOD__, ExpressionLanguage::class, \is_object($expressionLanguage) ? \get_class($expressionLanguage) : \gettype($expressionLanguage)), E_USER_DEPRECATED);
         }
 
-        $this->expressionLanguage = $expressionLanguage;
+        if (($this->expressionLanguage = $expressionLanguage) instanceof ExpressionLanguage) {
+            $this->addIsValidFunction();
+        }
     }
 
     /**
@@ -65,13 +68,87 @@ class ExpressionValidator extends ConstraintValidator
 
     private function getExpressionLanguage()
     {
-        if (null === $this->expressionLanguage) {
+        if (!$this->expressionLanguage instanceof ExpressionLanguage) {
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage();
+
+            $this->addIsValidFunction();
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function addIsValidFunction(): void
+    {
+        if ($this->expressionLanguage->hasFunction('is_valid')) {
+            return;
+        }
+
+        $this->expressionLanguage->register('is_valid', function () {
+            throw new LogicException('The "is_valid" function cannot be compiled.');
+        }, function (array $variables, ...$arguments): bool {
+            if (!$arguments) {
+                throw new ConstraintDefinitionException('The "is_valid" function requires at least one argument.');
+            }
+
+            $isObject = \is_object($object = $this->context->getObject());
+
+            $constraints = [];
+            $properties = [];
+
+            foreach ($arguments as $argument) {
+                if ($argument instanceof Constraint) {
+                    $constraints[] = $argument;
+
+                    continue;
+                }
+
+                if (\is_array($argument)) {
+                    foreach ($argument as $constraint) {
+                        if (!$constraint instanceof Constraint) {
+                            throw new ConstraintDefinitionException(sprintf('The "is_valid" function only accepts arrays that contain instances of "%s" exclusively, "%s" given.', Constraint::class, \is_object($constraint) ? \get_class($constraint) : \gettype($constraint)));
+                        }
+
+                        $constraints[] = $constraint;
+                    }
+
+                    continue;
+                }
+
+                if (\is_string($argument)) {
+                    if (!$isObject) {
+                        throw new ConstraintDefinitionException('The "is_valid" function only accepts strings that represent properties paths when validating an object.');
+                    }
+
+                    $properties[] = $argument;
+
+                    continue;
+                }
+
+                throw new ConstraintDefinitionException(sprintf('The "is_valid" function only accepts instances of "%s", arrays of "%s", or strings that represent properties paths (when validating an object), "%s" given.', Constraint::class, Constraint::class, \is_object($argument) ? \get_class($argument) : \gettype($argument)));
+            }
+
+            if (!$constraints && !$properties) {
+                return true;
+            }
+
+            $validator = $this->context->getValidator();
+
+            if ($constraints) {
+                if ($validator->validate($variables['value'], $constraints, $this->context->getGroup())->count()) {
+                    return false;
+                }
+            }
+
+            foreach ($properties as $property) {
+                if ($validator->validateProperty($object, $property, $this->context->getGroup())->count()) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 }

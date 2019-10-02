@@ -62,6 +62,8 @@ class FakeMetadataFactory implements MetadataFactoryInterface
     public function addMetadata($metadata)
     {
         $this->metadatas[$metadata->getClassName()] = $metadata;
+
+        return $this;
     }
 
     public function addMetadataForValue($value, MetadataInterface $metadata)

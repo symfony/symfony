@@ -256,4 +256,15 @@ class ExpressionLanguageTest extends TestCase
             ],
         ];
     }
+
+    public function testHasFunction()
+    {
+        $el = new ExpressionLanguage();
+
+        $this->assertFalse($el->hasFunction('foo'));
+
+        $el->register('foo', function () {}, function () {});
+
+        $this->assertTrue($el->hasFunction('foo'));
+    }
 }

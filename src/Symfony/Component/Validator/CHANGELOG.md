@@ -24,6 +24,7 @@ CHANGELOG
  * Overriding the methods `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` without the `void` return-type is deprecated.
  * deprecated `Symfony\Component\Validator\Mapping\Cache\CacheInterface` in favor of PSR-6.
  * deprecated `ValidatorBuilder::setMetadataCache`, use `ValidatorBuilder::setMappingCache` instead.
+ * Added the `is_valid` function to the `Expression` constraint.
 
 4.3.0
 -----

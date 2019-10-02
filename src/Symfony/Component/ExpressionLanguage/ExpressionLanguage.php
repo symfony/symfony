@@ -132,6 +132,11 @@ class ExpressionLanguage
         }
     }
 
+    public function hasFunction(string $name): bool
+    {
+        return isset($this->functions[$name]);
+    }
+
     protected function registerFunctions()
     {
         $this->addFunction(ExpressionFunction::fromPhp('constant'));

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * Added the `ExpressionLanguage::hasFunction()` method.
+
 4.0.0
 -----
 

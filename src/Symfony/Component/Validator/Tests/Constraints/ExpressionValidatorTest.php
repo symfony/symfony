@@ -14,9 +14,20 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Constraints\IdenticalTo;
+use Symfony\Component\Validator\Constraints\IsNull;
+use Symfony\Component\Validator\Constraints\NotIdenticalTo;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 use Symfony\Component\Validator\Tests\Fixtures\ToString;
+use Symfony\Component\Validator\ValidatorBuilder;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExpressionValidatorTest extends ConstraintValidatorTestCase
 {
@@ -322,4 +333,108 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
+
+    public function testExistingIsValidFunctionIsNotOverridden()
+    {
+        $used = false;
+
+        $el = $el = new ExpressionLanguage();
+        $el->register('is_valid', function () {}, function () use (&$used) {
+            $used = true;
+        });
+
+        $validator = new ExpressionValidator($el);
+        $validator->initialize($this->context);
+
+        $validator->validate('foo', new Expression('is_valid()'));
+
+        $this->assertTrue($used);
+    }
+
+    /**
+     * @dataProvider isValidFunctionWithInvalidArgumentsProvider
+     */
+    public function testIsValidFunctionWithInvalidArguments(string $expectedMessage, $value, string $expression, array $values)
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $this->validator->validate($value, new Expression([
+            'expression' => $expression,
+            'values' => $values,
+        ]));
+    }
+
+    public function isValidFunctionWithInvalidArgumentsProvider()
+    {
+        return [
+            ['The "is_valid" function requires at least one argument.', null, 'is_valid()', []],
+            ['The "is_valid" function only accepts instances of "Symfony\Component\Validator\Constraint", arrays of "Symfony\Component\Validator\Constraint", or strings that represent properties paths (when validating an object), "ArrayIterator" given.', null, 'is_valid(a)', ['a' => new \ArrayIterator()]],
+            ['The "is_valid" function only accepts instances of "Symfony\Component\Validator\Constraint", arrays of "Symfony\Component\Validator\Constraint", or strings that represent properties paths (when validating an object), "NULL" given.', null, 'is_valid(a)', ['a' => null]],
+            ['The "is_valid" function only accepts arrays that contain instances of "Symfony\Component\Validator\Constraint" exclusively, "ArrayIterator" given.', null, 'is_valid(a)', ['a' => [new \ArrayIterator()]]],
+            ['The "is_valid" function only accepts arrays that contain instances of "Symfony\Component\Validator\Constraint" exclusively, "string" given.', null, 'is_valid(a)', ['a' => ['foo']]],
+            ['The "is_valid" function only accepts strings that represent properties paths when validating an object.', 'foo', 'is_valid("bar")', []],
+        ];
+    }
+
+    /**
+     * @dataProvider isValidFunctionProvider
+     */
+    public function testIsValidFunction(bool $shouldBeValid, $value, string $expression, array $values = [], string $group = null, array $propertiesConstraints = [])
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnArgument(0);
+
+        $validatorBuilder = new ValidatorBuilder();
+
+        $classMetadata = null;
+        if ($valueIsObject = \is_object($value)) {
+            $classMetadata = new ClassMetadata(\get_class($value));
+            foreach ($propertiesConstraints as $property => $constraints) {
+                $classMetadata->addPropertyConstraints($property, $constraints);
+            }
+
+            $validatorBuilder->setMetadataFactory((new FakeMetadataFactory())->addMetadata($classMetadata));
+        }
+
+        $this->validator->initialize($executionContext = new ExecutionContext(
+            $validatorBuilder->getValidator(),
+            $this->root,
+            $translator
+        ));
+
+        $executionContext->setConstraint($constraint = new Expression([
+            'expression' => $expression,
+            'values' => $values,
+        ]));
+        $executionContext->setGroup($group);
+        $executionContext->setNode($value, $valueIsObject ? $value : null, $classMetadata, '');
+
+        $this->validator->validate($value, $constraint);
+
+        $this->assertSame($shouldBeValid, !(bool) $executionContext->getViolations()->count());
+    }
+
+    public function isValidFunctionProvider()
+    {
+        return [
+            [true, 'foo', 'is_valid(a) or is_valid(b)', ['a' => new NotIdenticalTo('foo'), 'b' => new IdenticalTo('foo')]],
+            [false, 'foo', 'is_valid(a) and is_valid(b)', ['a' => new NotIdenticalTo('foo'), 'b' => new IdenticalTo('foo')]],
+            [false, 'foo', 'is_valid(a, b)', ['a' => new NotIdenticalTo('foo'), 'b' => new IdenticalTo('foo')]],
+            [false, 'foo', 'is_valid(a)', ['a' => new NotIdenticalTo('foo')]],
+            [true, 'foo', 'is_valid(a)', ['a' => [new IdenticalTo('foo')]]],
+            [true, 'foo', 'is_valid(a)', ['a' => new NotIdenticalTo(['value' => 'foo', 'groups' => 'g1'])], 'g2'],
+            [false, new TestExpressionValidatorObject(), 'is_valid("foo")', [], null, ['foo' => [new NotNull()]]],
+            [true, new TestExpressionValidatorObject(), 'is_valid("foo")', [], null, ['foo' => [new IsNull()]]],
+            [true, new TestExpressionValidatorObject(), 'is_valid("foo")'],
+            [true, new TestExpressionValidatorObject(), 'is_valid("any string")'],
+            [false, new TestExpressionValidatorObject(), 'is_valid("foo", a)', ['a' => new IsNull()], null, ['foo' => [new IsNull()]]],
+            [true, new TestExpressionValidatorObject(), 'is_valid(a, "foo")', ['a' => new Type(TestExpressionValidatorObject::class)], null, ['foo' => [new IsNull()]]],
+        ];
+    }
+}
+
+final class TestExpressionValidatorObject
+{
+    public $foo = null;
 }

@@ -10,6 +10,7 @@ CHANGELOG
  * removed `TableStyle::getHorizontalBorderChar()` method in favor of `TableStyle::getBorderChars()`
  * removed `TableStyle::setVerticalBorderChar()` method in favor of `TableStyle::setVerticalBorderChars()`
  * removed `TableStyle::getVerticalBorderChar()` method in favor of `TableStyle::getBorderChars()`
+ * removed support for returning `null` from `Command::execute()`, return `0` instead
  * `ProcessHelper::run()` accepts only `array|Symfony\Component\Process\Process` for its `command` argument
  * `Application::setDispatcher` accepts only `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` 
     for its `dispatcher` argument

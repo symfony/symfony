@@ -219,6 +219,11 @@ Security
    ) {}
    ```
 
+Serializer
+----------
+
+ * Deprecated the `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant. Use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead.
+
 Stopwatch
 ---------
 

@@ -70,7 +70,7 @@ CSV
 CSV
         , $this->encoder->encode($data = ['', '"', 'foo"', '\\"', '\\', 'foo\\'], 'csv'));
 
-        $this->assertSame($data, $this->encoder->decode($csv, 'csv'));
+        $this->assertSame($data, $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
     /**
@@ -79,8 +79,8 @@ CSV
     public function testSingleSlash()
     {
         $this->assertSame($csv = "0\n\\\n", $this->encoder->encode($data = ['\\'], 'csv'));
-        $this->assertSame($data, $this->encoder->decode($csv, 'csv'));
-        $this->assertSame($data, $this->encoder->decode(trim($csv), 'csv'));
+        $this->assertSame($data, $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
+        $this->assertSame($data, $this->encoder->decode(trim($csv), 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]));
     }
 
     public function testSupportEncoding()

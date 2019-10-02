@@ -81,17 +81,15 @@ abstract class AbstractUnicodeString extends AbstractString
         $s = $str->string;
         $str->string = '';
 
-        if (!$rules) {
-            $rules[] = '[:nonspacing mark:] remove';
-        }
-
-        array_unshift($rules, 'nfd');
-
         if (\function_exists('transliterator_transliterate')) {
+            array_unshift($rules, 'nfd');
             $rules[] = 'any-latin/bgn';
             $rules[] = 'nfkd';
-            $rules[] = '[:nonspacing mark:] remove';
+        } else {
+            array_unshift($rules, 'nfkd');
         }
+
+        $rules[] = '[:nonspacing mark:] remove';
 
         while (\strlen($s) - 1 > $i = strspn($s, self::ASCII)) {
             if (0 < --$i) {
@@ -99,16 +97,13 @@ abstract class AbstractUnicodeString extends AbstractString
                 $s = substr($s, $i);
             }
 
-            if ($rules && !$rule = array_shift($rules)) {
+            if (!$rule = array_shift($rules)) {
                 $rules = []; // An empty rule interrupts the next ones
             }
 
-            if ($rules && $rule) {
-                if ($rule instanceof \Transliterator) {
-                    $s = $rule->transliterate($s);
-                    continue;
-                }
-
+            if ($rule instanceof \Transliterator) {
+                $s = $rule->transliterate($s);
+            } elseif ($rule) {
                 if ('nfd' === $rule = strtolower($rule)) {
                     normalizer_is_normalized($s, self::NFD) ?: $s = normalizer_normalize($s, self::NFD);
                 } elseif ('nfkd' === $rule) {

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by linaori at 2019-10-01T10:43:19Z
+
+One possibility for 4.4 is to have both constants and mark the old one with `@deprecated`
+
+---------------------------------------------------------------------------
+
+by pierredup at 2019-10-01T10:53:47Z
+
+Deprecation added in #33789

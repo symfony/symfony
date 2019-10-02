@@ -46,7 +46,7 @@ class X509AuthenticationListener extends AbstractPreAuthenticatedListener
             $user = $request->server->get($this->userKey);
         } elseif (
             $request->server->has($this->credentialKey)
-            && preg_match('#emailAddress=(.+\@.+\.[^,/]+)($|,|/)#', $request->server->get($this->credentialKey), $matches)
+            && preg_match('#emailAddress=([^,/@]++@[^,/]++)#', $request->server->get($this->credentialKey), $matches)
         ) {
             $user = $matches[1];
         }

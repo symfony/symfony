@@ -110,6 +110,7 @@ class TemplateManagerTest extends TestCase
             $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
             $loader->method('getSourceContext')->willReturn(new Source('source-code', 'source-name'));
         }
+
         $this->twigEnvironment->expects($this->any())->method('getLoader')->willReturn($loader);
 
         return $this->twigEnvironment;

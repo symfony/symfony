@@ -36,15 +36,51 @@ class CsvEncoderTest extends TestCase
             'int' => 2,
             'false' => false,
             'true' => true,
+            'int_one' => 1,
+            'string_one' => '1',
         ];
 
         // Check that true and false are appropriately handled
-        $this->assertEquals(<<<'CSV'
-string,int,false,true
-foo,2,0,1
+        $this->assertSame($csv = <<<'CSV'
+string,int,false,true,int_one,string_one
+foo,2,0,1,1,1
 
 CSV
-    , $this->encoder->encode($data, 'csv'));
+        , $this->encoder->encode($data, 'csv'));
+
+        $this->assertSame([
+            'string' => 'foo',
+            'int' => '2',
+            'false' => '0',
+            'true' => '1',
+            'int_one' => '1',
+            'string_one' => '1',
+        ], $this->encoder->decode($csv, 'csv'));
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testDoubleQuotesAndSlashes()
+    {
+        $this->assertSame($csv = <<<'CSV'
+0,1,2,3,4,5
+,"""","foo""","\""",\,foo\
+
+CSV
+        , $this->encoder->encode($data = ['', '"', 'foo"', '\\"', '\\', 'foo\\'], 'csv'));
+
+        $this->assertSame($data, $this->encoder->decode($csv, 'csv'));
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testSingleSlash()
+    {
+        $this->assertSame($csv = "0\n\\\n", $this->encoder->encode($data = ['\\'], 'csv'));
+        $this->assertSame($data, $this->encoder->decode($csv, 'csv'));
+        $this->assertSame($data, $this->encoder->decode(trim($csv), 'csv'));
     }
 
     public function testSupportEncoding()

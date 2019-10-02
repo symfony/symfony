@@ -17,7 +17,7 @@ use Symfony\Component\String\Exception\InvalidArgumentException;
 /**
  * Represents a string of Unicode grapheme clusters encoded as UTF-8.
  *
- * A letter followed by combining characters (accents typically) forms what Unicode defines
+ * A letter followed by combining characters (accents typically) form what Unicode defines
  * as a grapheme cluster: a character as humans mean it in written texts. This class knows
  * about the concept and won't split a letter apart from its combining accents. It also
  * ensures all string comparisons happen on their canonically-composed representation,
@@ -32,7 +32,7 @@ use Symfony\Component\String\Exception\InvalidArgumentException;
  *
  * @experimental in 5.0
  */
-class GraphemeString extends AbstractUnicodeString
+class UnicodeString extends AbstractUnicodeString
 {
     public function __construct(string $string = '')
     {

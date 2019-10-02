@@ -24,7 +24,7 @@ use Symfony\Component\String\Exception\InvalidArgumentException;
  *
  * @experimental in 5.0
  */
-class Utf8String extends AbstractUnicodeString
+class CodePointString extends AbstractUnicodeString
 {
     public function __construct(string $string = '')
     {

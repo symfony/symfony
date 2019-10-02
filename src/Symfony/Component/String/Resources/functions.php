@@ -14,15 +14,15 @@ namespace Symfony\Component\String;
 /**
  * @experimental in 5.0
  */
-function u(string $string = ''): GraphemeString
+function u(string $string = ''): UnicodeString
 {
-    return new GraphemeString($string);
+    return new UnicodeString($string);
 }
 
 /**
  * @experimental in 5.0
  */
-function b(string $string = ''): BinaryString
+function b(string $string = ''): ByteString
 {
-    return new BinaryString($string);
+    return new ByteString($string);
 }

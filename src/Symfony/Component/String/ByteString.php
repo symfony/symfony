@@ -25,7 +25,7 @@ use Symfony\Component\String\Exception\RuntimeException;
  *
  * @experimental in 5.0
  */
-class BinaryString extends AbstractString
+class ByteString extends AbstractString
 {
     public function __construct(string $string = '')
     {
@@ -371,14 +371,14 @@ class BinaryString extends AbstractString
         return $str;
     }
 
-    public function toGrapheme(string $fromEncoding = null): GraphemeString
+    public function toUnicodeString(string $fromEncoding = null): UnicodeString
     {
-        return new GraphemeString($this->toUtf8($fromEncoding)->string);
+        return new UnicodeString($this->toCodePointString($fromEncoding)->string);
     }
 
-    public function toUtf8(string $fromEncoding = null): Utf8String
+    public function toCodePointString(string $fromEncoding = null): CodePointString
     {
-        $u = new Utf8String();
+        $u = new CodePointString();
 
         if (\in_array($fromEncoding, [null, 'utf8', 'utf-8', 'UTF8', 'UTF-8'], true) && preg_match('//u', $this->string)) {
             $u->string = $this->string;

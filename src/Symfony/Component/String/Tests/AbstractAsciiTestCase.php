@@ -4,10 +4,10 @@ namespace Symfony\Component\String\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\AbstractString;
-use Symfony\Component\String\BinaryString;
+use Symfony\Component\String\ByteString;
+use Symfony\Component\String\CodePointString;
 use Symfony\Component\String\Exception\InvalidArgumentException;
-use Symfony\Component\String\GraphemeString;
-use Symfony\Component\String\Utf8String;
+use Symfony\Component\String\UnicodeString;
 
 abstract class AbstractAsciiTestCase extends TestCase
 {
@@ -875,9 +875,9 @@ abstract class AbstractAsciiTestCase extends TestCase
             [false, "\nfoo", 'f'],
             [true, 'foo', 'f'],
             [true, 'foo', 'fo'],
-            [true, 'foo', new BinaryString('f')],
-            [true, 'foo', new Utf8String('f')],
-            [true, 'foo', new GraphemeString('f')],
+            [true, 'foo', new ByteString('f')],
+            [true, 'foo', new CodePointString('f')],
+            [true, 'foo', new UnicodeString('f')],
             [true, 'foo', ['e', 'f', 'g']],
         ];
     }
@@ -900,9 +900,9 @@ abstract class AbstractAsciiTestCase extends TestCase
             [false, "\nfoo", 'f'],
             [true, 'foo', 'F'],
             [true, 'FoO', 'foo'],
-            [true, 'foo', new BinaryString('F')],
-            [true, 'foo', new Utf8String('F')],
-            [true, 'foo', new GraphemeString('F')],
+            [true, 'foo', new ByteString('F')],
+            [true, 'foo', new CodePointString('F')],
+            [true, 'foo', new UnicodeString('F')],
             [true, 'foo', ['E', 'F', 'G']],
         ];
     }
@@ -926,9 +926,9 @@ abstract class AbstractAsciiTestCase extends TestCase
             [false, "foo\n", 'o'],
             [true, 'foo', 'o'],
             [true, 'foo', 'foo'],
-            [true, 'foo', new BinaryString('o')],
-            [true, 'foo', new Utf8String('o')],
-            [true, 'foo', new GraphemeString('o')],
+            [true, 'foo', new ByteString('o')],
+            [true, 'foo', new CodePointString('o')],
+            [true, 'foo', new UnicodeString('o')],
             [true, 'foo', ['a', 'o', 'u']],
         ];
     }
@@ -951,9 +951,9 @@ abstract class AbstractAsciiTestCase extends TestCase
             [false, "foo\n", 'o'],
             [true, 'foo', 'O'],
             [true, 'Foo', 'foo'],
-            [true, 'foo', new BinaryString('O')],
-            [true, 'foo', new Utf8String('O')],
-            [true, 'foo', new GraphemeString('O')],
+            [true, 'foo', new ByteString('O')],
+            [true, 'foo', new CodePointString('O')],
+            [true, 'foo', new UnicodeString('O')],
             [true, 'foo', ['A', 'O', 'U']],
         ];
     }
@@ -1098,9 +1098,9 @@ abstract class AbstractAsciiTestCase extends TestCase
             [false, 'foo', 'Foo'],
             [false, "foo\n", 'foo'],
             [true, 'Foo bar', 'Foo bar'],
-            [true, 'Foo bar', new BinaryString('Foo bar')],
-            [true, 'Foo bar', new Utf8String('Foo bar')],
-            [true, 'Foo bar', new GraphemeString('Foo bar')],
+            [true, 'Foo bar', new ByteString('Foo bar')],
+            [true, 'Foo bar', new CodePointString('Foo bar')],
+            [true, 'Foo bar', new UnicodeString('Foo bar')],
             [false, '', []],
             [false, 'foo', ['bar', 'baz']],
             [true, 'foo', ['bar', 'foo', 'baz']],
@@ -1123,9 +1123,9 @@ abstract class AbstractAsciiTestCase extends TestCase
             [false, 'foo', ''],
             [false, "foo\n", 'foo'],
             [true, 'foo Bar', 'FOO bar'],
-            [true, 'foo Bar', new BinaryString('FOO bar')],
-            [true, 'foo Bar', new Utf8String('FOO bar')],
-            [true, 'foo Bar', new GraphemeString('FOO bar')],
+            [true, 'foo Bar', new ByteString('FOO bar')],
+            [true, 'foo Bar', new CodePointString('FOO bar')],
+            [true, 'foo Bar', new UnicodeString('FOO bar')],
             [false, '', []],
             [false, 'Foo', ['bar', 'baz']],
             [true, 'Foo', ['bar', 'foo', 'baz']],

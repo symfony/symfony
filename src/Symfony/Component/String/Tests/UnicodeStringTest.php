@@ -12,13 +12,13 @@
 namespace Symfony\Component\String\Tests;
 
 use Symfony\Component\String\AbstractString;
-use Symfony\Component\String\GraphemeString;
+use Symfony\Component\String\UnicodeString;
 
-class GraphemeStringTest extends AbstractUtf8TestCase
+class UnicodeStringTest extends AbstractUnicodeTestCase
 {
     protected static function createFromString(string $string): AbstractString
     {
-        return new GraphemeString($string);
+        return new UnicodeString($string);
     }
 
     public static function provideLength(): array

@@ -12,13 +12,13 @@
 namespace Symfony\Component\String\Tests;
 
 use Symfony\Component\String\AbstractString;
-use Symfony\Component\String\BinaryString;
+use Symfony\Component\String\ByteString;
 
-class BinaryStringTest extends AbstractAsciiTestCase
+class ByteStringTest extends AbstractAsciiTestCase
 {
     protected static function createFromString(string $string): AbstractString
     {
-        return new BinaryString($string);
+        return new ByteString($string);
     }
 
     public static function provideLength(): array

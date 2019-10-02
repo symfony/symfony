@@ -72,10 +72,6 @@ trait MaxDepthTestTrait
         $level4->bar = 'level4';
         $level3->child = $level4;
 
-        $level5 = new MaxDepthDummyChild2();
-        $level5->bar = 'level5';
-        $level4->child = $level5;
-
         $result = $normalizer->normalize($level1, null, ['enable_max_depth' => true]);
 
         $expected = [

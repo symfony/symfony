@@ -104,7 +104,7 @@ EOF
         } catch (LogicException $e) {
             $errorIo->error($e->getMessage());
 
-            return;
+            return 1;
         }
 
         $io->title(sprintf('Current configuration for "%s.%s"', $extensionAlias, $path));

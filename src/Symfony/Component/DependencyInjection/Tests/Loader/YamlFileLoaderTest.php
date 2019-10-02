@@ -834,4 +834,17 @@ class YamlFileLoaderTest extends TestCase
         $this->assertInstanceOf(TaggedIteratorArgument::class, $iteratorArgument);
         $this->assertNull($iteratorArgument->getIndexAttribute());
     }
+
+    public function testReturnsClone()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('returns_clone.yaml');
+
+        $expected = [
+            ['bar', [1], true],
+            ['bar', [2], true],
+        ];
+        $this->assertSame($expected, $container->getDefinition('foo')->getMethodCalls());
+    }
 }

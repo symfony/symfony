@@ -225,7 +225,7 @@ class StopwatchEvent
      *
      * @throws \InvalidArgumentException When the raw time is not valid
      */
-    private function formatTime(float $time)
+    private function formatTime(float $time): float
     {
         return round($time, 1);
     }

@@ -69,7 +69,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$denormalizeCache[$class][$propertyName] ?? $this->denormalizeFallback($propertyName, $class, $format, $context);
     }
 
-    private function getCacheValueForNormalization(string $propertyName, string $class)
+    private function getCacheValueForNormalization(string $propertyName, string $class): ?string
     {
         if (!$this->metadataFactory->hasMetadataFor($class)) {
             return null;
@@ -83,12 +83,12 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
     }
 
-    private function normalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = [])
+    private function normalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = []): string
     {
         return $this->fallbackNameConverter ? $this->fallbackNameConverter->normalize($propertyName, $class, $format, $context) : $propertyName;
     }
 
-    private function getCacheValueForDenormalization(string $propertyName, string $class)
+    private function getCacheValueForDenormalization(string $propertyName, string $class): ?string
     {
         if (!isset(self::$attributesMetadataCache[$class])) {
             self::$attributesMetadataCache[$class] = $this->getCacheValueForAttributesMetadata($class);
@@ -97,7 +97,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$attributesMetadataCache[$class][$propertyName] ?? null;
     }
 
-    private function denormalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = [])
+    private function denormalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = []): string
     {
         return $this->fallbackNameConverter ? $this->fallbackNameConverter->denormalize($propertyName, $class, $format, $context) : $propertyName;
     }

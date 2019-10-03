@@ -39,7 +39,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         parent::__construct();
     }
 
-    protected function getReceiverName()
+    protected function getReceiverName(): string
     {
         return $this->receiverName;
     }

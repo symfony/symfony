@@ -70,7 +70,7 @@ class MultiplierRetryStrategyTest extends TestCase
         $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
     }
 
-    public function getWaitTimeTests()
+    public function getWaitTimeTests(): iterable
     {
         // delay, multiplier, maxDelay, retries, expectedDelay
         yield [1000, 1, 5000, 0, 1000];

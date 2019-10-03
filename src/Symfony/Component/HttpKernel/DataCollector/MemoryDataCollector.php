@@ -89,7 +89,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
         return 'memory';
     }
 
-    private function convertToBytes(string $memoryLimit)
+    private function convertToBytes(string $memoryLimit): int
     {
         if ('-1' === $memoryLimit) {
             return -1;

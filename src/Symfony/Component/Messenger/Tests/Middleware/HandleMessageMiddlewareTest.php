@@ -60,7 +60,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertEquals($expectedStamps, $envelope->all(HandledStamp::class));
     }
 
-    public function itAddsHandledStampsProvider()
+    public function itAddsHandledStampsProvider(): iterable
     {
         $first = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
         $first->method('__invoke')->willReturn('first result');

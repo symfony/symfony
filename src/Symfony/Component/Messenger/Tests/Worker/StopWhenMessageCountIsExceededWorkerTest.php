@@ -23,7 +23,7 @@ class StopWhenMessageCountIsExceededWorkerTest extends TestCase
     /**
      * @dataProvider countProvider
      */
-    public function testWorkerStopsWhenMaximumCountExceeded($max, $shouldStop)
+    public function testWorkerStopsWhenMaximumCountExceeded(int $max, bool $shouldStop)
     {
         $handlerCalledTimes = 0;
         $handledCallback = function () use (&$handlerCalledTimes) {
@@ -44,7 +44,7 @@ class StopWhenMessageCountIsExceededWorkerTest extends TestCase
         $this->assertSame($shouldStop, $decoratedWorker->isStopped());
     }
 
-    public function countProvider()
+    public function countProvider(): iterable
     {
         yield [1, true];
         yield [2, true];

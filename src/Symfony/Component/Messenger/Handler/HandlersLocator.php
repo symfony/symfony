@@ -74,7 +74,7 @@ class HandlersLocator implements HandlersLocatorInterface
             + ['*' => '*'];
     }
 
-    private function shouldHandle(Envelope $envelope, HandlerDescriptor $handlerDescriptor)
+    private function shouldHandle(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool
     {
         if (null === $received = $envelope->last(ReceivedStamp::class)) {
             return true;

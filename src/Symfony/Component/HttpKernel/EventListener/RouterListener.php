@@ -161,7 +161,7 @@ class RouterListener implements EventSubscriberInterface
         ];
     }
 
-    private function createWelcomeResponse()
+    private function createWelcomeResponse(): Response
     {
         $version = Kernel::VERSION;
         $projectDir = realpath($this->projectDir).\DIRECTORY_SEPARATOR;

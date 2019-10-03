@@ -53,7 +53,7 @@ final class User implements UserInterface, EquatableInterface, AdvancedUserInter
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->roles;
     }

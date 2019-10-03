@@ -241,7 +241,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock(false));
     }
 
-    private function createSendersLocator(array $sendersMap, array $senders)
+    private function createSendersLocator(array $sendersMap, array $senders): SendersLocator
     {
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->any())

@@ -93,7 +93,7 @@ class ExpressionVoter implements VoterInterface
         return $result;
     }
 
-    private function getVariables(TokenInterface $token, $subject)
+    private function getVariables(TokenInterface $token, $subject): array
     {
         if (method_exists($token, 'getRoleNames')) {
             $roleNames = $token->getRoleNames();

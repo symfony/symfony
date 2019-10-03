@@ -32,7 +32,7 @@ trait CompiledUrlMatcherTrait
     private $dynamicRoutes = [];
     private $checkCondition;
 
-    public function match($pathinfo)
+    public function match($pathinfo): array
     {
         $allow = $allowSchemes = [];
         if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {

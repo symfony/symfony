@@ -167,7 +167,7 @@ abstract class Descriptor implements DescriptorInterface
         $this->extensionOptions = $filterByDeprecated($this->extensionOptions);
     }
 
-    private function getParentOptionsResolver(ResolvedFormTypeInterface $type)
+    private function getParentOptionsResolver(ResolvedFormTypeInterface $type): OptionsResolver
     {
         $this->parents[$class = \get_class($type->getInnerType())] = [];
 

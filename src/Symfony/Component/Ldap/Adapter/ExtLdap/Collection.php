@@ -118,7 +118,7 @@ class Collection implements CollectionInterface
         unset($this->entries[$offset]);
     }
 
-    private function getSingleEntry($con, $current)
+    private function getSingleEntry($con, $current): Entry
     {
         $attributes = ldap_get_attributes($con, $current);
 
@@ -137,7 +137,7 @@ class Collection implements CollectionInterface
         return new Entry($dn, $attributes);
     }
 
-    private function cleanupAttributes(array $entry)
+    private function cleanupAttributes(array $entry): array
     {
         $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + [
                 'count' => null,

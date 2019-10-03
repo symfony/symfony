@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nesk at 2019-10-03T08:19:52Z
+
+> the PR should target 4.4, as a new "feature"
+
+Did it, and removed the upgrade line. However, I do not understand why this is considered a new feature instead of a BC break. 🤔
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-03T08:26:30Z
+
+If it's considered as a BC break, then merging on master is equally wrong: we don't do hard BC breaks that don't trigger a prior notice in 4.4.
+
+Now we can discuss the BC break nature of this.
+
+This is a BC break only if some class implements `HttpExceptionInterface` without actually extending a base exception. I think that doesn't exist. So we're in the "yes" of the table on https://symfony.com/bc
+
+---------------------------------------------------------------------------
+
+by nesk at 2019-10-03T08:31:59Z
+
+> This is a BC break only if some class implements `HttpExceptionInterface` without actually extending a base exception. I think that doesn't exist. So we're in the "yes" of the table on [symfony.com/bc](https://symfony.com/bc)
+
+I see your point, I don't think anyone did this too.

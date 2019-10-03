@@ -37,6 +37,8 @@ class ExpressionValidator extends ConstraintValidator
             }
         } elseif (null !== $expressionLanguage && !$expressionLanguage instanceof ExpressionLanguage) {
             @trigger_error(sprintf('The "%s" first argument must be an instance of "%s" or null since 4.4. "%s" given', __METHOD__, ExpressionLanguage::class, \is_object($expressionLanguage) ? \get_class($expressionLanguage) : \gettype($expressionLanguage)), E_USER_DEPRECATED);
+
+            $expressionLanguage = null;
         }
 
         $this->expressionLanguage = $expressionLanguage;

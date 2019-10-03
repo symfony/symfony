@@ -414,6 +414,7 @@ Workflow
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
+ * `WorkflowInterface::apply()` has a third argument: `array $context = []`.
  * `MarkingStoreInterface::setMarking()` has a third argument: `array $context = []`.
  * Removed support of `initial_place`. Use `initial_places` instead.
  * `MultipleStateMarkingStore` has been removed. Use `MethodMarkingStore` instead.

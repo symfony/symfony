@@ -53,12 +53,13 @@ interface WorkflowInterface
      *
      * @param object $subject        A subject
      * @param string $transitionName A transition
+     * @param array  $context        Some context
      *
      * @return Marking The new Marking
      *
      * @throws LogicException If the transition is not applicable
      */
-    public function apply($subject, $transitionName, array $context = []);
+    public function apply($subject, $transitionName/*, array $context = []*/);
 
     /**
      * Returns all enabled transitions.

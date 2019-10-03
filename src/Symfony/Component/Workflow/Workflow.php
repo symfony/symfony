@@ -150,9 +150,13 @@ class Workflow implements WorkflowInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context Some context
      */
-    public function apply($subject, $transitionName, array $context = [])
+    public function apply($subject, $transitionName/*, array $context = []*/)
     {
+        $context = \func_get_args()[2] ?? [];
+
         $marking = $this->getMarking($subject);
 
         $transitionBlockerList = null;

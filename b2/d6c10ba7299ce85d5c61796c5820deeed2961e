@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T18:11:35Z
+
+Thank you. I'm not sure about any of the changes on tests: they provide nothing quality-wise, and make merges more conflict-prone.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-30T12:14:41Z
+
+> Thank you. I'm not sure about any of the changes on tests: they provide nothing quality-wise, and make merges more conflict-prone.
+
+On the last PR, we agreed that I could add types to tests that don't exist on the 3.4 branch. That should be the case for the Messenger and HttpClient tests that I've patched here.

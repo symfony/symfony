@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by creiner at 2019-10-02T06:39:42Z
+
+I've added it to the LanguageType and added also the tests...
+
+When a language doesn't have a three letter code, it doesn't appear in the collection (behavior of Language::getAlpha3Names )..
+Maybe this can cause confusion.. do you think a fallback to 2-letter codes for languages which doesn't have three letter codes would be appropriate?

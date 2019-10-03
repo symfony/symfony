@@ -196,9 +196,18 @@ class FrameworkExtension extends Extension
         }
 
         // If the slugger is used but the String component is not available, we should throw an error
-        if (!class_exists(SluggerInterface::class)) {
+        if (!interface_exists(SluggerInterface::class)) {
             $container->register('slugger', 'stdClass')
-                ->addError('You cannot use the "slugger" since the String component is not installed. Try running "composer require symfony/string".');
+                ->addError('You cannot use the "slugger" service since the String component is not installed. Try running "composer require symfony/string".');
+        } else {
+            if (!interface_exists(LocaleAwareInterface::class)) {
+                $container->register('slugger', 'stdClass')
+                    ->addError('You cannot use the "slugger" service since the Translation contracts are not installed. Try running "composer require symfony/translation".');
+            }
+
+            if (!\extension_loaded('intl')) {
+                @trigger_error('Please install the "intl" PHP extension for best performance.', E_USER_DEPRECATED);
+            }
         }
 
         if (isset($config['secret'])) {

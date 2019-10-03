@@ -242,6 +242,28 @@ Workflow
               initial_marking: [draft]
    ```
 
+ * `WorkflowInterface::apply()` will have a third argument in Symfony 5.0.
+
+   Before:
+   ```php
+   class MyWorkflow implements WorkflowInterface
+   {
+       public function apply($subject, $transitionName)
+       {
+       }
+   }
+   ```
+
+   After:
+   ```php
+   class MyWorkflow implements WorkflowInterface
+   {
+       public function apply($subject, $transitionName, array $context = [])
+       {
+       }
+   }
+   ```
+
  * `MarkingStoreInterface::setMarking()` will have a third argument in Symfony 5.0.
 
    Before:

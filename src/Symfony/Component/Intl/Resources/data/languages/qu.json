@@ -147,7 +147,6 @@
         "nds": "Bajo Alemán Simi",
         "ne": "Nepali Simi",
         "nl": "Neerlandes Simi",
-        "nl_BE": "Flamenco Simi",
         "nmg": "Kwasio Ngumba Simi",
         "nn": "Noruego Nynorsk Simi",
         "nnh": "Ngiemboon Simi",
@@ -233,12 +232,13 @@
         "yue": "Cantonés Simi",
         "zgh": "Bereber Marroquí Estándar Simi",
         "zh": "Chino Simi",
-        "zh_Hans": "Chino Simplificado Simi",
-        "zh_Hant": "Chino Tradicional Simi",
         "zu": "Isizulu Simi"
     },
     "LocalizedNames": {
         "es_419": "Español Simi (Latino América)",
-        "sw_CD": "Suajili Simi (Congo (RDC))"
+        "nl_BE": "Flamenco Simi",
+        "sw_CD": "Suajili Simi (Congo (RDC))",
+        "zh_Hans": "Chino Simplificado Simi",
+        "zh_Hant": "Chino Tradicional Simi"
     }
 }

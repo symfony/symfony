@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.86",
+    "Version": "36",
     "Names": {
         "ace": "acehnés",
         "alt": "altái meridional",
@@ -18,8 +18,10 @@
         "grc": "griego antiguo",
         "gu": "gurayatí",
         "hak": "hak",
+        "hil": "hiligainón",
         "hsn": "xiang (China)",
         "ht": "criollo haitiano",
+        "inh": "ingusetio",
         "kbd": "kabardiano",
         "krc": "karachay-balkar",
         "lo": "lao",
@@ -39,12 +41,14 @@
         "tet": "tetún",
         "tn": "setchwana",
         "tyv": "tuviniano",
-        "tzm": "tamazight del Atlas Central",
         "wo": "wolof",
         "wuu": "wuu",
         "xal": "kalmyk"
     },
     "LocalizedNames": {
-        "sw_CD": "swahili del Congo"
+        "nl_BE": "flamenco",
+        "sw_CD": "swahili del Congo",
+        "zh_Hans": "chino simplificado",
+        "zh_Hant": "chino tradicional"
     }
 }

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "af": "africanês",
         "alt": "altai do sul",
@@ -11,6 +11,7 @@
         "bbj": "ghomala",
         "bn": "bengalês",
         "bua": "buriat",
+        "ccp": "changma",
         "chk": "chuquês",
         "chn": "jargão chinook",
         "chr": "cherokee",
@@ -42,7 +43,6 @@
         "lg": "ganda",
         "lou": "crioulo de Louisiana",
         "lrc": "luri do norte",
-        "luo": "luo",
         "mak": "makassarês",
         "mk": "macedónio",
         "moh": "mohawk",
@@ -77,7 +77,6 @@
         "tt": "tatar",
         "tzm": "tamazight do Atlas Central",
         "uz": "usbeque",
-        "vai": "vai",
         "wo": "uólofe",
         "xh": "xosa",
         "xog": "soga",
@@ -100,7 +99,11 @@
         "fr_CA": "francês canadiano",
         "fr_CH": "francês suíço",
         "nds_NL": "baixo-saxão",
+        "nl_BE": "flamengo",
         "pt_BR": "português do Brasil",
-        "pt_PT": "português europeu"
+        "pt_PT": "português europeu",
+        "ro_MD": "moldávio",
+        "zh_Hans": "chinês simplificado",
+        "zh_Hant": "chinês tradicional"
     }
 }

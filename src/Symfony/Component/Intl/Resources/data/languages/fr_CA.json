@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.86",
+    "Version": "36",
     "Names": {
         "ady": "adygué",
         "ang": "vieil anglais",
@@ -19,6 +19,8 @@
         "esu": "yupik central",
         "ewo": "ewondo",
         "frc": "cajun",
+        "frp": "franco-provençal",
+        "gbz": "dari",
         "goh": "vieux haut-allemand",
         "gu": "gujarati",
         "ii": "yi de Sichuan",
@@ -30,14 +32,12 @@
         "ksh": "kölsch",
         "liv": "live",
         "lu": "luba-katanga",
-        "luo": "luo",
         "lzh": "chinois classique",
         "mgh": "makhuwa-meetto",
         "mgo": "meta’",
         "mr": "marathe",
         "mwr": "marwari",
         "mwv": "mentawai",
-        "nds": "bas allemand",
         "njo": "ao naga",
         "nmg": "kwasio",
         "nwc": "newari classique",
@@ -56,11 +56,28 @@
         "sga": "vieil irlandais",
         "sly": "selayar",
         "smn": "sami d’Inari",
+        "stq": "frison de Saterland",
+        "sus": "sosso",
         "tru": "turoyo",
         "tzm": "tamazight"
     },
     "LocalizedNames": {
+        "ar_001": "arabe standard moderne",
+        "de_AT": "allemand autrichien",
+        "de_CH": "allemand suisse",
+        "en_AU": "anglais australien",
+        "en_CA": "anglais canadien",
+        "en_GB": "anglais britannique",
+        "en_US": "anglais américain",
+        "fr_CA": "français canadien",
+        "fr_CH": "français suisse",
         "nds_NL": "bas saxon",
-        "sw_CD": "swahili congolais"
+        "nl_BE": "flamand",
+        "pt_BR": "portugais brésilien",
+        "pt_PT": "portugais européen",
+        "ro_MD": "moldave",
+        "sw_CD": "swahili congolais",
+        "zh_Hans": "chinois simplifié",
+        "zh_Hant": "chinois traditionnel"
     }
 }

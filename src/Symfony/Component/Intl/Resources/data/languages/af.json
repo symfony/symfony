@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "aa": "Afar",
         "ab": "Abkasies",
@@ -48,6 +48,7 @@
         "bug": "Buginees",
         "byn": "Blin",
         "ca": "Katalaans",
+        "ccp": "Tsjaakma",
         "ce": "Tsjetsjeens",
         "ceb": "Cebuano",
         "cgg": "Kiga",
@@ -247,7 +248,7 @@
         "naq": "Nama",
         "nb": "Boeknoors",
         "nd": "Noord-Ndebele",
-        "nds": "Lae Duits",
+        "nds": "Nederduits",
         "ne": "Nepalees",
         "new": "Newari",
         "ng": "Ndonga",
@@ -387,19 +388,16 @@
         "yo": "Yoruba",
         "yue": "Kantonees",
         "zgh": "Standaard Marokkaanse Tamazight",
-        "zh": "Sjinees",
+        "zh": "Chinees",
         "zu": "Zoeloe",
         "zun": "Zuni",
         "zza": "Zaza"
     },
     "LocalizedNames": {
         "ar_001": "Moderne Standaardarabies",
-        "de_CH": "Switserse hoog-Duits",
         "en_GB": "Engels (VK)",
         "en_US": "Engels (VSA)",
         "nds_NL": "Nedersaksies",
-        "nl_BE": "Vlaams",
-        "zh_Hans": "Chinees (Vereenvoudig)",
-        "zh_Hant": "Chinees (Tradisioneel)"
+        "nl_BE": "Vlaams"
     }
 }

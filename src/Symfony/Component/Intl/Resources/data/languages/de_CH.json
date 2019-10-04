@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.86",
+    "Version": "36",
     "Names": {
         "ace": "Aceh-Sprache",
         "ach": "Acholi-Sprache",
@@ -16,5 +16,11 @@
         "mus": "Muskogee-Sprache",
         "prg": "Altpreussisch"
     },
-    "LocalizedNames": []
+    "LocalizedNames": {
+        "ar_001": "Modernes Hocharabisch",
+        "de_CH": "Schweizer Hochdeutsch",
+        "nl_BE": "Flämisch",
+        "zh_Hans": "Chinesisch (vereinfacht)",
+        "zh_Hant": "Chinesisch (traditionell)"
+    }
 }

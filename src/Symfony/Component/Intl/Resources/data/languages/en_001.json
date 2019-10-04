@@ -1,7 +1,9 @@
 {
     "Version": "36",
     "Names": {
-        "mus": "Creek",
+        "mus": "Creek"
+    },
+    "LocalizedNames": {
         "nds_NL": "West Low German"
     }
 }

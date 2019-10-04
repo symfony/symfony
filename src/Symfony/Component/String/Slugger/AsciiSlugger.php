@@ -107,7 +107,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
     private function createTransliterator(string $locale): ?\Transliterator
     {
-        if (isset($this->transliterators[$locale])) {
+        if (\array_key_exists($locale, $this->transliterators)) {
             return $this->transliterators[$locale];
         }
 
@@ -118,7 +118,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
         // Locale not supported and no parent, fallback to any-latin
         if (false === $str = strrchr($locale, '_')) {
-            return null;
+            return $this->transliterators[$locale] = null;
         }
 
         // Try to use the parent locale (ie. try "de" for "de_AT") and cache both locales
@@ -126,11 +126,8 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
         if ($id = self::LOCALE_TO_TRANSLITERATOR_ID[$parent] ?? null) {
             $transliterator = \Transliterator::create($id.'/BGN') ?? \Transliterator::create($id);
-            $this->transliterators[$locale] = $this->transliterators[$parent] = $transliterator;
-
-            return $transliterator;
         }
 
-        return null;
+        return $this->transliterators[$locale] = $this->transliterators[$parent] = $transliterator ?? null;
     }
 }

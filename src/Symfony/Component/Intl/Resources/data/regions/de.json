@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -215,7 +215,7 @@
         "SV": "El Salvador",
         "SX": "Sint Maarten",
         "SY": "Syrien",
-        "SZ": "Swasiland",
+        "SZ": "Eswatini",
         "TA": "Tristan da Cunha",
         "TC": "Turks- und Caicosinseln",
         "TD": "Tschad",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis und Futuna",
         "WS": "Samoa",
+        "XA": "Pseudo-Akzente",
+        "XB": "Pseudo-Bidi",
         "XK": "Kosovo",
         "YE": "Jemen",
         "YT": "Mayotte",

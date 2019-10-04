@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.90",
+    "Version": "36",
     "Names": {
         "Adlm": "adlamiska",
         "Afak": "afakiska",
@@ -32,6 +32,7 @@
         "Cyrl": "kyrilliska",
         "Cyrs": "fornkyrkoslavisk kyrilliska",
         "Deva": "devanagari",
+        "Dogr": "dogriska",
         "Dsrt": "deseret",
         "Dupl": "Duployéstenografiska",
         "Egyd": "demotiska",
@@ -93,10 +94,12 @@
         "Lyci": "lykiska",
         "Lydi": "lydiska",
         "Mahj": "mahajaniska",
+        "Maka": "makasariska",
         "Mand": "mandaéiska",
         "Mani": "manikeanska",
         "Marc": "marchenska",
         "Maya": "mayahieroglyfer",
+        "Medf": "medefaidrin",
         "Mend": "mende",
         "Merc": "kursiv-meroitiska",
         "Mero": "meroitiska",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.65",
+    "Version": "36",
     "Names": {
         "Adlm": "Adlam",
         "Afak": "Afaka",
@@ -134,6 +134,7 @@
         "Phnx": "Phoenician",
         "Plrd": "Pollard Phonetic",
         "Prti": "Inscriptional Parthian",
+        "Qaag": "Zawgyi",
         "Rjng": "Rejang",
         "Rohg": "Hanifi Rohingya",
         "Roro": "Rongorongo",

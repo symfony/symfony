@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "AC": "Ostrvo Ascension",
         "AD": "Andora",
@@ -79,7 +79,7 @@
         "FO": "Farska ostrva",
         "FR": "Francuska",
         "GA": "Gabon",
-        "GB": "Velika Britanija",
+        "GB": "Ujedinjeno Kraljevstvo",
         "GD": "Grenada",
         "GE": "Gruzija",
         "GF": "Francuska Gvajana",
@@ -215,7 +215,7 @@
         "SV": "Salvador",
         "SX": "Sint Marten",
         "SY": "Sirija",
-        "SZ": "Svazilend",
+        "SZ": "Esvatini",
         "TA": "Tristan da Cunha",
         "TC": "Ostrva Turks i Kaikos",
         "TD": "Čad",
@@ -236,7 +236,7 @@
         "UA": "Ukrajina",
         "UG": "Uganda",
         "UM": "Američka Vanjska Ostrva",
-        "US": "Sjedinjene Američke Države",
+        "US": "Sjedinjene Države",
         "UY": "Urugvaj",
         "UZ": "Uzbekistan",
         "VA": "Vatikan",

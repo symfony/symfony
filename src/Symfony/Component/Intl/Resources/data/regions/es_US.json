@@ -1,12 +1,11 @@
 {
-    "Version": "2.1.47.86",
+    "Version": "36",
     "Names": {
         "AC": "Isla de la Ascensión",
         "BA": "Bosnia y Herzegovina",
         "CI": "Côte d’Ivoire",
         "GG": "Guernsey",
-        "TL": "Timor-Leste",
-        "UM": "Islas menores alejadas de EE. UU.",
-        "VI": "Islas Vírgenes de EE. UU."
+        "TA": "Tristán de Acuña",
+        "UM": "Islas menores alejadas de EE. UU."
     }
 }

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "AC": "Đảo Ascension",
         "AD": "Andorra",
@@ -81,7 +81,7 @@
         "GA": "Gabon",
         "GB": "Vương quốc Anh",
         "GD": "Grenada",
-        "GE": "Gruzia",
+        "GE": "Georgia",
         "GF": "Guiana thuộc Pháp",
         "GG": "Guernsey",
         "GH": "Ghana",
@@ -248,8 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis và Futuna",
         "WS": "Samoa",
-        "XA": "XA",
-        "XB": "XB",
+        "XA": "Pseudo-Accents",
+        "XB": "Pseudo-Bidi",
         "XK": "Kosovo",
         "YE": "Yemen",
         "YT": "Mayotte",

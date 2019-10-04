@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -88,6 +88,7 @@
         "car": "karibisk",
         "cay": "cayuga",
         "cch": "atsam",
+        "ccp": "chakma",
         "ce": "tsjetsjensk",
         "ceb": "cebuansk",
         "cgg": "kiga",

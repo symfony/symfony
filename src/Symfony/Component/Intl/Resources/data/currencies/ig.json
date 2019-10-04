@@ -1,9 +1,21 @@
 {
-    "Version": "2.1.48.45",
+    "Version": "36",
     "Names": {
+        "BMD": [
+            "BMD",
+            "Dollar Bermuda"
+        ],
         "BRL": [
             "R$",
             "Real Brazil"
+        ],
+        "BZD": [
+            "BZD",
+            "Dollar Belize"
+        ],
+        "CAD": [
+            "CA$",
+            "Dollar Canada"
         ],
         "CNY": [
             "CN¥",
@@ -36,6 +48,14 @@
         "RUB": [
             "RUB",
             "Ruble Russia"
+        ],
+        "SRD": [
+            "SRD",
+            "Dollar Surinamese"
+        ],
+        "TTD": [
+            "TTD",
+            "Dollar Trinidad & Tobago"
         ],
         "USD": [
             "$",

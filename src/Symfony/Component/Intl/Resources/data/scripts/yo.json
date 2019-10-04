@@ -1,12 +1,14 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "Arab": "èdè Lárúbáwá",
         "Cyrl": "èdè ilẹ̀ Rọ́ṣíà",
         "Hans": "tí wọ́n mú rọrùn.",
         "Hant": "Hans àtọwọ́dọ́wọ́",
+        "Jpan": "èdè jàpáànù",
+        "Kore": "Kóríà",
         "Latn": "Èdè Látìn",
         "Zxxx": "Aikọsilẹ",
-        "Zzzz": "ọ̀nà ìgbàkọ̀wé àìmọ̀"
+        "Zzzz": "Ìṣọwọ́kọ̀wé àìmọ̀"
     }
 }

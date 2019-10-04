@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "AED": [
             "AED",
@@ -590,7 +590,7 @@
             "i-Ugandan Shilling"
         ],
         "USD": [
-            "US$",
+            "$",
             "i-US Dollar"
         ],
         "UYU": [

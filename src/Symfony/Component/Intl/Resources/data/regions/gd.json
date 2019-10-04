@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "AC": "Eilean na Deasgabhalach",
         "AD": "Andorra",
@@ -215,7 +215,7 @@
         "SV": "An Salbhador",
         "SX": "Sint Maarten",
         "SY": "Siridhea",
-        "SZ": "Dùthaich nan Suasaidh",
+        "SZ": "eSwatini",
         "TA": "Tristan da Cunha",
         "TC": "Na h-Eileanan Turcach is Caiceo",
         "TD": "An t-Seàd",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Uallas agus Futuna",
         "WS": "Samotha",
+        "XA": "Sràcan fuadain",
+        "XB": "Dà-chomhaireach fuadain",
         "XK": "A’ Chosobho",
         "YE": "An Eaman",
         "YT": "Mayotte",

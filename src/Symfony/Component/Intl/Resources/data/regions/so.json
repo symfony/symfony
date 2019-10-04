@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "AC": "Jasiiradda Asensiyoon",
         "AD": "Andora",
@@ -49,7 +49,6 @@
         "CL": "Jili",
         "CM": "Kaameruun",
         "CN": "Shiinaha",
-        "CO": "Kolombiya",
         "CR": "Kosta Riika",
         "CU": "Kuuba",
         "CV": "Jasiiradda Kayb Faarde",
@@ -96,7 +95,6 @@
         "GT": "Guwaatamaala",
         "GU": "Guaam",
         "GW": "Gini-Bisaaw",
-        "GY": "Guyana",
         "HK": "Hong Kong",
         "HN": "Honduras",
         "HR": "Korweeshiya",
@@ -248,8 +246,6 @@
         "VU": "Fanuaatu",
         "WF": "Walis & Futuna",
         "WS": "Samoowa",
-        "XA": "XA",
-        "XB": "XB",
         "XK": "Koosofo",
         "YE": "Yaman",
         "YT": "Mayotte",

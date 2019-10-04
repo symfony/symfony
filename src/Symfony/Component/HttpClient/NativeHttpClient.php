@@ -203,7 +203,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         ];
 
         $proxy = self::getProxy($options['proxy'], $url);
-        $noProxy = $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '';
+        $noProxy = $options['no_proxy'] ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '';
         $noProxy = $noProxy ? preg_split('/[\s,]+/', $noProxy) : [];
 
         $resolveRedirect = self::createRedirectResolver($options, $host, $proxy, $noProxy, $info, $onProgress);

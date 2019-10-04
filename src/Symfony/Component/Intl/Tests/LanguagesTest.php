@@ -123,6 +123,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'chp',
         'chr',
         'chy',
+        'cic',
         'ckb',
         'co',
         'cop',

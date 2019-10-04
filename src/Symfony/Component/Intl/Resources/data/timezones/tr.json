@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Greenwich Ortalama Saati (Abidjan)",
         "Africa\/Accra": "Greenwich Ortalama Saati (Akra)",
@@ -184,7 +184,7 @@
         "America\/Sao_Paulo": "Brasilia Saati (Sao Paulo)",
         "America\/Scoresbysund": "Doğu Grönland Saati (Ittoqqortoormiit)",
         "America\/Sitka": "Alaska Saati (Sitka)",
-        "America\/St_Barthelemy": "Atlantik Saati (Saint Barthélemy)",
+        "America\/St_Barthelemy": "Atlantik Saati (Saint Barthelemy)",
         "America\/St_Johns": "Newfoundland Saati (St. John’s)",
         "America\/St_Kitts": "Atlantik Saati (St. Kitts)",
         "America\/St_Lucia": "Atlantik Saati (St. Lucia)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Batı Endonezya Saati (Pontianak)",
         "Asia\/Pyongyang": "Kore Saati (Pyongyang)",
         "Asia\/Qatar": "Arabistan Saati (Katar)",
-        "Asia\/Qostanay": "Doğu Kazakistan Saati (Qostanay)",
+        "Asia\/Qostanay": "Doğu Kazakistan Saati (Kostanay)",
         "Asia\/Qyzylorda": "Batı Kazakistan Saati (Kızılorda)",
         "Asia\/Rangoon": "Myanmar Saati (Yangon)",
         "Asia\/Riyadh": "Arabistan Saati (Riyad)",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "وقت گرینویچ (آبیجان)",
         "Africa\/Accra": "وقت گرینویچ (اکرا)",
@@ -51,7 +51,7 @@
         "Africa\/Porto-Novo": "وقت غرب افریقا (پورتو نووو)",
         "Africa\/Sao_Tome": "وقت گرینویچ (سائوتومه)",
         "Africa\/Tripoli": "وقت شرق اروپا (طرابلس)",
-        "Africa\/Tunis": "وقت مرکز اروپا (شهر تونس)",
+        "Africa\/Tunis": "وقت مرکز اروپا (تونس)",
         "Africa\/Windhoek": "وقت مرکز افریقا (ویندهوک)",
         "America\/Adak": "وقت هاوایی‐الوشن (ایدک)",
         "America\/Anchorage": "وقت آلاسکا (انکوریج)",
@@ -393,7 +393,7 @@
         "Indian\/Maldives": "وقت مالدیو",
         "Indian\/Mauritius": "وقت موریس",
         "Indian\/Mayotte": "وقت شرق افریقا (مایوت)",
-        "Indian\/Reunion": "وقت ریونیون (رئونیون)",
+        "Indian\/Reunion": "وقت رئونیون",
         "MST7MDT": "وقت کوهستانی امریکا",
         "PST8PDT": "وقت غرب امریکا",
         "Pacific\/Apia": "وقت آپیا",
@@ -420,7 +420,7 @@
         "Pacific\/Midway": "وقت ساموا (میدوی)",
         "Pacific\/Nauru": "وقت نائورو",
         "Pacific\/Niue": "وقت نیوئه",
-        "Pacific\/Norfolk": "وقت جزایر نورفولک",
+        "Pacific\/Norfolk": "وقت جزیرهٔ نورفولک",
         "Pacific\/Noumea": "وقت کالدونیای جدید (نومئا)",
         "Pacific\/Pago_Pago": "وقت ساموا (پاگوپاگو)",
         "Pacific\/Palau": "وقت پالائو",

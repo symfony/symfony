@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "GMT (Abidjan)",
         "Africa\/Accra": "GMT (Accra)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Vestindonesisk tid (Pontianak)",
         "Asia\/Pyongyang": "Koreansk tid (Pyongyang)",
         "Asia\/Qatar": "Arabisk tid (Qatar)",
-        "Asia\/Qostanay": "Østkasakhstansk tid (Qostanay)",
+        "Asia\/Qostanay": "Østkasakhstansk tid (Kostanay)",
         "Asia\/Qyzylorda": "Vestkasakhstansk tid (Kyzylorda)",
         "Asia\/Rangoon": "Myanmar-tid (Rangoon)",
         "Asia\/Riyadh": "Arabisk tid (Riyadh)",
@@ -385,7 +385,7 @@
         "Europe\/Zurich": "Centraleuropæisk tid (Zürich)",
         "Indian\/Antananarivo": "Østafrikansk tid (Antananarivo)",
         "Indian\/Chagos": "Indiske Ocean-normaltid (Chagos)",
-        "Indian\/Christmas": "Juleøen-normaltid (Juleøerne)",
+        "Indian\/Christmas": "Juleøen-normaltid",
         "Indian\/Cocos": "Cocosøerne-normaltid",
         "Indian\/Comoro": "Østafrikansk tid (Comorerne)",
         "Indian\/Kerguelen": "Franske Sydlige og Antarktiske Territorier-tid (Kerguelen)",

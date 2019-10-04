@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Mittlere Greenwich-Zeit (Abidjan)",
         "Africa\/Accra": "Mittlere Greenwich-Zeit (Accra)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Westindonesische Zeit (Pontianak)",
         "Asia\/Pyongyang": "Koreanische Zeit (Pjöngjang)",
         "Asia\/Qatar": "Arabische Zeit (Katar)",
-        "Asia\/Qostanay": "Ostkasachische Zeit (Qostanay)",
+        "Asia\/Qostanay": "Ostkasachische Zeit (Qostanai)",
         "Asia\/Qyzylorda": "Westkasachische Zeit (Qysylorda)",
         "Asia\/Rangoon": "Myanmar-Zeit (Rangun)",
         "Asia\/Riyadh": "Arabische Zeit (Riad)",

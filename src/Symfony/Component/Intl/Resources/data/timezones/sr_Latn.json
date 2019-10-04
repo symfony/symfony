@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Srednje vreme po Griniču (Abidžan)",
         "Africa\/Accra": "Srednje vreme po Griniču (Akra)",
@@ -91,7 +91,7 @@
         "America\/Costa_Rica": "Severnoameričko centralno vreme (Kostarika)",
         "America\/Creston": "Severnoameričko planinsko vreme (Kreston)",
         "America\/Cuiaba": "Amazon vreme (Kuiaba)",
-        "America\/Curacao": "Atlantsko vreme (Kiraso)",
+        "America\/Curacao": "Atlantsko vreme (Kurasao)",
         "America\/Danmarkshavn": "Srednje vreme po Griniču (Danmarkshagen)",
         "America\/Dawson": "Severnoameričko pacifičko vreme (Doson)",
         "America\/Dawson_Creek": "Severnoameričko planinsko vreme (Doson Krik)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Zapadno-indonezijsko vreme (Pontijanak)",
         "Asia\/Pyongyang": "Korejsko vreme (Pjongjang)",
         "Asia\/Qatar": "Arabijsko vreme (Katar)",
-        "Asia\/Qostanay": "Istočno-kazahstansko vreme (Qostanay)",
+        "Asia\/Qostanay": "Istočno-kazahstansko vreme (Kostanaj)",
         "Asia\/Qyzylorda": "Zapadno-kazahstansko vreme (Kizilorda)",
         "Asia\/Rangoon": "Mijanmar vreme (Rangun)",
         "Asia\/Riyadh": "Arabijsko vreme (Rijad)",

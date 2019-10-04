@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "グリニッジ標準時（アビジャン）",
         "Africa\/Accra": "グリニッジ標準時（アクラ）",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "インドネシア西部時間（ポンティアナック）",
         "Asia\/Pyongyang": "韓国時間（平壌）",
         "Asia\/Qatar": "アラビア時間（カタール）",
-        "Asia\/Qostanay": "東カザフスタン時間（Qostanay）",
+        "Asia\/Qostanay": "東カザフスタン時間（コスタナイ）",
         "Asia\/Qyzylorda": "西カザフスタン時間（クズロルダ）",
         "Asia\/Rangoon": "ミャンマー時間（ヤンゴン）",
         "Asia\/Riyadh": "アラビア時間（リヤド）",

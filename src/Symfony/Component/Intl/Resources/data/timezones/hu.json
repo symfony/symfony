@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "greenwichi középidő, téli idő (Abidjan)",
         "Africa\/Accra": "greenwichi középidő, téli idő (Accra)",
@@ -221,7 +221,7 @@
         "Asia\/Aqtau": "nyugat-kazahsztáni idő (Aktau)",
         "Asia\/Aqtobe": "nyugat-kazahsztáni idő (Aktöbe)",
         "Asia\/Ashgabat": "türkmenisztáni idő (Asgabat)",
-        "Asia\/Atyrau": "nyugat-kazahsztáni idő (Atyrau)",
+        "Asia\/Atyrau": "nyugat-kazahsztáni idő (Atirau)",
         "Asia\/Baghdad": "arab idő (Bagdad)",
         "Asia\/Bahrain": "arab idő (Bahrein)",
         "Asia\/Baku": "azerbajdzsáni idő (Baku)",
@@ -322,7 +322,7 @@
         "CST6CDT": "középső államokbeli idő",
         "EST5EDT": "keleti államokbeli idő",
         "Etc\/GMT": "greenwichi középidő, téli idő",
-        "Etc\/UTC": "egyezményes koordinált világidő",
+        "Etc\/UTC": "Koordinált világidő",
         "Europe\/Amsterdam": "közép-európai időzóna (Amszterdam)",
         "Europe\/Andorra": "közép-európai időzóna (Andorra)",
         "Europe\/Astrakhan": "moszkvai idő (Asztrahán)",

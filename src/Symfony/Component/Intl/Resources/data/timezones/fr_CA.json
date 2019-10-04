@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.86",
+    "Version": "36",
     "Names": {
         "Africa\/Addis_Ababa": "heure d’Afrique orientale (Addis-Abeba)",
         "Africa\/Asmera": "heure d’Afrique orientale (Asmara)",
@@ -87,7 +87,6 @@
         "Asia\/Omsk": "heure d’Omsk",
         "Asia\/Shanghai": "heure de Chine (Shanghai)",
         "Asia\/Thimphu": "heure du Bhoutan (Thimphou)",
-        "Atlantic\/Canary": "heure d’Europe de l’Ouest (îles Canaries)",
         "Atlantic\/Faeroe": "heure d’Europe de l’Ouest (îles Féroé)",
         "CST6CDT": "heure du Centre",
         "EST5EDT": "heure de l’Est",

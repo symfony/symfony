@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-10-01T16:46:10Z
+
+I've backported the new tests to 4.3: #33795
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-02T17:25:42Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-03T09:53:58Z
+
+can you please update the CHANGELOG of the component?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-10-04T11:02:04Z
+
+> can you please update the CHANGELOG of the component?
+
+✅

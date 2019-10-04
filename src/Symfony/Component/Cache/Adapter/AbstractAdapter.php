@@ -76,7 +76,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                     $key = (string) $key;
                     if (null === $item->expiry) {
                         $ttl = 0 < $item->defaultLifetime ? $item->defaultLifetime : 0;
-                    } elseif (0 >= $ttl = (int) ($item->expiry - $now)) {
+                    } elseif (0 >= $ttl = (int) (0.1 + $item->expiry - $now)) {
                         $expiredIds[] = $getId($key);
                         continue;
                     }
@@ -84,7 +84,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                         unset($metadata[CacheItem::METADATA_TAGS]);
                     }
                     // For compactness, expiry and creation duration are packed in the key of an array, using magic numbers as separators
-                    $byLifetime[$ttl][$getId($key)] = $metadata ? ["\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $item->value] : $item->value;
+                    $byLifetime[$ttl][$getId($key)] = $metadata ? ["\x9D".pack('VN', (int) (0.1 + $metadata[self::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[self::METADATA_CTIME])."\x5F" => $item->value] : $item->value;
                 }
 
                 return $byLifetime;

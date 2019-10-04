@@ -109,7 +109,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->deleteItem('foo');
         $cache->get('foo', function ($item) {
             $item->expiresAfter(10);
-            sleep(1);
+            usleep(999000);
 
             return 'bar';
         });

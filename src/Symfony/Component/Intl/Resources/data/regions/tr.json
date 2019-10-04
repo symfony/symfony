@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "AD": "Andorra",
         "AE": "Birleşik Arap Emirlikleri",
@@ -44,7 +44,7 @@
         "CF": "Orta Afrika Cumhuriyeti",
         "CG": "Kongo - Brazavil",
         "CH": "İsviçre",
-        "CI": "Fildişi Sahili",
+        "CI": "Côte d’Ivoire",
         "CK": "Cook Adaları",
         "CL": "Şili",
         "CM": "Kamerun",
@@ -188,7 +188,7 @@
         "PW": "Palau",
         "PY": "Paraguay",
         "QA": "Katar",
-        "RE": "Réunion",
+        "RE": "Reunion",
         "RO": "Romanya",
         "RS": "Sırbistan",
         "RU": "Rusya",
@@ -209,7 +209,7 @@
         "SO": "Somali",
         "SR": "Surinam",
         "SS": "Güney Sudan",
-        "ST": "São Tomé ve Príncipe",
+        "ST": "Sao Tome ve Principe",
         "SV": "El Salvador",
         "SX": "Sint Maarten",
         "SY": "Suriye",

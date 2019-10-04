@@ -924,7 +924,7 @@ Validator
 VarDumper
 ---------
 
- * The `VarDumperTestTrait::assertDumpEquals()` method expects a 3rd `$context = null`
+ * The `VarDumperTestTrait::assertDumpEquals()` method expects a 3rd `$filter = 0`
    argument and moves `$message = ''` argument at 4th position.
 
    Before:
@@ -939,7 +939,7 @@ VarDumper
    VarDumperTestTrait::assertDumpEquals($dump, $data, $filter = 0, $message = '');
    ```
 
- * The `VarDumperTestTrait::assertDumpMatchesFormat()` method expects a 3rd `$context = null`
+ * The `VarDumperTestTrait::assertDumpMatchesFormat()` method expects a 3rd `$filter = 0`
    argument and moves `$message = ''` argument at 4th position.
 
    Before:

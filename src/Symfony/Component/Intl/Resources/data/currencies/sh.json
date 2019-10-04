@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "ADP": [
             "ADP",
@@ -283,7 +283,7 @@
         ],
         "DJF": [
             "DJF",
-            "Džibutanski franak"
+            "Džibutski franak"
         ],
         "DKK": [
             "DKK",
@@ -627,7 +627,7 @@
         ],
         "MRU": [
             "MRU",
-            "Mauritanijska ogija"
+            "Mauritanska ogija"
         ],
         "MTL": [
             "MTL",
@@ -823,7 +823,7 @@
         ],
         "SHP": [
             "SHP",
-            "Sv. jelenska funta"
+            "Svete Jelene funta"
         ],
         "SIT": [
             "SIT",

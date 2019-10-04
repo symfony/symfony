@@ -336,6 +336,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'fy',
         'fy_NL',
         'ga',
+        'ga_GB',
         'ga_IE',
         'gd',
         'gd_GB',

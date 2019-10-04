@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "hora del meridiano de Greenwich (Abiyán)",
         "Africa\/Accra": "hora del meridiano de Greenwich (Acra)",
@@ -273,7 +273,7 @@
         "Asia\/Qatar": "hora de Arabia (Catar)",
         "Asia\/Qostanay": "hora de Kazajistán oriental (Kostanái)",
         "Asia\/Qyzylorda": "hora de Kazajistán occidental (Kyzylorda)",
-        "Asia\/Rangoon": "hora de Myanmar (Birmania) (Yangón (Rangún))",
+        "Asia\/Rangoon": "hora de Myanmar (Yangón (Rangún))",
         "Asia\/Riyadh": "hora de Arabia (Riad)",
         "Asia\/Saigon": "hora de Indochina (Ciudad Ho Chi Minh)",
         "Asia\/Sakhalin": "hora de Sajalín",
@@ -299,7 +299,7 @@
         "Asia\/Yerevan": "hora de Armenia (Ereván)",
         "Atlantic\/Azores": "hora de las Azores",
         "Atlantic\/Bermuda": "hora del Atlántico (Bermudas)",
-        "Atlantic\/Canary": "hora de Europa occidental (Islas Canarias)",
+        "Atlantic\/Canary": "hora de Europa occidental (Canarias)",
         "Atlantic\/Cape_Verde": "hora de Cabo Verde",
         "Atlantic\/Faeroe": "hora de Europa occidental (Islas Feroe)",
         "Atlantic\/Madeira": "hora de Europa occidental (Madeira)",
@@ -388,7 +388,7 @@
         "Indian\/Christmas": "hora de la Isla de Navidad",
         "Indian\/Cocos": "hora de las Islas Cocos",
         "Indian\/Comoro": "hora de África oriental (Comoras)",
-        "Indian\/Kerguelen": "hora de las Tierras Australes y Antárticas Francesas (Kerguelen)",
+        "Indian\/Kerguelen": "hora de Antártida y Territorios Australes Franceses (Kerguelen)",
         "Indian\/Mahe": "hora de Seychelles (Mahé)",
         "Indian\/Maldives": "hora de Maldivas",
         "Indian\/Mauritius": "hora de Mauricio",

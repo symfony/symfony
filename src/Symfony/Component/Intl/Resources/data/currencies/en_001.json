@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.69",
+    "Version": "36",
     "Names": {
         "BYB": [
             "BYB",
@@ -28,6 +28,10 @@
         "RUR": [
             "RUR",
             "Russian Rouble (1991–1998)"
+        ],
+        "SHP": [
+            "SHP",
+            "St Helena Pound"
         ],
         "TJR": [
             "TJR",

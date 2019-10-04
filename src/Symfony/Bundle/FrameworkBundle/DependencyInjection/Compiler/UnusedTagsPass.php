@@ -65,6 +65,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'twig.loader',
         'validator.constraint_validator',
         'validator.initializer',
+        'validator.auto_mapper',
     ];
 
     public function process(ContainerBuilder $container)

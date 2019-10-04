@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Greenwiški srednji čas (Abidžan)",
         "Africa\/Accra": "Greenwiški srednji čas (Akra)",
@@ -230,10 +230,10 @@
         "Asia\/Beirut": "Vzhodnoevropski čas (Bejrut)",
         "Asia\/Bishkek": "Kirgizistanski čas (Biškek)",
         "Asia\/Brunei": "Brunejski čas",
-        "Asia\/Calcutta": "Indijski standardni čas (Kolkata)",
+        "Asia\/Calcutta": "Indijski standardni čas (Kalkuta)",
         "Asia\/Chita": "Jakutski čas (Čita)",
         "Asia\/Choibalsan": "Čojbalsanski čas",
-        "Asia\/Colombo": "Indijski standardni čas (Colombo)",
+        "Asia\/Colombo": "Indijski standardni čas (Kolombo)",
         "Asia\/Damascus": "Vzhodnoevropski čas (Damask)",
         "Asia\/Dhaka": "Bangladeški čas (Daka)",
         "Asia\/Dili": "Vzhodnotimorski čas (Dili)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Indonezijski zahodni čas (Pontianak)",
         "Asia\/Pyongyang": "Korejski čas (Pjongjang)",
         "Asia\/Qatar": "Arabski čas (Katar)",
-        "Asia\/Qostanay": "Vzhodni kazahstanski čas (Qostanay)",
+        "Asia\/Qostanay": "Vzhodni kazahstanski čas (Kostanaj)",
         "Asia\/Qyzylorda": "Zahodni kazahstanski čas (Kizlorda)",
         "Asia\/Rangoon": "Mjanmarski čas (Rangun)",
         "Asia\/Riyadh": "Arabski čas (Rijad)",

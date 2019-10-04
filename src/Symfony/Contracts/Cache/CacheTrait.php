@@ -56,7 +56,7 @@ trait CacheTrait
             if ($recompute = $ctime && $expiry && $expiry <= ($now = microtime(true)) - $ctime / 1000 * $beta * log(random_int(1, PHP_INT_MAX) / PHP_INT_MAX)) {
                 // force applying defaultLifetime to expiry
                 $item->expiresAt(null);
-                $this->logger && $this->logger->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [
+                $logger && $logger->info('Item "{key}" elected for early recomputation {delta}s before its expiration', [
                     'key' => $key,
                     'delta' => sprintf('%.1f', $expiry - $now),
                 ]);

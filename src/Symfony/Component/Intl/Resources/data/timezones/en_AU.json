@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.43",
+    "Version": "36",
     "Names": {
         "Africa\/Addis_Ababa": "Eastern Africa Time (Addis Ababa)",
         "Africa\/Asmera": "Eastern Africa Time (Asmara)",
@@ -9,7 +9,6 @@
         "Africa\/Kampala": "Eastern Africa Time (Kampala)",
         "Africa\/Mogadishu": "Eastern Africa Time (Mogadishu)",
         "Africa\/Nairobi": "Eastern Africa Time (Nairobi)",
-        "America\/St_Barthelemy": "Atlantic Time (St Barthélemy)",
         "Antarctica\/Casey": "Australian Western Time (Casey)",
         "Asia\/Aden": "Arabia Time (Aden)",
         "Asia\/Baghdad": "Arabia Time (Baghdad)",

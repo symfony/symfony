@@ -124,6 +124,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'chp',
         'chr',
         'chy',
+        'cic',
         'ckb',
         'co',
         'cop',

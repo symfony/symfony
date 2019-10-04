@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.96",
+    "Version": "36",
     "Names": {
         "BDT": [
             "BDT",
@@ -8,14 +8,6 @@
         "BTN": [
             "BTN",
             "ngultrum butanés"
-        ],
-        "CNH": [
-            "CNH",
-            "CNH"
-        ],
-        "ERN": [
-            "ERN",
-            "nakfa"
         ],
         "KGS": [
             "KGS",
@@ -45,10 +37,6 @@
             "$",
             "peso mexicano"
         ],
-        "MYR": [
-            "MYR",
-            "ringit"
-        ],
         "STN": [
             "STN",
             "dobra santotomense"
@@ -56,18 +44,6 @@
         "THB": [
             "THB",
             "baht tailandés"
-        ],
-        "UZS": [
-            "UZS",
-            "sum"
-        ],
-        "VEF": [
-            "VEF",
-            "bolívar venezolano (2008–2018)"
-        ],
-        "VES": [
-            "VES",
-            "bolívar venezolano"
         ],
         "VND": [
             "VND",

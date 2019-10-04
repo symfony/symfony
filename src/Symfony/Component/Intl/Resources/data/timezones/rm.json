@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.4",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Costa d’Ivur (Abidjan)",
         "Africa\/Accra": "Ghana (Accra)",
@@ -359,7 +359,6 @@
         "Europe\/Sarajevo": "Bosnia ed Erzegovina (Sarajevo)",
         "Europe\/Saratov": "Russia (Saratov)",
         "Europe\/Simferopol": "Ucraina (Simferopol)",
-        "Europe\/Skopje": "Macedonia (Skopje)",
         "Europe\/Sofia": "Bulgaria (Sofia)",
         "Europe\/Stockholm": "Svezia (Stockholm)",
         "Europe\/Tallinn": "Estonia (Tallinn)",

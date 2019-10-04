@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Greenwich-tyd (Abidjan)",
         "Africa\/Accra": "Greenwich-tyd (Accra)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Wes-Indonesië-tyd (Pontianak)",
         "Asia\/Pyongyang": "Koreaanse tyd (Pyongyang)",
         "Asia\/Qatar": "Arabiese tyd (Katar)",
-        "Asia\/Qostanay": "Oos-Kazakstan-tyd (Qostanay)",
+        "Asia\/Qostanay": "Oos-Kazakstan-tyd (Kostanay)",
         "Asia\/Qyzylorda": "Wes-Kazakstan-tyd (Qyzylorda)",
         "Asia\/Rangoon": "Mianmar-tyd (Yangon)",
         "Asia\/Riyadh": "Arabiese tyd (Riaad)",

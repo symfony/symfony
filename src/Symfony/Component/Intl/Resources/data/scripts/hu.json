@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "Arab": "Arab",
         "Armi": "Birodalmi arámi",
@@ -101,7 +101,10 @@
         "Saur": "Szaurastra",
         "Sgnw": "Jelírás",
         "Shaw": "Shaw ábécé",
+        "Sidd": "Sziddham",
         "Sinh": "Szingaléz",
+        "Sogd": "Szogd",
+        "Sogo": "Ószogd",
         "Sund": "Szundanéz",
         "Sylo": "Sylheti nagári",
         "Syrc": "Szíriai",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.9",
+    "Version": "36",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -146,7 +146,6 @@
         "MF": "St-Martin",
         "MG": "Madagaskar",
         "MH": "Marshalloyggjar",
-        "MK": "Makedónia",
         "ML": "Mali",
         "MM": "Myanmar (Burma)",
         "MN": "Mongolia",
@@ -215,7 +214,7 @@
         "SV": "El Salvador",
         "SX": "Sint Maarten",
         "SY": "Sýria",
-        "SZ": "Svasiland",
+        "SZ": "Esvatini",
         "TA": "Tristan da Cunha",
         "TC": "Turks- og Caicosoyggjar",
         "TD": "Kjad",
@@ -248,6 +247,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis- og Futunaoyggjar",
         "WS": "Samoa",
+        "XA": "óekta tónalag",
+        "XB": "óektaður BIDI tekstur",
         "XK": "Kosovo",
         "YE": "Jemen",
         "YT": "Mayotte",

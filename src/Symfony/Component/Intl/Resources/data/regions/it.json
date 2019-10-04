@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "AC": "Isola Ascensione",
         "AD": "Andorra",
@@ -248,8 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis e Futuna",
         "WS": "Samoa",
-        "XA": "pseudo-accenti",
-        "XB": "pseudo-bidi",
+        "XA": "Pseudo-accenti",
+        "XB": "Pseudo-bidi",
         "XK": "Kosovo",
         "YE": "Yemen",
         "YT": "Mayotte",

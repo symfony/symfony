@@ -1,6 +1,7 @@
 {
-    "Version": "2.1.47.71",
+    "Version": "36",
     "Names": {
+        "ar_001": "Kiarabu sanifu",
         "arq": "Kiarabu cha Aljeria",
         "as": "Kiasamisi",
         "chr": "Kicheroki",
@@ -31,6 +32,7 @@
         "nqo": "Kiin’ko",
         "or": "Kiodia",
         "pcm": "Kipijini cha Nigeria",
+        "ro_MD": "Kimoldova cha Romania",
         "ses": "Kikoyraborosenni",
         "shu": "Kiarabu cha Chadi",
         "srn": "Kisranantongo",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.86",
+    "Version": "36",
     "Names": {
         "ADP": [
             "ADP",
@@ -44,6 +44,18 @@
         "AON": [
             "AON",
             "kwanza nevez Angola (1990–2000)"
+        ],
+        "AOR": [
+            "AOR",
+            "AOR"
+        ],
+        "ARA": [
+            "ARA",
+            "ARA"
+        ],
+        "ARL": [
+            "ARL",
+            "ARL"
         ],
         "ARM": [
             "ARM",
@@ -105,9 +117,9 @@
             "BEF",
             "lur Belgia"
         ],
-        "BEL": [
-            "BEL",
-            "BEL"
+        "BGL": [
+            "BGL",
+            "BGL"
         ],
         "BGM": [
             "BGM",
@@ -149,9 +161,37 @@
             "BOP",
             "peso Bolivia"
         ],
+        "BOV": [
+            "BOV",
+            "BOV"
+        ],
+        "BRB": [
+            "BRB",
+            "BRB"
+        ],
+        "BRC": [
+            "BRC",
+            "BRC"
+        ],
+        "BRE": [
+            "BRE",
+            "BRE"
+        ],
         "BRL": [
             "BRL",
             "real Brazil"
+        ],
+        "BRN": [
+            "BRN",
+            "BRN"
+        ],
+        "BRR": [
+            "BRR",
+            "BRR"
+        ],
+        "BRZ": [
+            "BRZ",
+            "BRZ"
         ],
         "BSD": [
             "BSD",
@@ -229,6 +269,10 @@
             "COP",
             "peso Kolombia"
         ],
+        "COU": [
+            "COU",
+            "COU"
+        ],
         "CRC": [
             "CRC",
             "colón Costa Rica"
@@ -236,6 +280,10 @@
         "CSD": [
             "CSD",
             "dinar Serbia (2002–2006)"
+        ],
+        "CSK": [
+            "CSK",
+            "CSK"
         ],
         "CUC": [
             "CUC",
@@ -281,6 +329,14 @@
             "DZD",
             "dinar Aljeria"
         ],
+        "ECS": [
+            "ECS",
+            "ECS"
+        ],
+        "ECV": [
+            "ECV",
+            "ECV"
+        ],
         "EEK": [
             "EEK",
             "kurunenn Estonia"
@@ -292,6 +348,10 @@
         "ERN": [
             "ERN",
             "nakfa Eritrea"
+        ],
+        "ESA": [
+            "ESA",
+            "ESA"
         ],
         "ESB": [
             "ESB",
@@ -329,9 +389,17 @@
             "£ RU",
             "lur Breizh-Veur"
         ],
+        "GEK": [
+            "GEK",
+            "GEK"
+        ],
         "GEL": [
             "GEL",
             "lari Jorjia"
+        ],
+        "GHC": [
+            "GHC",
+            "GHC"
         ],
         "GHS": [
             "GHS",
@@ -364,6 +432,10 @@
         "GTQ": [
             "GTQ",
             "quetzal Guatemala"
+        ],
+        "GWE": [
+            "GWE",
+            "GWE"
         ],
         "GWP": [
             "GWP",
@@ -533,6 +605,10 @@
             "LUF",
             "lur Luksembourg"
         ],
+        "LUL": [
+            "LUL",
+            "LUL"
+        ],
         "LVL": [
             "LVL",
             "lats Latvia"
@@ -556,6 +632,10 @@
         "MCF": [
             "MCF",
             "lur Monaco"
+        ],
+        "MDC": [
+            "MDC",
+            "MDC"
         ],
         "MDL": [
             "MDL",
@@ -633,6 +713,10 @@
             "MXP",
             "peso arcʼhant Mecʼhiko (1861–1992)"
         ],
+        "MXV": [
+            "MXV",
+            "MXV"
+        ],
         "MYR": [
             "MYR",
             "ringgit Malaysia"
@@ -688,6 +772,10 @@
         "PAB": [
             "PAB",
             "balboa Panamá"
+        ],
+        "PEI": [
+            "PEI",
+            "PEI"
         ],
         "PEN": [
             "PEN",
@@ -901,6 +989,10 @@
             "UAH",
             "hryvnia Ukraina"
         ],
+        "UAK": [
+            "UAK",
+            "UAK"
+        ],
         "UGS": [
             "UGS",
             "shilling Ouganda (1966–1987)"
@@ -912,6 +1004,18 @@
         "USD": [
             "$ SU",
             "dollar SU"
+        ],
+        "USN": [
+            "USN",
+            "USN"
+        ],
+        "USS": [
+            "USS",
+            "USS"
+        ],
+        "UYI": [
+            "UYI",
+            "UYI"
         ],
         "UYP": [
             "UYP",
@@ -981,6 +1085,10 @@
             "CFPF",
             "lur CFP"
         ],
+        "XRE": [
+            "XRE",
+            "XRE"
+        ],
         "YDD": [
             "YDD",
             "dinar Yemen"
@@ -988,6 +1096,10 @@
         "YER": [
             "YER",
             "rial Yemen"
+        ],
+        "YUD": [
+            "YUD",
+            "YUD"
         ],
         "YUM": [
             "YUM",
@@ -1001,6 +1113,10 @@
             "YUR",
             "dinar adreizhet Yougoslavia (1992–1993)"
         ],
+        "ZAL": [
+            "ZAL",
+            "ZAL"
+        ],
         "ZAR": [
             "ZAR",
             "rand Suafrika"
@@ -1012,6 +1128,14 @@
         "ZMW": [
             "ZMW",
             "kwacha Zambia"
+        ],
+        "ZRN": [
+            "ZRN",
+            "ZRN"
+        ],
+        "ZRZ": [
+            "ZRZ",
+            "ZRZ"
         ],
         "ZWD": [
             "ZWD",

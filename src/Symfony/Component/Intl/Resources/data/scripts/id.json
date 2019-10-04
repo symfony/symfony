@@ -1,8 +1,9 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Albania Kaukasia",
+        "Arab": "Arab",
         "Armi": "Aram Imperial",
         "Armn": "Armenia",
         "Avst": "Avesta",
@@ -54,6 +55,7 @@
         "Hung": "Hungaria Kuno",
         "Inds": "Indus",
         "Ital": "Italia Lama",
+        "Jamo": "Jamo",
         "Java": "Jawa",
         "Jpan": "Jepang",
         "Jurc": "Jurchen",
@@ -142,6 +144,7 @@
         "Tfng": "Tifinagh",
         "Tglg": "Tagalog",
         "Thaa": "Thaana",
+        "Thai": "Thai",
         "Tibt": "Tibet",
         "Tirh": "Tirhuta",
         "Ugar": "Ugaritik",

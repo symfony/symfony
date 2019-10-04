@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "AC": "Oileán na Deascabhála",
         "AD": "Andóra",
@@ -215,7 +215,7 @@
         "SV": "an tSalvadóir",
         "SX": "Sint Maarten",
         "SY": "an tSiria",
-        "SZ": "an tSuasalainn",
+        "SZ": "eSuaitíní",
         "TA": "Tristan da Cunha",
         "TC": "Oileáin na dTurcach agus Caicos",
         "TD": "Sead",
@@ -248,8 +248,8 @@
         "VU": "Vanuatú",
         "WF": "Vailís agus Futúna",
         "WS": "Samó",
-        "XA": "XA",
-        "XB": "XB",
+        "XA": "Bréagdhiaicriticí",
+        "XB": "Bréag-Bidi",
         "XK": "an Chosaiv",
         "YE": "Éimin",
         "YT": "Mayotte",

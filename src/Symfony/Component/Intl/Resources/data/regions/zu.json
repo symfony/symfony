@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "AC": "i-Ascension Island",
         "AD": "i-Andorra",
@@ -146,7 +146,7 @@
         "MF": "i-Saint Martin",
         "MG": "i-Madagascar",
         "MH": "i-Marshall Islands",
-        "MK": "i-Macedonia",
+        "MK": "i-North Macedonia",
         "ML": "iMali",
         "MM": "i-Myanmar (Burma)",
         "MN": "i-Mongolia",
@@ -235,7 +235,7 @@
         "TZ": "i-Tanzania",
         "UA": "i-Ukraine",
         "UG": "i-Uganda",
-        "UM": "i-U.S. Minor Outlying Islands",
+        "UM": "I-U.S. Outlying Islands",
         "US": "i-United States",
         "UY": "i-Uruguay",
         "UZ": "i-Uzbekistan",

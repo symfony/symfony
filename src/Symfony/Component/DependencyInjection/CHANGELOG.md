@@ -15,6 +15,7 @@ CHANGELOG
  * added support for improved syntax to define method calls in Yaml
  * added `LazyString` for lazy computation of string values injected into services
  * made the `%env(base64:...)%` processor able to decode base64url
+ * added ability to choose behavior of decorations on non existent decorated services
 
 4.3.0
 -----

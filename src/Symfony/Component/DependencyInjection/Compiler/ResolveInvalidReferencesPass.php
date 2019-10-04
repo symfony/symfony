@@ -42,7 +42,9 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
         $this->signalingException = new RuntimeException('Invalid reference.');
 
         try {
-            $this->processValue($container->getDefinitions(), 1);
+            foreach ($container->getDefinitions() as $this->currentId => $definition) {
+                $this->processValue($definition);
+            }
         } finally {
             $this->container = $this->signalingException = null;
         }
@@ -72,9 +74,6 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             $i = 0;
 
             foreach ($value as $k => $v) {
-                if (!$rootLevel) {
-                    $this->currentId = $k;
-                }
                 try {
                     if (false !== $i && $k !== $i++) {
                         $i = false;
@@ -101,6 +100,14 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             if ($this->container->has($id = (string) $value)) {
                 return $value;
             }
+
+            $currentDefinition = $this->container->getDefinition($this->currentId);
+
+            // resolve decorated service behavior depending on decorator service
+            if ($currentDefinition->innerServiceId === $id && ContainerInterface::NULL_ON_INVALID_REFERENCE === $currentDefinition->decorationOnInvalid) {
+                return null;
+            }
+
             $invalidBehavior = $value->getInvalidBehavior();
 
             if (ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior && $value instanceof TypedReference && !$this->container->has($id)) {

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DecoratorServicePassTest extends TestCase
 {
@@ -123,6 +124,61 @@ class DecoratorServicePassTest extends TestCase
         $this->assertNull($barDefinition->getDecoratedService());
         $this->assertNull($bazDefinition->getDecoratedService());
         $this->assertNull($quxDefinition->getDecoratedService());
+    }
+
+    public function testProcessWithInvalidDecorated()
+    {
+        $container = new ContainerBuilder();
+        $decoratorDefinition = $container
+            ->register('decorator')
+            ->setDecoratedService('unknown_decorated', null, 0, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+        ;
+
+        $this->process($container);
+        $this->assertFalse($container->has('decorator'));
+
+        $container = new ContainerBuilder();
+        $decoratorDefinition = $container
+            ->register('decorator')
+            ->setDecoratedService('unknown_decorated', null, 0, ContainerInterface::NULL_ON_INVALID_REFERENCE)
+        ;
+
+        $this->process($container);
+        $this->assertTrue($container->has('decorator'));
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $decoratorDefinition->decorationOnInvalid);
+
+        $container = new ContainerBuilder();
+        $decoratorDefinition = $container
+            ->register('decorator')
+            ->setDecoratedService('unknown_service')
+        ;
+
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->process($container);
+    }
+
+    public function testProcessNoInnerAliasWithInvalidDecorated()
+    {
+        $container = new ContainerBuilder();
+        $decoratorDefinition = $container
+            ->register('decorator')
+            ->setDecoratedService('unknown_decorated', null, 0, ContainerInterface::NULL_ON_INVALID_REFERENCE)
+        ;
+
+        $this->process($container);
+        $this->assertFalse($container->hasAlias('decorator.inner'));
+    }
+
+    public function testProcessWithInvalidDecoratedAndWrongBehavior()
+    {
+        $container = new ContainerBuilder();
+        $decoratorDefinition = $container
+            ->register('decorator')
+            ->setDecoratedService('unknown_decorated', null, 0, 12)
+        ;
+
+        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->process($container);
     }
 
     public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinition()

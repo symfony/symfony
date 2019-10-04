@@ -71,6 +71,13 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services24.yml', $dumper->dump());
     }
 
+    public function testDumpDecoratedServices()
+    {
+        $container = include self::$fixturesPath.'/containers/container34.php';
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services34.yml', $dumper->dump());
+    }
+
     public function testDumpLoad()
     {
         $container = new ContainerBuilder();

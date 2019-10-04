@@ -231,7 +231,7 @@ class SwitchUserListenerTest extends TestCase
             ->method('checkPostAuth')->with($user);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
-        $listener->handle($this->event);
+        $listener($this->event);
 
         $this->assertSame([], $this->request->query->all());
         $this->assertSame('', $this->request->server->get('QUERY_STRING'));

@@ -728,30 +728,6 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('FooHiddenCommand', $application->find('afoohidden'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Command "%s:hidden" is hidden, finding it using an abbreviation is deprecated since Symfony 4.4, use its full name instead.
-     * @dataProvider provideAbbreviationsForHiddenCommands
-     */
-    public function testFindHiddenWithAbbreviatedName($name)
-    {
-        $application = new Application();
-
-        $application->add(new \FooHiddenCommand());
-        $application->add(new \BarHiddenCommand());
-
-        $application->find($name);
-    }
-
-    public function provideAbbreviationsForHiddenCommands()
-    {
-        return [
-            ['foo:hidde'],
-            ['afoohidd'],
-            ['bar:hidde'],
-        ];
-    }
-
     public function testFindAmbiguousCommandsIfAllAlternativesAreHidden()
     {
         $application = new Application();

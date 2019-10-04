@@ -13,6 +13,7 @@ namespace Symfony\Component\OptionsResolver\Tests;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -2377,5 +2378,36 @@ class OptionsResolverTest extends TestCase
             'database' => ['profiling' => false, 'logging' => true],
         ];
         $this->assertSame($expectedOptions, $actualOptions);
+    }
+
+    public function testFailsIfOptionIsAlreadyDefined()
+    {
+        $this->expectException('Symfony\Component\OptionsResolver\Exception\OptionDefinitionException');
+        $this->expectExceptionMessage('The options "foo" is already defined.');
+        $this->resolver->define('foo');
+        $this->resolver->define('foo');
+    }
+
+    public function testResolveOptionsDefinedByOptionConfigurator()
+    {
+        $this->resolver->define('foo')
+            ->required()
+            ->deprecated()
+            ->default('bar')
+            ->allowedTypes('string', 'bool')
+            ->allowedValues('bar', 'zab')
+            ->normalize(static function (Options $options, $value) {
+                return $value;
+            })
+        ;
+        $introspector = new OptionsResolverIntrospector($this->resolver);
+
+        $this->assertTrue(true, $this->resolver->isDefined('foo'));
+        $this->assertTrue(true, $this->resolver->isDeprecated('foo'));
+        $this->assertTrue(true, $this->resolver->hasDefault('foo'));
+        $this->assertSame('bar', $introspector->getDefault('foo'));
+        $this->assertSame(['string', 'bool'], $introspector->getAllowedTypes('foo'));
+        $this->assertSame(['bar', 'zab'], $introspector->getAllowedValues('foo'));
+        $this->assertCount(1, $introspector->getNormalizers('foo'));
     }
 }

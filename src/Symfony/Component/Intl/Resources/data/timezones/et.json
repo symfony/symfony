@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Greenwichi aeg (Abidjan)",
         "Africa\/Accra": "Greenwichi aeg (Accra)",
@@ -254,8 +254,8 @@
         "Asia\/Katmandu": "Nepali aeg (Katmandu)",
         "Asia\/Khandyga": "Jakutski aeg (Handõga)",
         "Asia\/Krasnoyarsk": "Krasnojarski aeg",
-        "Asia\/Kuala_Lumpur": "Malaisia ​​aeg (Kuala Lumpur)",
-        "Asia\/Kuching": "Malaisia ​​aeg (Kuching)",
+        "Asia\/Kuala_Lumpur": "Malaisia aeg (Kuala Lumpur)",
+        "Asia\/Kuching": "Malaisia aeg (Kuching)",
         "Asia\/Kuwait": "Araabia aeg (Kuveit)",
         "Asia\/Macau": "Hiina aeg (Macau)",
         "Asia\/Magadan": "Magadani aeg",

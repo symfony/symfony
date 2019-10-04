@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "AD": "Andorra",
         "AE": "Verenigde Arabiese Emirate",
@@ -144,7 +144,7 @@
         "MF": "Sint Martin",
         "MG": "Madagaskar",
         "MH": "Marshalleilande",
-        "MK": "Macedonië",
+        "MK": "Noord-Macedonië",
         "ML": "Mali",
         "MM": "Mianmar (Birma)",
         "MN": "Mongolië",
@@ -213,7 +213,7 @@
         "SV": "El Salvador",
         "SX": "Sint Maarten",
         "SY": "Sirië",
-        "SZ": "Swaziland",
+        "SZ": "Eswatini",
         "TC": "Turks- en Caicoseilande",
         "TD": "Tsjad",
         "TF": "Franse Suidelike Gebiede",

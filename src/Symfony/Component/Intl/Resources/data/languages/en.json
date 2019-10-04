@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.65",
+    "Version": "36",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazian",
@@ -102,6 +102,7 @@
         "chp": "Chipewyan",
         "chr": "Cherokee",
         "chy": "Cheyenne",
+        "cic": "Chickasaw",
         "ckb": "Central Kurdish",
         "co": "Corsican",
         "cop": "Coptic",
@@ -369,7 +370,7 @@
         "ms": "Malay",
         "mt": "Maltese",
         "mua": "Mundang",
-        "mus": "Creek",
+        "mus": "Muscogee",
         "mwl": "Mirandese",
         "mwr": "Marwari",
         "mwv": "Mentawai",

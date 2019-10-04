@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.43",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Abidžana (Griničas laiks)",
         "Africa\/Accra": "Akra (Griničas laiks)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Pontianaka (Rietumindonēzijas laiks)",
         "Asia\/Pyongyang": "Phenjana (Korejas laiks)",
         "Asia\/Qatar": "Katara (Arābijas pussalas laiks)",
-        "Asia\/Qostanay": "Qostanay (Austrumkazahstānas laiks)",
+        "Asia\/Qostanay": "Kostanaja (Austrumkazahstānas laiks)",
         "Asia\/Qyzylorda": "Kizilorda (Rietumkazahstānas laiks)",
         "Asia\/Rangoon": "Ranguna (Mjanmas laiks)",
         "Asia\/Riyadh": "Rijāda (Arābijas pussalas laiks)",

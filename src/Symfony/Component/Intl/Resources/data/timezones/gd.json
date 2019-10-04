@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Greenwich Mean Time (Abidjan)",
         "Africa\/Accra": "Greenwich Mean Time (Accra)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Àm nan Innd-Innse an Iar (Pontianak)",
         "Asia\/Pyongyang": "Àm Choirèa (Pyeongyang)",
         "Asia\/Qatar": "Àm Arabach (Catar)",
-        "Asia\/Qostanay": "Àm Casachstàin an Ear (Qostanay)",
+        "Asia\/Qostanay": "Àm Casachstàin an Ear (Qostanaı)",
         "Asia\/Qyzylorda": "Àm Casachstàin an Iar (Qızılorda)",
         "Asia\/Rangoon": "Àm Miànmar (Rangun)",
         "Asia\/Riyadh": "Àm Arabach (Riyadh)",

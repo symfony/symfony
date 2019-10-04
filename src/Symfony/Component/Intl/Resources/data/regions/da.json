@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "AD": "Andorra",
         "AE": "De Forenede Arabiske Emirater",
@@ -106,7 +106,7 @@
         "IL": "Israel",
         "IM": "Isle of Man",
         "IN": "Indien",
-        "IO": "Det britiske territorium i Det Indiske Ocean",
+        "IO": "Det Britiske Territorium i Det Indiske Ocean",
         "IQ": "Irak",
         "IR": "Iran",
         "IS": "Island",
@@ -216,7 +216,7 @@
         "SZ": "Eswatini",
         "TC": "Turks- og Caicosøerne",
         "TD": "Tchad",
-        "TF": "De Franske Besiddelser i Det Sydlige Indiske Ocean",
+        "TF": "De Franske Besiddelser i Det Sydlige Indiske Ocean og Antarktis",
         "TG": "Togo",
         "TH": "Thailand",
         "TJ": "Tadsjikistan",

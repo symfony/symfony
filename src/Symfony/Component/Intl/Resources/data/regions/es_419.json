@@ -1,13 +1,10 @@
 {
-    "Version": "2.1.47.86",
+    "Version": "36",
     "Names": {
         "BA": "Bosnia-Herzegovina",
         "CG": "República del Congo",
         "CI": "Costa de Marfil",
         "GG": "Guernesey",
-        "SZ": "Suazilandia",
-        "TL": "Timor Oriental",
-        "UM": "Islas Ultramarinas de EE.UU.",
-        "VI": "Islas Vírgenes de los Estados Unidos"
+        "UM": "Islas Ultramarinas de EE.UU."
     }
 }

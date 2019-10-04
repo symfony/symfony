@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Giờ Trung bình Greenwich (Abidjan)",
         "Africa\/Accra": "Giờ Trung bình Greenwich (Accra)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Giờ Miền Tây Indonesia (Pontianak)",
         "Asia\/Pyongyang": "Giờ Hàn Quốc (Bình Nhưỡng)",
         "Asia\/Qatar": "Giờ Ả Rập (Qatar)",
-        "Asia\/Qostanay": "Giờ Miền Đông Kazakhstan (Qostanay)",
+        "Asia\/Qostanay": "Giờ Miền Đông Kazakhstan (Kostanay)",
         "Asia\/Qyzylorda": "Giờ Miền Tây Kazakhstan (Qyzylorda)",
         "Asia\/Rangoon": "Giờ Myanmar (Rangoon)",
         "Asia\/Riyadh": "Giờ Ả Rập (Riyadh)",
@@ -284,7 +284,7 @@
         "Asia\/Srednekolymsk": "Giờ Magadan (Srednekolymsk)",
         "Asia\/Taipei": "Giờ Đài Bắc",
         "Asia\/Tashkent": "Giờ Uzbekistan (Tashkent)",
-        "Asia\/Tbilisi": "Giờ Gruzia (Tbilisi)",
+        "Asia\/Tbilisi": "Giờ Georgia (Tbilisi)",
         "Asia\/Tehran": "Giờ Iran (Tehran)",
         "Asia\/Thimphu": "Giờ Bhutan (Thimphu)",
         "Asia\/Tokyo": "Giờ Nhật Bản (Tokyo)",

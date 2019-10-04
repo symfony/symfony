@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "aa": "Kiafar",
         "ab": "Kiabkhazi",
@@ -59,6 +59,7 @@
         "byn": "Kiblin",
         "byv": "Kimedumba",
         "ca": "Kikatalani",
+        "ccp": "Kichakma",
         "ce": "Kichechenia",
         "ceb": "Kichebuano",
         "cgg": "Kichiga",
@@ -315,6 +316,7 @@
         "rm": "Kiromanshi",
         "rn": "Kirundi",
         "ro": "Kiromania",
+        "ro_MD": "Kimoldova cha Romania",
         "rof": "Kirombo",
         "root": "Kiroot",
         "ru": "Kirusi",

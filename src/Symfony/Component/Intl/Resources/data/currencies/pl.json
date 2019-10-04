@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "ADP": [
             "ADP",
@@ -7,7 +7,7 @@
         ],
         "AED": [
             "AED",
-            "dirham arabski"
+            "dirham ZEA"
         ],
         "AFA": [
             "AFA",
@@ -15,7 +15,7 @@
         ],
         "AFN": [
             "AFN",
-            "afgani"
+            "afgani afgańskie"
         ],
         "ALL": [
             "ALL",
@@ -31,7 +31,7 @@
         ],
         "AOA": [
             "AOA",
-            "kwanza angolańska"
+            "kwanza angolska"
         ],
         "AOK": [
             "AOK",
@@ -139,7 +139,7 @@
         ],
         "BOB": [
             "BOB",
-            "boliviano"
+            "boliviano boliwijskie"
         ],
         "BOP": [
             "BOP",
@@ -359,7 +359,7 @@
         ],
         "GHS": [
             "GHS",
-            "cedi ghański"
+            "cedi ghańskie"
         ],
         "GIP": [
             "GIP",
@@ -419,7 +419,7 @@
         ],
         "HTG": [
             "HTG",
-            "gourde haitańskie"
+            "gourde haitański"
         ],
         "HUF": [
             "HUF",
@@ -599,7 +599,7 @@
         ],
         "MRU": [
             "MRU",
-            "ouguiya mauretańska"
+            "ugija mauretańska"
         ],
         "MTL": [
             "MTL",
@@ -699,7 +699,7 @@
         ],
         "PGK": [
             "PGK",
-            "kina Papua Nowa Gwinea"
+            "kina papuańska"
         ],
         "PHP": [
             "PHP",
@@ -791,7 +791,7 @@
         ],
         "SHP": [
             "SHP",
-            "funt Wyspy Świętej Heleny"
+            "funt Świętej Heleny"
         ],
         "SIT": [
             "SIT",

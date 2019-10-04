@@ -1,6 +1,7 @@
 {
-    "Version": "2.1.49.14",
+    "Version": "36",
     "Names": {
-        "bn": "Bengali"
+        "bn": "Bengali",
+        "ro_MD": "Moldavian"
     }
 }

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "aa": "afarčina",
         "ab": "abcházčina",
@@ -71,6 +71,7 @@
         "car": "karibčina",
         "cay": "kajugčina",
         "cch": "atsam",
+        "ccp": "čakma",
         "ce": "čečenčina",
         "ceb": "cebuánčina",
         "cgg": "kiga",
@@ -518,7 +519,7 @@
         "zap": "zapotéčtina",
         "zbl": "systém Bliss",
         "zen": "zenaga",
-        "zgh": "tuaregčina (štandardná marocká)",
+        "zgh": "tuaregčina (marocká štandardná)",
         "zh": "čínština",
         "zh_Hans": "čínština (zjednodušená)",
         "zh_Hant": "čínština (tradičná)",

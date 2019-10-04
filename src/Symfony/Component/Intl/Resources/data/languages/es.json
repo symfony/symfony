@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "aa": "afar",
         "ab": "abjasio",
@@ -71,6 +71,7 @@
         "car": "caribe",
         "cay": "cayuga",
         "cch": "atsam",
+        "ccp": "chakma",
         "ce": "checheno",
         "ceb": "cebuano",
         "cgg": "chiga",
@@ -366,7 +367,7 @@
         "os": "osético",
         "osa": "osage",
         "ota": "turco otomano",
-        "pa": "panyabí",
+        "pa": "punyabí",
         "pag": "pangasinán",
         "pal": "pahlavi",
         "pam": "pampanga",

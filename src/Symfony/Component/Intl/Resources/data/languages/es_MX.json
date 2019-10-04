@@ -1,7 +1,8 @@
 {
-    "Version": "2.1.47.96",
+    "Version": "36",
     "Names": {
         "ace": "acehnés",
+        "ar_001": "árabe estándar moderno",
         "arp": "arapaho",
         "bas": "basa",
         "bax": "bamun",
@@ -27,23 +28,23 @@
         "lus": "lushai",
         "mga": "irlandés medieval",
         "nan": "min nan (Chino)",
+        "nl_BE": "flamenco",
         "nr": "ndebele meridional",
         "nso": "sotho septentrional",
         "pa": "punyabí",
         "pcm": "pcm",
-        "rn": "kiroundi",
         "shu": "árabe chadiano",
         "ss": "siswati",
-        "st": "sesotho meridional",
         "sw": "suajili",
         "sw_CD": "suajili del Congo",
         "syr": "siriaco",
         "tet": "tetún",
         "tn": "setswana",
         "tyv": "tuviniano",
-        "wo": "wolof",
         "wuu": "wuu",
         "xal": "kalmyk",
-        "zgh": "tamazight marroquí estándar"
+        "zgh": "tamazight marroquí estándar",
+        "zh_Hans": "chino simplificado",
+        "zh_Hant": "chino tradicional"
     }
 }

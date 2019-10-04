@@ -1,9 +1,10 @@
 {
-    "Version": "2.1.48.45",
+    "Version": "36",
     "Names": {
         "ak": "Akan",
         "am": "Amariikị",
         "ar": "Arabiikị",
+        "ar_001": "Ụdị Arabiikị nke oge a",
         "be": "Belaruusu",
         "bg": "Bọlụgarịa",
         "bn": "Bengali",
@@ -15,7 +16,6 @@
         "en": "Asụsụ Bekee",
         "en_AU": "Bekee ndị Australia",
         "en_CA": "Bekee ndị Canada",
-        "en_GB": "Bekee ndị Britain",
         "en_US": "Bekee ndị America",
         "es": "Asụsụ Spanish",
         "es_419": "Asụsụ Spanish ndị Latin America",

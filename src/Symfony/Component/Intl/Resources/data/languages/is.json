@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "aa": "afár",
         "ab": "abkasíska",
@@ -65,6 +65,7 @@
         "car": "karíbamál",
         "cay": "kajúga",
         "cch": "atsam",
+        "ccp": "tsjakma",
         "ce": "tsjetsjenska",
         "ceb": "kebúanó",
         "cgg": "kíga",
@@ -344,7 +345,7 @@
         "nus": "núer",
         "nv": "navahó",
         "nwc": "klassísk nevaríska",
-        "ny": "njanja; sísjeva; sjeva",
+        "ny": "nýanja",
         "nym": "njamvesí",
         "nyn": "nyankole",
         "nyo": "njóró",

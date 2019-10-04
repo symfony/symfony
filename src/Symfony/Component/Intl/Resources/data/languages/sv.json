@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.90",
+    "Version": "36",
     "Names": {
         "aa": "afar",
         "ab": "abchaziska",
@@ -270,7 +270,7 @@
         "kgp": "kaingang",
         "kha": "khasi",
         "kho": "khotanesiska",
-        "khq": "Timbuktu-songhoy",
+        "khq": "Timbuktu-songhai",
         "khw": "khowar",
         "ki": "kikuyu",
         "kiu": "kirmanjki",
@@ -302,7 +302,7 @@
         "kut": "kutenaj",
         "kv": "kome",
         "kw": "korniska",
-        "ky": "kirgisiska",
+        "ky": "kirgiziska",
         "la": "latin",
         "lad": "ladino",
         "lag": "langi",
@@ -484,7 +484,7 @@
         "seh": "sena",
         "sei": "seri",
         "sel": "selkup",
-        "ses": "Gao-songhay",
+        "ses": "Gao-songhai",
         "sg": "sango",
         "sga": "forniriska",
         "sgs": "samogitiska",

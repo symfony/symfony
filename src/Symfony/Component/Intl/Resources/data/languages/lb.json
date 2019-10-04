@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "aa": "Afar",
         "ab": "Abchasesch",
@@ -377,6 +377,7 @@
         "nb": "Norwegesch Bokmål",
         "nd": "Nord-Ndebele-Sprooch",
         "nds": "Nidderdäitsch",
+        "nds_NL": "nds_NL",
         "ne": "Nepalesesch",
         "new": "Newari",
         "ng": "Ndonga",

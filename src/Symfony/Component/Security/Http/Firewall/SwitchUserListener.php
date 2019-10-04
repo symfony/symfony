@@ -82,9 +82,16 @@ class SwitchUserListener implements ListenerInterface
     public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
-        $username = $request->get($this->usernameParameter) ?: $request->headers->get($this->usernameParameter);
 
-        if (!$username) {
+        // usernames can be falsy
+        $username = $request->get($this->usernameParameter);
+
+        if (null === $username || '' === $username) {
+            $username = $request->headers->get($this->usernameParameter);
+        }
+
+        // if it's still "empty", nothing to do.
+        if (null === $username || '' === $username) {
             return;
         }
 

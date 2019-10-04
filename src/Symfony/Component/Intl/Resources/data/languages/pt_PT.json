@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "af": "africanês",
         "alt": "altai do sul",
@@ -12,6 +12,7 @@
         "bbj": "ghomala",
         "bn": "bengalês",
         "bua": "buriat",
+        "ccp": "changma",
         "chk": "chuquês",
         "chn": "jargão chinook",
         "chr": "cherokee",
@@ -54,7 +55,6 @@
         "lg": "ganda",
         "lou": "crioulo de Louisiana",
         "lrc": "luri do norte",
-        "luo": "luo",
         "mak": "makassarês",
         "mk": "macedónio",
         "moh": "mohawk",
@@ -63,6 +63,7 @@
         "nds": "baixo-alemão",
         "nds_NL": "baixo-saxão",
         "nl": "neerlandês",
+        "nl_BE": "flamengo",
         "nn": "norueguês nynorsk",
         "non": "nórdico antigo",
         "oc": "occitano",
@@ -78,6 +79,7 @@
         "pt_BR": "português do Brasil",
         "pt_PT": "português europeu",
         "raj": "rajastanês",
+        "ro_MD": "moldávio",
         "root": "root",
         "se": "sami do norte",
         "sga": "irlandês antigo",
@@ -93,12 +95,13 @@
         "tt": "tatar",
         "tzm": "tamazight do Atlas Central",
         "uz": "usbeque",
-        "vai": "vai",
         "wo": "uólofe",
         "xh": "xosa",
         "xog": "soga",
         "yo": "ioruba",
         "zgh": "tamazight marroquino padrão",
+        "zh_Hans": "chinês simplificado",
+        "zh_Hant": "chinês tradicional",
         "zun": "zuni",
         "zza": "zaza"
     }

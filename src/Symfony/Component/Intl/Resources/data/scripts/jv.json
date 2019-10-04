@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.44",
+    "Version": "36",
     "Names": {
         "Arab": "Arab",
         "Armn": "Armenia",
@@ -35,6 +35,7 @@
         "Sinh": "Sinhala",
         "Taml": "Tamil",
         "Thaa": "Thaana",
+        "Thai": "Thailand",
         "Tibt": "Tibetan",
         "Zmth": "Notasi Matematika",
         "Zsye": "Emoji",

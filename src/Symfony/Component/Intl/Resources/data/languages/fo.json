@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.9",
+    "Version": "36",
     "Names": {
         "aa": "afar",
         "ab": "abkhasiskt",
@@ -48,6 +48,7 @@
         "bug": "buginesiskt",
         "byn": "blin",
         "ca": "katalani",
+        "ccp": "khakma",
         "ce": "tjetjenskt",
         "ceb": "cebuano",
         "cgg": "chiga",

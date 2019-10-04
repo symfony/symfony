@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -67,6 +68,9 @@ class RegisterListenersPassTest extends TestCase
         $builder->register('my_event_subscriber', AliasedSubscriber::class)
             ->addTag('kernel.event_subscriber');
 
+        $eventAliasPass = new AddEventAliasesPass([CustomEvent::class => 'custom_event']);
+        $eventAliasPass->process($builder);
+
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($builder);
 
@@ -76,6 +80,14 @@ class RegisterListenersPassTest extends TestCase
                 [
                     'aliased_event',
                     [new ServiceClosureArgument(new Reference('my_event_subscriber')), 'onAliasedEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'custom_event',
+                    [new ServiceClosureArgument(new Reference('my_event_subscriber')), 'onCustomEvent'],
                     0,
                 ],
             ],
@@ -202,7 +214,11 @@ class RegisterListenersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
         $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => AliasedEvent::class, 'method' => 'onEvent']);
+        $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => CustomEvent::class, 'method' => 'onEvent']);
         $container->register('event_dispatcher');
+
+        $eventAliasPass = new AddEventAliasesPass([CustomEvent::class => 'custom_event']);
+        $eventAliasPass->process($container);
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -214,6 +230,14 @@ class RegisterListenersPassTest extends TestCase
                 [
                     'aliased_event',
                     [new ServiceClosureArgument(new Reference('foo')), 'onEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'custom_event',
+                    [new ServiceClosureArgument(new Reference('bar')), 'onEvent'],
                     0,
                 ],
             ],
@@ -249,10 +273,15 @@ final class AliasedSubscriber implements EventSubscriberInterface
     {
         return [
             AliasedEvent::class => 'onAliasedEvent',
+            CustomEvent::class => 'onCustomEvent',
         ];
     }
 }
 
 final class AliasedEvent
+{
+}
+
+final class CustomEvent
 {
 }

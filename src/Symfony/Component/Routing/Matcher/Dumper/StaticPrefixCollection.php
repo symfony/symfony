@@ -197,6 +197,6 @@ class StaticPrefixCollection
 
     public static function handleError($type, $msg)
     {
-        return 0 === strpos($msg, 'preg_match(): Compilation failed: lookbehind assertion is not fixed length');
+        return false !== strpos($msg, 'Compilation failed: lookbehind assertion is not fixed length');
     }
 }

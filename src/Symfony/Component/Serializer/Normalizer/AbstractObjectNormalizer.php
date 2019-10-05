@@ -49,7 +49,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return \is_object($data) && !$data instanceof \Traversable;
+        return \is_object($data) && !$data instanceof \Traversable && !$data instanceof \stdClass;
     }
 
     /**

@@ -147,7 +147,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             return $data;
         }
 
-        if (\is_array($data) || $data instanceof \Traversable) {
+        if (\is_array($data) || $data instanceof \Traversable || $data instanceof \stdClass) {
             $normalized = [];
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);

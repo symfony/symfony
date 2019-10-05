@@ -112,6 +112,15 @@ class OptionsResolver implements Options
     ];
 
     /**
+     * @param string $optionName
+     * @return OptionConfigurator
+     */
+    public function define(string $optionName): OptionConfigurator
+    {
+        return new OptionConfigurator($optionName, $this);
+    }
+
+    /**
      * Sets the default value of a given option.
      *
      * If the default value should be set based on other options, you can pass

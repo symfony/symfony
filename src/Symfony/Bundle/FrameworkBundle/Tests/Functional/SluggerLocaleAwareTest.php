@@ -16,6 +16,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
  */
 class SluggerLocaleAwareTest extends AbstractWebTestCase
 {
+    /**
+     * @requires extension intl
+     */
     public function testLocalizedSlugger()
     {
         $kernel = static::createKernel(['test_case' => 'Slugger', 'root_config' => 'config.yml']);

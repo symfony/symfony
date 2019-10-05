@@ -89,6 +89,12 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
+use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
+use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
+use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
+use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\Notifier\Recipient\AdminRecipient;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -311,6 +317,10 @@ class FrameworkExtension extends Extension
 
         if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['notifier'])) {
+            $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
         }
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
@@ -1862,6 +1872,67 @@ class FrameworkExtension extends Extension
         $envelopeListener = $container->getDefinition('mailer.envelope_listener');
         $envelopeListener->setArgument(0, $sender);
         $envelopeListener->setArgument(1, $recipients);
+    }
+
+    private function registerNotifierConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!class_exists(Notifier::class)) {
+            throw new LogicException('Notifier support cannot be enabled as the component is not installed. Try running "composer require symfony/notifier".');
+        }
+
+        $loader->load('notifier.xml');
+        $loader->load('notifier_transports.xml');
+
+        if ($config['chatter_transports']) {
+            $container->getDefinition('chatter.transports')->setArgument(0, $config['chatter_transports']);
+        } else {
+            $container->removeDefinition('chatter');
+        }
+        if ($config['texter_transports']) {
+            $container->getDefinition('texter.transports')->setArgument(0, $config['texter_transports']);
+        } else {
+            $container->removeDefinition('texter');
+        }
+
+        if ($this->mailerConfigEnabled) {
+            $sender = $container->getDefinition('mailer.envelope_listener')->getArgument(0);
+            $container->getDefinition('notifier.channel.email')->setArgument(2, $sender);
+        } else {
+            $container->removeDefinition('notifier.channel.email');
+        }
+
+        if (!$this->messengerConfigEnabled) {
+            $container->removeDefinition('notifier.failed_message_listener');
+        } else {
+            // as we have a bus, the channels don't need the transports
+            $container->getDefinition('notifier.channel.chat')->setArgument(0, null);
+            $container->getDefinition('notifier.channel.email')->setArgument(0, null);
+            $container->getDefinition('notifier.channel.sms')->setArgument(0, null);
+        }
+
+        $container->getDefinition('notifier.channel_policy')->setArgument(0, $config['channel_policy']);
+
+        $classToServices = [
+            SlackTransportFactory::class => 'notifier.transport_factory.slack',
+            TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
+            NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
+            TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
+        ];
+
+        foreach ($classToServices as $class => $service) {
+            if (!class_exists($class)) {
+                $container->removeDefinition($service);
+            }
+        }
+
+        if (isset($config['admin_recipients'])) {
+            $notifier = $container->getDefinition('notifier');
+            foreach ($config['admin_recipients'] as $i => $recipient) {
+                $id = 'notifier.admin_recipient.'.$i;
+                $container->setDefinition($id, new Definition(AdminRecipient::class, [$recipient['email'], $recipient['phone']]));
+                $notifier->addMethodCall('addAdminRecipient', [new Reference($id)]);
+            }
+        }
     }
 
     /**

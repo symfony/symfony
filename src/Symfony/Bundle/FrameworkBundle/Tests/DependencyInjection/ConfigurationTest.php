@@ -21,6 +21,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Notifier\Notifier;
 
 class ConfigurationTest extends TestCase
 {
@@ -410,6 +411,13 @@ class ConfigurationTest extends TestCase
                 'dsn' => null,
                 'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
+            ],
+            'notifier' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
+                'chatter_transports' => [],
+                'texter_transports' => [],
+                'channel_policy' => [],
+                'admin_recipients' => [],
             ],
             'error_controller' => 'error_controller',
         ];

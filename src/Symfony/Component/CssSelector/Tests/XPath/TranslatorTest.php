@@ -308,6 +308,8 @@ HTML
             ['li div:only-child', ['li-div']],
             ['div *:only-child', ['li-div', 'foobar-span']],
             ['p:only-of-type', ['paragraph']],
+            [':only-of-type', ['html', 'li-div', 'foobar-span', 'paragraph']],
+            ['div#foobar-div :only-of-type', ['foobar-span']],
             ['a:empty', ['name-anchor']],
             ['a:EMpty', ['name-anchor']],
             ['li:empty', ['third-li', 'fourth-li', 'fifth-li', 'sixth-li']],

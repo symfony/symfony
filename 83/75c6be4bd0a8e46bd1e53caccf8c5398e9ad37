@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-27T05:15:31Z
+
+Ready for another round of reviews.
+
+---------------------------------------------------------------------------
+
+by Wirone at 2019-10-04T08:33:23Z
+
+@fabpot @nicolas-grekas Side question: why are you amending changes all the time? In this case it's impossible to see changes introduced on each step of the review process, so when new version of a branch is pushed I don't know what should be reviewed again (Github marks whole files as "changed since last view", with large files it's difficult to read whole file every time). I recommend adding new commits and squash them just before merging, if you want to keep compact history.
+
+Edit: ahh, Github generates `compare` view for those pushes, but they're linked under "force pushed" and it's not intuitive and transparent since text is not decorated in any way. In Gitlab there is "Compare with previous version" link, much easier to notice.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-10-05T10:22:07Z
+
+For some reasons, some of my comments were not published :(
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-10-05T10:25:34Z
+
+@Wirone About providers that could be implemented: this initial PR provides just a few of the possible/popular providers to get us started. I hope that many other ones will be submitted over time.
+
+Regarding `setXxx()` methos vs `xxx()` ones: I only used the `xxx()` styles for data objects.

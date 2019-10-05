@@ -111,10 +111,6 @@ class OptionsResolver implements Options
         'double' => 'float',
     ];
 
-    /**
-     * @param string $optionName
-     * @return OptionConfigurator
-     */
     public function define(string $optionName): OptionConfigurator
     {
         return new OptionConfigurator($optionName, $this);
@@ -838,8 +834,7 @@ class OptionsResolver implements Options
     /**
      * Returns the resolved value of an option.
      *
-     * @param string $option             The option name
-     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not (true by default)
+     * @param string $option The option name
      *
      * @return mixed The option value
      *

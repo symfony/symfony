@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\EmptyDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 
@@ -45,7 +46,7 @@ class SerializerTest extends TestCase
     {
         $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $serializer = new Serializer([$this->getMockBuilder('Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock()]);
-        $serializer->normalize(new \stdClass(), 'xml');
+        $serializer->normalize(new EmptyDummy(), 'xml');
     }
 
     public function testNormalizeTraversable()
@@ -66,7 +67,7 @@ class SerializerTest extends TestCase
     {
         $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $serializer = new Serializer([new TestDenormalizer()], []);
-        $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
+        $this->assertTrue($serializer->normalize(new EmptyDummy(), 'json'));
     }
 
     public function testDenormalizeNoMatch()
@@ -158,6 +159,26 @@ class SerializerTest extends TestCase
         $data = ['foo', [5, 3]];
         $result = $serializer->serialize($data, 'json');
         $this->assertEquals(json_encode($data), $result);
+    }
+
+    public function testSerializeStdClass()
+    {
+        $std = new \stdClass();
+        $std->foo = ['bar', 'baz'];
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $result = $serializer->serialize($std, 'json');
+        $this->assertEquals('{"foo":["bar","baz"]}', $result);
+    }
+
+    public function testSerializeArrayStdClass()
+    {
+        $stdFoo = new \stdClass();
+        $stdFoo->foo = 'bar';
+        $stdBar = new \stdClass();
+        $stdBar->bar = 'baz';
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $result = $serializer->serialize([$stdFoo, $stdBar], 'json');
+        $this->assertEquals('[{"foo":"bar"},{"bar":"baz"}]', $result);
     }
 
     public function testSerializeNoEncoder()

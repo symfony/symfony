@@ -864,14 +864,16 @@ class Application implements ResetInterface
 
         if (true === $input->hasParameterOption(['--no-interaction', '-n'], true)) {
             $input->setInteractive(false);
-        } elseif (\function_exists('posix_isatty')) {
+        } else {
             $inputStream = null;
 
             if ($input instanceof StreamableInputInterface) {
                 $inputStream = $input->getStream();
             }
 
-            if (!@posix_isatty($inputStream) && false === getenv('SHELL_INTERACTIVE')) {
+            $inputStream = !$inputStream && \defined('STDIN') ? STDIN : $inputStream;
+
+            if ((!$inputStream || !stream_isatty($inputStream)) && false === getenv('SHELL_INTERACTIVE')) {
                 $input->setInteractive(false);
             }
         }

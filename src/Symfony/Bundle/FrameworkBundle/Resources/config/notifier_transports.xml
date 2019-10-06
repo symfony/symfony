@@ -18,6 +18,10 @@
             <tag name="chatter.transport_factory" />
         </service>
 
+        <service id="notifier.transport_factory.mattermost" class="Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory" parent="notifier.transport_factory.abstract">
+            <tag name="chatter.transport_factory" />
+        </service>
+
         <service id="notifier.transport_factory.nexmo" class="Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory" parent="notifier.transport_factory.abstract">
             <tag name="texter.transport_factory" />
         </service>

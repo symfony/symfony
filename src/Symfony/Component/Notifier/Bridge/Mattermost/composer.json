@@ -1,0 +1,35 @@
+{
+    "name": "symfony/mattermost-notifier",
+    "type": "symfony-bridge",
+    "description": "Symfony Mattermost Notifier Bridge",
+    "keywords": ["mattermost", "notifier"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Emanuele Panzeri",
+            "email": "thepanz@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5",
+        "symfony/http-client": "^4.3|^5.0",
+        "symfony/notifier": "^5.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Mattermost\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.1-dev"
+        }
+    }
+}

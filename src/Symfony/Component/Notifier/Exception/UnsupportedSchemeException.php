@@ -30,6 +30,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Telegram\TelegramTransportFactory::class,
             'package' => 'symfony/telegram-notifier',
         ],
+        'mattermost' => [
+            'class' => Bridge\Mattermost\MattermostTransportFactory::class,
+            'package' => 'symfony/mattermost-notifier',
+        ],
         'nexmo' => [
             'class' => Bridge\Nexmo\NexmoTransportFactory::class,
             'package' => 'symfony/nexmo-notifier',

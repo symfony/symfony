@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class UuidCaster
+final class UuidCaster
 {
     public static function castRamseyUuid(UuidInterface $c, array $a, Stub $stub, bool $isNested): array
     {

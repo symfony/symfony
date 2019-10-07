@@ -42,6 +42,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
+use Symfony\Component\Serializer\Tests\Fixtures\EmptyDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
@@ -82,7 +83,7 @@ class SerializerTest extends TestCase
     {
         $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $serializer = new Serializer([$this->getMockBuilder('Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock()]);
-        $serializer->normalize(new \stdClass(), 'xml');
+        $serializer->normalize(new EmptyDummy(), 'xml');
     }
 
     public function testNormalizeTraversable()
@@ -103,7 +104,7 @@ class SerializerTest extends TestCase
     {
         $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $serializer = new Serializer([new TestDenormalizer()], []);
-        $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
+        $this->assertTrue($serializer->normalize(new EmptyDummy(), 'json'));
     }
 
     public function testDenormalizeNoMatch()
@@ -189,6 +190,26 @@ class SerializerTest extends TestCase
         $this->assertEquals('"foo"', $result);
     }
 
+    public function testSerializeStdClass()
+    {
+        $std = new \stdClass();
+        $std->foo = ['bar', 'baz'];
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $result = $serializer->serialize($std, 'json');
+        $this->assertEquals('{"foo":["bar","baz"]}', $result);
+    }
+
+    public function testSerializeArrayStdClass()
+    {
+        $stdFoo = new \stdClass();
+        $stdFoo->foo = 'bar';
+        $stdBar = new \stdClass();
+        $stdBar->bar = 'baz';
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $result = $serializer->serialize([$stdFoo, $stdBar], 'json');
+        $this->assertEquals('[{"foo":"bar"},{"bar":"baz"}]', $result);
+    }
+
     public function testSerializeArrayOfScalars()
     {
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
@@ -200,7 +221,7 @@ class SerializerTest extends TestCase
     public function testSerializeEmpty()
     {
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
-        $data = ['foo' => new \stdClass()];
+        $data = ['foo' => new EmptyDummy()];
 
         //Old buggy behaviour
         $result = $serializer->serialize($data, 'json');

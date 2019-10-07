@@ -344,6 +344,8 @@ Validator
  * Overriding the methods `ConstraintValidatorTestCase::setUp()` and `ConstraintValidatorTestCase::tearDown()` without the `void` return-type is deprecated.
  * deprecated `Symfony\Component\Validator\Mapping\Cache\CacheInterface` and all implementations in favor of PSR-6.
  * deprecated `ValidatorBuilder::setMetadataCache`, use `ValidatorBuilder::setMappingCache` instead.
+ * The `Range` constraint has a new message option `notInRangeMessage` that is used when both `min` and `max` values are set.
+   In case you are using custom translations make sure to add one for this new message.
 
 WebProfilerBundle
 -----------------

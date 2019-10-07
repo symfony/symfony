@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2019-10-05T09:35:46Z
+
+[One more failure](https://travis-ci.org/symfony/symfony/jobs/593845764#L3612):
+
+<img width="831" alt="image" src="https://user-images.githubusercontent.com/190447/66253169-3137d800-e764-11e9-8391-2f4b0febe8a0.png">
+
+---------------------------------------------------------------------------
+
+by jakzal at 2019-10-05T19:16:21Z
+
+Build's green now :)

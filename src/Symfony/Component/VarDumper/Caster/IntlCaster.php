@@ -16,6 +16,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+ *
+ * @final since Symfony 4.4
  */
 class IntlCaster
 {

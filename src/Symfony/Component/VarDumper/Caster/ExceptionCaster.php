@@ -19,6 +19,8 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  * Casts common Exception classes to array representation.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final since Symfony 4.4
  */
 class ExceptionCaster
 {

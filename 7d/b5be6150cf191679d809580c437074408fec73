@@ -1,0 +1,279 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-01T10:19:06Z
+
+For this kind of renamings/refactorings, we usually ask the new names/syntax to be much better than the original ones (we say *"ten times better"*, but it's not a scientific measure). Why? Because the effort to update our docs, making other community doc resources "obsolete" and forcing developers to learn a new way of doing things must be worth it.
+
+Looking at the before/after comparison, I think the new way it's better but I'm not sure it's much better. What do others think? Thanks!
+
+```yaml
+services:
+  App\MyService:
+    calls:
+      # Before:
+      - { method: 'addStuff', arguments: ['@App\Stuff']
+      # After:
+      - 'addStuff': ['@App\Stuff']
+
+      # Before:
+      - ['withStuff', ['@App\Stuff'], true]
+      # After
+      - 'withStuff': !returns_clone ['@App\Stuff']
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-01T10:43:15Z
+
+@javiereguiluz good point, please have look at the example in https://twitter.com/nicolasgrekas/status/1178763141485912064?s=19
+Can you spot the mistake? Can you fix it?
+
+With trivial definitions we miss the point I think but once we get into array in arguments, inline services, etc. the difference is significant to me.
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2019-10-01T10:50:14Z
+
+@javiereguiluz About forcing developers to learn a new way, I'm not sure most people remember the current syntax exactly because this feature is not among the most often used. I personnally always look it up in the documentation when I do need it.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T10:53:44Z
+
+@javiereguiluz here is the complete example (we have 2 existing syntaxes for *both* cases):
+
+```yaml
+services:
+  App\MyService:
+    calls:
+      # Before (2 supported ways):
+      - { method: 'addStuff', arguments: ['@App\Stuff'] }
+      - ['withStuff', ['@App\Stuff']]
+      # After:
+      - addStuff: ['@App\Stuff']
+
+      # Before (2 supported ways):
+      - { method: 'addStuff', arguments: ['@App\Stuff'], returns_clone: true }
+      - ['withStuff', ['@App\Stuff'], true]
+      # After
+      - withStuff: !returns_clone ['@App\Stuff']
+```
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-10-01T14:07:45Z
+
+`!returns_clone` is problematic, as that syntax is reserved for YAML tag, which "represents type information": https://yaml.org/spec/1.2/spec.html#tag//
+
+Also, on its own:
+
+```yaml
+calls:
+    - withStuff: !returns_clone ['@App\Stuff']
+```
+
+isn't exactly intuitive either. It gives the impression that the "returns clone" is somehow tied to the method arguments, which it of course is not.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T14:18:51Z
+
+@teohhanhui well, that syntax is precisely using a YAML tag.
+
+but I agree that this syntax is quite confusing, by trying `returns clone` to arguments. IMO, the existing mapping-based syntax is easier to understand in this case.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-10-01T14:27:15Z
+
+@stof:
+> well, that syntax is precisely using a YAML tag.
+
+Yes, but according to the YAML spec, a tag "represents type information". I'm not sure such an interpretation is possible here.
+
+Perhaps this might work better:
+
+```yaml
+calls:
+    - withStuff: { arguments: ['@App\Stuff'], returns_clone: true }
+```
+
+or in expanded formatting:
+
+```yaml
+calls:
+    -   withStuff:
+            arguments:
+                - '@App\Stuff'
+            returns_clone: true
+```
+
+In summary, just allow moving `method` to YAML key.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T14:32:46Z
+
+Yeah, in that case, the usage of a tag is indeed abusing the system (which is also related to the fact that it is confusing).
+but if we go back to mapping to configure arguments and `returns_clone`, I don't see any benefit to moving the method name as a key rather than a value (and we cannot switch back that way only when needing `returns_clone` as that would be ambiguous).
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-10-01T14:35:52Z
+
+My modified proposal, in full:
+
+```yaml
+services:
+  App\MyService:
+    calls:
+      # Before (2 supported ways):
+      - { method: 'addStuff', arguments: ['@App\Stuff'] }
+      - ['withStuff', ['@App\Stuff']]
+      # After (2 supported ways):
+      - addStuff: ['@App\Stuff']
+      - addStuff: { arguments: ['@App\Stuff'] }
+
+      # Before (2 supported ways):
+      - { method: 'addStuff', arguments: ['@App\Stuff'], returns_clone: true }
+      - ['withStuff', ['@App\Stuff'], true]
+      # After
+      - withStuff: { arguments: ['@App\Stuff'], returns_clone: true }
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T14:38:34Z
+
+@teohhanhui your proposal makes it very hard to avoid ambiguity, given that arguments are not limited to a simple list of strings.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-10-01T14:41:13Z
+
+@stof:
+> your proposal makes it very hard to avoid ambiguity, given that arguments are not limited to a simple list of strings.
+
+I don't see any possible ambiguity. Or have I missed something? A list of arguments must always be, well, a list. That's already the case now and my proposal changes nothing about that. Complex arguments are still nested in a list.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T14:44:30Z
+
+@teohhanhui not true. When using autowiring, we support named arguments to specify some arguments while letting others be autowiring. And when using ChildDefinition, we can also have string keys to override some parent arguments. Both of these cases have a mapping for arguments, not a list.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-10-01T14:50:20Z
+
+@stof Are those applicable to `calls` too? Even so, we could tell the difference by the presence of the `arguments` key, right?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-01T15:04:53Z
+
+yes, autowiring works with call arguments too.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-10-01T15:55:50Z
+
+Taking the autowiring case into account:
+
+```yaml
+services:
+  App\MyService:
+    calls:
+      # Before (2 supported ways):
+      - { method: 'addStuff', arguments: ['@App\Stuff'] }
+      - ['withStuff', ['@App\Stuff']]
+      # After (2 supported ways):
+      - addStuff: ['@App\Stuff']
+      - addStuff: { arguments: ['@App\Stuff'] }
+
+      # Before (2 supported ways):
+      - { method: 'addStuff', arguments: { $stuff: '@App\Stuff' } }
+      - ['withStuff', { $stuff: '@App\Stuff' }]
+      # After (2 supported ways):
+      - addStuff: { $stuff: '@App\Stuff' }
+      - addStuff: { arguments: { $stuff: '@App\Stuff' } }
+
+      # Before (2 supported ways):
+      - { method: 'addStuff', arguments: ['@App\Stuff'], returns_clone: true }
+      - ['withStuff', ['@App\Stuff'], true]
+      # After
+      - withStuff: { arguments: ['@App\Stuff'], returns_clone: true }
+```
+
+(If the array has `arguments` or `returns_clone` key, it's not the arguments list; otherwise it must be the arguments list.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-02T07:49:43Z
+
+I was about to move `!returns_clone` before the method, but then that would force one to add brackets around the call definition:
+`- !returns_clone {foo: [...]}`
+vs this for regular calls:
+`- foo: [...]`
+
+Therefore I'd prefer to stick with the current syntax. Also because to me, the method should be read before the type of return.
+
+Yaml doesn't have any inherent semantics past its base parsing rules, so we're not "abusing" anything: *we* define what a specific yaml tree means.
+
+ (it'd be great if we could avoid such strong words btw, to keep the discussions open...)
+
+Status: needs review
+
+(I'm going to submit a separate PR to add a test case as @stof requested in https://github.com/symfony/symfony/pull/33779#discussion_r329956903)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-07T11:48:10Z
+
+/cc @symfony/mergers please review this one, it's an important DX improvement (to me at least, I really really don't like the current `[method, [...]]` syntax.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-10-07T12:22:30Z
+
+We would then have three different notations for configuring method calls:
+
+```yaml
+services:
+    App\MyService:
+        calls:
+            - addStuff: ['@App\Stuff']
+```
+
+vs.
+
+```yaml
+    App\MyService:
+        calls:
+            method: addStuff
+            arguments: ['@App\Stuff']
+```
+
+vs.
+
+```yaml
+    App\MyService:
+        calls:
+            - [addStuff, ['@App\Stuff']]
+```
+
+IMO that would be too many and I would at least try to get rid of the third one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-07T12:24:39Z
+
+@xabbuh 100% agree, that's why I added this note in the description:
+
+> Note that deprecating the current syntax wouldn't be nice for the ecosystem in 4.4, but could be considered starting with 5.1.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-10-07T12:38:55Z
+
+@nicolas-grekas works for me 👍

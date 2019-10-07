@@ -211,7 +211,7 @@ class FrameworkExtension extends Extension
                     ->addError('You cannot use the "slugger" service since the Translation contracts are not installed. Try running "composer require symfony/translation".');
             }
 
-            if (!\extension_loaded('intl')) {
+            if (!\extension_loaded('intl') && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
                 @trigger_error('Please install the "intl" PHP extension for best performance.', E_USER_DEPRECATED);
             }
         }

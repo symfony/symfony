@@ -65,7 +65,7 @@ class UndefinedCallableHandler
         'workflow' => 'enable "framework.workflows"',
     ];
 
-    public static function onUndefinedFilter(string $name)
+    public static function onUndefinedFilter(string $name): bool
     {
         if (!isset(self::$filterComponents[$name])) {
             return false;
@@ -76,7 +76,7 @@ class UndefinedCallableHandler
         return true;
     }
 
-    public static function onUndefinedFunction(string $name)
+    public static function onUndefinedFunction(string $name): bool
     {
         if (!isset(self::$functionComponents[$name])) {
             return false;
@@ -87,7 +87,7 @@ class UndefinedCallableHandler
         return true;
     }
 
-    private static function onUndefined($name, $type, $component)
+    private static function onUndefined(string $name, string $type, string $component)
     {
         if (class_exists(FullStack::class) && isset(self::$fullStackEnable[$component])) {
             throw new SyntaxError(sprintf('Did you forget to %s? Unknown %s "%s".', self::$fullStackEnable[$component], $type, $name));

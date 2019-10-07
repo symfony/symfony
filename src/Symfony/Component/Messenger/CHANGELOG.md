@@ -16,6 +16,7 @@ CHANGELOG
  * `InMemoryTransport` handle acknowledged and rejected messages.
  * Made all dispatched worker event classes final.
  * Added support for `from_transport` attribute on `messenger.message_handler` tag.
+ * Added support for passing `dbindex` as a query parameter to the redis transport DSN.
 
 4.3.0
 -----

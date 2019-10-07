@@ -233,7 +233,7 @@ EOF
         return $this->containerBuilder = $container;
     }
 
-    private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $name, bool $showHidden)
+    private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $name, bool $showHidden): string
     {
         $name = ltrim($name, '\\');
 
@@ -253,7 +253,7 @@ EOF
         return $io->choice('Select one of the following services to display its information', $matchingServices);
     }
 
-    private function findServiceIdsContaining(ContainerBuilder $builder, string $name, bool $showHidden)
+    private function findServiceIdsContaining(ContainerBuilder $builder, string $name, bool $showHidden): array
     {
         $serviceIds = $builder->getServiceIds();
         $foundServiceIds = $foundServiceIdsIgnoringBackslashes = [];
@@ -275,7 +275,7 @@ EOF
     /**
      * @internal
      */
-    public function filterToServiceTypes($serviceId)
+    public function filterToServiceTypes(string $serviceId): bool
     {
         // filter out things that could not be valid class names
         if (!preg_match('/(?(DEFINE)(?<V>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+))^(?&V)(?:\\\\(?&V))*+(?: \$(?&V))?$/', $serviceId)) {

@@ -187,7 +187,7 @@ EOF
         return base64_encode(random_bytes(30));
     }
 
-    private function getUserClass(InputInterface $input, SymfonyStyle $io)
+    private function getUserClass(InputInterface $input, SymfonyStyle $io): string
     {
         if (null !== $userClass = $input->getArgument('user-class')) {
             return $userClass;

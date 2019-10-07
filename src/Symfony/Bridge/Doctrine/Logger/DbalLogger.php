@@ -68,7 +68,7 @@ class DbalLogger implements SQLLogger
         $this->logger->debug($message, $params);
     }
 
-    private function normalizeParams(array $params)
+    private function normalizeParams(array $params): array
     {
         foreach ($params as $index => $param) {
             // normalize recursively

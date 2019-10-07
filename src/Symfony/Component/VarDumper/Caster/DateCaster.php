@@ -17,6 +17,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * Casts DateTimeInterface related classes to array representation.
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class DateCaster
 {
@@ -52,7 +54,7 @@ class DateCaster
         return $filter & Caster::EXCLUDE_VERBOSE ? $i : $i + $a;
     }
 
-    private static function formatInterval(\DateInterval $i)
+    private static function formatInterval(\DateInterval $i): string
     {
         $format = '%R ';
 

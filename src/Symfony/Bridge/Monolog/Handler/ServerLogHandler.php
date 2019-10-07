@@ -101,7 +101,7 @@ class ServerLogHandler extends AbstractHandler
         return $socket;
     }
 
-    private function formatRecord(array $record)
+    private function formatRecord(array $record): string
     {
         if ($this->processors) {
             foreach ($this->processors as $processor) {

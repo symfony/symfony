@@ -17,6 +17,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * Casts Reflector related classes to array representation.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final since Symfony 4.4
  */
 class ReflectionCaster
 {
@@ -361,7 +363,7 @@ class ReflectionCaster
         return $signature;
     }
 
-    private static function addExtra(&$a, \Reflector $c)
+    private static function addExtra(array &$a, \Reflector $c)
     {
         $x = isset($a[Caster::PREFIX_VIRTUAL.'extra']) ? $a[Caster::PREFIX_VIRTUAL.'extra']->value : [];
 
@@ -377,7 +379,7 @@ class ReflectionCaster
         }
     }
 
-    private static function addMap(&$a, \Reflector $c, $map, $prefix = Caster::PREFIX_VIRTUAL)
+    private static function addMap(array &$a, \Reflector $c, array $map, string $prefix = Caster::PREFIX_VIRTUAL)
     {
         foreach ($map as $k => $m) {
             if (method_exists($c, $m) && false !== ($m = $c->$m()) && null !== $m) {

@@ -11,10 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
+use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -60,9 +61,7 @@ class EntityUserProviderTest extends TestCase
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->getMockBuilder('Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock([ObjectRepository::class, UserLoaderInterface::class]);
         $repository
             ->expects($this->once())
             ->method('loadUserByUsername')
@@ -148,7 +147,7 @@ class EntityUserProviderTest extends TestCase
 
     public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()
     {
-        $repository = $this->getMockBuilder('\Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')->getMock();
+        $repository = $this->createMock([ObjectRepository::class, UserLoaderInterface::class]);
         $repository->expects($this->once())
             ->method('loadUserByUsername')
             ->with('name')
@@ -167,7 +166,7 @@ class EntityUserProviderTest extends TestCase
     public function testLoadUserByUserNameShouldDeclineInvalidInterface()
     {
         $this->expectException('InvalidArgumentException');
-        $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
@@ -181,7 +180,7 @@ class EntityUserProviderTest extends TestCase
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->getMockBuilder(PasswordUpgraderInterface::class)->getMock();
+        $repository = $this->createMock([ObjectRepository::class, PasswordUpgraderInterface::class]);
         $repository->expects($this->once())
             ->method('upgradePassword')
             ->with($user, 'foobar');

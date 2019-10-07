@@ -31,6 +31,9 @@ final class Validation
         return self::createValidatorBuilder()->getValidator();
     }
 
+    /**
+     * Creates a configurable builder for validator objects.
+     */
     public static function createValidatorBuilder(): ValidatorBuilder
     {
         return new ValidatorBuilder();

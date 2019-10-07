@@ -143,7 +143,7 @@ class ConsoleFormatter implements FormatterInterface
     /**
      * @internal
      */
-    public function castObject($v, array $a, Stub $s, bool $isNested)
+    public function castObject($v, array $a, Stub $s, bool $isNested): array
     {
         if ($this->options['multiline']) {
             return $a;
@@ -157,7 +157,7 @@ class ConsoleFormatter implements FormatterInterface
         return $a;
     }
 
-    private function replacePlaceHolder(array $record)
+    private function replacePlaceHolder(array $record): array
     {
         $message = $record['message'];
 

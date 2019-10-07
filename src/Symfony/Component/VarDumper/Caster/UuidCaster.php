@@ -11,22 +11,19 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
-use ProxyManager\Proxy\ProxyInterface;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
- *
- * @final since Symfony 4.4
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class ProxyManagerCaster
+final class UuidCaster
 {
-    public static function castProxy(ProxyInterface $c, array $a, Stub $stub, bool $isNested)
+    public static function castRamseyUuid(UuidInterface $c, array $a, Stub $stub, bool $isNested): array
     {
-        if ($parent = get_parent_class($c)) {
-            $stub->class .= ' - '.$parent;
-        }
-        $stub->class .= '@proxy';
+        $a += [
+            Caster::PREFIX_VIRTUAL.'uuid' => (string) $c,
+        ];
 
         return $a;
     }

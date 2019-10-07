@@ -150,7 +150,7 @@ class TwigExtension extends Extension
         }
     }
 
-    private function getBundleTemplatePaths(ContainerBuilder $container, array $config)
+    private function getBundleTemplatePaths(ContainerBuilder $container, array $config): array
     {
         $bundleHierarchy = [];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
@@ -170,7 +170,7 @@ class TwigExtension extends Extension
         return $bundleHierarchy;
     }
 
-    private function normalizeBundleName(string $name)
+    private function normalizeBundleName(string $name): string
     {
         if ('Bundle' === substr($name, -6)) {
             $name = substr($name, 0, -6);

@@ -14,6 +14,9 @@ namespace Symfony\Component\VarDumper\Caster;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
+/**
+ * @final since Symfony 4.4
+ */
 class SymfonyCaster
 {
     private static $requestGetters = [

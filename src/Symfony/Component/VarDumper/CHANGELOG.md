@@ -8,6 +8,8 @@ CHANGELOG
    to configure casters & flags to use in tests
  * added `ImagineCaster` and infrastructure to dump images
  * added the stamps of a message after it is dispatched in `TraceableMessageBus` and `MessengerDataCollector` collected data
+ * added `UuidCaster`
+ * made all casters final
 
 4.3.0
 -----

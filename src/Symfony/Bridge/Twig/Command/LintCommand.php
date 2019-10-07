@@ -112,7 +112,7 @@ EOF
         return $template;
     }
 
-    private function getFilesInfo(array $filenames)
+    private function getFilesInfo(array $filenames): array
     {
         $filesInfo = [];
         foreach ($filenames as $filename) {

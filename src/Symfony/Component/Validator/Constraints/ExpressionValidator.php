@@ -50,7 +50,7 @@ class ExpressionValidator extends ConstraintValidator
         }
     }
 
-    private function getExpressionLanguage()
+    private function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
             $this->expressionLanguage = new ExpressionLanguage();

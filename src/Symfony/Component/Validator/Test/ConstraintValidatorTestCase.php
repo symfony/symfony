@@ -234,7 +234,7 @@ class ConstraintViolationAssertion
     private $constraint;
     private $cause;
 
-    public function __construct(ExecutionContextInterface $context, $message, Constraint $constraint = null, array $assertions = [])
+    public function __construct(ExecutionContextInterface $context, string $message, Constraint $constraint = null, array $assertions = [])
     {
         $this->context = $context;
         $this->message = $message;
@@ -242,14 +242,14 @@ class ConstraintViolationAssertion
         $this->assertions = $assertions;
     }
 
-    public function atPath($path)
+    public function atPath(string $path)
     {
         $this->propertyPath = $path;
 
         return $this;
     }
 
-    public function setParameter($key, $value)
+    public function setParameter(string $key, $value)
     {
         $this->parameters[$key] = $value;
 
@@ -277,14 +277,14 @@ class ConstraintViolationAssertion
         return $this;
     }
 
-    public function setPlural($number)
+    public function setPlural(int $number)
     {
         $this->plural = $number;
 
         return $this;
     }
 
-    public function setCode($code)
+    public function setCode(string $code)
     {
         $this->code = $code;
 
@@ -298,7 +298,7 @@ class ConstraintViolationAssertion
         return $this;
     }
 
-    public function buildNextViolation($message)
+    public function buildNextViolation(string $message): self
     {
         $assertions = $this->assertions;
         $assertions[] = $this;
@@ -326,7 +326,7 @@ class ConstraintViolationAssertion
         }
     }
 
-    private function getViolation()
+    private function getViolation(): ConstraintViolation
     {
         return new ConstraintViolation(
             $this->message,

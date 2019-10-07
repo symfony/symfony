@@ -12,6 +12,9 @@
 namespace Symfony\Bridge\Doctrine\Security\User;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -124,17 +127,17 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         }
     }
 
-    private function getObjectManager()
+    private function getObjectManager(): ObjectManager
     {
         return $this->registry->getManager($this->managerName);
     }
 
-    private function getRepository()
+    private function getRepository(): ObjectRepository
     {
         return $this->getObjectManager()->getRepository($this->classOrAlias);
     }
 
-    private function getClass()
+    private function getClass(): string
     {
         if (null === $this->class) {
             $class = $this->classOrAlias;
@@ -149,7 +152,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         return $this->class;
     }
 
-    private function getClassMetadata()
+    private function getClassMetadata(): ClassMetadata
     {
         return $this->getObjectManager()->getClassMetadata($this->classOrAlias);
     }

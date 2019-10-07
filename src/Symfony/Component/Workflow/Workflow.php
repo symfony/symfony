@@ -249,7 +249,7 @@ class Workflow implements WorkflowInterface
         return $this->definition->getMetadataStore();
     }
 
-    private function buildTransitionBlockerListForTransition(object $subject, Marking $marking, Transition $transition)
+    private function buildTransitionBlockerListForTransition(object $subject, Marking $marking, Transition $transition): TransitionBlockerList
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {

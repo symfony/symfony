@@ -92,7 +92,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         return [$providerId, $listenerId, $entryPointId];
     }
 
-    private function determineEntryPoint(?string $defaultEntryPointId, array $config)
+    private function determineEntryPoint(?string $defaultEntryPointId, array $config): string
     {
         if ($defaultEntryPointId) {
             // explode if they've configured the entry_point, but there is already one

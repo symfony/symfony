@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * added `StreamWrapper`
- * added `HttplugClient`
+ * added `HttplugClient` with support for sync and async requests
  * added `max_duration` option
  * added support for NTLM authentication
  * added `$response->toStream()` to cast responses to regular PHP streams

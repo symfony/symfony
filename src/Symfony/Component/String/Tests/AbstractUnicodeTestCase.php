@@ -4,7 +4,7 @@ namespace Symfony\Component\String\Tests;
 
 use Symfony\Component\String\Exception\InvalidArgumentException;
 
-abstract class AbstractUtf8TestCase extends AbstractAsciiTestCase
+abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 {
     public function testCreateFromStringWithInvalidUtf8Input()
     {

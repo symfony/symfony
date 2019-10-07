@@ -543,9 +543,9 @@ abstract class AbstractString implements \JsonSerializable
      */
     abstract public function title(bool $allWords = false): self;
 
-    public function toBinary(string $toEncoding = null): BinaryString
+    public function toByteString(string $toEncoding = null): ByteString
     {
-        $b = new BinaryString();
+        $b = new ByteString();
 
         $toEncoding = \in_array($toEncoding, ['utf8', 'utf-8', 'UTF8'], true) ? 'UTF-8' : $toEncoding;
 
@@ -574,14 +574,14 @@ abstract class AbstractString implements \JsonSerializable
         return $b;
     }
 
-    public function toGrapheme(): GraphemeString
+    public function toCodePointString(): CodePointString
     {
-        return new GraphemeString($this->string);
+        return new CodePointString($this->string);
     }
 
-    public function toUtf8(): Utf8String
+    public function toUnicodeString(): UnicodeString
     {
-        return new Utf8String($this->string);
+        return new UnicodeString($this->string);
     }
 
     /**

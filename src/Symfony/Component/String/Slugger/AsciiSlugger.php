@@ -12,7 +12,7 @@
 namespace Symfony\Component\String\Slugger;
 
 use Symfony\Component\String\AbstractUnicodeString;
-use Symfony\Component\String\GraphemeString;
+use Symfony\Component\String\UnicodeString;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
@@ -91,13 +91,13 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
         $transliterator = [];
         if ('de' === $locale || 0 === strpos($locale, 'de_')) {
-            // Use the shortcut for German in GraphemeString::ascii() if possible (faster and no requirement on intl)
+            // Use the shortcut for German in UnicodeString::ascii() if possible (faster and no requirement on intl)
             $transliterator = ['de-ASCII'];
         } elseif (\function_exists('transliterator_transliterate') && $locale) {
             $transliterator = (array) $this->createTransliterator($locale);
         }
 
-        return (new GraphemeString($string))
+        return (new UnicodeString($string))
             ->ascii($transliterator)
             ->replace('@', $separator.'at'.$separator)
             ->replaceMatches('/[^A-Za-z0-9]++/', $separator)

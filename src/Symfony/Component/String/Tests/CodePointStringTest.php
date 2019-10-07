@@ -12,13 +12,13 @@
 namespace Symfony\Component\String\Tests;
 
 use Symfony\Component\String\AbstractString;
-use Symfony\Component\String\Utf8String;
+use Symfony\Component\String\CodePointString;
 
-class Utf8StringTest extends AbstractUtf8TestCase
+class CodePointStringTest extends AbstractUnicodeTestCase
 {
     protected static function createFromString(string $string): AbstractString
     {
-        return new Utf8String($string);
+        return new CodePointString($string);
     }
 
     public static function provideLength(): array

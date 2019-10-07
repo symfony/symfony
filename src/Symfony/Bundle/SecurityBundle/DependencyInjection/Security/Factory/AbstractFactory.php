@@ -89,7 +89,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         }
     }
 
-    final public function addOption($name, $default = null)
+    final public function addOption(string $name, $default = null)
     {
         $this->options[$name] = $default;
     }

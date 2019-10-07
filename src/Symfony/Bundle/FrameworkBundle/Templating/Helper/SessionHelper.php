@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 @trigger_error('The '.SessionHelper::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -61,7 +62,7 @@ class SessionHelper extends Helper
         return $this->getSession()->getFlashBag()->has($name);
     }
 
-    private function getSession()
+    private function getSession(): SessionInterface
     {
         if (null === $this->session) {
             if (!$this->requestStack->getMasterRequest()) {

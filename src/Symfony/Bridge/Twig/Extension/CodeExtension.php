@@ -236,7 +236,7 @@ class CodeExtension extends AbstractExtension
     /**
      * @internal
      */
-    public function formatLogMessage($message, array $context)
+    public function formatLogMessage(string $message, array $context): string
     {
         if ($context && false !== strpos($message, '{')) {
             $replacements = [];

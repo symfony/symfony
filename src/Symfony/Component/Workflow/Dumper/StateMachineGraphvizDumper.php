@@ -44,7 +44,7 @@ class StateMachineGraphvizDumper extends GraphvizDumper
     /**
      * @internal
      */
-    protected function findEdges(Definition $definition)
+    protected function findEdges(Definition $definition): array
     {
         $workflowMetadata = $definition->getMetadataStore();
 
@@ -82,7 +82,7 @@ class StateMachineGraphvizDumper extends GraphvizDumper
     /**
      * @internal
      */
-    protected function addEdges(array $edges)
+    protected function addEdges(array $edges): string
     {
         $code = '';
 

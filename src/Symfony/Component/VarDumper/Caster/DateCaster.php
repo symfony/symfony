@@ -54,7 +54,7 @@ class DateCaster
         return $filter & Caster::EXCLUDE_VERBOSE ? $i : $i + $a;
     }
 
-    private static function formatInterval(\DateInterval $i)
+    private static function formatInterval(\DateInterval $i): string
     {
         $format = '%R ';
 

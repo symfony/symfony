@@ -44,7 +44,7 @@ class WebServerExtension extends Extension
         }
     }
 
-    private function getPublicDirectory(ContainerBuilder $container)
+    private function getPublicDirectory(ContainerBuilder $container): string
     {
         $kernelProjectDir = $container->getParameter('kernel.project_dir');
         $publicDir = 'public';

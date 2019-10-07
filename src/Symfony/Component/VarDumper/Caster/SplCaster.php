@@ -203,7 +203,7 @@ class SplCaster
         return $a;
     }
 
-    private static function castSplArray($c, array $a, Stub $stub, $isNested)
+    private static function castSplArray($c, array $a, Stub $stub, bool $isNested): array
     {
         $prefix = Caster::PREFIX_VIRTUAL;
         $class = $stub->class;

@@ -40,7 +40,7 @@ final class DoctrineCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function has($class)
+    public function has($class): bool
     {
         return $this->cache->contains($class);
     }

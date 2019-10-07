@@ -208,7 +208,7 @@ class FileValidator extends ConstraintValidator
      * Convert the limit to the smallest possible number
      * (i.e. try "MB", then "kB", then "bytes").
      */
-    private function factorizeSizes(int $size, int $limit, bool $binaryFormat)
+    private function factorizeSizes(int $size, int $limit, bool $binaryFormat): array
     {
         if ($binaryFormat) {
             $coef = self::MIB_BYTES;

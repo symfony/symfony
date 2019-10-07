@@ -15,6 +15,7 @@ use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterfa
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -200,7 +202,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function buildViolation($message, array $parameters = [])
+    public function buildViolation($message, array $parameters = []): ConstraintViolationBuilderInterface
     {
         return new ConstraintViolationBuilder(
             $this->violations,
@@ -218,7 +220,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getViolations()
+    public function getViolations(): ConstraintViolationListInterface
     {
         return $this->violations;
     }
@@ -226,7 +228,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidator()
+    public function getValidator(): ValidatorInterface
     {
         return $this->validator;
     }
@@ -258,7 +260,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getMetadata()
+    public function getMetadata(): ?MetadataInterface
     {
         return $this->metadata;
     }
@@ -266,12 +268,12 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getGroup()
+    public function getGroup(): ?string
     {
         return $this->group;
     }
 
-    public function getConstraint()
+    public function getConstraint(): ?Constraint
     {
         return $this->constraint;
     }
@@ -279,7 +281,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getClassName()
+    public function getClassName(): ?string
     {
         return $this->metadata instanceof MemberMetadata || $this->metadata instanceof ClassMetadataInterface ? $this->metadata->getClassName() : null;
     }
@@ -287,7 +289,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getPropertyName()
+    public function getPropertyName(): ?string
     {
         return $this->metadata instanceof PropertyMetadataInterface ? $this->metadata->getPropertyName() : null;
     }
@@ -295,7 +297,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getPropertyPath($subPath = '')
+    public function getPropertyPath($subPath = ''): string
     {
         return PropertyPath::append($this->propertyPath, $subPath);
     }
@@ -315,7 +317,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function isGroupValidated($cacheKey, $groupHash)
+    public function isGroupValidated($cacheKey, $groupHash): bool
     {
         return isset($this->validatedObjects[$cacheKey][$groupHash]);
     }
@@ -331,7 +333,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function isConstraintValidated($cacheKey, $constraintHash)
+    public function isConstraintValidated($cacheKey, $constraintHash): bool
     {
         return isset($this->validatedConstraints[$cacheKey.':'.$constraintHash]);
     }
@@ -347,7 +349,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function isObjectInitialized($cacheKey)
+    public function isObjectInitialized($cacheKey): bool
     {
         return isset($this->initializedObjects[$cacheKey]);
     }

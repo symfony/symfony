@@ -76,7 +76,7 @@ trait VarDumperTestTrait
         return rtrim($dumper->dump($data, true));
     }
 
-    private function prepareExpectation($expected, int $filter)
+    private function prepareExpectation($expected, int $filter): string
     {
         if (!\is_string($expected)) {
             $expected = $this->getDump($expected, null, $filter);

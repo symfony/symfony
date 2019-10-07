@@ -28,7 +28,7 @@ class TestAbstractController extends AbstractController
         return $this->$method(...$arguments);
     }
 
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
         if (!$this->throwOnUnexpectedService) {
             return parent::setContainer($container);

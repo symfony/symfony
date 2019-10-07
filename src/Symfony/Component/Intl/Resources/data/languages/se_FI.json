@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.83",
+    "Version": "36",
     "Names": {
         "ace": "ačehgiella",
         "be": "vilgesruoššagiella",
@@ -31,6 +31,7 @@
         "pt_BR": "brasilialaš portugálagiella",
         "pt_PT": "portugálalaš portugálagiella",
         "ro_MD": "moldávialaš romániagiella",
-        "zh_Hans": "álkes kiinnágiella"
+        "zh_Hans": "álkes kiinnágiella",
+        "zh_Hant": "árbevirolaš kiinnágiella"
     }
 }

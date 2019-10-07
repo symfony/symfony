@@ -1611,23 +1611,6 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('The foo:bar command', $tester->getDisplay());
     }
 
-    /**
-     * @requires function posix_isatty
-     */
-    public function testCanCheckIfTerminalIsInteractive()
-    {
-        $application = new CustomDefaultCommandApplication();
-        $application->setAutoExit(false);
-
-        $tester = new ApplicationTester($application);
-        $tester->run(['command' => 'help']);
-
-        $this->assertFalse($tester->getInput()->hasParameterOption(['--no-interaction', '-n']));
-
-        $inputStream = $tester->getInput()->getStream();
-        $this->assertEquals($tester->getInput()->isInteractive(), @posix_isatty($inputStream));
-    }
-
     public function testRunLazyCommandService()
     {
         $container = new ContainerBuilder();

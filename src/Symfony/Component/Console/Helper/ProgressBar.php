@@ -46,7 +46,7 @@ final class ProgressBar
     private $messages = [];
     private $overwrite = true;
     private $terminal;
-    private $firstRun = true;
+    private $previousMessage;
 
     private static $formatters;
     private static $formats;
@@ -432,8 +432,14 @@ final class ProgressBar
      */
     private function overwrite(string $message): void
     {
+        if ($this->previousMessage === $message) {
+            return;
+        }
+
+        $originalMessage = $message;
+
         if ($this->overwrite) {
-            if (!$this->firstRun) {
+            if (null !== $this->previousMessage) {
                 if ($this->output instanceof ConsoleSectionOutput) {
                     $lines = floor(Helper::strlen($message) / $this->terminal->getWidth()) + $this->formatLineCount + 1;
                     $this->output->clear($lines);
@@ -451,7 +457,7 @@ final class ProgressBar
             $message = PHP_EOL.$message;
         }
 
-        $this->firstRun = false;
+        $this->previousMessage = $originalMessage;
         $this->lastWriteTime = microtime(true);
 
         $this->output->write($message);

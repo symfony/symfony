@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-07-01T14:37:02Z
+
+@vincenttouzet I'd like your eyes on this too :)
+
+---------------------------------------------------------------------------
+
+by mareksuscak at 2019-09-23T20:40:42Z
+
+I was wondering if this PR fixes an issue I'm seeing [here](https://github.com/symfony/symfony/issues/33659#issuecomment-534273768). If so,   is there a workaround? I've disabled auto-setup, yet I'm still seeing tons and tons of queries. They're slamming our database.
+
+EDIT: Yeah, it [did work](https://github.com/symfony/symfony/issues/33659#issuecomment-534294681), after all.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2019-09-27T13:59:33Z
+
+fixed?
+
+---------------------------------------------------------------------------
+
+by bendavies at 2019-09-27T14:00:16Z
+
+failure unrelated.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-07T13:17:01Z
+
+This should be ready to go!

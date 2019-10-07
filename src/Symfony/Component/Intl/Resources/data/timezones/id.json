@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Greenwich Mean Time (Abidjan)",
         "Africa\/Accra": "Greenwich Mean Time (Accra)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Waktu Indonesia Barat (Pontianak)",
         "Asia\/Pyongyang": "Waktu Korea (Pyongyang)",
         "Asia\/Qatar": "Waktu Arab (Qatar)",
-        "Asia\/Qostanay": "Waktu Kazakhstan Timur (Qostanay)",
+        "Asia\/Qostanay": "Waktu Kazakhstan Timur (Kostanay)",
         "Asia\/Qyzylorda": "Waktu Kazakhstan Barat (Qyzylorda)",
         "Asia\/Rangoon": "Waktu Myanmar (Rangoon)",
         "Asia\/Riyadh": "Waktu Arab (Riyadh)",

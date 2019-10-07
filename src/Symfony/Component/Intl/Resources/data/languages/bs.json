@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -69,6 +69,7 @@
         "car": "karipski",
         "cay": "kajuga",
         "cch": "atsam",
+        "ccp": "čakma",
         "ce": "čečenski",
         "ceb": "cebuano",
         "cgg": "čiga",
@@ -80,7 +81,7 @@
         "chn": "činukski žargon",
         "cho": "čoktav",
         "chp": "čipvijanski",
-        "chr": "čiroki",
+        "chr": "čeroki",
         "chy": "čejenski",
         "ckb": "centralnokurdski",
         "co": "korzikanski",
@@ -342,7 +343,7 @@
         "oc": "oksitanski",
         "oj": "ojibva",
         "om": "oromo",
-        "or": "orijski",
+        "or": "odija",
         "os": "osetski",
         "osa": "osage",
         "ota": "osmanski turski",
@@ -505,7 +506,6 @@
     },
     "LocalizedNames": {
         "ar_001": "moderni standardni arapski",
-        "de_CH": "gornjonjemački (Švicarska)",
         "nds_NL": "donjosaksonski",
         "nl_BE": "flamanski",
         "ro_MD": "moldavski",

@@ -32,6 +32,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'controller.service_arguments',
         'config_cache.resource_checker',
         'data_collector',
+        'error_renderer.renderer',
         'form.type',
         'form.type_extension',
         'form.type_guesser',
@@ -63,6 +64,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'twig.loader',
         'validator.constraint_validator',
         'validator.initializer',
+        'validator.auto_mapper',
     ];
 
     public function process(ContainerBuilder $container)

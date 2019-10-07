@@ -23,6 +23,7 @@ CHANGELOG
  * deprecated passing an instance of `Symfony\Component\DependencyInjection\Parameter` as class name to `Symfony\Component\DependencyInjection\Definition`
  * added support for binding iterable and tagged services
  * made singly-implemented interfaces detection be scoped by file
+ * added ability to define a static priority method for tagged service
 
 4.3.0
 -----

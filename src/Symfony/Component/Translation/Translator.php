@@ -344,7 +344,7 @@ EOF
         return $fallbackContent;
     }
 
-    private function getCatalogueCachePath(string $locale)
+    private function getCatalogueCachePath(string $locale): string
     {
         return $this->cacheDir.'/catalogue.'.$locale.'.'.strtr(substr(base64_encode(hash('sha256', serialize($this->fallbackLocales), true)), 0, 7), '/', '_').'.php';
     }

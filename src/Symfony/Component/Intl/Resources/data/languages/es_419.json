@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.86",
+    "Version": "36",
     "Names": {
         "ace": "achenés",
         "ady": "adigeo",
@@ -7,7 +7,6 @@
         "arp": "arapajó",
         "ars": "árabe de Néyed",
         "bla": "siksiká",
-        "ccp": "chakma",
         "eu": "vasco",
         "goh": "alemán de la alta edad antigua",
         "grc": "griego clásico",
@@ -16,9 +15,9 @@
         "kbd": "cabardiano",
         "krc": "karachái-bálkaro",
         "lo": "laosiano",
-        "luo": "luo",
         "nr": "ndebele del sur",
         "nso": "sesotho del norte",
+        "pa": "panyabí",
         "prg": "prusiano antiguo",
         "rm": "retorrománico",
         "shu": "árabe (Chad)",
@@ -28,14 +27,30 @@
         "syr": "siríaco",
         "tet": "tetun",
         "tyv": "tuvano",
-        "tzm": "tamazight del Marruecos Central",
-        "vai": "vai",
         "wal": "walamo",
         "wuu": "wu",
         "xal": "calmuco",
         "zun": "zuni"
     },
     "LocalizedNames": {
-        "sw_CD": "swahili (Congo)"
+        "ar_001": "árabe estándar moderno",
+        "de_AT": "alemán austríaco",
+        "de_CH": "alto alemán suizo",
+        "en_AU": "inglés australiano",
+        "en_CA": "inglés canadiense",
+        "en_GB": "inglés británico",
+        "en_US": "inglés estadounidense",
+        "es_419": "español latinoamericano",
+        "es_ES": "español de España",
+        "es_MX": "español de México",
+        "fr_CA": "francés canadiense",
+        "fr_CH": "francés suizo",
+        "nl_BE": "flamenco",
+        "pt_BR": "portugués de Brasil",
+        "pt_PT": "portugués de Portugal",
+        "ro_MD": "moldavo",
+        "sw_CD": "swahili (Congo)",
+        "zh_Hans": "chino simplificado",
+        "zh_Hant": "chino tradicional"
     }
 }

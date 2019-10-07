@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "aa": "Kiafar",
         "ab": "Kiabkhazi",
@@ -58,6 +58,7 @@
         "byn": "Kiblin",
         "byv": "Kimedumba",
         "ca": "Kikatalani",
+        "ccp": "Kichakma",
         "ce": "Kichechenia",
         "ceb": "Kichebuano",
         "cgg": "Kichiga",
@@ -423,6 +424,7 @@
         "fr_CA": "Kifaransa (Canada)",
         "nl_BE": "Kiflemi",
         "pt_PT": "Kireno (Ulaya)",
+        "ro_MD": "Kimoldova cha Romania",
         "zh_Hans": "Kichina (Kilichorahisishwa)",
         "zh_Hant": "Kichina cha Jadi"
     }

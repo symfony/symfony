@@ -49,17 +49,17 @@ final class GitRepository
         return $this->path;
     }
 
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->getLastLine($this->execInPath('git config --get remote.origin.url'));
     }
 
-    public function getLastCommitHash()
+    public function getLastCommitHash(): string
     {
         return $this->getLastLine($this->execInPath('git log -1 --format="%H"'));
     }
 
-    public function getLastAuthor()
+    public function getLastAuthor(): string
     {
         return $this->getLastLine($this->execInPath('git log -1 --format="%an"'));
     }
@@ -69,7 +69,7 @@ final class GitRepository
         return new \DateTime($this->getLastLine($this->execInPath('git log -1 --format="%ai"')));
     }
 
-    public function getLastTag(callable $filter = null)
+    public function getLastTag(callable $filter = null): string
     {
         $tags = $this->execInPath('git tag -l --sort=v:refname');
 
@@ -80,17 +80,17 @@ final class GitRepository
         return $this->getLastLine($tags);
     }
 
-    public function checkout($branch)
+    public function checkout(string $branch)
     {
         $this->execInPath(sprintf('git checkout %s', escapeshellarg($branch)));
     }
 
-    private function execInPath(string $command)
+    private function execInPath(string $command): array
     {
         return self::exec(sprintf('cd %s && %s', escapeshellarg($this->path), $command));
     }
 
-    private static function exec($command, $customErrorMessage = null)
+    private static function exec(string $command, string $customErrorMessage = null): array
     {
         exec(sprintf('%s 2>&1', $command), $output, $result);
 
@@ -101,7 +101,7 @@ final class GitRepository
         return $output;
     }
 
-    private function getLastLine(array $output)
+    private function getLastLine(array $output): string
     {
         return array_pop($output);
     }

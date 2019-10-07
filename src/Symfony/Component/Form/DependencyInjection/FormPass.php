@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
@@ -59,7 +60,7 @@ class FormPass implements CompilerPassInterface
         $definition->replaceArgument(2, $this->processFormTypeGuessers($container));
     }
 
-    private function processFormTypes(ContainerBuilder $container)
+    private function processFormTypes(ContainerBuilder $container): Reference
     {
         // Get service locator argument
         $servicesMap = [];
@@ -82,7 +83,7 @@ class FormPass implements CompilerPassInterface
         return ServiceLocatorTagPass::register($container, $servicesMap);
     }
 
-    private function processFormTypeExtensions(ContainerBuilder $container)
+    private function processFormTypeExtensions(ContainerBuilder $container): array
     {
         $typeExtensions = [];
         $typeExtensionsClasses = [];
@@ -123,7 +124,7 @@ class FormPass implements CompilerPassInterface
         return $typeExtensions;
     }
 
-    private function processFormTypeGuessers(ContainerBuilder $container)
+    private function processFormTypeGuessers(ContainerBuilder $container): ArgumentInterface
     {
         $guessers = [];
         $guessersClasses = [];

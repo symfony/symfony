@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.45",
+    "Version": "36",
     "Names": {
         "ak": "Akan",
         "am": "Amariikị",
@@ -47,11 +47,11 @@
         "zu": "Zulu"
     },
     "LocalizedNames": {
+        "ar_001": "Ụdị Arabiikị nke oge a",
         "de_AT": "Jaman ndị Austria",
         "de_CH": "Jaman Izugbe ndị Switzerland",
         "en_AU": "Bekee ndị Australia",
         "en_CA": "Bekee ndị Canada",
-        "en_GB": "Bekee ndị Britain",
         "en_US": "Bekee ndị America",
         "es_419": "Asụsụ Spanish ndị Latin America",
         "es_ES": "Asụsụ Spanish ndị Europe",

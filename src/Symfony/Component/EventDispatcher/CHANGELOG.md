@@ -9,6 +9,11 @@ CHANGELOG
  * The `TraceableEventDispatcherInterface` has been removed.
  * The `WrappedListener` class is now final.
 
+4.4.0
+-----
+
+ * `AddEventAliasesPass` has been added, allowing applications and bundles to extend the event alias mapping used by `RegisterListenersPass`.
+
 4.3.0
 -----
 
@@ -18,7 +23,7 @@ CHANGELOG
 4.1.0
 -----
 
- * added support for invokable event listeners tagged with `kernel.event_listener` by default 
+ * added support for invokable event listeners tagged with `kernel.event_listener` by default
  * The `TraceableEventDispatcher::getOrphanedEvents()` method has been added.
  * The `TraceableEventDispatcherInterface` has been deprecated.
 

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "AD": "Andora",
         "AE": "Ujedinjeni Arapski Emirati",
@@ -77,7 +77,7 @@
         "FO": "Farska ostrva",
         "FR": "Francuska",
         "GA": "Gabon",
-        "GB": "Velika Britanija",
+        "GB": "Ujedinjeno Kraljevstvo",
         "GD": "Grenada",
         "GE": "Gruzija",
         "GF": "Francuska Gvajana",
@@ -213,7 +213,7 @@
         "SV": "Salvador",
         "SX": "Sint Marten",
         "SY": "Sirija",
-        "SZ": "Svazilend",
+        "SZ": "Esvatini",
         "TC": "Ostrva Turks i Kaikos",
         "TD": "Čad",
         "TF": "Francuske Južne Teritorije",
@@ -233,7 +233,7 @@
         "UA": "Ukrajina",
         "UG": "Uganda",
         "UM": "Američka Vanjska Ostrva",
-        "US": "Sjedinjene Američke Države",
+        "US": "Sjedinjene Države",
         "UY": "Urugvaj",
         "UZ": "Uzbekistan",
         "VA": "Vatikan",

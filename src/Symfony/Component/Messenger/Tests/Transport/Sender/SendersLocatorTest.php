@@ -65,7 +65,7 @@ class SendersLocatorTest extends TestCase
         $locator->getSenderByAlias('sender2');
     }
 
-    private function createContainer(array $senders)
+    private function createContainer(array $senders): ContainerInterface
     {
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->any())

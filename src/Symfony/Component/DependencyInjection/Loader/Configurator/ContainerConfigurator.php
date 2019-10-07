@@ -116,9 +116,9 @@ function iterator(array $values): IteratorArgument
 /**
  * Creates a lazy iterator by tag name.
  */
-function tagged_iterator(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null): TaggedIteratorArgument
+function tagged_iterator(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, string $defaultPriorityMethod = null): TaggedIteratorArgument
 {
-    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod);
+    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, false, $defaultPriorityMethod);
 }
 
 /**

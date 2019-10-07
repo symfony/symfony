@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "ADP": [
             "ADP",
@@ -203,7 +203,7 @@
         ],
         "BTN": [
             "BTN",
-            "Bhutan Ngultrumu"
+            "Butan Ngultrumu"
         ],
         "BUK": [
             "BUK",
@@ -311,7 +311,7 @@
         ],
         "CZK": [
             "CZK",
-            "Çek Cumhuriyeti Korunası"
+            "Çek Korunası"
         ],
         "DDM": [
             "DDM",
@@ -479,7 +479,7 @@
         ],
         "IDR": [
             "IDR",
-            "Endonezya Rupiahı"
+            "Endonezya Rupisi"
         ],
         "IEP": [
             "IEP",
@@ -923,7 +923,7 @@
         ],
         "STN": [
             "STN",
-            "São Tomé ve Príncipe Dobrası"
+            "Sao Tome ve Principe Dobrası"
         ],
         "SUR": [
             "SUR",
@@ -1068,7 +1068,7 @@
         ],
         "XAF": [
             "FCFA",
-            "CFA Frangı BEAC"
+            "Orta Afrika CFA Frangı"
         ],
         "XCD": [
             "EC$",
@@ -1088,7 +1088,7 @@
         ],
         "XOF": [
             "CFA",
-            "CFA Frangı BCEAO"
+            "Batı Afrika CFA Frangı"
         ],
         "XPF": [
             "CFPF",

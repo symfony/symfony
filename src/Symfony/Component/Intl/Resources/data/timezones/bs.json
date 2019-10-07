@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Griničko vrijeme (Abidjan)",
         "Africa\/Accra": "Griničko vrijeme (Accra)",
@@ -221,7 +221,7 @@
         "Asia\/Aqtau": "Zapadnokazahstansko vrijeme (Aktau)",
         "Asia\/Aqtobe": "Zapadnokazahstansko vrijeme (Akutobe)",
         "Asia\/Ashgabat": "Turkmenistansko vrijeme (Ašhabad)",
-        "Asia\/Atyrau": "Zapadnokazahstansko vrijeme (Atyrau)",
+        "Asia\/Atyrau": "Zapadnokazahstansko vrijeme (Atiraj)",
         "Asia\/Baghdad": "Arabijsko vrijeme (Bagdad)",
         "Asia\/Bahrain": "Arabijsko vrijeme (Bahrein)",
         "Asia\/Baku": "Azerbejdžansko vrijeme (Baku)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "Zapadnoindonezijsko vrijeme (Pontianak)",
         "Asia\/Pyongyang": "Korejsko vrijeme (Pjongjang)",
         "Asia\/Qatar": "Arabijsko vrijeme (Katar)",
-        "Asia\/Qostanay": "Istočnokazahstansko vrijeme (Qostanay)",
+        "Asia\/Qostanay": "Istočnokazahstansko vrijeme (Kostanaj)",
         "Asia\/Qyzylorda": "Zapadnokazahstansko vrijeme (Kizilorda)",
         "Asia\/Rangoon": "Mijanmarsko vrijeme (Rangun)",
         "Asia\/Riyadh": "Arabijsko vrijeme (Rijad)",

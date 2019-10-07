@@ -31,7 +31,14 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMe
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\LdapFactory;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\SwitchUserEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
  * Bundle.
@@ -64,5 +71,12 @@ class SecurityBundle extends Bundle
         $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RegisterCsrfTokenClearingLogoutHandlerPass());
         $container->addCompilerPass(new RegisterTokenUsageTrackingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
+
+        $container->addCompilerPass(new AddEventAliasesPass([
+            AuthenticationSuccessEvent::class => AuthenticationEvents::AUTHENTICATION_SUCCESS,
+            AuthenticationFailureEvent::class => AuthenticationEvents::AUTHENTICATION_FAILURE,
+            InteractiveLoginEvent::class => SecurityEvents::INTERACTIVE_LOGIN,
+            SwitchUserEvent::class => SecurityEvents::SWITCH_USER,
+        ]));
     }
 }

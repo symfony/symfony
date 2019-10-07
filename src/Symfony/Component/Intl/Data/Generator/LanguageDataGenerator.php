@@ -205,7 +205,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         return array_keys($alpha3Codes);
     }
 
-    private function generateAlpha2ToAlpha3Mapping(ArrayAccessibleResourceBundle $metadataBundle)
+    private function generateAlpha2ToAlpha3Mapping(ArrayAccessibleResourceBundle $metadataBundle): array
     {
         $aliases = iterator_to_array($metadataBundle['alias']['language']);
         $alpha2ToAlpha3 = [];

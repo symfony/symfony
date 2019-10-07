@@ -409,7 +409,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    private function isElementValueNull(\DOMElement $element)
+    private function isElementValueNull(\DOMElement $element): bool
     {
         $namespaceUri = 'http://www.w3.org/2001/XMLSchema-instance';
 

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.17",
+    "Version": "36",
     "Names": {
         "AD": "i-Andorra",
         "AE": "i-United Arab Emirates",
@@ -96,7 +96,7 @@
         "GW": "i-Guinea-Bissau",
         "GY": "i-Guyana",
         "HK": "i-Hong Kong SAR China",
-        "HM": "i-Heard Island ne-McDonald Islands",
+        "HM": "I-Heard & McDonald Island",
         "HN": "i-Honduras",
         "HR": "i-Croatia",
         "HT": "i-Haiti",
@@ -144,7 +144,7 @@
         "MF": "i-Saint Martin",
         "MG": "i-Madagascar",
         "MH": "i-Marshall Islands",
-        "MK": "i-Macedonia",
+        "MK": "i-North Macedonia",
         "ML": "iMali",
         "MM": "i-Myanmar (Burma)",
         "MN": "i-Mongolia",
@@ -232,7 +232,7 @@
         "TZ": "i-Tanzania",
         "UA": "i-Ukraine",
         "UG": "i-Uganda",
-        "UM": "i-U.S. Minor Outlying Islands",
+        "UM": "I-U.S. Outlying Islands",
         "US": "i-United States",
         "UY": "i-Uruguay",
         "UZ": "i-Uzbekistan",

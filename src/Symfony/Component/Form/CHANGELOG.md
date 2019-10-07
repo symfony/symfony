@@ -33,6 +33,7 @@ CHANGELOG
  * Overriding the methods `FormIntegrationTestCase::setUp()`, `TypeTestCase::setUp()` and `TypeTestCase::tearDown()` without the `void` return-type is deprecated.
  * marked all dispatched event classes as `@final`
  * Added the `validate` option to `SubmitType` to toggle the browser built-in form validation.
+ * Added the `alpha3` option to `LanguageType` and `CountryType` to use alpha3 instead of alpha2 codes
 
 4.3.0
 -----

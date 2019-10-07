@@ -84,7 +84,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 }
                 if ($metadata) {
                     // For compactness, expiry and creation duration are packed in the key of an array, using magic numbers as separators
-                    $item["\0*\0value"] = ["\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $item["\0*\0value"]];
+                    $item["\0*\0value"] = ["\x9D".pack('VN', (int) (0.1 + $metadata[self::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[self::METADATA_CTIME])."\x5F" => $item["\0*\0value"]];
                 }
                 $innerItem->set($item["\0*\0value"]);
                 $innerItem->expiresAt(null !== $item["\0*\0expiry"] ? \DateTime::createFromFormat('U.u', sprintf('%.6f', $item["\0*\0expiry"])) : null);

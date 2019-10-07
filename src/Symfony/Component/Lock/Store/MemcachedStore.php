@@ -149,7 +149,7 @@ class MemcachedStore implements PersistingStoreInterface
         return $key->getState(__CLASS__);
     }
 
-    private function getValueAndCas(Key $key)
+    private function getValueAndCas(Key $key): array
     {
         if (null === $this->useExtendedReturn) {
             $this->useExtendedReturn = version_compare(phpversion('memcached'), '2.9.9', '>');

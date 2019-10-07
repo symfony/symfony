@@ -244,7 +244,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function mustRun(callable $callback = null, array $env = []): object
+    public function mustRun(callable $callback = null, array $env = []): self
     {
         if (0 !== $this->run($callback, $env)) {
             throw new ProcessFailedException($this);
@@ -366,7 +366,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function restart(callable $callback = null, array $env = []): object
+    public function restart(callable $callback = null, array $env = []): self
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
@@ -1497,7 +1497,7 @@ class Process implements \IteratorAggregate
         return true;
     }
 
-    private function prepareWindowsCommandLine(string $cmd, array &$env)
+    private function prepareWindowsCommandLine(string $cmd, array &$env): string
     {
         $uid = uniqid('', true);
         $varCount = 0;
@@ -1600,7 +1600,7 @@ class Process implements \IteratorAggregate
         }, $commandline);
     }
 
-    private function getDefaultEnv()
+    private function getDefaultEnv(): array
     {
         $env = [];
 

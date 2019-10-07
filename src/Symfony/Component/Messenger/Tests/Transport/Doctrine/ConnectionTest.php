@@ -135,7 +135,7 @@ class ConnectionTest extends TestCase
         return $queryBuilder;
     }
 
-    private function getStatementMock($expectedResult)
+    private function getStatementMock($expectedResult): Statement
     {
         $stmt = $this->createMock(Statement::class);
         $stmt->expects($this->once())
@@ -145,7 +145,7 @@ class ConnectionTest extends TestCase
         return $stmt;
     }
 
-    private function getSchemaSynchronizerMock()
+    private function getSchemaSynchronizerMock(): SchemaSynchronizer
     {
         return $this->createMock(SchemaSynchronizer::class);
     }
@@ -153,7 +153,7 @@ class ConnectionTest extends TestCase
     /**
      * @dataProvider buildConfigurationProvider
      */
-    public function testBuildConfiguration($dsn, $options, $expectedConnection, $expectedTableName, $expectedRedeliverTimeout, $expectedQueue, $expectedAutoSetup)
+    public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup)
     {
         $config = Connection::buildConfiguration($dsn, $options);
         $this->assertEquals($expectedConnection, $config['connection']);
@@ -163,7 +163,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals($expectedAutoSetup, $config['auto_setup']);
     }
 
-    public function buildConfigurationProvider()
+    public function buildConfigurationProvider(): iterable
     {
         yield 'no options' => [
             'dsn' => 'doctrine://default',

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "ግሪንዊች ማዕከላዊ ሰዓት (አቢጃን)",
         "Africa\/Accra": "ግሪንዊች ማዕከላዊ ሰዓት (አክራ)",
@@ -271,7 +271,7 @@
         "Asia\/Pontianak": "የምዕራባዊ ኢንዶኔዢያ ሰዓት (ፖንቲአናክ)",
         "Asia\/Pyongyang": "የኮሪያ ሰዓት (ፕዮንግያንግ)",
         "Asia\/Qatar": "የዓረቢያ ሰዓት (ኳታር)",
-        "Asia\/Qostanay": "የምስራቅ ካዛኪስታን ሰዓት (Qostanay)",
+        "Asia\/Qostanay": "የምስራቅ ካዛኪስታን ሰዓት (ኮስታናይ)",
         "Asia\/Qyzylorda": "የምዕራብ ካዛኪስታን ሰዓት (ኩይዚሎርዳ)",
         "Asia\/Rangoon": "የሚያንማር ሰዓት (ያንጎን)",
         "Asia\/Riyadh": "የዓረቢያ ሰዓት (ሪያድ)",

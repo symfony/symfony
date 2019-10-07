@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.96",
+    "Version": "36",
     "Names": {
         "Africa\/Bujumbura": "hora de África central (Buyumbura)",
         "Africa\/Conakry": "hora del meridiano de Greenwich (Conakri)",
@@ -9,11 +9,8 @@
         "Asia\/Almaty": "hora de Kazajistán oriental (Almatý)",
         "Asia\/Aqtobe": "hora de Kazajistán occidental (Aktobé)",
         "Asia\/Atyrau": "hora de Kazajistán occidental (Atirau)",
-        "Asia\/Pyongyang": "hora de Corea (Piongyang)",
-        "Asia\/Qatar": "hora de Arabia (Qatar)",
         "Atlantic\/Stanley": "hora de Islas Malvinas (Stanley)",
-        "Etc\/UTC": "Tiempo Universal Coordinado",
-        "Europe\/Kirov": "hora de Rusia (Kirov)",
+        "Etc\/UTC": "hora universal coordinada",
         "Indian\/Christmas": "hora de la isla de Navidad",
         "Pacific\/Easter": "hora de Isla de Pascua",
         "Pacific\/Honolulu": "hora de Hawái-Aleutianas (Honolulu)",

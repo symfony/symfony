@@ -252,7 +252,7 @@ abstract class AbstractToken implements TokenInterface
         $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
     }
 
-    private function hasUserChanged(UserInterface $user)
+    private function hasUserChanged(UserInterface $user): bool
     {
         if (!($this->user instanceof UserInterface)) {
             throw new \BadMethodCallException('Method "hasUserChanged" should be called when current user class is instance of "UserInterface".');

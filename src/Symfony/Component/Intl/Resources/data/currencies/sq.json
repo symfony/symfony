@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.42",
+    "Version": "36",
     "Names": {
         "AED": [
             "AED",
@@ -78,7 +78,7 @@
             "Boliviani i Bolivisë"
         ],
         "BRL": [
-            "R$",
+            "BRL",
             "Reali brazilian"
         ],
         "BSD": [

@@ -118,7 +118,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return 'logger';
     }
 
-    private function getContainerDeprecationLogs()
+    private function getContainerDeprecationLogs(): array
     {
         if (null === $this->containerPathPrefix || !file_exists($file = $this->containerPathPrefix.'Deprecations.log')) {
             return [];
@@ -212,7 +212,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return array_values($sanitizedLogs);
     }
 
-    private function isSilencedOrDeprecationErrorLog(array $log)
+    private function isSilencedOrDeprecationErrorLog(array $log): bool
     {
         if (!isset($log['context']['exception'])) {
             return false;
@@ -231,7 +231,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return false;
     }
 
-    private function computeErrorsCount(array $containerDeprecationLogs)
+    private function computeErrorsCount(array $containerDeprecationLogs): array
     {
         $silencedLogs = [];
         $count = [

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Greenwichko meridianoaren ordua (Abidjan)",
         "Africa\/Accra": "Greenwichko meridianoaren ordua (Akkra)",
@@ -322,7 +322,7 @@
         "CST6CDT": "Ipar Amerikako erdialdeko ordua",
         "EST5EDT": "Ipar Amerikako ekialdeko ordua",
         "Etc\/GMT": "Greenwichko meridianoaren ordua",
-        "Etc\/UTC": "Ordu Unibertsal Koordinatua",
+        "Etc\/UTC": "ordu unibertsal koordinatua",
         "Europe\/Amsterdam": "Europako erdialdeko ordua (Amsterdam)",
         "Europe\/Andorra": "Europako erdialdeko ordua (Andorra)",
         "Europe\/Astrakhan": "Moskuko ordua (Astrakhan)",

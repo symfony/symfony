@@ -44,7 +44,7 @@ class StopWhenMemoryUsageIsExceededWorkerTest extends TestCase
         $this->assertSame($shouldStop, $decoratedWorker->isStopped());
     }
 
-    public function memoryProvider()
+    public function memoryProvider(): iterable
     {
         yield [2048, 1024, true];
         yield [1024, 1024, false];

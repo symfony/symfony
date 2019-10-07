@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.48.44",
+    "Version": "36",
     "Names": {
         "Africa\/Abidjan": "Greenwichský střední čas (Abidžan)",
         "Africa\/Accra": "Greenwichský střední čas (Accra)",
@@ -420,11 +420,11 @@
         "Pacific\/Midway": "Samojský čas (Midway)",
         "Pacific\/Nauru": "Naurský čas (Nauru)",
         "Pacific\/Niue": "Niuejský čas",
-        "Pacific\/Norfolk": "Norfolský čas (Norfolk)",
+        "Pacific\/Norfolk": "Norfolkský čas",
         "Pacific\/Noumea": "Novokaledonský čas (Nouméa)",
         "Pacific\/Pago_Pago": "Samojský čas (Pago Pago)",
         "Pacific\/Palau": "Palauský čas",
-        "Pacific\/Pitcairn": "Čas Pitcairnova ostrova (Pitcairnovy ostrovy)",
+        "Pacific\/Pitcairn": "Čas Pitcairnových ostrovů (Pitcairnovy ostrovy)",
         "Pacific\/Ponape": "Ponapský čas (Pohnpei)",
         "Pacific\/Port_Moresby": "Čas Papuy-Nové Guiney (Port Moresby)",
         "Pacific\/Rarotonga": "Čas Cookových ostrovů (Rarotonga)",

@@ -148,7 +148,7 @@ class MessageBusTest extends TestCase
         $this->assertCount(2, $finalEnvelope->all());
     }
 
-    public function provideConstructorDataStucture()
+    public function provideConstructorDataStucture(): iterable
     {
         yield 'iterator' => [new \ArrayObject([
             new SimpleMiddleware(),
@@ -167,7 +167,7 @@ class MessageBusTest extends TestCase
     }
 
     /** @dataProvider provideConstructorDataStucture */
-    public function testConstructDataStructure($dataStructure)
+    public function testConstructDataStructure(iterable $dataStructure)
     {
         $bus = new MessageBus($dataStructure);
         $envelope = new Envelope(new DummyMessage('Hello'));

@@ -147,7 +147,7 @@ class ControllerResolver implements ControllerResolverInterface
         return new $class();
     }
 
-    private function getControllerError($callable)
+    private function getControllerError($callable): string
     {
         if (\is_string($callable)) {
             if (false !== strpos($callable, '::')) {
@@ -209,7 +209,7 @@ class ControllerResolver implements ControllerResolverInterface
         return $message;
     }
 
-    private function getClassMethodsWithoutMagicMethods($classOrObject)
+    private function getClassMethodsWithoutMagicMethods($classOrObject): array
     {
         $methods = get_class_methods($classOrObject);
 

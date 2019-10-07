@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.47.82",
+    "Version": "36",
     "Names": {
         "AD": "ʻAnitola",
         "AE": "ʻAlepea Fakatahataha",
@@ -144,7 +144,7 @@
         "MF": "Sā Mātini (fakafalanisē)",
         "MG": "Matakasika",
         "MH": "ʻOtumotu Māsolo",
-        "MK": "Masetōnia",
+        "MK": "Masetōnia fakatokelau",
         "ML": "Māli",
         "MM": "Mianimā (Pema)",
         "MN": "Mongokōlia",
@@ -213,7 +213,7 @@
         "SV": "ʻEle Salavatoa",
         "SX": "Sā Mātini (fakahōlani)",
         "SY": "Sīlia",
-        "SZ": "Suasilani",
+        "SZ": "ʻEsuatini",
         "TC": "ʻOtumotu Tuki mo Kaikosi",
         "TD": "Sāti",
         "TF": "Potu fonua tonga fakafalanisē",
@@ -221,7 +221,7 @@
         "TH": "Tailani",
         "TJ": "Tasikitani",
         "TK": "Tokelau",
-        "TL": "Timoa hahake",
+        "TL": "Timoa fakahahake",
         "TM": "Tūkimenisitani",
         "TN": "Tunīsia",
         "TO": "Tonga",

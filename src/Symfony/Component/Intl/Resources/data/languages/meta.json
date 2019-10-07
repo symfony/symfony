@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.49.82",
+    "Version": "36",
     "Languages": [
         "aa",
         "ab",
@@ -101,6 +101,7 @@
         "chp",
         "chr",
         "chy",
+        "cic",
         "ckb",
         "co",
         "cop",
@@ -700,6 +701,7 @@
         "chu",
         "chv",
         "chy",
+        "cic",
         "ckb",
         "cop",
         "cor",

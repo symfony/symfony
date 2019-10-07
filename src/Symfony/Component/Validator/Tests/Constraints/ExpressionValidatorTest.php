@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;

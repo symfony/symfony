@@ -77,17 +77,20 @@ class CachingHttpClient implements HttpClientInterface
         $request = Request::create($url, $method);
         $request->attributes->set('http_client_options', $options);
 
-        foreach ($options['headers'] as $name => $values) {
+        foreach ($options['normalized_headers'] as $name => $values) {
             if ('cookie' !== $name) {
-                $request->headers->set($name, $values);
+                foreach ($values as $value) {
+                    $request->headers->set($name, substr($value, 2 + \strlen($name)), false);
+                }
+
                 continue;
             }
 
             foreach ($values as $cookies) {
-                foreach (explode('; ', $cookies) as $cookie) {
+                foreach (explode('; ', substr($cookies, \strlen('Cookie: '))) as $cookie) {
                     if ('' !== $cookie) {
                         $cookie = explode('=', $cookie, 2);
-                        $request->cookies->set($cookie[0], $cookie[1] ?? null);
+                        $request->cookies->set($cookie[0], $cookie[1] ?? '');
                     }
                 }
             }

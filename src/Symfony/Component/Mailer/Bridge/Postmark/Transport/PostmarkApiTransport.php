@@ -67,13 +67,14 @@ class PostmarkApiTransport extends AbstractApiTransport
             'To' => implode(',', $this->stringifyAddresses($this->getRecipients($email, $envelope))),
             'Cc' => implode(',', $this->stringifyAddresses($email->getCc())),
             'Bcc' => implode(',', $this->stringifyAddresses($email->getBcc())),
+            'ReplyTo' => implode(',', $this->stringifyAddresses($email->getReplyTo())),
             'Subject' => $email->getSubject(),
             'TextBody' => $email->getTextBody(),
             'HtmlBody' => $email->getHtmlBody(),
             'Attachments' => $this->getAttachments($email),
         ];
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender'];
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to'];
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
                 continue;

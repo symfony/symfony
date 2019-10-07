@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-07T12:14:02Z
+
+Thank you. The PR should target 4.4 as it's more an improvement than a bug fix.
+
+---------------------------------------------------------------------------
+
+by fmasa at 2019-10-07T12:36:18Z
+
+@nicolas-grekas Done. I wasn't really sure whether to consider it bugfix or improvement.

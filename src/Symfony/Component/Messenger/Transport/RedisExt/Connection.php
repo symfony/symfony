@@ -32,6 +32,7 @@ class Connection
         'consumer' => 'consumer',
         'auto_setup' => true,
         'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
+        'dbindex' => 0,
     ];
 
     private $connection;
@@ -54,6 +55,10 @@ class Connection
 
         if (isset($connectionCredentials['auth'])) {
             $this->connection->auth($connectionCredentials['auth']);
+        }
+
+        if (($dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex']) && !$this->connection->select($dbIndex)) {
+            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
         }
 
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];
@@ -97,12 +102,19 @@ class Connection
             unset($redisOptions['stream_max_entries']);
         }
 
+        $dbIndex = null;
+        if (\array_key_exists('dbindex', $redisOptions)) {
+            $dbIndex = filter_var($redisOptions['dbindex'], FILTER_VALIDATE_INT);
+            unset($redisOptions['dbindex']);
+        }
+
         return new self([
             'stream' => $stream,
             'group' => $group,
             'consumer' => $consumer,
             'auto_setup' => $autoSetup,
             'stream_max_entries' => $maxEntries,
+            'dbindex' => $dbIndex,
         ], $connectionCredentials, $redisOptions, $redis);
     }
 

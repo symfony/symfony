@@ -104,6 +104,15 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('redis://password@localhost/queue', [], $redis);
     }
 
+    public function testDbIndex()
+    {
+        $redis = new \Redis();
+
+        Connection::fromDsn('redis://password@localhost/queue?dbindex=2', [], $redis);
+
+        $this->assertSame(2, $redis->getDbNum());
+    }
+
     public function testFirstGetPendingMessagesThenNewMessages()
     {
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();

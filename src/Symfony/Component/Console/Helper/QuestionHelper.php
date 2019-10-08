@@ -217,12 +217,12 @@ class QuestionHelper extends Helper
     {
         $choices = $question->getChoices();
 
-        $maxWidth = max(array_map([static::class, 'strlen'], array_keys($choices)));
+        $maxWidth = max(array_map([$this, 'strlen'], array_keys($choices)));
 
         $messages = [];
 
         foreach ($choices as $key => $value) {
-            $width = $maxWidth - static::strlen($key);
+            $width = $maxWidth - $this->strlen($key);
             // We using strlen + str_repeat to fix sprintf whitespace padding problem with UTF-8)
             $messages[] = sprintf('  [<%s>%s%s</%s>] %s', $tag, $key, str_repeat(' ', $width), $tag, $value);
         }

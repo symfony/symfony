@@ -31,6 +31,8 @@ class CliDumper extends AbstractDumper
         'default' => '38;5;208',
         'num' => '1;38;5;38',
         'const' => '1;38;5;208',
+        'true' => '1;38;5;40',
+        'false' => '1;38;5;213',
         'str' => '1;38;5;113',
         'note' => '38;5;38',
         'ref' => '38;5;247',
@@ -167,6 +169,7 @@ class CliDumper extends AbstractDumper
 
             case 'boolean':
                 $value = $value ? 'true' : 'false';
+                $style = $value;
                 break;
 
             default:

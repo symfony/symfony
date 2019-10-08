@@ -2,13 +2,13 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * @group tty
@@ -140,14 +140,14 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $input = $this->createStreamableInputInterfaceMock($this->getInputStream('foo'));
         $result = [];
         $output->method('writeln')->willReturnCallback(function ($params) use (&$result) {
-            if (is_array($params)) {
+            if (\is_array($params)) {
                 $result = array_merge($result, $params);
             } else {
                 $result[] = $params;
             }
         });
         $dialog->ask($input, $output, $question);
-        $this->assertEquals(array_merge([$question_result],$outputShown), $result);
+        $this->assertEquals(array_merge([$question_result], $outputShown), $result);
     }
 
     public function testAskDefaultPrompt()

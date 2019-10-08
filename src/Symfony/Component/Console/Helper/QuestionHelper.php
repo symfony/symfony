@@ -204,12 +204,12 @@ class QuestionHelper extends Helper
 
             $message = $question->getPrompt();
         }
+
         $output->write($message);
     }
 
     /**
      * @param string $tag
-     * @param ChoiceQuestion $question
      *
      * @return string[]
      */

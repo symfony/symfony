@@ -30,7 +30,6 @@ use Symfony\Component\Console\Terminal;
  */
 class QuestionHelper extends Helper
 {
-    const DEFAULT_PROMPT = ' > ';
     private $inputStream;
     private static $shell;
     private static $stty;
@@ -209,7 +208,8 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * @param $tag
+     * @param string $tag
+     * @param ChoiceQuestion $question
      *
      * @return string[]
      */

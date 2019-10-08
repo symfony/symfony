@@ -116,29 +116,38 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testForUtf8Keys()
     {
-      $question = 'Lorem ipsum?';
-      $possibleChoices = [
-        'foo' => 'foo',
-        'żółw' => 'bar',
-        'łabądź' => 'baz',
-      ];
-      $question_result = ' <info>Lorem ipsum?</info> [<comment>foo</comment>]:';
-      $outputShown = [
-        '  [<comment>foo   </comment>] foo',
-        '  [<comment>żółw  </comment>] bar',
-        '  [<comment>łabądź</comment>] baz',
-      ];
+        $question = 'Lorem ipsum?';
+        $possibleChoices = [
+            'foo' => 'foo',
+            'żółw' => 'bar',
+            'łabądź' => 'baz',
+        ];
+        $question_result = ' <info>Lorem ipsum?</info> [<comment>foo</comment>]:';
+        $outputShown = [
+            '  [<comment>foo   </comment>] foo',
+            '  [<comment>żółw  </comment>] bar',
+            '  [<comment>łabądź</comment>] baz',
+        ];
 
-      $dialog = new SymfonyQuestionHelper();
+        $dialog = new SymfonyQuestionHelper();
 
-      $question = new ChoiceQuestion($question, $possibleChoices, 'foo');
+        $question = new ChoiceQuestion($question, $possibleChoices, 'foo');
 
-      $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
-      $output->method('getFormatter')->willReturn(new OutputFormatter());
+        $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
+        $output->method('getFormatter')->willReturn(new OutputFormatter());
+        $question->setValidator(null);
 
-      $input = $this->createStreamableInputInterfaceMock($this->getInputStream('foo'));
-      $output->expects($this->exactly(2))->method('writeln')->withConsecutive([$question_result], [$outputShown]);
-      $dialog->ask($input, $output, $question);
+        $input = $this->createStreamableInputInterfaceMock($this->getInputStream('foo'));
+        $result = [];
+        $output->method('writeln')->willReturnCallback(function ($params) use (&$result) {
+            if (is_array($params)) {
+                $result = array_merge($result, $params);
+            } else {
+                $result[] = $params;
+            }
+        });
+        $dialog->ask($input, $output, $question);
+        $this->assertEquals(array_merge([$question_result],$outputShown), $result);
     }
 
     public function testAskDefaultPrompt()

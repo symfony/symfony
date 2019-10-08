@@ -101,9 +101,9 @@ class SymfonyQuestionHelper extends QuestionHelper
 
             $output->writeln($messages);
             // ChoiceQuestion can have any prompt
-            $output->write($question->getPrompt() ?: static::DEFAULT_PROMPT);
+            $output->write($question->getPrompt() ?: Question::DEFAULT_PROMPT);
         } else {
-            $output->write(static::DEFAULT_PROMPT);
+            $output->write(Question::DEFAULT_PROMPT);
         }
     }
 

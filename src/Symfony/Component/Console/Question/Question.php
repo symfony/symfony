@@ -21,6 +21,7 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class Question
 {
+    const DEFAULT_PROMPT = ' > ';
     private $question;
     private $attempts;
     private $hidden = false;

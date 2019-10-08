@@ -22,7 +22,7 @@ class ChoiceQuestion extends Question
 {
     private $choices;
     private $multiselect = false;
-    private $prompt = null;
+    private $prompt = ' > ';
     private $errorMessage = 'Value "%s" is invalid';
 
     /**

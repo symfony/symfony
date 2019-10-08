@@ -37,6 +37,14 @@ class FlattenException
     private $file;
     private $line;
 
+    /**
+     * @deprecated since Symfony 4.4, use createFromThrowable instead.
+     */
+    public static function create(\Exception $exception, $statusCode = null, array $headers = [])
+    {
+        return static::createFromThrowable($exception, $statusCode, $headers);
+    }
+
     public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
     {
         $e = new static();

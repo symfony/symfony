@@ -181,6 +181,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
     private function getOutputString(StreamOutput $output)
     {
         rewind($output->getStream());
+
         return stream_get_contents($output->getStream()) ?: '';
     }
 }

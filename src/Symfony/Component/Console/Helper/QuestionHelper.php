@@ -199,7 +199,7 @@ class QuestionHelper extends Helper
         $message = $question->getQuestion();
 
         if ($question instanceof ChoiceQuestion) {
-            $messages = (array)$question->getQuestion();
+            $messages = (array) $question->getQuestion();
             $messages = array_merge($messages, $this->prepareChoices('info', $question));
             $output->writeln($messages);
 
@@ -210,10 +210,11 @@ class QuestionHelper extends Helper
 
     /**
      * @param $tag
-     * @param ChoiceQuestion $question
+     *
      * @return string[]
      */
-    protected function prepareChoices($tag, ChoiceQuestion $question) {
+    protected function prepareChoices($tag, ChoiceQuestion $question)
+    {
         $choices = $question->getChoices();
 
         $maxWidth = max(array_map([static::class, 'strlen'], array_keys($choices)));
@@ -223,7 +224,7 @@ class QuestionHelper extends Helper
         foreach ($choices as $key => $value) {
             $width = $maxWidth - static::strlen($key);
             // We using strlen + str_repeat to fix sprintf whitespace padding problem with UTF-8)
-            $messages[] = sprintf("  [<%s>%s%s</%s>] %s", $tag, $key, str_repeat(' ', $width), $tag, $value);
+            $messages[] = sprintf('  [<%s>%s%s</%s>] %s', $tag, $key, str_repeat(' ', $width), $tag, $value);
         }
 
         return $messages;

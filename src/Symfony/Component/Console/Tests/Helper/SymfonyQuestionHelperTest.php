@@ -8,6 +8,7 @@ use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * @group tty
@@ -111,6 +112,33 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $helper->ask($input, $output = $this->createOutputInterface(), new Question('Do you want to use Foo\\Bar <comment>or</comment> Foo\\Baz?', 'Foo\\Baz'));
 
         $this->assertOutputContains('Do you want to use Foo\\Bar or Foo\\Baz? [Foo\\Baz]:', $output);
+    }
+
+    public function testForUtf8Keys()
+    {
+      $question = 'Lorem ipsum?';
+      $possibleChoices = [
+        'foo' => 'foo',
+        'żółw' => 'bar',
+        'łabądź' => 'baz',
+      ];
+      $question_result = ' <info>Lorem ipsum?</info> [<comment>foo</comment>]:';
+      $outputShown = [
+        '  [<comment>foo   </comment>] foo',
+        '  [<comment>żółw  </comment>] bar',
+        '  [<comment>łabądź</comment>] baz',
+      ];
+
+      $dialog = new SymfonyQuestionHelper();
+
+      $question = new ChoiceQuestion($question, $possibleChoices, 'foo');
+
+      $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
+      $output->method('getFormatter')->willReturn(new OutputFormatter());
+
+      $input = $this->createStreamableInputInterfaceMock($this->getInputStream('foo'));
+      $output->expects($this->exactly(2))->method('writeln')->withConsecutive([$question_result], [$outputShown]);
+      $dialog->ask($input, $output, $question);
     }
 
     public function testAskDefaultPrompt()

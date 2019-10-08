@@ -47,6 +47,8 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
         $mt = new MimeTypes();
         $this->assertSame(['mbox'], $mt->getExtensions('application/mbox'));
         $this->assertSame(['ai', 'eps', 'ps'], $mt->getExtensions('application/postscript'));
+        $this->assertContains('svg', $mt->getExtensions('image/svg+xml'));
+        $this->assertContains('svg', $mt->getExtensions('image/svg'));
         $this->assertSame([], $mt->getExtensions('application/whatever-symfony'));
     }
 
@@ -56,6 +58,8 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
         $this->assertSame(['application/mbox'], $mt->getMimeTypes('mbox'));
         $this->assertContains('application/postscript', $mt->getMimeTypes('ai'));
         $this->assertContains('application/postscript', $mt->getMimeTypes('ps'));
+        $this->assertContains('image/svg+xml', $mt->getMimeTypes('svg'));
+        $this->assertContains('image/svg', $mt->getMimeTypes('svg'));
         $this->assertSame([], $mt->getMimeTypes('symfony'));
     }
 }

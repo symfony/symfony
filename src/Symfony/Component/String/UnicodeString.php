@@ -250,9 +250,9 @@ class UnicodeString extends AbstractUnicodeString
         return $str;
     }
 
-    public function replaceMatches(string $fromPattern, $to): AbstractString
+    public function replaceMatches(string $fromRegexp, $to): AbstractString
     {
-        $str = parent::replaceMatches($fromPattern, $to);
+        $str = parent::replaceMatches($fromRegexp, $to);
         normalizer_is_normalized($str->string) ?: $str->string = normalizer_normalize($str->string);
 
         return $str;

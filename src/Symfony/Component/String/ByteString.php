@@ -189,18 +189,18 @@ class ByteString extends AbstractString
         return $str;
     }
 
-    public function match(string $pattern, int $flags = 0, int $offset = 0): array
+    public function match(string $regexp, int $flags = 0, int $offset = 0): array
     {
         $match = ((\PREG_PATTERN_ORDER | \PREG_SET_ORDER) & $flags) ? 'preg_match_all' : 'preg_match';
 
         if ($this->ignoreCase) {
-            $pattern .= 'i';
+            $regexp .= 'i';
         }
 
         set_error_handler(static function ($t, $m) { throw new InvalidArgumentException($m); });
 
         try {
-            if (false === $match($pattern, $this->string, $matches, $flags | PREG_UNMATCHED_AS_NULL, $offset)) {
+            if (false === $match($regexp, $this->string, $matches, $flags | PREG_UNMATCHED_AS_NULL, $offset)) {
                 $lastError = preg_last_error();
 
                 foreach (get_defined_constants(true)['pcre'] as $k => $v) {
@@ -261,10 +261,10 @@ class ByteString extends AbstractString
         return $str;
     }
 
-    public function replaceMatches(string $fromPattern, $to): parent
+    public function replaceMatches(string $fromRegexp, $to): parent
     {
         if ($this->ignoreCase) {
-            $fromPattern .= 'i';
+            $fromRegexp .= 'i';
         }
 
         if (\is_array($to)) {
@@ -280,7 +280,7 @@ class ByteString extends AbstractString
         set_error_handler(static function ($t, $m) { throw new InvalidArgumentException($m); });
 
         try {
-            if (null === $string = $replace($fromPattern, $to, $this->string)) {
+            if (null === $string = $replace($fromRegexp, $to, $this->string)) {
                 $lastError = preg_last_error();
 
                 foreach (get_defined_constants(true)['pcre'] as $k => $v) {

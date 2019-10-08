@@ -404,11 +404,11 @@ abstract class AbstractString implements \JsonSerializable
     /**
      * Matches the string using a regular expression.
      *
-     * Pass PREG_PATTERN_ORDER or PREG_SET_ORDER as $flags to get all occurrences matching the pattern.
+     * Pass PREG_PATTERN_ORDER or PREG_SET_ORDER as $flags to get all occurrences matching the regular expression.
      *
      * @return array All matches in a multi-dimensional array ordered according to flags
      */
-    abstract public function match(string $pattern, int $flags = 0, int $offset = 0): array;
+    abstract public function match(string $regexp, int $flags = 0, int $offset = 0): array;
 
     /**
      * @return static
@@ -455,7 +455,7 @@ abstract class AbstractString implements \JsonSerializable
      *
      * @return static
      */
-    abstract public function replaceMatches(string $fromPattern, $to): self;
+    abstract public function replaceMatches(string $fromRegexp, $to): self;
 
     /**
      * @return static

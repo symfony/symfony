@@ -178,9 +178,9 @@ class UnicodeString extends AbstractUnicodeString
         return false === $i ? null : $i;
     }
 
-    public function join(array $strings): AbstractString
+    public function join(array $strings, string $lastGlue = null): AbstractString
     {
-        $str = parent::join($strings);
+        $str = parent::join($strings, $lastGlue);
         normalizer_is_normalized($str->string) ?: $str->string = normalizer_normalize($str->string);
 
         return $str;

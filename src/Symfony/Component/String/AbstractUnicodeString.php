@@ -180,10 +180,12 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
-    public function join(array $strings): parent
+    public function join(array $strings, string $lastGlue = null): parent
     {
         $str = clone $this;
-        $str->string = implode($this->string, $strings);
+
+        $tail = null !== $lastGlue && 1 < \count($strings) ? $lastGlue.array_pop($strings) : '';
+        $str->string = implode($this->string, $strings).$tail;
 
         if (!preg_match('//u', $str->string)) {
             throw new InvalidArgumentException('Invalid UTF-8 string.');

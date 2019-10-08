@@ -387,7 +387,7 @@ abstract class AbstractString implements \JsonSerializable
     /**
      * @return static
      */
-    abstract public function join(array $strings): self;
+    abstract public function join(array $strings, string $lastGlue = null): self;
 
     public function jsonSerialize(): string
     {

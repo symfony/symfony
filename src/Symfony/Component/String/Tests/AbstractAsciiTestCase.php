@@ -1160,6 +1160,11 @@ abstract class AbstractAsciiTestCase extends TestCase
         $this->assertEquals(static::createFromString($expected), $instance);
     }
 
+    public function testJoinWithLastGlue()
+    {
+        $this->assertSame('foo, bar and baz', (string) static::createFromString(', ')->join(['foo', 'bar', 'baz'], ' and '));
+    }
+
     public static function provideJoin()
     {
         return [

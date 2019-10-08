@@ -30,6 +30,7 @@ use Symfony\Component\Console\Terminal;
  */
 class QuestionHelper extends Helper
 {
+    const DEFAULT_PROMPT = ' > ';
     private $inputStream;
     private static $shell;
     private static $stty;
@@ -198,20 +199,34 @@ class QuestionHelper extends Helper
         $message = $question->getQuestion();
 
         if ($question instanceof ChoiceQuestion) {
-            $maxWidth = max(array_map([$this, 'strlen'], array_keys($question->getChoices())));
-
-            $messages = (array) $question->getQuestion();
-            foreach ($question->getChoices() as $key => $value) {
-                $width = $maxWidth - $this->strlen($key);
-                $messages[] = '  [<info>'.$key.str_repeat(' ', $width).'</info>] '.$value;
-            }
-
+            $messages = (array)$question->getQuestion();
+            $messages = array_merge($messages, $this->prepareChoices('info', $question));
             $output->writeln($messages);
 
             $message = $question->getPrompt();
         }
-
         $output->write($message);
+    }
+
+    /**
+     * @param $tag
+     * @param ChoiceQuestion $question
+     * @return string[]
+     */
+    protected function prepareChoices($tag, ChoiceQuestion $question) {
+        $choices = $question->getChoices();
+
+        $maxWidth = max(array_map([static::class, 'strlen'], array_keys($choices)));
+
+        $messages = [];
+
+        foreach ($choices as $key => $value) {
+            $width = $maxWidth - static::strlen($key);
+            // We using strlen + str_repeat to fix sprintf whitespace padding problem with UTF-8)
+            $messages[] = sprintf("  [<%s>%s%s</%s>] %s", $tag, $key, str_repeat(' ', $width), $tag, $value);
+        }
+
+        return $messages;
     }
 
     /**

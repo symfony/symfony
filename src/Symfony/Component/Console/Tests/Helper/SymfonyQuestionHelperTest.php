@@ -108,9 +108,18 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
     {
         $helper = new SymfonyQuestionHelper();
         $input = $this->createStreamableInputInterfaceMock($this->getInputStream('Foo\\Bar'));
-        $helper->ask($input, $output = $this->createOutputInterface(), new Question('Do you want to use Foo\\Bar <comment>or</comment> Foo\\Baz\\?', 'Foo\\Baz'));
+        $helper->ask($input, $output = $this->createOutputInterface(), new Question('Do you want to use Foo\\Bar <comment>or</comment> Foo\\Baz?', 'Foo\\Baz'));
 
-        $this->assertOutputContains('Do you want to use Foo\\Bar or Foo\\Baz\\? [Foo\\Baz]:', $output);
+        $this->assertOutputContains('Do you want to use Foo\\Bar or Foo\\Baz? [Foo\\Baz]:', $output);
+    }
+
+    public function testAskDefaultPrompt()
+    {
+        $helper = new SymfonyQuestionHelper();
+        $input = $this->createStreamableInputInterfaceMock($this->getInputStream('Foo\\Bar'));
+        $helper->ask($input, $output = $this->createOutputInterface(), new Question('Do you want to use Foo\\Bar <comment>or</comment> Foo\\Baz?', 'Foo\\Baz'));
+
+        $this->assertOutputEndsWith("\n > ", $output);
     }
 
     public function testLabelTrailingBackslash()
@@ -159,8 +168,19 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
     private function assertOutputContains($expected, StreamOutput $output)
     {
-        rewind($output->getStream());
-        $stream = stream_get_contents($output->getStream());
+        $stream = $this->getOutputString($output);
         $this->assertStringContainsString($expected, $stream);
+    }
+
+    private function assertOutputEndsWith($suffix, StreamOutput $output)
+    {
+        $stream = $this->getOutputString($output);
+        $this->assertStringEndsWith($suffix, $stream);
+    }
+
+    private function getOutputString(StreamOutput $output)
+    {
+        rewind($output->getStream());
+        return stream_get_contents($output->getStream()) ?: '';
     }
 }

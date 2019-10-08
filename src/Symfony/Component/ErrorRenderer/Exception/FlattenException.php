@@ -43,7 +43,7 @@ class FlattenException
     public static function create(\Exception $exception, $statusCode = null, array $headers = [])
     {
         @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "createFromThrowable()" instead.', __METHOD__), E_USER_DEPRECATED);
-        
+
         return static::createFromThrowable($exception, $statusCode, $headers);
     }
 

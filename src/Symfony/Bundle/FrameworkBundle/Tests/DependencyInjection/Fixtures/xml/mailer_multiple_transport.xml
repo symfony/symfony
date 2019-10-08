@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:framework="http://symfony.com/schema/dic/symfony"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:mailer>
+            <framework:transports name="baz">smtp://baz</framework:transports>
+            <framework:transports name="foo">smtp://foo</framework:transports>
+            <framework:transports name="bar">smtp://bar</framework:transports>
+        </framework:mailer>
+    </framework:config>
+</container>

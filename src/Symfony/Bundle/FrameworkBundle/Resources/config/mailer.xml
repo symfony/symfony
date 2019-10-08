@@ -16,6 +16,7 @@
         <service id="mailer.transports" class="Symfony\Component\Mailer\Transport\Transports">
             <factory service="mailer.transport_factory" method="fromStrings" />
             <argument type="collection" /> <!-- transports -->
+            <argument /> <!-- transport -->
         </service>
 
         <service id="mailer.transport_factory" class="Symfony\Component\Mailer\Transport">

@@ -29,13 +29,16 @@ final class Transports implements TransportInterface
     /**
      * @param TransportInterface[] $transports
      */
-    public function __construct(iterable $transports)
+    public function __construct(iterable $transports, TransportInterface $default = null)
     {
+        if (null === $default) {
+            $this->default = current($transports);
+        } else {
+            $this->default = $default;
+        }
+
         $this->transports = [];
         foreach ($transports as $name => $transport) {
-            if (null === $this->default) {
-                $this->default = $transport;
-            }
             $this->transports[$name] = $transport;
         }
 

@@ -35,6 +35,23 @@ class TransportsTest extends TestCase
         $transport->send($email);
     }
 
+    public function testSpecificTransport()
+    {
+        $transport = new Transports(
+            [
+                'foo' => $foo = $this->createMock(TransportInterface::class),
+                'bar' => $bar = $this->createMock(TransportInterface::class),
+            ],
+            $bar
+        );
+
+        $foo->expects($this->never())->method('send');
+        $bar->expects($this->once())->method('send');
+
+        $email = new Message(new Headers(), new TextPart('...'));
+        $transport->send($email);
+    }
+
     public function testOverrideTransport()
     {
         $transport = new Transports([

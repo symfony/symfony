@@ -17,6 +17,7 @@ CHANGELOG
  * Added new `error_controller` configuration to handle system exceptions
  * Added sort option for `translation:update` command.
  * [BC Break] The `framework.messenger.routing.senders` config key is not deep merged anymore.
+ * Added services for each mailer transports.
 
 4.3.0
 -----

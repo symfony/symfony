@@ -85,6 +85,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport\Transports;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -1987,8 +1988,15 @@ class FrameworkExtension extends Extension
             $config['dsn'] = 'smtp://null';
         }
         $transports = $config['dsn'] ? ['main' => $config['dsn']] : $config['transports'];
-        $container->getDefinition('mailer.transports')->setArgument(0, $transports);
-        $container->getDefinition('mailer.default_transport')->setArgument(0, current($transports));
+        $defaultTransport = current($transports);
+        $container->getDefinition('mailer.transports')->setArgument(0, $transports)->setArgument(1, $defaultTransport);
+        $container->getDefinition('mailer.default_transport')->setArgument(0, $defaultTransport);
+
+        if (1 < \count($transports)) {
+            foreach ($transports as $name => $transport) {
+                $container->setDefinition('mailer.transports.'.$name, new Definition(Transports::class, [$transports, $transport]));
+            }
+        }
 
         $classToServices = [
             SesTransportFactory::class => 'mailer.transport_factory.amazon',

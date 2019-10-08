@@ -1580,6 +1580,24 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(['redirected@example.org', 'redirected1@example.org'], $l->getArgument(1));
     }
 
+    public function testMailerMultipleTransport(): void
+    {
+        $container = $this->createContainerFromFile('mailer_multiple_transport');
+
+        $this->assertTrue($container->hasDefinition('mailer.default_transport'));
+        $this->assertSame('smtp://baz', $container->getDefinition('mailer.default_transport')->getArgument(0));
+
+        $this->assertTrue($container->hasDefinition('mailer.transports'));
+        $this->assertSame('smtp://baz', $container->getDefinition('mailer.transports')->getArgument(1));
+
+        $this->assertTrue($container->hasDefinition('mailer.transports.baz'));
+        $this->assertSame('smtp://baz', $container->getDefinition('mailer.transports.baz')->getArgument(1));
+        $this->assertTrue($container->hasDefinition('mailer.transports.foo'));
+        $this->assertSame('smtp://foo', $container->getDefinition('mailer.transports.foo')->getArgument(1));
+        $this->assertTrue($container->hasDefinition('mailer.transports.bar'));
+        $this->assertSame('smtp://bar', $container->getDefinition('mailer.transports.bar')->getArgument(1));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new ParameterBag(array_merge([

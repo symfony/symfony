@@ -10,6 +10,7 @@ CHANGELOG
  * added the stamps of a message after it is dispatched in `TraceableMessageBus` and `MessengerDataCollector` collected data
  * added `UuidCaster`
  * made all casters final
+ * draw boolean in different styles
 
 4.3.0
 -----

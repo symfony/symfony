@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by gharlan at 2019-10-08T09:18:08Z
+
+Then `$fromPattern` in `replaceMatches` should be changed, too.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-08T09:25:04Z
+
+@gharlan you are right! Done. Thanks.

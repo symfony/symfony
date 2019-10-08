@@ -1,0 +1,183 @@
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-05T15:44:13Z
+
+Some setbacks here, clients are _not_ so complete:
+- `RedisArray` does not support SSCAN, you'll get:
+  `Parameter 2 to Redis::sscan() expected to be a reference, value given`
+- Predis alos have limited SSCAN and gives the following if key does not exists:
+  `Predis\Response\ServerException: ERR no such key`
+
+These can potentially be fixed by instead using SMEMBERS + skipping SSCAN/SMEMBERS on tagId if RENAME returned 0 _(not found in this case)_.
+
+More of a Server issue:
+- Cluster on Predis and `RedisCluster` does not support RENAME:
+  ` RedisCluster::rename(): Keys don't hash to the same slot`
+
+This one I'm unsure of, should we try to make sure we RENAME within same node?
+
+Suggestions @nicolas-grekas / @berezuev?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-05T15:47:50Z
+
+Can't we rename to a key that will be guaranteed on the same node, using the special syntax they support for this?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-05T19:27:46Z
+
+> using the special syntax they support for this?
+
+Do you happen to remember where that is described? Thought about that too, but didn't know where to look.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-06T11:46:10Z
+
+Sure, see https://redis.io/topics/cluster-spec, the section about "hash tags"
+
+---------------------------------------------------------------------------
+
+by stof at 2019-09-06T12:14:22Z
+
+is it possible to have `{` and `}` in our normal tagId Redis keys ? If yes, we won't be able to use hash tags to achieve our goal.
+Otherwise, this can indeed by used, making the temporary tag id being `'{'.$tagId.'}'.$randomSuffix` instead of `$tagId.':'.$randomSuffix`.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-06T14:48:38Z
+
+Thanks for the hints 👍
+
+However still getting `RedisCluster::rename(): Keys don't hash to the same slot`. Could be it's phpredis which forbids it. Like Predis Cluster client does with a `Predis\NotSupportedException: Cannot use 'RENAME' with redis-cluster.`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-06T14:57:34Z
+
+The alternative could be to talk directly to the corresponding node in the cluster. That's possible AFAIK.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-06T15:22:50Z
+
+> The alternative could be to talk directly to the corresponding node in the cluster. That's possible AFAIK.
+
+yes, I'll "just" need to figure out which node the key is on, and it might also work on Predis. However that will be topic for after vacation then 🌴😏
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-06T15:24:01Z
+
+I think there is a function for that :)
+Happy :palm_tree: !
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-22T19:28:39Z
+
+RedisCluster failure was fixed in be040793acab4737634c122cefd7b3177a8de6d6. I did not find a simple way to deal with `RENAME` on Predis across RedisCluster & PredisCluster so left that as-is, could instead use SPOP there if prefered.
+
+AppVeyor failure seems unrelated _(HttpClient\Tests\NativeHttpClientTest::testNotATimeout)_, so rebased and moving this to review.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-26T10:18:18Z
+
+@nicolas-grekas Be aware of one new issue introduced here, even if we log warnings about it:
+- With Predis cluster there is now a race condition issue where tags added to set between it being read with SMEMBERS and whole set being Deleted at the end will be lost
+- So you could argue that we should keep SPOP logic for Predis Cluster as it does not have race condition issue at least. It would still mean we don't require phpredis 3.1.3, but it will then continue to require 3.2 server _for_ Predis Cluster setups
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T10:42:04Z
+
+I miss some background here: how does phpredis do to support RENAME on cluster? Can't we mimic this with Predis, e.g calculating the node then doing the RENAME on its specific connection?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T10:47:42Z
+
+Or should we throw an exception when this adapter is used with a Predis cluster?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-26T16:05:55Z
+
+> I miss some background here: how does phpredis do to support RENAME on cluster?
+
+Predis Cluster aggregates throws on it from PHP code no matter what, phpredis only if there is a cross slot response which we avoid by using the `{key}hash` key form.
+
+> Can't we mimic this with Predis, e.g calculating the node then doing the RENAME on its specific connection?
+
+On PredisCluster Connection we probably easily can: https://github.com/nrk/predis/blob/111d100ee389d624036b46b35ed0c9ac59c71313/src/Connection/Aggregate/PredisCluster.php#L159
+
+On (Predis) RedisCluster Connection there is no such method, and while there is `->getClusterStrategy()->getSlotByKey($key)`, it's a bit unclear where to go from there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T16:09:12Z
+
+> On PredisCluster Connection we probably easily can
+
+let's do it?
+
+> On (Predis) RedisCluster Connection
+
+let's throw for now in this situation and open an issue on Predis?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-26T21:00:53Z
+
+> let's throw for now in this situation and open an issue on Predis?
+
+last commit 2017...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T21:14:55Z
+
+Another reason to throw and encourage using phpredis...
+Let's still create the issue for the record...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-27T05:49:13Z
+
+Mergeable?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-09-27T10:53:46Z
+
+IMHO Yes, we can do the improvements as a follow up, it will anyway need some investigation and testing. But it's entirely up to you two.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-27T10:58:26Z
+
+I'd prefer doing it in this PR, depending on your availability to do it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-07T16:32:32Z
+
+Hello, I just push-forced this here:
+https://github.com/symfony/symfony/compare/db80b9db0519ec73165b9bc2d57674993c7a3d5e..28948eeb8b
+
+Should fix the last comment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-08T09:43:12Z
+
+> Exception on rename on missing key
+
+Actually, I just discovered this is already possible! PR updated to use pipelining.
+
+> Lack of api to find slot of key when using RedisCluster
+
+that's a bit more involving, as that'd require implementing the logic to react to `MOVE` responses. Should be handled at the Predis level instead, as phpredis does.

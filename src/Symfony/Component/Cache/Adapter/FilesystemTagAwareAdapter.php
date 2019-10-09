@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
@@ -115,22 +114,39 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     protected function doInvalidate(array $tagIds): bool
     {
         foreach ($tagIds as $tagId) {
-            $tagsFolder = $this->getTagFolder($tagId);
-            if (!file_exists($tagsFolder)) {
+            if (!file_exists($tagsFolder = $this->getTagFolder($tagId))) {
                 continue;
             }
 
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($tagsFolder, \FilesystemIterator::SKIP_DOTS)) as $itemLink) {
-                if (!$itemLink->isLink()) {
-                    throw new LogicException('Expected a (sym)link when iterating over tag folder, non link found: '.$itemLink);
+            set_error_handler(static function () {});
+
+            try {
+                if (rename($tagsFolder, $renamed = substr_replace($tagsFolder, bin2hex(random_bytes(4)), -1))) {
+                    $tagsFolder = $renamed.\DIRECTORY_SEPARATOR;
+                } else {
+                    $renamed = null;
                 }
 
-                $valueFile = $itemLink->getRealPath();
-                if ($valueFile && file_exists($valueFile)) {
-                    @unlink($valueFile);
+                foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($tagsFolder, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME)) as $itemLink) {
+                    unlink(realpath($itemLink) ?: $itemLink);
+                    unlink($itemLink);
                 }
 
-                @unlink((string) $itemLink);
+                if (null === $renamed) {
+                    continue;
+                }
+
+                $chars = '+-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+                for ($i = 0; $i < 38; ++$i) {
+                    for ($j = 0; $j < 38; ++$j) {
+                        rmdir($tagsFolder.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j]);
+                    }
+                    rmdir($tagsFolder.$chars[$i]);
+                }
+                rmdir($renamed);
+            } finally {
+                restore_error_handler();
             }
         }
 

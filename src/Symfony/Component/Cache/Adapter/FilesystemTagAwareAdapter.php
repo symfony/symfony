@@ -106,20 +106,20 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     protected function doInvalidate(array $tagIds): bool
     {
         foreach ($tagIds as $tagId) {
-            if (!file_exists($tagsFolder = $this->getTagFolder($tagId))) {
+            if (!file_exists($tagFolder = $this->getTagFolder($tagId))) {
                 continue;
             }
 
             set_error_handler(static function () {});
 
             try {
-                if (rename($tagsFolder, $renamed = substr_replace($tagsFolder, bin2hex(random_bytes(4)), -1))) {
-                    $tagsFolder = $renamed.\DIRECTORY_SEPARATOR;
+                if (rename($tagFolder, $renamed = substr_replace($tagFolder, bin2hex(random_bytes(4)), -1))) {
+                    $tagFolder = $renamed.\DIRECTORY_SEPARATOR;
                 } else {
                     $renamed = null;
                 }
 
-                foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($tagsFolder, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME)) as $itemLink) {
+                foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($tagFolder, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME)) as $itemLink) {
                     unlink(realpath($itemLink) ?: $itemLink);
                     unlink($itemLink);
                 }
@@ -132,9 +132,9 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
 
                 for ($i = 0; $i < 38; ++$i) {
                     for ($j = 0; $j < 38; ++$j) {
-                        rmdir($tagsFolder.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j]);
+                        rmdir($tagFolder.$chars[$i].\DIRECTORY_SEPARATOR.$chars[$j]);
                     }
-                    rmdir($tagsFolder.$chars[$i]);
+                    rmdir($tagFolder.$chars[$i]);
                 }
                 rmdir($renamed);
             } finally {

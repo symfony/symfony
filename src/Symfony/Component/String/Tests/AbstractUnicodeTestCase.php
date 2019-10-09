@@ -405,6 +405,16 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         );
     }
 
+    public static function provideReplaceMatches(): array
+    {
+        return array_merge(
+            parent::provideReplaceMatches(),
+            [
+                ['This is a dj-vu situation!', 'This is a déjà-vu situation!', '/([à-ú])/', ''],
+            ]
+        );
+    }
+
     public static function provideReplaceIgnoreCase(): array
     {
         return array_merge(

@@ -595,18 +595,18 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * Pass true as the 2nd argument to normalize whitespaces.
      *
-     * @param mixed $default             When provided and the current node is empty, this value is returned and no exception is thrown
-     * @param bool  $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
+     * @param string|null $default             When not null: the value to return when the current node is empty
+     * @param bool        $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      *
      * @return string The node value
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function text(/* $default = null, bool $normalizeWhitespace = false */)
+    public function text(/* string $default = null, bool $normalizeWhitespace = false */)
     {
         if (!$this->nodes) {
-            if (0 < \func_num_args()) {
-                return func_get_arg(0);
+            if (0 < \func_num_args() && null !== func_get_arg(0)) {
+                return (string) func_get_arg(0);
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');
@@ -624,17 +624,17 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the first node of the list as HTML.
      *
-     * @param mixed $default When provided and the current node is empty, this value is returned and no exception is thrown
+     * @param string|null $default When not null: the value to return when the current node is empty
      *
      * @return string The node html
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function html(/* $default = null */)
+    public function html(/* string $default = null */)
     {
         if (!$this->nodes) {
-            if (0 < \func_num_args()) {
-                return func_get_arg(0);
+            if (0 < \func_num_args() && null !== func_get_arg(0)) {
+                return (string) func_get_arg(0);
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');

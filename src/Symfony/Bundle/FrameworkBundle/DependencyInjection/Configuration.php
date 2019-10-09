@@ -544,7 +544,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cookie_domain')->end()
                         ->enumNode('cookie_secure')->values([true, false, 'auto'])->end()
                         ->booleanNode('cookie_httponly')->defaultTrue()->end()
-                        ->enumNode('cookie_samesite')->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT])->defaultNull()->end()
+                        ->enumNode('cookie_samesite')->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->defaultNull()->end()
                         ->booleanNode('use_cookies')->end()
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->defaultValue(1)->end()

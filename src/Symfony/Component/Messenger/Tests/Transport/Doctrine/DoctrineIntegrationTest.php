@@ -21,29 +21,27 @@ use Symfony\Component\Messenger\Transport\Doctrine\Connection;
  */
 class DoctrineIntegrationTest extends TestCase
 {
+    /** @var \Doctrine\DBAL\Connection */
     private $driverConnection;
+    /** @var Connection */
     private $connection;
+    /** @var string */
+    private $sqliteFile;
 
-    /**
-     * @after
-     */
-    public function cleanup()
+    protected function setUp(): void
     {
-        @unlink(sys_get_temp_dir().'/symfony.messenger.sqlite');
-    }
-
-    /**
-     * @before
-     */
-    public function createConnection()
-    {
-        $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'sqlite:///'.sys_get_temp_dir().'/symfony.messenger.sqlite';
+        $this->sqliteFile = sys_get_temp_dir().'/symfony.messenger.sqlite';
+        $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'sqlite:///'.$this->sqliteFile;
         $this->driverConnection = DriverManager::getConnection(['url' => $dsn]);
         $this->connection = new Connection([], $this->driverConnection);
-        // call send to auto-setup the table
-        $this->connection->setup();
-        // ensure the table is clean for tests
-        $this->driverConnection->exec('DELETE FROM messenger_messages');
+    }
+
+    protected function tearDown(): void
+    {
+        $this->driverConnection->close();
+        if (file_exists($this->sqliteFile)) {
+            unlink($this->sqliteFile);
+        }
     }
 
     public function testConnectionSendAndGet()
@@ -75,6 +73,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testItRetrieveTheFirstAvailableMessage()
     {
+        $this->connection->setup();
         // insert messages
         // one currently handled
         $this->driverConnection->insert('messenger_messages', [
@@ -108,6 +107,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testItCountMessages()
     {
+        $this->connection->setup();
         // insert messages
         // one currently handled
         $this->driverConnection->insert('messenger_messages', [
@@ -148,6 +148,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout()
     {
+        $this->connection->setup();
         $twoHoursAgo = new \DateTime('now');
         $twoHoursAgo->modify('-2 hours');
         $this->driverConnection->insert('messenger_messages', [
@@ -173,10 +174,7 @@ class DoctrineIntegrationTest extends TestCase
 
     public function testTheTransportIsSetupOnGet()
     {
-        // If the table does not exist and we call the get (i.e run messenger:consume) the table must be setup
-        // so first delete the tables
-        $this->driverConnection->exec('DROP TABLE messenger_messages');
-
+        $this->assertFalse($this->driverConnection->getSchemaManager()->tablesExist('messenger_messages'));
         $this->assertNull($this->connection->get());
 
         $this->connection->send('the body', ['my' => 'header']);

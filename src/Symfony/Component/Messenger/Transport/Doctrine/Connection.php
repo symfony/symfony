@@ -51,12 +51,14 @@ class Connection
     private $configuration = [];
     private $driverConnection;
     private $schemaSynchronizer;
+    private $autoSetup;
 
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
+        $this->autoSetup = $this->configuration['auto_setup'];
     }
 
     public function getConfiguration(): array
@@ -130,9 +132,7 @@ class Connection
 
     public function get(): ?array
     {
-        if ($this->configuration['auto_setup']) {
-            $this->setup();
-        }
+        get:
         $this->driverConnection->beginTransaction();
         try {
             $query = $this->createAvailableMessagesQueryBuilder()
@@ -168,6 +168,11 @@ class Connection
             return $doctrineEnvelope;
         } catch (\Throwable $e) {
             $this->driverConnection->rollBack();
+
+            if ($this->autoSetup && $e instanceof TableNotFoundException) {
+                $this->setup();
+                goto get;
+            }
 
             throw $e;
         }
@@ -212,6 +217,8 @@ class Connection
         } else {
             $this->driverConnection->getConfiguration()->setFilterSchemaAssetsExpression($assetFilter);
         }
+
+        $this->autoSetup = false;
     }
 
     public function getMessageCount(): int
@@ -225,10 +232,6 @@ class Connection
 
     public function findAll(int $limit = null): array
     {
-        if ($this->configuration['auto_setup']) {
-            $this->setup();
-        }
-
         $queryBuilder = $this->createAvailableMessagesQueryBuilder();
         if (null !== $limit) {
             $queryBuilder->setMaxResults($limit);
@@ -243,10 +246,6 @@ class Connection
 
     public function find($id): ?array
     {
-        if ($this->configuration['auto_setup']) {
-            $this->setup();
-        }
-
         $queryBuilder = $this->createQueryBuilder()
             ->where('m.id = ?');
 
@@ -287,8 +286,12 @@ class Connection
             $stmt = $this->driverConnection->prepare($sql);
             $stmt->execute($parameters);
         } catch (TableNotFoundException $e) {
+            if ($this->driverConnection->isTransactionActive()) {
+                throw $e;
+            }
+
             // create table
-            if (!$this->driverConnection->isTransactionActive() && $this->configuration['auto_setup']) {
+            if ($this->autoSetup) {
                 $this->setup();
             }
             // statement not prepared ? SQLite throw on exception on prepare if the table does not exist

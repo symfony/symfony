@@ -16,16 +16,33 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDat
 
 class DateTimeImmutableToDateTimeTransformerTest extends TestCase
 {
-    public function testTransform()
+    /**
+     * @dataProvider provider
+     */
+    public function testTransform(\DateTime $expectedOutput, \DateTimeImmutable $input)
     {
         $transformer = new DateTimeImmutableToDateTimeTransformer();
 
-        $input = new \DateTimeImmutable('2010-02-03 04:05:06 UTC');
-        $expectedOutput = new \DateTime('2010-02-03 04:05:06 UTC');
         $actualOutput = $transformer->transform($input);
 
-        $this->assertInstanceOf(\DateTime::class, $actualOutput);
         $this->assertEquals($expectedOutput, $actualOutput);
+        $this->assertEquals($expectedOutput->getTimezone(), $actualOutput->getTimezone());
+    }
+
+    public function provider()
+    {
+        return [
+            [
+                new \DateTime('2010-02-03 04:05:06 UTC'),
+                new \DateTimeImmutable('2010-02-03 04:05:06 UTC'),
+            ],
+            [
+                (new \DateTime('2019-10-07 +11:00'))
+                    ->setTime(14, 27, 11, 10042),
+                (new \DateTimeImmutable('2019-10-07 +11:00'))
+                    ->setTime(14, 27, 11, 10042),
+            ],
+        ];
     }
 
     public function testTransformEmpty()
@@ -43,16 +60,17 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
         $transformer->transform(new \DateTime());
     }
 
-    public function testReverseTransform()
+    /**
+     * @dataProvider provider
+     */
+    public function testReverseTransform(\DateTime $input, \DateTimeImmutable $expectedOutput)
     {
         $transformer = new DateTimeImmutableToDateTimeTransformer();
 
-        $input = new \DateTime('2010-02-03 04:05:06 UTC');
-        $expectedOutput = new \DateTimeImmutable('2010-02-03 04:05:06 UTC');
         $actualOutput = $transformer->reverseTransform($input);
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $actualOutput);
         $this->assertEquals($expectedOutput, $actualOutput);
+        $this->assertEquals($expectedOutput->getTimezone(), $actualOutput->getTimezone());
     }
 
     public function testReverseTransformEmpty()

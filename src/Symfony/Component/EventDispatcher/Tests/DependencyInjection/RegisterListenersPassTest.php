@@ -14,6 +14,7 @@ namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
@@ -244,6 +245,116 @@ class RegisterListenersPassTest extends TestCase
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
+
+    public function testOmitEventNameOnTypedListener(): void
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
+        $container->register('foo', TypedListener::class)->addTag('kernel.event_listener', ['method' => 'onEvent']);
+        $container->register('bar', TypedListener::class)->addTag('kernel.event_listener');
+        $container->register('event_dispatcher');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'aliased_event',
+                    [new ServiceClosureArgument(new Reference('bar')), '__invoke'],
+                    0,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
+
+    public function testOmitEventNameOnUntypedListener(): void
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['method' => 'onEvent']);
+        $container->register('event_dispatcher');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
+
+    public function testOmitEventNameAndMethodOnUntypedListener(): void
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener');
+        $container->register('event_dispatcher');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
+
+    /**
+     * @requires PHP 7.2
+     */
+    public function testOmitEventNameAndMethodOnGenericListener(): void
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', GenericListener::class)->addTag('kernel.event_listener');
+        $container->register('event_dispatcher');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Service "foo" must define the "event" attribute on "kernel.event_listener" tags.');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
+
+    public function testOmitEventNameOnSubscriber(): void
+    {
+        $container = new ContainerBuilder();
+        $container->register('subscriber', IncompleteSubscriber::class)
+            ->addTag('kernel.event_subscriber')
+            ->addTag('kernel.event_listener')
+            ->addTag('kernel.event_listener', ['event' => 'bar', 'method' => 'onBar'])
+        ;
+        $container->register('event_dispatcher');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    'bar',
+                    [new ServiceClosureArgument(new Reference('subscriber')), 'onBar'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'foo',
+                    [new ServiceClosureArgument(new Reference('subscriber')), 'onFoo'],
+                    0,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
 }
 
 class SubscriberService implements EventSubscriberInterface
@@ -284,4 +395,44 @@ final class AliasedEvent
 
 final class CustomEvent
 {
+}
+
+final class TypedListener
+{
+    public function __invoke(AliasedEvent $event): void
+    {
+    }
+
+    public function onEvent(CustomEvent $event): void
+    {
+    }
+}
+
+final class GenericListener
+{
+    public function __invoke(object $event): void
+    {
+    }
+}
+
+final class IncompleteSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            'foo' => 'onFoo',
+        ];
+    }
+
+    public function onFoo(): void
+    {
+    }
+
+    public function onBar(): void
+    {
+    }
+
+    public function __invoke(CustomEvent $event): void
+    {
+    }
 }

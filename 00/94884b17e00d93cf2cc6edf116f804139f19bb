@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-10-04T15:19:17Z
+
+cc @yceruto who has worked on the previous PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-04T20:41:49Z
+
+My 2cts:
+
+when and only when the "event" attribute is missing:
+- look also for `public static getDefaultListenerPriority(): int`
+- skip the listener when it also has the `event_subscriber` tag
+- refuse running the added logic if `count($events) > 1`
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-10-06T09:28:39Z
+
+> * look also for `public static getDefaultListenerPriority(): int`
+
+Fine by me, although personally I'd probably use the attribute or a subscriber if I wanted to change the priority.
+
+```YAML
+services:
+    App\EventListener\:
+        resource: ../src/EventListener/*
+        tags: [kernel.event_listener]
+
+    App\EventListener\VeryImportantListener:
+        tags: [{name: kernel.event_listener, priority: 1337}]
+```
+
+> * skip the listener when it also has the `event_subscriber` tag
+
+Makes sense, but I'd prefer to throw here. The developer should know that we don't want to process a piece of configuration they gave us.
+
+> * refuse running the added logic if `count($events) > 1`
+
+That would render the following configuration invalid, that would work with my current implementation.
+
+```YAML
+services:
+    App\EventListener\MyListener:
+        tags:
+            - {name: kernel.event_listener, method: onFoo}
+            - {name: kernel.event_listener, method: onBar}
+```
+
+What would be the reason for that limitation?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-06T12:05:06Z
+
+> skip the listener when it also has the event_subscriber tag
+
+I insist on this one as that allows configuring a directory with the tag, defaulting to listeners, but allowing to augment them to subscribers, all that without touching the configuration files.
+
+Fine for the rest.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-10-06T14:15:47Z
+
+> that allows configuring a directory with the tag, defaulting to listeners, but allowing to augment them to subscribers, all that without touching the configuration files.
+
+Fair point! `kernel.event_listener` without `event` attribute is now skipped if `kernel.event_subscriber` is also present.
+
+> Fine for the rest.
+
+All right then. We can discuss/implement the functionality around `getDefaultListenerPriority()` in a separate PR if we really want that. This PR works well without it, I think.

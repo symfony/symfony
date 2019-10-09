@@ -318,7 +318,7 @@ class Connection
         $table->addColumn('id', Type::BIGINT)
             ->setAutoincrement(true)
             ->setNotnull(true);
-        $table->addColumn('body', Type::TEXT)
+        $table->addColumn('body', Type::BLOB)
             ->setNotnull(true);
         $table->addColumn('headers', Type::TEXT)
             ->setNotnull(true);

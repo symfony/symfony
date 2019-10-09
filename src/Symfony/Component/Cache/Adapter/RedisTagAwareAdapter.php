@@ -97,7 +97,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         }
 
         // While pipeline isn't supported on RedisCluster, other setups will at least benefit from doing this in one op
-        $results = $this->pipeline(static function () use ($serialized, $lifetime, $addTagData, $delTagData) {
+        $results = $this->pipeline(static function () use ($serialized, $lifetime, $addTagData, $delTagData, $failed) {
             // Store cache items, force a ttl if none is set, as there is no MSETEX we need to set each one
             foreach ($serialized as $id => $value) {
                 yield 'setEx' => [
@@ -109,11 +109,15 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 
             // Add and Remove Tags
             foreach ($addTagData as $tagId => $ids) {
-                yield 'sAdd' => array_merge([$tagId], $ids);
+                if (!$failed || $ids = array_diff($ids, $failed)) {
+                    yield 'sAdd' => array_merge([$tagId], $ids);
+                }
             }
 
             foreach ($delTagData as $tagId => $ids) {
-                yield 'sRem' => array_merge([$tagId], $ids);
+                if (!$failed || $ids = array_diff($ids, $failed)) {
+                    yield 'sRem' => array_merge([$tagId], $ids);
+                }
             }
         });
 

@@ -427,7 +427,7 @@ final class Dotenv
             (?!\()                             # no opening parenthesis
             (?P<opening_brace>\{)?             # optional brace
             (?P<name>'.self::VARNAME_REGEX.')? # var name
-            (?P<default_value>:-[^\}]++)?      # optional default value
+            (?P<default_value>:[-=][^\}]++)?   # optional default value
             (?P<closing_brace>\})?             # optional closing brace
         /x';
 
@@ -464,6 +464,10 @@ final class Dotenv
                 }
 
                 $value = substr($matches['default_value'], 2);
+
+                if ('=' === $matches['default_value'][1]) {
+                    $this->values[$name] = $value;
+                }
             }
 
             if (!$matches['opening_brace'] && isset($matches['closing_brace'])) {

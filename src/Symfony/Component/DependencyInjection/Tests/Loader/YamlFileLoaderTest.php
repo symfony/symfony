@@ -868,4 +868,19 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertSame(Prototype\SinglyImplementedInterface\Adapter\Adapter::class, (string) $alias);
     }
+
+    public function testAlternativeMethodCalls()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('alt_call.yaml');
+
+        $expected = [
+            ['foo', [1, 2, 3]],
+            ['bar', [1, 2, 3], true],
+        ];
+
+        $this->assertSame($expected, $container->getDefinition('foo')->getMethodCalls());
+    }
 }

@@ -13,6 +13,7 @@ CHANGELOG
 -----
 
  * `AddEventAliasesPass` has been added, allowing applications and bundles to extend the event alias mapping used by `RegisterListenersPass`.
+ * Made the `event` attribute of the `kernel.event_listener` tag optional for FQCN events.
 
 4.3.0
 -----

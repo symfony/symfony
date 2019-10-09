@@ -571,17 +571,19 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the text of the first node of the list.
      *
-     * @param mixed $default             When provided and the current node is empty, this value is returned and no exception is thrown
-     * @param bool  $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
+     * Pass true as the 2nd argument to normalize whitespaces.
+     *
+     * @param string|null $default             When not null: the value to return when the current node is empty
+     * @param bool        $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
      *
      * @return string The node value
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function text($default = null, bool $normalizeWhitespace = false)
+    public function text(string $default = null, bool $normalizeWhitespace = false)
     {
         if (!$this->nodes) {
-            if (0 < \func_num_args()) {
+            if (null !== $default) {
                 return $default;
             }
 
@@ -600,16 +602,16 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the first node of the list as HTML.
      *
-     * @param mixed $default When provided and the current node is empty, this value is returned and no exception is thrown
+     * @param string|null $default When not null: the value to return when the current node is empty
      *
      * @return string The node html
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function html($default = null)
+    public function html(string $default = null)
     {
         if (!$this->nodes) {
-            if (0 < \func_num_args()) {
+            if (null !== $default) {
                 return $default;
             }
 

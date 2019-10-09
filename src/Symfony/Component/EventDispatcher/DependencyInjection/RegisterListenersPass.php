@@ -16,8 +16,10 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\Event as LegacyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
@@ -67,8 +69,14 @@ class RegisterListenersPass implements CompilerPassInterface
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
                 if (!isset($event['event'])) {
-                    throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $this->listenerTag));
+                    if ($container->getDefinition($id)->hasTag($this->subscriberTag)) {
+                        continue;
+                    }
+
+                    $event['method'] = $event['method'] ?? '__invoke';
+                    $event['event'] = $this->getEventFromTypeDeclaration($container, $id, $event['method']);
                 }
+
                 $event['event'] = $aliases[$event['event']] ?? $event['event'];
 
                 if (!isset($event['method'])) {
@@ -121,6 +129,24 @@ class RegisterListenersPass implements CompilerPassInterface
             $extractingDispatcher->listeners = [];
             ExtractingEventDispatcher::$aliases = [];
         }
+    }
+
+    private function getEventFromTypeDeclaration(ContainerBuilder $container, string $id, string $method): string
+    {
+        if (
+            null === ($class = $container->getDefinition($id)->getClass())
+            || !($r = $container->getReflectionClass($class, false))
+            || !$r->hasMethod($method)
+            || 1 > ($m = $r->getMethod($method))->getNumberOfParameters()
+            || !($type = $m->getParameters()[0]->getType())
+            || $type->isBuiltin()
+            || Event::class === ($name = $type->getName())
+            || LegacyEvent::class === $name
+        ) {
+            throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $this->listenerTag));
+        }
+
+        return $name;
     }
 }
 

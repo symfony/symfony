@@ -166,6 +166,10 @@ class DotenvTest extends TestCase
             ["FOO=BAR\nBAR=\${NOTDEFINED:-TEST}", ['FOO' => 'BAR', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\${FOO:-TEST}", ['FOO' => '', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\$FOO:-TEST}", ['FOO' => '', 'BAR' => 'TEST}']],
+            ["FOO=BAR\nBAR=\${FOO:=TEST}", ['FOO' => 'BAR', 'BAR' => 'BAR']],
+            ["FOO=BAR\nBAR=\${NOTDEFINED:=TEST}", ['FOO' => 'BAR', 'NOTDEFINED' => 'TEST', 'BAR' => 'TEST']],
+            ["FOO=\nBAR=\${FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST']],
+            ["FOO=\nBAR=\$FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST}']],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {

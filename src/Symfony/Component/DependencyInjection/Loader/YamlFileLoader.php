@@ -459,20 +459,48 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('Parameter "calls" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
             }
 
-            foreach ($service['calls'] as $call) {
+            foreach ($service['calls'] as $k => $call) {
+                if (!\is_array($call) && (!\is_string($k) || !$call instanceof TaggedValue)) {
+                    throw new InvalidArgumentException(sprintf('Invalid method call for service "%s": expected map or array, %s given in %s.', $id, $call instanceof TaggedValue ? '!'.$call->getTag() : \gettype($call), $file));
+                }
+
+                if (\is_string($k)) {
+                    throw new InvalidArgumentException(sprintf('Invalid method call for service "%s", did you forgot a leading dash before "%s: ..." in %s?', $id, $k, $file));
+                }
+
                 if (isset($call['method'])) {
                     $method = $call['method'];
-                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments'], $file) : [];
+                    $args = $call['arguments'] ?? [];
                     $returnsClone = $call['returns_clone'] ?? false;
                 } else {
-                    $method = $call[0];
-                    $args = isset($call[1]) ? $this->resolveServices($call[1], $file) : [];
-                    $returnsClone = $call[2] ?? false;
+                    if (1 === \count($call) && \is_string(key($call))) {
+                        $method = key($call);
+                        $args = $call[$method];
+
+                        if ($args instanceof TaggedValue) {
+                            if ('returns_clone' !== $args->getTag()) {
+                                throw new InvalidArgumentException(sprintf('Unsupported tag "!%s", did you mean "!returns_clone" for service "%s" in %s?', $args->getTag(), $id, $file));
+                            }
+
+                            $returnsClone = true;
+                            $args = $args->getValue();
+                        } else {
+                            $returnsClone = false;
+                        }
+                    } elseif (empty($call[0])) {
+                        throw new InvalidArgumentException(sprintf('Invalid call for service "%s": the method must be defined as the first index of an array or as the only key of a map in %s.', $id, $file));
+                    } else {
+                        $method = $call[0];
+                        $args = $call[1] ?? [];
+                        $returnsClone = $call[2] ?? false;
+                    }
                 }
 
                 if (!\is_array($args)) {
                     throw new InvalidArgumentException(sprintf('The second parameter for function call "%s" must be an array of its arguments for service "%s" in %s. Check your YAML syntax.', $method, $id, $file));
                 }
+
+                $args = $this->resolveServices($args, $file);
                 $definition->addMethodCall($method, $args, $returnsClone);
             }
         }

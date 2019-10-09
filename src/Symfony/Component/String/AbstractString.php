@@ -226,6 +226,16 @@ abstract class AbstractString implements \JsonSerializable
     }
 
     /**
+     * @return int[]
+     */
+    public function bytesAt(int $offset): array
+    {
+        $str = $this->slice($offset, 1);
+
+        return '' === $str->string ? [] : array_values(unpack('C*', $str->string));
+    }
+
+    /**
      * @return static
      */
     abstract public function camel(): self;

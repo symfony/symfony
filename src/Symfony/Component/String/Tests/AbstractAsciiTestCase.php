@@ -35,6 +35,27 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
+     * @dataProvider provideBytesAt
+     */
+    public function testBytesAt(array $expected, string $string, int $offset, int $form = null)
+    {
+        $instance = static::createFromString($string);
+        $instance = $form ? $instance->normalize($form) : $instance;
+
+        $this->assertSame($expected, $instance->bytesAt($offset));
+    }
+
+    public static function provideBytesAt(): array
+    {
+        return [
+            [[], '', 0],
+            [[], 'a', 1],
+            [[0x62], 'abc', 1],
+            [[0x63], 'abcde', -3],
+        ];
+    }
+
+    /**
      * @dataProvider provideWrap
      */
     public function testWrap(array $expected, array $values)

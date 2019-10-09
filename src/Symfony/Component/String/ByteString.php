@@ -43,11 +43,11 @@ class ByteString extends AbstractString
         return new static(substr($string, 0, $length));
     }
 
-    public function byteCode(int $offset = 0): ?int
+    public function bytesAt(int $offset): array
     {
-        $str = $offset ? $this->slice($offset, 1) : $this;
+        $str = $this->string[$offset] ?? '';
 
-        return '' === $str->string ? null : \ord($str->string);
+        return '' === $str ? [] : [\ord($str)];
     }
 
     public function append(string ...$suffix): parent

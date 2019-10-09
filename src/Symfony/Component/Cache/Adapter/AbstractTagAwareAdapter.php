@@ -150,6 +150,16 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     abstract protected function doInvalidate(array $tagIds): bool;
 
     /**
+     * Returns the tags bound to the provided ids.
+     */
+    protected function doFetchTags(array $ids): iterable
+    {
+        foreach ($this->doFetch($ids) as $id => $value) {
+            yield $id => \is_array($value) && \is_array($value['tags'] ?? null) ? $value['tags'] : [];
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return bool
@@ -233,8 +243,8 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         }
 
         try {
-            foreach ($this->doFetch($ids) as $id => $value) {
-                foreach ($value['tags'] ?? [] as $tag) {
+            foreach ($this->doFetchTags($ids) as $id => $tags) {
+                foreach ($tags as $tag) {
                     $tagData[$this->getId(self::TAGS_PREFIX.$tag)][] = $id;
                 }
             }

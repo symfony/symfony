@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\FilesystemTrait;
 
@@ -37,7 +37,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
 
     public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null, MarshallerInterface $marshaller = null)
     {
-        $this->marshaller = $marshaller ?? new DefaultMarshaller();
+        $this->marshaller = new TagAwareMarshaller($marshaller);
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);
     }
@@ -128,6 +128,40 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
         }
 
         return $failed;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doFetchTags(array $ids): iterable
+    {
+        foreach ($ids as $id) {
+            $file = $this->getFile($id);
+            if (!file_exists($file) || !$h = @fopen($file, 'rb')) {
+                continue;
+            }
+
+            $meta = explode("\n", fread($h, 4096), 3)[2] ?? '';
+
+            // detect the compact format used in marshall() using magic numbers in the form 9D-..-..-..-..-00-..-..-..-5F
+            if (13 < \strlen($meta) && "\x9D" === $meta[0] && "\0" === $meta[5] && "\x5F" === $meta[9]) {
+                $meta[9] = "\0";
+                $tagLen = unpack('Nlen', $meta, 9)['len'];
+                $meta = substr($meta, 13, $tagLen);
+
+                if (0 < $tagLen -= \strlen($meta)) {
+                    $meta .= fread($h, $tagLen);
+                }
+
+                try {
+                    yield $id => '' === $meta ? [] : $this->marshaller->unmarshall($meta);
+                } catch (\Exception $e) {
+                    yield $id => [];
+                }
+            }
+
+            fclose($h);
+        }
     }
 
     /**

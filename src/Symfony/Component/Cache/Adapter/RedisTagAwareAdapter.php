@@ -16,6 +16,7 @@ use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Response\Status;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 /**
@@ -67,7 +68,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, \get_class($redisClient->getConnection())));
         }
 
-        $this->init($redisClient, $namespace, $defaultLifetime, $marshaller);
+        $this->init($redisClient, $namespace, $defaultLifetime, new TagAwareMarshaller($marshaller));
     }
 
     /**
@@ -117,6 +118,42 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         }
 
         return $failed;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doFetchTags(array $ids): iterable
+    {
+        $lua = <<<'EOLUA'
+            local v = redis.call('GET', KEYS[1])
+
+            if not v or v:len() <= 13 or v:byte(1) ~= 0x9D or v:byte(6) ~= 0 or v:byte(10) ~= 0x5F then
+                return ''
+            end
+
+            return v:sub(14, 13 + v:byte(13) + v:byte(12) * 256 + v:byte(11) * 65536)
+EOLUA;
+
+        if ($this->redis instanceof \Predis\ClientInterface) {
+            $evalArgs = [$lua, 1, &$id];
+        } else {
+            $evalArgs = [$lua, [&$id], 1];
+        }
+
+        $results = $this->pipeline(function () use ($ids, &$id, $evalArgs) {
+            foreach ($ids as $id) {
+                yield 'eval' => $evalArgs;
+            }
+        });
+
+        foreach ($results as $id => $result) {
+            try {
+                yield $id => !\is_string($result) || '' === $result ? [] : $this->marshaller->unmarshall($result);
+            } catch (\Exception $e) {
+                yield $id => [];
+            }
+        }
     }
 
     /**

@@ -131,7 +131,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return \is_object($data) && !$data instanceof \Traversable && !$data instanceof \stdClass;
+        return \is_object($data) && !$data instanceof \Traversable;
     }
 
     /**
@@ -139,6 +139,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        if (\stdClass::class === get_class($object)) {
+            return $this->normalizeStdClassObject($object, $format, $context);
+        }
+
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
@@ -629,5 +633,28 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // The context cannot be serialized, skip the cache
             return false;
         }
+    }
+
+    /**
+     * @param \stdClass   $object
+     * @param string|null $format
+     * @param array       $context
+     *
+     * @return mixed
+     *
+     * @throws LogicException
+     */
+    private function normalizeStdClassObject(\stdClass $object, $format = null, array $context = [])
+    {
+        $normalized = [];
+        foreach ($object as $key => $val) {
+            if (!$this->serializer instanceof NormalizerInterface) {
+                throw new LogicException(sprintf('Cannot normalize value for key "%s" because the injected serializer is not a normalizer', $key));
+            }
+
+            $normalized[$key] = $this->serializer->normalize($val, $format, $context);
+        }
+
+        return $normalized;
     }
 }

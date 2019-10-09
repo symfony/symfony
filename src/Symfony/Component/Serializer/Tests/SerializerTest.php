@@ -83,7 +83,7 @@ class SerializerTest extends TestCase
     {
         $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $serializer = new Serializer([$this->getMockBuilder('Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock()]);
-        $serializer->normalize(new EmptyDummy(), 'xml');
+        $serializer->normalize(new \stdClass(), 'xml');
     }
 
     public function testNormalizeTraversable()
@@ -104,7 +104,7 @@ class SerializerTest extends TestCase
     {
         $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
         $serializer = new Serializer([new TestDenormalizer()], []);
-        $this->assertTrue($serializer->normalize(new EmptyDummy(), 'json'));
+        $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
     }
 
     public function testDenormalizeNoMatch()

@@ -156,7 +156,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $data;
         }
 
-        if (\is_array($data) || $data instanceof \Traversable || $data instanceof \stdClass) {
+        if (\is_array($data) || $data instanceof \Traversable) {
             $normalized = [];
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);

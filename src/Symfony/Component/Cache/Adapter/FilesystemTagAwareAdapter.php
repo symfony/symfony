@@ -16,7 +16,6 @@ use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\FilesystemTrait;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Stores tag id <> cache id relationship as a symlink, and lookup on invalidation calls.
@@ -29,19 +28,14 @@ use Symfony\Component\Filesystem\Filesystem;
 class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {
     use FilesystemTrait {
-        doSave as doSaveCache;
-        doDelete as doDeleteCache;
+        doSave as private doSaveCache;
+        doDelete as private doDeleteCache;
     }
 
     /**
      * Folder used for tag symlinks.
      */
     private const TAG_FOLDER = 'tags';
-
-    /**
-     * @var Filesystem|null
-     */
-    private $fs;
 
     public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null, MarshallerInterface $marshaller = null)
     {
@@ -57,7 +51,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     {
         $failed = $this->doSaveCache($values, $lifetime);
 
-        $fs = $this->getFilesystem();
         // Add Tags as symlinks
         foreach ($addTagData as $tagId => $ids) {
             $tagFolder = $this->getTagFolder($tagId);
@@ -67,12 +60,15 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                 }
 
                 $file = $this->getFile($id);
-                $fs->symlink($file, $this->getFile($id, true, $tagFolder));
+
+                if (!@symlink($file, $this->getFile($id, true, $tagFolder))) {
+                    @unlink($file);
+                    $failed[] = $id;
+                }
             }
         }
 
         // Unlink removed Tags
-        $files = [];
         foreach ($removeTagData as $tagId => $ids) {
             $tagFolder = $this->getTagFolder($tagId);
             foreach ($ids as $id) {
@@ -80,10 +76,9 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                     continue;
                 }
 
-                $files[] = $this->getFile($id, false, $tagFolder);
+                @unlink($this->getFile($id, false, $tagFolder));
             }
         }
-        $fs->remove($files);
 
         return $failed;
     }
@@ -96,15 +91,12 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
         $ok = $this->doDeleteCache($ids);
 
         // Remove tags
-        $files = [];
-        $fs = $this->getFilesystem();
         foreach ($tagData as $tagId => $idMap) {
             $tagFolder = $this->getTagFolder($tagId);
             foreach ($idMap as $id) {
-                $files[] = $this->getFile($id, false, $tagFolder);
+                @unlink($this->getFile($id, false, $tagFolder));
             }
         }
-        $fs->remove($files);
 
         return $ok;
     }
@@ -135,11 +127,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
         }
 
         return true;
-    }
-
-    private function getFilesystem(): Filesystem
-    {
-        return $this->fs ?? $this->fs = new Filesystem();
     }
 
     private function getTagFolder(string $tagId): string

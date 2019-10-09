@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-08-06T09:56:02Z
+
+`:=` actually should assign too. I'm not sure we need it, since the same can be achieved using `:-`.
+
+![image](https://user-images.githubusercontent.com/243674/62530579-1d91f300-b841-11e9-858e-9619f066cba2.png)

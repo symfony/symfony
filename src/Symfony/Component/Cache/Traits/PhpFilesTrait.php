@@ -54,7 +54,7 @@ trait PhpFilesTrait
 
         set_error_handler($this->includeHandler);
         try {
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+            foreach ($this->scanHashDir($this->directory) as $file) {
                 try {
                     if (\is_array($expiresAt = include $file)) {
                         $expiresAt = $expiresAt[0];

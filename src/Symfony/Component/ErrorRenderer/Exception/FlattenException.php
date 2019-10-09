@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  * Basically, this class removes all objects from the trace.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
  */
 class FlattenException
 {
@@ -36,6 +38,11 @@ class FlattenException
     private $headers;
     private $file;
     private $line;
+
+    public static function create(\Exception $exception, int $statusCode = null, array $headers = []): self
+    {
+        return static::createFromThrowable($exception, $statusCode, $headers);
+    }
 
     public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
     {
@@ -372,20 +379,5 @@ class FlattenException
         }
 
         return rtrim($message);
-    }
-}
-
-namespace Symfony\Component\Debug\Exception;
-
-if (!class_exists(FlattenException::class, false)) {
-    class_alias(\Symfony\Component\ErrorRenderer\Exception\FlattenException::class, FlattenException::class);
-}
-
-if (false) {
-    /**
-     * @deprecated since Symfony 4.4, use Symfony\Component\ErrorRenderer\Exception\FlattenException instead.
-     */
-    class FlattenException extends \Symfony\Component\ErrorRenderer\Exception\FlattenException
-    {
     }
 }

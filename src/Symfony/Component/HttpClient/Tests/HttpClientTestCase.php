@@ -19,4 +19,32 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
     {
         $this->markTestSkipped('Implemented as of version 4.4');
     }
+
+    public function testAcceptHeader()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057');
+        $requestHeaders = $response->toArray();
+
+        $this->assertSame('*/*', $requestHeaders['HTTP_ACCEPT']);
+
+        $response = $client->request('GET', 'http://localhost:8057', [
+            'headers' => [
+                'Accept' => 'foo/bar',
+            ],
+        ]);
+        $requestHeaders = $response->toArray();
+
+        $this->assertSame('foo/bar', $requestHeaders['HTTP_ACCEPT']);
+
+        $response = $client->request('GET', 'http://localhost:8057', [
+            'headers' => [
+                'Accept' => null,
+            ],
+        ]);
+        $requestHeaders = $response->toArray();
+
+        $this->assertArrayNotHasKey('HTTP_ACCEPT', $requestHeaders);
+    }
 }

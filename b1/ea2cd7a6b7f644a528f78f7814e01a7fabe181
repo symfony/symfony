@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-08T12:39:45Z
+
+This list is updated from the list in the Apache HTTPD server and in mimemagic.
+
+I'm not sure it makes sense to accept direct contributions there instead of contributing them upstream.
+
+---------------------------------------------------------------------------
+
+by 0xB4LINT at 2019-10-08T12:51:44Z
+
+I didn't find any reference/documentation to `image/svg` MIME type besides PHP (see the [Gist](https://gist.github.com/0xB4LINT/0d90ddaa02c91147635667b2a8b90f9b)).
+So I thought handling it via Symfony would be an effective solution.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-08T12:59:58Z
+
+well, the gist shows that using PHP might detect the mime type as `image/svg`. It does not prove that it impacts only PHP, as it does not use anything than PHP.
+And I used the same files to prove that it is not specific to PHP:
+
+```shell
+$ file -b --mime image-svg.svg
+image/svg; charset=us-ascii
+$ file -b --mime image-svg-xml.svg
+image/svg+xml; charset=us-ascii
+```
+
+---------------------------------------------------------------------------
+
+by 0xB4LINT at 2019-10-08T13:29:16Z
+
+Thanks for your help @stof!
+What do you think which upstream would be a better choice? Apache HTTPD or MimeMagic? Or both?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-08T13:56:52Z
+
+I'm not sure whether HTTPD is using the list to find the extension for a mime type or to find the mime type for an extension. This is what will determine whether they need this change (as the `svg` extension is already registered there). In doubt, I would submit it and see what their decision is.
+
+Regarding MimeMagic, they are themselves vendoring the freedesktop.org mime database (our script probably takes the file from MimeMagic rather than the original source because it was easier to do). So a request may be submitted to https://freedesktop.org/wiki/Software/shared-mime-info/
+I don't know what their rules are to accept contributions, but that's worth a submission of the issue IMO.
+
+---------------------------------------------------------------------------
+
+by 0xB4LINT at 2019-10-09T14:34:22Z
+
+I've investigated on `image/svg` MIME type, here's what I've found:
+
+It seems the incident source is from `file (1)` (http://www.darwinsys.com/file/) command.
+`image/svg` MIME was introduced in **2015-11-29** via this commit: https://github.com/file/file/commit/bc86bfe4212af7bde8f5e113c61ff8d54e644fad
+It was removed a few days ago: **2019-09-30** via this commit: https://github.com/file/file/commit/1a08bb5c235700ba623ffa6f3c95938fe295b262 - tracked in [MantisBT](https://bugs.astron.com/view.php?id=108))
+
+So this bug/feature was present for almost 4 years and meantime was included in multiple Linux distro / macOS.
+
+Let me present a basic real-life situation where it can be an issue:
+there's a website with a form and users are required to upload an image file, after upload it's validated on server-side and guessed it's extension using the file's MIME type (via Symfony's Mime component), then validates whether the extension is whitelisted... but if the OS is from the last 4 years and the user uploaded a valid (maybe minified) SVG file, then it will be rejected.
+
+It's clear `image/svg` isn't an accepted MIME type but it can easily cause an error in application level as long as the operating system's `file` command version is from the ~4 years window.
+
+What do you think is this topic deserve a temporary fix on Symfony's side?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-10-09T15:16:32Z
+
+Could we ensure a specific file version in the mime component? Same as we do for curl for some special “features”?
+Or do I miss something in the discussion?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-09T15:21:58Z
+
+We might want to add a list of legacy MIME types for this situation...
+
+---------------------------------------------------------------------------
+
+by 0xB4LINT at 2019-10-09T15:50:28Z
+
+@nicolas-grekas I think this situation is a little different, it's about how it currently works on (almost) any environment (even in LTS distros).
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-09T16:46:40Z
+
+Well, I'm totally in favor of including `image/svg` in the list. My request before was to make sure that we don't limit that fix to Symfony while we are reusing the work done by some upstream lists.

@@ -47,6 +47,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $requestHeaders = $response->toArray();
 
         $this->assertArrayNotHasKey('HTTP_ACCEPT', $requestHeaders);
+    }
 
     public function testToStream()
     {

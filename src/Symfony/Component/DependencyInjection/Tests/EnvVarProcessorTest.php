@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class EnvVarProcessorTest extends TestCase
 {
@@ -594,5 +595,18 @@ CSV;
         $this->assertNull($result);
 
         $this->assertSame(2, $index);
+    }
+
+    public function testGetEnvInvalidPrefixWithDefault()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported env var prefix');
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('unknown', 'default::FAKE', function ($name) {
+            $this->assertSame('default::FAKE', $name);
+
+            return null;
+        });
     }
 }

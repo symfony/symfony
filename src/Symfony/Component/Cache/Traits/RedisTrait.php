@@ -445,25 +445,26 @@ trait RedisTrait
             $results = [];
             foreach ($generator() as $command => $args) {
                 $results[] = $redis->{$command}(...$args);
-                $ids[] = $args[0];
+                $ids[] = 'eval' === $command ? ($redis instanceof \Predis\ClientInterface ? $args[2] : $args[1][0]) : $args[0];
             }
         } elseif ($redis instanceof \Predis\ClientInterface) {
             $results = $redis->pipeline(static function ($redis) use ($generator, &$ids) {
                 foreach ($generator() as $command => $args) {
                     $redis->{$command}(...$args);
-                    $ids[] = $args[0];
+                    $ids[] = 'eval' === $command ? $args[2] : $args[0];
                 }
             });
         } elseif ($redis instanceof \RedisArray) {
             $connections = $results = $ids = [];
             foreach ($generator() as $command => $args) {
-                if (!isset($connections[$h = $redis->_target($args[0])])) {
+                $id = 'eval' === $command ? $args[1][0] : $args[0];
+                if (!isset($connections[$h = $redis->_target($id)])) {
                     $connections[$h] = [$redis->_instance($h), -1];
                     $connections[$h][0]->multi(\Redis::PIPELINE);
                 }
                 $connections[$h][0]->{$command}(...$args);
                 $results[] = [$h, ++$connections[$h][1]];
-                $ids[] = $args[0];
+                $ids[] = $id;
             }
             foreach ($connections as $h => $c) {
                 $connections[$h] = $c[0]->exec();
@@ -475,7 +476,7 @@ trait RedisTrait
             $redis->multi(\Redis::PIPELINE);
             foreach ($generator() as $command => $args) {
                 $redis->{$command}(...$args);
-                $ids[] = $args[0];
+                $ids[] = 'eval' === $command ? $args[1][0] : $args[0];
             }
             $results = $redis->exec();
         }

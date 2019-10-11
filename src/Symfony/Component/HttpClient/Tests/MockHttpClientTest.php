@@ -36,6 +36,7 @@ class MockHttpClientTest extends HttpClientTestCase
     "SERVER_NAME": "127.0.0.1",
     "REQUEST_URI": "/",
     "REQUEST_METHOD": "GET",
+    "HTTP_ACCEPT": "*/*",
     "HTTP_FOO": "baR",
     "HTTP_HOST": "localhost:8057"
 }';
@@ -112,6 +113,12 @@ class MockHttpClientTest extends HttpClientTestCase
                     ->willThrowException(new TransportException('Timeout'));
 
                 $responses[] = $mock;
+                break;
+
+            case 'testAcceptHeader':
+                $responses[] = new MockResponse($body, ['response_headers' => $headers]);
+                $responses[] = new MockResponse(str_replace('*/*', 'foo/bar', $body), ['response_headers' => $headers]);
+                $responses[] = new MockResponse(str_replace('"HTTP_ACCEPT": "*/*",', '', $body), ['response_headers' => $headers]);
                 break;
 
             case 'testResolve':

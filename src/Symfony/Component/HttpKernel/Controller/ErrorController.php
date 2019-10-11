@@ -37,12 +37,12 @@ class ErrorController
         $this->errorRenderer = $errorRenderer;
     }
 
-    public function __invoke(Request $request, FlattenException $exception): Response
+    public function __invoke(Request $request, FlattenException $e): Response
     {
         try {
-            return new Response($this->errorRenderer->render($exception, $request->getPreferredFormat()), $exception->getStatusCode(), $exception->getHeaders());
-        } catch (ErrorRendererNotFoundException $e) {
-            return new Response($this->errorRenderer->render($exception), $exception->getStatusCode(), $exception->getHeaders());
+            return new Response($this->errorRenderer->render($e, $request->getPreferredFormat()), $e->getStatusCode(), $e->getHeaders());
+        } catch (ErrorRendererNotFoundException $_) {
+            return new Response($this->errorRenderer->render($e), $e->getStatusCode(), $e->getHeaders());
         }
     }
 
@@ -57,7 +57,7 @@ class ErrorController
          */
         $subRequest = $request->duplicate(null, null, [
             '_controller' => $this->controller,
-            'exception' => $exception,
+            'e' => $exception,
             'logger' => null,
             'showException' => false,
         ]);

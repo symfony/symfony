@@ -42,7 +42,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
+use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -122,7 +122,7 @@ class Application implements ResetInterface
 
         $renderException = function (\Throwable $e) use ($output) {
             if (!$e instanceof \Exception) {
-                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+                $e = class_exists(ErrorException::class) ? new ErrorException($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
             }
             if ($output instanceof ConsoleOutputInterface) {
                 $this->renderException($e, $output->getErrorOutput());

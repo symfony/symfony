@@ -244,7 +244,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
 
         // Prevent curl from sending its default Accept and Expect headers
         foreach (['accept', 'expect'] as $header) {
-            if (!isset($options['normalized_headers'][$header])) {
+            if (!isset($options['normalized_headers'][$header][0])) {
                 $curlopts[CURLOPT_HTTPHEADER][] = $header.':';
             }
         }
@@ -441,7 +441,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
                 return 0 !== stripos($h, 'Host:');
             });
 
-            if (isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {
+            if (isset($options['normalized_headers']['authorization'][0]) || isset($options['normalized_headers']['cookie'][0])) {
                 $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
                     return 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:');
                 });

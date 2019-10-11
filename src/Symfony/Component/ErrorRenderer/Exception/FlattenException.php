@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ErrorRenderer\Exception;
 
-use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
+use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  * Basically, this class removes all objects from the trace.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
  */
 class FlattenException
 {
@@ -36,6 +38,11 @@ class FlattenException
     private $headers;
     private $file;
     private $line;
+
+    public static function create(\Exception $exception, int $statusCode = null, array $headers = []): self
+    {
+        return static::createFromThrowable($exception, $statusCode, $headers);
+    }
 
     public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
     {
@@ -64,7 +71,7 @@ class FlattenException
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
         $e->setTraceFromThrowable($exception);
-        $e->setClass($exception instanceof FatalThrowableError ? $exception->getOriginalClassName() : \get_class($exception));
+        $e->setClass($exception instanceof ErrorException ? $exception->getOriginalClassName() : \get_class($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
 

@@ -9,24 +9,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorHandler\FatalErrorHandler;
+namespace Symfony\Component\ErrorHandler\ErrorEnhancer;
 
-use Symfony\Component\ErrorHandler\Exception\FatalErrorException;
-use Symfony\Component\ErrorHandler\Exception\UndefinedMethodException;
+use Symfony\Component\ErrorHandler\Error\FatalError;
+use Symfony\Component\ErrorHandler\Error\UndefinedMethodError;
 
 /**
- * ErrorHandler for undefined methods.
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class UndefinedMethodFatalErrorHandler implements FatalErrorHandlerInterface
+class UndefinedMethodErrorEnhancer implements ErrorEnhancerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function handleError(array $error, FatalErrorException $exception)
+    public function enhance(\Throwable $error): ?\Throwable
     {
-        preg_match('/^Call to undefined method (.*)::(.*)\(\)$/', $error['message'], $matches);
+        if ($error instanceof FatalError) {
+            return null;
+        }
+
+        $message = $error->getMessage();
+        preg_match('/^Call to undefined method (.*)::(.*)\(\)$/', $message, $matches);
         if (!$matches) {
             return null;
         }
@@ -38,7 +41,7 @@ class UndefinedMethodFatalErrorHandler implements FatalErrorHandlerInterface
 
         if (!class_exists($className) || null === $methods = get_class_methods($className)) {
             // failed to get the class or its methods on which an unknown method was called (for example on an anonymous class)
-            return new UndefinedMethodException($message, $exception);
+            return new UndefinedMethodError($message, $error);
         }
 
         $candidates = [];
@@ -61,6 +64,6 @@ class UndefinedMethodFatalErrorHandler implements FatalErrorHandlerInterface
             $message .= "\nDid you mean to call ".$candidates;
         }
 
-        return new UndefinedMethodException($message, $exception);
+        return new UndefinedMethodError($message, $error);
     }
 }

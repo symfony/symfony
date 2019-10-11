@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
+use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -208,7 +208,7 @@ class Application extends BaseApplication
 
         foreach ($this->registrationErrors as $error) {
             if (!$error instanceof \Exception) {
-                $error = new FatalThrowableError($error);
+                $error = new ErrorException($error);
             }
 
             $this->doRenderException($error, $output);

@@ -23,14 +23,12 @@ if (true) {
     {
     }
 }
-
-?>
 --EXPECTF--
-object(Symfony\Component\ErrorHandler\Exception\ClassNotFoundException)#%d (8) {
+object(Symfony\Component\ErrorHandler\Error\ClassNotFoundError)#%d (7) {
   ["message":protected]=>
   string(138) "Attempted to load class "missing" from namespace "Symfony\Component\ErrorHandler".
 Did you forget a "use" statement for another namespace?"
-  ["string":"Exception":private]=>
+  ["string":"Error":private]=>
   string(0) ""
   ["code":protected]=>
   int(0)
@@ -38,10 +36,8 @@ Did you forget a "use" statement for another namespace?"
   string(%d) "%s"
   ["line":protected]=>
   int(%d)
-  ["trace":"Exception":private]=>
+  ["trace":"Error":private]=>
   array(%d) {%A}
-  ["previous":"Exception":private]=>
+  ["previous":"Error":private]=>
   NULL
-  ["severity":protected]=>
-  int(1)
 }

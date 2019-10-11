@@ -9,13 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorHandler\Exception;
+namespace Symfony\Component\ErrorHandler\Error;
 
-/**
- * Out of memory exception.
- *
- * @author Nicolas Grekas <p@tchwork.com>
- */
-class OutOfMemoryException extends FatalErrorException
+class OutOfMemoryError extends FatalError
 {
 }

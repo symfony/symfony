@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Symfony\Component\ErrorHandler\BufferingLogger;
+use Symfony\Component\ErrorHandler\Error\ClassNotFoundError;
+use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\ErrorHandler\Tests\Fixtures\ErrorHandlerThatUsesThePreviousOne;
@@ -518,7 +520,7 @@ class ErrorHandlerTest extends TestCase
             $logArgCheck = function ($level, $message, $context) {
                 $this->assertEquals('Fatal Parse Error: foo', $message);
                 $this->assertArrayHasKey('exception', $context);
-                $this->assertInstanceOf(\Exception::class, $context['exception']);
+                $this->assertInstanceOf(FatalError::class, $context['exception']);
             };
 
             $logger
@@ -552,7 +554,7 @@ class ErrorHandlerTest extends TestCase
 
         $handler->handleException($exception);
 
-        $this->assertInstanceOf('Symfony\Component\ErrorHandler\Exception\ClassNotFoundException', $args[0]);
+        $this->assertInstanceOf(ClassNotFoundError::class, $args[0]);
         $this->assertStringStartsWith("Attempted to load class \"IReallyReallyDoNotExistAnywhereInTheRepositoryISwear\" from the global namespace.\nDid you forget a \"use\" statement", $args[0]->getMessage());
     }
 

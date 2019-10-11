@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by andrerom at 2019-10-10T01:22:45Z
+
+What does this actually do _(is there now double serialization of value for instance?)_, and why does it do it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-10T07:25:33Z
+
+- right now, the data is stored as: `serialize([$value, $tags])`
+- this PR stores it as `serialize([serialize($value), serialize($tags))`
+
+This allows unserializing only the tags when only them are needed, in `doDelete` especially. The value is still downloaded but not unserialized anymore in this method.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-10-10T07:39:52Z
+
+> this PR stores it as serialize([serialize($value), serialize($tags))
+
+ok, that's what I thought. Anyway we can avoid the double serialization?
+As in, could be two chunks of serialized blobs with a predictable separator between them for instance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-10T07:42:02Z
+
+> As in, could be two chunks of serialized blobs with a predictable separator between them for instance.
+
+I suppose yes, I'll have a look.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-10T10:20:48Z
+
+@andrerom updated, please have a look at `TagAwareMarshaller`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-10T13:34:57Z
+
+@andrerom comments addressed hopefully.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-10T13:55:07Z
+
+>
+> Looks to add quite a bit of complexity, sure you don't want to solve this
+> by just storing tags separately in adapters where that makes sense
+
+That would be more complex to implement to me. E.g. we'd want values and
+tags to be stored on the same Redis node, fetching logic would also need to
+be patched, etc.
+
+The added code here on the contrary builds only on existing design roots.
+To me it's a first needed step that fixes the unserialization issue in a
+generic way.
+
+The split at the storage level would be an extra step to also save
+downloading the data on delete. This would benefit ppl that deal with big
+enough payloads. I'd wait for someone to report they need it before caring.
+
+> for now treat indeed serialization on delete as know issue for file system? *(until
+> we have a reliable way to do parallel and/or async file reading)*
+
+That's solved already with this PR, see previous answer too.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-10-10T19:21:22Z
+
+> E.g. we'd want values and tags to be stored on the same Redis node
+
+That would be the simple part I guess using key like `{cache-key}-tags` or similar.
+
+> first needed step that fixes the unserialization issue in a generic way.
+
+ok 👍  If we find time afterwards we can see if we can approach this using non blocking streams for Filesystem or something to contemplate splitting tags in separate files.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-10T22:28:35Z
+
+Actually for filesystem another approach would work better: we read the first bytes of the file and stop before reading the value. The data format provided by this PR allows that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-11T09:24:33Z
+
+Good news: I managed to remove over fetching for both Redis and Filesystem adapters! Once again, the solution is completely different than we originally anticipated :)

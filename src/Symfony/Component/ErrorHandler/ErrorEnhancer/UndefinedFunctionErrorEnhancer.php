@@ -9,41 +9,44 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorHandler\FatalErrorHandler;
+namespace Symfony\Component\ErrorHandler\ErrorEnhancer;
 
-use Symfony\Component\ErrorHandler\Exception\FatalErrorException;
-use Symfony\Component\ErrorHandler\Exception\UndefinedFunctionException;
+use Symfony\Component\ErrorHandler\Error\FatalError;
+use Symfony\Component\ErrorHandler\Error\UndefinedFunctionError;
 
 /**
- * ErrorHandler for undefined functions.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
+class UndefinedFunctionErrorEnhancer implements ErrorEnhancerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function handleError(array $error, FatalErrorException $exception)
+    public function enhance(\Throwable $error): ?\Throwable
     {
-        $messageLen = \strlen($error['message']);
+        if ($error instanceof FatalError) {
+            return null;
+        }
+
+        $message = $error->getMessage();
+        $messageLen = \strlen($message);
         $notFoundSuffix = '()';
         $notFoundSuffixLen = \strlen($notFoundSuffix);
         if ($notFoundSuffixLen > $messageLen) {
             return null;
         }
 
-        if (0 !== substr_compare($error['message'], $notFoundSuffix, -$notFoundSuffixLen)) {
+        if (0 !== substr_compare($message, $notFoundSuffix, -$notFoundSuffixLen)) {
             return null;
         }
 
         $prefix = 'Call to undefined function ';
         $prefixLen = \strlen($prefix);
-        if (0 !== strpos($error['message'], $prefix)) {
+        if (0 !== strpos($message, $prefix)) {
             return null;
         }
 
-        $fullyQualifiedFunctionName = substr($error['message'], $prefixLen, -$notFoundSuffixLen);
+        $fullyQualifiedFunctionName = substr($message, $prefixLen, -$notFoundSuffixLen);
         if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedFunctionName, '\\')) {
             $functionName = substr($fullyQualifiedFunctionName, $namespaceSeparatorIndex + 1);
             $namespacePrefix = substr($fullyQualifiedFunctionName, 0, $namespaceSeparatorIndex);
@@ -79,6 +82,6 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
             $message .= "\nDid you mean to call ".$candidates;
         }
 
-        return new UndefinedFunctionException($message, $exception);
+        return new UndefinedFunctionError($message, $error);
     }
 }

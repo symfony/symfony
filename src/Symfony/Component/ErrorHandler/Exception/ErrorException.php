@@ -13,12 +13,7 @@ namespace Symfony\Component\ErrorHandler\Exception;
 
 use Symfony\Component\ErrorHandler\ThrowableUtils;
 
-/**
- * Fatal Throwable Error.
- *
- * @author Nicolas Grekas <p@tchwork.com>
- */
-class FatalThrowableError extends FatalErrorException
+class ErrorException extends \ErrorException
 {
     private $originalClassName;
 
@@ -26,7 +21,7 @@ class FatalThrowableError extends FatalErrorException
     {
         $this->originalClassName = \get_class($e);
 
-        \ErrorException::__construct(
+        parent::__construct(
             $e->getMessage(),
             $e->getCode(),
             ThrowableUtils::getSeverity($e),
@@ -35,7 +30,9 @@ class FatalThrowableError extends FatalErrorException
             $e->getPrevious()
         );
 
-        $this->setTrace($e->getTrace());
+        $refl = new \ReflectionProperty(\Exception::class, 'trace');
+        $refl->setAccessible(true);
+        $refl->setValue($this, $e->getTrace());
     }
 
     public function getOriginalClassName(): string

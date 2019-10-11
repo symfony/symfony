@@ -35,7 +35,18 @@ array(1) {
   [0]=>
   string(37) "Error and exception handlers do match"
 }
-object(Symfony\Component\ErrorHandler\Exception\FatalErrorException)#%d (%d) {
+object(Symfony\Component\ErrorHandler\Error\FatalError)#%d (%d) {
+  ["error":"Symfony\Component\ErrorHandler\Error\FatalError":private]=>
+  array(4) {
+    ["type"]=>
+    int(1)
+    ["message"]=>
+    string(179) "Class Symfony\Component\ErrorHandler\Broken contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (JsonSerializable::jsonSerialize)"
+    ["file"]=>
+    string(%d) "%s"
+    ["line"]=>
+    int(%d)
+  }
   ["message":protected]=>
   string(186) "Error: Class Symfony\Component\ErrorHandler\Broken contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (JsonSerializable::jsonSerialize)"
 %a

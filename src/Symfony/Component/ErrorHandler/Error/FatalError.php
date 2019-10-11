@@ -9,18 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorHandler\Exception;
+namespace Symfony\Component\ErrorHandler\Error;
 
-/**
- * Fatal Error Exception.
- *
- * @author Konstanton Myakshin <koc-dp@yandex.ru>
- */
-class FatalErrorException extends \ErrorException
+class FatalError extends \Error
 {
-    public function __construct(string $message, int $code, int $severity, string $filename, int $lineno, int $traceOffset = null, bool $traceArgs = true, array $trace = null, \Throwable $previous = null)
+    private $error;
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param array $error An array as returned by error_get_last()
+     */
+    public function __construct(string $message, int $code, array $error, int $traceOffset = null, bool $traceArgs = true, array $trace = null)
     {
-        parent::__construct($message, $code, $severity, $filename, $lineno, $previous);
+        parent::__construct($message, $code);
+
+        $this->error = $error;
 
         if (null !== $trace) {
             if (!$traceArgs) {
@@ -28,8 +32,6 @@ class FatalErrorException extends \ErrorException
                     unset($frame['args'], $frame['this'], $frame);
                 }
             }
-
-            $this->setTrace($trace);
         } elseif (null !== $traceOffset) {
             if (\function_exists('xdebug_get_function_stack')) {
                 $trace = xdebug_get_function_stack();
@@ -63,15 +65,24 @@ class FatalErrorException extends \ErrorException
             } else {
                 $trace = [];
             }
+        }
 
-            $this->setTrace($trace);
+        foreach ([
+            'file' => $error['file'],
+            'line' => $error['line'],
+            'trace' => $trace,
+        ] as $property => $value) {
+            $refl = new \ReflectionProperty(\Error::class, $property);
+            $refl->setAccessible(true);
+            $refl->setValue($this, $value);
         }
     }
 
-    protected function setTrace(array $trace): void
+    /**
+     * {@inheritdoc}
+     */
+    public function getError(): array
     {
-        $traceReflector = new \ReflectionProperty('Exception', 'trace');
-        $traceReflector->setAccessible(true);
-        $traceReflector->setValue($this, $trace);
+        return $this->error;
     }
 }

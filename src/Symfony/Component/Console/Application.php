@@ -44,7 +44,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Debug\ErrorHandler as LegacyErrorHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError as LegacyFatalThrowableError;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\ErrorHandler\Exception\FatalThrowableError;
+use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Contracts\Service\ResetInterface;
@@ -129,7 +129,7 @@ class Application implements ResetInterface
 
         $renderException = function (\Throwable $e) use ($output) {
             if (!$e instanceof \Exception) {
-                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : (class_exists(LegacyFatalThrowableError::class) ? new LegacyFatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()));
+                $e = class_exists(ErrorException::class) ? new ErrorException($e) : (class_exists(LegacyFatalThrowableError::class) ? new LegacyFatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()));
             }
             if ($output instanceof ConsoleOutputInterface) {
                 $this->renderException($e, $output->getErrorOutput());

@@ -27,7 +27,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     use FilesystemTrait {
         doClear as private doClearCache;
         doSave as private doSaveCache;
-        doDelete as private doDeleteCache;
     }
 
     /**
@@ -133,11 +132,16 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     /**
      * {@inheritdoc}
      */
-    protected function doFetchTags(array $ids): iterable
+    protected function doDeleteYieldTags(array $ids): iterable
     {
         foreach ($ids as $id) {
             $file = $this->getFile($id);
             if (!file_exists($file) || !$h = @fopen($file, 'rb')) {
+                continue;
+            }
+
+            if ((\PHP_VERSION_ID >= 70300 || '\\' !== \DIRECTORY_SEPARATOR) && !@unlink($file)) {
+                fclose($h);
                 continue;
             }
 
@@ -161,25 +165,26 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
             }
 
             fclose($h);
+
+            if (\PHP_VERSION_ID < 70300 && '\\' === \DIRECTORY_SEPARATOR) {
+                @unlink($file);
+            }
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function doDelete(array $ids, array $tagData = []): bool
+    protected function doDeleteTagRelations(array $tagData): bool
     {
-        $ok = $this->doDeleteCache($ids);
-
-        // Remove tags
-        foreach ($tagData as $tagId => $idMap) {
+        foreach ($tagData as $tagId => $idList) {
             $tagFolder = $this->getTagFolder($tagId);
-            foreach ($idMap as $id) {
+            foreach ($idList as $id) {
                 @unlink($this->getFile($id, false, $tagFolder));
             }
         }
 
-        return $ok;
+        return true;
     }
 
     /**

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-08-09T13:38:53Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-08-09T14:18:29Z
+
+Impossible to resolve conflicts, because of 1st commit.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-09-04T16:27:54Z
+
+@fancyweb Thanks a lot for this PR, great job so far!
+
+There are still some pending failures, let me know when this is ready for you and I will take a deeper look.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-27T06:27:18Z
+
+#33038 has been merged now. @fancyweb Can you rebase this one?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-09-27T09:07:09Z
+
+@fabpot Rebase is done and CI is green.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-09-27T14:35:00Z
+
+Just repushed to take comments into account:
+
+1. Removed `FatalErrorHandlerInterface`, everything is done by `ErrorEnhancerInterface`.
+2. Removed `FatalErrorInterface` and everything related that was only necessary to know if a class not found error was "fatal" or not. We handle it but end user just can't know if the error he gets was fatal or not (well not easily).
+3. Removed `FatalErrorException` and `FatalThrowableError` in favor of `ErrorException`.

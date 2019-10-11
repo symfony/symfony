@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-10-08T16:14:15Z
+
+unicode defines a start/middle/end part: https://github.com/unicode-org/icu/blob/fd123bf023882f07bfacf51c39111be2f946d8f8/icu4c/source/data/locales/en.txt#L2008-L2019
+
+this was on my list to investigate :) not sure it fits String component, as i was already skeptical about `$glue->join($strings)` for an API.
+
+ultimately i want to format list values in ICU translation files, but the spec format is missing still :( https://github.com/tc39/proposal-intl-list-format
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-08T16:18:55Z
+
+@ro0NL I'm not trying to solve 100% of the problem but the most common that we've all been solving again and again. TC39 is another level of complexity (same reasoning about `title(true)`: it's not linguistically universal, yet it's common enough to deserve being supported out of the box.)
+
+---------------------------------------------------------------------------
+
+by gharlan at 2019-10-09T08:52:09Z
+
+What do you think about making the method static, like in Java: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#join-java.lang.CharSequence-java.lang.CharSequence...-
+
+For me, it is a kind of named special constructor for a string (and not a method for doing something with the glue string).
+`$str = UnicodeString::join($array, $glue, $lastGlue);`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-09T09:11:39Z
+
+I think it would make the method harder to discover.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-11T08:54:29Z
+
+I'm not even sure this should belong to a String component, as it is more about dealing with arrays...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-11T09:20:06Z
+
+@stof Python has it. That's a serious enough precedent to me.

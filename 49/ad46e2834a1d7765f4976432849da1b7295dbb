@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-10T11:41:36Z
+
+do we need the same for other non-bold styles ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-10T11:50:35Z
+
+@stof that's already what the remaining of the default style does to me. I didn't notice any other issues.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-10T11:51:39Z
+
+So, only `default` needs to reset bold state, not `note` or stuff like that ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-10T12:10:10Z
+
+It looks like so: there is always a default-styled character between any other style (even just a space).
+At least I didn't catch any visual glitch related to another missing state reset.

@@ -168,10 +168,12 @@ class ByteString extends AbstractString
         return '' === $this->string || preg_match('//u', $this->string);
     }
 
-    public function join(array $strings): parent
+    public function join(array $strings, string $lastGlue = null): parent
     {
         $str = clone $this;
-        $str->string = implode($str->string, $strings);
+
+        $tail = null !== $lastGlue && 1 < \count($strings) ? $lastGlue.array_pop($strings) : '';
+        $str->string = implode($this->string, $strings).$tail;
 
         return $str;
     }

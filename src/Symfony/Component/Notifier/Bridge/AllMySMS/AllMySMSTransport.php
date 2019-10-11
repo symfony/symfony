@@ -21,6 +21,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Quentin Dequippe <quentin@dequippe.tech>
+ *
+ * @experimental in 5.0
  */
 final class AllMySMSTransport extends AbstractTransport
 {
@@ -67,6 +69,7 @@ final class AllMySMSTransport extends AbstractTransport
         ]);
 
         $result = $response->toArray();
+
         if (100 != $result['status']) {
             throw new TransportException(sprintf('Unable to send the SMS: %s (%s).', $result['statusText'], $result['status']), $response);
         }

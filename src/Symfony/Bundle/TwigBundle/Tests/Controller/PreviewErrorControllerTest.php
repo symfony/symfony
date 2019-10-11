@@ -13,7 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Controller\PreviewErrorController;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

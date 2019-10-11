@@ -21,6 +21,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Quentin Dequippe <quentin@dequippe.tech>
+ *
+ * @experimental in 5.0
  */
 final class AllMySMSTransport extends AbstractTransport
 {

@@ -19,11 +19,12 @@ final class AllMySMSTransportFactory extends AbstractTransportFactory
         $scheme = $dsn->getScheme();
         $login = $this->getUser($dsn);
         $apiKey = $this->getPassword($dsn);
+        $tpoa = $dsn->getOption('tpoa');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
         if ('allmysms' === $scheme) {
-            return (new AllMySMSTransport($login, $apiKey, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+            return (new AllMySMSTransport($login, $apiKey, $this->client, $tpoa, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
         throw new UnsupportedSchemeException($dsn, 'allmysms', $this->getSupportedSchemes());

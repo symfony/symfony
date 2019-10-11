@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Notifier\Bridge\AllMySMS;
 
 use Symfony\Component\Notifier\Exception\LogicException;
@@ -60,7 +69,7 @@ final class AllMySMSTransport extends AbstractTransport
         ]);
 
         $result = $response->toArray();
-        if ($result['status'] != 100) {
+        if (100 != $result['status']) {
             throw new TransportException(sprintf('Unable to send the SMS: %s (%s).', $result['statusText'], $result['status']), $response);
         }
     }

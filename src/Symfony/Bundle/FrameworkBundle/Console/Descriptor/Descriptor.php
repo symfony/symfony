@@ -286,6 +286,25 @@ abstract class Descriptor implements DescriptorInterface
         return array_keys($maxPriority);
     }
 
+    protected function sortTagsByPriority(array $tags): array
+    {
+        $sortedTags = [];
+        foreach ($tags as $tagName => $tag) {
+            $sortedTags[$tagName] = $this->sortByPriority($tag);
+        }
+
+        return $sortedTags;
+    }
+
+    protected function sortByPriority(array $tag): array
+    {
+        usort($tag, function ($a, $b) {
+            return ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0);
+        });
+
+        return $tag;
+    }
+
     /**
      * Gets class description from a docblock.
      */

@@ -238,7 +238,7 @@ class TextDescriptor extends Descriptor
             $styledServiceId = $rawOutput ? $serviceId : sprintf('<fg=cyan>%s</fg=cyan>', OutputFormatter::escape($serviceId));
             if ($definition instanceof Definition) {
                 if ($showTag) {
-                    foreach ($definition->getTag($showTag) as $key => $tag) {
+                    foreach ($this->sortByPriority($definition->getTag($showTag)) as $key => $tag) {
                         $tagValues = [];
                         foreach ($tagsNames as $tagName) {
                             $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : '';

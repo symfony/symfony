@@ -233,7 +233,7 @@ class MarkdownDescriptor extends Descriptor
         }
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
-            foreach ($definition->getTags() as $tagName => $tagData) {
+            foreach ($this->sortTagsByPriority($definition->getTags()) as $tagName => $tagData) {
                 foreach ($tagData as $parameters) {
                     $output .= "\n".'- Tag: `'.$tagName.'`';
                     foreach ($parameters as $name => $value) {

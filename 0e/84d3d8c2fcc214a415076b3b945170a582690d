@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by andrerom at 2019-10-12T09:26:43Z
+
+That said, does the lua logic work on cluster? Didn't see any code picking different code paths for it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-12T09:29:59Z
+
+It does by design: the connection is given the key as first argument to the `eval` function and knows it's a key so that sharding/clustering can work.

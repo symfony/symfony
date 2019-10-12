@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-11T20:54:08Z
+
+I figured out the issue: calling `\GuzzleHttp\Promise\queue()->run()` in the client's loop was missing.
+
+PR ready \o/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-11T21:21:05Z
+
+For the record, the following script runs in 5s:
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+use Symfony\Component\HttpClient\HttplugClient;
+
+$client = new HttplugClient();
+
+$s = microtime(1);
+
+$client->sendAsyncRequest($client->createRequest('GET', 'https://localhost:8000/?sleep=4'));
+$client->sendAsyncRequest($client->createRequest('GET', 'https://localhost:8000/?sleep=2'))
+    ->then(function ($resp) use ($client) {
+        return $client->sendAsyncRequest($client->createRequest('GET', 'https://localhost:8000/?sleep=3'));
+    });
+
+$client->wait();
+
+dump(microtime(1) - $s);
+```

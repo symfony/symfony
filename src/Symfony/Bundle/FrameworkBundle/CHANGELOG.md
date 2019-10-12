@@ -4,7 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
- * Added `lint:container` to check that services wiring matches type declarations
+ * Added `lint:container` command to check that services wiring matches type declarations
  * Added `MailerAssertionsTrait`
  * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
  * Deprecated the `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`

@@ -17,7 +17,7 @@
         </service>
         <service id="Symfony\Component\Validator\Validator\ValidatorInterface" alias="validator" />
 
-        <service id="validator.builder" class="Symfony\Component\Validator\ValidatorBuilderInterface">
+        <service id="validator.builder" class="Symfony\Component\Validator\ValidatorBuilder">
             <factory class="Symfony\Component\Validator\Validation" method="createValidatorBuilder" />
             <call method="setConstraintValidatorFactory">
                 <argument type="service" id="validator.validator_factory" />

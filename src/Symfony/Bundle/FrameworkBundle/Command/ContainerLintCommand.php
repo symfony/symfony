@@ -15,7 +15,6 @@ use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -39,7 +38,6 @@ final class ContainerLintCommand extends Command
         $this
             ->setDescription('Ensures that arguments injected into services match type declarations')
             ->setHelp('This command parses service definitions and ensures that injected values match the type declarations of each services\' class.')
-            ->addOption('ignore-unused-services', 'o', InputOption::VALUE_NONE, 'Ignore unused services')
         ;
     }
 
@@ -50,13 +48,11 @@ final class ContainerLintCommand extends Command
     {
         $container = $this->getContainerBuilder();
 
+        $container->setParameter('container.build_hash', 'lint_container');
+        $container->setParameter('container.build_time', time());
         $container->setParameter('container.build_id', 'lint_container');
 
-        $container->addCompilerPass(
-            new CheckTypeDeclarationsPass(true),
-            $input->getOption('ignore-unused-services') ? PassConfig::TYPE_AFTER_REMOVING : PassConfig::TYPE_OPTIMIZE,
-            -5
-        );
+        $container->addCompilerPass(new CheckTypeDeclarationsPass(true), PassConfig::TYPE_AFTER_REMOVING, -100);
 
         $container->compile();
 

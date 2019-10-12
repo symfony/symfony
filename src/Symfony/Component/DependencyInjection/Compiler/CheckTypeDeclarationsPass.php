@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
@@ -79,27 +80,27 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     /**
      * @throws InvalidArgumentException When not enough parameters are defined for the method
      */
-    private function checkTypeDeclarations(Definition $checkedDefinition, \ReflectionFunctionAbstract $reflectionFunction, array $configurationArguments): void
+    private function checkTypeDeclarations(Definition $checkedDefinition, \ReflectionFunctionAbstract $reflectionFunction, array $values): void
     {
         $numberOfRequiredParameters = $reflectionFunction->getNumberOfRequiredParameters();
 
-        if (\count($configurationArguments) < $numberOfRequiredParameters) {
-            throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": "%s::%s()" requires %d arguments, %d passed.', $this->currentId, $reflectionFunction->class, $reflectionFunction->name, $numberOfRequiredParameters, \count($configurationArguments)));
+        if (\count($values) < $numberOfRequiredParameters) {
+            throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": "%s::%s()" requires %d arguments, %d passed.', $this->currentId, $reflectionFunction->class, $reflectionFunction->name, $numberOfRequiredParameters, \count($values)));
         }
 
         $reflectionParameters = $reflectionFunction->getParameters();
-        $checksCount = min($reflectionFunction->getNumberOfParameters(), \count($configurationArguments));
+        $checksCount = min($reflectionFunction->getNumberOfParameters(), \count($values));
 
         for ($i = 0; $i < $checksCount; ++$i) {
             if (!$reflectionParameters[$i]->hasType() || $reflectionParameters[$i]->isVariadic()) {
                 continue;
             }
 
-            $this->checkType($checkedDefinition, $configurationArguments[$i], $reflectionParameters[$i]);
+            $this->checkType($checkedDefinition, $values[$i], $reflectionParameters[$i]);
         }
 
         if ($reflectionFunction->isVariadic() && ($lastParameter = end($reflectionParameters))->hasType()) {
-            $variadicParameters = \array_slice($configurationArguments, $lastParameter->getPosition());
+            $variadicParameters = \array_slice($values, $lastParameter->getPosition());
 
             foreach ($variadicParameters as $variadicParameter) {
                 $this->checkType($checkedDefinition, $variadicParameter, $lastParameter);
@@ -110,63 +111,82 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     /**
      * @throws InvalidParameterTypeException When a parameter is not compatible with the declared type
      */
-    private function checkType(Definition $checkedDefinition, $configurationArgument, \ReflectionParameter $parameter): void
+    private function checkType(Definition $checkedDefinition, $value, \ReflectionParameter $parameter): void
     {
-        $parameterTypeName = $parameter->getType()->getName();
+        $type = $parameter->getType()->getName();
 
-        $referencedDefinition = $configurationArgument;
-
-        if ($referencedDefinition instanceof Reference) {
-            if (!$this->container->has($referencedDefinition)) {
+        if ($value instanceof Reference) {
+            if (!$this->container->has($value = (string) $value)) {
                 return;
             }
 
-            $referencedDefinition = $this->container->findDefinition((string) $referencedDefinition);
+            if ('service_container' === $value && is_a($type, Container::class, true)) {
+                return;
+            }
+
+            $value = $this->container->findDefinition($value);
         }
 
-        if ('self' === $parameterTypeName) {
-            $parameterTypeName = $parameter->getDeclaringClass()->getName();
-        }
-        if ('static' === $parameterTypeName) {
-            $parameterTypeName = $checkedDefinition->getClass();
+        if ('self' === $type) {
+            $type = $parameter->getDeclaringClass()->getName();
         }
 
-        if ($referencedDefinition instanceof Definition) {
-            $class = $referencedDefinition->getClass();
+        if ('static' === $type) {
+            $type = $checkedDefinition->getClass();
+        }
+
+        if ($value instanceof Definition) {
+            $class = $value->getClass();
 
             if (!$class || (!$this->autoload && !class_exists($class, false) && !interface_exists($class, false))) {
                 return;
             }
 
-            if (!is_a($class, $parameterTypeName, true)) {
-                throw new InvalidParameterTypeException($this->currentId, $class, $parameter);
-            }
-        } else {
-            if (null === $configurationArgument && $parameter->allowsNull()) {
+            if ('callable' === $type && method_exists($class, '__invoke')) {
                 return;
             }
 
-            if (\in_array($parameterTypeName, self::SCALAR_TYPES, true) && is_scalar($configurationArgument)) {
+            if ('iterable' === $type && is_subclass_of($class, 'Traversable')) {
                 return;
             }
 
-            if ('iterable' === $parameterTypeName && $configurationArgument instanceof IteratorArgument) {
+            if (is_a($class, $type, true)) {
                 return;
             }
 
-            if ('Traversable' === $parameterTypeName && $configurationArgument instanceof IteratorArgument) {
-                return;
-            }
+            throw new InvalidParameterTypeException($this->currentId, $class, $parameter);
+        }
 
-            if ($configurationArgument instanceof Parameter) {
-                return;
-            }
+        if ($value instanceof Parameter) {
+            $value = $this->container->getParameter($value);
+        } elseif (\is_string($value) && '%' === ($value[0] ?? '') && preg_match('/^%([^%]+)%$/', $value, $match)) {
+            $value = $this->container->getParameter($match[1]);
+        }
 
-            $checkFunction = sprintf('is_%s', $parameter->getType()->getName());
+        if (null === $value && $parameter->allowsNull()) {
+            return;
+        }
 
-            if (!$parameter->getType()->isBuiltin() || !$checkFunction($configurationArgument)) {
-                throw new InvalidParameterTypeException($this->currentId, \gettype($configurationArgument), $parameter);
-            }
+        if (\in_array($type, self::SCALAR_TYPES, true) && is_scalar($value)) {
+            return;
+        }
+
+        if ('callable' === $type && \is_array($value) && isset($value[0]) && ($value[0] instanceof Reference || $value[0] instanceof Definition)) {
+            return;
+        }
+
+        if ('iterable' === $type && (\is_array($value) || $value instanceof \Traversable || $value instanceof IteratorArgument)) {
+            return;
+        }
+
+        if ('Traversable' === $type && ($value instanceof \Traversable || $value instanceof IteratorArgument)) {
+            return;
+        }
+
+        $checkFunction = sprintf('is_%s', $parameter->getType()->getName());
+
+        if (!$parameter->getType()->isBuiltin() || !$checkFunction($value)) {
+            throw new InvalidParameterTypeException($this->currentId, \gettype($value), $parameter);
         }
     }
 }

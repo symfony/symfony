@@ -68,7 +68,7 @@ class MailgunApiTransport extends AbstractApiTransport
                 throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $response->getStatusCode()), $response);
             }
 
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result, $response->getStatusCode()), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $response->getContent(false), $response->getStatusCode()), $response);
         }
 
         $sentMessage->setMessageId($result['id']);

@@ -59,6 +59,10 @@ class SendgridApiTransportTest extends TestCase
             ->expects($this->once())
             ->method('getStatusCode')
             ->willReturn(202);
+        $response
+            ->expects($this->once())
+            ->method('getHeaders')
+            ->willReturn(['x-message-id' => '1']);
 
         $httpClient = $this->createMock(HttpClientInterface::class);
 

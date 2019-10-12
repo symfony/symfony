@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -41,20 +42,22 @@ class MandrillApiTransport extends AbstractApiTransport
         return sprintf('mandrill+api://%s', $this->getEndpoint());
     }
 
-    protected function doSendApi(Email $email, Envelope $envelope): ResponseInterface
+    protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/send.json', [
             'json' => $this->getPayload($email, $envelope),
         ]);
 
+        $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
-            $result = $response->toArray(false);
             if ('error' === ($result['status'] ?? false)) {
                 throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $result['code']), $response);
             }
 
             throw new HttpTransportException(sprintf('Unable to send an email (code %s).', $result['code']), $response);
         }
+
+        $sentMessage->setMessageId($result['_id']);
 
         return $response;
     }

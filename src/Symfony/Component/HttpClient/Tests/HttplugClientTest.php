@@ -75,6 +75,31 @@ class HttplugClientTest extends TestCase
         $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }
 
+    public function testWait()
+    {
+        $client = new HttplugClient(new NativeHttpClient());
+
+        $successCallableCalled = false;
+        $failureCallableCalled = false;
+        $client->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057/timeout-body'))
+            ->then(function (ResponseInterface $response) use (&$successCallableCalled) {
+                $successCallableCalled = true;
+
+                return $response;
+            }, function (\Exception $exception) use (&$failureCallableCalled) {
+                $failureCallableCalled = true;
+
+                throw $exception;
+            });
+
+        $client->wait(0);
+        $this->assertFalse($successCallableCalled, '$promise->then() should not be called yet.');
+
+        $client->wait();
+        $this->assertTrue($successCallableCalled, '$promise->then() should have been called.');
+        $this->assertFalse($failureCallableCalled, 'Failure callable should not be called when request is successful.');
+    }
+
     public function testPostRequest()
     {
         $client = new HttplugClient(new NativeHttpClient());

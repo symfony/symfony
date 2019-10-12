@@ -23,12 +23,10 @@ use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
 final class HttplugPromise implements HttplugPromiseInterface
 {
     private $promise;
-    private $cancel;
 
-    public function __construct(GuzzlePromiseInterface $promise, callable $cancel = null)
+    public function __construct(GuzzlePromiseInterface $promise)
     {
         $this->promise = $promise;
-        $this->cancel = $cancel;
     }
 
     public function then(callable $onFulfilled = null, callable $onRejected = null): self
@@ -57,17 +55,5 @@ final class HttplugPromise implements HttplugPromiseInterface
     public function wait($unwrap = true)
     {
         return $this->promise->wait($unwrap);
-    }
-
-    public function __destruct()
-    {
-        if ($this->cancel) {
-            ($this->cancel)();
-        }
-    }
-
-    public function __wakeup()
-    {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
 }

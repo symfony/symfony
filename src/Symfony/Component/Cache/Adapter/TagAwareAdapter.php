@@ -156,7 +156,12 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
         if (!$this->pool->hasItem($key)) {
             return false;
         }
-        if (!$itemTags = $this->pool->getItem(static::TAGS_PREFIX.$key)->get()) {
+
+        if (!($itemTags = $this->pool->getItem(static::TAGS_PREFIX.$key))->isHit()) {
+            return false;
+        }
+
+        if (!$itemTags = $itemTags->get()) {
             return true;
         }
 
@@ -296,7 +301,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
             }
 
             unset($tagKeys[$key]);
-            $itemTags[$key] = $item->get() ?: [];
+
+            if ($item->isHit()) {
+                $itemTags[$key] = $item->get() ?: [];
+            }
 
             if (!$tagKeys) {
                 $tagVersions = $this->getTagVersions($itemTags);

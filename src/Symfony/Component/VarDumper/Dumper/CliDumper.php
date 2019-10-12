@@ -28,7 +28,7 @@ class CliDumper extends AbstractDumper
     protected $maxStringWidth = 0;
     protected $styles = [
         // See http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-        'default' => '38;5;208',
+        'default' => '0;38;5;208',
         'num' => '1;38;5;38',
         'const' => '1;38;5;208',
         'str' => '1;38;5;113',

@@ -59,6 +59,8 @@ class ReflectionExtractorTest extends TestCase
                 '123',
                 'self',
                 'realParent',
+                'xTotals',
+                'YT',
                 'c',
                 'd',
                 'e',

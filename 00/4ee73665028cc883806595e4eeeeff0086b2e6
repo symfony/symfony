@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-08T09:16:47Z
+
+I agree with @nicolas-grekas that we should always handle BOM in the input.
+And I'm not sure we need the ByteOrderMask class.
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-10-08T10:03:39Z
+
+@nicolas-grekas so you're proposing we always add BOM to output and handle it in input (if present)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-08T10:10:25Z
+
+I'm proposing to never add the BOM in the output, and always handle it in the input.
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-10-08T10:13:02Z
+
+I'm :-1: for never adding BOM in the output as then I'm as a consumer responsible for checking whether data is serialized to CSV and if so, add BOM to it.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-08T10:22:23Z
+
+@malarzm as @nicolas-grekas said, you can still concatenate the BOM before the serialized data.
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-10-08T10:25:16Z
+
+@nicolas-grekas @stof I'm not sure when exactly you want to manually concatenate BOM, may I ask for an example how do you see it?
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-10-08T19:04:02Z
+
+@nicolas-grekas I've removed the ByteOrderMask class keeping only UTF-8 BOM in the encoder itself, the BOM is always stripped while decoding and, for now, I've left a bool switch to include BOM in encoded string as I believe this is encoder's responsibility.
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-10-13T08:46:01Z
+
+@fabpot thanks for noticing, fixed :)

@@ -157,7 +157,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
             return false;
         }
 
-        if (!($itemTags = $this->pool->getItem(static::TAGS_PREFIX.$key))->isHit()) {
+        $itemTags = $this->pool->getItem(static::TAGS_PREFIX.$key);
+
+        if (!$itemTags->isHit()) {
             return false;
         }
 

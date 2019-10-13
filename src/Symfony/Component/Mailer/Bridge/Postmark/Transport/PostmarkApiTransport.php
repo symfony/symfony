@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -41,7 +42,7 @@ class PostmarkApiTransport extends AbstractApiTransport
         return sprintf('postmark+api://%s', $this->getEndpoint());
     }
 
-    protected function doSendApi(Email $email, Envelope $envelope): ResponseInterface
+    protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/email', [
             'headers' => [
@@ -51,11 +52,12 @@ class PostmarkApiTransport extends AbstractApiTransport
             'json' => $this->getPayload($email, $envelope),
         ]);
 
+        $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
-            $error = $response->toArray(false);
-
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $error['Message'], $error['ErrorCode']), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['Message'], $result['ErrorCode']), $response);
         }
+
+        $sentMessage->setMessageId($result['MessageID']);
 
         return $response;
     }

@@ -63,11 +63,12 @@ class SesHttpTransport extends AbstractHttpTransport
             ],
         ]);
 
+        $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {
-            $error = new \SimpleXMLElement($response->getContent(false));
-
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $error->Error->Message, $error->Error->Code), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result->Error->Message, $result->Error->Code), $response);
         }
+
+        $message->setMessageId($result->SendEmailResult->MessageId);
 
         return $response;
     }

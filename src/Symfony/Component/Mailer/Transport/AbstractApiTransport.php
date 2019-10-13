@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 abstract class AbstractApiTransport extends AbstractHttpTransport
 {
-    abstract protected function doSendApi(Email $email, Envelope $envelope): ResponseInterface;
+    abstract protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface;
 
     protected function doSendHttp(SentMessage $message): ResponseInterface
     {
@@ -34,7 +34,7 @@ abstract class AbstractApiTransport extends AbstractHttpTransport
             throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: %s', __CLASS__, $e->getMessage()), 0, $e);
         }
 
-        return $this->doSendApi($email, $message->getEnvelope());
+        return $this->doSendApi($message, $email, $message->getEnvelope());
     }
 
     protected function getRecipients(Email $email, Envelope $envelope): array

@@ -51,14 +51,16 @@ class MandrillHttpTransport extends AbstractHttpTransport
             ],
         ]);
 
+        $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
-            $result = $response->toArray(false);
             if ('error' === ($result['status'] ?? false)) {
                 throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $result['code']), $response);
             }
 
             throw new HttpTransportException(sprintf('Unable to send an email (code %s).', $result['code']), $response);
         }
+
+        $message->setMessageId($result['_id']);
 
         return $response;
     }

@@ -32,9 +32,7 @@ class Message extends RawMessage
 
     public function __clone()
     {
-        if (null !== $this->headers) {
-            $this->headers = clone $this->headers;
-        }
+        $this->headers = clone $this->headers;
 
         if (null !== $this->body) {
             $this->body = clone $this->body;
@@ -86,16 +84,12 @@ class Message extends RawMessage
         }
 
         // determine the "real" sender
-        $senders = $headers->get('From')->getAddresses();
-        $sender = $senders[0];
-        if ($headers->has('Sender')) {
-            $sender = $headers->get('Sender')->getAddress();
-        } elseif (\count($senders) > 1) {
-            $headers->addMailboxHeader('Sender', $sender);
+        if (!$headers->has('Sender') && \count($froms = $headers->get('From')->getAddresses()) > 1) {
+            $headers->addMailboxHeader('Sender', $froms[0]);
         }
 
         if (!$headers->has('Message-ID')) {
-            $headers->addIdHeader('Message-ID', $this->generateMessageId($sender->getAddress()));
+            $headers->addIdHeader('Message-ID', $this->generateMessageId());
         }
 
         // remove the Bcc field which should NOT be part of the sent message
@@ -132,9 +126,17 @@ class Message extends RawMessage
         parent::ensureValidity();
     }
 
-    private function generateMessageId(string $email): string
+    public function generateMessageId(): string
     {
-        return bin2hex(random_bytes(16)).strstr($email, '@');
+        if ($this->headers->has('Sender')) {
+            $sender = $this->headers->get('Sender')->getAddress();
+        } elseif ($this->headers->has('From')) {
+            $sender = $this->headers->get('From')->getAddresses()[0];
+        } else {
+            throw new LogicException('An email must have a "From" or a "Sender" header to compute a Messsage ID.');
+        }
+
+        return bin2hex(random_bytes(16)).strstr($sender->getAddress(), '@');
     }
 
     public function __serialize(): array

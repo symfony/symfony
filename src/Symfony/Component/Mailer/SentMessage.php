@@ -22,6 +22,7 @@ class SentMessage
     private $original;
     private $raw;
     private $envelope;
+    private $messageId;
     private $debug = '';
 
     /**
@@ -31,9 +32,20 @@ class SentMessage
     {
         $message->ensureValidity();
 
-        $this->raw = $message instanceof Message ? new RawMessage($message->toIterable()) : $message;
         $this->original = $message;
         $this->envelope = $envelope;
+
+        if ($message instanceof Message) {
+            $message = clone $message;
+            $headers = $message->getHeaders();
+            if (!$headers->has('Message-ID')) {
+                $headers->addIdHeader('Message-ID', $message->generateMessageId());
+            }
+            $this->messageId = $headers->get('Message-ID')->getId();
+            $this->raw = new RawMessage($message->toIterable());
+        } else {
+            $this->raw = $message;
+        }
     }
 
     public function getMessage(): RawMessage
@@ -49,6 +61,16 @@ class SentMessage
     public function getEnvelope(): Envelope
     {
         return $this->envelope;
+    }
+
+    public function setMessageId(string $id): void
+    {
+        $this->messageId = $id;
+    }
+
+    public function getMessageId(): string
+    {
+        return $this->messageId;
     }
 
     public function getDebug(): string

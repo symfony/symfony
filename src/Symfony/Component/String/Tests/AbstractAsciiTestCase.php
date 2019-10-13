@@ -35,6 +35,31 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
+     * @dataProvider provideWrap
+     */
+    public function testWrap(array $expected, array $values)
+    {
+        $s = static::createFromString('');
+
+        $this->assertEquals($expected, $s::wrap($values));
+    }
+
+    public static function provideWrap(): array
+    {
+        return [
+            [[], []],
+            [
+                ['abc' => static::createFromString('foo'), 1, static::createFromString('bar'), 'baz' => true],
+                ['abc' => 'foo', 1, 'bar', 'baz' => true],
+            ],
+            [
+                ['a' => ['b' => static::createFromString('c'), [static::createFromString('d')]], static::createFromString('e')],
+                ['a' => ['b' => 'c', ['d']], 'e'],
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider provideLength
      */
     public function testLength(int $length, string $string)

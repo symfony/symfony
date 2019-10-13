@@ -1,13 +1,18 @@
 {
-    "name": "qdequippe/allmysms-notifier",
+    "name": "symfony/allmysms-notifier",
     "type": "symfony-bridge",
     "description": "AllMySMS Notifier Bridge",
-    "keywords": ["sms", "allMySMS", "notifier"],
+    "keywords": ["sms", "allmysms", "notifier"],
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
-            "name": "Quentin Dequippe",
-            "email": "quentin@dequippe.tech"
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {

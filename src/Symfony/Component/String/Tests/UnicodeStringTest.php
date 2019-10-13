@@ -200,4 +200,26 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             ]
         );
     }
+
+    public static function provideStartsWith()
+    {
+        return array_merge(
+            parent::provideStartsWith(),
+            [
+                [false, "cle\u{0301} prive\u{0301}e", 'cle', UnicodeString::NFD],
+                [true, "cle\u{0301} prive\u{0301}e", 'clé', UnicodeString::NFD],
+            ]
+        );
+    }
+
+    public static function provideEndsWith()
+    {
+        return array_merge(
+            parent::provideEndsWith(),
+            [
+                [false, "cle\u{0301} prive\u{0301}e", 'ee', UnicodeString::NFD],
+                [true, "cle\u{0301} prive\u{0301}e", 'ée', UnicodeString::NFD],
+            ]
+        );
+    }
 }

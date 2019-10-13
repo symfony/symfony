@@ -97,7 +97,7 @@ class ByteString extends AbstractString
             $suffix = (string) $suffix;
         }
 
-        return \strlen($this->string) - \strlen($suffix) === ($this->ignoreCase ? strripos($this->string, $suffix) : strrpos($this->string, $suffix));
+        return '' !== $suffix && \strlen($this->string) >= \strlen($suffix) && 0 === substr_compare($this->string, $suffix, -\strlen($suffix), null, $this->ignoreCase);
     }
 
     public function equalsTo($string): bool
@@ -362,7 +362,7 @@ class ByteString extends AbstractString
             return parent::startsWith($prefix);
         }
 
-        return '' !== $prefix && 0 === ($this->ignoreCase ? stripos($this->string, $prefix) : strpos($this->string, $prefix));
+        return '' !== $prefix && 0 === ($this->ignoreCase ? strncasecmp($this->string, $prefix, \strlen($prefix)) : strncmp($this->string, $prefix, \strlen($prefix)));
     }
 
     public function title(bool $allWords = false): parent

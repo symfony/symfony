@@ -859,9 +859,12 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideStartsWith
      */
-    public function testStartsWith(bool $expected, string $origin, $prefix)
+    public function testStartsWith(bool $expected, string $origin, $prefix, int $form = null)
     {
-        $this->assertSame($expected, static::createFromString($origin)->startsWith($prefix));
+        $instance = static::createFromString($origin);
+        $instance = $form ? $instance->normalize($form) : $instance;
+
+        $this->assertSame($expected, $instance->startsWith($prefix));
     }
 
     public static function provideStartsWith()
@@ -910,9 +913,12 @@ abstract class AbstractAsciiTestCase extends TestCase
     /**
      * @dataProvider provideEndsWith
      */
-    public function testEndsWith(bool $expected, string $origin, $suffix)
+    public function testEndsWith(bool $expected, string $origin, $suffix, int $form = null)
     {
-        $this->assertSame($expected, static::createFromString($origin)->endsWith($suffix));
+        $instance = static::createFromString($origin);
+        $instance = $form ? $instance->normalize($form) : $instance;
+
+        $this->assertSame($expected, $instance->endsWith($suffix));
     }
 
     public static function provideEndsWith()

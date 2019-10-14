@@ -614,7 +614,7 @@ CSV
         $value = [mb_convert_encoding('ÄÖÜ', 'ISO-8859-1', 'UTF-8')];
 
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('You are trying to add an UTF-8 BOM to a non UTF-8 text.');
+        $this->expectExceptionMessage('You are trying to add a UTF-8 BOM to a non UTF-8 text.');
         $this->encoder->encode($value, 'csv', [CsvEncoder::OUTPUT_UTF8_BOM_KEY => true]);
     }
 

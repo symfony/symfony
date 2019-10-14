@@ -123,10 +123,11 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doFetchTags(array $ids): iterable
+    protected function doDeleteYieldTags(array $ids): iterable
     {
         $lua = <<<'EOLUA'
             local v = redis.call('GET', KEYS[1])
+            redis.call('DEL', KEYS[1])
 
             if not v or v:len() <= 13 or v:byte(1) ~= 0x9D or v:byte(6) ~= 0 or v:byte(10) ~= 0x5F then
                 return ''
@@ -159,25 +160,12 @@ EOLUA;
     /**
      * {@inheritdoc}
      */
-    protected function doDelete(array $ids, array $tagData = []): bool
+    protected function doDeleteTagRelations(array $tagData): bool
     {
-        if (!$ids) {
-            return true;
-        }
-
-        $predisCluster = $this->redis instanceof \Predis\ClientInterface && $this->redis->getConnection() instanceof PredisCluster;
-        $this->pipeline(static function () use ($ids, $tagData, $predisCluster) {
-            if ($predisCluster) {
-                // Unlike phpredis, Predis does not handle bulk calls for us against cluster
-                foreach ($ids as $id) {
-                    yield 'del' => [$id];
-                }
-            } else {
-                yield 'del' => $ids;
-            }
-
+        $this->pipeline(static function () use ($tagData) {
             foreach ($tagData as $tagId => $idList) {
-                yield 'sRem' => array_merge([$tagId], $idList);
+                array_unshift($idList, $tagId);
+                yield 'sRem' => $idList;
             }
         })->rewind();
 

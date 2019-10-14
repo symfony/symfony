@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -532,5 +533,39 @@ CSV
         , 'csv', [
             CsvEncoder::NO_HEADERS_KEY => true,
         ]));
+    }
+
+    public function testBOMIsAddedOnDemand()
+    {
+        $value = ['foo' => 'hello', 'bar' => 'hey ho'];
+
+        $this->assertEquals("\xEF\xBB\xBF".<<<'CSV'
+foo,bar
+hello,"hey ho"
+
+CSV
+            , $this->encoder->encode($value, 'csv', [CsvEncoder::OUTPUT_UTF8_BOM_KEY => true]));
+    }
+
+    public function testBOMCanNotBeAddedToNonUtf8Csv()
+    {
+        $value = [mb_convert_encoding('ÄÖÜ', 'ISO-8859-1', 'UTF-8')];
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('You are trying to add a UTF-8 BOM to a non UTF-8 text.');
+        $this->encoder->encode($value, 'csv', [CsvEncoder::OUTPUT_UTF8_BOM_KEY => true]);
+    }
+
+    public function testBOMIsStripped()
+    {
+        $csv = "\xEF\xBB\xBF".<<<'CSV'
+foo,bar
+hello,"hey ho"
+
+CSV;
+        $this->assertEquals(
+            ['foo' => 'hello', 'bar' => 'hey ho'],
+            $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false])
+        );
     }
 }

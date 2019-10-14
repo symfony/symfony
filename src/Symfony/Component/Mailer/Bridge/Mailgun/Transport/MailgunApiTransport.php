@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -46,7 +47,7 @@ class MailgunApiTransport extends AbstractApiTransport
         return sprintf('mailgun+api://%s?domain=%s', $this->getEndpoint(), $this->domain);
     }
 
-    protected function doSendApi(Email $email, Envelope $envelope): ResponseInterface
+    protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
         $body = new FormDataPart($this->getPayload($email, $envelope));
         $headers = [];
@@ -61,13 +62,16 @@ class MailgunApiTransport extends AbstractApiTransport
             'body' => $body->bodyToIterable(),
         ]);
 
+        $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
             if ('application/json' === $response->getHeaders(false)['content-type'][0]) {
-                throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $response->toArray(false)['message'], $response->getStatusCode()), $response);
+                throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result['message'], $response->getStatusCode()), $response);
             }
 
             throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $response->getContent(false), $response->getStatusCode()), $response);
         }
+
+        $sentMessage->setMessageId($result['id']);
 
         return $response;
     }

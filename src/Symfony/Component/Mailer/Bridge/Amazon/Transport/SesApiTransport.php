@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -48,7 +49,7 @@ class SesApiTransport extends AbstractApiTransport
         return sprintf('ses+api://%s@%s', $this->accessKey, $this->getEndpoint());
     }
 
-    protected function doSendApi(Email $email, Envelope $envelope): ResponseInterface
+    protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
         $date = gmdate('D, d M Y H:i:s e');
         $auth = sprintf('AWS3-HTTPS AWSAccessKeyId=%s,Algorithm=HmacSHA256,Signature=%s', $this->accessKey, $this->getSignature($date));
@@ -62,11 +63,12 @@ class SesApiTransport extends AbstractApiTransport
             'body' => $this->getPayload($email, $envelope),
         ]);
 
+        $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {
-            $error = new \SimpleXMLElement($response->getContent(false));
-
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $error->Error->Message, $error->Error->Code), $response);
+            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result->Error->Message, $result->Error->Code), $response);
         }
+
+        $sentMessage->setMessageId($result->SendEmailResult->MessageId);
 
         return $response;
     }

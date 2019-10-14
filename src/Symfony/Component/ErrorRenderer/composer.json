@@ -33,7 +33,6 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorRenderer\\": "" },
-        "classmap": [ "Resources/stubs/Exception/FlattenException.php" ],
         "exclude-from-classmap": [
             "/Tests/"
         ]

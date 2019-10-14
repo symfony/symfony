@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -21,14 +20,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal
  */
-final class SecretsRemoveCommand extends Command
+final class SecretsEncryptFromLocalCommand extends Command
 {
-    protected static $defaultName = 'secrets:remove';
+    protected static $defaultName = 'secrets:encrypt-from-local';
 
     private $vault;
     private $localVault;
@@ -44,13 +42,16 @@ final class SecretsRemoveCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Removes a secret from the vault.')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret')
-            ->addOption('local', 'l', InputOption::VALUE_NONE, 'Updates the local vault.')
+            ->setDescription('Encrypts all local secrets to the vault.')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces overriding of secrets that already exist in the vault')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command removes a secret from the vault.
+The <info>%command.name%</info> command list encrypts all local secrets and stores them in the vault..
 
-    <info>%command.full_name% <name></info>
+    <info>%command.full_name%</info>
+
+When the option <info>--force</info> is provided, secrets that already exist in the vault are overriden.
+
+    <info>%command.full_name% --force</info>
 EOF
             )
         ;
@@ -59,22 +60,29 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
-        $vault = $input->getOption('local') ? $this->localVault : $this->vault;
 
-        if (null === $vault) {
-            $io->success('The local vault is disabled.');
+        if (null === $this->localVault) {
+            $io->error('The local vault is disabled.');
 
             return 1;
         }
 
-        if ($vault->remove($name = $input->getArgument('name'))) {
-            $io->success($vault->getLastMessage() ?? 'Secret was removed from the vault.');
-        } else {
-            $io->comment($vault->getLastMessage() ?? 'Secret was not found in the vault.');
+        $secrets = $this->localVault->list(true);
+
+        if (!$input->getOption('force')) {
+            foreach ($this->vault->list() as $k => $v) {
+                unset($secrets[$k]);
+            }
         }
 
-        if ($this->vault === $vault && null !== $this->localVault->reveal($name)) {
-            $io->comment('Note that this secret is overridden in the local vault.');
+        foreach ($secrets as $k => $v) {
+            if (null === $v) {
+                $io->error($this->localVault->getLastMessage());
+
+                return 1;
+            }
+
+            $this->vault->seal($k, $v);
         }
 
         return 0;

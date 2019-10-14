@@ -438,9 +438,10 @@ class ConfigurationTest extends TestCase
             ],
             'error_controller' => 'error_controller',
             'secrets' => [
-                'enabled' => false,
-                'encrypted_secrets_dir' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
-                'encryption_key' => '%kernel.project_dir%/config/secrets/encryption_%kernel.environment%.key',
+                'enabled' => true,
+                'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
+                'local_dotenv_file' => '%kernel.project_dir%/.env.local',
+                'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
             ],
         ];
     }

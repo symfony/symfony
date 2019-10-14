@@ -113,6 +113,7 @@
         "monolog/monolog": "^1.25.1",
         "nyholm/psr7": "^1.0",
         "ocramius/proxy-manager": "^2.1",
+        "paragonie/sodium_compat": "^1.8",
         "php-http/httplug": "^1.0|^2.0",
         "predis/predis": "~1.1",
         "psr/http-client": "^1.0",

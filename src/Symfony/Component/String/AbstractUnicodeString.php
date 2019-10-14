@@ -159,11 +159,14 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
-    public function codePoint(int $offset = 0): ?int
+    /**
+     * @return int[]
+     */
+    public function codePointsAt(int $offset): array
     {
-        $str = $offset ? $this->slice($offset, 1) : $this;
+        $str = $this->slice($offset, 1);
 
-        return '' === $str->string ? null : mb_ord($str->string);
+        return '' === $str->string ? [] : array_map('mb_ord', preg_split('//u', $str->string, -1, PREG_SPLIT_NO_EMPTY));
     }
 
     public function folded(bool $compat = true): parent

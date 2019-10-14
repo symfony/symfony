@@ -31,4 +31,28 @@ class CodePointStringTest extends AbstractUnicodeTestCase
             ]
         );
     }
+
+    public static function provideBytesAt(): array
+    {
+        return array_merge(
+            parent::provideBytesAt(),
+            [
+                [[0x61], "Spa\u{0308}ßchen", 2],
+                [[0xCC, 0x88], "Spa\u{0308}ßchen", 3],
+                [[0xE0, 0xA5, 0x8D], 'नमस्ते', 3],
+            ]
+        );
+    }
+
+    public static function provideCodePointsAt(): array
+    {
+        return array_merge(
+            parent::provideCodePointsAt(),
+            [
+                [[0x61], "Spa\u{0308}ßchen", 2],
+                [[0x0308], "Spa\u{0308}ßchen", 3],
+                [[0x094D], 'नमस्ते', 3],
+            ]
+        );
+    }
 }

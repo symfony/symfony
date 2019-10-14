@@ -34,6 +34,40 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         ];
     }
 
+    public static function provideBytesAt(): array
+    {
+        return array_merge(
+            parent::provideBytesAt(),
+            [
+                [[0xC3, 0xA4], 'Späßchen', 2],
+                [[0xC3, 0x9F], 'Späßchen', -5],
+            ]
+        );
+    }
+
+    /**
+     * @dataProvider provideCodePointsAt
+     */
+    public function testCodePointsAt(array $expected, string $string, int $offset, int $form = null)
+    {
+        $instance = static::createFromString($string);
+        $instance = $form ? $instance->normalize($form) : $instance;
+
+        $this->assertSame($expected, $instance->codePointsAt($offset));
+    }
+
+    public static function provideCodePointsAt(): array
+    {
+        return [
+            [[], '', 0],
+            [[], 'a', 1],
+            [[0x53], 'Späßchen', 0],
+            [[0xE4], 'Späßchen', 2],
+            [[0xDF], 'Späßchen', -5],
+            [[0x260E], '☢☎❄', 1],
+        ];
+    }
+
     public static function provideLength(): array
     {
         return [

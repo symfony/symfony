@@ -21,6 +21,19 @@ class ByteStringTest extends AbstractAsciiTestCase
         return new ByteString($string);
     }
 
+    public static function provideBytesAt(): array
+    {
+        return array_merge(
+            parent::provideBytesAt(),
+            [
+                [[0xC3], 'Späßchen', 2],
+                [[0x61], "Spa\u{0308}ßchen", 2],
+                [[0xCC], "Spa\u{0308}ßchen", 3],
+                [[0xE0], 'नमस्ते', 6],
+            ]
+        );
+    }
+
     public static function provideLength(): array
     {
         return array_merge(

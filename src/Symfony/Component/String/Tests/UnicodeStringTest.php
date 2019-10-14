@@ -90,6 +90,30 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
         );
     }
 
+    public static function provideBytesAt(): array
+    {
+        return array_merge(
+            parent::provideBytesAt(),
+            [
+                [[0xC3, 0xA4], "Spa\u{0308}ßchen", 2],
+                [[0x61, 0xCC, 0x88], "Spa\u{0308}ßchen", 2, UnicodeString::NFD],
+                [[0xE0, 0xA4, 0xB8, 0xE0, 0xA5, 0x8D], 'नमस्ते', 2],
+            ]
+        );
+    }
+
+    public static function provideCodePointsAt(): array
+    {
+        return array_merge(
+            parent::provideCodePointsAt(),
+            [
+                [[0xE4], "Spa\u{0308}ßchen", 2],
+                [[0x61, 0x0308], "Spa\u{0308}ßchen", 2, UnicodeString::NFD],
+                [[0x0938, 0x094D], 'नमस्ते', 2],
+            ]
+        );
+    }
+
     public static function provideLower(): array
     {
         return array_merge(

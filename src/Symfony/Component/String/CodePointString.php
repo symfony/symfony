@@ -75,6 +75,13 @@ class CodePointString extends AbstractUnicodeString
         return $chunks;
     }
 
+    public function codePointsAt(int $offset): array
+    {
+        $str = $offset ? $this->slice($offset, 1) : $this;
+
+        return '' === $str->string ? [] : [mb_ord($str->string)];
+    }
+
     public function endsWith($suffix): bool
     {
         if ($suffix instanceof AbstractString) {

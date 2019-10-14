@@ -669,7 +669,7 @@ abstract class HttpClientTestCase extends TestCase
         $duration = microtime(true) - $start;
 
         $this->assertGreaterThan(1, $duration);
-        $this->assertLessThan(3, $duration);
+        $this->assertLessThan(4, $duration);
     }
 
     public function testProxy()

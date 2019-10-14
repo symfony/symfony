@@ -90,6 +90,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
+    public const CAST_PRIMITIVE_TYPES = 'cast_primitive_types';
+
     private $propertyTypeExtractor;
     private $typesCache = [];
     private $attributesCache = [];
@@ -409,7 +411,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if ('xml' === $format && null !== $collectionValueType && (!\is_array($data) || !\is_int(key($data)))) {
                 $data = [$data];
             }
-
             if (null !== $collectionValueType && Type::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType()) {
                 $builtinType = Type::BUILTIN_TYPE_OBJECT;
                 $class = $collectionValueType->getClassName().'[]';
@@ -467,6 +468,21 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             if (('is_'.$builtinType)($data)) {
                 return $data;
+            }
+
+            // If the above condition found the data was of the incorrect type, try casting the data to a
+            //  primitive value.
+            if (isset($context[self::CAST_PRIMITIVE_TYPES]) && $context[self::CAST_PRIMITIVE_TYPES]) {
+                switch ($builtinType) {
+                    case Type::BUILTIN_TYPE_INT:
+                    case Type::BUILTIN_TYPE_FLOAT:
+                    case Type::BUILTIN_TYPE_STRING:
+                    case Type::BUILTIN_TYPE_BOOL:
+                    case Type::BUILTIN_TYPE_ARRAY:
+                    case Type::BUILTIN_TYPE_NULL:
+                        settype($data, $builtinType);
+                        return $data;
+                }
             }
         }
 

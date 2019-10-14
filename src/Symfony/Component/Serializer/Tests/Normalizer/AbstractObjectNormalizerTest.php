@@ -227,6 +227,64 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
     }
 
+    public function testDenormalizeWithPrimitiveTypeCasting()
+    {
+        $normalizer = new AbstractObjectNormalizerDummy(
+            null,
+            null,
+            new PhpDocExtractor()
+        );
+
+        /** @var TypedDummy $normalizedData */
+        $normalizedData = $normalizer->denormalize(
+            [
+                'foo' => '123',
+                'baz' => '3.14',
+                'quux' => 'The quick brown fox jumps over the lazy dog.',
+                'corge' => '1',
+                'grault' => 'Lorem ipsum dolor sit amet',
+                'garply' => 'foobar'
+            ],
+            __NAMESPACE__.'\TypedDummy',
+            null,
+            ['cast_primitive_types' => true]
+        );
+        $this->assertIsInt($normalizedData->foo);
+        $this->assertSame(123, $normalizedData->foo);
+        $this->assertIsFloat($normalizedData->baz);
+        $this->assertSame(3.14, $normalizedData->baz);
+        $this->assertSame('The quick brown fox jumps over the lazy dog.', $normalizedData->quux);
+        $this->assertTrue($normalizedData->corge);
+        $this->assertIsArray($normalizedData->grault);
+        $this->assertCount(1, $normalizedData->grault);
+        $this->assertSame('Lorem ipsum dolor sit amet', $normalizedData->grault[0]);
+        $this->assertNull($normalizedData->garply);
+
+        $normalizedData = $normalizer->denormalize(
+            [
+                'foo' => '3.14',
+                'baz' => '123',
+                'corge' => '0'
+            ],
+            __NAMESPACE__.'\TypedDummy',
+            null,
+            ['cast_primitive_types' => true]
+        );
+        $this->assertIsInt($normalizedData->foo);
+        $this->assertSame(3, $normalizedData->foo);
+        $this->assertIsFloat($normalizedData->baz);
+        $this->assertSame(123.0, $normalizedData->baz);
+        $this->assertFalse($normalizedData->corge);
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the "foo" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\TypedDummy" must be one of "int" ("string" given).');
+        $normalizer->denormalize(
+            ['foo' => '123'],
+            __NAMESPACE__.'\TypedDummy',
+            null
+        );
+    }
+
     /**
      * Test that additional attributes throw an exception if no metadata factory is specified.
      */
@@ -272,7 +330,7 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = []): bool
     {
-        return \in_array($attribute, ['foo', 'baz', 'quux', 'value']);
+        return \in_array($attribute, ['foo', 'baz', 'quux', 'value', 'corge', 'grault', 'garply']);
     }
 
     /**
@@ -293,6 +351,39 @@ class Dummy
 
 class EmptyDummy
 {
+}
+
+class TypedDummy
+{
+    /**
+     * @var int
+     */
+    public $foo;
+
+    /**
+     * @var float
+     */
+    public $baz;
+
+    /**
+     * @var string
+     */
+    public $quux;
+
+    /**
+     * @var bool
+     */
+    public $corge;
+
+    /**
+     * @var array
+     */
+    public $grault;
+
+    /**
+     * @var null
+     */
+    public $garply;
 }
 
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer

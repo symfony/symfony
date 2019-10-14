@@ -16,6 +16,7 @@ use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
 use Http\Client\HttpAsyncClient;
 use Http\Client\HttpClient as HttplugInterface;
+use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Message\RequestFactory;
 use Http\Message\StreamFactory;
 use Http\Message\UriFactory;
@@ -70,13 +71,13 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         $this->promisePool = \function_exists('GuzzleHttp\Promise\queue') ? new \SplObjectStorage() : null;
 
         if (null === $this->responseFactory || null === $this->streamFactory) {
-            if (!class_exists(Psr17Factory::class)) {
+            if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
                 throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\HttplugClient" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
             }
 
-            $psr17Factory = new Psr17Factory();
-            $this->responseFactory = $this->responseFactory ?? $psr17Factory;
-            $this->streamFactory = $this->streamFactory ?? $psr17Factory;
+            $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
+            $this->responseFactory = $this->responseFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
+            $this->streamFactory = $this->streamFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
         }
 
         $this->waitLoop = new HttplugWaitLoop($this->client, $this->promisePool, $this->responseFactory, $this->streamFactory);
@@ -144,10 +145,12 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
     {
         if ($this->responseFactory instanceof RequestFactoryInterface) {
             $request = $this->responseFactory->createRequest($method, $uri);
-        } elseif (!class_exists(Request::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
-        } else {
+        } elseif (class_exists(Request::class)) {
             $request = new Request($method, $uri);
+        } elseif (class_exists(Psr17FactoryDiscovery::class)) {
+            $request = Psr17FactoryDiscovery::findRequestFactory()->createRequest($method, $uri);
+        } else {
+            throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
         }
 
         $request = $request
@@ -199,11 +202,15 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
             return $this->responseFactory->createUri($uri);
         }
 
-        if (!class_exists(Uri::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
+        if (class_exists(Uri::class)) {
+            return new Uri($uri);
         }
 
-        return new Uri($uri);
+        if (class_exists(Psr17FactoryDiscovery::class)) {
+            return Psr17FactoryDiscovery::findUrlFactory()->createUri($uri);
+        }
+
+        throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
     }
 
     public function __destruct()

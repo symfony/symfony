@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Http\Discovery\Psr17FactoryDiscovery;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Uri;
@@ -63,13 +64,13 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             return;
         }
 
-        if (!class_exists(Psr17Factory::class)) {
+        if (!class_exists(Psr17Factory::class) && !class_exists(Psr17FactoryDiscovery::class)) {
             throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
         }
 
-        $psr17Factory = new Psr17Factory();
-        $this->responseFactory = $this->responseFactory ?? $psr17Factory;
-        $this->streamFactory = $this->streamFactory ?? $psr17Factory;
+        $psr17Factory = class_exists(Psr17Factory::class, false) ? new Psr17Factory() : null;
+        $this->responseFactory = $this->responseFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findResponseFactory();
+        $this->streamFactory = $this->streamFactory ?? $psr17Factory ?? Psr17FactoryDiscovery::findStreamFactory();
     }
 
     /**
@@ -124,11 +125,15 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             return $this->responseFactory->createRequest($method, $uri);
         }
 
-        if (!class_exists(Request::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
+        if (class_exists(Request::class)) {
+            return new Request($method, $uri);
         }
 
-        return new Request($method, $uri);
+        if (class_exists(Psr17FactoryDiscovery::class)) {
+            return Psr17FactoryDiscovery::findRequestFactory()->createRequest($method, $uri);
+        }
+
+        throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
     }
 
     /**
@@ -170,11 +175,15 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
             return $this->responseFactory->createUri($uri);
         }
 
-        if (!class_exists(Uri::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
+        if (class_exists(Uri::class)) {
+            return new Uri($uri);
         }
 
-        return new Uri($uri);
+        if (class_exists(Psr17FactoryDiscovery::class)) {
+            return Psr17FactoryDiscovery::findUrlFactory()->createUri($uri);
+        }
+
+        throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
     }
 }
 

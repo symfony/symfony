@@ -160,10 +160,6 @@ final class NativeResponse implements ResponseInterface
         stream_set_blocking($h, false);
         $this->context = $this->resolveRedirect = null;
 
-        if (null !== $this->shouldBuffer && null === $this->content && ($this->shouldBuffer)($this->headers)) {
-            $this->content = fopen('php://temp', 'w+');
-        }
-
         if (isset($context['ssl']['peer_certificate_chain'])) {
             $this->info['peer_certificate_chain'] = $context['ssl']['peer_certificate_chain'];
         }
@@ -180,6 +176,23 @@ final class NativeResponse implements ResponseInterface
 
         if ($this->inflate && 'gzip' !== ($this->headers['content-encoding'][0] ?? null)) {
             $this->inflate = null;
+        }
+
+        try {
+            if (null !== $this->shouldBuffer && null === $this->content && ($this->shouldBuffer)($this->headers)) {
+                $this->content = fopen('php://temp', 'w+');
+            }
+
+            if (!$this->buffer) {
+                throw new TransportException('Response has been canceled.');
+            }
+        } catch (\Throwable $e) {
+            $this->close();
+            $this->multi->handlesActivity[$this->id] = [new FirstChunk()];
+            $this->multi->handlesActivity[$this->id][] = null;
+            $this->multi->handlesActivity[$this->id][] = $e;
+
+            return;
         }
 
         $this->multi->openHandles[$this->id] = [$h, $this->buffer, $this->inflate, $this->content, $this->onProgress, &$this->remaining, &$this->info];

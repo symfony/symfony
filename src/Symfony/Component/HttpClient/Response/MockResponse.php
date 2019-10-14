@@ -105,9 +105,7 @@ class MockResponse implements ResponseInterface
         $response->requestOptions = $options;
         $response->id = ++self::$idSequence;
 
-        if (($options['buffer'] ?? null) instanceof \Closure) {
-            $response->content = $options['buffer']($mock->getHeaders(false)) ? fopen('php://temp', 'w+') : null;
-        } else {
+        if (!($options['buffer'] ?? null) instanceof \Closure) {
             $response->content = true === ($options['buffer'] ?? true) ? fopen('php://temp', 'w+') : null;
         }
         $response->initializer = static function (self $response) {
@@ -184,6 +182,10 @@ class MockResponse implements ResponseInterface
                     $response->headers = $chunk[1]->getHeaders(false);
                     self::readResponse($response, $chunk[0], $chunk[1], $offset);
                     $multi->handlesActivity[$id][] = new FirstChunk();
+
+                    if (($response->requestOptions['buffer'] ?? null) instanceof \Closure) {
+                        $response->content = $response->requestOptions['buffer']($response->headers) ? fopen('php://temp', 'w+') : null;
+                    }
                 } catch (\Throwable $e) {
                     $multi->handlesActivity[$id][] = null;
                     $multi->handlesActivity[$id][] = $e;

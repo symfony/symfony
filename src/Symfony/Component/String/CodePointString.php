@@ -93,7 +93,7 @@ class CodePointString extends AbstractUnicodeString
             return preg_match('{'.preg_quote($suffix).'$}iuD', $this->string);
         }
 
-        return \strlen($this->string) - \strlen($suffix) === strrpos($this->string, $suffix);
+        return \strlen($this->string) >= \strlen($suffix) && 0 === substr_compare($this->string, $suffix, -\strlen($suffix));
     }
 
     public function equalsTo($string): bool
@@ -107,7 +107,7 @@ class CodePointString extends AbstractUnicodeString
         }
 
         if ('' !== $string && $this->ignoreCase) {
-            return mb_strlen($string, 'UTF-8') === mb_strlen($this->string, 'UTF-8') && 0 === mb_stripos($this->string, $string, 0, 'UTF-8');
+            return \strlen($string) === \strlen($this->string) && 0 === mb_stripos($this->string, $string, 0, 'UTF-8');
         }
 
         return $string === $this->string;
@@ -256,6 +256,10 @@ class CodePointString extends AbstractUnicodeString
             return false;
         }
 
-        return 0 === ($this->ignoreCase ? mb_stripos($this->string, $prefix, 0, 'UTF-8') : strpos($this->string, $prefix));
+        if ($this->ignoreCase) {
+            return 0 === mb_stripos($this->string, $prefix, 0, 'UTF-8');
+        }
+
+        return 0 === strncmp($this->string, $prefix, \strlen($prefix));
     }
 }

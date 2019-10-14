@@ -97,11 +97,15 @@ class UnicodeString extends AbstractUnicodeString
         $form = null === $this->ignoreCase ? \Normalizer::NFD : \Normalizer::NFC;
         normalizer_is_normalized($suffix, $form) ?: $suffix = normalizer_normalize($suffix, $form);
 
-        if ('' === $suffix || false === $suffix || false === $i = $this->ignoreCase ? grapheme_strripos($this->string, $suffix) : grapheme_strrpos($this->string, $suffix)) {
+        if ('' === $suffix || false === $suffix) {
             return false;
         }
 
-        return grapheme_strlen($this->string) - grapheme_strlen($suffix) === $i;
+        if ($this->ignoreCase) {
+            return 0 === mb_stripos(grapheme_extract($this->string, \strlen($suffix), GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix)), $suffix, 0, 'UTF-8');
+        }
+
+        return $suffix === grapheme_extract($this->string, \strlen($suffix), GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix));
     }
 
     public function equalsTo($string): bool
@@ -118,7 +122,7 @@ class UnicodeString extends AbstractUnicodeString
         normalizer_is_normalized($string, $form) ?: $string = normalizer_normalize($string, $form);
 
         if ('' !== $string && false !== $string && $this->ignoreCase) {
-            return grapheme_strlen($string) === grapheme_strlen($this->string) && 0 === grapheme_stripos($this->string, $string);
+            return \strlen($string) === \strlen($this->string) && 0 === mb_stripos($this->string, $string, 0, 'UTF-8');
         }
 
         return $string === $this->string;
@@ -332,7 +336,15 @@ class UnicodeString extends AbstractUnicodeString
         $form = null === $this->ignoreCase ? \Normalizer::NFD : \Normalizer::NFC;
         normalizer_is_normalized($prefix, $form) ?: $prefix = normalizer_normalize($prefix, $form);
 
-        return '' !== $prefix && false !== $prefix && 0 === ($this->ignoreCase ? grapheme_stripos($this->string, $prefix) : grapheme_strpos($this->string, $prefix));
+        if ('' === $prefix || false === $prefix) {
+            return false;
+        }
+
+        if ($this->ignoreCase) {
+            return 0 === mb_stripos(grapheme_extract($this->string, \strlen($prefix), GRAPHEME_EXTR_MAXBYTES), $prefix, 0, 'UTF-8');
+        }
+
+        return $prefix === grapheme_extract($this->string, \strlen($prefix), GRAPHEME_EXTR_MAXBYTES);
     }
 
     public function __clone()

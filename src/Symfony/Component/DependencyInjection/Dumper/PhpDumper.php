@@ -1955,7 +1955,7 @@ EOF;
             if (!$value = $edge->getSourceNode()->getValue()) {
                 continue;
             }
-            if ($edge->isLazy() || !$value->isShared()) {
+            if ($edge->isLazy() || !$value instanceof Definition || !$value->isShared()) {
                 return false;
             }
             $ids[$edge->getSourceNode()->getId()] = true;

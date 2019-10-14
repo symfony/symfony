@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-13T18:13:58Z
+
+Please check tests, something is wrong :)
+On Windows, the intl polyfills might not be up to the need and might need a fix...
+
+---------------------------------------------------------------------------
+
+by gharlan at 2019-10-13T20:48:42Z
+
+> Please check tests, something is wrong :)
+
+fixed.
+
+> the intl polyfills might not be up to the need and might need a fix...
+
+Added a workaround in this pr, and a fix for the polyfills: https://github.com/symfony/polyfill/pull/193

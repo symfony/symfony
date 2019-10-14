@@ -21,6 +21,23 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
         return new UnicodeString($string);
     }
 
+    public static function provideWrap(): array
+    {
+        return array_merge(
+            parent::provideWrap(),
+            [
+                [
+                    ['Käse' => static::createFromString('köstlich'), 'fromage' => static::createFromString('délicieux')],
+                    ["Ka\u{0308}se" => "ko\u{0308}stlich", 'fromage' => 'délicieux'],
+                ],
+                [
+                    ['a' => 1, 'ä' => ['ö' => 2, 'ü' => 3]],
+                    ['a' => 1, "a\u{0308}" => ["o\u{0308}" => 2, 'ü' => 3]],
+                ],
+            ]
+        );
+    }
+
     public static function provideLength(): array
     {
         return array_merge(

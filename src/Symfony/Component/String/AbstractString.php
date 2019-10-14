@@ -75,11 +75,9 @@ abstract class AbstractString implements \JsonSerializable
         $keys = null;
 
         foreach ($values as $k => $v) {
-            ++$i;
-
             if (\is_string($k) && '' !== $k && $k !== $j = (string) new static($k)) {
                 $keys = $keys ?? array_keys($values);
-                array_splice($keys, $i, 1, [$j]);
+                $keys[$i] = $j;
             }
 
             if (\is_string($v)) {
@@ -87,6 +85,8 @@ abstract class AbstractString implements \JsonSerializable
             } elseif (\is_array($v) && $values[$k] !== $v = static::wrap($v)) {
                 $values[$k] = $v;
             }
+
+            ++$i;
         }
 
         return null !== $keys ? array_combine($keys, $values) : $values;

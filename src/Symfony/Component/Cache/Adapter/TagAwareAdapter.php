@@ -162,7 +162,14 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         if (!$this->pool->hasItem($key)) {
             return false;
         }
-        if (!$itemTags = $this->pool->getItem(static::TAGS_PREFIX.$key)->get()) {
+
+        $itemTags = $this->pool->getItem(static::TAGS_PREFIX.$key);
+
+        if (!$itemTags->isHit()) {
+            return false;
+        }
+
+        if (!$itemTags = $itemTags->get()) {
             return true;
         }
 
@@ -330,7 +337,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             }
 
             unset($tagKeys[$key]);
-            $itemTags[$key] = $item->get() ?: [];
+
+            if ($item->isHit()) {
+                $itemTags[$key] = $item->get() ?: [];
+            }
 
             if (!$tagKeys) {
                 $tagVersions = $this->getTagVersions($itemTags);

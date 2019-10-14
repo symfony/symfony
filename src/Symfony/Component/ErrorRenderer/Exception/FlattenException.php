@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ErrorRenderer\Exception;
 
+use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,10 +23,8 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  * Basically, this class removes all objects from the trace.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @internal
  */
-class FlattenException
+final class FlattenException extends LegacyFlattenException
 {
     private $title;
     private $message;
@@ -39,12 +38,12 @@ class FlattenException
     private $file;
     private $line;
 
-    public static function create(\Exception $exception, int $statusCode = null, array $headers = []): self
+    public static function create(\Exception $exception, $statusCode = null, array $headers = []): LegacyFlattenException
     {
         return static::createFromThrowable($exception, $statusCode, $headers);
     }
 
-    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
+    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): LegacyFlattenException
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
@@ -106,7 +105,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setStatusCode($code)
+    public function setStatusCode($code): self
     {
         $this->statusCode = $code;
 
@@ -121,7 +120,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): self
     {
         $this->headers = $headers;
 
@@ -136,7 +135,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setClass($class)
+    public function setClass($class): self
     {
         $this->class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).'@anonymous' : $class;
 
@@ -151,7 +150,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setFile($file)
+    public function setFile($file): self
     {
         $this->file = $file;
 
@@ -166,7 +165,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setLine($line)
+    public function setLine($line): self
     {
         $this->line = $line;
 
@@ -193,7 +192,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setMessage($message)
+    public function setMessage($message): self
     {
         if (false !== strpos($message, "class@anonymous\0")) {
             $message = preg_replace_callback('/class@anonymous\x00.*?\.php0x?[0-9a-fA-F]++/', function ($m) {
@@ -214,7 +213,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setCode($code)
+    public function setCode($code): self
     {
         $this->code = $code;
 
@@ -229,7 +228,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setPrevious(self $previous)
+    public function setPrevious(LegacyFlattenException $previous): self
     {
         $this->previous = $previous;
 
@@ -272,7 +271,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setTrace($trace, $file, $line)
+    public function setTrace($trace, $file, $line): self
     {
         $this->trace = [];
         $this->trace[] = [

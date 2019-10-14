@@ -21,7 +21,8 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "symfony/debug": "^4.4"
     },
     "require-dev": {
         "symfony/console": "^4.4",
@@ -33,7 +34,6 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorRenderer\\": "" },
-        "classmap": [ "Resources/stubs/Exception/FlattenException.php" ],
         "exclude-from-classmap": [
             "/Tests/"
         ]

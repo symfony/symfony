@@ -155,33 +155,6 @@ HttpKernel
    current directory or with a glob pattern. The fallback directories have never been advocated
    so you likely do not use those in any app based on the SF Standard or Flex edition.
  * Getting the container from a non-booted kernel is deprecated
- * Deprecated passing the `exception` attribute (instance of `Symfony\Component\Debug\Exception\FlattenException`) 
-   to the configured controller of the `ExceptionListener`, use the `e` attribute 
-   (instance of `Symfony\Component\ErrorRenderer\Exception\FlattenException`) instead
-   
-   before:
-   ```php
-   use Symfony\Component\Debug\Exception\FlattenException;   
-
-   class ExceptionController
-   {
-       public function __invoke(FlattenException $exception)
-       {
-       }
-   }
-   ```  
- 
-   after:
-   ```php
-   use Symfony\Component\ErrorRenderer\Exception\FlattenException;   
-
-   class ExceptionController
-   {
-       public function __invoke(FlattenException $e)
-       {
-       }
-   }
-   ```
 
 Lock
 ----

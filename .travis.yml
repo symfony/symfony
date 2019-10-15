@@ -212,6 +212,9 @@ install:
 
     - |
       # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
+      git config --global user.email ""
+      git config --global user.name "Symfony"
+
       if [[ ! $deps ]]; then
           php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit
       else

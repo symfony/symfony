@@ -47,7 +47,7 @@ foreach ($dirs as $k => $dir) {
     if (isset($preferredInstall[$package->name]) && 'source' === $preferredInstall[$package->name]) {
         passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
     } else {
-        passthru("cd $dir && git init && git add . && git commit --author \"Symfony <>\" -m - && git archive -o package.tar HEAD && rm .git/ -Rf");
+        passthru("cd $dir && git init && git add . && git commit -q -m - && git archive -o package.tar HEAD && rm .git/ -Rf");
     }
 
     if (!isset($package->extra->{'branch-alias'}->{'dev-master'})) {

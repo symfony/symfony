@@ -29,6 +29,7 @@
         "symfony/http-kernel": "^4.4"
     },
     "conflict": {
+        "symfony/debug": "<5.0",
         "symfony/http-kernel": "<4.4"
     },
     "autoload": {

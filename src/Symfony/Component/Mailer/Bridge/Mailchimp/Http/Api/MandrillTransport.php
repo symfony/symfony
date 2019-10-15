@@ -70,14 +70,15 @@ class MandrillTransport extends AbstractApiTransport
             $disposition = $headers->getHeaderBody('Content-Disposition');
 
             $att = [
+                'name' => $attachment->getName(),
                 'content' => $attachment->bodyToString(),
                 'type' => $headers->get('Content-Type')->getBody(),
             ];
 
             if ('inline' === $disposition) {
-                $payload['images'][] = $att;
+                $payload['message']['images'][] = $att;
             } else {
-                $payload['attachments'][] = $att;
+                $payload['message']['attachments'][] = $att;
             }
         }
 

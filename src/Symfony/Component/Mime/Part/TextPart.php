@@ -69,6 +69,11 @@ class TextPart extends AbstractPart
         return $this->subtype;
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
     /**
      * @param string $disposition one of attachment, inline, or form-data
      *

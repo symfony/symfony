@@ -126,13 +126,13 @@ class Inline
                     $result = self::parseScalar($value, $flags, null, $i, null === $tag, $references);
             }
 
-            if (null !== $tag) {
-                return new TaggedValue($tag, $result);
-            }
-
             // some comments are allowed at the end
             if (preg_replace('/\s+#.*$/A', '', substr($value, $i))) {
                 throw new ParseException(sprintf('Unexpected characters near "%s".', substr($value, $i)), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
+            }
+
+            if (null !== $tag) {
+                return new TaggedValue($tag, $result);
             }
 
             return $result;

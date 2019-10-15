@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -124,21 +123,9 @@ class ExceptionListener implements EventSubscriberInterface
      */
     protected function duplicateRequest(\Exception $exception, Request $request)
     {
-        @trigger_error(sprintf('Passing the "exception" attribute (instance of "%s") to the configured controller of the "%s" class is deprecated since Symfony 4.4, use the passed "e" attribute (instance of "%s") instead.', LegacyFlattenException::class, self::class, FlattenException::class));
-
-        $flattenException = FlattenException::createFromThrowable($exception);
-
-        // BC layer to be removed in 5.0
-        if (class_exists(\Symfony\Component\Debug\Debug::class, false)) {
-            $legacyFlattenException = LegacyFlattenException::createFromThrowable($exception);
-        } else {
-            $legacyFlattenException = $flattenException;
-        }
-
         $attributes = [
             '_controller' => $this->controller,
-            'exception' => $legacyFlattenException, // to be removed in 5.0
-            'e' => $flattenException,
+            'exception' => FlattenException::createFromThrowable($exception),
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
         ];
         $request = $request->duplicate(null, null, $attributes);

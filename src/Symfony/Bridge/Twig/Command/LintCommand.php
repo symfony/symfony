@@ -50,6 +50,7 @@ class LintCommand extends Command
         $this
             ->setDescription('Lints a template and outputs encountered errors')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
+            ->addOption('show-deprecations', null, InputOption::VALUE_NONE, 'Show deprecations as errors')
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lints a template and outputs to STDOUT
@@ -77,6 +78,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $filenames = $input->getArgument('filename');
+        $showDeprecations = $input->getOption('show-deprecations');
 
         if (['-'] === $filenames) {
             return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
@@ -97,7 +99,28 @@ EOF
             }
         }
 
-        $filesInfo = $this->getFilesInfo($filenames);
+        if ($showDeprecations) {
+            $prevErrorHandler = set_error_handler(static function ($level, $message, $file, $line) use (&$prevErrorHandler) {
+                if (E_USER_DEPRECATED === $level) {
+                    $templateLine = 0;
+                    if (preg_match('/ at line (\d+) /', $message, $matches)) {
+                        $templateLine = $matches[1];
+                    }
+
+                    throw new Error($message, $templateLine);
+                }
+
+                return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
+            });
+        }
+
+        try {
+            $filesInfo = $this->getFilesInfo($filenames);
+        } finally {
+            if ($showDeprecations) {
+                restore_error_handler();
+            }
+        }
 
         return $this->display($input, $output, $io, $filesInfo);
     }

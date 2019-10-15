@@ -371,7 +371,7 @@ class XmlDescriptor extends Descriptor
         }
 
         if (!$omitTags) {
-            if ($tags = $definition->getTags()) {
+            if ($tags = $this->sortTagsByPriority($definition->getTags())) {
                 $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
                 foreach ($tags as $tagName => $tagData) {
                     foreach ($tagData as $parameters) {

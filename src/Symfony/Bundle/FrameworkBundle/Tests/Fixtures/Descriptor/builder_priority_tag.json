@@ -14,16 +14,16 @@
                 {
                     "name": "tag1",
                     "parameters": {
-                        "attr1": "val1",
-                        "attr2": "val2",
-                        "priority": 0
+                        "attr3": "val3",
+                        "priority": 40
                     }
                 },
                 {
                     "name": "tag1",
                     "parameters": {
-                        "attr3": "val3",
-                        "priority": 40
+                        "attr1": "val1",
+                        "attr2": "val2",
+                        "priority": 0
                     }
                 }
             ]

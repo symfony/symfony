@@ -16,12 +16,12 @@ Definitions
 - Autoconfigured: no
 - File: `/path/to/file`
 - Tag: `tag1`
+    - Attr3: val3
+    - Priority: 40
+- Tag: `tag1`
     - Attr1: val1
     - Attr2: val2
     - Priority: 0
-- Tag: `tag1`
-    - Attr3: val3
-    - Priority: 40
 
 ### definition_1
 

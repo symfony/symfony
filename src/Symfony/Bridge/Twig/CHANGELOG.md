@@ -17,6 +17,7 @@ CHANGELOG
    `DebugCommand::__construct()` method, swap the variables position.
  * the `LintCommand` lints all the templates stored in all configured Twig paths if none argument is provided
  * deprecated accepting STDIN implicitly when using the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
+ * added `--show-deprecations` option to the `lint:twig` command
 
 4.3.0
 -----

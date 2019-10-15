@@ -341,33 +341,6 @@ HttpKernel
  * Removed the second and third argument of `FileLocator::__construct`
  * Removed loading resources from `%kernel.root_dir%/Resources` and `%kernel.root_dir%` as
    fallback directories.
- * Removed passing the `exception` attribute (instance of `Symfony\Component\Debug\Exception\FlattenException`) 
-   to the configured controller of the `ExceptionListener`, use the `e` attribute 
-   (instance of `Symfony\Component\ErrorRenderer\Exception\FlattenException`) instead
-   
-   before:
-   ```php
-   use Symfony\Component\Debug\Exception\FlattenException;   
-
-   class ExceptionController
-   {
-       public function __invoke(FlattenException $exception)
-       {
-       }
-   }
-   ```  
- 
-   after:
-   ```php
-   use Symfony\Component\ErrorRenderer\Exception\FlattenException;   
-
-   class ExceptionController
-   {
-       public function __invoke(FlattenException $e)
-       {
-       }
-   }
-   ```
 
 Intl
 ----

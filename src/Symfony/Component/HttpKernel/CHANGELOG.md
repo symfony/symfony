@@ -15,8 +15,6 @@ CHANGELOG
  * Marked all dispatched event classes as `@final`
  * Added `ErrorController` to enable the preview and error rendering mechanism
  * Getting the container from a non-booted kernel is deprecated.
- * Deprecated passing the `exception` attribute (instance of `Symfony\Component\Debug\Exception\FlattenException`) 
-   to the configured controller of the `ExceptionListener` 
 
 4.3.0
 -----

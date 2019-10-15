@@ -72,7 +72,7 @@ DUMP
         $connection = new Connection(self::VAR_DUMPER_SERVER);
         $start = microtime(true);
         $this->assertFalse($connection->write($data));
-        $this->assertLessThan(1, microtime(true) - $start);
+        $this->assertLessThan(4, microtime(true) - $start);
     }
 
     private function getServerProcess(): Process

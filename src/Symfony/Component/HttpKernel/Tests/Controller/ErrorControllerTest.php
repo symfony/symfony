@@ -103,7 +103,7 @@ class ErrorControllerTest extends TestCase
             ->method('handle')
             ->with(
                 $this->callback(function (Request $request) use ($_controller, $code) {
-                    $exception = $request->attributes->get('e');
+                    $exception = $request->attributes->get('exception');
 
                     $this->assertSame($_controller, $request->attributes->get('_controller'));
                     $this->assertInstanceOf(FlattenException::class, $exception);

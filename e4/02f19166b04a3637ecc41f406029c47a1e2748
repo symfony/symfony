@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-14T13:43:45Z
+
+Just asking: Did you find another BC break? Won't https://github.com/symfony/symfony/pull/33941 be enough to keep the BC?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-14T17:41:08Z
+
+> Just asking: Did you find another BC break? Won't #33941 be enough to keep the BC?
+
+see 3.4 and 4.3 in https://travis-ci.org/symfony/symfony/builds
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-10-15T08:00:24Z
+
+Status: Needs Review

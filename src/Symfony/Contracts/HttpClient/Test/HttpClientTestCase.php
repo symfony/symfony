@@ -597,9 +597,9 @@ abstract class HttpClientTestCase extends TestCase
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/timeout-header', [
-            'timeout' => 0.5,
+            'timeout' => 0.9,
         ]);
-        usleep(510000);
+        sleep(1);
         $this->assertSame(200, $response->getStatusCode());
     }
 

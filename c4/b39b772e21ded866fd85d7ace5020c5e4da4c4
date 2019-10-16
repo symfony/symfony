@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-15T08:08:29Z
+
+no new tests covering what you spotted ? this means we have no way to prevent regressions.
+Is it because that cannot be covered by tests, or just because you haven't worked on tests ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-15T15:38:39Z
+
+Now with tests.

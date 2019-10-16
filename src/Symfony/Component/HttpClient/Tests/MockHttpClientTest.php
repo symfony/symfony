@@ -103,6 +103,8 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testBadRequestBody':
             case 'testOnProgressCancel':
             case 'testOnProgressError':
+            case 'testReentrantBufferCallback':
+            case 'testThrowingBufferCallback':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
 

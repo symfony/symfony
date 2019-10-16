@@ -73,6 +73,11 @@ class StreamWrapper
         }
     }
 
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
+    }
+
     public function stream_open(string $path, string $mode, int $options): bool
     {
         if ('r' !== $mode) {
@@ -107,7 +112,9 @@ class StreamWrapper
             // Empty the internal activity list
             foreach ($this->client->stream([$this->response], 0) as $chunk) {
                 try {
-                    $chunk->isTimeout();
+                    if (!$chunk->isTimeout() && $chunk->isFirst()) {
+                        $this->response->getStatusCode(); // ignore 3/4/5xx
+                    }
                 } catch (ExceptionInterface $e) {
                     trigger_error($e->getMessage(), E_USER_WARNING);
 
@@ -145,6 +152,10 @@ class StreamWrapper
                 $this->eof = true;
                 $this->eof = !$chunk->isTimeout();
                 $this->eof = $chunk->isLast();
+
+                if ($chunk->isFirst()) {
+                    $this->response->getStatusCode(); // ignore 3/4/5xx
+                }
 
                 if ('' !== $data = $chunk->getContent()) {
                     if (\strlen($data) > $count) {
@@ -192,6 +203,10 @@ class StreamWrapper
         if (SEEK_END === $whence || $size < $offset) {
             foreach ($this->client->stream([$this->response]) as $chunk) {
                 try {
+                    if ($chunk->isFirst()) {
+                        $this->response->getStatusCode(); // ignore 3/4/5xx
+                    }
+
                     // Chunks are buffered in $this->content already
                     $size += \strlen($chunk->getContent());
 
@@ -231,6 +246,13 @@ class StreamWrapper
 
     public function stream_stat(): array
     {
+        try {
+            $headers = $this->response->getHeaders(false);
+        } catch (ExceptionInterface $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            $headers = [];
+        }
+
         return [
             'dev' => 0,
             'ino' => 0,
@@ -239,12 +261,16 @@ class StreamWrapper
             'uid' => 0,
             'gid' => 0,
             'rdev' => 0,
-            'size' => (int) ($this->response->getHeaders(false)['content-length'][0] ?? 0),
+            'size' => (int) ($headers['content-length'][0] ?? 0),
             'atime' => 0,
-            'mtime' => strtotime($this->response->getHeaders(false)['last-modified'][0] ?? '') ?: 0,
+            'mtime' => strtotime($headers['last-modified'][0] ?? '') ?: 0,
             'ctime' => 0,
             'blksize' => 0,
             'blocks' => 0,
         ];
+    }
+
+    private function __construct()
+    {
     }
 }

@@ -1,5 +1,26 @@
 UPGRADE FROM 4.1 to 4.2
 =======================
+# Table of Contents
+- [BrowserKit](#browserkit)
+- [Cache](#cache)
+- [Config](#config)
+- [Console](#console)
+- [DoctrineBridge](#doctrinebridge)
+- [DomCrawler](#domcrawler)
+- [Finder](#finder)
+- [Form](#form)
+- [FrameworkBundle](#frameworkbundle)
+- [HttpFoundation](#httpfoundation)
+- [HttpKernel](#httpkernel)
+- [Messenger](#messenger)
+- [Monolog](#monolog)
+- [Process](#process)
+- [Security](#security)
+- [SecurityBundle](#securitybundle)
+- [Serializer](#serializer)
+- [Translation](#translation)
+- [TwigBundle](#twigbundle)
+- [Validator](#validator)
 
 BrowserKit
 ----------

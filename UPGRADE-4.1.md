@@ -1,5 +1,6 @@
 UPGRADE FROM 4.0 to 4.1
 =======================
+# Table of Contents
 - [Config](#config)
 - [Console](#console)
 - [DependencyInjection](#dependencyinjection)

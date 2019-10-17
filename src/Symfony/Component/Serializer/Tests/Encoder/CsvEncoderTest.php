@@ -374,6 +374,15 @@ CSV
             , $this->encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
                 CsvEncoder::NO_HEADERS_KEY => true,
             ]));
+        $encoder = new CsvEncoder([CsvEncoder::NO_HEADERS_KEY => true]);
+        $this->assertSame(<<<'CSV'
+a,b
+c,d
+
+CSV
+            , $encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+            ]));
     }
 
     public function testEncodeArrayObject()
@@ -587,6 +596,15 @@ CSV
 
     public function testDecodeWithoutHeader()
     {
+        $this->assertEquals([['a', 'b'], ['c', 'd']], $this->encoder->decode(<<<'CSV'
+a,b
+c,d
+
+CSV
+        , 'csv', [
+            CsvEncoder::NO_HEADERS_KEY => true,
+        ]));
+        $encoder = new CsvEncoder([CsvEncoder::NO_HEADERS_KEY => true]);
         $this->assertEquals([['a', 'b'], ['c', 'd']], $this->encoder->decode(<<<'CSV'
 a,b
 c,d

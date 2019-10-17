@@ -1,5 +1,34 @@
 UPGRADE FROM 4.3 to 4.4
 =======================
+# Table of Contents
+- [Cache](#cache)
+- [Console](#console)
+- [Debug](#debug)
+- [DependencyInjection](#dependencyinjection)
+- [DoctrineBridge](#doctrinebridge)
+- [Filesystem](#filesystem)
+- [Form](#form)
+- [FrameworkBundle](#frameworkbundle)
+- [HttpClient](#httpclient)
+- [HttpFoundation](#httpfoundation)
+- [HttpKernel](#httpkernel)
+- [Lock](#lock)
+- [Messenger](#messenger)
+- [Mime](#mime)
+- [MonologBridge](#monologbridge)
+- [Process](#process)
+- [PropertyAccess](#propertyaccess)
+- [Routing](#routing)
+- [Security](#security)
+- [Serializer](#serializer)
+- [Stopwatch](#stopwatch)
+- [Translation](#translation)
+- [TwigBridge](#twigbridge)
+- [TwigBundle](#twigbundle)
+- [Validator](#validator)
+- [WebProfilerBundle](#webprofilerbundle)
+- [WebServerBundle](#webserverbundle)
+- [Yaml](#yaml)
 
 Cache
 -----

@@ -68,7 +68,7 @@ class SesHttpTransport extends AbstractHttpTransport
             throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result->Error->Message, $result->Error->Code), $response);
         }
 
-        $message->setMessageId($result->SendEmailResult->MessageId);
+        $message->setMessageId($result->SendRawEmailResult->MessageId);
 
         return $response;
     }

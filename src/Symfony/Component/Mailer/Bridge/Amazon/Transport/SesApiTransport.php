@@ -60,7 +60,7 @@ class SesApiTransport extends AbstractApiTransport
                 'Date' => $date,
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ],
-            'body' => $this->getPayload($email, $envelope),
+            'body' => $payload = $this->getPayload($email, $envelope),
         ]);
 
         $result = new \SimpleXMLElement($response->getContent(false));
@@ -68,7 +68,9 @@ class SesApiTransport extends AbstractApiTransport
             throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $result->Error->Message, $result->Error->Code), $response);
         }
 
-        $sentMessage->setMessageId($result->SendEmailResult->MessageId);
+        $property = $payload['Action'].'Result';
+
+        $sentMessage->setMessageId($result->{$property}->MessageId);
 
         return $response;
     }

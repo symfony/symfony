@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
  *
  * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @author Robin Chalas <robin.chalas@gmail.com>
  *
  * @internal
  * @final
@@ -52,8 +53,8 @@ class Connection
         $this->connection->connect($connectionCredentials['host'] ?? '127.0.0.1', $connectionCredentials['port'] ?? 6379);
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 
-        if (isset($connectionCredentials['auth'])) {
-            $this->connection->auth($connectionCredentials['auth']);
+        if (isset($connectionCredentials['auth']) && !$this->connection->auth($connectionCredentials['auth'])) {
+            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
         }
 
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];
@@ -70,9 +71,9 @@ class Connection
 
         $pathParts = explode('/', $parsedUrl['path'] ?? '');
 
-        $stream = $pathParts[1] ?? null;
-        $group = $pathParts[2] ?? null;
-        $consumer = $pathParts[3] ?? null;
+        $stream = $pathParts[1] ?? $redisOptions['stream'] ?? null;
+        $group = $pathParts[2] ?? $redisOptions['group'] ?? null;
+        $consumer = $pathParts[3] ?? $redisOptions['consumer'] ?? null;
 
         $connectionCredentials = [
             'host' => $parsedUrl['host'] ?? '127.0.0.1',

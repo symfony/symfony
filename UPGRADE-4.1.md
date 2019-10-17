@@ -1,5 +1,19 @@
 UPGRADE FROM 4.0 to 4.1
 =======================
+- [Config](#config)
+- [Console](#console)
+- [DependencyInjection](#dependencyinjection)
+- [EventDispatcher](#eventdispatcher)
+- [Form](#form)
+- [FrameworkBundle](#frameworkbundle)
+- [HttpFoundation](#httpfoundation)
+- [Security](#security)
+- [SecurityBundle](#securitybundle)
+- [Serializer](#serializer)
+- [Translation](#translation)
+- [TwigBundle](#twigbundle)
+- [Validator](#validator)
+- [Workflow](#workflow)
 
 Config
 ------

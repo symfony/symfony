@@ -81,7 +81,7 @@ EOF
         $showDeprecations = $input->getOption('show-deprecations');
 
         if (['-'] === $filenames) {
-            return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
+            return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), uniqid('sf_', true))]);
         }
 
         if (!$filenames) {
@@ -89,7 +89,7 @@ EOF
             if (0 === ftell(STDIN)) {
                 @trigger_error('Piping content from STDIN to the "lint:twig" command without passing the dash symbol "-" as argument is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
 
-                return $this->display($input, $output, $io, [$this->validate($this->getStdin(), uniqid('sf_', true))]);
+                return $this->display($input, $output, $io, [$this->validate(file_get_contents('php://stdin'), uniqid('sf_', true))]);
             }
 
             $loader = $this->twig->getLoader();
@@ -130,16 +130,6 @@ EOF
         }
 
         return $this->display($input, $output, $io, $filesInfo);
-    }
-
-    private function getStdin(): string
-    {
-        $template = '';
-        while (!feof(STDIN)) {
-            $template .= fread(STDIN, 1024);
-        }
-
-        return $template;
     }
 
     private function getFilesInfo(array $filenames): array

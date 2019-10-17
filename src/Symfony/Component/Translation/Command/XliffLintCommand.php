@@ -85,7 +85,7 @@ EOF
         $this->displayCorrectFiles = $output->isVerbose();
 
         if (['-'] === $filenames) {
-            return $this->display($io, [$this->validate($this->getStdin())]);
+            return $this->display($io, [$this->validate(file_get_contents('php://stdin'))]);
         }
 
         // @deprecated to be removed in 5.0
@@ -96,7 +96,7 @@ EOF
 
             @trigger_error('Piping content from STDIN to the "lint:xliff" command without passing the dash symbol "-" as argument is deprecated since Symfony 4.4.', E_USER_DEPRECATED);
 
-            return $this->display($io, [$this->validate($this->getStdin())]);
+            return $this->display($io, [$this->validate(file_get_contents('php://stdin'))]);
         }
 
         $filesInfo = [];
@@ -228,16 +228,6 @@ EOF
 
             yield $file;
         }
-    }
-
-    private function getStdin(): string
-    {
-        $xliff = '';
-        while (!feof(STDIN)) {
-            $xliff .= fread(STDIN, 1024);
-        }
-
-        return $xliff;
     }
 
     private function getDirectoryIterator(string $directory)

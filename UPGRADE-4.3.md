@@ -1,5 +1,26 @@
 UPGRADE FROM 4.2 to 4.3
 =======================
+# Table of Contents
+- [BrowserKit](#browserkit)
+- [Cache](#cache)
+- [Config](#config)
+- [DependencyInjection](#dependencyinjection)
+- [DoctrineBridge](#doctrine-bridge)
+- [DotEnv](#dotenv)
+- [EventDispatcher](#eventdispatcher)
+- [Filesystem](#filesystem)
+- [Form](#form)
+- [FrameworkBundle](#frameworkbundle)
+- [HttpFoundation](#httpfoundation)
+- [HttpKernel](#httpkernel)
+- [Intl](#intl)
+- [Messenger](#messenger)
+- [Routing](#routing)
+- [Security](#security)
+- [SecurityBundle](#securitybundle)
+- [TwigBridge](#twigbridge)
+- [Workflow](#workflow)
+- [Yaml](#yaml)
 
 BrowserKit
 ----------

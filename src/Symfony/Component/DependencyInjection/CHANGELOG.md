@@ -14,6 +14,7 @@ CHANGELOG
  * added ability to define a static priority method for tagged service
  * added support for improved syntax to define method calls in Yaml
  * added `LazyString` for lazy computation of string values injected into services
+ * made the `%env(base64:...)%` processor able to decode base64url
 
 4.3.0
 -----

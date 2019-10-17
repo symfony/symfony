@@ -231,6 +231,12 @@ class EnvVarProcessorTest extends TestCase
         });
 
         $this->assertSame('hello', $result);
+
+        $result = $processor->getEnv('base64', 'foo', function ($name) { return '/+0='; });
+        $this->assertSame("\xFF\xED", $result);
+
+        $result = $processor->getEnv('base64', 'foo', function ($name) { return '_-0='; });
+        $this->assertSame("\xFF\xED", $result);
     }
 
     public function testGetEnvTrim()

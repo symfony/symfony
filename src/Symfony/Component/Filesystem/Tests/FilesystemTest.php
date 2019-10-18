@@ -370,6 +370,30 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue($this->filesystem->exists($basePath.'folder'));
     }
 
+    public function testFilesExistsAndOfTypeRegular()
+    {
+        $basePath = $this->workspace.\DIRECTORY_SEPARATOR.'directory'.\DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        touch($basePath.'file1');
+
+        $this->assertTrue($this->filesystem->exists($basePath.'file1', null));
+        $this->assertTrue($this->filesystem->exists($basePath.'file1', \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_REGULAR));
+        $this->assertFalse($this->filesystem->exists($basePath.'file1', \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_DIRECTORY));
+    }
+
+    public function testFilesExistsAndOfTypeDirectory()
+    {
+        $basePath = $this->workspace.\DIRECTORY_SEPARATOR.'directory'.\DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        mkdir($basePath.'folder');
+
+        $this->assertTrue($this->filesystem->exists($basePath.'folder', null));
+        $this->assertFalse($this->filesystem->exists($basePath.'folder', \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_REGULAR));
+        $this->assertTrue($this->filesystem->exists($basePath.'folder', \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_DIRECTORY));
+    }
+
     public function testFilesExistsFails()
     {
         $this->expectException('Symfony\Component\Filesystem\Exception\IOException');

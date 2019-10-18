@@ -22,6 +22,9 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 class Filesystem
 {
+    const FILE_TYPE_REGULAR = 'regular';
+    const FILE_TYPE_DIRECTORY = 'directory';
+
     private static $lastError;
 
     /**
@@ -114,10 +117,11 @@ class Filesystem
      * Checks the existence of files or directories.
      *
      * @param string|iterable $files A filename, an array of files, or a \Traversable instance to check
+     * @param string|null $isOfFileType A file type to check against, skipped if null (backward compatibility)
      *
      * @return bool true if the file exists, false otherwise
      */
-    public function exists($files)
+    public function exists($files, $isOfFileType = null)
     {
         $maxPathLength = PHP_MAXPATHLEN - 2;
 
@@ -128,6 +132,21 @@ class Filesystem
 
             if (!file_exists($file)) {
                 return false;
+            }
+
+            if (!is_null($isOfFileType)) {
+                switch ($isOfFileType) {
+                    case self::FILE_TYPE_REGULAR:
+                        if (!is_file($file)) {
+                            return false;
+                        }
+                        break;
+                    case self::FILE_TYPE_DIRECTORY:
+                        if (!is_dir($file)) {
+                            return false;
+                        }
+                        break;
+                }
             }
         }
 

@@ -75,11 +75,14 @@ class MandrillApiTransport extends AbstractApiTransport
                 'html' => $email->getHtmlBody(),
                 'text' => $email->getTextBody(),
                 'subject' => $email->getSubject(),
-                'from_name' => $envelope->getSender()->getName(),
                 'from_email' => $envelope->getSender()->getAddress(),
                 'to' => $this->getRecipients($email, $envelope),
             ],
         ];
+
+        if ('' !== $envelope->getSender()->getName()) {
+            $payload['message']['from_name'] = $envelope->getSender()->getName();
+        }
 
         foreach ($email->getAttachments() as $attachment) {
             $headers = $attachment->getPreparedHeaders();
@@ -122,9 +125,12 @@ class MandrillApiTransport extends AbstractApiTransport
 
             $recipientPayload = [
                 'email' => $recipient->getAddress(),
-                'name' => $recipient->getName(),
                 'type' => $type,
             ];
+
+            if ('' !== $recipient->getName()) {
+                $recipientPayload['name'] = $recipient->getName();
+            }
 
             $recipients[] = $recipientPayload;
         }

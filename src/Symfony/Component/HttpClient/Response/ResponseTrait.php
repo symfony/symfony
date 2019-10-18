@@ -57,7 +57,7 @@ trait ResponseTrait
     /** @var resource */
     private $handle;
     private $id;
-    private $timeout;
+    private $timeout = 0;
     private $finalInfo;
     private $offset = 0;
     private $jsonData;
@@ -185,7 +185,7 @@ trait ResponseTrait
     /**
      * Casts the response to a PHP stream resource.
      *
-     * @return resource|null
+     * @return resource
      *
      * @throws TransportExceptionInterface   When a network error occurs
      * @throws RedirectionExceptionInterface On a 3xx when $throw is true and the "max_redirects" option has been reached
@@ -194,8 +194,10 @@ trait ResponseTrait
      */
     public function toStream(bool $throw = true)
     {
-        // Ensure headers arrived
-        $this->getHeaders($throw);
+        if ($throw) {
+            // Ensure headers arrived
+            $this->getHeaders($throw);
+        }
 
         return StreamWrapper::createResource($this, null, $this->content, $this->handle && 'stream' === get_resource_type($this->handle) ? $this->handle : null);
     }

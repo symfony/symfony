@@ -85,7 +85,7 @@ EOF
         $this->displayCorrectFiles = $output->isVerbose();
 
         if (['-'] === $filenames) {
-            return $this->display($io, [$this->validate($this->getStdin())]);
+            return $this->display($io, [$this->validate(file_get_contents('php://stdin'))]);
         }
 
         if (!$filenames) {
@@ -221,16 +221,6 @@ EOF
 
             yield $file;
         }
-    }
-
-    private function getStdin(): string
-    {
-        $xliff = '';
-        while (!feof(STDIN)) {
-            $xliff .= fread(STDIN, 1024);
-        }
-
-        return $xliff;
     }
 
     private function getDirectoryIterator(string $directory)

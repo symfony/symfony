@@ -88,7 +88,7 @@ EOF
         $flags = $input->getOption('parse-tags') ? Yaml::PARSE_CUSTOM_TAGS : 0;
 
         if (['-'] === $filenames) {
-            return $this->display($io, [$this->validate($this->getStdin(), $flags)]);
+            return $this->display($io, [$this->validate(file_get_contents('php://stdin'), $flags)]);
         }
 
         if (!$filenames) {
@@ -206,16 +206,6 @@ EOF
 
             yield $file;
         }
-    }
-
-    private function getStdin(): string
-    {
-        $yaml = '';
-        while (!feof(STDIN)) {
-            $yaml .= fread(STDIN, 1024);
-        }
-
-        return $yaml;
     }
 
     private function getParser(): Parser

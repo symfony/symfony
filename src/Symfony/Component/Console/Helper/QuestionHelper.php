@@ -115,7 +115,7 @@ class QuestionHelper extends Helper
     {
         $this->writePrompt($output, $question);
 
-        $inputStream = $this->inputStream ?: STDIN;
+        $inputStream = $this->inputStream ?: fopen('php://stdin', 'r');
         $autocomplete = $question->getAutocompleterCallback();
 
         if (null === $autocomplete || !Terminal::hasSttyAvailable()) {

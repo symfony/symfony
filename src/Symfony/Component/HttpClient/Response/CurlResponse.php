@@ -227,6 +227,13 @@ final class CurlResponse implements ResponseInterface
      */
     private function close(): void
     {
+        if (self::$performing) {
+            $this->multi->handlesActivity[$this->id][] = null;
+            $this->multi->handlesActivity[$this->id][] = new TransportException('Response has been canceled.');
+
+            return;
+        }
+
         unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
         curl_multi_remove_handle($this->multi->handle, $this->handle);
         curl_setopt_array($this->handle, [
@@ -264,6 +271,12 @@ final class CurlResponse implements ResponseInterface
     private static function perform(CurlClientState $multi, array &$responses = null): void
     {
         if (self::$performing) {
+            if ($responses) {
+                $response = current($responses);
+                $multi->handlesActivity[(int) $response->handle][] = null;
+                $multi->handlesActivity[(int) $response->handle][] = new TransportException(sprintf('Userland callback cannot use the client nor the response while processing "%s".', curl_getinfo($response->handle, CURLINFO_EFFECTIVE_URL)));
+            }
+
             return;
         }
 
@@ -370,8 +383,15 @@ final class CurlResponse implements ResponseInterface
 
             curl_setopt($ch, CURLOPT_PRIVATE, 'content');
 
-            if (!$content && $options['buffer'] instanceof \Closure && $options['buffer']($headers)) {
-                $content = fopen('php://temp', 'w+');
+            try {
+                if (!$content && $options['buffer'] instanceof \Closure && $options['buffer']($headers)) {
+                    $content = fopen('php://temp', 'w+');
+                }
+            } catch (\Throwable $e) {
+                $multi->handlesActivity[$id][] = null;
+                $multi->handlesActivity[$id][] = $e;
+
+                return 0;
             }
         } elseif (null !== $info['redirect_url'] && $logger) {
             $logger->info(sprintf('Redirecting: "%s %s"', $info['http_code'], $info['redirect_url']));

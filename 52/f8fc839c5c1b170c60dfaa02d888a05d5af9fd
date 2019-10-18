@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by gharlan at 2019-10-15T09:14:00Z
+
+> should be merged into `3.4` if I don't miss anything
+
+Tagged scalars were introduced in 4.0.
+
+---------------------------------------------------------------------------
+
+by gharlan at 2019-10-15T09:30:50Z
+
+Oh, but it seems that tagged inline arrays are also affected (in 3.4).
+
+```
+!foo [bar] baz
+```
+
+This does not throw an exception.
+
+So I will change target to 3.4 and fix it there.
+
+Status: Needs Work

@@ -92,6 +92,7 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
+use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
@@ -2000,6 +2001,7 @@ class FrameworkExtension extends Extension
             TelegramTransportFactory::class => 'notifier.transport_factory.telegram',
             MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
+            RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
         ];
 

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-17T12:42:57Z
+
+should we support lazy-loading a service reference in a `array($object, $method)` callback, as we do for event listeners ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-17T13:12:00Z
+
+> should we support lazy-loading a service reference in a array($object, $method) callback, as we do for event listeners ?
+
+good idea, updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-17T15:37:18Z
+
+(fabbot failure is false positive)
+
+---------------------------------------------------------------------------
+
+by Devristo at 2019-10-17T18:26:47Z
+
+Could we do something similar, yet different, for string formatting? Some languages / libraries offer a string interpolation / formatting function which is lazily evaluated. An example use case is constructing a log message, which may or not be evaluated depending on the log level.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-17T18:42:38Z
+
+@Devristo I feel like that's what this provides already:
+`$s = LazyString::fromCallable(function () { return compure_log_line(); });` would do it
+(of course, it requires `$s` to not be resolved as a string before the very last moment, but that's out of scope here.)

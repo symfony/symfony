@@ -1370,4 +1370,11 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['fo...', 'foobar', 5, '...'],
         ];
     }
+
+    public function testToString()
+    {
+        $instance = static::createFromString('foobar');
+
+        self::assertSame('foobar', $instance->toString());
+    }
 }

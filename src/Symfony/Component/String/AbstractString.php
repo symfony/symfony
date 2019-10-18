@@ -589,6 +589,11 @@ abstract class AbstractString implements \JsonSerializable
         return new CodePointString($this->string);
     }
 
+    public function toString(): string
+    {
+        return $this->string;
+    }
+
     public function toUnicodeString(): UnicodeString
     {
         return new UnicodeString($this->string);

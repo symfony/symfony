@@ -30,7 +30,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
      */
     private $em;
 
-    protected static $supportedFeatureSetVersion = 403;
+    protected static $supportedFeatureSetVersion = 404;
 
     protected function getExtensions()
     {

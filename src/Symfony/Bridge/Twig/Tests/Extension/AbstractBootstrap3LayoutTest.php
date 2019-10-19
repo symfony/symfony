@@ -17,7 +17,7 @@ use Symfony\Component\Form\Tests\AbstractLayoutTest;
 
 abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 {
-    protected static $supportedFeatureSetVersion = 403;
+    protected static $supportedFeatureSetVersion = 404;
 
     public function testLabelOnForm()
     {

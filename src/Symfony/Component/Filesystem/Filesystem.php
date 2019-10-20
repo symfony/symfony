@@ -116,12 +116,12 @@ class Filesystem
     /**
      * Checks the existence of files or directories.
      *
-     * @param string|iterable $files        A filename, an array of files, or a \Traversable instance to check
-     * @param string|null     $isOfFileType A file type to check against, skipped if null (backward compatibility)
+     * @param string|iterable $files  A filename, an array of files, or a \Traversable instance to check
+     * @param string|null     $ofType A file type to check against, skipped if null (backward compatibility)
      *
      * @return bool true if the file exists, false otherwise
      */
-    public function exists($files, $isOfFileType = null)
+    public function exists($files, $ofType = null)
     {
         $maxPathLength = PHP_MAXPATHLEN - 2;
 
@@ -134,8 +134,8 @@ class Filesystem
                 return false;
             }
 
-            if (null !== $isOfFileType) {
-                switch ($isOfFileType) {
+            if (null !== $ofType) {
+                switch ($ofType) {
                     case self::FILE_TYPE_REGULAR:
                         if (!is_file($file)) {
                             return false;

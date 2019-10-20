@@ -1,0 +1,555 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-16T10:50:23Z
+
+How does the management of the secret key would work on Saas hosting like Heroku or Symfony Cloud ? I don't think they let us inject some files on the filesystem.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T11:03:18Z
+
+> How does the management of the secret key would work on Saas hosting like Heroku or Symfony Cloud ? I don't think they let us inject some files on the filesystem.
+
+All PaaS providers have a build and/or deploy step so this file could be dealt with there. For SFCloud at least there are many possible solutions. I think it's the same for all hosting providers.
+
+Since the key file is a PHP file, it's also possible to dump e.g a reference to an env var if that's what one wants to do:
+`echo "<?php return base64_decode(\$_SERVER['SODIUM_DECRYPT_KEY']);" > prod.sodium.decrypt.key`
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-16T11:10:04Z
+
+> Since the key file is a PHP file
+
+hmm, this is what I missed. I thought it was the key file itself.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-16T14:25:58Z
+
+I've been playing with this feature inside the Symfony Demo application. First, thanks Nicolas for working on this. I don't know if this could disappoint some who expected a more complex feature (not only filesystem-based, etc.) ... but **to me it was perfect** and it didn't fall short at anything I needed. I love it ❤️
+
+Now, let's comment some details.
+
+-----
+
+1) The headers of this table could be "Name" + "Value" instead of "Name" + "Secret" because I think that "secret" means everything (name + value):
+
+```
+$ php bin/console debug:secrets --reveal
+ ------------- ----------------------------------
+  name          secret
+ ------------- ----------------------------------
+  ...           ...
+ ------------- ----------------------------------
+```
+
+2) Secret names are used as part of the PHP file that stores their encrypted values. That prevents using some useful characters for the secret name. For example: `db/password`, `aws/config/root`, etc. (names like these are used for example extensively in the Hashicorp Vault docs: https://learn.hashicorp.com/vault/getting-started/first-secret)
+
+I guess it would be complicated to change this ... but just a comment in case we could do some effort.
+
+3) I tried to create `app/secret` secret, but I couldn't because of 2), so I created `app-secret` (with a dash, not an underscore). It worked great ... but when I used it in `framework.yaml` like this: `'%env(secret:app-secret)%'` I saw this error:
+
+```
+Invalid env(secret:app-secret) name: only "word" characters are allowed.
+```
+
+4) I don't understand why can't we store `null` as the value of some secret. I think it's a super common scenario, moreover in non-prod environments. Right now it's not possible:
+
+```
+In SodiumVault.php line 61:
+
+  Argument 2 passed to Symfony\Bundle\FrameworkBundle\Secrets\SodiumVault::seal() must be of the ty
+  pe string, null given, called in /Users/javier/work/symfony-demo/vendor/symfony/framework-bundle/
+  Command/SecretsSetCommand.php on line 66
+```
+
+5) The text of the question in the `secrets:set` command is `Please type the secret value 🤫:`  The emoji looks great in GitHub ... but in my console at least it looks like a big green circle. Moreover, at least on macOS, the OS already displays a special 🔑 key icon to tell the user that the input will be hidden:
+
+![secret-set](https://user-images.githubusercontent.com/73419/66927170-a2fb0600-f02f-11e9-8845-98778e1ccef2.gif)
+
+6) After running `secrets:generate-keys` I only see this message:
+
+![image](https://user-images.githubusercontent.com/73419/66927223-bd34e400-f02f-11e9-9152-a68728ca29cb.png)
+
+Maybe we can improve the output to add more information about the successful message? E.g.: which files have been generated and in which file. Also, a basic info explaining what to do: commit the public key but not the private key, etc.
+
+7) When you run `secrets:generate-keys` a second time, the error message is:
+
+![image](https://user-images.githubusercontent.com/73419/66927375-f8cfae00-f02f-11e9-97d9-1a6e545e3639.png)
+
+We could improve it explaining that even keys already exist, you can rotate them with the `--rotate` command option.
+
+8) I guess it's not worth it but ... the name of the keys looks a bit long and not very "friendly". Do we need to add the env name in the key? And the word "sodium" too?
+
+Before:
+
+```
+config/
+  secrets/
+    dev/
+      dev.sodium.decrypt.key
+      dev.sodium.encrypt.key
+```
+
+After:
+
+```
+config/
+  secrets/
+    dev/
+      private.key
+      public.key
+```
+
+Or:
+
+```
+config/
+  secrets/
+    dev/
+      keys/
+        private.key
+        public.key
+```
+
+Same for the names of the encrypted values: do we need to include the env name? `config/secrets/prod/prod.foo.sodium` instead of `config/secrets/prod/foo.sodium`?
+
+9) How can I store a "complex" secret value that includes "\n"? For example, imagine that I want to set an `aws-policy` secret with this value:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1426528957000",
+      "Effect": "Allow",
+      "Action": ["ec2:*"],
+      "Resource": ["*"]
+    }
+  ]
+}
+```
+
+In Hashicorp Vault I can do this:
+
+```
+$ vault write aws/roles/my-role \
+        credential_type=iam_user \
+        policy_document=-<<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1426528957000",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
+EOF
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T15:29:55Z
+
+Thanks for the feedback @javiereguiluz
+
+> The headers of this table could be "Name" + "Value"
+
+updated
+
+> Secret names are used as part of the PHP file that stores their encrypted values
+
+using more fancy chars is anyway incompatible with `%env(secret:...)%` references, which allow even fewer chars as you spotted, so I think we should't try to accept more chars here (but we could on env(), that's #33806).
+
+> I don't understand why can't we store null
+
+You can store only strings. Store the empty one if you want to (using STDIN as input as the interactive mode doesn't allow empty strings. I don't think that's useful enough to fix.)
+The type error is now fixed and replaced with an "aborting" message.
+
+> The text of the question in the secrets:set command is Please type the secret value 🤫:
+
+emoji removed
+ > After running secrets:generate-keys I only see this message:
+
+you'll now also see:
+![image](https://user-images.githubusercontent.com/243674/66933830-e9edf900-f039-11e9-9503-e3e6baecd994.png)
+
+> Maybe we can improve the output to add more information about the successful message? E.g.: which files have been generated and in which file.
+
+I'm not sure we can, because commands don't know anything about where keys are put (the vault is a black box to them.)
+
+> Also, a basic info explaining what to do: commit the public key but not the private key, etc.
+
+maybe the above message is enough a hint? if you have a suggestion, I'm listening.
+
+> We could improve it explaining that even keys already exist, you can rotate them with the --rotate command option.
+
+that's a dangerous hint as ppl may erase the existing keys by mistake. I'd better have them check the help (or read the doc) to discover how to get past this.
+
+> the name of the keys looks a bit long and not very "friendly". Do we need to add the env name in the key? And the word "sodium" too?
+
+yes, we do: if for any reason a file is moved out of the directory where it is, then you'd suddenly lose all context to know what this is about. With these, you're a bit safer. Same for secrets' files. The word sodium provides some possible future extensibility.
+
+> How can I store a "complex" secret value that includes "\n"?
+
+Addressed by adding an additional command-line argument which is a file where to read the secret from (`"-"` for STDIN).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T15:50:19Z
+
+BTW: public/private are generic terms, encrypt/decrypt are more accurate because we do have more context about the use case.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-16T19:58:47Z
+
+Hiya!
+
+I agree with Javier - this is fun to use! After kicking the tires, here's my feedback FWIW
+
+**A) For local dev workflow, fallback to env vars**
+
+There's a workflow problem currently for local development. If the app requires 10 "secrets", does the user need to create their own `dev` secrets directory and manually add all 10? Or should the `config/secrets/dev` directory be committed so they have them all? If so, how does the dev override some value locally without having uncommitted changes?
+
+I think the workflow should look like this:
+
+1) If using secrets, the entire `config/secrets/dev` directory SHOULD be committed (ok, they could choose to commit or not commit the actual "private key" depending on how sensitive the default/dev values are in the vault).
+
+2) Now, what if the dev needs to override the `database_url` secret locally? I think (well, it was Nicolas idea) that we could add a `secrets:set database_url --local` flag. This would create a `dev.database_url.sodium.local` file... and the system would know to look for and load these `.local` files. Then, a simple gitignore for `config/secrets/dev/*.local` could be used to ignore those overrides.
+
+** B) Smaller Stuff**
+
+* 1) I was surprised when secrets:set made the keys for me. I'm not sure that's needed. Creating a key is a pretty important thing, so maybe we should throw an error and tell them what command to run.
+
+* 2) I know why... but i don't like that `secrets:debug` isn't there (it's `debug:secrets`). It means that when you look at all the `secrets` command when you run `bin/console`, you don't discover this command. If we decided this was a command that "listed" secrets instead of "debugging" them, we would have decided to call it `secrets:list` or `secrets:show`.
+
+* 3) `[OK] New encryption keys have been generated.` - can we tell them where they were generated exactly?
+
+* 4) I don't like the encrypy/decrypt in the names. I saw your message about why you did this, but it could be dangerous: it's not clear which is the secret file that should NOT be committed.
+
+* 5) `// dev.foo.sodium on Wed, 16 Oct 2019 18:44:11 +0000` in the output - I like the date here, but what are we trying to communicate? Maybe that this contains the `foo` key and that it was dumped via the `secrets:set` command?
+
+* 6) `// Secrets could not be revealed as not decryption key has been found` - could we say where it looked for the decryption key?
+
+* 7) I see that `dev` and `prod` secrets will have two different directories. This makes sense. Maybe we could add some output to make this difference even more clear - e.g. "listing all secrets for the dev environment" or "setting value into the dev secrets".
+
+* 8) once I have keys, I can just regenerate new ones with the command... which replace the old ones and kill any existing keys. Could we add a "are you sure" confirmation and also educate them about the `--rotate` option?
+
+* 9) Minor: if you try to remove a secret before even your keys exist, you get:
+
+> Encryption key not found in "/Users/weaverryan/Sites/os/symfony-demo/config/secrets/dev/dev."
+
+That path - `dev/dev.` looked weird to me.
+
+* 10) The filenames look like `dev.foo.sodium`. What's the purpose of the `dev.` prefix? And is the `sodium` suffix needed? I assume this is how we are determining the algo to use (for the future, when multiple might be used), but I wish it could be stored elsewhere - `foo` would be a nice filename :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-10-16T21:32:31Z
+
+IMHO you should never commit the private key. If you don't care about the secret and want an easy way to share the key, then those are not secrets and you don't have to use the "secrets feature".
+if each user have their own secret (`--local` flag) then you don't have to share the secrets and don't need the "secrets feature" too. User should use the standard `env` configuration for that
+
+Symfony is flexible enough to use different ways to configure 2 environments.
+Below are 3 ways to use secrets only in `prod`.
+
+1) using distinguished conf
+
+```yaml
+# /config/packages/database.yaml
+doctrine:
+  dbal:
+    url: '%env(DATABASE_URL)%'
+    password: 'root'  # yes, you can provide both DSN (without password) and password attribute
+
+# /config/packages/prod/database.yaml
+doctrine:
+  dbal:
+    password: '%env(secret:DATABASE_PASSWORD)%'
+
+# .env
+DATABASE_URL=mysql://db_user@127.0.0.1:3306/db_name
+```
+
+2) using parameter fallback
+
+```yaml
+# /config/packages/database.yaml
+doctrine:
+  dbal:
+    url: '%env(DATABASE_URL)%'
+    password: '%env(default:empty_database_password:secret:DATABASE_PASSWORD)%'
+parameters:
+  empty_database_password: '%env(DATABASE_PASSWORD)%'
+```
+
+3) using parameters : when the secret is inside a complexe string (like DSN) and you don't want to store the entiere DSN in the secret
+
+```yaml
+# /config/packages/messenger.yaml
+framework:
+  messenger:
+    transports:
+      async: '%env(resolve:MESSENGER_TRANSPORT_DSN)%'
+parameters:
+  amqp_password: '%env(secret:AMQP_PASSWORD)'
+
+# .env
+MESSENGER_TRANSPORT_DSN=amqp://guest:guest@localhost:5672/%2f/messages
+# .env.prod
+MESSENGER_TRANSPORT_DSN=amqp://guest:%amqp_password%@localhost:5672/%2f/messages
+```
+
+note: I personnaly would loved to use `resolve` without intermediate parameters, but this has been rejected in #31000
+
+```yaml
+# /config/packages/messenger.yaml
+framework:
+  messenger:
+    transports:
+      async: '%env(resolve:MESSENGER_TRANSPORT_DSN)%'
+# .env
+MESSENGER_TRANSPORT_DSN=amqp://guest:guest@localhost:5672/%2f/messages
+# .env.prod
+MESSENGER_TRANSPORT_DSN=amqp://guest:%env(secret:AMQP_PASSWORD)%@localhost:5672/%2f/messages
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T22:32:35Z
+
+> IMHO you should never commit the private key
+
+It's a matter of policy: I think it does no harm personally have ppl get used to the command for the dev and learn the tools meanwhile. But let's not debate this here: the implementation doesn't care, ppl will have the choice.
+
+> we could add a `secrets:set database_url --local` flag
+
+Implemented. To keep vaults independent from the need, the commands receive two vaults as argument: one for `config/secrets/%kernel.environment%/` and one for `config/secrets/local/` (if one named their Symfony env "local", too bad for them :) )
+
+> I was surprised when secrets:set made the keys for me.
+
+The output is pretty clear about what happened, I don't think I'd like to be forced to run two commands when one does the job, once I'm used to it. I'm going to keep this as is, for now at least.
+
+> i don't like that secrets:debug
+
+updated to `secrets:list`
+
+> New encryption keys have been generated. - can we tell them where they were generated exactly?
+
+the commands don't have any clue about the way the secrets are stored - that's the job of the vault (could be anywhere in the future).
+
+> I don't like the encrypt/decrypt in the names. I saw your message about why you did this, but it could be dangerous: it's not clear which is the secret file that should NOT be committed.
+
+The warning that is displayed when keys tells about the DECRYPTION key. Name them public/private key and I'm equally confused personnaly: which one is used for what?
+
+> // dev.foo.sodium on Wed, 16 Oct 2019 18:44:11 +0000 in the output - I like the date here, but what are we trying to communicate? Maybe that this contains the foo key and that it was dumped via the secrets:set command?
+
+Without any context, the content of these files is completly random to the reader. Adding any useful context makes them a little bit more manageable. I don't think we care that these have been "generated by the command".
+
+> // Secrets could not be revealed as not decryption key has been found - could we say where it looked for the decryption key?
+
+Same as above: commands don't know anything at all about storages - the vault does.
+
+>  e.g. "listing all secrets for the dev environment" or "setting value into the dev secrets".
+
+Same, commands don't know anything about the storage :)
+
+> Could we add a "are you sure" confirmation and also educate them about the --rotate option?
+
+Or we could keep all files and add .1, .2, .3 as extensions?
+
+> if you try to remove a secret before even your keys exist, you get:
+
+fixed
+
+> That path - dev/dev. looked weird to me.
+> The filenames look like dev.foo.sodium. What's the purpose of the dev. prefix?
+
+See above: the better the context, the more manageable are the files.
+
+> sodium suffix needed? I assume this is how we are determining the algo to use (for the future, when multiple might be used)
+
+yes: future proofing!
+
+> foo would be a nice filename :)
+
+Also: this is internal storage, it's not optimized for humans (but we still care to add context everywhere possible: file name + comment inside)
+
+Thanks for the review!
+
+Note that anything I'm objecting here is about this very PR. More PRs are welcomed after merge, as usual :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T22:39:55Z
+
+PR updated with all comments addressed (either by code or replies above :) )
+
+Indirectly requested by @stof: `SodiumVault` now accepts a decryption key as a constructor argument, and this is wired by default to the `SYMFONY_DECRYPTION_SECRET`env var, so that this become another first-class way to deploy this key in prod.
+
+Getting the env var is actually the job of a new `secret.decryption_key` service, which ppl can override and replace by any other mean they'd like to use to fetch the key. Because the key is a string, and because we want this key to be lazily-retrivable, the PR also introduces a new `LazyString::fromCallable()` factory, for this purpose. See how it's wired in `secrets.xml`: it's not really needed for reading `SYMFONY_DECRYPTION_SECRET`, but I'm still proposing to put this wiring in the definition to allow people to take inspiration from it.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-17T06:31:33Z
+
+> The warning that is displayed when keys tells about the DECRYPTION key. Name them public/private key and I'm equally confused personally: which one is used for what?
+
+My opinion: as a regular user I don't care about the internal details of encrypting/decrypting, etc. ... but if you tell me *"this is the public key and this is the private key"*, I instantly know which key to commit/share and which key to protect. To me it's self-explanatory and that's why I mentioned it. But I totally understand if there are other reasons to not do this change. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-17T09:47:41Z
+
+public/private is unaware of the domain. You can encrypt with the private key and decrypt with the public one, or vice versa depending on the domain you apply crypto to. Here, we do have a specific domain where private == decrypt and public == encrypt. I think using domain-specific terms is appropriate. As I wrote before, I would be personally confused by public/private...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-17T15:49:50Z
+
+PR updated, ready for final review as I think all comments are now addressed.
+The only remaining is public/private vs encrypt/decrypt, I gave my pov in https://github.com/symfony/symfony/pull/33997#issuecomment-543096990
+
+So, what's new?
+- commands now *do* display useful info about the location of the secrets, thanks to a new `getLastMessage()` method;
+- the local vault now stores secret in `.env.local`, thanks to a new `DotenvVault`.
+
+Please give it a new try!
+(fabbot failure unrelated)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-18T01:38:36Z
+
+Played with it again! Feedback is minor now... mostly messaging, etc. Ultimately, I like that you chose to do the environment-variable override in `env.local` instead of the new `.local` secret files - it removes a new concept (and we can communicate this override clearly in the messaging).
+
+- Could we add notes/example to `secrets:set --help` to show passing `--env=prod` to set prod secrets?
+- Oh, could we add extra help text, for example, after `secrets:set`? For example:
+
+```
+> [OK] Secret "DATABASE_URL" encrypted in "config/secrets/dev/".
+>      Use this in config files via "%env(secret:DATABASE_URL)%".
+```
+
+- the `_SECRET` suffix is a problem... because of APP_SECRET... it thinks there's a secret called APP in `secrets:list`. So... maybe a `SECRET_` prefix?
+
+- for the message:
+
+> Secret "foo" updated in ".env.local".
+
+Can we show added vs updated (when appropriate)? Is that possible. Also, can well tell them what the env var is called? Maybe:
+
+> Added/updated "foo_SECRET" to .env.local. This will
+> override the "foo" secret.
+
+- For secrets:list, instead of showing both "Value" and "Local", could we *just* show the value, then add a comment if it's overridden on a local level (reminds me a bit of SymfonyCloud, actually)
+
+So, instead of this:
+
+```
+ -------------- ---------- ----------
+  Name           Value      Local
+ -------------- ---------- ----------
+  DATABASE_URL   ********
+  foo            ********   ********
+ ------------- ---------- ----------
+```
+
+Maybe this:
+
+```
+ -------------- -----------------------------------------------
+  Name           Value
+ -------------- -----------------------------------------------
+  DATABASE_URL   ********
+  foo            ******** (overridden by a foo_SECRET env var)
+ -------------  -----------------------------------------------
+```
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2019-10-18T03:43:06Z
+
+As a regular user too, with encrypt/decrypt terms, I have absolutely no idea which one is the key I should share and the one I should keep private.
+
+I am more familiar with public/private terms usually used when you generate ssh keys.
+
+Why not generating key like ssh keys using the `.pub` extension so we can easily understand which one is public?
+```
+config/
+  secrets/
+    dev/
+      dev.sodium.decrypt
+      dev.sodium.encrypt.pub
+```
+or
+```
+config/
+  secrets/
+    dev/
+      dev.sodium
+      dev.sodium.pub
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-18T10:25:38Z
+
+> Why not generating key like ssh keys using the .pub extension so we can easily understand which one is public?
+
+good idea - extensions are now `.encrypt.public` or `.decrypt.private`.
+
+> Could we add notes/example to secrets:set --help to show passing --env=prod to set prod secrets?
+
+I did it, then reverted it: `--help` already shows:
+`-e, --env=ENV          The Environment name. [default: "dev"]`
+
+> Oh, could we add extra help text, for example, after secrets:set? For example:
+
+Not sure after calling the command, but in the help yes! Now updated:
+![image](https://user-images.githubusercontent.com/243674/67086885-11f86c00-f1a2-11e9-9e10-85633b967d69.png)
+
+> the _SECRET suffix is a problem... because of APP_SECRET...
+
+to me it's a solution: it makes it possible to transition `APP_SECRET` to be dealt with as any other secret - as it should.
+
+> Can we show added vs updated (when appropriate)?
+
+yes, updated.
+
+> Also, can well tell them what the env var is called?
+
+Why? We tell them to reference secrets using `"%env(secret:<name>)%"` - that's all one needs to know. Using env vars directly is an advanced use case.
+
+> For secrets:list, instead of showing both "Value" and "Local", could we just show the value, then add a comment if it's overridden on a local level.
+
+Not sure at all - thus not updated :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-18T10:59:24Z
+
+PR updated - #34023 is needed.
+
+![image](https://user-images.githubusercontent.com/243674/67089062-09eefb00-f1a7-11e9-83b0-203f1169febf.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-18T20:07:36Z
+
+Now with two new commands:
+- `secrets:decrypt-to-local`
+- `secrets:encrypt-from-local`
+
+and `secrets:list` sorting the secrets by name.

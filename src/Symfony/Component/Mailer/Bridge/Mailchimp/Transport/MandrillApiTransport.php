@@ -17,7 +17,6 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\NamedAddress;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -76,14 +75,11 @@ class MandrillApiTransport extends AbstractApiTransport
                 'html' => $email->getHtmlBody(),
                 'text' => $email->getTextBody(),
                 'subject' => $email->getSubject(),
+                'from_name' => $envelope->getSender()->getName(),
                 'from_email' => $envelope->getSender()->getAddress(),
                 'to' => $this->getRecipients($email, $envelope),
             ],
         ];
-
-        if ($envelope->getSender() instanceof NamedAddress) {
-            $payload['message']['from_name'] = $envelope->getSender()->getName();
-        }
 
         foreach ($email->getAttachments() as $attachment) {
             $headers = $attachment->getPreparedHeaders();
@@ -126,12 +122,9 @@ class MandrillApiTransport extends AbstractApiTransport
 
             $recipientPayload = [
                 'email' => $recipient->getAddress(),
+                'name' => $recipient->getName(),
                 'type' => $type,
             ];
-
-            if ($recipient instanceof NamedAddress) {
-                $recipientPayload['name'] = $recipient->getName();
-            }
 
             $recipients[] = $recipientPayload;
         }

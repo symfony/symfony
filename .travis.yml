@@ -207,6 +207,7 @@ install:
 
       if [[ ! $deps ]]; then
           php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
+          composer remove --dev --no-update paragonie/sodium_compat
       else
           export SYMFONY_DEPRECATIONS_HELPER=weak &&
           cp composer.json composer.json.orig &&

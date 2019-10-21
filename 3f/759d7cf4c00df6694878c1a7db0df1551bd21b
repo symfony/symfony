@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-21T08:54:50Z
+
+Thanks!
+Could you please add a check in `HttpClientTestCase`?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-10-21T08:56:06Z
+
+I tried but:
+
+> However, I'm not quite sure about the tests here because it looks like the `MockResponse` always throws a `TransportException` when I cancel a response, even if I call `$response->getContent(false)`.  Is that a desired behaviour? :) Need some guidance here to finish that PR maybe.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-21T09:00:23Z
+
+> throws a TransportException when I cancel a response, even if I call $response->getContent(false)
+
+Yes, that's desired behavior, for all clients that didn't get the content before canceling: `false` is only about `HttpExceptionInterface` (3/4/5xx), not transport errors.
+
+But the check just needs to assert the result of `->getInfo('canceled')`, so not sure why we care about the content?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-10-21T09:24:11Z
+
+Ah, I guess I was thinking way too complicated :) Test added.
+I noticed that there are some `case` statements in `MockHttpClientTest::getHttpClient()` that don't seem to be used anymore. Want me to clean them up although not related to that PR?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-10-21T09:53:54Z
+
+Appveyor failures look unrelated :)

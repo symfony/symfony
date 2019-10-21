@@ -64,15 +64,21 @@ final class CurlResponse implements ResponseInterface
         }
 
         if (null === $content = &$this->content) {
-            $content = null === $options || true === $options['buffer'] ? fopen('php://temp', 'w+') : null;
+            $content = null === $options || true === $options['buffer'] ? fopen('php://temp', 'w+') : (\is_resource($options['buffer']) ? $options['buffer'] : null);
         } else {
             // Move the pushed response to the activity list
             $buffer = $options['buffer'];
 
             if ('headers' !== curl_getinfo($ch, CURLINFO_PRIVATE)) {
                 if ($options['buffer'] instanceof \Closure) {
-                    [$content, $buffer] = [null, $content];
-                    [$content, $buffer] = [$buffer, (bool) $options['buffer']($headers)];
+                    try {
+                        [$content, $buffer] = [null, $content];
+                        [$content, $buffer] = [$buffer, $options['buffer']($headers)];
+                    } catch (\Throwable $e) {
+                        $multi->handlesActivity[$id][] = null;
+                        $multi->handlesActivity[$id][] = $e;
+                        [$content, $buffer] = [$buffer, false];
+                    }
                 }
 
                 if (ftell($content)) {
@@ -81,7 +87,9 @@ final class CurlResponse implements ResponseInterface
                 }
             }
 
-            if (true !== $buffer) {
+            if (\is_resource($buffer)) {
+                $content = $buffer;
+            } elseif (true !== $buffer) {
                 $content = null;
             }
         }
@@ -384,8 +392,8 @@ final class CurlResponse implements ResponseInterface
             curl_setopt($ch, CURLOPT_PRIVATE, 'content');
 
             try {
-                if (!$content && $options['buffer'] instanceof \Closure && $options['buffer']($headers)) {
-                    $content = fopen('php://temp', 'w+');
+                if (!$content && $options['buffer'] instanceof \Closure && $content = $options['buffer']($headers) ?: null) {
+                    $content = \is_resource($content) ? $content : fopen('php://temp', 'w+');
                 }
             } catch (\Throwable $e) {
                 $multi->handlesActivity[$id][] = null;

@@ -87,6 +87,70 @@ abstract class HttpClientTestCase extends TestCase
         $response->getContent();
     }
 
+    public function testBufferSink()
+    {
+        $sink = fopen('php://temp', 'w+');
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057', [
+            'buffer' => $sink,
+            'headers' => ['Foo' => 'baR'],
+        ]);
+
+        $body = $response->toArray();
+        $this->assertSame('baR', $body['HTTP_FOO']);
+
+        rewind($sink);
+        $sink = stream_get_contents($sink);
+        $this->assertSame($sink, $response->getContent());
+    }
+
+    public function testConditionalBuffering()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057');
+        $firstContent = $response->getContent();
+        $secondContent = $response->getContent();
+
+        $this->assertSame($firstContent, $secondContent);
+
+        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () { return false; }]);
+        $response->getContent();
+
+        $this->expectException(TransportExceptionInterface::class);
+        $response->getContent();
+    }
+
+    public function testReentrantBufferCallback()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () use (&$response) {
+            $response->cancel();
+
+            return true;
+        }]);
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $this->expectException(TransportExceptionInterface::class);
+        $response->getContent();
+    }
+
+    public function testThrowingBufferCallback()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () {
+            throw new \Exception('Boo');
+        }]);
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $this->expectException(TransportExceptionInterface::class);
+        $this->expectExceptionMessage('Boo');
+        $response->getContent();
+    }
+
     public function testUnsupportedOption()
     {
         $client = $this->getHttpClient(__FUNCTION__);

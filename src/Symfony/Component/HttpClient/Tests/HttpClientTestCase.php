@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\Exception\ClientException;
-use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
@@ -80,52 +79,5 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->expectException(ClientException::class);
         $response = $client->request('GET', 'http://localhost:8057/404');
         $stream = $response->toStream();
-    }
-
-    public function testConditionalBuffering()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://localhost:8057');
-        $firstContent = $response->getContent();
-        $secondContent = $response->getContent();
-
-        $this->assertSame($firstContent, $secondContent);
-
-        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () { return false; }]);
-        $response->getContent();
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Cannot get the content of the response twice: buffering is disabled.');
-        $response->getContent();
-    }
-
-    public function testReentrantBufferCallback()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-
-        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () use (&$response) {
-            $response->cancel();
-        }]);
-
-        $this->assertSame(200, $response->getStatusCode());
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Response has been canceled.');
-        $response->getContent();
-    }
-
-    public function testThrowingBufferCallback()
-    {
-        $client = $this->getHttpClient(__FUNCTION__);
-
-        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () {
-            throw new \Exception('Boo');
-        }]);
-
-        $this->assertSame(200, $response->getStatusCode());
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Boo');
-        $response->getContent();
     }
 }

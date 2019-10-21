@@ -37,9 +37,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
     use HttpClientTrait;
     use LoggerAwareTrait;
 
-    private $defaultOptions = [
-        'buffer' => null, // bool|\Closure - a boolean or a closure telling if the response should be buffered based on its headers
-    ] + self::OPTIONS_DEFAULTS + [
+    private $defaultOptions = self::OPTIONS_DEFAULTS + [
         'auth_ntlm' => null, // array|string - an array containing the username as first value, and optionally the
                              //   password as the second one; or string like username:password - enabling NTLM auth
     ];
@@ -64,7 +62,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\CurlHttpClient" as the "curl" extension is not installed.');
         }
 
-        $this->defaultOptions['buffer'] = \Closure::fromCallable([__CLASS__, 'shouldBuffer']);
+        $this->defaultOptions['buffer'] = $this->defaultOptions['buffer'] ?? \Closure::fromCallable([__CLASS__, 'shouldBuffer']);
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);

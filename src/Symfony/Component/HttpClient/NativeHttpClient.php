@@ -35,9 +35,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     use HttpClientTrait;
     use LoggerAwareTrait;
 
-    private $defaultOptions = [
-        'buffer' => null, // bool|\Closure - a boolean or a closure telling if the response should be buffered based on its headers
-    ] + self::OPTIONS_DEFAULTS;
+    private $defaultOptions = self::OPTIONS_DEFAULTS;
 
     /** @var NativeClientState */
     private $multi;
@@ -50,7 +48,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
      */
     public function __construct(array $defaultOptions = [], int $maxHostConnections = 6)
     {
-        $this->defaultOptions['buffer'] = \Closure::fromCallable([__CLASS__, 'shouldBuffer']);
+        $this->defaultOptions['buffer'] = $this->defaultOptions['buffer'] ?? \Closure::fromCallable([__CLASS__, 'shouldBuffer']);
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);

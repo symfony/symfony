@@ -405,19 +405,19 @@ class FilesystemTest extends FilesystemTestCase
         mkdir($basePath.'folder2');
 
         $filesOnly = new \ArrayObject([
-            $basePath.'file', $basePath.'file2'
+            $basePath.'file', $basePath.'file2',
         ]);
 
         $dirsOnly = new \ArrayObject([
-            $basePath.'folder', $basePath.'folder2'
+            $basePath.'folder', $basePath.'folder2',
         ]);
 
         $mixedFilesDirs = new \ArrayObject([
-            $basePath.'file', $basePath.'folder', $basePath.'file2', $basePath.'folder2'
+            $basePath.'file', $basePath.'folder', $basePath.'file2', $basePath.'folder2',
         ]);
 
         $mixedDirsFiles = new \ArrayObject([
-            $basePath.'folder', $basePath.'file', $basePath.'folder2', $basePath.'file2'
+            $basePath.'folder', $basePath.'file', $basePath.'folder2', $basePath.'file2',
         ]);
 
         $this->assertTrue($this->filesystem->exists($filesOnly, \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_REGULAR));

@@ -88,15 +88,16 @@ interface ResponseInterface
      * another, as the request/response progresses.
      *
      * The following info MUST be returned:
-     *  - response_headers - an array modelled after the special $http_response_header variable
-     *  - redirect_count - the number of redirects followed while executing the request
-     *  - redirect_url - the resolved location of redirect responses, null otherwise
-     *  - start_time - the time when the request was sent or 0.0 when it's pending
-     *  - http_method - the HTTP verb of the last request
-     *  - http_code - the last response code or 0 when it is not known yet
-     *  - error - the error message when the transfer was aborted, null otherwise
-     *  - user_data - the value of the "user_data" request option, null if not set
-     *  - url - the last effective URL of the request
+     *  - canceled (bool) - true if the response was canceled using ResponseInterface::cancel(), false otherwise
+     *  - error (string|null) - the error message when the transfer was aborted, null otherwise
+     *  - http_code (int) - the last response code or 0 when it is not known yet
+     *  - http_method (string) - the HTTP verb of the last request
+     *  - redirect_count (int) - the number of redirects followed while executing the request
+     *  - redirect_url (string|null) - the resolved location of redirect responses, null otherwise
+     *  - response_headers (array) - an array modelled after the special $http_response_header variable
+     *  - start_time (float) - the time when the request was sent or 0.0 when it's pending
+     *  - url (string) - the last effective URL of the request
+     *  - user_data (mixed|null) - the value of the "user_data" request option, null if not set
      *
      * When the "capture_peer_cert_chain" option is true, the "peer_certificate_chain"
      * attribute SHOULD list the peer certificates as an array of OpenSSL X.509 resources.

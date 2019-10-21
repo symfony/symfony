@@ -52,6 +52,7 @@ trait ResponseTrait
         'response_headers' => [],
         'http_code' => 0,
         'error' => null,
+        'canceled' => false,
     ];
 
     /** @var resource */
@@ -178,6 +179,7 @@ trait ResponseTrait
      */
     public function cancel(): void
     {
+        $this->info['canceled'] = true;
         $this->info['error'] = 'Response has been canceled.';
         $this->close();
     }

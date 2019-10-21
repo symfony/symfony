@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * added `canceled` to `ResponseInterface::getInfo()`
  * added `HttpClient::createForBaseUri()`
  * added `HttplugClient` with support for sync and async requests
  * added `max_duration` option

@@ -84,6 +84,7 @@ class MockResponse implements ResponseInterface
      */
     public function cancel(): void
     {
+        $this->info['canceled'] = true;
         $this->info['error'] = 'Response has been canceled.';
         $this->body = null;
     }

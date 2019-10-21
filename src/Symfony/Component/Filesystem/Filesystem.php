@@ -22,8 +22,8 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 class Filesystem
 {
-    const FILE_TYPE_REGULAR = 'regular';
-    const FILE_TYPE_DIRECTORY = 'directory';
+    public const FILE_TYPE_REGULAR = 'regular';
+    public const FILE_TYPE_DIRECTORY = 'directory';
 
     private static $lastError;
 

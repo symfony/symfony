@@ -515,6 +515,17 @@ abstract class HttpClientTestCase extends TestCase
         $response->getHeaders();
     }
 
+    public function testInfoOnCanceledResponse()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header');
+
+        $this->assertFalse($response->getInfo('canceled'));
+        $response->cancel();
+        $this->assertTrue($response->getInfo('canceled'));
+    }
+
     public function testCancelInStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);

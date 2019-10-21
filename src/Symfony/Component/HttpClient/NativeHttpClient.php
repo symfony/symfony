@@ -96,6 +96,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             'response_headers' => [],
             'url' => $url,
             'error' => null,
+            'canceled' => false,
             'http_method' => $method,
             'http_code' => 0,
             'redirect_count' => 0,

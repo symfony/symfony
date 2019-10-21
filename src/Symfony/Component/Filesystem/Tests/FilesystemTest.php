@@ -394,6 +394,41 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue($this->filesystem->exists($basePath.'folder', \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_DIRECTORY));
     }
 
+    public function testFilesExistsAndFullSetIsOfTheSameType()
+    {
+        $basePath = $this->workspace.\DIRECTORY_SEPARATOR.'directory'.\DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        touch($basePath.'file');
+        touch($basePath.'file2');
+        mkdir($basePath.'folder');
+        mkdir($basePath.'folder2');
+
+        $filesOnly = new \ArrayObject([
+            $basePath.'file', $basePath.'file2'
+        ]);
+
+        $dirsOnly = new \ArrayObject([
+            $basePath.'folder', $basePath.'folder2'
+        ]);
+
+        $mixedFilesDirs = new \ArrayObject([
+            $basePath.'file', $basePath.'folder', $basePath.'file2', $basePath.'folder2'
+        ]);
+
+        $mixedDirsFiles = new \ArrayObject([
+            $basePath.'folder', $basePath.'file', $basePath.'folder2', $basePath.'file2'
+        ]);
+
+        $this->assertTrue($this->filesystem->exists($filesOnly, \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_REGULAR));
+        $this->assertFalse($this->filesystem->exists($mixedFilesDirs, \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_REGULAR));
+        $this->assertFalse($this->filesystem->exists($mixedFilesDirs, \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_DIRECTORY));
+
+        $this->assertTrue($this->filesystem->exists($dirsOnly, \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_DIRECTORY));
+        $this->assertFalse($this->filesystem->exists($mixedDirsFiles, \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_DIRECTORY));
+        $this->assertFalse($this->filesystem->exists($mixedDirsFiles, \Symfony\Component\Filesystem\Filesystem::FILE_TYPE_REGULAR));
+    }
+
     public function testFilesExistsFails()
     {
         $this->expectException('Symfony\Component\Filesystem\Exception\IOException');

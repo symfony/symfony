@@ -15,11 +15,6 @@ use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCa
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
-    public function testMaxDuration()
-    {
-        $this->markTestSkipped('Implemented as of version 4.4');
-    }
-
     public function testAcceptHeader()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -46,5 +41,35 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $requestHeaders = $response->toArray();
 
         $this->assertArrayNotHasKey('HTTP_ACCEPT', $requestHeaders);
+    }
+
+    public function testInfoOnCanceledResponse()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
+
+    public function testBufferSink()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
+
+    public function testConditionalBuffering()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
+
+    public function testReentrantBufferCallback()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
+
+    public function testThrowingBufferCallback()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
+
+    public function testMaxDuration()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
     }
 }

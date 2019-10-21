@@ -58,8 +58,24 @@ class StoreFactory
                 return new FlockStore(substr($connection, 8));
             case 'semaphore' === $connection:
                 return new SemaphoreStore();
-            case class_exists(AbstractAdapter::class) && preg_match('#^[a-z]++://#', $connection):
-                return static::createStore(AbstractAdapter::createConnection($connection));
+            case 0 === strpos($connection, 'redis://') && class_exists(AbstractAdapter::class):
+            case 0 === strpos($connection, 'rediss://') && class_exists(AbstractAdapter::class):
+                return new RedisStore(AbstractAdapter::createConnection($connection, ['lazy' => true]));
+            case 0 === strpos($connection, 'memcached://') && class_exists(AbstractAdapter::class):
+                return new MemcachedStore(AbstractAdapter::createConnection($connection, ['lazy' => true]));
+            case 0 === strpos($connection, 'sqlite:'):
+            case 0 === strpos($connection, 'mysql:'):
+            case 0 === strpos($connection, 'pgsql:'):
+            case 0 === strpos($connection, 'oci:'):
+            case 0 === strpos($connection, 'sqlsrv:'):
+            case 0 === strpos($connection, 'sqlite3://'):
+            case 0 === strpos($connection, 'mysql2://'):
+            case 0 === strpos($connection, 'postgres://'):
+            case 0 === strpos($connection, 'postgresql://'):
+            case 0 === strpos($connection, 'mssql://'):
+                return new PdoStore($connection);
+            case 0 === strpos($connection, 'zookeeper://'):
+                return new ZookeeperStore(ZookeeperStore::createConnection($connection));
             default:
                 throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', $connection));
         }

@@ -348,14 +348,11 @@ abstract class AbstractUnicodeString extends AbstractString
     {
         $str = clone $this;
 
-        if ($allWords) {
-            $str->string = preg_replace_callback('/\b./u', static function ($m) {
-                return mb_convert_case($m[0], MB_CASE_TITLE, 'UTF-8');
-            }, $str->string);
-        } else {
-            $firstChar = mb_substr($str->string, 0, 1, 'UTF-8');
-            $str->string = mb_convert_case($firstChar, MB_CASE_TITLE, 'UTF-8').substr($str->string, \strlen($firstChar));
-        }
+        $limit = $allWords ? -1 : 1;
+
+        $str->string = preg_replace_callback('/\b./u', static function (array $m): string {
+            return mb_convert_case($m[0], MB_CASE_TITLE, 'UTF-8');
+        }, $str->string, $limit);
 
         return $str;
     }

@@ -117,7 +117,7 @@ class Filesystem
      * Checks the existence of files or directories.
      *
      * @param string|iterable $files  A filename, an array of files, or a \Traversable instance to check
-     * @param string|null     $ofType A file type to check against, skipped if null (backward compatibility)
+     * @param string|null     $ofType A file type to check against, skipped if null
      *
      * @return bool true if the file exists, false otherwise
      */

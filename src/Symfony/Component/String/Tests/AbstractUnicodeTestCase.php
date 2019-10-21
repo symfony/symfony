@@ -292,6 +292,19 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
                 ['DEJa', 'dEJa', false],
                 ['ΣσΣ', 'σσΣ', false],
                 ['Deja Σσς DEJa ΣσΣ', 'deja σσς dEJa σσΣ', true],
+
+                // Spanish
+                ['Última prueba', 'última prueba', false],
+                ['ÚLTIMA pRUEBA', 'úLTIMA pRUEBA', false],
+
+                ['¡Hola spain!', '¡hola spain!', false],
+                ['¡HOLA sPAIN!', '¡hOLA sPAIN!', false],
+
+                ['¡Hola Spain!', '¡hola spain!', true],
+                ['¡HOLA SPAIN!', '¡hOLA sPAIN!', true],
+
+                ['Última Prueba', 'última prueba', true],
+                ['ÚLTIMA PRUEBA', 'úLTIMA pRUEBA', true],
             ]
         );
     }

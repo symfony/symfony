@@ -56,7 +56,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
     public function testWorkflowValidationStateMachine()
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
-        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" where found on StateMachine "article".');
+        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'workflows' => [

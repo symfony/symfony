@@ -37,6 +37,7 @@ CHANGELOG
  * Added new `error_controller` configuration to handle system exceptions
  * Added sort option for `translation:update` command.
  * [BC Break] The `framework.messenger.routing.senders` config key is not deep merged anymore.
+ * Added `secrets:*` commands and `%env(secret:...)%` processor to deal with secrets seamlessly.
 
 4.3.0
 -----

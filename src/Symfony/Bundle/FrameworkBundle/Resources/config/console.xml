@@ -199,5 +199,41 @@
             <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <tag name="console.command" command="debug:error-renderer" />
         </service>
+
+        <service id="console.command.secrets_set" class="Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:set" />
+        </service>
+
+        <service id="console.command.secrets_remove" class="Symfony\Bundle\FrameworkBundle\Command\SecretsRemoveCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:remove" />
+        </service>
+
+        <service id="console.command.secrets_generate_key" class="Symfony\Bundle\FrameworkBundle\Command\SecretsGenerateKeysCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:generate-keys" />
+        </service>
+
+        <service id="console.command.secrets_list" class="Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:list" />
+        </service>
+
+        <service id="console.command.secrets_decrypt_to_local" class="Symfony\Bundle\FrameworkBundle\Command\SecretsDecryptToLocalCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:decrypt-to-local" />
+        </service>
+
+        <service id="console.command.secrets_encrypt_from_local" class="Symfony\Bundle\FrameworkBundle\Command\SecretsEncryptFromLocalCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:encrypt-from-local" />
+        </service>
     </services>
 </container>

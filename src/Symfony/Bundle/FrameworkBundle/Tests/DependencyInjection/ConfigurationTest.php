@@ -420,6 +420,12 @@ class ConfigurationTest extends TestCase
                 'admin_recipients' => [],
             ],
             'error_controller' => 'error_controller',
+            'secrets' => [
+                'enabled' => true,
+                'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
+                'local_dotenv_file' => '%kernel.project_dir%/.env.local',
+                'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
+            ],
         ];
     }
 }

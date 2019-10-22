@@ -115,9 +115,26 @@ class Configuration implements ConfigurationInterface
         $this->addRobotsIndexSection($rootNode);
         $this->addHttpClientSection($rootNode);
         $this->addMailerSection($rootNode);
+        $this->addSecretsSection($rootNode);
         $this->addNotifierSection($rootNode);
 
         return $treeBuilder;
+    }
+
+    private function addSecretsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('secrets')
+                    ->canBeDisabled()
+                    ->children()
+                        ->scalarNode('vault_directory')->defaultValue('%kernel.project_dir%/config/secrets/%kernel.environment%')->cannotBeEmpty()->end()
+                        ->scalarNode('local_dotenv_file')->defaultValue('%kernel.project_dir%/.env.local')->end()
+                        ->scalarNode('decryption_env_var')->defaultValue('base64:default::SYMFONY_DECRYPTION_SECRET')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 
     private function addCsrfSection(ArrayNodeDefinition $rootNode)

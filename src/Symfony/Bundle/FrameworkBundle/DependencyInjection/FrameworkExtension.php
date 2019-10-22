@@ -336,6 +336,7 @@ class FrameworkExtension extends Extension
         $this->registerRouterConfiguration($config['router'], $container, $loader);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
+        $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists('Symfony\Component\Serializer\Serializer')) {
@@ -1314,6 +1315,34 @@ class FrameworkExtension extends Extension
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
             ->replaceArgument(3, $config['throw_exception_on_invalid_property_path'])
         ;
+    }
+
+    private function registerSecretsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$this->isConfigEnabled($container, $config)) {
+            $container->removeDefinition('console.command.secrets_set');
+            $container->removeDefinition('console.command.secrets_list');
+            $container->removeDefinition('console.command.secrets_remove');
+            $container->removeDefinition('console.command.secrets_generate_key');
+            $container->removeDefinition('console.command.secrets_decrypt_to_local');
+            $container->removeDefinition('console.command.secrets_encrypt_from_local');
+
+            return;
+        }
+
+        $loader->load('secrets.xml');
+
+        $container->getDefinition('secrets.vault')->replaceArgument(0, $config['vault_directory']);
+
+        if (!$config['local_dotenv_file']) {
+            $container->removeDefinition('secrets.local_vault');
+        }
+
+        if ($config['decryption_env_var']) {
+            $container->getDefinition('secrets.decryption_key')->replaceArgument(1, $config['decryption_env_var']);
+        } else {
+            $container->removeDefinition('secrets.decryption_key');
+        }
     }
 
     private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)

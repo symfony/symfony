@@ -37,6 +37,7 @@
         "symfony/console": "^4.4|^5.0",
         "symfony/css-selector": "^4.4|^5.0",
         "symfony/dom-crawler": "^4.4|^5.0",
+        "symfony/dotenv": "^4.4|^5.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/form": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",

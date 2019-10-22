@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class FlattenException extends LegacyFlattenException
+class FlattenException extends LegacyFlattenException
 {
     private $title;
     private $message;

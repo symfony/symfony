@@ -97,8 +97,10 @@ class LexerTest extends TestCase
                     new Token('punctuation', '[', 25),
                     new Token('number', '4', 26),
                     new Token('punctuation', ']', 27),
+                    new Token('operator', '-', 29),
+                    new Token('number', '1990', 31),
                 ],
-                '(3 + 5) ~ foo("bar").baz[4]',
+                '(3 + 5) ~ foo("bar").baz[4] - 1.99E+3',
             ],
             [
                 [new Token('operator', '..', 1)],

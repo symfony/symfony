@@ -40,7 +40,7 @@ class Lexer
                 continue;
             }
 
-            if (preg_match('/[0-9]+(?:\.[0-9]+)?/A', $expression, $match, 0, $cursor)) {
+            if (preg_match('/[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/A', $expression, $match, 0, $cursor)) {
                 // numbers
                 $number = (float) $match[0];  // floats
                 if (preg_match('/^[0-9]+$/', $match[0]) && $number <= PHP_INT_MAX) {

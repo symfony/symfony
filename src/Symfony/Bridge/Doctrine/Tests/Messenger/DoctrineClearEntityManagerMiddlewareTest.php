@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineClearEntityManagerMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineClearEntityManagerMiddlewareTest extends MiddlewareTestCase
@@ -34,7 +35,10 @@ class DoctrineClearEntityManagerMiddlewareTest extends MiddlewareTestCase
 
         $middleware = new DoctrineClearEntityManagerMiddleware($managerRegistry, 'default');
 
-        $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
+        $envelope = new Envelope(new \stdClass(), [
+            new ReceivedStamp('async'),
+        ]);
+        $middleware->handle($envelope, $this->getStackMock());
     }
 
     public function testInvalidEntityManagerThrowsException()
@@ -50,5 +54,23 @@ class DoctrineClearEntityManagerMiddlewareTest extends MiddlewareTestCase
         $this->expectException(UnrecoverableMessageHandlingException::class);
 
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
+    }
+
+    public function testMiddlewareDoesNotClearInNonWorkerContext()
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never())
+            ->method('clear');
+
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry
+            ->method('getManager')
+            ->with('default')
+            ->willReturn($entityManager);
+
+        $middleware = new DoctrineClearEntityManagerMiddleware($managerRegistry, 'default');
+
+        $envelope = new Envelope(new \stdClass());
+        $middleware->handle($envelope, $this->getStackMock());
     }
 }

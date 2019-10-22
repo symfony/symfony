@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineCloseConnectionMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
@@ -49,7 +50,10 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
             ->method('close')
         ;
 
-        $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
+        $envelope = new Envelope(new \stdClass(), [
+            new ReceivedStamp('async'),
+        ]);
+        $this->middleware->handle($envelope, $this->getStackMock());
     }
 
     public function testInvalidEntityManagerThrowsException()
@@ -65,5 +69,15 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
         $this->expectException(UnrecoverableMessageHandlingException::class);
 
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
+    }
+
+    public function testMiddlewareNotCloseInNonWorkerContext()
+    {
+        $this->connection->expects($this->never())
+            ->method('close')
+        ;
+
+        $envelope = new Envelope(new \stdClass());
+        $this->middleware->handle($envelope, $this->getStackMock());
     }
 }

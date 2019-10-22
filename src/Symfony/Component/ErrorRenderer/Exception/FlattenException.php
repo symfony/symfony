@@ -38,12 +38,12 @@ class FlattenException extends LegacyFlattenException
     private $file;
     private $line;
 
-    public static function create(\Exception $exception, $statusCode = null, array $headers = []): LegacyFlattenException
+    public static function create(\Exception $exception, $statusCode = null, array $headers = []): self
     {
         return static::createFromThrowable($exception, $statusCode, $headers);
     }
 
-    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): LegacyFlattenException
+    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
@@ -228,7 +228,7 @@ class FlattenException extends LegacyFlattenException
     /**
      * @return $this
      */
-    public function setPrevious(LegacyFlattenException $previous): self
+    final public function setPrevious(LegacyFlattenException $previous): self
     {
         $this->previous = $previous;
 

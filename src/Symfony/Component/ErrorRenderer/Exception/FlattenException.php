@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class FlattenException
+class FlattenException
 {
     private $title;
     private $message;

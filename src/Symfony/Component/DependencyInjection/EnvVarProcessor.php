@@ -173,7 +173,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('base64' === $prefix) {
-            return base64_decode($env);
+            return base64_decode(strtr($env, '-_', '+/'));
         }
 
         if ('json' === $prefix) {

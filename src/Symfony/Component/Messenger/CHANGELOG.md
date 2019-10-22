@@ -10,6 +10,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * [BC BREAK] The `SyncTransport` and `SyncTransportFactory` classes were removed.
  * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
    pass a `RoutableMessageBus`  instance instead.
  * Added support for auto trimming of Redis streams.

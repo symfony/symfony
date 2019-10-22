@@ -57,7 +57,7 @@
         "symfony/twig-bundle": "^4.4|^5.0",
         "symfony/validator": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0",
-        "symfony/workflow": "^4.3|^5.0",
+        "symfony/workflow": "^4.3.6|^5.0",
         "symfony/yaml": "^3.4|^4.0|^5.0",
         "symfony/property-info": "^3.4|^4.0|^5.0",
         "symfony/web-link": "^4.4|^5.0",
@@ -88,7 +88,7 @@
         "symfony/twig-bundle": "<4.4",
         "symfony/validator": "<4.4",
         "symfony/var-dumper": "<4.4",
-        "symfony/workflow": "<4.3"
+        "symfony/workflow": "<4.3.6"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:messenger>
+            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage">
+                <framework:sender service="amqp" />
+            </framework:routing>
+            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\SecondMessage">
+                <framework:sender service="sync" />
+            </framework:routing>
+            <framework:routing message-class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage">
+                <framework:sender service="amqp" />
+                <framework:sender service="sync" />
+            </framework:routing>
+            <framework:transport name="amqp" dsn="amqp://localhost/%2f/messages" />
+            <framework:transport name="sync" dsn="sync://" />
+        </framework:messenger>
+    </framework:config>
+</container>

@@ -54,7 +54,7 @@ before_install:
       sudo rm /etc/apt/sources.list.d/google-chrome.list
       sudo rm /etc/apt/sources.list.d/mongodb-3.4.list
       sudo apt update
-      sudo apt install -y librabbitmq-dev libsodium-dev
+      sudo apt install -y librabbitmq-dev
 
     - |
       # Start Redis cluster
@@ -160,9 +160,6 @@ before_install:
           export PHP=$PHP
           phpenv global $PHP
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
-          if ! php --ri sodium > /dev/null; then
-              tfold ext.libsodium tpecl libsodium sodium.so $INI
-          fi
 
           tfold ext.apcu tpecl apcu-5.1.17 apcu.so $INI
           tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI

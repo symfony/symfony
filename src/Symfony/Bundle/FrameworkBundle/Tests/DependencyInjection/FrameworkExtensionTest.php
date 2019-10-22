@@ -316,7 +316,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testWorkflowAreValidated()
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
-        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" where found on StateMachine "my_workflow".');
+        $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" were found on StateMachine "my_workflow".');
         $this->createContainerFromFile('workflow_not_valid');
     }
 

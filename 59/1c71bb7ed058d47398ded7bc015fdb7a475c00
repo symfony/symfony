@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by B-Galati at 2019-10-22T13:37:37Z
+
+@weaverryan Do you think the doc could be improved to make it more explicit how middlewares works with async transport/workers?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-22T14:02:45Z
+
+> Do you think the doc could be improved to make it more explicit how middlewares works with async transport/workers
+
+Good idea :). See https://github.com/symfony/symfony-docs/pull/12535
+
+I'm going to update this PR a bit based on feedback from Nicolas, but the core idea will remain the same.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-22T14:56:47Z
+
+This now depends on #34069, but otherwise, is ready to go and is now much simpler.
+
+I can't think of a downside to this - I can't think of why we would ever want to ping/close/clear *except* when inside a worker context. Ping @Koc

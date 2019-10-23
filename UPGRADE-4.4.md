@@ -93,7 +93,7 @@ Form
 FrameworkBundle
 ---------------
 
- * Deprecated booting the kernel before running `WebTestCase::createClient()`.
+ * Deprecated calling `WebTestCase::createClient()` while a kernel has been booted, ensure the kernel is shut down before calling the method
  * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
  * The `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
    has been deprecated.

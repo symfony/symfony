@@ -300,7 +300,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function getContainer()
     {
-        if (!$this->booted) {
+        if (!$this->container) {
             throw new \LogicException('Cannot retrieve the container from a non-booted kernel.');
         }
 

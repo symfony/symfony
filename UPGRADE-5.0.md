@@ -222,8 +222,7 @@ Form
 FrameworkBundle
 ---------------
 
- * Dropped support for booting the kernel before running `WebTestCase::createClient()`. `createClient()` will throw an
-   exception if the kernel was already booted before.
+ * Calling `WebTestCase::createClient()` while a kernel has been booted now throws an exception, ensure the kernel is shut down before calling the method
  * Removed the `framework.templating` option, configure the Twig bundle instead.
  * The project dir argument of the constructor of `AssetsInstallCommand` is required.
  * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`

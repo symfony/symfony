@@ -100,7 +100,7 @@ class AppKernel extends Kernel
 
     public function getContainer(): ContainerInterface
     {
-        if (!$this->booted) {
+        if (!$this->container) {
             throw new \LogicException('Cannot access the container on a non-booted kernel. Did you forget to boot it?');
         }
 

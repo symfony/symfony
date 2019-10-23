@@ -10,7 +10,7 @@ CHANGELOG
  * Deprecated the `controller_name_converter` and `resolve_controller_name_subscriber` services
  * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`
  * Added support for configuring chained cache pools
- * Deprecated booting the kernel before running `WebTestCase::createClient()`
+ * Deprecated calling `WebTestCase::createClient()` while a kernel has been booted, ensure the kernel is shut down before calling the method
  * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
  * Not tagging service route loaders with `routing.route_loader` has been deprecated.
  * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.

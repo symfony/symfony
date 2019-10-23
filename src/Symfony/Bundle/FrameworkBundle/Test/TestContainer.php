@@ -119,7 +119,7 @@ class TestContainer extends Container
      */
     public function reset()
     {
-        $this->getPublicContainer()->reset();
+        // ignore the call
     }
 
     /**

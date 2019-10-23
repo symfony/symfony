@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -154,7 +153,7 @@ class Worker implements WorkerInterface
 
                 // add the delay and retry stamp info + remove ReceivedStamp
                 $retryEnvelope = $envelope->with(new DelayStamp($delay))
-                    ->with(new RedeliveryStamp($retryCount, $transportName, $throwable->getMessage(), $this->flattenedException($throwable)))
+                    ->with(new RedeliveryStamp($retryCount, $transportName))
                     ->withoutAll(ReceivedStamp::class);
 
                 // re-send the message
@@ -216,18 +215,5 @@ class Worker implements WorkerInterface
         }
 
         return $retryStrategy->isRetryable($envelope);
-    }
-
-    private function flattenedException(\Throwable $throwable): ?FlattenException
-    {
-        if (!class_exists(FlattenException::class)) {
-            return null;
-        }
-
-        if ($throwable instanceof HandlerFailedException) {
-            $throwable = $throwable->getNestedExceptions()[0];
-        }
-
-        return FlattenException::createFromThrowable($throwable);
     }
 }

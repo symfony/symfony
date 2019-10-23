@@ -79,7 +79,9 @@ class Terminal
                 // or [w, h] from "wxh"
                 self::$width = (int) $matches[1];
                 self::$height = isset($matches[4]) ? (int) $matches[4] : (int) $matches[2];
-            } elseif (self::hasSttyAvailable()) {
+            } elseif (!self::hasVt100Support() && self::hasSttyAvailable()) {
+                //only use stty in windows if the terminal does not support vt100 (e.g. win7 + git-bash)
+                //testing for stty in a win10 vt100 enabled console will implicitly disable vt100 support on STDOUT
                 self::initDimensionsUsingStty();
             } elseif (null !== $dimensions = self::getConsoleMode()) {
                 // extract [w, h] from "wxh"
@@ -91,6 +93,18 @@ class Terminal
         }
     }
 
+    /**
+     * Returns true if STDOUT has vt100 support (some win10 configurations)
+     * @return bool
+     */
+    private static function hasVt100Support()
+    {
+        return \function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT);
+    }
+
+    /**
+     * Initialize dimensions using the output of an stty columns line
+     */
     private static function initDimensionsUsingStty()
     {
         if ($sttyString = self::getSttyColumns()) {

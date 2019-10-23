@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-07-03T15:27:52Z
+
+Could you please ensure this behavior by a test?
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2019-07-03T21:03:27Z
+
+Ofcourse. Is the direction of this fix the right one? As in, am I not doing something I shouldn't? ;-)
+If so, I'll make sure to add the tests tomorrow.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-07-08T18:03:48Z
+
+Thanks for fixing this @TimoBakx! I'd like to discuss an alternative. As you know, the exception info isn't fully lost, it's just that the "top" `RedeliveryStamp` doesn't contain it... and then the "failed" console commands only look at the top `RedeliveryStamp` for that exception info.
+
+I'd like to discuss two possible alternative approaches:
+
+1) Improve the code in the console command - i.e. loop over all `RedeliveryStamps` and find the first that has some exception details. From a high level, the command would be displaying the "most recent exception info"... which may or may not be from the top-level stamp.
+
+2) Stop putting the exception info on the `RedeliveryStamp` and instead put it on some new stamp - e.g. `FailedMessageErrorDetailsStamp`. Then, naturally, the exception info wouldn't get "covered" up when it's redelivered later.
+
+Let me know what you think!
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2019-07-08T18:38:32Z
+
+Hi @weaverryan, thanks for the feedback. I have to agree that the current "solution" is a bit icky. I've been thinking about it for the past few days.
+I really like the idea of the `FailedMessageErrorDetailsStamp`. But I think we should add one every time an exception occurs during handling and not only after we run out of retries. That way, you also have a better view of what went wrong the previous times (as the Exception might be a different one). What do you think?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-07-09T01:44:47Z
+
+> I really like the idea of the FailedMessageErrorDetailsStamp. But I think we should add one every time an exception occurs during handling and not only after we run out of retries. That way, you also have a better view of what went wrong the previous times (as the Exception might be a different one). What do you think?
+
+I was also wondering about the same thing.... it seems a bit arbitrary to store the exception *only* on the one failure that triggered it to be sent to the failure transport. My concern would be message size. Ping @Tobion - do you have any concerns about attaching exception information *each* time a message fails? The exception message & class are small... but the stack trace is big.
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2019-07-09T06:57:27Z
+
+Oh, indeed. That could become quite big quite fast. Would storing the Handler FQCN, the Exception FQCN and the Exception message be enough?
+Logging would generally give you the same information, and if you want to start debugging, there are better ways than going through plain-text tracelogs from stamps.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-07-16T19:56:54Z
+
+> Would storing the Handler FQCN, the Exception FQCN and the Exception message be enough?
+
+Yes and no. I like seeing the full stracktrace... at least for one of the failures. I'm not sure if it's really "natural" to store the full stacktrace just for the first... and then not for any of the others... but this is also an edge-case (failing, in general is an edge case.
+
+To get this PR to review stage, let's do this new `FailedMessageErrorDetailsStamp` where we store those details on every failure. And let's include the same stuff we have now (including the full trace) EVERY time. Then we can get other eyes on this and see if size is really a problem or if we're making a fuss out of nothing.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-07-16T19:59:17Z
+
+And, btw, this would go into 4.4. However, we could additionally do solution 1 (https://github.com/symfony/symfony/pull/32341#issuecomment-509331101) in 4.3, as it would be a very simple, and sensible patch.
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2019-07-16T20:07:12Z
+
+Alright. Thanks for your feedback and insight. I will implement solution 1 in this PR and then create a new PR for solution 2.
+
+---------------------------------------------------------------------------
+
+by iosifch at 2019-07-21T20:47:48Z
+
+I think that the size of the message becomes an issue if the number of retries is too big, but this should be a concern of the developer. Maybe a warning in the documentation will help the developers to know what to expect if the number of retries is too high.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-26T16:53:43Z
+
+I thought the failed:retry discards messages when they fail again as discussed in https://github.com/symfony/symfony/issues/32559#issuecomment-515169250. So I was wondering about this PR/issue as it didn't make sense to me. Turns out they are retried but using the retry strategy of the failed transport (which is enabled by default).
+
+Here is the current workflow:
+
+messenger:consume async -> "async" transport message received by worker -> exception in handler -> retry strategy from the "async" transport
+- retry: ack and send the message again to the "async" transport -> received after delay again
+- no retry: SendFailedMessageToFailureTransportListener -> add SentToFailureTransportStamp and RedeliveryStamp and redispatch to send to the "failed" transport
+
+messenger:failed:retry -> get message -> exception in handler -> retry strategy from the "failed" transport
+- retry: ack and send the message again to the "failed" transport with delay which also creates a new id -> messenger:failed:retry command stops because it only receives one message
+- no retry: message gets rejected
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2019-08-03T14:34:04Z
+
+I updated this PR to reflect part one of the solution (https://github.com/symfony/symfony/pull/32341#issuecomment-509331101)
+Part two of the solution is available here: #32904.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-09-17T15:05:18Z
+
+Seems like a different solution was merged: #33600
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-10-23T11:55:45Z
+
+> @Tobion - do you have any concerns about attaching exception information each time a message fails?
+
+@weaverryan yes that is problematic as I have found out: #34082
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2019-10-23T11:58:24Z
+
+Would it be better to only store the exception that last occurred? Or perhaps only the trace of the last exception (and keep only the type & message of the previous ones)?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-10-23T12:02:43Z
+
+I would suggest we only add the new exception info when the exception message and class is different from the previous one. So when you have the same error, it does not re-add the same information over and over. And we also need to limit it to something like the last three different exceptions and drop older error details.
+I guess this is something to consider for #32904
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2019-10-23T12:05:57Z
+
+Thanks for the feedback. I added two todo-items in #32904.

@@ -101,6 +101,13 @@ EOT
 
         $io->table([], $rows);
 
+        if (self::isExpired(Kernel::END_OF_LIFE)) {
+            return 2;
+        }
+        if (self::isExpired(Kernel::END_OF_MAINTENANCE)) {
+            return 1;
+        }
+
         return 0;
     }
 

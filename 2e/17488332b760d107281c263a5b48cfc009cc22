@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-23T12:29:01Z
+
+Sorry for being late on #33600 stuff!
+
+Summary:
+
+A) We should merge this and revert #33600 (into 4.3)
+B) We should merge #32341, which is a superficial fix in how the exception info is displayed in the command (into 4.3)
+C) We should consider #32904 for the future, which is a safer way to try to store some exception info for *each* time it fails. (4.4 or 5.1 - I know 4.4 needs to get shipped)

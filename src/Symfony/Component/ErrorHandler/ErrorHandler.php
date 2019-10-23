@@ -20,6 +20,8 @@ use Symfony\Component\ErrorHandler\ErrorEnhancer\ErrorEnhancerInterface;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedFunctionErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedMethodErrorEnhancer;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 /**
  * A generic ErrorHandler for the PHP engine.

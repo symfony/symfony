@@ -37,10 +37,6 @@ class RegisterListenersPassTest extends TestCase
 
     public function testValidEventSubscriber()
     {
-        $services = [
-            'my_event_subscriber' => [0 => []],
-        ];
-
         $builder = new ContainerBuilder();
         $eventDispatcherDefinition = $builder->register('event_dispatcher');
         $builder->register('my_event_subscriber', 'Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService')

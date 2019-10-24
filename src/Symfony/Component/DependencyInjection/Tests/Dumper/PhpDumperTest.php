@@ -886,7 +886,7 @@ class PhpDumperTest extends TestCase
             ->setPublic(true)
             ->addArgument($baz);
 
-        $passConfig = $container->getCompiler()->getPassConfig();
+        $container->getCompiler()->getPassConfig();
         $container->compile();
 
         $dumper = new PhpDumper($container);
@@ -978,7 +978,6 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
-        $dump = $dumper->dump();
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_adawson.php', $dumper->dump());
     }
 

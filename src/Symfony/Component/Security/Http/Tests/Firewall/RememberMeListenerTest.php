@@ -221,7 +221,7 @@ class RememberMeListenerTest extends TestCase
 
     public function testSessionStrategy()
     {
-        list($listener, $tokenStorage, $service, $manager, , $dispatcher, $sessionStrategy) = $this->getListener(false, true, true);
+        list($listener, $tokenStorage, $service, $manager, , , $sessionStrategy) = $this->getListener(false, true, true);
 
         $tokenStorage
             ->expects($this->once())
@@ -286,7 +286,7 @@ class RememberMeListenerTest extends TestCase
 
     public function testSessionIsMigratedByDefault()
     {
-        list($listener, $tokenStorage, $service, $manager, , $dispatcher, $sessionStrategy) = $this->getListener(false, true, false);
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, true, false);
 
         $tokenStorage
             ->expects($this->once())

@@ -153,7 +153,7 @@ class UploadedFileTest extends TestCase
             UPLOAD_ERR_OK
         );
 
-        $movedFile = $file->move(__DIR__.'/Fixtures/directory');
+        $file->move(__DIR__.'/Fixtures/directory');
     }
 
     public function testMoveLocalFileIsAllowedInTestMode()

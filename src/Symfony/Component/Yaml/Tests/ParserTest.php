@@ -110,7 +110,7 @@ class ParserTest extends TestCase
 
         foreach ($yamls as $yaml) {
             try {
-                $content = $this->parser->parse($yaml);
+                $this->parser->parse($yaml);
 
                 $this->fail('YAML files must not contain tabs');
             } catch (\Exception $e) {

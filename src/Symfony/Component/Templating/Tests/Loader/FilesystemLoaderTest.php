@@ -27,7 +27,6 @@ class FilesystemLoaderTest extends TestCase
     public function testConstructor()
     {
         $pathPattern = self::$fixturesPath.'/templates/%name%.%engine%';
-        $path = self::$fixturesPath.'/templates';
         $loader = new ProjectTemplateLoader2($pathPattern);
         $this->assertEquals([$pathPattern], $loader->getTemplatePathPatterns(), '__construct() takes a path as its second argument');
         $loader = new ProjectTemplateLoader2([$pathPattern]);

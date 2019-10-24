@@ -11,7 +11,7 @@ class DefinitionBuilderTest extends TestCase
     public function testAddPlaceInvalidName()
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
-        $builder = new DefinitionBuilder(['a"', 'b']);
+        new DefinitionBuilder(['a"', 'b']);
     }
 
     public function testSetInitialPlace()

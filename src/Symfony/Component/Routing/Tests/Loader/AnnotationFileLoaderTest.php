@@ -35,9 +35,6 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php');
     }
 
-    /**
-     * @requires PHP 5.4
-     */
     public function testLoadTraitWithClassConstant()
     {
         $this->reader->expects($this->never())->method('getClassAnnotation');

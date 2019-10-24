@@ -39,14 +39,14 @@ class FormTest extends TestCase
         $nodes = $dom->getElementsByTagName('input');
 
         try {
-            $form = new Form($nodes->item(0), 'http://example.com');
+            new Form($nodes->item(0), 'http://example.com');
             $this->fail('__construct() throws a \\LogicException if the node has no form ancestor');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the node has no form ancestor');
         }
 
         try {
-            $form = new Form($nodes->item(1), 'http://example.com');
+            new Form($nodes->item(1), 'http://example.com');
             $this->fail('__construct() throws a \\LogicException if the input type is not submit, button, or image');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the input type is not submit, button, or image');
@@ -55,7 +55,7 @@ class FormTest extends TestCase
         $nodes = $dom->getElementsByTagName('button');
 
         try {
-            $form = new Form($nodes->item(0), 'http://example.com');
+            new Form($nodes->item(0), 'http://example.com');
             $this->fail('__construct() throws a \\LogicException if the node has no form ancestor');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the node has no form ancestor');
@@ -63,11 +63,19 @@ class FormTest extends TestCase
     }
 
     /**
-     * __construct() should throw \\LogicException if the form attribute is invalid.
+     * @dataProvider constructorThrowsExceptionIfNoRelatedFormProvider
+     *
+     * __construct() should throw a \LogicException if the form attribute is invalid.
      */
-    public function testConstructorThrowsExceptionIfNoRelatedForm()
+    public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node)
     {
         $this->expectException('LogicException');
+
+        new Form($node, 'http://example.com');
+    }
+
+    public function constructorThrowsExceptionIfNoRelatedFormProvider()
+    {
         $dom = new \DOMDocument();
         $dom->loadHTML('
             <html>
@@ -81,8 +89,10 @@ class FormTest extends TestCase
 
         $nodes = $dom->getElementsByTagName('input');
 
-        $form = new Form($nodes->item(0), 'http://example.com');
-        $form = new Form($nodes->item(1), 'http://example.com');
+        return [
+            [$nodes->item(0)],
+            [$nodes->item(1)],
+        ];
     }
 
     public function testConstructorLoadsOnlyFieldsOfTheRightForm()

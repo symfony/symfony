@@ -26,16 +26,6 @@ class MultiplierRetryStrategyTest extends TestCase
         $this->assertTrue($strategy->isRetryable($envelope));
     }
 
-    public function testIsRetryableWithNullMax()
-    {
-        $strategy = new MultiplierRetryStrategy(null);
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0, 'sender_alias')]);
-        $this->assertTrue($strategy->isRetryable($envelope));
-
-        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(1, 'sender_alias')]);
-        $this->assertTrue($strategy->isRetryable($envelope));
-    }
-
     public function testIsNotRetryable()
     {
         $strategy = new MultiplierRetryStrategy(3);

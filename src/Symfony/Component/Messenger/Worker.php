@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -135,6 +136,13 @@ class Worker implements WorkerInterface
         try {
             $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName)));
         } catch (\Throwable $throwable) {
+            $rejectFirst = $throwable instanceof RejectRedeliveredMessageException;
+            if ($rejectFirst) {
+                // redelivered messages are rejected first so that continuous failures in an event listener or while
+                // publishing for retry does not cause infinite redelivery loops
+                $receiver->reject($envelope);
+            }
+
             if ($throwable instanceof HandlerFailedException) {
                 $envelope = $throwable->getEnvelope();
             }
@@ -156,15 +164,15 @@ class Worker implements WorkerInterface
                     ->with(new RedeliveryStamp($retryCount, $transportName))
                     ->withoutAll(ReceivedStamp::class);
 
-                // re-send the message
+                // re-send the message for retry
                 $this->bus->dispatch($retryEnvelope);
-                // acknowledge the previous message has received
-                $receiver->ack($envelope);
             } else {
                 if (null !== $this->logger) {
                     $this->logger->critical('Error thrown while handling message {class}. Removing from transport after {retryCount} retries. Error: "{error}"', $context + ['retryCount' => $retryCount, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
                 }
+            }
 
+            if (!$rejectFirst) {
                 $receiver->reject($envelope);
             }
 

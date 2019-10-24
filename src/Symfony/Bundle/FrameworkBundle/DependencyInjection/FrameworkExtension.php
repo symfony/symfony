@@ -1934,9 +1934,11 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('notifier.channel.email');
         }
 
-        if (!$this->messengerConfigEnabled) {
-            $container->removeDefinition('notifier.failed_message_listener');
-        } else {
+        if ($this->messengerConfigEnabled) {
+            if ($config['notification_on_failed_messages']) {
+                $container->getDefinition('notifier.failed_message_listener')->addTag('kernel.event_subscriber');
+            }
+
             // as we have a bus, the channels don't need the transports
             $container->getDefinition('notifier.channel.chat')->setArgument(0, null);
             $container->getDefinition('notifier.channel.email')->setArgument(0, null);

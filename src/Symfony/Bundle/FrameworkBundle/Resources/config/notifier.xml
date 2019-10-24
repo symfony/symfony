@@ -44,7 +44,6 @@
 
         <service id="notifier.failed_message_listener" class="Symfony\Component\Notifier\EventListener\SendFailedMessageToNotifierListener">
             <argument type="service" id="notifier" />
-            <tag name="kernel.event_subscriber" />
         </service>
 
         <!-- chatter -->

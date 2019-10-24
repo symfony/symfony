@@ -1531,7 +1531,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('email')->cannotBeEmpty()->end()
-                                    ->scalarNode('phone')->defaultNull()->end()
+                                    ->scalarNode('phone')->defaultValue('')->end()
                                 ->end()
                             ->end()
                         ->end()

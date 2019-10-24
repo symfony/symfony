@@ -1516,6 +1516,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
+                    ->booleanNode('notification_on_failed_messages')->defaultFalse()->end()
                     ->children()
                         ->arrayNode('channel_policy')
                             ->useAttributeAsKey('name')

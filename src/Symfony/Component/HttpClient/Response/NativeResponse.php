@@ -51,7 +51,7 @@ final class NativeResponse implements ResponseInterface
         $this->info = &$info;
         $this->resolveRedirect = $resolveRedirect;
         $this->onProgress = $onProgress;
-        $this->content = true === $options['buffer'] ? fopen('php://temp', 'w+') : null;
+        $this->content = true === $options['buffer'] ? fopen('php://temp', 'w+') : (\is_resource($options['buffer']) ? $options['buffer'] : null);
         $this->shouldBuffer = $options['buffer'] instanceof \Closure ? $options['buffer'] : null;
 
         // Temporary resources to dechunk/inflate the response stream
@@ -179,8 +179,8 @@ final class NativeResponse implements ResponseInterface
         }
 
         try {
-            if (null !== $this->shouldBuffer && null === $this->content && ($this->shouldBuffer)($this->headers)) {
-                $this->content = fopen('php://temp', 'w+');
+            if (null !== $this->shouldBuffer && null === $this->content && $this->content = ($this->shouldBuffer)($this->headers) ?: null) {
+                $this->content = \is_resource($this->content) ? $this->content : fopen('php://temp', 'w+');
             }
 
             if (!$this->buffer) {

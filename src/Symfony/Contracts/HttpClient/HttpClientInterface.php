@@ -45,7 +45,9 @@ interface HttpClientInterface
                                 //   NOT follow except for the initial host name
         'http_version' => null, // string - defaults to the best supported version, typically 1.1 or 2.0
         'base_uri' => null,     // string - the URI to resolve relative URLs, following rules in RFC 3986, section 2
-        'buffer' => true,       // bool - whether the content of the response should be buffered or not
+        'buffer' => true,       // bool|resource|\Closure - whether the content of the response should be buffered or not,
+                                //   or a stream resource where the response body should be written,
+                                //   or a closure telling if/where the response should be buffered based on its headers
         'on_progress' => null,  // callable(int $dlNow, int $dlSize, array $info) - throwing any exceptions MUST abort
                                 //   the request; it MUST be called on DNS resolution, on arrival of headers and on
                                 //   completion; it SHOULD be called on upload/download of data and at least 1/s

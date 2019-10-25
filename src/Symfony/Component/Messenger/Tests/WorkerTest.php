@@ -118,8 +118,8 @@ class WorkerTest extends TestCase
             }
         });
 
-        // old message acknowledged
-        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        // old message rejected
+        $this->assertSame(1, $receiver->getRejectCount());
     }
 
     public function testUnrecoverableMessageHandlingExceptionPreventsRetries()

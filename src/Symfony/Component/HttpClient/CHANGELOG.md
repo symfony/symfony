@@ -14,6 +14,7 @@ CHANGELOG
  * made `Psr18Client` implement relevant PSR-17 factories and have streaming responses
  * added `TraceableHttpClient`, `HttpClientDataCollector` and `HttpClientPass` to integrate with the web profiler
  * allow enabling buffering conditionally with a Closure
+ * allow option "buffer" to be a stream resource
 
 4.3.0
 -----

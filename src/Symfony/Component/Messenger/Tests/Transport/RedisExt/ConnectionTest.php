@@ -57,13 +57,8 @@ class ConnectionTest extends TestCase
     public function testFromDsnWithOptions()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'stream_max_entries' => 20000], [
-                'host' => 'localhost',
-                'port' => 6379,
-            ], [
-                'serializer' => 2,
-            ]),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['serializer' => 2, 'auto_setup' => false, 'stream_max_entries' => 20000])
+            Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
         );
     }
 
@@ -99,7 +94,21 @@ class ConnectionTest extends TestCase
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
 
         $redis->expects($this->exactly(1))->method('auth')
-            ->with('password');
+            ->with('password')
+            ->willReturn(true);
+
+        Connection::fromDsn('redis://password@localhost/queue', [], $redis);
+    }
+
+    public function testFailedAuth()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Redis connection failed');
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('password')
+            ->willReturn(false);
 
         Connection::fromDsn('redis://password@localhost/queue', [], $redis);
     }

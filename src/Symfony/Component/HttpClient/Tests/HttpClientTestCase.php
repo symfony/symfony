@@ -12,16 +12,10 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\Exception\ClientException;
-use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
 
 abstract class HttpClientTestCase extends BaseHttpClientTestCase
 {
-    public function testMaxDuration()
-    {
-        $this->markTestSkipped('Implemented as of version 4.4');
-    }
-
     public function testAcceptHeader()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -82,50 +76,33 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $stream = $response->toStream();
     }
 
+    public function testInfoOnCanceledResponse()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
+
+    public function testBufferSink()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
+
     public function testConditionalBuffering()
     {
-        $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://localhost:8057');
-        $firstContent = $response->getContent();
-        $secondContent = $response->getContent();
-
-        $this->assertSame($firstContent, $secondContent);
-
-        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () { return false; }]);
-        $response->getContent();
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Cannot get the content of the response twice: buffering is disabled.');
-        $response->getContent();
+        $this->markTestSkipped('Implemented as of version 4.4');
     }
 
     public function testReentrantBufferCallback()
     {
-        $client = $this->getHttpClient(__FUNCTION__);
-
-        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () use (&$response) {
-            $response->cancel();
-        }]);
-
-        $this->assertSame(200, $response->getStatusCode());
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Response has been canceled.');
-        $response->getContent();
+        $this->markTestSkipped('Implemented as of version 4.4');
     }
 
     public function testThrowingBufferCallback()
     {
-        $client = $this->getHttpClient(__FUNCTION__);
+        $this->markTestSkipped('Implemented as of version 4.4');
+    }
 
-        $response = $client->request('GET', 'http://localhost:8057', ['buffer' => function () {
-            throw new \Exception('Boo');
-        }]);
-
-        $this->assertSame(200, $response->getStatusCode());
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Boo');
-        $response->getContent();
+    public function testMaxDuration()
+    {
+        $this->markTestSkipped('Implemented as of version 4.4');
     }
 }

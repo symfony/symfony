@@ -42,6 +42,32 @@ trait HttpClientTrait
 
         $options = self::mergeDefaultOptions($options, $defaultOptions, $allowExtraOptions);
 
+        $buffer = $options['buffer'] ?? true;
+
+        if ($buffer instanceof \Closure) {
+            $options['buffer'] = static function (array $headers) use ($buffer) {
+                if (!\is_bool($buffer = $buffer($headers))) {
+                    if (!\is_array($bufferInfo = @stream_get_meta_data($buffer))) {
+                        throw new \LogicException(sprintf('The closure passed as option "buffer" must return bool or stream resource, got %s.', \is_resource($buffer) ? get_resource_type($buffer).' resource' : \gettype($buffer)));
+                    }
+
+                    if (false === strpbrk($bufferInfo['mode'], 'acew+')) {
+                        throw new \LogicException(sprintf('The stream returned by the closure passed as option "buffer" must be writeable, got mode "%s".', $bufferInfo['mode']));
+                    }
+                }
+
+                return $buffer;
+            };
+        } elseif (!\is_bool($buffer)) {
+            if (!\is_array($bufferInfo = @stream_get_meta_data($buffer))) {
+                throw new InvalidArgumentException(sprintf('Option "buffer" must be bool, stream resource or Closure, %s given.', \is_resource($buffer) ? get_resource_type($buffer).' resource' : \gettype($buffer)));
+            }
+
+            if (false === strpbrk($bufferInfo['mode'], 'acew+')) {
+                throw new InvalidArgumentException(sprintf('The stream in option "buffer" must be writeable, mode "%s" given.', $bufferInfo['mode']));
+            }
+        }
+
         if (isset($options['json'])) {
             if (isset($options['body']) && '' !== $options['body']) {
                 throw new InvalidArgumentException('Define either the "json" or the "body" option, setting both is not supported.');

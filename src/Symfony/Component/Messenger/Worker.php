@@ -12,13 +12,13 @@
 namespace Symfony\Component\Messenger;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -134,6 +134,13 @@ class Worker implements WorkerInterface
         try {
             $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName)));
         } catch (\Throwable $throwable) {
+            $rejectFirst = $throwable instanceof RejectRedeliveredMessageException;
+            if ($rejectFirst) {
+                // redelivered messages are rejected first so that continuous failures in an event listener or while
+                // publishing for retry does not cause infinite redelivery loops
+                $receiver->reject($envelope);
+            }
+
             if ($throwable instanceof HandlerFailedException) {
                 $envelope = $throwable->getEnvelope();
             }
@@ -152,18 +159,18 @@ class Worker implements WorkerInterface
 
                 // add the delay and retry stamp info + remove ReceivedStamp
                 $retryEnvelope = $envelope->with(new DelayStamp($delay))
-                    ->with(new RedeliveryStamp($retryCount, $transportName, $throwable->getMessage(), $this->flattenedException($throwable)))
+                    ->with(new RedeliveryStamp($retryCount, $transportName))
                     ->withoutAll(ReceivedStamp::class);
 
-                // re-send the message
+                // re-send the message for retry
                 $this->bus->dispatch($retryEnvelope);
-                // acknowledge the previous message has received
-                $receiver->ack($envelope);
             } else {
                 if (null !== $this->logger) {
                     $this->logger->critical('Error thrown while handling message {class}. Removing from transport after {retryCount} retries. Error: "{error}"', $context + ['retryCount' => $retryCount, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
                 }
+            }
 
+            if (!$rejectFirst) {
                 $receiver->reject($envelope);
             }
 
@@ -214,18 +221,5 @@ class Worker implements WorkerInterface
         }
 
         return $retryStrategy->isRetryable($envelope);
-    }
-
-    private function flattenedException(\Throwable $throwable): ?FlattenException
-    {
-        if (!class_exists(FlattenException::class)) {
-            return null;
-        }
-
-        if ($throwable instanceof HandlerFailedException) {
-            $throwable = $throwable->getNestedExceptions()[0];
-        }
-
-        return FlattenException::createFromThrowable($throwable);
     }
 }

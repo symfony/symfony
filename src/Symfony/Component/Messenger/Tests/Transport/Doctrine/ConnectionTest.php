@@ -44,8 +44,11 @@ class ConnectionTest extends TestCase
         $queryBuilder
             ->method('getParameters')
             ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
         $driverConnection
-            ->method('prepare')
+            ->method('executeQuery')
             ->willReturn($stmt);
 
         $connection = new Connection([], $driverConnection, $schemaSynchronizer);
@@ -65,13 +68,17 @@ class ConnectionTest extends TestCase
         $queryBuilder
             ->method('getParameters')
             ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
         $driverConnection->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
-        $driverConnection->method('prepare')
-            ->willReturn($stmt);
         $driverConnection->expects($this->never())
             ->method('update');
+        $driverConnection
+            ->method('executeQuery')
+            ->willReturn($stmt);
 
         $connection = new Connection([], $driverConnection, $schemaSynchronizer);
         $doctrineEnvelope = $connection->get();
@@ -273,7 +280,7 @@ class ConnectionTest extends TestCase
             ->method('getParameters')
             ->willReturn([]);
         $driverConnection
-            ->method('prepare')
+            ->method('executeQuery')
             ->willReturn($stmt);
 
         $connection = new Connection([], $driverConnection, $schemaSynchronizer);
@@ -316,8 +323,11 @@ class ConnectionTest extends TestCase
         $queryBuilder
             ->method('getParameters')
             ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
         $driverConnection
-            ->method('prepare')
+            ->method('executeQuery')
             ->willReturn($stmt);
 
         $connection = new Connection([], $driverConnection, $schemaSynchronizer);

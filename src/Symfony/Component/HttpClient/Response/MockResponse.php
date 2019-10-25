@@ -107,7 +107,7 @@ class MockResponse implements ResponseInterface
         $response->id = ++self::$idSequence;
 
         if (!($options['buffer'] ?? null) instanceof \Closure) {
-            $response->content = true === ($options['buffer'] ?? true) ? fopen('php://temp', 'w+') : null;
+            $response->content = true === ($options['buffer'] ?? true) ? fopen('php://temp', 'w+') : (\is_resource($options['buffer']) ? $options['buffer'] : null);
         }
         $response->initializer = static function (self $response) {
             if (null !== $response->info['error']) {
@@ -115,8 +115,11 @@ class MockResponse implements ResponseInterface
             }
 
             if (\is_array($response->body[0] ?? null)) {
-                // Consume the first chunk if it's not yielded yet
-                self::stream([$response])->current();
+                foreach (self::stream([$response]) as $chunk) {
+                    if ($chunk->isFirst()) {
+                        break;
+                    }
+                }
             }
         };
 
@@ -183,9 +186,10 @@ class MockResponse implements ResponseInterface
                     $response->headers = $chunk[1]->getHeaders(false);
                     self::readResponse($response, $chunk[0], $chunk[1], $offset);
                     $multi->handlesActivity[$id][] = new FirstChunk();
+                    $buffer = $response->requestOptions['buffer'] ?? null;
 
-                    if (($response->requestOptions['buffer'] ?? null) instanceof \Closure) {
-                        $response->content = $response->requestOptions['buffer']($response->headers) ? fopen('php://temp', 'w+') : null;
+                    if ($buffer instanceof \Closure && $response->content = $buffer($response->headers) ?: null) {
+                        $response->content = \is_resource($response->content) ? $response->content : fopen('php://temp', 'w+');
                     }
                 } catch (\Throwable $e) {
                     $multi->handlesActivity[$id][] = null;

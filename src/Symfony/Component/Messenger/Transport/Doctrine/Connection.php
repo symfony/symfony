@@ -124,8 +124,14 @@ class Connection
             $body,
             json_encode($headers),
             $this->configuration['queue_name'],
-            self::formatDateTime($now),
-            self::formatDateTime($availableAt),
+            $now,
+            $availableAt,
+        ], [
+            null,
+            null,
+            null,
+            Type::DATETIME,
+            Type::DATETIME,
         ]);
 
         return $this->driverConnection->lastInsertId();
@@ -143,7 +149,8 @@ class Connection
             // use SELECT ... FOR UPDATE to lock table
             $doctrineEnvelope = $this->executeQuery(
                 $query->getSQL().' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
-                $query->getParameters()
+                $query->getParameters(),
+                $query->getParameterTypes()
             )->fetch();
 
             if (false === $doctrineEnvelope) {
@@ -160,8 +167,10 @@ class Connection
                 ->where('id = ?');
             $now = new \DateTime();
             $this->executeQuery($queryBuilder->getSQL(), [
-                self::formatDateTime($now),
+                $now,
                 $doctrineEnvelope['id'],
+            ], [
+                Type::DATETIME,
             ]);
 
             $this->driverConnection->commit();
@@ -228,7 +237,7 @@ class Connection
             ->select('COUNT(m.id) as message_count')
             ->setMaxResults(1);
 
-        return $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters())->fetchColumn();
+        return $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes())->fetchColumn();
     }
 
     public function findAll(int $limit = null): array
@@ -238,7 +247,7 @@ class Connection
             $queryBuilder->setMaxResults($limit);
         }
 
-        $data = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters())->fetchAll();
+        $data = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes())->fetchAll();
 
         return array_map(function ($doctrineEnvelope) {
             return $this->decodeEnvelopeHeaders($doctrineEnvelope);
@@ -267,9 +276,12 @@ class Connection
             ->andWhere('m.available_at <= ?')
             ->andWhere('m.queue_name = ?')
             ->setParameters([
-                self::formatDateTime($redeliverLimit),
-                self::formatDateTime($now),
+                $redeliverLimit,
+                $now,
                 $this->configuration['queue_name'],
+            ], [
+                Type::DATETIME,
+                Type::DATETIME,
             ]);
     }
 
@@ -280,12 +292,10 @@ class Connection
             ->from($this->configuration['table_name'], 'm');
     }
 
-    private function executeQuery(string $sql, array $parameters = [])
+    private function executeQuery(string $sql, array $parameters = [], array $types = [])
     {
-        $stmt = null;
         try {
-            $stmt = $this->driverConnection->prepare($sql);
-            $stmt->execute($parameters);
+            $stmt = $this->driverConnection->executeQuery($sql, $parameters, $types);
         } catch (TableNotFoundException $e) {
             if ($this->driverConnection->isTransactionActive()) {
                 throw $e;
@@ -295,11 +305,7 @@ class Connection
             if ($this->autoSetup) {
                 $this->setup();
             }
-            // statement not prepared ? SQLite throw on exception on prepare if the table does not exist
-            if (null === $stmt) {
-                $stmt = $this->driverConnection->prepare($sql);
-            }
-            $stmt->execute($parameters);
+            $stmt = $this->driverConnection->executeQuery($sql, $parameters, $types);
         }
 
         return $stmt;
@@ -330,11 +336,6 @@ class Connection
         $table->addIndex(['delivered_at']);
 
         return $schema;
-    }
-
-    public static function formatDateTime(\DateTimeInterface $dateTime)
-    {
-        return $dateTime->format('Y-m-d\TH:i:s');
     }
 
     private function decodeEnvelopeHeaders(array $doctrineEnvelope): array

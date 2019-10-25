@@ -1043,8 +1043,6 @@ class FrameworkExtension extends Extension
         $container->getDefinition('assets.url_package')->setPrivate(true);
         $container->getDefinition('assets.static_version_strategy')->setPrivate(true);
 
-        $defaultVersion = null;
-
         if ($config['version_strategy']) {
             $defaultVersion = new Reference($config['version_strategy']);
         } else {

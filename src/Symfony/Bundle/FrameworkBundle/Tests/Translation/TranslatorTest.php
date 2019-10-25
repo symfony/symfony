@@ -162,7 +162,7 @@ class TranslatorTest extends TestCase
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('Missing third $defaultLocale argument.');
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $translator = new Translator($container, new MessageFormatter());
+        new Translator($container, new MessageFormatter());
     }
 
     /**

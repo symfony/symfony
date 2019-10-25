@@ -248,7 +248,7 @@ class RouteCompilerTest extends TestCase
         $this->expectException('LogicException');
         $route = new Route('/{name}/{name}');
 
-        $compiled = $route->compile();
+        $route->compile();
     }
 
     public function testRouteCharsetMismatch()
@@ -256,7 +256,7 @@ class RouteCompilerTest extends TestCase
         $this->expectException('LogicException');
         $route = new Route("/\xE9/{bar}", [], ['bar' => '.'], ['utf8' => true]);
 
-        $compiled = $route->compile();
+        $route->compile();
     }
 
     public function testRequirementCharsetMismatch()
@@ -264,7 +264,7 @@ class RouteCompilerTest extends TestCase
         $this->expectException('LogicException');
         $route = new Route('/foo/{bar}', [], ['bar' => "\xE9"], ['utf8' => true]);
 
-        $compiled = $route->compile();
+        $route->compile();
     }
 
     public function testRouteWithFragmentAsPathParameter()
@@ -272,7 +272,7 @@ class RouteCompilerTest extends TestCase
         $this->expectException('InvalidArgumentException');
         $route = new Route('/{_fragment}');
 
-        $compiled = $route->compile();
+        $route->compile();
     }
 
     /**

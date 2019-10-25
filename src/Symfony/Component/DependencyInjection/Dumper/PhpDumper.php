@@ -219,7 +219,7 @@ EOF;
                 foreach ($ids as $id) {
                     $c .= '    '.$this->doExport($id)." => true,\n";
                 }
-                $files['removed-ids.php'] = $c .= "];\n";
+                $files['removed-ids.php'] = $c."];\n";
             }
 
             foreach ($this->generateServiceFiles() as $file => $c) {

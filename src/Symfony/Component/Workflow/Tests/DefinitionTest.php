@@ -22,7 +22,7 @@ class DefinitionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
         $places = ['a"', 'e"'];
-        $definition = new Definition($places, []);
+        new Definition($places, []);
     }
 
     public function testSetInitialPlace()
@@ -37,7 +37,7 @@ class DefinitionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
         $this->expectExceptionMessage('Place "d" cannot be the initial place as it does not exist.');
-        $definition = new Definition([], [], 'd');
+        new Definition([], [], 'd');
     }
 
     public function testAddTransition()

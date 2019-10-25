@@ -256,7 +256,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testControllersAreMadePublic()
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', ArgumentWithoutTypeController::class)
             ->setPublic(false)

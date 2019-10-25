@@ -219,7 +219,7 @@ class WorkflowTest extends TestCase
         $this->assertFalse($marking->has('b'));
         $this->assertFalse($marking->has('c'));
 
-        $marking = $workflow->apply($subject, 'a_to_bc');
+        $workflow->apply($subject, 'a_to_bc');
         $marking = $workflow->apply($subject, 'b_to_c');
 
         $this->assertFalse($marking->has('a'));
@@ -291,7 +291,7 @@ class WorkflowTest extends TestCase
             'workflow.workflow_name.announce.t2',
         ];
 
-        $marking = $workflow->apply($subject, 't1');
+        $workflow->apply($subject, 't1');
 
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
@@ -330,7 +330,7 @@ class WorkflowTest extends TestCase
             'workflow.workflow_name.announce',
         ];
 
-        $marking = $workflow->apply($subject, 'a-b');
+        $workflow->apply($subject, 'a-b');
 
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }

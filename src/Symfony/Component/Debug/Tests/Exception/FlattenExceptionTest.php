@@ -256,7 +256,7 @@ class FlattenExceptionTest extends TestCase
 
         // assertEquals() does not like NAN values.
         $this->assertEquals($array[$i][0], 'float');
-        $this->assertNan($array[$i++][1]);
+        $this->assertNan($array[$i][1]);
     }
 
     public function testRecursionInArguments()

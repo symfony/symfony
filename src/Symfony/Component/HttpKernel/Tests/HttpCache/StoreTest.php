@@ -52,7 +52,7 @@ class StoreTest extends TestCase
 
     public function testUnlockFileThatDoesExist()
     {
-        $cacheKey = $this->storeSimpleEntry();
+        $this->storeSimpleEntry();
         $this->store->lock($this->request);
 
         $this->assertTrue($this->store->unlock($this->request));
@@ -92,7 +92,7 @@ class StoreTest extends TestCase
     {
         $cacheKey = $this->storeSimpleEntry();
         $entries = $this->getStoreMetadata($cacheKey);
-        list($req, $res) = $entries[0];
+        list(, $res) = $entries[0];
 
         $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
     }
@@ -208,7 +208,7 @@ class StoreTest extends TestCase
     {
         $req1 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $res1 = new Response('test 1', 200, ['Vary' => 'Foo Bar']);
-        $key = $this->store->write($req1, $res1);
+        $this->store->write($req1, $res1);
         $this->assertEquals($this->getStorePath('en'.hash('sha256', 'test 1')), $this->store->lookup($req1)->getContent());
 
         $req2 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Bling', 'HTTP_BAR' => 'Bam']);
@@ -229,7 +229,7 @@ class StoreTest extends TestCase
         $req = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $this->assertTrue($this->store->lock($req));
 
-        $path = $this->store->lock($req);
+        $this->store->lock($req);
         $this->assertTrue($this->store->isLocked($req));
 
         $this->store->unlock($req);

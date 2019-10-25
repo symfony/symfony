@@ -43,7 +43,7 @@ class IntegrationTest extends TestCase
             ->addArgument(new Reference('c'))
         ;
 
-        $b = $container
+        $container
             ->register('b', '\stdClass')
             ->addArgument(new Reference('c'))
             ->setPublic(false)

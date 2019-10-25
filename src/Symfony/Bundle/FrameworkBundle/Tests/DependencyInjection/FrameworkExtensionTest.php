@@ -251,7 +251,7 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testDeprecatedWorkflowMissingType()
     {
-        $container = $this->createContainerFromFile('workflows_without_type');
+        $this->createContainerFromFile('workflows_without_type');
     }
 
     public function testWorkflowCannotHaveBothTypeAndService()

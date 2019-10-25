@@ -11,7 +11,7 @@ class TransitionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
         $this->expectExceptionMessage('The transition "foo.bar" contains invalid characters.');
-        $transition = new Transition('foo.bar', 'a', 'b');
+        new Transition('foo.bar', 'a', 'b');
     }
 
     public function testConstructor()

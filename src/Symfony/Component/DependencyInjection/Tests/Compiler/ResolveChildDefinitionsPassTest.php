@@ -390,7 +390,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
             ->setBindings(['a' => '1', 'b' => '2'])
         ;
 
-        $child = $container->setDefinition('child', new ChildDefinition('parent'))
+        $container->setDefinition('child', new ChildDefinition('parent'))
             ->setBindings(['b' => 'B', 'c' => 'C'])
         ;
 

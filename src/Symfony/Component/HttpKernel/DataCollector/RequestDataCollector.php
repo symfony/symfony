@@ -49,7 +49,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             }
         }
 
-        $content = null;
         try {
             $content = $request->getContent();
         } catch (\LogicException $e) {
@@ -59,7 +58,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         $sessionMetadata = [];
         $sessionAttributes = [];
-        $session = null;
         $flashes = [];
         if ($request->hasSession()) {
             $session = $request->getSession();

@@ -68,7 +68,7 @@ class ParserCacheAdapterTest extends TestCase
             ->willReturn($value)
         ;
 
-        $cacheItem = $parserCacheAdapter->save($cacheItemMock);
+        $parserCacheAdapter->save($cacheItemMock);
     }
 
     public function testGetItems()

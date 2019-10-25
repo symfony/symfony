@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 
 class TimeTypeTest extends BaseTypeTest
 {
@@ -785,6 +786,9 @@ class TimeTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
+        if ($emptyData instanceof \Closure) {
+            $emptyData = $emptyData($form);
+        }
         $this->assertSame($emptyData, $form->getViewData());
         $this->assertEquals($expectedData, $form->getNormData());
         $this->assertEquals($expectedData, $form->getData());
@@ -793,11 +797,17 @@ class TimeTypeTest extends BaseTypeTest
     public function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i', '1970-01-01 21:23');
+        $lazyEmptyData = static function (FormInterface $form) {
+            return $form->getConfig()->getCompound() ? ['hour' => '21', 'minute' => '23'] : '21:23';
+        };
 
         return [
             'Simple field' => ['single_text', '21:23', $expectedData],
             'Compound text field' => ['text', ['hour' => '21', 'minute' => '23'], $expectedData],
             'Compound choice field' => ['choice', ['hour' => '21', 'minute' => '23'], $expectedData],
+            'Simple field lazy' => ['single_text', $lazyEmptyData, $expectedData],
+            'Compound text field lazy' => ['text', $lazyEmptyData, $expectedData],
+            'Compound choice field lazy' => ['choice', $lazyEmptyData, $expectedData],
         ];
     }
 }

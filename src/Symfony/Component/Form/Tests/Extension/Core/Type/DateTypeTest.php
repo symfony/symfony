@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTypeTest extends BaseTypeTest
@@ -985,6 +986,9 @@ class DateTypeTest extends BaseTypeTest
         ]);
         $form->submit(null);
 
+        if ($emptyData instanceof \Closure) {
+            $emptyData = $emptyData($form);
+        }
         $this->assertSame($emptyData, $form->getViewData());
         $this->assertEquals($expectedData, $form->getNormData());
         $this->assertEquals($expectedData, $form->getData());
@@ -993,11 +997,17 @@ class DateTypeTest extends BaseTypeTest
     public function provideEmptyData()
     {
         $expectedData = \DateTime::createFromFormat('Y-m-d H:i:s', '2018-11-11 00:00:00');
+        $lazyEmptyData = static function (FormInterface $form) {
+            return $form->getConfig()->getCompound() ? ['year' => '2018', 'month' => '11', 'day' => '11'] : '2018-11-11';
+        };
 
         return [
             'Simple field' => ['single_text', '2018-11-11', $expectedData],
             'Compound text fields' => ['text', ['year' => '2018', 'month' => '11', 'day' => '11'], $expectedData],
             'Compound choice fields' => ['choice', ['year' => '2018', 'month' => '11', 'day' => '11'], $expectedData],
+            'Simple field lazy' => ['single_text', $lazyEmptyData, $expectedData],
+            'Compound text fields lazy' => ['text', $lazyEmptyData, $expectedData],
+            'Compound choice fields lazy' => ['choice', $lazyEmptyData, $expectedData],
         ];
     }
 }

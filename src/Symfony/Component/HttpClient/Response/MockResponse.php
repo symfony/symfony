@@ -176,7 +176,7 @@ class MockResponse implements ResponseInterface
                 try {
                     $offset = 0;
                     $chunk[1]->getStatusCode();
-                    $response->headers = $chunk[1]->getHeaders(false);
+                    $chunk[1]->getHeaders(false);
                     self::readResponse($response, $chunk[0], $chunk[1], $offset);
                     $multi->handlesActivity[$id][] = new FirstChunk();
                 } catch (\Throwable $e) {

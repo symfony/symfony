@@ -58,7 +58,7 @@ class Inline
      *
      * @throws ParseException
      */
-    public static function parse(string $value = null, int $flags = 0, array $references = [])
+    public static function parse(string $value = null, int $flags = 0, array $references = [], array $processors = [])
     {
         self::initialize($flags);
 
@@ -78,15 +78,15 @@ class Inline
             $tag = self::parseTag($value, $i, $flags);
             switch ($value[$i]) {
                 case '[':
-                    $result = self::parseSequence($value, $flags, $i, $references);
+                    $result = self::parseSequence($value, $flags, $i, $references, $processors);
                     ++$i;
                     break;
                 case '{':
-                    $result = self::parseMapping($value, $flags, $i, $references);
+                    $result = self::parseMapping($value, $flags, $i, $references, $processors);
                     ++$i;
                     break;
                 default:
-                    $result = self::parseScalar($value, $flags, null, $i, null === $tag, $references);
+                    $result = self::parseScalar($value, $flags, null, $i, null === $tag, $references, $processors);
             }
 
             // some comments are allowed at the end
@@ -267,7 +267,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    public static function parseScalar(string $scalar, int $flags = 0, array $delimiters = null, int &$i = 0, bool $evaluate = true, array $references = [])
+    public static function parseScalar(string $scalar, int $flags = 0, array $delimiters = null, int &$i = 0, bool $evaluate = true, array $references = [], array $processors = [])
     {
         if (\in_array($scalar[$i], ['"', "'"])) {
             // quoted scalar
@@ -306,7 +306,7 @@ class Inline
             }
 
             if ($evaluate) {
-                $output = self::evaluateScalar($output, $flags, $references);
+                $output = self::evaluateScalar($output, $flags, $references, $processors);
             }
         }
 
@@ -343,7 +343,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseSequence(string $sequence, int $flags, int &$i = 0, array $references = []): array
+    private static function parseSequence(string $sequence, int $flags, int &$i = 0, array $references = [], array $processors = []): array
     {
         $output = [];
         $len = \strlen($sequence);
@@ -368,18 +368,18 @@ class Inline
                     break;
                 case '{':
                     // nested mapping
-                    $value = self::parseMapping($sequence, $flags, $i, $references);
+                    $value = self::parseMapping($sequence, $flags, $i, $references, $processors);
                     break;
                 default:
                     $isQuoted = \in_array($sequence[$i], ['"', "'"]);
-                    $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references);
+                    $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references, $processors);
 
                     // the value can be an array if a reference has been resolved to an array var
                     if (\is_string($value) && !$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
                         try {
                             $pos = 0;
-                            $value = self::parseMapping('{'.$value.'}', $flags, $pos, $references);
+                            $value = self::parseMapping('{'.$value.'}', $flags, $pos, $references, $processors);
                         } catch (\InvalidArgumentException $e) {
                             // no, it's not
                         }
@@ -407,7 +407,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseMapping(string $mapping, int $flags, int &$i = 0, array $references = [])
+    private static function parseMapping(string $mapping, int $flags, int &$i = 0, array $references = [], array $processors = [])
     {
         $output = [];
         $len = \strlen($mapping);
@@ -433,7 +433,7 @@ class Inline
             // key
             $offsetBeforeKeyParsing = $i;
             $isKeyQuoted = \in_array($mapping[$i], ['"', "'"], true);
-            $key = self::parseScalar($mapping, $flags, [':', ' '], $i, false, []);
+            $key = self::parseScalar($mapping, $flags, [':', ' '], $i, false, [], $processors);
 
             if ($offsetBeforeKeyParsing === $i) {
                 throw new ParseException('Missing mapping key.', self::$parsedLineNumber + 1, $mapping);
@@ -444,7 +444,7 @@ class Inline
             }
 
             if (!$isKeyQuoted) {
-                $evaluatedKey = self::evaluateScalar($key, $flags, $references);
+                $evaluatedKey = self::evaluateScalar($key, $flags, $references, $processors);
 
                 if ('' !== $key && $evaluatedKey !== $key && !\is_string($evaluatedKey) && !\is_int($evaluatedKey)) {
                     throw new ParseException('Implicit casting of incompatible mapping keys to strings is not supported. Quote your evaluable mapping keys instead.', self::$parsedLineNumber + 1, $mapping);
@@ -470,7 +470,7 @@ class Inline
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
-                        $value = self::parseSequence($mapping, $flags, $i, $references);
+                        $value = self::parseSequence($mapping, $flags, $i, $references, $processors);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
@@ -491,7 +491,7 @@ class Inline
                         break;
                     case '{':
                         // nested mapping
-                        $value = self::parseMapping($mapping, $flags, $i, $references);
+                        $value = self::parseMapping($mapping, $flags, $i, $references, $processors);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
@@ -509,7 +509,7 @@ class Inline
                         }
                         break;
                     default:
-                        $value = self::parseScalar($mapping, $flags, [',', '}', "\n"], $i, null === $tag, $references);
+                        $value = self::parseScalar($mapping, $flags, [',', '}', "\n"], $i, null === $tag, $references, $processors);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
@@ -541,9 +541,10 @@ class Inline
      *
      * @return mixed The evaluated YAML string
      *
-     * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
+     * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a
+     *                        reference could not be resolved
      */
-    private static function evaluateScalar(string $scalar, int $flags, array $references = [])
+    private static function evaluateScalar(string $scalar, int $flags, array $references = [], array $processors = [])
     {
         $scalar = trim($scalar);
         $scalarLower = strtolower($scalar);
@@ -577,45 +578,49 @@ class Inline
             case 'false' === $scalarLower:
                 return false;
             case '!' === $scalar[0]:
-                switch (true) {
-                    case 0 === strpos($scalar, '!!str '):
-                        return (string) substr($scalar, 6);
-                    case 0 === strpos($scalar, '! '):
-                        return substr($scalar, 2);
-                    case 0 === strpos($scalar, '!php/object'):
-                        if (self::$objectSupport) {
-                            return unserialize(self::parseScalar(substr($scalar, 12)));
-                        }
-
-                        if (self::$exceptionOnInvalidType) {
-                            throw new ParseException('Object support when parsing a YAML file has been disabled.', self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
-                        }
-
-                        return null;
-                    case 0 === strpos($scalar, '!php/const'):
-                        if (self::$constantSupport) {
-                            $i = 0;
-                            if (\defined($const = self::parseScalar(substr($scalar, 11), 0, null, $i, false))) {
-                                return \constant($const);
-                            }
-
-                            throw new ParseException(sprintf('The constant "%s" is not defined.', $const), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
-                        }
-                        if (self::$exceptionOnInvalidType) {
-                            throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
-                        }
-
-                        return null;
-                    case 0 === strpos($scalar, '!!float '):
-                        return (float) substr($scalar, 8);
-                    case 0 === strpos($scalar, '!!binary '):
-                        return self::evaluateBinaryScalar(substr($scalar, 9));
-                    default:
-                        throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
+                if (0 === strpos($scalar, '! ')) {
+                    return substr($scalar, 2);
                 }
 
+                if (0 === strpos($scalar, '!php/object')) {
+                    if (self::$objectSupport) {
+                        $_ = 0;
+
+                        return unserialize(self::parseScalar(substr($scalar, 12), 0, null, $_, true, [], $processors));
+                    }
+
+                    if (self::$exceptionOnInvalidType) {
+                        throw new ParseException('Object support when parsing a YAML file has been disabled.', self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                    }
+
+                    return null;
+                }
+
+                if (0 === strpos($scalar, '!php/const')) {
+                    if (self::$constantSupport) {
+                        $i = 0;
+                        if (\defined($const = self::parseScalar(substr($scalar, 11), 0, null, $i, false, [], $processors))) {
+                            return \constant($const);
+                        }
+
+                        throw new ParseException(sprintf('The constant "%s" is not defined.', $const), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                    }
+                    if (self::$exceptionOnInvalidType) {
+                        throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                    }
+
+                    return null;
+                }
+
+                /** @var \Symfony\Component\Yaml\TagProcessor\TagProcessorInterface $processor */
+                foreach ($processors as $processor) {
+                    if (0 === strpos($scalar, $processor->getTag().' ')) {
+                        return $processor->process(new TaggedValue($processor->getTag(), substr($scalar, \strlen($processor->getTag()) + 1)));
+                    }
+                }
+
+                throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
             // Optimize for returning strings.
-            // no break
             case '+' === $scalar[0] || '-' === $scalar[0] || '.' === $scalar[0] || is_numeric($scalar[0]):
                 switch (true) {
                     case Parser::preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar):

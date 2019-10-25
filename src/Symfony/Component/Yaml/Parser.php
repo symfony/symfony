@@ -13,6 +13,10 @@ namespace Symfony\Component\Yaml;
 
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Tag\TaggedValue;
+use Symfony\Component\Yaml\TagProcessor\BinaryTagProcessor;
+use Symfony\Component\Yaml\TagProcessor\FloatTagProcessor;
+use Symfony\Component\Yaml\TagProcessor\StrTagProcessor;
+use Symfony\Component\Yaml\TagProcessor\TagProcessorInterface;
 
 /**
  * Parser parses YAML strings to convert them to PHP arrays.
@@ -26,6 +30,11 @@ class Parser
     const TAG_PATTERN = '(?P<tag>![\w!.\/:-]+)';
     const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
 
+    /**
+     * @var array<string, TagProcessorInterface>
+     */
+    private $processors = [];
+
     private $filename;
     private $offset = 0;
     private $totalNumberOfLines;
@@ -36,6 +45,25 @@ class Parser
     private $skippedLineNumbers = [];
     private $locallySkippedLineNumbers = [];
     private $refsBeingParsed = [];
+
+    public function __construct()
+    {
+        $this->addTagProcessor(new BinaryTagProcessor());
+        $this->addTagProcessor(new StrTagProcessor());
+        $this->addTagProcessor(new FloatTagProcessor());
+    }
+
+    /**
+     * Add a tag processor to use while parsing yaml content.
+     *
+     * @return $this
+     */
+    public function addTagProcessor(TagProcessorInterface $processor): self
+    {
+        $this->processors[$processor->getTag()] = $processor;
+
+        return $this;
+    }
 
     /**
      * Parses a YAML file into a PHP value.
@@ -136,7 +164,12 @@ class Parser
 
         // Resolves the tag and returns if end of the document
         if (null !== ($tag = $this->getLineTag($this->currentLine, $flags, false)) && !$this->moveToNextLine()) {
-            return new TaggedValue($tag, '');
+            $tagged = new TaggedValue($tag, '');
+            if (\array_key_exists($tag, $this->processors)) {
+                $tagged = $this->processors[$tag]->process($tagged);
+            }
+
+            return $tagged;
         }
 
         do {
@@ -172,10 +205,15 @@ class Parser
                 if (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     $data[] = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true) ?? '', $flags);
                 } elseif (null !== $subTag = $this->getLineTag(ltrim($values['value'], ' '), $flags)) {
-                    $data[] = new TaggedValue(
+                    $tagged = new TaggedValue(
                         $subTag,
                         $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags)
                     );
+                    if (\array_key_exists($subTag, $this->processors)) {
+                        $tagged = $this->processors[$subTag]->process($tagged);
+                    }
+
+                    $data[] = $tagged;
                 } else {
                     if (isset($values['leadspaces'])
                         && self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->trimTag($values['value']), $matches)
@@ -205,7 +243,8 @@ class Parser
                 $context = 'mapping';
 
                 try {
-                    $key = Inline::parseScalar($values['key']);
+                    $_ = 0;
+                    $key = Inline::parseScalar($values['key'], 0, null, $_, true, [], $this->processors);
                 } catch (ParseException $e) {
                     $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                     $e->setSnippet($this->currentLine);
@@ -300,7 +339,12 @@ class Parser
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             if (null !== $subTag) {
-                                $data[$key] = new TaggedValue($subTag, '');
+                                $tagged = new TaggedValue($subTag, '');
+                                if (\array_key_exists($subTag, $this->processors)) {
+                                    $tagged = $this->processors[$subTag]->process($tagged);
+                                }
+
+                                $data[$key] = $tagged;
                             } else {
                                 $data[$key] = null;
                             }
@@ -323,7 +367,12 @@ class Parser
                             // Spec: Keys MUST be unique; first one wins.
                             // But overwriting is allowed when a merge node is used in current block.
                             if (null !== $subTag) {
-                                $data[$key] = new TaggedValue($subTag, $value);
+                                $tagged = new TaggedValue($subTag, $value);
+                                if (\array_key_exists($subTag, $this->processors)) {
+                                    $tagged = $this->processors[$subTag]->process($tagged);
+                                }
+
+                                $data[$key] = $tagged;
                             } else {
                                 $data[$key] = $value;
                             }
@@ -480,6 +529,9 @@ class Parser
 
         if (null !== $tag) {
             $data = new TaggedValue($tag, $data);
+            if (\array_key_exists($tag, $this->processors)) {
+                $data = $this->processors[$tag]->process($data);
+            }
         }
 
         if (Yaml::PARSE_OBJECT_FOR_MAP & $flags && !\is_object($data) && 'mapping' === $context) {
@@ -508,6 +560,10 @@ class Parser
         }
 
         $parser = new self();
+        foreach ($this->processors as $processor) {
+            $parser->addTagProcessor($processor);
+        }
+
         $parser->offset = $offset;
         $parser->totalNumberOfLines = $this->totalNumberOfLines;
         $parser->skippedLineNumbers = $skippedLineNumbers;
@@ -714,11 +770,12 @@ class Parser
             $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs((int) $modifiers));
 
             if ('' !== $matches['tag'] && '!' !== $matches['tag']) {
-                if ('!!binary' === $matches['tag']) {
-                    return Inline::evaluateBinaryScalar($data);
+                $tagged = new TaggedValue($matches['tag'], $data);
+                if (\array_key_exists($tagged->getTag(), $this->processors)) {
+                    $tagged = $this->processors[$tagged->getTag()]->process($tagged);
                 }
 
-                return new TaggedValue(substr($matches['tag'], 1), $data);
+                return $tagged;
             }
 
             return $data;
@@ -771,7 +828,7 @@ class Parser
 
             Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
 
-            $parsedValue = Inline::parse($value, $flags, $this->refs);
+            $parsedValue = Inline::parse($value, $flags, $this->refs, $this->processors);
 
             if ('mapping' === $context && \is_string($parsedValue) && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($parsedValue, ': ')) {
                 throw new ParseException('A colon cannot be used in an unquoted mapping value.', $this->getRealCurrentLineNb() + 1, $value, $this->filename);

@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Tag\TaggedValue;
+use Symfony\Component\Yaml\TagProcessor\BinaryTagProcessor;
+use Symfony\Component\Yaml\TagProcessor\FloatTagProcessor;
 use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
@@ -80,11 +82,11 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getTestsForDump
      */
-    public function testDump($yaml, $value, $parseFlags = 0)
+    public function testDump($yaml, $value, $parseFlags = 0, array $processors = [])
     {
         $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
 
-        $this->assertSame($value, Inline::parse(Inline::dump($value), $parseFlags), 'check consistency');
+        $this->assertSame($value, Inline::parse(Inline::dump($value), $parseFlags, [], $processors), 'check consistency');
     }
 
     public function testDumpNumericValueWithLocale()
@@ -454,7 +456,7 @@ class InlineTest extends TestCase
             ['_12', '_12'],
             ["'12_'", '12_'],
             ["'quoted string'", 'quoted string'],
-            ['!!float 1230', 12.30e+02],
+            ['!!float 1230', 12.30e+02, 0, [new FloatTagProcessor()]],
             ['1234', 0x4D2],
             ['1243', 02333],
             ["'0x_4_D_2_'", '0x_4_D_2_'],
@@ -580,7 +582,7 @@ class InlineTest extends TestCase
      */
     public function testParseBinaryData($data)
     {
-        $this->assertSame('Hello world', Inline::parse($data));
+        $this->assertSame('Hello world', Inline::parse($data, 0, [], [new BinaryTagProcessor()]));
     }
 
     public function getBinaryData()
@@ -600,7 +602,7 @@ class InlineTest extends TestCase
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         $this->expectExceptionMessageRegExp($expectedMessage);
 
-        Inline::parse($data);
+        Inline::parse($data, 0, [], [new BinaryTagProcessor()]);
     }
 
     public function getInvalidBinaryData()

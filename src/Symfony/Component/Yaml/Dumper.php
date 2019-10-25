@@ -12,6 +12,10 @@
 namespace Symfony\Component\Yaml;
 
 use Symfony\Component\Yaml\Tag\TaggedValue;
+use Symfony\Component\Yaml\TagProcessor\BinaryTagProcessor;
+use Symfony\Component\Yaml\TagProcessor\FloatTagProcessor;
+use Symfony\Component\Yaml\TagProcessor\StrTagProcessor;
+use Symfony\Component\Yaml\TagProcessor\TagProcessorInterface;
 
 /**
  * Dumper dumps PHP variables to YAML strings.
@@ -36,6 +40,21 @@ class Dumper
         }
 
         $this->indentation = $indentation;
+        $this->addTagProcessor(new BinaryTagProcessor());
+        $this->addTagProcessor(new StrTagProcessor());
+        $this->addTagProcessor(new FloatTagProcessor());
+    }
+
+    /**
+     * Add a tag processor to use while dumping yaml content.
+     *
+     * @return $this
+     */
+    public function addTagProcessor(TagProcessorInterface $processor): self
+    {
+        $this->processors[$processor->getTag()] = $processor;
+
+        return $this;
     }
 
     /**

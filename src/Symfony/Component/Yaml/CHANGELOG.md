@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.0.1
+-----
+ * Add support for custom tag processors via `TagProcessorInterface`
+
 5.0.0
 -----
 

@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Exception;
 
 /**
  * @author Tobias Schultze <http://tobion.de>
- *
- * @experimental in 4.3
  */
 class RejectRedeliveredMessageException extends RuntimeException
 {

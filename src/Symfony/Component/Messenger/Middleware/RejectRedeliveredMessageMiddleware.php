@@ -28,8 +28,6 @@ use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp;
  * infinite redelivery loops and to unblock the queue by republishing the redelivered messages as retries with a retry
  * limit and potential delay.
  *
- * @experimental in 4.3
- *
  * @author Tobias Schultze <http://tobion.de>
  */
 class RejectRedeliveredMessageMiddleware implements MiddlewareInterface

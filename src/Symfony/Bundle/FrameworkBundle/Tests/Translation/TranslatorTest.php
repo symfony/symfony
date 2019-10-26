@@ -18,6 +18,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslatorTest extends TestCase
@@ -242,6 +243,41 @@ class TranslatorTest extends TestCase
 
         $this->assertEquals(new DirectoryResource(__DIR__), $resources[1]);
         $this->assertEquals(new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'), $resources[2]);
+    }
+
+    public function testCachedCatalogueIsReDumpedWhenScannedDirectoriesChange()
+    {
+        /** @var Translator $translator */
+        $translator = $this->getTranslator(new YamlFileLoader(), [
+            'cache_dir' => $this->tmpDir,
+            'resource_files' => [
+                'fr' => [
+                    __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+                ],
+            ],
+            'scanned_directories' => [
+                __DIR__.'/../Fixtures/Resources/translations/',
+            ],
+        ], 'yml');
+
+        // Cached catalogue is dumped
+        $this->assertSame('répertoire', $translator->trans('folder', [], 'messages', 'fr'));
+
+        $translator = $this->getTranslator(new YamlFileLoader(), [
+            'cache_dir' => $this->tmpDir,
+            'resource_files' => [
+                'fr' => [
+                    __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+                    __DIR__.'/../Fixtures/Resources/translations2/ccc.fr.yml',
+                ],
+            ],
+            'scanned_directories' => [
+                __DIR__.'/../Fixtures/Resources/translations/',
+                __DIR__.'/../Fixtures/Resources/translations2/',
+            ],
+        ], 'yml');
+
+        $this->assertSame('bar', $translator->trans('foo', [], 'ccc', 'fr'));
     }
 
     protected function getCatalogue($locale, $messages, $resources = [])

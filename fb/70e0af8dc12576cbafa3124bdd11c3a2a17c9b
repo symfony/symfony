@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-03-04T15:09:54Z
+
+There are a lot of changes unrelated to the PR' goal, which will make revision and approval difficult, I suggest you revert them and create a separate PR or issue to discuss about that? By the way, CS fixes and code refactoring should be done in highest branch (master) and lower branchs for bugfix only, that's why code version 4.2+ has improvements that 3.4 doesn't have.
+
+---------------------------------------------------------------------------
+
+by dimabory at 2019-03-04T15:21:12Z
+
+Why do not discuss it here?
+Actually, CS fixes and refactoring are placed only in 156, 178, 573 lines. Anything else is a bugfix.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-03-04T15:24:21Z
+
+Yes, please revert all the changes that are not necessary for the bugfix. This just makes reviewing the changes harder than needed.
+
+---------------------------------------------------------------------------
+
+by dimabory at 2019-03-04T15:58:51Z
+
+> Yes, please revert all the changes that are not necessary for the bugfix. This just makes reviewing the changes harder than needed.
+
+Done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-03-07T09:03:59Z
+
+The changes look rather complicated to me. If I am not mistaken, most of the complexity comes from composing the error message for nested arrays. I played with this a bit myself and came up with something simpler: https://github.com/symfony/symfony/compare/3.4...xabbuh:issue-30432?expand=1 Though tests don't pass with these changes yet. Would you like to give it a try?
+
+---------------------------------------------------------------------------
+
+by dimabory at 2019-03-11T10:54:24Z
+
+Thanks @xabbuh
+[symfony/symfony/compare/3.4...xabbuh:issue-30432?expand=1](https://github.com/symfony/symfony/compare/3.4...xabbuh:issue-30432?expand=1)
+
+Following changes in the above link, I've refactored PR's code. Seems like it contains much fewer changes and certainly easier to review now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-10-15T11:28:06Z
+
+@dimabory Sorry for the long delay. Could you please rebase here?
+
+---------------------------------------------------------------------------
+
+by dimabory at 2019-10-15T12:34:06Z
+
+> @dimabory Sorry for the long delay. Could you please rebase here?
+
+done...

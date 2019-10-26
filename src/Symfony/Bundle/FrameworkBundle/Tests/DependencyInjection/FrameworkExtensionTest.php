@@ -199,7 +199,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testEnabledInspector()
     {
-        $container = $this->createContainerFromFile('profiler');
+        $container = $this->createContainerFromFile('inspector');
 
         $this->assertTrue($container->hasDefinition('inspector'), '->registerProfilerConfiguration() loads inspector.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');

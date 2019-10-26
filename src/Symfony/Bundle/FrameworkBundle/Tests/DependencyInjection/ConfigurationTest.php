@@ -298,7 +298,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'only_exceptions' => false,
                 'only_master_requests' => false,
-                'dsn' => 'file:%kernel.cache_dir%/profiler',
+                'dsn' => 'file:%kernel.cache_dir%/inspector',
                 'collect' => true,
             ],
             'translator' => [

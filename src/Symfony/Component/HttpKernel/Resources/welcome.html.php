@@ -43,7 +43,7 @@
         @media (min-width: 768px) {
             @-webkit-keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
             @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
-            .sf-toolbar { opacity: 0; -webkit-animation: fade-in 1s .2s forwards; animation: fade-in 1s .2s forwards;}
+            .sf-toolbar { opacity: 0; -webkit-animation: fade-in 1s .2s forwards; animation: fade-in 1s .2s forwards; z-index: 99999; }
 
             body { font-size: 20px; }
             .warning { text-align: center; }

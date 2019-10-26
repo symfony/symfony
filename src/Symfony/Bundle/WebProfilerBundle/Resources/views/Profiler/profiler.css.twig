@@ -46,6 +46,8 @@
     --base-4: #666;
     --base-5: #444;
     --base-6: #222;
+    --card-label-background: #eee;
+    --card-label-color: var(--base-6);
 }
 
 .theme-dark {
@@ -85,6 +87,8 @@
     --base-4: #666;
     --base-5: #e0e0e0;
     --base-6: #f5f5f5;
+    --card-label-background: var(--tab-active-background);
+    --card-label-color: var(--tab-active-color);
 }
 
 {# Basic styles
@@ -436,8 +440,8 @@ table tbody td.num-col {
     margin-top: 0;
 }
 .card .label {
-    background-color: #EEE;
-    color: var(--base-6);
+    background-color: var(--card-label-background);
+    color: var(--card-label-color);
 }
 
 {# Status

@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -80,7 +79,7 @@ class FileLinkFormatter
     {
         try {
             return $router->generate($routeName).$queryString;
-        } catch (ExceptionInterface $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }

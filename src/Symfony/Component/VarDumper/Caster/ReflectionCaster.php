@@ -212,7 +212,7 @@ class ReflectionCaster
             $a[$prefix.'parameters'] = new EnumStub($a[$prefix.'parameters']);
         }
 
-        if ($v = $c->getStaticVariables()) {
+        if (!($filter & Caster::EXCLUDE_VERBOSE) && $v = $c->getStaticVariables()) {
             foreach ($v as $k => &$v) {
                 if (\is_object($v)) {
                     $a[$prefix.'use']['$'.$k] = new CutStub($v);

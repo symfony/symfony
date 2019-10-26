@@ -23,6 +23,9 @@ trait ContainerAwareTrait
      */
     protected $container;
 
+    /**
+     * @required
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;

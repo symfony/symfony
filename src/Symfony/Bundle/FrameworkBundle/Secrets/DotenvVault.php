@@ -36,14 +36,13 @@ class DotenvVault extends AbstractVault
     {
         $this->lastMessage = null;
         $this->validateName($name);
-        $k = $name.'_SECRET';
         $v = str_replace("'", "'\\''", $value);
 
         $content = file_exists($this->dotenvFile) ? file_get_contents($this->dotenvFile) : '';
-        $content = preg_replace("/^$k=((\\\\'|'[^']++')++|.*)/m", "$k='$v'", $content, -1, $count);
+        $content = preg_replace("/^$name=((\\\\'|'[^']++')++|.*)/m", "$name='$v'", $content, -1, $count);
 
         if (!$count) {
-            $content .= "$k='$v'\n";
+            $content .= "$name='$v'\n";
         }
 
         file_put_contents($this->dotenvFile, $content);
@@ -55,8 +54,7 @@ class DotenvVault extends AbstractVault
     {
         $this->lastMessage = null;
         $this->validateName($name);
-        $k = $name.'_SECRET';
-        $v = \is_string($_SERVER[$k] ?? null) ? $_SERVER[$k] : ($_ENV[$k] ?? null);
+        $v = \is_string($_SERVER[$name] ?? null) ? $_SERVER[$name] : ($_ENV[$name] ?? null);
 
         if (null === $v) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath($this->dotenvFile));
@@ -71,10 +69,9 @@ class DotenvVault extends AbstractVault
     {
         $this->lastMessage = null;
         $this->validateName($name);
-        $k = $name.'_SECRET';
 
         $content = file_exists($this->dotenvFile) ? file_get_contents($this->dotenvFile) : '';
-        $content = preg_replace("/^$k=((\\\\'|'[^']++')++|.*)\n?/m", '', $content, -1, $count);
+        $content = preg_replace("/^$name=((\\\\'|'[^']++')++|.*)\n?/m", '', $content, -1, $count);
 
         if ($count) {
             file_put_contents($this->dotenvFile, $content);
@@ -94,14 +91,14 @@ class DotenvVault extends AbstractVault
         $secrets = [];
 
         foreach ($_ENV as $k => $v) {
-            if (preg_match('/^(\w+)_SECRET$/D', $k, $m)) {
-                $secrets[$m[1]] = $reveal ? $v : null;
+            if (preg_match('/^\w+$/D', $k)) {
+                $secrets[$k] = $reveal ? $v : null;
             }
         }
 
         foreach ($_SERVER as $k => $v) {
-            if (\is_string($v) && preg_match('/^(\w+)_SECRET$/D', $k, $m)) {
-                $secrets[$m[1]] = $reveal ? $v : null;
+            if (\is_string($v) && preg_match('/^\w+$/D', $k)) {
+                $secrets[$k] = $reveal ? $v : null;
             }
         }
 

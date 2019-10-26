@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -43,15 +42,10 @@ final class SecretsEncryptFromLocalCommand extends Command
     {
         $this
             ->setDescription('Encrypts all local secrets to the vault.')
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces overriding of secrets that already exist in the vault')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command list encrypts all local secrets and stores them in the vault..
+The <info>%command.name%</info> command encrypts all locally overridden secrets to the vault.
 
     <info>%command.full_name%</info>
-
-When the option <info>--force</info> is provided, secrets that already exist in the vault are overriden.
-
-    <info>%command.full_name% --force</info>
 EOF
             )
         ;
@@ -67,22 +61,16 @@ EOF
             return 1;
         }
 
-        $secrets = $this->localVault->list(true);
+        foreach ($this->vault->list(true) as $name => $value) {
+            $localValue = $this->localVault->reveal($name);
 
-        if (!$input->getOption('force')) {
-            foreach ($this->vault->list() as $k => $v) {
-                unset($secrets[$k]);
-            }
-        }
-
-        foreach ($secrets as $k => $v) {
-            if (null === $v) {
-                $io->error($this->localVault->getLastMessage());
+            if (null !== $localValue && $value !== $localValue) {
+                $this->vault->seal($name, $localValue);
+            } elseif (null !== $message = $this->localVault->getLastMessage()) {
+                $io->error($message);
 
                 return 1;
             }
-
-            $this->vault->seal($k, $v);
         }
 
         return 0;

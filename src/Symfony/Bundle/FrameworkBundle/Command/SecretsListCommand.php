@@ -89,10 +89,10 @@ EOF
         }
 
         foreach ($localSecrets ?? [] as $name => $value) {
-            $rows[$name] = [$name, $rows[$name][1] ?? '', $dump($value)];
+            if (isset($rows[$name])) {
+                $rows[$name][] = $dump($value);
+            }
         }
-
-        uksort($rows, 'strnatcmp');
 
         if (null !== $this->localVault && null !== $message = $this->localVault->getLastMessage()) {
             $io->comment($message);

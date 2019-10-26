@@ -84,7 +84,7 @@ class ProfilerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->tmp = tempnam(sys_get_temp_dir(), 'sf_profiler');
+        $this->tmp = tempnam(sys_get_temp_dir(), 'sf_inspector');
         if (file_exists($this->tmp)) {
             @unlink($this->tmp);
         }

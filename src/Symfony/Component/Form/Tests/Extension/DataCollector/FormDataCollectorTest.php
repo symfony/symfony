@@ -13,10 +13,20 @@ namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ResolvedFormTypeFactory;
 
 class FormDataCollectorTest extends TestCase
 {
@@ -69,9 +79,9 @@ class FormDataCollectorTest extends TestCase
     {
         $this->dataExtractor = $this->getMockBuilder('Symfony\Component\Form\Extension\DataCollector\FormDataExtractorInterface')->getMock();
         $this->dataCollector = new FormDataCollector($this->dataExtractor);
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
-        $this->dataMapper = $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
+        $this->dispatcher = new EventDispatcher();
+        $this->factory = new FormFactory(new FormRegistry([new CoreExtension()], new ResolvedFormTypeFactory()));
+        $this->dataMapper = new PropertyPathMapper();
         $this->form = $this->createForm('name');
         $this->childForm = $this->createForm('child');
         $this->view = new FormView();
@@ -724,6 +734,56 @@ class FormDataCollectorTest extends TestCase
             ],
             $this->dataCollector->getData()
         );
+    }
+
+    public function testCollectMissingDataFromChildFormAddedOnFormEvents()
+    {
+        $form = $this->factory->createNamedBuilder('root', FormType::class, ['items' => null])
+            ->add('items', CollectionType::class, [
+                'entry_type' => TextType::class,
+                'allow_add' => true,
+                // data is locked and modelData (null) is different to the
+                // configured data, so modifications of the configured data
+                // won't be allowed at this point. It also means *_SET_DATA
+                // events won't dispatched either. Therefore, no child form
+                // is created during the mapping of data to the form.
+                'data' => ['foo'],
+            ])
+            ->getForm()
+        ;
+        $this->dataExtractor->expects($extractConfiguration = $this->exactly(4))
+            ->method('extractConfiguration')
+            ->willReturn([])
+        ;
+        $this->dataExtractor->expects($extractDefaultData = $this->exactly(4))
+            ->method('extractDefaultData')
+            ->willReturnCallback(static function (FormInterface $form) {
+                // this simulate the call in extractDefaultData() method
+                // where (if defaultDataSet is false) it fires *_SET_DATA
+                // events, adding the form related to the configured data
+                $form->getNormData();
+
+                return [];
+            })
+        ;
+        $this->dataExtractor->expects($this->exactly(4))
+            ->method('extractSubmittedData')
+            ->willReturn([])
+        ;
+
+        $this->dataCollector->collectConfiguration($form);
+        $this->assertSame(2, $extractConfiguration->getInvocationCount(), 'only "root" and "items" forms were collected, the "items" children do not exist yet.');
+
+        $this->dataCollector->collectDefaultData($form);
+        $this->assertSame(3, $extractConfiguration->getInvocationCount(), 'extracted missing configuration of the "items" children ["0" => foo].');
+        $this->assertSame(3, $extractDefaultData->getInvocationCount());
+        $this->assertSame(['foo'], $form->get('items')->getData());
+
+        $form->submit(['items' => ['foo', 'bar']]);
+        $this->dataCollector->collectSubmittedData($form);
+        $this->assertSame(4, $extractConfiguration->getInvocationCount(), 'extracted missing configuration of the "items" children ["1" => bar].');
+        $this->assertSame(4, $extractDefaultData->getInvocationCount(), 'extracted missing default data of the "items" children ["1" => bar].');
+        $this->assertSame(['foo', 'bar'], $form->get('items')->getData());
     }
 
     private function createForm($name)

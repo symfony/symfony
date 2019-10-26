@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds tagged data_collector services to profiler service.
+ * Adds tagged data_collector services to inspector service.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -25,11 +25,11 @@ class ProfilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (false === $container->hasDefinition('profiler')) {
+        if (false === $container->hasDefinition('inspector')) {
             return;
         }
 
-        $definition = $container->getDefinition('profiler');
+        $definition = $container->getDefinition('inspector');
 
         $collectors = new \SplPriorityQueue();
         $order = PHP_INT_MAX;

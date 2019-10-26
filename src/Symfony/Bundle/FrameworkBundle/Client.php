@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 class Client extends HttpKernelBrowser
 {
     private $hasPerformedRequest = false;
-    private $profiler = false;
+    private $inspector = false;
     private $reboot = true;
 
     /**
@@ -66,23 +66,31 @@ class Client extends HttpKernelBrowser
      */
     public function getProfile()
     {
-        if (null === $this->response || !$this->kernel->getContainer()->has('profiler')) {
+        if (null === $this->response || !$this->kernel->getContainer()->has('inspector')) {
             return false;
         }
 
-        return $this->kernel->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
+        return $this->kernel->getContainer()->get('inspector')->loadProfileFromResponse($this->response);
     }
 
     /**
-     * Enables the profiler for the very next request.
+     * Enables the inspector for the very next request.
      *
-     * If the profiler is not enabled, the call to this method does nothing.
+     * If the inspector is not enabled, the call to this method does nothing.
+     */
+    public function enableInspector()
+    {
+        if ($this->kernel->getContainer()->has('inspector')) {
+            $this->inspector = true;
+        }
+    }
+
+    /**
+     * @deprecated since Symfony 4.4, use enableInspector() instead
      */
     public function enableProfiler()
     {
-        if ($this->kernel->getContainer()->has('profiler')) {
-            $this->profiler = true;
-        }
+        $this->enableInspector();
     }
 
     /**
@@ -121,11 +129,11 @@ class Client extends HttpKernelBrowser
             $this->hasPerformedRequest = true;
         }
 
-        if ($this->profiler) {
-            $this->profiler = false;
+        if ($this->inspector) {
+            $this->inspector = false;
 
             $this->kernel->boot();
-            $this->kernel->getContainer()->get('profiler')->enable();
+            $this->kernel->getContainer()->get('inspector')->enable();
         }
 
         return parent::doRequest($request);
@@ -142,7 +150,7 @@ class Client extends HttpKernelBrowser
     {
         $response = parent::doRequestInProcess($request);
 
-        $this->profiler = false;
+        $this->inspector = false;
 
         return $response;
     }
@@ -182,9 +190,9 @@ class Client extends HttpKernelBrowser
 
         $requires .= 'require_once '.var_export((new \ReflectionObject($this->kernel))->getFileName(), true).";\n";
 
-        $profilerCode = '';
-        if ($this->profiler) {
-            $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
+        $inspectorCode = '';
+        if ($this->inspector) {
+            $inspectorCode = '$kernel->getContainer()->get(\'inspector\')->enable();';
         }
 
         $code = <<<EOF
@@ -196,7 +204,7 @@ $requires
 
 \$kernel = unserialize($kernel);
 \$kernel->boot();
-$profilerCode
+$inspectorCode
 
 \$request = unserialize($request);
 EOF;

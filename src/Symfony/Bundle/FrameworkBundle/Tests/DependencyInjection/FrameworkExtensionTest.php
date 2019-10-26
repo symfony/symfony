@@ -197,19 +197,19 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('fragment.renderer.ssi'), 'The SSI fragment renderer is registered');
     }
 
-    public function testEnabledProfiler()
+    public function testEnabledInspector()
     {
         $container = $this->createContainerFromFile('profiler');
 
-        $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
+        $this->assertTrue($container->hasDefinition('inspector'), '->registerProfilerConfiguration() loads inspector.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
     }
 
-    public function testDisabledProfiler()
+    public function testDisabledInspector()
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertFalse($container->hasDefinition('profiler'), '->registerProfilerConfiguration() does not load profiling.xml');
+        $this->assertFalse($container->hasDefinition('inspector'), '->registerProfilerConfiguration() does not load inspector.xml');
         $this->assertFalse($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() does not load collectors.xml');
     }
 

@@ -19,7 +19,7 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('profiler')) {
+        if (!$container->hasDefinition('inspector')) {
             return;
         }
         if (!$container->hasDefinition('monolog.logger_prototype')) {

@@ -539,6 +539,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        $loader->load('inspector.xml');
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
         $loader->load('cache_debug.xml');
@@ -580,7 +581,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
 
-        $container->getDefinition('profiler')
+        $container->getDefinition('inspector')
             ->addArgument($config['collect'])
             ->addTag('kernel.reset', ['method' => 'reset']);
     }

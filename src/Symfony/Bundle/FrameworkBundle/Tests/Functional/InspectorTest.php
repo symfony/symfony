@@ -26,8 +26,8 @@ class InspectorTest extends AbstractWebTestCase
         $client->request('GET', '/inspector');
         $this->assertNull($client->getProfile());
 
-        // enable the profiler for the next request
-        $client->enableProfiler();
+        // enable the inspector for the next request
+        $client->enableInspector();
         $this->assertNull($client->getProfile());
         $client->request('GET', '/inspector');
         $this->assertIsObject($client->getProfile());

@@ -29,7 +29,7 @@ class ProfilerPassTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
         $builder = new ContainerBuilder();
-        $builder->register('profiler', 'ProfilerClass');
+        $builder->register('inspector', 'ProfilerClass');
         $builder->register('my_collector_service')
             ->addTag('data_collector', ['template' => 'foo']);
 
@@ -40,7 +40,7 @@ class ProfilerPassTest extends TestCase
     public function testValidCollector()
     {
         $container = new ContainerBuilder();
-        $profilerDefinition = $container->register('profiler', 'ProfilerClass');
+        $profilerDefinition = $container->register('inspector', 'ProfilerClass');
         $container->register('my_collector_service')
             ->addTag('data_collector', ['template' => 'foo', 'id' => 'my_collector']);
 

@@ -149,7 +149,7 @@
 
             document.body.classList.remove(optionName + '-' + oppositeValues[optionValue]);
             document.body.classList.add(optionName + '-' + optionValue);
-            localStorage.setItem('symfony/profiler/' + optionName, optionName + '-' + optionValue);
+            localStorage.setItem('symfony/inspector/' + optionName, optionName + '-' + optionValue);
         });
     });
 
@@ -159,8 +159,8 @@
     let modalWrapper = document.getElementsByClassName('modal-wrap')[0]
 
     openModalButton.addEventListener('click', function(event) {
-        document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/theme') || 'theme-light')).checked = 'checked';
-        document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/width') || 'width-normal')).checked = 'checked';
+        document.getElementById('settings-' + (localStorage.getItem('symfony/inspector/theme') || 'theme-light')).checked = 'checked';
+        document.getElementById('settings-' + (localStorage.getItem('symfony/inspector/width') || 'width-normal')).checked = 'checked';
 
         modalWindow.classList.toggle('visible');
         event.preventDefault();

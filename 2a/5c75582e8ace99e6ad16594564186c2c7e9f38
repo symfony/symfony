@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-16T13:27:19Z
+
+wouldn't this have a bad side-effect if the call to `setData` happens after creating the form rather than passing the data to the form factory directly ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-16T13:32:17Z
+
+@stof in that case `$this->defaultDataSet` is already `true` and `setData()` wouldn't be called again.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-16T14:02:30Z
+
+>https://github.com/symfony/symfony/issues/29291#issuecomment-441232536
+>I think this is related to the fact that the fields are added in a PRE_SUBMIT listener. Maybe extractConfiguration is not called properly for dynamic fields, and so the data is incomplete.
+
+I've also checked the case when dynamic child forms are added on `PRE_SUBMIT` event and they are correctly collected thanks to this code:
+https://github.com/symfony/symfony/blob/29cabf94c513e7d1df3373d372286a4dc091f049/src/Symfony/Component/Form/Extension/DataCollector/FormDataCollector.php#L151-L155
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-16T14:21:44Z
+
+I've changed the solution consistent with `collectSubmittedData()` approach when the form hash doesn't exist.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-10-17T05:18:59Z
+
+Is it possible to add a testcase?

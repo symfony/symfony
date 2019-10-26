@@ -38,8 +38,8 @@ class Notification
     public const IMPORTANCE_MEDIUM = 'medium';
     public const IMPORTANCE_LOW = 'low';
 
-    private $channels;
-    private $subject;
+    private $channels = [];
+    private $subject = '';
     private $content = '';
     private $emoji = '';
     private $exception;

@@ -22,9 +22,9 @@ session_showflash:
     path:     /session_showflash
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::showFlashAction }
 
-profiler:
-    path:     /profiler
-    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\ProfilerController::indexAction }
+inspector:
+    path:     /inspector
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\InspectorController::indexAction }
 
 subrequest_index:
     path:     /subrequest/{_locale}.{_format}

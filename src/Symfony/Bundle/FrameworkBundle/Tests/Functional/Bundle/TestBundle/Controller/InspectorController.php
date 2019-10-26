@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProfilerController implements ContainerAwareInterface
+class InspectorController implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
 

@@ -11,28 +11,28 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-class ProfilerTest extends AbstractWebTestCase
+class InspectorTest extends AbstractWebTestCase
 {
     /**
      * @dataProvider getConfigs
      */
-    public function testProfilerIsDisabled($insulate)
+    public function testInspectorIsDisabled($insulate)
     {
-        $client = $this->createClient(['test_case' => 'Profiler', 'root_config' => 'config.yml']);
+        $client = $this->createClient(['test_case' => 'Inspector', 'root_config' => 'config.yml']);
         if ($insulate) {
             $client->insulate();
         }
 
-        $client->request('GET', '/profiler');
+        $client->request('GET', '/inspector');
         $this->assertNull($client->getProfile());
 
         // enable the profiler for the next request
         $client->enableProfiler();
         $this->assertNull($client->getProfile());
-        $client->request('GET', '/profiler');
+        $client->request('GET', '/inspector');
         $this->assertIsObject($client->getProfile());
 
-        $client->request('GET', '/profiler');
+        $client->request('GET', '/inspector');
         $this->assertNull($client->getProfile());
     }
 

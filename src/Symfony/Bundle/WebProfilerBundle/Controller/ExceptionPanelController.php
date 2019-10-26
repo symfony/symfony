@@ -26,12 +26,12 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 class ExceptionPanelController
 {
     private $htmlErrorRenderer;
-    private $profiler;
+    private $inspector;
 
-    public function __construct(HtmlErrorRenderer $htmlErrorRenderer, ?Profiler $profiler)
+    public function __construct(HtmlErrorRenderer $htmlErrorRenderer, ?Profiler $inspector)
     {
         $this->htmlErrorRenderer = $htmlErrorRenderer;
-        $this->profiler = $profiler;
+        $this->inspector = $inspector;
     }
 
     /**
@@ -39,11 +39,11 @@ class ExceptionPanelController
      */
     public function body(string $token): Response
     {
-        if (null === $this->profiler) {
-            throw new NotFoundHttpException('The profiler must be enabled.');
+        if (null === $this->inspector) {
+            throw new NotFoundHttpException('The inspector must be enabled.');
         }
 
-        $exception = $this->profiler->loadProfile($token)
+        $exception = $this->inspector->loadProfile($token)
             ->getCollector('exception')
             ->getException()
         ;

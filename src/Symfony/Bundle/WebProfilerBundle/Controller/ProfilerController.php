@@ -33,16 +33,16 @@ class ProfilerController
 {
     private $templateManager;
     private $generator;
-    private $profiler;
+    private $inspector;
     private $twig;
     private $templates;
     private $cspHandler;
     private $baseDir;
 
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, Profiler $inspector = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
     {
         $this->generator = $generator;
-        $this->profiler = $profiler;
+        $this->inspector = $inspector;
         $this->twig = $twig;
         $this->templates = $templates;
         $this->cspHandler = $cspHandler;
@@ -58,15 +58,15 @@ class ProfilerController
      */
     public function homeAction()
     {
-        $this->denyAccessIfProfilerDisabled();
+        $this->denyAccessIfInspectorDisabled();
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', ['token' => 'empty', 'limit' => 10]), 302, ['Content-Type' => 'text/html']);
     }
 
     /**
-     * Renders a profiler panel for the given token.
+     * Renders an inspector panel for the given token.
      *
-     * @param string $token The profiler token
+     * @param string $token The inspector token
      *
      * @return Response A Response instance
      *
@@ -74,7 +74,7 @@ class ProfilerController
      */
     public function panelAction(Request $request, $token)
     {
-        $this->denyAccessIfProfilerDisabled();
+        $this->denyAccessIfInspectorDisabled();
 
         if (null !== $this->cspHandler) {
             $this->cspHandler->disableCsp();
@@ -83,11 +83,11 @@ class ProfilerController
         $panel = $request->query->get('panel');
         $page = $request->query->get('page', 'home');
 
-        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null))) {
+        if ('latest' === $token && $latest = current($this->inspector->find(null, null, 1, null, null, null))) {
             $token = $latest['token'];
         }
 
-        if (!$profile = $this->profiler->loadProfile($token)) {
+        if (!$profile = $this->inspector->loadProfile($token)) {
             return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', ['about' => 'no_token', 'token' => $token, 'request' => $request]), 200, ['Content-Type' => 'text/html']);
         }
 
@@ -120,14 +120,14 @@ class ProfilerController
             'request' => $request,
             'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
-            'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
+            'profiler_markup_version' => 2, // 1 = original inspector, 2 = Symfony 2.8+ inspector
         ]), 200, ['Content-Type' => 'text/html']);
     }
 
     /**
      * Renders the Web Debug Toolbar.
      *
-     * @param string $token The profiler token
+     * @param string $token The inspector token
      *
      * @return Response A Response instance
      *
@@ -135,8 +135,8 @@ class ProfilerController
      */
     public function toolbarAction(Request $request, $token)
     {
-        if (null === $this->profiler) {
-            throw new NotFoundHttpException('The profiler must be enabled.');
+        if (null === $this->inspector) {
+            throw new NotFoundHttpException('The inspector must be enabled.');
         }
 
         if ($request->hasSession() && ($session = $request->getSession())->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
@@ -148,9 +148,9 @@ class ProfilerController
             return new Response('', 200, ['Content-Type' => 'text/html']);
         }
 
-        $this->profiler->disable();
+        $this->inspector->disable();
 
-        if (!$profile = $this->profiler->loadProfile($token)) {
+        if (!$profile = $this->inspector->loadProfile($token)) {
             return new Response('', 404, ['Content-Type' => 'text/html']);
         }
 
@@ -158,7 +158,7 @@ class ProfilerController
         try {
             $url = $this->generator->generate('_profiler', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
         } catch (\Exception $e) {
-            // the profiler is not enabled
+            // the inspector is not enabled
         }
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/toolbar.html.twig', [
@@ -172,7 +172,7 @@ class ProfilerController
     }
 
     /**
-     * Renders the profiler search bar.
+     * Renders the inspector search bar.
      *
      * @return Response A Response instance
      *
@@ -180,7 +180,7 @@ class ProfilerController
      */
     public function searchBarAction(Request $request)
     {
-        $this->denyAccessIfProfilerDisabled();
+        $this->denyAccessIfInspectorDisabled();
 
         if (null !== $this->cspHandler) {
             $this->cspHandler->disableCsp();
@@ -198,14 +198,14 @@ class ProfilerController
         } else {
             $session = $request->getSession();
 
-            $ip = $request->query->get('ip', $session->get('_profiler_search_ip'));
-            $method = $request->query->get('method', $session->get('_profiler_search_method'));
-            $statusCode = $request->query->get('status_code', $session->get('_profiler_search_status_code'));
-            $url = $request->query->get('url', $session->get('_profiler_search_url'));
-            $start = $request->query->get('start', $session->get('_profiler_search_start'));
-            $end = $request->query->get('end', $session->get('_profiler_search_end'));
-            $limit = $request->query->get('limit', $session->get('_profiler_search_limit'));
-            $token = $request->query->get('token', $session->get('_profiler_search_token'));
+            $ip = $request->query->get('ip', $session->get('_inspector_search_ip'));
+            $method = $request->query->get('method', $session->get('_inspector_search_method'));
+            $statusCode = $request->query->get('status_code', $session->get('_inspector_search_status_code'));
+            $url = $request->query->get('url', $session->get('_inspector_search_url'));
+            $start = $request->query->get('start', $session->get('_inspector_search_start'));
+            $end = $request->query->get('end', $session->get('_inspector_search_end'));
+            $limit = $request->query->get('limit', $session->get('_inspector_search_limit'));
+            $token = $request->query->get('token', $session->get('_inspector_search_token'));
         }
 
         return new Response(
@@ -236,13 +236,13 @@ class ProfilerController
      */
     public function searchResultsAction(Request $request, $token)
     {
-        $this->denyAccessIfProfilerDisabled();
+        $this->denyAccessIfInspectorDisabled();
 
         if (null !== $this->cspHandler) {
             $this->cspHandler->disableCsp();
         }
 
-        $profile = $this->profiler->loadProfile($token);
+        $profile = $this->inspector->loadProfile($token);
 
         $ip = $request->query->get('ip');
         $method = $request->query->get('method');
@@ -256,7 +256,7 @@ class ProfilerController
             'request' => $request,
             'token' => $token,
             'profile' => $profile,
-            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode),
+            'tokens' => $this->inspector->find($ip, $url, $limit, $method, $start, $end, $statusCode),
             'ip' => $ip,
             'method' => $method,
             'status_code' => $statusCode,
@@ -277,7 +277,7 @@ class ProfilerController
      */
     public function searchAction(Request $request)
     {
-        $this->denyAccessIfProfilerDisabled();
+        $this->denyAccessIfInspectorDisabled();
 
         $ip = $request->query->get('ip');
         $method = $request->query->get('method');
@@ -291,21 +291,21 @@ class ProfilerController
         if ($request->hasSession()) {
             $session = $request->getSession();
 
-            $session->set('_profiler_search_ip', $ip);
-            $session->set('_profiler_search_method', $method);
-            $session->set('_profiler_search_status_code', $statusCode);
-            $session->set('_profiler_search_url', $url);
-            $session->set('_profiler_search_start', $start);
-            $session->set('_profiler_search_end', $end);
-            $session->set('_profiler_search_limit', $limit);
-            $session->set('_profiler_search_token', $token);
+            $session->set('_inspector_search_ip', $ip);
+            $session->set('_inspector_search_method', $method);
+            $session->set('_inspector_search_status_code', $statusCode);
+            $session->set('_inspector_search_url', $url);
+            $session->set('_inspector_search_start', $start);
+            $session->set('_inspector_search_end', $end);
+            $session->set('_inspector_search_limit', $limit);
+            $session->set('_inspector_search_token', $token);
         }
 
         if (!empty($token)) {
             return new RedirectResponse($this->generator->generate('_profiler', ['token' => $token]), 302, ['Content-Type' => 'text/html']);
         }
 
-        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode);
+        $tokens = $this->inspector->find($ip, $url, $limit, $method, $start, $end, $statusCode);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', [
             'token' => $tokens ? $tokens[0]['token'] : 'empty',
@@ -328,7 +328,7 @@ class ProfilerController
      */
     public function phpinfoAction()
     {
-        $this->denyAccessIfProfilerDisabled();
+        $this->denyAccessIfInspectorDisabled();
 
         if (null !== $this->cspHandler) {
             $this->cspHandler->disableCsp();
@@ -354,8 +354,8 @@ class ProfilerController
             throw new NotFoundHttpException('The base dir should be set.');
         }
 
-        if ($this->profiler) {
-            $this->profiler->disable();
+        if ($this->inspector) {
+            $this->inspector->disable();
         }
 
         $file = $request->query->get('file');
@@ -382,19 +382,19 @@ class ProfilerController
     protected function getTemplateManager()
     {
         if (null === $this->templateManager) {
-            $this->templateManager = new TemplateManager($this->profiler, $this->twig, $this->templates);
+            $this->templateManager = new TemplateManager($this->inspector, $this->twig, $this->templates);
         }
 
         return $this->templateManager;
     }
 
-    private function denyAccessIfProfilerDisabled()
+    private function denyAccessIfInspectorDisabled()
     {
-        if (null === $this->profiler) {
-            throw new NotFoundHttpException('The profiler must be enabled.');
+        if (null === $this->inspector) {
+            throw new NotFoundHttpException('The inspector must be enabled.');
         }
 
-        $this->profiler->disable();
+        $this->inspector->disable();
     }
 
     private function renderWithCspNonces(Request $request, string $template, array $variables, int $code = 200, array $headers = ['Content-Type' => 'text/html']): Response

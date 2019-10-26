@@ -327,7 +327,7 @@ class FrameworkExtension extends Extension
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
-        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+        $this->registerInspectorConfiguration($config['profiler'], $container, $loader);
         $this->registerCacheConfiguration($config['cache'], $container);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
@@ -530,10 +530,10 @@ class FrameworkExtension extends Extension
         $container->setParameter('fragment.path', $config['path']);
     }
 
-    private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerInspectorConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
-            // this is needed for the WebProfiler to work even if the profiler is disabled
+            // this is needed for the WebProfiler to work even if the inspector is disabled
             $container->setParameter('data_collector.templates', []);
 
             return;
@@ -576,7 +576,7 @@ class FrameworkExtension extends Extension
         // Choose storage class based on the DSN
         list($class) = explode(':', $config['dsn'], 2);
         if ('file' !== $class) {
-            throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
+            throw new \LogicException(sprintf('Driver "%s" is not supported for the inspector.', $class));
         }
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);

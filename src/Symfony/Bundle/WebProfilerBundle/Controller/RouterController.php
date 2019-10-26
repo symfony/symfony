@@ -31,23 +31,23 @@ use Twig\Environment;
  */
 class RouterController
 {
-    private $profiler;
+    private $inspector;
     private $twig;
     private $matcher;
     private $routes;
 
-    public function __construct(Profiler $profiler = null, Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
+    public function __construct(Profiler $inspector = null, Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
     {
-        $this->profiler = $profiler;
+        $this->inspector = $inspector;
         $this->twig = $twig;
         $this->matcher = $matcher;
         $this->routes = (null === $routes && $matcher instanceof RouterInterface) ? $matcher->getRouteCollection() : $routes;
     }
 
     /**
-     * Renders the profiler panel for the given token.
+     * Renders the inspector panel for the given token.
      *
-     * @param string $token The profiler token
+     * @param string $token The inspector token
      *
      * @return Response A Response instance
      *
@@ -55,17 +55,17 @@ class RouterController
      */
     public function panelAction($token)
     {
-        if (null === $this->profiler) {
-            throw new NotFoundHttpException('The profiler must be enabled.');
+        if (null === $this->inspector) {
+            throw new NotFoundHttpException('The inspector must be enabled.');
         }
 
-        $this->profiler->disable();
+        $this->inspector->disable();
 
         if (null === $this->matcher || null === $this->routes) {
             return new Response('The Router is not enabled.', 200, ['Content-Type' => 'text/html']);
         }
 
-        $profile = $this->profiler->loadProfile($token);
+        $profile = $this->inspector->loadProfile($token);
 
         /** @var RequestDataCollector $request */
         $request = $profile->getCollector('request');

@@ -94,7 +94,7 @@ class Configuration implements ConfigurationInterface
         $this->addEsiSection($rootNode);
         $this->addSsiSection($rootNode);
         $this->addFragmentsSection($rootNode);
-        $this->addProfilerSection($rootNode);
+        $this->addInspectorSection($rootNode);
         $this->addWorkflowSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
@@ -217,7 +217,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addProfilerSection(ArrayNodeDefinition $rootNode)
+    private function addInspectorSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
             ->children()

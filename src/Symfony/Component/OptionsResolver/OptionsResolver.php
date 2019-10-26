@@ -734,7 +734,7 @@ class OptionsResolver implements Options
 
         // Validate the type of the resolved option
         if (isset($this->allowedTypes[$option])) {
-            $valid = false;
+            $valid = true;
             $invalidTypes = [];
 
             foreach ($this->allowedTypes[$option] as $type) {
@@ -746,13 +746,22 @@ class OptionsResolver implements Options
             }
 
             if (!$valid) {
-                $keys = array_keys($invalidTypes);
+                $fmtActualValue = $this->formatValue($value);
+                $fmtAllowedTypes = implode('" or "', $this->allowedTypes[$option]);
+                $fmtProvidedTypes = implode('|', array_keys($invalidTypes));
 
-                if (1 === \count($keys) && '[]' === substr($keys[0], -2)) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but one of the elements is of type "%s".', $option, $this->formatValue($value), implode('" or "', $this->allowedTypes[$option]), $keys[0]));
+                $allowedContainsArrayType = \count(array_filter(
+                    $this->allowedTypes[$option],
+                    function ($item) {
+                        return '[]' === substr(isset(self::$typeAliases[$item]) ? self::$typeAliases[$item] : $item, -2);
+                    }
+                )) > 0;
+
+                if (\is_array($value) && $allowedContainsArrayType) {
+                    throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but one of the elements is of type "%s".', $option, $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
                 }
 
-                throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but is of type "%s".', $option, $this->formatValue($value), implode('" or "', $this->allowedTypes[$option]), implode('|', array_keys($invalidTypes))));
+                throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but is of type "%s".', $option, $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
             }
         }
 
@@ -858,21 +867,14 @@ class OptionsResolver implements Options
     {
         $type = substr($type, 0, -2);
 
-        $suffix = '[]';
-        while (\strlen($suffix) <= $level * 2) {
-            $suffix .= '[]';
-        }
-
         if ('[]' === substr($type, -2)) {
             $success = true;
             foreach ($value as $item) {
                 if (!\is_array($item)) {
-                    $invalidTypes[$this->formatTypeOf($item, null).$suffix] = true;
+                    $invalidTypes[$this->formatTypeOf($item, null)] = true;
 
-                    return false;
-                }
-
-                if (!$this->verifyArrayType($type, $item, $invalidTypes, $level + 1)) {
+                    $success = false;
+                } elseif (!$this->verifyArrayType($type, $item, $invalidTypes, $level + 1)) {
                     $success = false;
                 }
             }
@@ -880,15 +882,17 @@ class OptionsResolver implements Options
             return $success;
         }
 
+        $valid = true;
+
         foreach ($value as $item) {
             if (!self::isValueValidType($type, $item)) {
-                $invalidTypes[$this->formatTypeOf($item, $type).$suffix] = $value;
+                $invalidTypes[$this->formatTypeOf($item, $type)] = $value;
 
-                return false;
+                $valid = false;
             }
         }
 
-        return true;
+        return $valid;
     }
 
     /**

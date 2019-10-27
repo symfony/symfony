@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-18T09:45:11Z
+
+Some tests are failing
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-10-19T01:32:49Z
+
+Got it, the `PASSWORD_*` constants will be strings as of PHP 7.4, not integers (https://wiki.php.net/rfc/password_registry).
+Now green.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-10-27T07:33:22Z
+
+@nicolas-grekas Now possible via a new encoder option:
+```yaml
+encoders:
+    App\User:
+        algorithm: argon2id
+        migrating_from: bcrypt # or ['bcrypt, 'argon2i']
+```
+
+Comments addressed also, thanks.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-10-27T10:23:30Z
+
+Migrations related part moved to #34139

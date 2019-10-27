@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
-use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
@@ -377,14 +377,9 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    /**
-     * @group legacy
-     *
-     * @expectedDeprecation Configuring an encoder with "argon2i" as algorithm is deprecated since Symfony 4.3, use "auto" instead.
-     */
     public function testEncodersWithArgon2i()
     {
-        if (!Argon2iPasswordEncoder::isSupported()) {
+        if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
         }
 
@@ -429,19 +424,15 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => [8, 102400, 15],
             ],
             'JMS\FooBundle\Entity\User7' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-                'arguments' => [256, 1, 2],
+                'class' => $sodium ? SodiumPasswordEncoder::class : NativePasswordEncoder::class,
+                'arguments' => $sodium ? [256, 1] : [1, 262144, null, \PASSWORD_ARGON2I],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    /**
-     * @group legacy
-     */
     public function testEncodersWithBCrypt()
     {
         $container = $this->getContainer('bcrypt_encoder');
-
         $this->assertEquals([[
             'JMS\FooBundle\Entity\User1' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
@@ -481,8 +472,8 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => [8, 102400, 15],
             ],
             'JMS\FooBundle\Entity\User7' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => [15],
+                'class' => NativePasswordEncoder::class,
+                'arguments' => [null, null, 15, \PASSWORD_BCRYPT],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }

@@ -115,7 +115,13 @@ class SodiumVault extends AbstractVault
             return null;
         }
 
-        return sodium_crypto_box_seal_open(include $file, $this->decryptionKey);
+        if (false === $value = sodium_crypto_box_seal_open(include $file, $this->decryptionKey)) {
+            $this->lastMessage = sprintf('Secrets cannot be revealed as the wrong decryption key was provided for "%s".', $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
+
+            return null;
+        }
+
+        return $value;
     }
 
     public function remove(string $name): bool

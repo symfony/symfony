@@ -22,7 +22,7 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
 {
     private $algorithm;
     private $encodeHashAsBase64;
-    private $iterations = 0;
+    private $iterations = 1;
     private $encodedLength = -1;
 
     /**

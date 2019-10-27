@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -677,6 +678,14 @@ XML;
         $actualXml = $xmlEncoder->encode(['foo' => ['@dateTime' => new \DateTime($this->exampleDateTimeString)]], 'xml');
 
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
+    }
+
+    public function testNotEncodableValueExceptionMessageForAResource()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('An unexpected value could not be serialized: stream resource');
+
+        (new XmlEncoder())->encode(tmpfile(), 'xml');
     }
 
     /**

@@ -87,6 +87,12 @@ class SodiumVault extends AbstractVault
         $this->validateName($name);
         $this->loadKeys();
         $this->export($name.'.'.substr_replace(md5($name), '.sodium', -26), sodium_crypto_box_seal($value, $this->encryptionKey ?? sodium_crypto_box_publickey($this->decryptionKey)));
+
+        $list = $this->list();
+        $list[$name] = null;
+        uksort($list, 'strnatcmp');
+        file_put_contents($this->pathPrefix.'sodium.list', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), LOCK_EX));
+
         $this->lastMessage = sprintf('Secret "%s" encrypted in "%s"; you can commit it.', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
     }
 
@@ -123,6 +129,10 @@ class SodiumVault extends AbstractVault
             return false;
         }
 
+        $list = $this->list();
+        unset($list[$name]);
+        file_put_contents($this->pathPrefix.'sodium.list', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), LOCK_EX));
+
         $this->lastMessage = sprintf('Secret "%s" removed from "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
         return @unlink($file) || !file_exists($file);
@@ -131,13 +141,19 @@ class SodiumVault extends AbstractVault
     public function list(bool $reveal = false): array
     {
         $this->lastMessage = null;
-        $secrets = [];
-        $regexp = sprintf('{^%s(\w++)\.[0-9a-f]{6}\.sodium$}D', preg_quote(basename($this->pathPrefix)));
 
-        foreach (scandir(\dirname($this->pathPrefix)) as $name) {
-            if (preg_match($regexp, $name, $m)) {
-                $secrets[$m[1]] = $reveal ? $this->reveal($m[1]) : null;
-            }
+        if (!file_exists($file = $this->pathPrefix.'sodium.list')) {
+            return [];
+        }
+
+        $secrets = include $file;
+
+        if (!$reveal) {
+            return $secrets;
+        }
+
+        foreach ($secrets as $name => $value) {
+            $secrets[$name] = $this->reveal($name);
         }
 
         return $secrets;

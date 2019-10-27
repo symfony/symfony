@@ -44,9 +44,9 @@ class SecretEnvVarProcessor implements EnvVarProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getEnv($prefix, $name, \Closure $getEnv)
+    public function getEnv($prefix, $name, \Closure $getEnv): string
     {
-        if (null !== $this->localVault && null !== $secret = $this->localVault->reveal($name)) {
+        if (null !== $this->localVault && null !== ($secret = $this->localVault->reveal($name)) && \array_key_exists($name, $this->vault->list())) {
             return $secret;
         }
 

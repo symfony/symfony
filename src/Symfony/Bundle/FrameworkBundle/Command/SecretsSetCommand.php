@@ -86,6 +86,12 @@ EOF
             return 1;
         }
 
+        if ($this->localVault === $vault && !\array_key_exists($name, $this->vault->list())) {
+            $io->error(sprintf('Secret "%s" does not exist in the vault, you cannot override it locally.', $name));
+
+            return 1;
+        }
+
         if (0 < $random = $input->getOption('random') ?? 16) {
             $value = strtr(substr(base64_encode(random_bytes($random)), 0, $random), '+/', '-_');
         } elseif (!$file = $input->getArgument('file')) {

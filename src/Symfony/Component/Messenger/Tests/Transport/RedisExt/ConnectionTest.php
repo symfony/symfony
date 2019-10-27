@@ -117,7 +117,7 @@ class ConnectionTest extends TestCase
     {
         $redis = new \Redis();
 
-        Connection::fromDsn('redis://password@localhost/queue?dbindex=2', [], $redis);
+        Connection::fromDsn('redis://localhost/queue?dbindex=2', [], $redis);
 
         $this->assertSame(2, $redis->getDbNum());
     }

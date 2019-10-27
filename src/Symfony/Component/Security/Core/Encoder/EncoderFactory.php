@@ -128,7 +128,7 @@ class EncoderFactory implements EncoderFactoryInterface
                     'arguments' => [
                         $config['time_cost'] ?? null,
                         (($config['memory_cost'] ?? 0) << 10) ?: null,
-                        $config['cost'] ?? null
+                        $config['cost'] ?? null,
                     ] + (isset($config['native_algorithm']) ? [3 => $config['native_algorithm']] : []),
                 ];
 

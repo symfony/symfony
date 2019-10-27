@@ -576,7 +576,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 'arguments' => [
                     $config['time_cost'],
                     (($config['memory_cost'] ?? 0) << 10) ?: null,
-                    $config['cost']
+                    $config['cost'],
                 ] + (isset($config['native_algorithm']) ? [3 => $config['native_algorithm']] : []),
             ];
         }

@@ -1,0 +1,7 @@
+imports:
+    - { resource: config.yml }
+
+security:
+    encoders:
+        Custom\Class\Argon2id\User:
+            algorithm: argon2id

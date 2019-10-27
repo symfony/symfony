@@ -27,7 +27,10 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
     private $algo;
     private $options;
 
-    public function __construct(int $opsLimit = null, int $memLimit = null, int $cost = null)
+    /**
+     * @param string|null $algo An algorithm supported by password_hash() or null to use the stronger available algorithm
+     */
+    public function __construct(int $opsLimit = null, int $memLimit = null, int $cost = null, string $algo = null)
     {
         $cost = $cost ?? 13;
         $opsLimit = $opsLimit ?? max(4, \defined('SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE') ? \SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE : 4);
@@ -45,7 +48,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
             throw new \InvalidArgumentException('$cost must be in the range of 4-31.');
         }
 
-        $this->algo = \defined('PASSWORD_ARGON2I') ? max(PASSWORD_DEFAULT, \defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : PASSWORD_ARGON2I) : PASSWORD_DEFAULT;
+        $this->algo = $algo ?? (\defined('PASSWORD_ARGON2I') ? max(PASSWORD_DEFAULT, \defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : PASSWORD_ARGON2I) : PASSWORD_DEFAULT);
         $this->options = [
             'cost' => $cost,
             'time_cost' => $opsLimit,

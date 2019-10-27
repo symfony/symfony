@@ -32,6 +32,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
     private $encodeHashAsBase64;
     private $iterations;
     private $length;
+    private $encodedLength;
 
     /**
      * @param string $algorithm          The digest algorithm to use
@@ -45,6 +46,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
         $this->encodeHashAsBase64 = $encodeHashAsBase64;
         $this->iterations = $iterations;
         $this->length = $length;
+        $this->encodedLength = $encodeHashAsBase64 ? intdiv($length + 2, 3) << 2 : ($length << 1);
     }
 
     /**
@@ -72,6 +74,10 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
+        if ((0 < $this->length && \strlen($encoded) !== $this->encodedLength) || false !== strpos($encoded, '$')) {
+            return false;
+        }
+
         return !$this->isPasswordTooLong($raw) && $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
     }
 }

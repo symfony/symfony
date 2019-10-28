@@ -277,8 +277,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
         $controller = $this->createController();
 
-        /* @var BinaryFileResponse $response */
-        $response = $controller->file('some-file.txt', 'test.php');
+        $controller->file('some-file.txt', 'test.php');
     }
 
     public function testIsGranted()

@@ -59,7 +59,7 @@ class SessionTest extends AbstractWebTestCase
         }
 
         // set flash
-        $crawler = $client->request('GET', '/session_setflash/Hello%20world.');
+        $client->request('GET', '/session_setflash/Hello%20world.');
 
         // check flash displays on redirect
         $this->assertStringContainsString('Hello world.', $client->followRedirect()->text());

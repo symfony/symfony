@@ -508,7 +508,6 @@ class TextDescriptor extends Descriptor
         $tableHeaders = ['Order', 'Callable', 'Priority'];
         $tableRows = [];
 
-        $order = 1;
         foreach ($eventListeners as $order => $listener) {
             $tableRows[] = [sprintf('#%d', $order + 1), $this->formatCallable($listener), $eventDispatcher->getListenerPriority($event, $listener)];
         }

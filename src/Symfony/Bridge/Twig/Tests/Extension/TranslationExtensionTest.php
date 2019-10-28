@@ -58,14 +58,14 @@ class TranslationExtensionTest extends TestCase
     {
         $this->expectException('Twig\Error\SyntaxError');
         $this->expectExceptionMessage('Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.');
-        $output = $this->getTemplate("{% trans \n\nfoo %}{% endtrans %}")->render();
+        $this->getTemplate("{% trans \n\nfoo %}{% endtrans %}")->render();
     }
 
     public function testTransComplexBody()
     {
         $this->expectException('Twig\Error\SyntaxError');
         $this->expectExceptionMessage('A message inside a trans tag must be a simple text in "index" at line 2.');
-        $output = $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
+        $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
     }
 
     /**
@@ -75,7 +75,7 @@ class TranslationExtensionTest extends TestCase
     {
         $this->expectException('Twig\Error\SyntaxError');
         $this->expectExceptionMessage('A message inside a transchoice tag must be a simple text in "index" at line 2.');
-        $output = $this->getTemplate("{% transchoice count %}\n{{ 1 + 2 }}{% endtranschoice %}")->render();
+        $this->getTemplate("{% transchoice count %}\n{{ 1 + 2 }}{% endtranschoice %}")->render();
     }
 
     public function getTransTests()

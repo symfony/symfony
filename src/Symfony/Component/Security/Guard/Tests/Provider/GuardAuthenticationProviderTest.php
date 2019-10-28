@@ -162,7 +162,7 @@ class GuardAuthenticationProviderTest extends TestCase
         $token->setAuthenticated(false);
 
         $provider = new GuardAuthenticationProvider([], $this->userProvider, $providerKey, $this->userChecker);
-        $actualToken = $provider->authenticate($token);
+        $provider->authenticate($token);
     }
 
     public function testSupportsChecksGuardAuthenticatorsTokenOrigin()

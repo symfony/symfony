@@ -29,13 +29,13 @@ class RedirectResponseTest extends TestCase
     public function testRedirectResponseConstructorNullUrl()
     {
         $this->expectException('InvalidArgumentException');
-        $response = new RedirectResponse(null);
+        new RedirectResponse(null);
     }
 
     public function testRedirectResponseConstructorWrongStatusCode()
     {
         $this->expectException('InvalidArgumentException');
-        $response = new RedirectResponse('foo.bar', 404);
+        new RedirectResponse('foo.bar', 404);
     }
 
     public function testGenerateLocationHeader()

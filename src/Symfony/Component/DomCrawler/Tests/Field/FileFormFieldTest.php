@@ -24,7 +24,7 @@ class FileFormFieldTest extends FormFieldTestCase
 
         $node = $this->createNode('textarea', '');
         try {
-            $field = new FileFormField($node);
+            new FileFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not an input field');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input field');
@@ -32,7 +32,7 @@ class FileFormFieldTest extends FormFieldTestCase
 
         $node = $this->createNode('input', '', ['type' => 'text']);
         try {
-            $field = new FileFormField($node);
+            new FileFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not a file input field');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not a file input field');

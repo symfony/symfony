@@ -201,7 +201,7 @@ class CookieTest extends TestCase
     {
         $this->expectException('UnexpectedValueException');
         $this->expectExceptionMessage('The cookie expiration time "string" is not valid.');
-        $cookie = new Cookie('foo', 'bar', 'string');
+        new Cookie('foo', 'bar', 'string');
     }
 
     public function testSameSite()

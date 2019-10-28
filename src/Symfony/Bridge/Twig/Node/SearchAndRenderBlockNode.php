@@ -28,7 +28,6 @@ class SearchAndRenderBlockNode extends FunctionExpression
 
         preg_match('/_([^_]+)$/', $this->getAttribute('name'), $matches);
 
-        $label = null;
         $arguments = iterator_to_array($this->getNode('arguments'));
         $blockNameSuffix = $matches[1];
 

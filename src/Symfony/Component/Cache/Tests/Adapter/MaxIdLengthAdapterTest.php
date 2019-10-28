@@ -70,7 +70,7 @@ class MaxIdLengthAdapterTest extends TestCase
     {
         $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
         $this->expectExceptionMessage('Namespace must be 26 chars max, 40 given ("----------------------------------------")');
-        $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
+        $this->getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs([str_repeat('-', 40)])
             ->getMock();
     }

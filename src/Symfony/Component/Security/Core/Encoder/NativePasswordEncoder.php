@@ -45,7 +45,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
             throw new \InvalidArgumentException('$cost must be in the range of 4-31.');
         }
 
-        $this->algo = \defined('PASSWORD_ARGON2I') ? max(PASSWORD_DEFAULT, \defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : PASSWORD_ARGON2I) : PASSWORD_DEFAULT;
+        $this->algo = \defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : (\defined('PASSWORD_ARGON2I') ? PASSWORD_ARGON2I : PASSWORD_BCRYPT);
         $this->options = [
             'cost' => $cost,
             'time_cost' => $opsLimit,
@@ -59,20 +59,13 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
      */
     public function encodePassword($raw, $salt)
     {
-        if (\strlen($raw) > self::MAX_PASSWORD_LENGTH) {
+        if (\strlen($raw) > self::MAX_PASSWORD_LENGTH || (PASSWORD_BCRYPT === $this->algo && 72 < \strlen($raw))) {
             throw new BadCredentialsException('Invalid password.');
         }
 
         // Ignore $salt, the auto-generated one is always the best
 
-        $encoded = password_hash($raw, $this->algo, $this->options);
-
-        if (72 < \strlen($raw) && 0 === strpos($encoded, '$2')) {
-            // BCrypt encodes only the first 72 chars
-            throw new BadCredentialsException('Invalid password.');
-        }
-
-        return $encoded;
+        return password_hash($raw, $this->algo, $this->options);
     }
 
     /**
@@ -80,11 +73,23 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
-        if (72 < \strlen($raw) && 0 === strpos($encoded, '$2')) {
-            // BCrypt encodes only the first 72 chars
+        if (\strlen($raw) > self::MAX_PASSWORD_LENGTH) {
             return false;
         }
 
-        return \strlen($raw) <= self::MAX_PASSWORD_LENGTH && password_verify($raw, $encoded);
+        if (0 === strpos($encoded, '$2')) {
+            // BCrypt encodes only the first 72 chars
+            return 72 >= \strlen($raw) && password_verify($raw, $encoded);
+        }
+
+        if (\extension_loaded('sodium') && version_compare(\SODIUM_LIBRARY_VERSION, '1.0.14', '>=')) {
+            return sodium_crypto_pwhash_str_verify($encoded, $raw);
+        }
+
+        if (\extension_loaded('libsodium') && version_compare(phpversion('libsodium'), '1.0.14', '>=')) {
+            return \Sodium\crypto_pwhash_str_verify($encoded, $raw);
+        }
+
+        return password_verify($raw, $encoded);
     }
 }

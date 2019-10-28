@@ -93,6 +93,6 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
             return \Sodium\crypto_pwhash_str_verify($encoded, $raw);
         }
 
-        throw new LogicException('Libsodium is not available. You should either install the sodium extension, upgrade to PHP 7.2+ or use a different encoder.');
+        return false;
     }
 }

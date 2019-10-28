@@ -29,7 +29,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
         $crawler = $client->followRedirect();
 
-        $text = $crawler->text();
+        $text = $crawler->text(null, true);
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/profile".', $text);
 
@@ -56,7 +56,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
         $this->assertRedirect($client->getResponse(), '/login');
 
-        $text = $client->followRedirect()->text();
+        $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Invalid CSRF token.', $text);
     }
 
@@ -75,7 +75,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
         $this->assertRedirect($client->getResponse(), '/foo');
 
-        $text = $client->followRedirect()->text();
+        $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/foo".', $text);
     }
@@ -96,7 +96,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $client->submit($form);
         $this->assertRedirect($client->getResponse(), '/protected-resource');
 
-        $text = $client->followRedirect()->text();
+        $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/protected-resource".', $text);
     }

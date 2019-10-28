@@ -593,7 +593,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns the text of the first node of the list.
      *
-     * Pass true as the 2nd argument to normalize whitespaces.
+     * Pass true as the second argument to normalize whitespaces.
      *
      * @param string|null $default             When not null: the value to return when the current node is empty
      * @param bool        $normalizeWhitespace Whether whitespaces should be trimmed and normalized to single spaces
@@ -602,7 +602,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function text(/* string $default = null, bool $normalizeWhitespace = false */)
+    public function text(/* string $default = null, bool $normalizeWhitespace = true */)
     {
         if (!$this->nodes) {
             if (0 < \func_num_args() && null !== func_get_arg(0)) {
@@ -613,6 +613,14 @@ class Crawler implements \Countable, \IteratorAggregate
         }
 
         $text = $this->getNode(0)->nodeValue;
+
+        if (\func_num_args() <= 1) {
+            if (trim(preg_replace('/(?:\s{2,}+|[^\S ])/', ' ', $text)) !== $text) {
+                @trigger_error(sprintf('"%s()" will normalize whitespaces by default in Symfony 5.0, set the second "$normalizeWhitespace" argument to false to retrieve the non-normalized version of the text.', __METHOD__), E_USER_DEPRECATED);
+            }
+
+            return $text;
+        }
 
         if (\func_num_args() > 1 && func_get_arg(1)) {
             return trim(preg_replace('/(?:\s{2,}+|[^\S ])/', ' ', $text));

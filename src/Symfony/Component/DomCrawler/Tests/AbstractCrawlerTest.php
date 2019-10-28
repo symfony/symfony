@@ -258,6 +258,14 @@ abstract class AbstractCrawlerTest extends TestCase
         $crawler = $this->createTestCrawler()->filterXPath('//p');
         $this->assertSame('Elsa <3', $crawler->text(null, true), '->text(null, true) returns the text with normalized whitespace');
         $this->assertNotSame('Elsa <3', $crawler->text(null, false));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyNormalizeWhiteSpace()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//p');
         $this->assertNotSame('Elsa <3', $crawler->text());
     }
 

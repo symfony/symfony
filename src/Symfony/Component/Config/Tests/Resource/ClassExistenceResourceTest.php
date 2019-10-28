@@ -67,7 +67,7 @@ EOF
 
             $loadedClass = 123;
 
-            $res = new ClassExistenceResource('MissingFooClass', false);
+            new ClassExistenceResource('MissingFooClass', false);
 
             $this->assertSame(123, $loadedClass);
         } finally {

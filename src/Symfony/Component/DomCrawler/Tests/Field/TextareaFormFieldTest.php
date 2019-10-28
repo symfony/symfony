@@ -24,7 +24,7 @@ class TextareaFormFieldTest extends FormFieldTestCase
 
         $node = $this->createNode('input', '');
         try {
-            $field = new TextareaFormField($node);
+            new TextareaFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not a textarea');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not a textarea');

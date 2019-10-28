@@ -61,7 +61,7 @@ class AbstractFactoryTest extends TestCase
             $options['failure_handler'] = $serviceId;
         }
 
-        list($container, $authProviderId, $listenerId, $entryPointId) = $this->callFactory('foo', $options, 'user_provider', 'entry_point');
+        list($container) = $this->callFactory('foo', $options, 'user_provider', 'entry_point');
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
@@ -99,7 +99,7 @@ class AbstractFactoryTest extends TestCase
             $options['success_handler'] = $serviceId;
         }
 
-        list($container, $authProviderId, $listenerId, $entryPointId) = $this->callFactory('foo', $options, 'user_provider', 'entry_point');
+        list($container) = $this->callFactory('foo', $options, 'user_provider', 'entry_point');
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();

@@ -24,7 +24,7 @@ class MissingUserProviderTest extends AbstractWebTestCase
 
         $response = $client->getResponse();
         $this->assertSame(500, $response->getStatusCode());
-        $this->stringContains('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException', $response->getContent());
-        $this->stringContains('"default" firewall requires a user provider but none was defined.', $response->getContent());
+        $this->assertStringContainsString('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException', $response->getContent());
+        $this->assertStringContainsString('"default" firewall requires a user provider but none was defined', html_entity_decode($response->getContent()));
     }
 }

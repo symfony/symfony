@@ -51,7 +51,7 @@ class IntegrationTest extends TestCase
             ->setPublic(true)
         ;
 
-        $b = $container
+        $container
             ->register('b', '\stdClass')
             ->addArgument(new Reference('c'))
             ->setPublic(false)

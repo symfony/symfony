@@ -509,7 +509,6 @@ SecurityBundle
    changed to underscores.
    Before: `my-cookie` deleted the `my_cookie` cookie (with an underscore).
    After: `my-cookie` deletes the `my-cookie` cookie (with a dash).
- * Configuring encoders using `argon2i` or `bcrypt` as algorithm is not supported anymore, use `auto` instead.
 
 Serializer
 ----------

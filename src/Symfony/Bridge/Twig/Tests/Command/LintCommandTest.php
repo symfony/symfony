@@ -52,7 +52,7 @@ class LintCommandTest extends TestCase
         $filename = $this->createFile('');
         unlink($filename);
 
-        $ret = $tester->execute(['filename' => [$filename]], ['decorated' => false]);
+        $tester->execute(['filename' => [$filename]], ['decorated' => false]);
     }
 
     public function testLintFileCompileTimeException()

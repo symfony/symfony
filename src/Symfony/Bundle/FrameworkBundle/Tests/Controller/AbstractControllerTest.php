@@ -336,8 +336,7 @@ class AbstractControllerTest extends TestCase
 
         $controller = $this->createController();
 
-        /* @var BinaryFileResponse $response */
-        $response = $controller->file('some-file.txt', 'test.php');
+        $controller->file('some-file.txt', 'test.php');
     }
 
     public function testIsGranted()

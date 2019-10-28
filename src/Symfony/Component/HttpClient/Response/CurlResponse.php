@@ -356,6 +356,7 @@ final class CurlResponse implements ResponseInterface
 
         if (200 > $statusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE)) {
             $multi->handlesActivity[$id][] = new InformationalChunk($statusCode, $headers);
+            $location = null;
 
             return \strlen($data);
         }
@@ -379,9 +380,7 @@ final class CurlResponse implements ResponseInterface
             }
         }
 
-        $location = null;
-
-        if ($statusCode < 300 || 400 <= $statusCode || curl_getinfo($ch, CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {
+        if ($statusCode < 300 || 400 <= $statusCode || null === $location || curl_getinfo($ch, CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {
             // Headers and redirects completed, time to get the response's body
             $multi->handlesActivity[$id][] = new FirstChunk();
 
@@ -404,6 +403,8 @@ final class CurlResponse implements ResponseInterface
         } elseif (null !== $info['redirect_url'] && $logger) {
             $logger->info(sprintf('Redirecting: "%s %s"', $info['http_code'], $info['redirect_url']));
         }
+
+        $location = null;
 
         return \strlen($data);
     }

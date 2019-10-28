@@ -117,7 +117,7 @@ class EncoderFactoryTest extends TestCase
 
         $user = new EncAwareUser('user', 'pass');
         $user->encoderName = 'invalid_encoder_name';
-        $encoder = $factory->getEncoder($user);
+        $factory->getEncoder($user);
     }
 
     public function testGetEncoderForEncoderAwareWithClassName()

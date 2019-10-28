@@ -530,6 +530,41 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ];
         }
 
+        // bcrypt encoder
+        if ('bcrypt' === $config['algorithm']) {
+            $config['algorithm'] = 'native';
+            $config['native_algorithm'] = PASSWORD_BCRYPT;
+
+            return $this->createEncoder($config);
+        }
+
+        // Argon2i encoder
+        if ('argon2i' === $config['algorithm']) {
+            if (SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+                $config['algorithm'] = 'sodium';
+            } elseif (\defined('PASSWORD_ARGON2I')) {
+                $config['algorithm'] = 'native';
+                $config['native_algorithm'] = PASSWORD_ARGON2I;
+            } else {
+                throw new InvalidConfigurationException(sprintf('Algorithm "argon2i" is not available. Either use %s"auto" or upgrade to PHP 7.2+ instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? '"argon2id", ' : ''));
+            }
+
+            return $this->createEncoder($config);
+        }
+
+        if ('argon2id' === $config['algorithm']) {
+            if (($hasSodium = SodiumPasswordEncoder::isSupported()) && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+                $config['algorithm'] = 'sodium';
+            } elseif (\defined('PASSWORD_ARGON2ID')) {
+                $config['algorithm'] = 'native';
+                $config['native_algorithm'] = PASSWORD_ARGON2ID;
+            } else {
+                throw new InvalidConfigurationException(sprintf('Algorithm "argon2id" is not available. Either use %s"auto", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? '"argon2i", ' : ''));
+            }
+
+            return $this->createEncoder($config);
+        }
+
         if ('native' === $config['algorithm']) {
             return [
                 'class' => NativePasswordEncoder::class,
@@ -537,7 +572,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     $config['time_cost'],
                     (($config['memory_cost'] ?? 0) << 10) ?: null,
                     $config['cost'],
-                ],
+                ] + (isset($config['native_algorithm']) ? [3 => $config['native_algorithm']] : []),
             ];
         }
 

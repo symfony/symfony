@@ -174,7 +174,8 @@ class AmqpExtIntegrationTest extends TestCase
 Get envelope with message: Symfony\Component\Messenger\Tests\Fixtures\DummyMessage
 with stamps: [
     "Symfony\\Component\\Messenger\\Transport\\AmqpExt\\AmqpReceivedStamp",
-    "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp"
+    "Symfony\\Component\\Messenger\\Stamp\\ReceivedStamp",
+    "Symfony\\Component\\Messenger\\Stamp\\ConsumedByWorkerStamp"
 ]
 Done.
 

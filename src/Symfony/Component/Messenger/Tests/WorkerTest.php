@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -47,11 +48,11 @@ class WorkerTest extends TestCase
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
         $bus->expects($this->at(0))->method('dispatch')->with(
-            $envelope = new Envelope($apiMessage, [new ReceivedStamp('transport')])
+            $envelope = new Envelope($apiMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])
         )->willReturn($envelope);
 
         $bus->expects($this->at(1))->method('dispatch')->with(
-            $envelope = new Envelope($ipaMessage, [new ReceivedStamp('transport')])
+            $envelope = new Envelope($ipaMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])
         )->willReturn($envelope);
 
         $worker = new Worker(['transport' => $receiver], $bus);
@@ -69,7 +70,7 @@ class WorkerTest extends TestCase
     {
         $envelope = new Envelope(new DummyMessage('API'));
         $receiver = new DummyReceiver([[$envelope]]);
-        $envelope = $envelope->with(new ReceivedStamp('transport'));
+        $envelope = $envelope->with(new ReceivedStamp('transport'), new ConsumedByWorkerStamp());
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
         $bus->expects($this->at(0))->method('dispatch')->with($envelope)->willReturn($envelope);

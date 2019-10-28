@@ -82,6 +82,11 @@ switch ($vars['REQUEST_URI']) {
         header('Location: ..', true, 302);
         break;
 
+    case '/304':
+        header('Content-Length: 10', true, 304);
+        echo '12345';
+        return;
+
     case '/307':
         header('Location: http://localhost:8057/post', true, 307);
         break;

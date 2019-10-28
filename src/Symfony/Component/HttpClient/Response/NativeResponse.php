@@ -176,7 +176,7 @@ final class NativeResponse implements ResponseInterface
 
         $this->multi->handlesActivity[$this->id] = [new FirstChunk()];
 
-        if ('HEAD' === $context['http']['method']) {
+        if ('HEAD' === $context['http']['method'] || \in_array($this->info['http_code'], [204, 304], true)) {
             $this->multi->handlesActivity[$this->id][] = null;
             $this->multi->handlesActivity[$this->id][] = null;
 

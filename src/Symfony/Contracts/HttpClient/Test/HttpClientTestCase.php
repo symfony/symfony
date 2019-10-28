@@ -260,6 +260,17 @@ abstract class HttpClientTestCase extends TestCase
         $response->getStatusCode();
     }
 
+    public function test304()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/304', [
+            'headers' => ['If-Match' => '"abc"'],
+        ]);
+
+        $this->assertSame(304, $response->getStatusCode());
+        $this->assertSame('', $response->getContent(false));
+    }
+
     public function testRedirects()
     {
         $client = $this->getHttpClient(__FUNCTION__);

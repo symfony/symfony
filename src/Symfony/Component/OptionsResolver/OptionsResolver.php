@@ -917,7 +917,7 @@ class OptionsResolver implements Options
 
         // Validate the type of the resolved option
         if (isset($this->allowedTypes[$option])) {
-            $valid = false;
+            $valid = true;
             $invalidTypes = [];
 
             foreach ($this->allowedTypes[$option] as $type) {
@@ -929,13 +929,18 @@ class OptionsResolver implements Options
             }
 
             if (!$valid) {
-                $keys = array_keys($invalidTypes);
+                $fmtActualValue = $this->formatValue($value);
+                $fmtAllowedTypes = implode('" or "', $this->allowedTypes[$option]);
+                $fmtProvidedTypes = implode('|', array_keys($invalidTypes));
+                $allowedContainsArrayType = \count(array_filter($this->allowedTypes[$option], static function ($item) {
+                    return '[]' === substr(self::$typeAliases[$item] ?? $item, -2);
+                })) > 0;
 
-                if (1 === \count($keys) && '[]' === substr($keys[0], -2)) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but one of the elements is of type "%s".', $option, $this->formatValue($value), implode('" or "', $this->allowedTypes[$option]), $keys[0]));
+                if (\is_array($value) && $allowedContainsArrayType) {
+                    throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but one of the elements is of type "%s".', $option, $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
                 }
 
-                throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but is of type "%s".', $option, $this->formatValue($value), implode('" or "', $this->allowedTypes[$option]), implode('|', array_keys($invalidTypes))));
+                throw new InvalidOptionsException(sprintf('The option "%s" with value %s is expected to be of type "%s", but is of type "%s".', $option, $fmtActualValue, $fmtAllowedTypes, $fmtProvidedTypes));
             }
         }
 
@@ -1040,26 +1045,23 @@ class OptionsResolver implements Options
     {
         if (\is_array($value) && '[]' === substr($type, -2)) {
             $type = substr($type, 0, -2);
+            $valid = true;
 
             foreach ($value as $val) {
                 if (!$this->verifyTypes($type, $val, $invalidTypes, $level + 1)) {
-                    return false;
+                    $valid = false;
                 }
             }
 
-            return true;
+            return $valid;
         }
 
         if (('null' === $type && null === $value) || (\function_exists($func = 'is_'.$type) && $func($value)) || $value instanceof $type) {
             return true;
         }
 
-        if (!$invalidTypes) {
-            $suffix = '';
-            while (\strlen($suffix) < $level * 2) {
-                $suffix .= '[]';
-            }
-            $invalidTypes[$this->formatTypeOf($value).$suffix] = true;
+        if (!$invalidTypes || $level > 0) {
+            $invalidTypes[$this->formatTypeOf($value)] = true;
         }
 
         return false;

@@ -666,7 +666,7 @@ class FrameworkExtension extends Extension
                 if ('method' === $workflow['marking_store']['type']) {
                     $markingStoreDefinition->setArguments([
                         'state_machine' === $type, //single state
-                        $workflow['marking_store']['property'],
+                        $workflow['marking_store']['property'] ?? 'marking',
                     ]);
                 } else {
                     foreach ($workflow['marking_store']['arguments'] as $argument) {

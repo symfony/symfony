@@ -303,7 +303,7 @@ class Configuration implements ConfigurationInterface
                                                 ->end()
                                             ->end()
                                             ->scalarNode('property')
-                                                ->defaultValue('marking')
+                                                ->defaultNull() // In Symfony 5.0, set "marking" as default property
                                             ->end()
                                             ->scalarNode('service')
                                                 ->cannotBeEmpty()
@@ -480,6 +480,14 @@ class Configuration implements ConfigurationInterface
 
                                         return $v;
                                     })
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(function ($v) {
+                                        return isset($v['marking_store']['property'])
+                                            && (!isset($v['marking_store']['type']) || 'method' !== $v['marking_store']['type'])
+                                        ;
+                                    })
+                                    ->thenInvalid('"property" option is only supported by the "method" marking store.')
                                 ->end()
                             ->end()
                         ->end()

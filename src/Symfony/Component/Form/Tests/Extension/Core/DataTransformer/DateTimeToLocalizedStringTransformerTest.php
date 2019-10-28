@@ -181,9 +181,9 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
 
     public function testTransformWrapsIntlErrors()
     {
-        $transformer = new DateTimeToLocalizedStringTransformer();
-
         $this->markTestIncomplete('Checking for intl errors needs to be reimplemented');
+
+        $transformer = new DateTimeToLocalizedStringTransformer();
 
         // HOW TO REPRODUCE?
 

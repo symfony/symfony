@@ -30,13 +30,13 @@ class RedirectResponseTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('Cannot redirect to an empty URL.');
-        $response = new RedirectResponse('');
+        new RedirectResponse('');
     }
 
     public function testRedirectResponseConstructorWrongStatusCode()
     {
         $this->expectException('InvalidArgumentException');
-        $response = new RedirectResponse('foo.bar', 404);
+        new RedirectResponse('foo.bar', 404);
     }
 
     public function testGenerateLocationHeader()

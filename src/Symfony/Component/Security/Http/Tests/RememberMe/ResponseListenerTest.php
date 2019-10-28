@@ -66,8 +66,6 @@ class ResponseListenerTest extends TestCase
 
     public function testItSubscribesToTheOnKernelResponseEvent()
     {
-        $listener = new ResponseListener();
-
         $this->assertSame([KernelEvents::RESPONSE => 'onKernelResponse'], ResponseListener::getSubscribedEvents());
     }
 

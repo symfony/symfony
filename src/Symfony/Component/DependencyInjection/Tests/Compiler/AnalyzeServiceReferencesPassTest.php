@@ -24,28 +24,28 @@ class AnalyzeServiceReferencesPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $a = $container
+        $container
             ->register('a')
             ->addArgument($ref1 = new Reference('b'))
         ;
 
-        $b = $container
+        $container
             ->register('b')
             ->addMethodCall('setA', [$ref2 = new Reference('a')])
         ;
 
-        $c = $container
+        $container
             ->register('c')
             ->addArgument($ref3 = new Reference('a'))
             ->addArgument($ref4 = new Reference('b'))
         ;
 
-        $d = $container
+        $container
             ->register('d')
             ->setProperty('foo', $ref5 = new Reference('b'))
         ;
 
-        $e = $container
+        $container
             ->register('e')
             ->setConfigurator([$ref6 = new Reference('b'), 'methodName'])
         ;

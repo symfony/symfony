@@ -72,6 +72,33 @@ abstract class HttpClientTestCase extends TestCase
         $response->getContent();
     }
 
+    public function testHeadRequest()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('HEAD', 'http://localhost:8057', [
+            'headers' => ['Foo' => 'baR'],
+            'user_data' => $data = new \stdClass(),
+        ]);
+
+        $this->assertSame([], $response->getInfo('response_headers'));
+        $this->assertSame($data, $response->getInfo()['user_data']);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $info = $response->getInfo();
+        $this->assertNull($info['error']);
+        $this->assertSame(0, $info['redirect_count']);
+        $this->assertSame('HTTP/1.1 200 OK', $info['response_headers'][0]);
+        $this->assertSame('Host: localhost:8057', $info['response_headers'][1]);
+        $this->assertSame('http://localhost:8057/', $info['url']);
+
+        $headers = $response->getHeaders();
+
+        $this->assertSame('localhost:8057', $headers['host'][0]);
+        $this->assertSame(['application/json'], $headers['content-type']);
+
+        $this->assertSame('', $response->getContent());
+    }
+
     public function testNonBufferedGetRequest()
     {
         $client = $this->getHttpClient(__FUNCTION__);
@@ -295,6 +322,17 @@ abstract class HttpClientTestCase extends TestCase
         ]);
 
         $response->getStatusCode();
+    }
+
+    public function test304()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/304', [
+            'headers' => ['If-Match' => '"abc"'],
+        ]);
+
+        $this->assertSame(304, $response->getStatusCode());
+        $this->assertSame('', $response->getContent(false));
     }
 
     public function testRedirects()

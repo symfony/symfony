@@ -59,7 +59,7 @@ class HeaderBagTest extends TestCase
     {
         $this->expectException('RuntimeException');
         $bag = new HeaderBag(['foo' => 'Tue']);
-        $headerDate = $bag->getDate('foo');
+        $bag->getDate('foo');
     }
 
     public function testGetCacheControlHeader()

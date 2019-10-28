@@ -108,14 +108,6 @@ class Parser
         return $data;
     }
 
-    /**
-     * @internal
-     */
-    public function getLastLineNumberBeforeDeprecation(): int
-    {
-        return $this->getRealCurrentLineNb();
-    }
-
     private function doParse(string $value, int $flags)
     {
         $this->currentLineNb = -1;

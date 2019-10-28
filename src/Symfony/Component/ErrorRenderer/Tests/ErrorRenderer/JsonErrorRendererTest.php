@@ -44,8 +44,7 @@ JSON;
         $expectedNonDebug = <<<JSON
 {
     "title": "Internal Server Error",
-    "status": 500,
-    "detail": "Foo"
+    "status": 500
 }
 JSON;
 

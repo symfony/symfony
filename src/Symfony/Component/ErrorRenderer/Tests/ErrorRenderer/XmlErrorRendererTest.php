@@ -43,7 +43,7 @@ XML;
 <problem xmlns="urn:ietf:rfc:7807">
     <title>Internal Server Error</title>
     <status>500</status>
-    <detail>Foo</detail>
+    
     
 </problem>
 XML;

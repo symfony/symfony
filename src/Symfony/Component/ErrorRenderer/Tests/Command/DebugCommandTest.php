@@ -56,8 +56,7 @@ TXT
         $this->assertSame(<<<TXT
 {
     "title": "Internal Server Error",
-    "status": 500,
-    "detail": "This is a sample exception."
+    "status": 500
 }
 
 TXT

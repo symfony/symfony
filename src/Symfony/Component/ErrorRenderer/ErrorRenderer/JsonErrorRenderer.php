@@ -43,9 +43,9 @@ class JsonErrorRenderer implements ErrorRendererInterface
         $content = [
             'title' => $exception->getTitle(),
             'status' => $exception->getStatusCode(),
-            'detail' => $exception->getMessage(),
         ];
         if ($debug) {
+            $content['detail'] = $exception->getMessage();
             $content['exceptions'] = $exception->toArray();
         }
 

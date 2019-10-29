@@ -59,7 +59,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     private const DEFAULT_CACHE_TTL = 8640000;
 
     /**
-     * @var string|null Detected eviction policy used on Redis server.
+     * @var string|null detected eviction policy used on Redis server
      */
     private $redisEvictionPolicy;
 
@@ -85,7 +85,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         }
 
         $eviction = $this->getRedisEvictionPolicy();
-        if ('noeviction' !== $eviction && strpos($eviction, 'volatile-') !== 0) {
+        if ('noeviction' !== $eviction && 0 !== strpos($eviction, 'volatile-')) {
             throw new InvalidArgumentException(sprintf('Redis maxmemory_policy setting "%s" is *not* supported by RedisTagAwareAdapter, use one "noeviction" or preferably one of "volatile-" eviction policies', $eviction));
         }
 

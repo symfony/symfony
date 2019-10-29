@@ -59,6 +59,11 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     private const DEFAULT_CACHE_TTL = 8640000;
 
     /**
+     * @var string|null Detected eviction policy used on Redis server.
+     */
+    private $redisEvictionPolicy;
+
+    /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redisClient     The redis client
      * @param string                                                   $namespace       The default namespace
      * @param int                                                      $defaultLifetime The default lifetime
@@ -77,6 +82,11 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
                     throw new InvalidArgumentException(sprintf('phpredis compression must be disabled when using "%s", use "%s" instead.', \get_class($this), DeflateMarshaller::class));
                 }
             }
+        }
+
+        $eviction = $this->getRedisEvictionPolicy();
+        if ('noeviction' !== $eviction && strpos($eviction, 'volatile-') !== 0) {
+            throw new InvalidArgumentException(sprintf('Redis maxmemory_policy setting "%s" is *not* supported by RedisTagAwareAdapter, use one "noeviction" or preferably one of "volatile-" eviction policies', $eviction));
         }
 
         $this->init($redisClient, $namespace, $defaultLifetime, new TagAwareMarshaller($marshaller));
@@ -259,5 +269,21 @@ EOLUA;
         }
 
         return $newIds;
+    }
+
+    private function getRedisEvictionPolicy(): string
+    {
+        if (null !== $this->redisEvictionPolicy) {
+            return $this->redisEvictionPolicy;
+        }
+
+        foreach ($this->getHosts() as $host) {
+            $info = $host->info('Memory');
+            $info = isset($info['Memory']) ? $info['Memory'] : $info;
+
+            return $this->redisEvictionPolicy = $info['maxmemory_policy'];
+        }
+
+        return $this->redisEvictionPolicy = '';
     }
 }

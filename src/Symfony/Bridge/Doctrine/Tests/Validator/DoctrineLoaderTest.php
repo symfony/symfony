@@ -173,7 +173,7 @@ class DoctrineLoaderTest extends TestCase
     public function regexpProvider()
     {
         return [
-            [false, null],
+            [true, null],
             [true, '{^'.preg_quote(DoctrineLoaderEntity::class).'$|^'.preg_quote(Entity::class).'$}'],
             [false, '{^'.preg_quote(Entity::class).'$}'],
         ];

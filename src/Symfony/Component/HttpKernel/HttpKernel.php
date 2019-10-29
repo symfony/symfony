@@ -258,8 +258,10 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         try {
             return $this->filterResponse($response, $request, $type);
         } catch (\Exception $e) {
-            return $response;
+        } catch (\Throwable $e) {
         }
+
+        return $response;
     }
 
     /**

@@ -95,7 +95,7 @@ class AmqpExtIntegrationTest extends TestCase
         $envelope = $envelopes[0];
         $newEnvelope = $envelope
             ->with(new DelayStamp(2000))
-            ->with(new RedeliveryStamp(1, 'not_important'));
+            ->with(new RedeliveryStamp(1));
         $sender->send($newEnvelope);
         $receiver->ack($envelope);
 

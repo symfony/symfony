@@ -9,25 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Handler;
+namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
-use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 class SendFailedMessageToFailureTransportListenerTest extends TestCase
 {
-    public function testItDispatchesToTheFailureTransport()
+    public function testItSendsToTheFailureTransport()
     {
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())->method('dispatch')->with($this->callback(function ($envelope) {
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->once())->method('send')->with($this->callback(function ($envelope) {
             /* @var Envelope $envelope */
             $this->assertInstanceOf(Envelope::class, $envelope);
 
@@ -38,31 +36,24 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
 
             /** @var RedeliveryStamp $redeliveryStamp */
             $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
-            $this->assertSame('failure_sender', $redeliveryStamp->getSenderClassOrAlias());
             $this->assertSame('no!', $redeliveryStamp->getExceptionMessage());
             $this->assertSame('no!', $redeliveryStamp->getFlattenException()->getMessage());
 
-            $this->assertNull($envelope->last(ReceivedStamp::class));
-            $this->assertNull($envelope->last(TransportMessageIdStamp::class));
-
             return true;
-        }))->willReturn(new Envelope(new \stdClass()));
-        $listener = new SendFailedMessageToFailureTransportListener(
-            $bus,
-            'failure_sender'
-        );
+        }))->willReturnArgument(0);
+        $listener = new SendFailedMessageToFailureTransportListener($sender);
 
         $exception = new \Exception('no!');
         $envelope = new Envelope(new \stdClass());
-        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception, false);
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
     }
 
     public function testItGetsNestedHandlerFailedException()
     {
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->once())->method('dispatch')->with($this->callback(function ($envelope) {
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->once())->method('send')->with($this->callback(function ($envelope) {
             /** @var Envelope $envelope */
             /** @var RedeliveryStamp $redeliveryStamp */
             $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
@@ -71,49 +62,41 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
             $this->assertSame('Exception', $redeliveryStamp->getFlattenException()->getClass());
 
             return true;
-        }))->willReturn(new Envelope(new \stdClass()));
+        }))->willReturnArgument(0);
 
-        $listener = new SendFailedMessageToFailureTransportListener(
-            $bus,
-            'failure_sender'
-        );
+        $listener = new SendFailedMessageToFailureTransportListener($sender);
 
         $envelope = new Envelope(new \stdClass());
         $exception = new \Exception('I am inside!');
         $exception = new HandlerFailedException($envelope, [$exception]);
-        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception, false);
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
     }
 
     public function testDoNothingOnRetry()
     {
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->never())->method('dispatch');
-        $listener = new SendFailedMessageToFailureTransportListener(
-            $bus,
-            'failure_sender'
-        );
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->never())->method('send');
+        $listener = new SendFailedMessageToFailureTransportListener($sender);
 
         $envelope = new Envelope(new \stdClass());
-        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', new \Exception(''), true);
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', new \Exception());
+        $event->setForRetry();
 
         $listener->onMessageFailed($event);
     }
 
     public function testDoNotRedeliverToFailed()
     {
-        $bus = $this->createMock(MessageBusInterface::class);
-        $bus->expects($this->never())->method('dispatch');
-        $listener = new SendFailedMessageToFailureTransportListener(
-            $bus,
-            'failure_sender'
-        );
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->never())->method('send');
+        $listener = new SendFailedMessageToFailureTransportListener($sender);
 
         $envelope = new Envelope(new \stdClass(), [
             new SentToFailureTransportStamp('my_receiver'),
         ]);
-        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', new \Exception(''), false);
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', new \Exception());
 
         $listener->onMessageFailed($event);
     }

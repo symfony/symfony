@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 abstract class FileLoader extends BaseFileLoader
 {
-    public const ANONYMOUS_ID_REGEXP = '/^\.\d+_[^~]++~[._a-zA-Z\d]{7}$/';
+    public const ANONYMOUS_ID_REGEXP = '/^\.\d+_[^~]*+~[._a-zA-Z\d]{7}$/';
 
     protected $container;
     protected $isLoadingInstanceof = false;

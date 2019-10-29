@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-22T08:25:25Z
+
+I would rather go with supporting those DSNs only when Dbal is found, to reuse the similar logic they have AFAIK. Doable?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-10-22T09:57:26Z
+
+@nicolas-grekas done
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-22T11:25:11Z
+
+> I would rather go with supporting those DSNs only when Dbal is found, to reuse the similar logic they have AFAIK. Doable?
+
+That's less powerful than in other components (and makes these PDO-based implementation unusable on Heroku or Symfony Cloud without installing DBAL)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-22T11:42:13Z
+
+> That's less powerful than in other components
+
+You mean PdoSessionHandler, are there more examples?
+The requirement is really low here (using dbal, which is a better PDO) and the alternative too is ok (using a PDO DSN).
+To me, the less code we maintain the better.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-10-22T11:44:37Z
+
+> the alternative too is ok (using a PDO DSN).
+
+that's exactly what is not possible when the env variable is managed by the PaaS hosting.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-22T11:50:31Z
+
+> that's exactly what is not possible when the env variable is managed by the PaaS hosting.
+
+well, then use dbal - we don't have to solve unreported problems.

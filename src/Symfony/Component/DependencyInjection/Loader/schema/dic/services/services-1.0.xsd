@@ -265,7 +265,7 @@
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
       <xsd:enumeration value="service_locator" />
-      <!-- "tagged" is deprecated since Symfony 4.4 and will be removed in 5.0, use "tagged_iterator" instead. -->
+      <!-- "tagged" is an alias of "tagged_iterator", using "tagged_iterator" is preferred. -->
       <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_iterator" />
       <xsd:enumeration value="tagged_locator" />

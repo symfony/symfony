@@ -41,9 +41,10 @@ class TxtErrorRenderer implements ErrorRendererInterface
         $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
         $content = sprintf("[title] %s\n", $exception->getTitle());
         $content .= sprintf("[status] %s\n", $exception->getStatusCode());
-        $content .= sprintf("[detail] %s\n", $exception->getMessage());
 
         if ($debug) {
+            $content .= sprintf("[detail] %s\n", $exception->getMessage());
+
             foreach ($exception->toArray() as $i => $e) {
                 $content .= sprintf("[%d] %s: %s\n", $i + 1, $e['class'], $e['message']);
                 foreach ($e['trace'] as $trace) {

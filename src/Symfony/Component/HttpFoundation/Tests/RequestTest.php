@@ -2132,7 +2132,7 @@ class RequestTest extends TestCase
         $this->expectException('BadMethodCallException');
         $request = new Request();
         $request->setMethod('OPTIONS');
-        $request->isMethodSafe();
+        $request->isMethodSafe(true);
     }
 
     /**

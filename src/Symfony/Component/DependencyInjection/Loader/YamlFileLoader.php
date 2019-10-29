@@ -733,7 +733,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('"!service_locator" tag only accepts maps of "@service" references in "%s".', $file));
                 }
             }
-            if (\in_array($value->getTag(), ['tagged_iterator', 'tagged_locator'], true)) {
+            if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator'], true)) {
                 $forLocator = 'tagged_locator' === $value->getTag();
 
                 if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {

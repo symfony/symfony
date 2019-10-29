@@ -265,6 +265,8 @@
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
       <xsd:enumeration value="service_locator" />
+      <!-- "tagged" is an alias of "tagged_iterator", using "tagged_iterator" is preferred. -->
+      <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_iterator" />
       <xsd:enumeration value="tagged_locator" />
     </xsd:restriction>

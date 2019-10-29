@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
@@ -31,6 +32,24 @@ class ZookeeperStore implements PersistingStoreInterface
     public function __construct(\Zookeeper $zookeeper)
     {
         $this->zookeeper = $zookeeper;
+    }
+
+    public static function createConnection(string $dsn): \Zookeeper
+    {
+        if (0 !== strpos($dsn, 'zookeeper:')) {
+            throw new InvalidArgumentException(sprintf('Unsupported DSN: %s.', $dsn));
+        }
+
+        if (false === $params = parse_url($dsn)) {
+            throw new InvalidArgumentException(sprintf('Invalid Zookeeper DSN: %s.', $dsn));
+        }
+
+        $host = $params['host'] ?? '';
+        if (isset($params['port'])) {
+            $host .= ':'.$params['port'];
+        }
+
+        return new \Zookeeper($host);
     }
 
     /**

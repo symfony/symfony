@@ -46,11 +46,7 @@ class EsmtpTransport extends SmtpTransport
         $stream = $this->getStream();
 
         if (null === $tls) {
-            if (465 === $port) {
-                $tls = true;
-            } else {
-                $tls = \defined('OPENSSL_VERSION_NUMBER') && 0 === $port && 'localhost' !== $host;
-            }
+            $tls = 465 === $port;
         }
         if (!$tls) {
             $stream->disableTls();

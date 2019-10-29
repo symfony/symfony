@@ -28,7 +28,6 @@ use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
@@ -75,7 +74,6 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
-use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
@@ -1621,42 +1619,13 @@ class FrameworkExtension extends Extension
             $storeDefinitions = [];
             foreach ($resourceStores as $storeDsn) {
                 $storeDsn = $container->resolveEnvPlaceholders($storeDsn, null, $usedEnvs);
-                switch (true) {
-                    case 'flock' === $storeDsn:
-                        $storeDefinition = new Reference('lock.store.flock');
-                        break;
-                    case 0 === strpos($storeDsn, 'flock://'):
-                        $flockPath = substr($storeDsn, 8);
+                $storeDefinition = new Definition(PersistingStoreInterface::class);
+                $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
+                $storeDefinition->setArguments([$storeDsn]);
 
-                        $storeDefinitionId = '.lock.flock.store.'.$container->hash($storeDsn);
-                        $container->register($storeDefinitionId, FlockStore::class)->addArgument($flockPath);
+                $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 
-                        $storeDefinition = new Reference($storeDefinitionId);
-                        break;
-                    case 'semaphore' === $storeDsn:
-                        $storeDefinition = new Reference('lock.store.semaphore');
-                        break;
-                    case $usedEnvs || preg_match('#^[a-z]++://#', $storeDsn):
-                        if (!$container->hasDefinition($connectionDefinitionId = '.lock_connection.'.$container->hash($storeDsn))) {
-                            $connectionDefinition = new Definition(\stdClass::class);
-                            $connectionDefinition->setPublic(false);
-                            $connectionDefinition->setFactory([AbstractAdapter::class, 'createConnection']);
-                            $connectionDefinition->setArguments([$storeDsn, ['lazy' => true]]);
-                            $container->setDefinition($connectionDefinitionId, $connectionDefinition);
-                        }
-
-                        $storeDefinition = new Definition(PersistingStoreInterface::class);
-                        $storeDefinition->setPublic(false);
-                        $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
-                        $storeDefinition->setArguments([new Reference($connectionDefinitionId)]);
-
-                        $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
-
-                        $storeDefinition = new Reference($storeDefinitionId);
-                        break;
-                    default:
-                        throw new InvalidArgumentException(sprintf('Lock store DSN "%s" is not valid in resource "%s"', $storeDsn, $resourceName));
-                }
+                $storeDefinition = new Reference($storeDefinitionId);
 
                 $storeDefinitions[] = $storeDefinition;
             }

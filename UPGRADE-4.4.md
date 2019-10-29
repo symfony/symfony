@@ -162,6 +162,8 @@ Lock
  * Deprecated `Symfony\Component\Lock\StoreInterface` in favor of `Symfony\Component\Lock\BlockingStoreInterface` and
    `Symfony\Component\Lock\PersistingStoreInterface`.
  * `Factory` is deprecated, use `LockFactory` instead
+ * Deprecated services `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract`, 
+   use `StoreFactory::createStore` instead. 
 
 Messenger
 ---------

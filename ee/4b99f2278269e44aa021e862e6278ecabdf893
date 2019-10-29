@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2019-10-15T20:33:55Z
+
+At least, the behavior must be consistent between `PropertyInfoLoader` and this one don't you think?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-10-15T20:44:50Z
+
+The current behavior makes it harder to use this class when using only the component (without framework bundle). I'm favor of patching FrameworkBundle instead.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-10-17T04:45:59Z
+
+Deregistering the loader service when no regex is configured would solve that, right?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-10-17T06:48:49Z
+
+Indeed, it’s what I have in mind.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-10-28T21:49:57Z
+
+@xabbuh implemented, could you check if it's ok for you now?

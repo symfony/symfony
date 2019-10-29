@@ -121,7 +121,7 @@ EOF;
         }
     }
 EOF;
-            $compiledRoutes[4] = $forDump ? $checkConditionCode .= ",\n" : eval('return '.$checkConditionCode.';');
+            $compiledRoutes[4] = $forDump ? $checkConditionCode.",\n" : eval('return '.$checkConditionCode.';');
         } else {
             $compiledRoutes[4] = $forDump ? "    null, // \$checkCondition\n" : null;
         }

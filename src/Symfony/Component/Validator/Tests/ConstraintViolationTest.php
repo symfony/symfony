@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Tests\Fixtures\CustomArrayObject;
-use Symfony\Component\Validator\Tests\Fixtures\ToString;
 
 class ConstraintViolationTest extends TestCase
 {
@@ -114,7 +113,7 @@ EOF;
     public function testMessageCannotBeArray()
     {
         $this->expectException(\TypeError::class);
-        $violation = new ConstraintViolation(
+        new ConstraintViolation(
             ['cannot be an array'],
             '',
             [],
@@ -127,7 +126,7 @@ EOF;
     public function testMessageObjectMustBeStringable()
     {
         $this->expectException(\TypeError::class);
-        $violation = new ConstraintViolation(
+        new ConstraintViolation(
             new CustomArrayObject(),
             '',
             [],

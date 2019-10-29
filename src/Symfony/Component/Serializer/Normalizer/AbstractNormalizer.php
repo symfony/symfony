@@ -552,7 +552,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     {
         if (\func_num_args() < 3) {
             @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', \get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-            $format = null;
         }
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];

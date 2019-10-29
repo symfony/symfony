@@ -1834,9 +1834,15 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $sendersLocator = ServiceLocatorTagPass::register($container, $senderReferences);
+
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
-            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $senderReferences))
+            ->replaceArgument(1, $sendersLocator)
+        ;
+
+        $container->getDefinition('messenger.retry.send_failed_message_for_retry_listener')
+            ->replaceArgument(0, $sendersLocator)
         ;
 
         $container->getDefinition('messenger.retry_strategy_locator')

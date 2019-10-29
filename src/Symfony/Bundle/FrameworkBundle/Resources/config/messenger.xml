@@ -93,6 +93,14 @@
             <argument /> <!-- max delay ms -->
         </service>
 
+        <service id="messenger.retry.send_failed_message_for_retry_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="messenger" />
+            <argument /> <!-- senders locator -->
+            <argument type="service" id="messenger.retry_strategy_locator" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
         <!-- failed handling -->
         <service id="messenger.failure.send_failed_message_to_failure_transport_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener">
             <tag name="kernel.event_subscriber" />

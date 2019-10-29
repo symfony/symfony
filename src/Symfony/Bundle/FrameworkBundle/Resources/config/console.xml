@@ -86,7 +86,6 @@
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="collection" /> <!-- Receiver names -->
-            <argument type="service" id="messenger.retry_strategy_locator" />
             <argument type="service" id="event_dispatcher" />
             <call method="setCachePoolForRestartSignal">
                 <argument type="service" id="cache.messenger.restart_workers_signal" />

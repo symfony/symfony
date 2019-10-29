@@ -48,7 +48,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
             throw new \InvalidArgumentException('$cost must be in the range of 4-31.');
         }
 
-        $this->algo = (string) ($algo ?? \defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : (\defined('PASSWORD_ARGON2I') ? PASSWORD_ARGON2I : PASSWORD_BCRYPT));
+        $this->algo = (string) ($algo ?? (\defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : (\defined('PASSWORD_ARGON2I') ? PASSWORD_ARGON2I : PASSWORD_BCRYPT)));
         $this->options = [
             'cost' => $cost,
             'time_cost' => $opsLimit,

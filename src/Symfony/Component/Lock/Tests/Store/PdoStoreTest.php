@@ -73,4 +73,34 @@ class PdoStoreTest extends AbstractStoreTest
 
         return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0.1);
     }
+
+    /**
+     * @dataProvider provideDsn
+     */
+    public function testDsn(string $dsn, string $file = null)
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+
+        try {
+            $store = new PdoStore($dsn);
+            $store->createTable();
+
+            $store->save($key);
+            $this->assertTrue($store->exists($key));
+        } finally {
+            if (null !== $file) {
+                @unlink($file);
+            }
+        }
+    }
+
+    public function provideDsn()
+    {
+        $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        yield ['sqlite://localhost/'.$dbFile, ''.$dbFile];
+        yield ['sqlite:'.$dbFile, ''.$dbFile];
+        yield ['sqlite3:///'.$dbFile, ''.$dbFile];
+        yield ['sqlite://localhost/:memory:'];
+        yield ['sqlite::memory:'];
+    }
 }

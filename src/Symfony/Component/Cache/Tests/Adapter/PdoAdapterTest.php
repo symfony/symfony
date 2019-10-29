@@ -71,4 +71,33 @@ class PdoAdapterTest extends AdapterTestCase
         $this->assertFalse($newItem->isHit());
         $this->assertSame(0, $getCacheItemCount(), 'PDOAdapter must clean up expired items');
     }
+
+    /**
+     * @dataProvider provideDsn
+     */
+    public function testDsn(string $dsn, string $file = null)
+    {
+        try {
+            $pool = new PdoAdapter($dsn);
+            $pool->createTable();
+
+            $item = $pool->getItem('key');
+            $item->set('value');
+            $this->assertTrue($pool->save($item));
+        } finally {
+            if (null !== $file) {
+                @unlink($file);
+            }
+        }
+    }
+
+    public function provideDsn()
+    {
+        $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        yield ['sqlite://localhost/'.$dbFile, ''.$dbFile];
+        yield ['sqlite:'.$dbFile, ''.$dbFile];
+        yield ['sqlite3:///'.$dbFile, ''.$dbFile];
+        yield ['sqlite://localhost/:memory:'];
+        yield ['sqlite::memory:'];
+    }
 }

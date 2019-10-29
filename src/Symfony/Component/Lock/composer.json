@@ -20,9 +20,12 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
-        "doctrine/dbal": "~2.4",
+        "doctrine/dbal": "~2.5",
         "mongodb/mongodb": "~1.1",
         "predis/predis": "~1.0"
+    },
+    "conflict": {
+        "doctrine/dbal": "<2.5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Lock\\": "" },

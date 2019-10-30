@@ -64,6 +64,6 @@ foreach (glob("$pathToProject/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as 
     echo "\"$package\" has been linked to \"$sfPackages[$package]\".".PHP_EOL;
 }
 
-foreach (glob("$pathToProject/var/cache/*") as $cacheDir) {
+foreach (glob("$pathToProject/var/cache/*", GLOB_NOSORT) as $cacheDir) {
     $filesystem->remove($cacheDir);
 }

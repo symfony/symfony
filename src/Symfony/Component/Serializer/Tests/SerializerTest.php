@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -327,6 +328,14 @@ class SerializerTest extends TestCase
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
 
         $this->assertEquals(new Foo(new Bar('baz')), $serializer->deserialize($jsonData, Foo::class, 'json'));
+    }
+
+    public function testNotNormalizableValueExceptionMessageForAResource()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('An unexpected value could not be normalized: stream resource');
+
+        (new Serializer())->normalize(tmpfile());
     }
 }
 

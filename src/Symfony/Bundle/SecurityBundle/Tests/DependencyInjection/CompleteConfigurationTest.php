@@ -394,7 +394,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
-                'threads' => null,
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -406,7 +405,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
-                'threads' => null,
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -442,7 +440,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
-                'threads' => null,
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -454,7 +451,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
-                'threads' => null,
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [

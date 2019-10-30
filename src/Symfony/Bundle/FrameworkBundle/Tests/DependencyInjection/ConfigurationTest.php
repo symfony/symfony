@@ -418,6 +418,7 @@ class ConfigurationTest extends TestCase
                 'texter_transports' => [],
                 'channel_policy' => [],
                 'admin_recipients' => [],
+                'notification_on_failed_messages' => false,
             ],
             'error_controller' => 'error_controller',
             'secrets' => [

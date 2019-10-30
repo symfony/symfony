@@ -1,0 +1,7 @@
+imports:
+    - { resource: config.yml }
+
+security:
+    encoders:
+        Custom\Class\Bcrypt\User:
+            algorithm: bcrypt

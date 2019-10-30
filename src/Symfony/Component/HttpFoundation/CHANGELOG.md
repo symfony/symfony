@@ -20,6 +20,7 @@ CHANGELOG
  * `PdoSessionHandler` now precalculates the expiry timestamp in the lifetime column,
     make sure to run `CREATE INDEX EXPIRY ON sessions (sess_lifetime)` to update your database
     to speed up garbage collection of expired sessions.
+ * added `SessionHandlerFactory` to create session handlers with a DSN
  
 4.3.0
 -----

@@ -19,7 +19,7 @@ CHANGELOG
  * added support for opcache.preload by generating a preloading script in the cache folder
  * added support for dumping the container in one file instead of many files
  * deprecated support for short factories and short configurators in Yaml
- * deprecated `tagged` in favor of `tagged_iterator`
+ * added `tagged_iterator` alias for `tagged` which might be deprecated in a future version
  * deprecated passing an instance of `Symfony\Component\DependencyInjection\Parameter` as class name to `Symfony\Component\DependencyInjection\Definition`
  * added support for binding iterable and tagged services
  * made singly-implemented interfaces detection be scoped by file

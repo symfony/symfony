@@ -69,4 +69,10 @@ class DoctrineLoaderEntity extends DoctrineLoaderParentEntity
 
     /** @ORM\Column(type="simple_array", length=100) */
     public $simpleArrayField = [];
+
+    /**
+     * @ORM\Column(length=10)
+     * @Assert\DisableAutoMapping
+     */
+    public $noAutoMapping;
 }

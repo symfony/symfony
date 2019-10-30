@@ -39,22 +39,6 @@ DependencyInjection
            factory: ['@factory_service', method]
    ```
 
- * Deprecated `tagged` in favor of `tagged_iterator`
-
-   Before:
-   ```yaml
-   services:
-       App\HandlerCollection:
-           arguments: [!tagged my_tag]
-   ```
-
-   After:
-   ```yaml
-   services:
-       App\HandlerCollection:
-           arguments: [!tagged_iterator my_tag]
-   ```
-
  * Passing an instance of `Symfony\Component\DependencyInjection\Parameter` as class name to `Symfony\Component\DependencyInjection\Definition` is deprecated.
 
    Before:

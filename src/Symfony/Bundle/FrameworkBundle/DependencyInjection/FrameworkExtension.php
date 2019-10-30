@@ -1039,8 +1039,6 @@ class FrameworkExtension extends Extension
     {
         $loader->load('assets.xml');
 
-        $defaultVersion = null;
-
         if ($config['version_strategy']) {
             $defaultVersion = new Reference($config['version_strategy']);
         } else {

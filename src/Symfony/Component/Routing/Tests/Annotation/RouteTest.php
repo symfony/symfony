@@ -25,7 +25,7 @@ class RouteTest extends TestCase
     public function testTryingToSetLocalesDirectly()
     {
         $this->expectException('BadMethodCallException');
-        $route = new Route(['locales' => ['nl' => 'bar']]);
+        new Route(['locales' => ['nl' => 'bar']]);
     }
 
     /**

@@ -109,7 +109,6 @@ trait ResponseTrait
 
         if (null === $this->content) {
             $content = null;
-            $chunk = null;
 
             foreach (self::stream([$this]) as $chunk) {
                 if (!$chunk->isLast()) {

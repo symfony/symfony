@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-10-16T10:52:06Z
+
+isn't disabled sorting even more likely to produce different orders ?
+
+---------------------------------------------------------------------------
+
+by hurricane-voronin at 2019-10-16T11:18:18Z
+
+> isn't disabled sorting even more likely to produce different orders ?
+
+Not able to reproduce issues with disabled sort.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T11:31:14Z
+
+Would you be able to debug two different lists when sorting is enabled? Maybe that will allow us to better understand what's going on.
+
+---------------------------------------------------------------------------
+
+by hurricane-voronin at 2019-10-16T11:40:07Z
+
+> Would you be able to debug two different lists when sorting is enabled? Maybe that will allow us to better understand what's going on.
+
+Well, what exactly do you need? May I miss some information to provide?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T11:43:11Z
+
+Two differently ordered list of files while the same input is provided would be nice.
+
+---------------------------------------------------------------------------
+
+by hurricane-voronin at 2019-10-16T11:53:37Z
+
+> Two differently ordered list of files while the same input is provided would be nice.
+
+Oh, sure, with the order I've got randomly 2 lists:
+
+`Array(
+    [0] => /my_path/symfony/config/packages/doctrine_mongodb.yaml
+    [1] => /my_path/symfony/config/packages/doctrine.yaml
+    [2] => /my_path/symfony/config/packages/framework.yaml
+    [3] => /my_path/symfony/config/packages/httplug.yaml
+    [4] => /my_path/symfony/config/packages/jms_serializer.yaml
+    [5] => /my_path/symfony/config/packages/knp_snappy.yaml
+    [6] => /my_path/symfony/config/packages/monolog.yaml
+    [7] => /my_path/symfony/config/packages/rabbitmq.yaml
+    [8] => /my_path/symfony/config/packages/routing.yaml
+    [9] => /my_path/symfony/config/packages/security.yaml
+    [10] => /my_path/symfony/config/packages/sensio_framework_extra.yaml
+    [11] => /my_path/symfony/config/packages/sentry.yaml
+    [12] => /my_path/symfony/config/packages/static_content.yaml
+    [13] => /my_path/symfony/config/packages/twig.yaml
+    [14] => /my_path/symfony/config/packages/workflow.yaml
+)
+`
+
+and
+
+`Array(
+    [0] => /my_path/symfony/config/packages/doctrine.yaml
+    [1] => /my_path/symfony/config/packages/doctrine_mongodb.yaml
+    [2] => /my_path/symfony/config/packages/framework.yaml
+    [3] => /my_path/symfony/config/packages/httplug.yaml
+    [4] => /my_path/symfony/config/packages/jms_serializer.yaml
+    [5] => /my_path/symfony/config/packages/knp_snappy.yaml
+    [6] => /my_path/symfony/config/packages/monolog.yaml
+    [7] => /my_path/symfony/config/packages/rabbitmq.yaml
+    [8] => /my_path/symfony/config/packages/routing.yaml
+    [9] => /my_path/symfony/config/packages/security.yaml
+    [10] => /my_path/symfony/config/packages/sensio_framework_extra.yaml
+    [11] => /my_path/symfony/config/packages/sentry.yaml
+    [12] => /my_path/symfony/config/packages/static_content.yaml
+    [13] => /my_path/symfony/config/packages/twig.yaml
+    [14] => /my_path/symfony/config/packages/workflow.yaml
+)
+`
+
+I guess that the problem is with an underscore in doctrine yamls.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T12:02:57Z
+
+ok thanks
+can you dump `setlocale(LC_COLLATE, '0')` in both cases, please?
+
+---------------------------------------------------------------------------
+
+by hurricane-voronin at 2019-10-16T12:22:00Z
+
+Got ` "en_US.UTF-8"` and `"C"` for first and second lists appropriate
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-16T12:40:09Z
+
+Thanks, that's why.
+Then I'd suggest to always `sort()` the array returned by glob() and always pass GLOB_NOSORT. Btw, no need for the "defined" check for it (GLOB_BRACE is special).
+Can you please survey if other places in the code could need the same kind of patch?

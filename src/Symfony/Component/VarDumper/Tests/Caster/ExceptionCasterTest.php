@@ -47,6 +47,7 @@ Exception {
   #line: 28
   trace: {
     %s%eTests%eCaster%eExceptionCasterTest.php:28 {
+      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
       › {
       ›     return new \Exception(''.$msg);
       › }
@@ -66,11 +67,12 @@ EODUMP;
         $expectedDump = <<<'EODUMP'
 {
   %s%eTests%eCaster%eExceptionCasterTest.php:28 {
+    Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
     › {
     ›     return new \Exception(''.$msg);
     › }
   }
-  %s%eTests%eCaster%eExceptionCasterTest.php:64 { …}
+  %s%eTests%eCaster%eExceptionCasterTest.php:65 { …}
 %A
 EODUMP;
 
@@ -90,11 +92,12 @@ Exception {
   #line: 28
   trace: {
     %sExceptionCasterTest.php:28 {
+      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
       › {
       ›     return new \Exception(''.$msg);
       › }
     }
-    %s%eTests%eCaster%eExceptionCasterTest.php:82 { …}
+    %s%eTests%eCaster%eExceptionCasterTest.php:84 { …}
 %A
 EODUMP;
 

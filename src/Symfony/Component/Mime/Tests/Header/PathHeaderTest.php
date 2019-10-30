@@ -26,7 +26,7 @@ class PathHeaderTest extends TestCase
     public function testAddressMustComplyWithRfc2822()
     {
         $this->expectException('Exception');
-        $header = new PathHeader('Return-Path', new Address('chr is@swiftmailer.org'));
+        new PathHeader('Return-Path', new Address('chr is@swiftmailer.org'));
     }
 
     public function testValueIsAngleAddrWithValidAddress()

@@ -57,8 +57,6 @@ class TransNode extends Node
         }
         list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults, (bool) $vars);
 
-        $method = !$this->hasNode('count') ? 'trans' : 'transChoice';
-
         $compiler
             ->write('echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans(')
             ->subcompile($msg)

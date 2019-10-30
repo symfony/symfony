@@ -257,14 +257,11 @@ class SymfonyTestsListenerTrait
         if (class_exists('PHPUnit_Util_Blacklist', false)) {
             $Test = 'PHPUnit_Util_Test';
             $BaseTestRunner = 'PHPUnit_Runner_BaseTestRunner';
-            $Warning = 'PHPUnit_Framework_Warning';
         } else {
             $Test = 'PHPUnit\Util\Test';
             $BaseTestRunner = 'PHPUnit\Runner\BaseTestRunner';
-            $Warning = 'PHPUnit\Framework\Warning';
         }
         $className = \get_class($test);
-        $classGroups = $Test::getGroups($className);
         $groups = $Test::getGroups($className, $test->getName(false));
 
         if (null !== $this->reportUselessTests) {

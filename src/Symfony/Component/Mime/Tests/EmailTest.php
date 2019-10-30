@@ -320,8 +320,6 @@ class EmailTest extends TestCase
         $e->text('text content');
         $e->attach($file);
         $e->attach($image, 'test.gif');
-        $fullhtml = new TextPart($content, 'utf-8', 'html');
-        $inlinedimg = (new DataPart($image, 'test.gif'))->asInline();
         $body = $e->getBody();
         $this->assertInstanceOf(MixedPart::class, $body);
         $this->assertCount(2, $related = $body->getParts());
@@ -378,7 +376,7 @@ class EmailTest extends TestCase
         $e->from('fabien@symfony.com');
         $e->text($r);
         $e->html($r);
-        $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test', 'r');
+        $name = __DIR__.'/Fixtures/mimetypes/test';
         $file = fopen($name, 'r');
         $e->attach($file, 'test');
         $expected = clone $e;

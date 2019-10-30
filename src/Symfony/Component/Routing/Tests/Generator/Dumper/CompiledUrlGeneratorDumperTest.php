@@ -194,7 +194,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext());
-        $url = $projectUrlGenerator->generate('NonExisting', []);
+        $projectUrlGenerator->generate('NonExisting', []);
     }
 
     public function testDumpForRouteWithDefaults()

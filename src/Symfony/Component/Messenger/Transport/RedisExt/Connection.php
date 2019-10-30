@@ -106,7 +106,6 @@ class Connection
             $messageId = '0'; // will receive consumers pending messages
         }
 
-        $e = null;
         try {
             $messages = $this->connection->xreadgroup(
                 $this->group,

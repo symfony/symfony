@@ -206,7 +206,7 @@ class ExceptionCaster
                     $f['file'] = substr($f['file'], 0, -\strlen($match[0]));
                     $f['line'] = (int) $match[1];
                 }
-                $caller = isset($f['function']) ? sprintf('in %s() on line %d', (isset($f['class']) ? $f['class'].$f['type'] : '').$f['function'], $f['line']) : null;
+                $caller = isset($f['function']) ? sprintf('in %s()', (isset($f['class']) ? $f['class'].$f['type'] : '').$f['function']) : null;
                 $src = $f['line'];
                 $srcKey = $f['file'];
                 $ellipsis = new LinkStub($srcKey, 0);
@@ -317,7 +317,7 @@ class ExceptionCaster
             $src[] = (isset($srcLines[$i]) ? $srcLines[$i] : '')."\n";
         }
 
-        $srcLines = [];
+        $srcLines = $title ? ["\0~separator=\0" => new ConstStub('string', $title)] : [];
         $ltrim = 0;
         do {
             $pad = null;

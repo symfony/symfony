@@ -143,6 +143,7 @@ RuntimeException {
   #line: %d
   trace: {
     %ACliDumperTest.php:%d {
+      "in Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest->testDumpWithCommaFlagsAndExceptionCodeExcerpt()"
       › 
       › $ex = new \RuntimeException('foo');
       › 
@@ -382,6 +383,7 @@ stream resource {@{$ref}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: {
       %sTwig.php:2 {
+        "in __TwigTemplate_VarDumperFixture_u75a09->doDisplay()"
         › foo bar
         ›   twig source
         › 

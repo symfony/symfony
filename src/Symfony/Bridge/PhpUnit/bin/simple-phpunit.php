@@ -99,6 +99,7 @@ foreach ($defaultEnvs as $envName => $envValue) {
 $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar')
     || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
     || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer`) : `which composer 2> /dev/null`))
+    || file_exists($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `git rev-parse --show-toplevel 2> NUL` : `git rev-parse --show-toplevel 2> /dev/null`).DIRECTORY_SEPARATOR.'composer.phar')
     ? $PHP.' '.escapeshellarg($COMPOSER)
     : 'composer';
 

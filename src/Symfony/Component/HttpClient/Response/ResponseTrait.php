@@ -117,11 +117,15 @@ trait ResponseTrait
                 }
             }
 
-            if (null === $content) {
-                throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
+            if (null !== $content) {
+                return $content;
             }
 
-            return $content;
+            if ('HEAD' === $this->info['http_method'] || \in_array($this->info['http_code'], [204, 304], true)) {
+                return '';
+            }
+
+            throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
         }
 
         foreach (self::stream([$this]) as $chunk) {

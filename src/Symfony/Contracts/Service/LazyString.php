@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection;
+namespace Symfony\Contracts\Service;
 
 /**
  * A string whose value is computed lazily by a callback.
@@ -47,6 +47,47 @@ class LazyString
         };
 
         return $lazyString;
+    }
+
+    /**
+     * @param object|string|int|float|bool $value A scalar or an object that implements the __toString() magic method
+     *
+     * @return static
+     */
+    public static function fromStringable($value): self
+    {
+        if (!self::isStringable($value)) {
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be a scalar or an object that implements the __toString() magic method, %s given.', __METHOD__, \is_object($value) ? \get_class($value) : \gettype($value)));
+        }
+
+        if (\is_object($value)) {
+            return static::fromCallable([$value, '__toString']);
+        }
+
+        $lazyString = new static();
+        $lazyString->value = (string) $value;
+
+        return $lazyString;
+    }
+
+    /**
+     * Tells whether the provided value can be cast to string.
+     */
+    final public static function isStringable($value): bool
+    {
+        return \is_string($value) || $value instanceof self || (\is_object($value) ? \is_callable([$value, '__toString']) : is_scalar($value));
+    }
+
+    /**
+     * Casts scalars and stringable objects to strings.
+     *
+     * @param object|string|int|float|bool $value
+     *
+     * @throws \TypeError When the provided value is not stringable
+     */
+    final public static function resolve($value): string
+    {
+        return $value;
     }
 
     public function __toString()

@@ -21,6 +21,7 @@
         "psr/container": "^1.0"
     },
     "require-dev": {
+        "symfony/error-handler": "^4.4|^5.0",
         "symfony/polyfill-intl-idn": "^1.10"
     },
     "replace": {
@@ -47,7 +48,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "1.1-dev"
+            "dev-master": "1.2-dev"
         }
     }
 }

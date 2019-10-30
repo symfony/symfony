@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.2.0
+-----
+
+ * added `LazyString` for lazy computation of string values injected into services
+
 1.1.0
 -----
 

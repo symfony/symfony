@@ -72,9 +72,10 @@ class StoreFactory
                 if (!class_exists(AbstractAdapter::class)) {
                     throw new InvalidArgumentException(sprintf('Unsupported DSN "%s". Try running "composer require symfony/cache".', $this->dsn));
                 }
+                $storeClass = 0 === strpos($connection, 'memcached://') ? MemcachedStore::class : RedisStore::class;
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
-                return 0 === strpos($connection, 'memcached://') ? new MemcachedStore($connection) : new RedisStore($connection);
+                return new $storeClass($connection);
 
             case 0 === strpos($connection, 'mssql://'):
             case 0 === strpos($connection, 'mysql:'):

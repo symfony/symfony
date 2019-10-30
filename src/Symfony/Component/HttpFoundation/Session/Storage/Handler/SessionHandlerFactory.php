@@ -56,9 +56,10 @@ class SessionHandlerFactory
                 if (!class_exists(AbstractAdapter::class)) {
                     throw new InvalidArgumentException(sprintf('Unsupported DSN "%s". Try running "composer require symfony/cache".', $this->dsn));
                 }
+                $handlerClass = 0 === strpos($connection, 'memcached://') ? MemcachedSessionHandler::class : RedisSessionHandler::class;
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
-                return 0 === strpos($connection, 'memcached://') ? new MemcachedSessionHandler($connection) : new RedisSessionHandler($connection);
+                return new $handlerClass($connection);
 
             case 0 === strpos($connection, 'pdo_oci://'):
                 if (!class_exists(DriverManager::class)) {

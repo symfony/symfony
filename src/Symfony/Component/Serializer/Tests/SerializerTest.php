@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
@@ -466,6 +467,14 @@ class SerializerTest extends TestCase
         $this->expectException('Symfony\Component\Serializer\Exception\RuntimeException');
         $this->expectExceptionMessage('Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"');
         $this->serializerWithClassDiscriminator()->deserialize('{"one":1}', DummyMessageInterface::class, 'json');
+    }
+
+    public function testNotNormalizableValueExceptionMessageForAResource()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('An unexpected value could not be normalized: stream resource');
+
+        (new Serializer())->normalize(tmpfile());
     }
 
     private function serializerWithClassDiscriminator()

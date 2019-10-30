@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-10-28T06:52:36Z
+
+What about:
+
+An unexpected value (“stream”) could not be serialized.
+
+It reads more fluently
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-10-28T08:26:01Z
+
+@OskarStark It might be read it as the `stream` string. We could have a new sentence for resources but I wanted to keep the same for simplicity.

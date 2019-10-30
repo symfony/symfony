@@ -81,11 +81,6 @@ class DelegatingLoader extends BaseDelegatingLoader
                 continue;
             }
 
-            if (1 === substr_count($controller, ':')) {
-                $nonDeprecatedNotation = str_replace(':', '::', $controller);
-                // TODO deprecate this in 5.1
-            }
-
             $route->setDefault('_controller', $controller);
         }
 

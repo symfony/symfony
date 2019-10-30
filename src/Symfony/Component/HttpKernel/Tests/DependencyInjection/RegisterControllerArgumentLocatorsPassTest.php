@@ -358,7 +358,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testNotTaggedControllerServiceReceivesLocatorArgument()
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.not_tagged_controller')->addArgument([]);
+        $container->register('argument_resolver.not_tagged_controller')->addArgument([]);
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);

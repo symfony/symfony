@@ -152,7 +152,6 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
 
     private function safelyUnserialize(string $file)
     {
-        $e = null;
         $meta = false;
         $content = file_get_contents($file);
         $signalingException = new \UnexpectedValueException();

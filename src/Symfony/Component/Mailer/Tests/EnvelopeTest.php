@@ -42,13 +42,13 @@ class EnvelopeTest extends TestCase
     public function testConstructorWithNoRecipients()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $e = new Envelope(new Address('fabien@symfony.com'), []);
+        new Envelope(new Address('fabien@symfony.com'), []);
     }
 
     public function testConstructorWithWrongRecipients()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $e = new Envelope(new Address('fabien@symfony.com'), ['lucas@symfony.com']);
+        new Envelope(new Address('fabien@symfony.com'), ['lucas@symfony.com']);
     }
 
     public function testSenderFromHeaders()

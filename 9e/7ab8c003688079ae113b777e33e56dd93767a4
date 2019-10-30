@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2019-06-20T07:22:43Z
+
+Hi @dunglas, this means in sf 4.3 it is a default feature (doctrine field are alwas by default validated) ?
+the dev need to optout to get rid off it? if yes, why not the other side?
+thank you
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-20T07:28:19Z
+
+@noniagriconomie see https://github.com/symfony/recipes/pull/612
+
+BTW, I think we also need an opt-in annotation
+having both config enabling+exclusion list and annotations to enable/disable looks the most sensible to me. Every style covered, maximum flexibility.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-06-20T08:14:49Z
+
+I agree with Nicolas here, Opt-In is definitely needed too 👍🏻
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2019-06-20T08:39:24Z
+
+thx for both answers @nicolas-grekas @OskarStark :)
+
+---------------------------------------------------------------------------
+
+by alanpoulain at 2019-06-20T09:36:54Z
+
+IMHO it should be enabled by default in the recipes (and allow to opt-out some classes or properties) and having an opt-in feature is a nice to have.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-20T09:41:24Z
+
+As we experienced issues when we enabled it by default and side effects that are difficult to understand, I'm in favor of only supporting the opt-in mode and only for classes/properties.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-06-20T11:13:55Z
+
+Being opt-in only defects the purpose of this feature and decreases the security benefits it provides: https://github.com/symfony/symfony/issues/32070#issuecomment-502867215
+
+Most side effects are because this feature is young, this PR should be enough to prevent the last remaining ones.
+
+The feature is already opt-in using the config file (it’s off by default). I don’t understand how the AutoMapping constraint would work? I mean, you must already opt in a specific directory using the config, and you can exclude some classes or properties using this new annotation. How the proposed annotation would integrate with this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-20T11:39:27Z
+
+Opt-in can still be made the default in maker-bundle, so that the security you want @dunglas is still a thing.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-06-20T16:32:28Z
+
+Many people (including me) don't use maker bundle to create entities (for instance, almost all PHPStorm users, I guess). And it's one more annotation to not forget to add to every new class, for no reasons. Actually, I prefer the current situation (having to uncomment one time for all some lines in a config file) than having to add an annotation to all new entities.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-06-20T16:33:52Z
+
+Travis failures are expected (we'll have to bump the required Validator version or to add conflict rules when merged).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-20T16:35:49Z
+
+That's why I think we need config + annotation, opt-in/out + list/exclusion, to cover all styles.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-06-20T18:04:45Z
+
+Here is a new proposal that should satisfy everybody:
+
+* Change the constraint to `@AutoMapping(true/false)`, `true` being the default value.
+* If the constraint is present on a property, and set to `true`, auto-mapping is always on, regardless of the config, and of any class level annotation
+* If the constraint is present on a property, and set to `false`, auto-mapping is always off, regardless of the config, and of any class level annotation
+* If the constraint is present on a class, and set to `true`, auto-mapping is always on except if a the annotation has been added to a specific property, and regardless of the config
+* If the constraint is present on a class, and set to `false`, auto-mapping is always off except if a the annotation has been added to a specific property, and regardless of the config
+* The config stays unchanged (with the new behavior, there is no need to a config for exclusions, it's already handled by the constraint) ; and is uncommented by default in the recipe
+
+It should cover all use cases, the feature is still on by default for the users of the framework thanks to the recipe. Do you folks agree?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-20T18:16:53Z
+
+Annotations always win, looks sensible to me.
+I would still like to have the exclusion list in the config, but someone else can provide it in another PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-23T14:57:45Z
+
+Should target 4.4 to me, except the bug fix part of course.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-06-30T23:53:42Z
+
+With this proposal, if no annotations are added (assuming we re-add the auto mapping config in the recipe in 4.4), then auto mapping would still be turned on, correct? We could then, in make:entity decide to always generate entities with AutoMapping(true) to be explicit and make it more obvious how to turn it off (or even answer the question “where is this validation coming from?”). I think that sensible... though we may debate later whether to have the default config be “always on without annotation” or “off, unless the annotation is present” (or an I misunderstanding how the config would work?)
+
+Thanks for the conversation. This feature makes me a bit uncomfortable... but @dunglas may very well be correct that it’s just this that’s needed to make it shine. After all, the form fields themselves hav built-in, automatic “sanity” validation, and that’s never been a problem (not an exact comparison).
+
+---------------------------------------------------------------------------
+
+by spackmat at 2019-07-01T12:47:14Z
+
+I think disabling all automatic constraints at once is a bit rough. Think, for example, of a decimal property type-hinted to float (or a Decimal object or whatever) instead of Doctrine's internal type string. At the moment, this leads to an invalid `Type` constraints. Disabling all automatic constraints for that property would mean to give up the wanted ones. This wouldn't be a big problem as the missing ones can easily be readded explicitly and as it is an Annotation, a dev will see that the automatic is disabled. But doing that the correct way requires devs to know about them all and keep track, when new ones will be added in the future.
+
+Wouldn't it be less invasive to only disable the specifically problematic automatic constraints? Like `@Assert\NoAutoMapping(['Type', 'NotNull'])`?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-10-03T15:53:21Z
+
+I implemented this: https://github.com/symfony/symfony/pull/32107#issuecomment-504125587
+
+Excluding only a specific annotation is not supported yet, but it would be nice to add this option (in a subsequent PR).
+
+---------------------------------------------------------------------------
+
+by ihmels at 2019-10-09T15:18:53Z
+
+Should this feature really be implemented with a validation constraint? In my opinion it feels wrong to enable or disable the auto-mapping by adding an constraint.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-10-09T16:02:37Z
+
+It's similar to `@Valid` and `@Traverse`, it doesn't look wrong to me, and allows to reuse all the existing infrastructure (formats, cache...).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-10-28T22:00:16Z
+
+This one should be ready to be merged now. The last decision to make is between this single annotation and `EnableAutoMapping`+`DisableAutoMapping` as suggested by @xabbuh. Ping @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-29T09:02:52Z
+
+I think I prefer Enable/DisableAutoMapping because it opens for better extensibility.
+One idea I have in mind would be to handle an `auto_mapper` attribute on the `validator.auto_mapper` tag:
+
+`<tag name="validator.auto_mapper" auto_mapper="property_info" />`
+
+Then `@Assert\DisableAutoMapping("property_info")` would allow specifically disabling this auto mapper (or enable it with `@Assert\EnableAutoMapping("property_info")`).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-10-29T10:51:54Z
+
+`EnableAutoMapping` and `DisableAutoMapping` added. It should be ready to be merged now. /cc @xabbuh

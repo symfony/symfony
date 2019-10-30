@@ -240,6 +240,9 @@ class FrameworkExtension extends Extension
             }
         }
 
+        // register cache before session so both can share the connection services
+        $this->registerCacheConfiguration($config['cache'], $container);
+
         if ($this->isConfigEnabled($container, $config['session'])) {
             if (!\extension_loaded('session')) {
                 throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://php.net/session.installation for instructions.');
@@ -326,7 +329,6 @@ class FrameworkExtension extends Extension
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container, $loader, $config['default_locale']);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
-        $this->registerCacheConfiguration($config['cache'], $container);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader);
@@ -925,7 +927,18 @@ class FrameworkExtension extends Extension
             $container->getDefinition('session.storage.native')->replaceArgument(1, null);
             $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
         } else {
-            $container->setAlias('session.handler', $config['handler_id'])->setPrivate(true);
+            $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
+
+            if ($usedEnvs || preg_match('#^[a-z]++://#', $config['handler_id'])) {
+                $id = '.cache_connection.'.ContainerBuilder::hash($config['handler_id']);
+
+                $container->getDefinition('session.abstract_handler')
+                    ->replaceArgument(0, $container->hasDefinition($id) ? new Reference($id) : $config['handler_id']);
+
+                $container->setAlias('session.handler', 'session.abstract_handler')->setPrivate(true);
+            } else {
+                $container->setAlias('session.handler', $config['handler_id'])->setPrivate(true);
+            }
         }
 
         $container->setParameter('session.save_path', $config['save_path']);

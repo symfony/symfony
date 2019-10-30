@@ -56,6 +56,11 @@
             </argument>
         </service>
 
+        <service id="session.abstract_handler" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler">
+            <factory class="Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerFactory" method="createHandler" />
+            <argument />
+        </service>
+
         <service id="session_listener" class="Symfony\Component\HttpKernel\EventListener\SessionListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service_locator">

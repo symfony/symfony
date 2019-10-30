@@ -75,26 +75,24 @@ abstract class HttpClientTestCase extends TestCase
     public function testHeadRequest()
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('HEAD', 'http://localhost:8057', [
+        $response = $client->request('HEAD', 'http://localhost:8057/head', [
             'headers' => ['Foo' => 'baR'],
             'user_data' => $data = new \stdClass(),
+            'buffer' => false,
         ]);
 
         $this->assertSame([], $response->getInfo('response_headers'));
-        $this->assertSame($data, $response->getInfo()['user_data']);
         $this->assertSame(200, $response->getStatusCode());
 
         $info = $response->getInfo();
-        $this->assertNull($info['error']);
-        $this->assertSame(0, $info['redirect_count']);
         $this->assertSame('HTTP/1.1 200 OK', $info['response_headers'][0]);
         $this->assertSame('Host: localhost:8057', $info['response_headers'][1]);
-        $this->assertSame('http://localhost:8057/', $info['url']);
 
         $headers = $response->getHeaders();
 
         $this->assertSame('localhost:8057', $headers['host'][0]);
         $this->assertSame(['application/json'], $headers['content-type']);
+        $this->assertTrue(0 < $headers['content-length'][0]);
 
         $this->assertSame('', $response->getContent());
     }
@@ -265,6 +263,7 @@ abstract class HttpClientTestCase extends TestCase
         $client = $this->getHttpClient(__FUNCTION__);
         $response = $client->request('GET', 'http://localhost:8057/304', [
             'headers' => ['If-Match' => '"abc"'],
+            'buffer' => false,
         ]);
 
         $this->assertSame(304, $response->getStatusCode());

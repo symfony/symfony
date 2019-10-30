@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Tests\Fixtures\CustomArrayObject;
+use Symfony\Component\Validator\Tests\Fixtures\ToString;
 
 class ConstraintViolationTest extends TestCase
 {

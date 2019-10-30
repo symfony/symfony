@@ -29,15 +29,20 @@ foreach ($_SERVER as $k => $v) {
     }
 }
 
+$json = json_encode($vars, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
 switch ($vars['REQUEST_URI']) {
     default:
         exit;
+
+    case '/head':
+        header('Content-Length: '.strlen($json), true);
+        break;
 
     case '/':
     case '/?a=a&b=b':
     case 'http://127.0.0.1:8057/':
     case 'http://localhost:8057/':
-        header('Content-Type: application/json');
         ob_start('ob_gzhandler');
         break;
 
@@ -85,6 +90,7 @@ switch ($vars['REQUEST_URI']) {
     case '/304':
         header('Content-Length: 10', true, 304);
         echo '12345';
+
         return;
 
     case '/307':
@@ -143,4 +149,4 @@ switch ($vars['REQUEST_URI']) {
 
 header('Content-Type: application/json', true);
 
-echo json_encode($vars, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+echo $json;

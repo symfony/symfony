@@ -112,11 +112,15 @@ trait ResponseTrait
                 }
             }
 
-            if (null === $content) {
-                throw new TransportException('Cannot get the content of the response twice: the request was issued with option "buffer" set to false.');
+            if (null !== $content) {
+                return $content;
             }
 
-            return $content;
+            if ('HEAD' === $this->info['http_method'] || \in_array($this->info['http_code'], [204, 304], true)) {
+                return '';
+            }
+
+            throw new TransportException('Cannot get the content of the response twice: the request was issued with option "buffer" set to false.');
         }
 
         foreach (self::stream([$this]) as $chunk) {

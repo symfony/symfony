@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-28T16:50:54Z
+
+> Maybe the other way to be sync is the one that should be removed?
+> Anyway, barely related :)
+
+It *is* something we could think about - by adding some sort of a "fallback" transport - i.e. the transport to use if no other transports are matched. I think it's safe to do this later - 5.1, etc if we want to.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-28T18:06:42Z
+
+Only failure is because `symfony/doctrine-bridge:dev-master` tests are looking for the new `ConsumedByWorkerStamp` inside `symfony/messenger:dev-master`, but it won't be there until this is merged up to `master`. But if this is fixable by a `composer.json` constraint, let me know.

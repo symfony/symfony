@@ -30,6 +30,8 @@ final class CurlClientState extends ClientState
     public $pauseExpiries = [];
     public $execCounter = \PHP_INT_MIN;
 
+    public $pendingHandles = [];
+
     public function __construct()
     {
         $this->handle = curl_multi_init();

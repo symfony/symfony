@@ -365,6 +365,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 curl_setopt($ch, \CURLOPT_VERBOSE, false);
             }
         }
+
+        foreach ($this->multi->pendingHandles as [$ch]) {
+            curl_setopt($ch, CURLOPT_VERBOSE, false);
+        }
     }
 
     public function __destruct()

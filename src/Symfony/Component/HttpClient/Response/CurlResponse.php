@@ -170,11 +170,15 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         };
 
         // Schedule the request in a non-blocking way
-        $multi->openHandles[$id] = [$ch, $options];
-        curl_multi_add_handle($multi->handle, $ch);
+        if (300 >= \count($multi->openHandles)) {
+            $multi->openHandles[$id] = [$ch, $options];
+            curl_multi_add_handle($multi->handle, $ch);
+        } else {
+            $multi->pendingHandles[$id] = [$ch, $options];
+        }
 
         $this->canary = new Canary(static function () use ($ch, $multi, $id) {
-            unset($multi->pauseExpiries[$id], $multi->openHandles[$id], $multi->handlesActivity[$id]);
+            unset($multi->pauseExpiries[$id], $multi->openHandles[$id], $multi->pendingHandles[$id], $multi->handlesActivity[$id]);
             curl_setopt($ch, \CURLOPT_PRIVATE, '_0');
 
             if (self::$performing) {
@@ -271,6 +275,17 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             // Response already completed
             $response->multi->handlesActivity[$response->id][] = null;
             $response->multi->handlesActivity[$response->id][] = null !== $response->info['error'] ? new TransportException($response->info['error']) : null;
+        } elseif (!$handle = $response->multi->pendingHandles[$response->id] ?? null) {
+            // no-op
+        } elseif (!$e = $handle[2] ?? null) {
+            $response->multi->openHandles[$response->id] = $handle;
+        } elseif (0 !== curl_multi_add_handle($response->multi->handle, $response->handle) || ($response->content && @(!rewind($response->content) || !ftruncate($response->content, 0)))) {
+            curl_multi_remove_handle($response->multi->handle, $response->handle);
+            $response->multi->handlesActivity[$response->id][] = null;
+            $response->multi->handlesActivity[$response->id][] = new TransportException($e);
+        } else {
+            $response->headers = $response->info['response_headers'] = [];
+            $response->offset = $response->info['http_code'] = 0;
         }
     }
 
@@ -301,23 +316,82 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 $result = $info['result'];
                 $id = (int) $ch = $info['handle'];
                 $waitFor = @curl_getinfo($ch, \CURLINFO_PRIVATE) ?: '_0';
+                $dlNow = @curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD);
+                $dlSize = @curl_getinfo($ch,\ CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
-                if (\in_array($result, [\CURLE_SEND_ERROR, \CURLE_RECV_ERROR, /*CURLE_HTTP2*/ 16, /*CURLE_HTTP2_STREAM*/ 92], true) && $waitFor[1] && 'C' !== $waitFor[0]) {
-                    curl_multi_remove_handle($multi->handle, $ch);
-                    $waitFor[1] = (string) ((int) $waitFor[1] - 1); // decrement the retry counter
-                    curl_setopt($ch, \CURLOPT_PRIVATE, $waitFor);
+                if (\in_array($result, [\CURLE_SEND_ERROR, \CURLE_RECV_ERROR, /*CURLE_HTTP2*/ 16, /*CURLE_HTTP2_STREAM*/ 92], true) && $waitFor[1] && (!$dlNow || $dlSize !== $dlNow)) {
+                    if ('C' === $waitFor[0]) {
+                        $dlNow = -1.0;
 
-                    if ('1' === $waitFor[1]) {
-                        curl_setopt($ch, \CURLOPT_HTTP_VERSION, \CURL_HTTP_VERSION_1_1);
+                        foreach ($multi->handlesActivity[$id] ?? [] as $chunk) {
+                            if ($chunk instanceof FirstChunk) {
+                                $dlNow = 0.0;
+                                break;
+                            }
+                        }
                     }
 
-                    if (0 === curl_multi_add_handle($multi->handle, $ch)) {
-                        continue;
+                    if (!$dlNow) {
+                        curl_multi_remove_handle($multi->handle, $ch);
+                        $waitFor[1] = (string) ((int) $waitFor[1] - 1); // decrement the retry counter
+                        curl_setopt($ch, \CURLOPT_PRIVATE, 'C' === $waitFor[0] ? 'H'.$waitFor[1] : $waitFor);
+
+                        if ('1' === $waitFor[1]) {
+                            curl_setopt($ch, \CURLOPT_HTTP_VERSION, \CURL_HTTP_VERSION_1_1);
+                        }
+
+                        if (!$response = $responses[$id] ?? null) {
+                            $multi->handlesActivity[$id] = [];
+                            $multi->pendingHandles[$id] = $multi->openHandles[$id];
+                            $multi->pendingHandles[$id][2] = sprintf('%s for "%s".', curl_strerror($result), curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL));
+                            continue;
+                        }
+
+                        if (0 !== curl_multi_add_handle($multi->handle, $ch)) {
+                            // no-op
+                        } elseif ($response->content && @(!rewind($response->content) || !ftruncate($response->content, 0))) {
+                            curl_multi_remove_handle($multi->handle, $ch);
+                        } else {
+                            ++$active;
+                            $response->headers = $response->info['response_headers'] = [];
+                            $response->offset = $response->info['http_code'] = 0;
+                            continue;
+                        }
                     }
                 }
 
                 $multi->handlesActivity[$id][] = null;
-                $multi->handlesActivity[$id][] = \in_array($result, [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || '_0' === $waitFor || curl_getinfo($ch, \CURLINFO_SIZE_DOWNLOAD) === curl_getinfo($ch, \CURLINFO_CONTENT_LENGTH_DOWNLOAD) ? null : new TransportException(sprintf('%s for "%s".', curl_strerror($result), curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
+                $multi->handlesActivity[$id][] = \in_array($result, [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || '_0' === $waitFor || $dlSize === $dlNow ? null : new TransportException(sprintf('%s for "%s".', curl_strerror($result), curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL)));
+            }
+
+            if ($multi->pendingHandles && $free = 300 - $active) {
+                $pendingHandles = [];
+
+                foreach ($responses as $id => $response) {
+                    if (isset($multi->pendingHandles[$id])) {
+                        $pendingHandles[$id] = $multi->pendingHandles[$id];
+
+                        if (!--$free) {
+                            break;
+                        }
+                    }
+                }
+
+                foreach ($multi->pendingHandles as $id => $handle) {
+                    if (!isset($pendingHandles[$id]) && !$free--) {
+                        break;
+                    }
+                    if (!isset($handle[2])) {
+                        $pendingHandles[$id] = $handle;
+                    }
+                }
+
+                foreach ($pendingHandles as $id => $handle) {
+                    curl_multi_add_handle($multi->handle, $handle[0]);
+                    unset($multi->pendingHandles[$id]);
+                }
+
+                $multi->pendingHandles = $multi->pendingHandles ?: [];
             }
         } finally {
             self::$performing = false;

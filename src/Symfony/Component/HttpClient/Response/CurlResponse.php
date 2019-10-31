@@ -142,7 +142,6 @@ final class CurlResponse implements ResponseInterface
         // Schedule the request in a non-blocking way
         $multi->openHandles[$id] = [$ch, $options];
         curl_multi_add_handle($multi->handle, $ch);
-        self::perform($multi);
     }
 
     /**

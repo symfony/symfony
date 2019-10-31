@@ -123,7 +123,7 @@ EOT
 
     private static function isExpired($date)
     {
-        $date = \DateTime::createFromFormat('m/Y', $date);
+        $date = \DateTime::createFromFormat('d/m/Y', '01/'.$date);
 
         return false !== $date && new \DateTime() > $date->modify('last day of this month 23:59:59');
     }

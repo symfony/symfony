@@ -53,7 +53,7 @@
                             <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>
                             <span class="nowrap newline">{{ result.time|date('H:i:s') }}</span>
                         </td>
-                        <td class="nowrap"><a href="{{ path('_profiler', { token: result.token }) }}">{{ result.token }}</a></td>
+                        <td class="nowrap"><a href="{{ path('_profiler', { token: result.token }) }}">{{ result.token }}</a>{% if result.has_dump %} <span class="sf-icon">{{ include('@Debug/Profiler/icon.svg') }}</span>{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>

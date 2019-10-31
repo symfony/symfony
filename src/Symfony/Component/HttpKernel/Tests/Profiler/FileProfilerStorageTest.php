@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
@@ -333,6 +334,40 @@ class FileProfilerStorageTest extends TestCase
 
         $this->assertEquals('line2', $r->invoke($this->storage, $h));
         $this->assertEquals('line1', $r->invoke($this->storage, $h));
+    }
+
+    public function testHasDump()
+    {
+        $collector = $this->getMockBuilder(DataCollectorInterface::class)
+            ->setMethods(['getName', 'getDumpsCount', 'collect', 'reset'])
+            ->getMock();
+        $collector->expects($this->any())->method('getName')->willReturn('dump');
+        $collector->expects($this->once())->method('getDumpsCount')->willReturn(1);
+
+        $profileWithDump = new Profile('token');
+        $profileWithDump->addCollector($collector);
+        $this->storage->write($profileWithDump);
+
+        $tokens = $this->storage->find('', '', 10, '');
+        $this->assertCount(1, $tokens);
+        $this->assertEquals($tokens[0]['has_dump'], true);
+    }
+
+    public function testHasNoDump()
+    {
+        $collector = $this->getMockBuilder(DataCollectorInterface::class)
+            ->setMethods(['getName', 'getDumpsCount', 'collect', 'reset'])
+            ->getMock();
+        $collector->expects($this->any())->method('getName')->willReturn('dump');
+        $collector->expects($this->once())->method('getDumpsCount')->willReturn(0);
+
+        $profile = new Profile('token');
+        $profile->addCollector($collector);
+        $this->storage->write($profile);
+
+        $tokens = $this->storage->find('', '', 10, '');
+        $this->assertCount(1, $tokens);
+        $this->assertEquals($tokens[0]['has_dump'], false);
     }
 
     protected function cleanDir()

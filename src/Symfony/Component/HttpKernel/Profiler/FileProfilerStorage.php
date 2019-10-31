@@ -62,6 +62,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         while (\count($result) < $limit && $line = $this->readLineFromFile($file)) {
             $values = str_getcsv($line);
             list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent, $csvStatusCode) = $values;
+            $hasDump = $values[7] ?? false;
             $csvTime = (int) $csvTime;
 
             if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method) || $statusCode && false === strpos($csvStatusCode, $statusCode)) {
@@ -84,6 +85,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'time' => $csvTime,
                 'parent' => $csvParent,
                 'status_code' => $csvStatusCode,
+                'has_dump' => $hasDump
             ];
         }
 
@@ -152,12 +154,20 @@ class FileProfilerStorage implements ProfilerStorageInterface
             return $profileToken !== $p->getToken() ? $p->getToken() : null;
         }, $profile->getChildren()));
 
+        $collectors = $profile->getCollectors();
+        $hasDump = false;
+        foreach ($collectors as $collector) {
+            if ('dump' === $collector->getName()) {
+                $hasDump = $collector->getDumpsCount() > 0;
+            }
+        }
+
         // Store profile
         $data = [
             'token' => $profileToken,
             'parent' => $parentToken,
             'children' => $childrenToken,
-            'data' => $profile->getCollectors(),
+            'data' => $collectors,
             'ip' => $profile->getIp(),
             'method' => $profile->getMethod(),
             'url' => $profile->getUrl(),
@@ -190,6 +200,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getTime(),
                 $profile->getParentToken(),
                 $profile->getStatusCode(),
+                $hasDump
             ]);
             fclose($file);
         }

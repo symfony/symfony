@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-10-28T17:25:21Z
+
+Seems fine to me to add this.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2019-10-28T17:28:04Z
+
+👍 I have pretty much exactly this in a project
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-10-29T09:49:12Z
+
+@weaverryan should doctrine middleware for same functionality be removed? Because now we are having 2 approaches to do same thing
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-29T14:10:31Z
+
+> @weaverryan should doctrine middleware for same functionality be removed? Because now we are having 2 approaches to do same thing
+
+Excellent question :). You probably know better than me. I personally think this should be done *always* and has no downside (well, a few micro-seconds added after handling each message to clear)... so there would indeed be no use-case anymore for the "clear" middleware. Do you agree?
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-10-29T14:33:08Z
+
+yes, event subscriber completely replaces middleware, so we can remove it.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-31T17:29:00Z
+
+DoctrineClearEntityManagerMiddleware is gone and docs PR added
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-31T17:58:17Z
+
+Failures unrelated - coming from 4.4 branch

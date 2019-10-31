@@ -279,7 +279,7 @@ class MockResponse implements ResponseInterface
             foreach ($body as $chunk) {
                 if ('' === $chunk = (string) $chunk) {
                     // simulate an idle timeout
-                    $response->body[] = new ErrorChunk($offset);
+                    $response->body[] = new ErrorChunk($offset, sprintf('Idle timeout reached for "%s".', $response->info['url']));
                 } else {
                     $response->body[] = $chunk;
                     $offset += \strlen($chunk);

@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl;
 use Symfony\Component\Intl\Data\Bundle\Reader\BufferedBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
+use Symfony\Component\Intl\Data\Bundle\Reader\PhpBundleReader;
 use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
@@ -257,7 +257,7 @@ final class Intl
     {
         if (null === self::$entryReader) {
             self::$entryReader = new BundleEntryReader(new BufferedBundleReader(
-                new JsonBundleReader(),
+                new PhpBundleReader(),
                 self::BUFFER_SIZE
             ));
             $localeDataProvider = new LocaleDataProvider(

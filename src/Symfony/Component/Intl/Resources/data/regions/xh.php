@@ -1,0 +1,9 @@
+<?php
+
+return [
+    'Version' => '36',
+    'Names' => [
+        'MK' => 'uMntla Macedonia',
+        'ZA' => 'eMzantsi Afrika',
+    ],
+];

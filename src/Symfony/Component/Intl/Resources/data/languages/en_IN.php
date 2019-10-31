@@ -1,0 +1,9 @@
+<?php
+
+return [
+    'Version' => '36',
+    'Names' => [
+        'bn' => 'Bengali',
+        'ro_MD' => 'Moldavian',
+    ],
+];

@@ -1,0 +1,9 @@
+<?php
+
+return [
+    'Names' => [
+        'eo' => 'Dʼan/Ƴar Kabilar Andalus',
+        'te' => 'Dʼan/Ƴar Kabilar Telug',
+        'te_IN' => 'Dʼan/Ƴar Kabilar Telug (Indiya)',
+    ],
+];

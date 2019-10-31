@@ -1,0 +1,14 @@
+<?php
+
+return [
+    'Version' => '36',
+    'Names' => [
+        'Arab' => 'Arapika',
+        'Cyrl' => 'Hīririki',
+        'Hans' => 'Māmā',
+        'Hant' => 'Tukuiho',
+        'Latn' => 'Rātina',
+        'Zxxx' => 'Tuhikore',
+        'Zzzz' => 'Momotuhi Tē Mōhiotia',
+    ],
+];

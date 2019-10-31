@@ -1,0 +1,16 @@
+<?php
+
+return [
+    'Version' => '36',
+    'Names' => [
+        'Arab' => 'Mkpụrụ Okwu Arabic',
+        'Cyrl' => 'Mkpụrụ Okwu Cyrillic',
+        'Hans' => 'Nke dị mfe',
+        'Hant' => 'Izugbe',
+        'Jpan' => 'Japanese',
+        'Kore' => 'Korea',
+        'Latn' => 'Latin',
+        'Zxxx' => 'Edeghị ede',
+        'Zzzz' => 'Mkpụrụ okwu amaghị',
+    ],
+];

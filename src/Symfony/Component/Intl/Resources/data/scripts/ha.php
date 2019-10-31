@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'Version' => '36',
+    'Names' => [
+        'Arab' => 'Larabci',
+        'Armn' => 'Armeniyawa',
+        'Beng' => 'Bangla',
+        'Bopo' => 'Bopomofo',
+        'Cyrl' => 'Cyrillic',
+        'Deva' => 'Devanagari',
+        'Ethi' => 'Ethiopic',
+        'Geor' => 'Georgian',
+        'Grek' => 'Girka',
+        'Gujr' => 'Gujarati',
+        'Guru' => 'Gurmukhi',
+        'Hanb' => 'Han with Bopomofo',
+        'Hans' => 'Sauƙaƙaƙƙen',
+        'Hant' => 'Na gargajiya',
+        'Hebr' => 'Ibrananci',
+        'Latn' => 'Latin',
+        'Zsym' => 'Alamomi',
+        'Zxxx' => 'Ba rubutacce ba',
+        'Zzzz' => 'Rubutun da ba sani ba',
+    ],
+];

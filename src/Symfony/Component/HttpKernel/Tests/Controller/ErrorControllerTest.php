@@ -61,7 +61,7 @@ class ErrorControllerTest extends TestCase
             $request,
             FlattenException::createFromThrowable(new \Exception('foo')),
             500,
-            '{"title": "Internal Server Error","status": 500}',
+            '{"title": "Internal Server Error","status": 500,"detail": "Whoops, looks like something went wrong."}',
         ];
 
         $request = new Request();
@@ -70,7 +70,7 @@ class ErrorControllerTest extends TestCase
             $request,
             FlattenException::createFromThrowable(new HttpException(405, 'Invalid request.')),
             405,
-            '{"title": "Method Not Allowed","status": 405}',
+            '{"title": "Method Not Allowed","status": 405,"detail": "Whoops, looks like something went wrong."}',
         ];
 
         $request = new Request();
@@ -79,7 +79,7 @@ class ErrorControllerTest extends TestCase
             $request,
             FlattenException::createFromThrowable(new HttpException(405, 'Invalid request.')),
             405,
-            '{"title": "Method Not Allowed","status": 405}',
+            '{"title": "Method Not Allowed","status": 405,"detail": "Whoops, looks like something went wrong."}',
         ];
 
         $request = new Request();

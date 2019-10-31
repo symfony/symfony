@@ -40,12 +40,18 @@ class JsonErrorRenderer implements ErrorRendererInterface
     {
         $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
 
+        if ($debug) {
+            $message = $exception->getMessage();
+        } else {
+            $message = 404 === $exception->getStatusCode() ? 'Sorry, the page you are looking for could not be found.' : 'Whoops, looks like something went wrong.';
+        }
+
         $content = [
             'title' => $exception->getTitle(),
             'status' => $exception->getStatusCode(),
+            'detail' => $message,
         ];
         if ($debug) {
-            $content['detail'] = $exception->getMessage();
             $content['exceptions'] = $exception->toArray();
         }
 

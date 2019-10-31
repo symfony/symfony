@@ -39,6 +39,7 @@ TXT;
         $expectedNonDebug = <<<TXT
 [title] Internal Server Error
 [status] 500
+[detail] Whoops, looks like something went wrong.
 TXT;
 
         yield '->render() returns the TXT content WITH stack traces in debug mode' => [

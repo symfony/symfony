@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Messenger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
-use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 
 /**
  * Closes connection and therefore saves number of connections.
@@ -30,7 +30,7 @@ class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware
 
             return $stack->next()->handle($envelope, $stack);
         } finally {
-            if (null !== $envelope->last(ReceivedStamp::class)) {
+            if (null !== $envelope->last(ConsumedByWorkerStamp::class)) {
                 $connection->close();
             }
         }

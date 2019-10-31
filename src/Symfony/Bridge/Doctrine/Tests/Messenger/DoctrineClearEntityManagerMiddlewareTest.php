@@ -16,7 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineClearEntityManagerMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
-use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineClearEntityManagerMiddlewareTest extends MiddlewareTestCase
@@ -36,7 +36,7 @@ class DoctrineClearEntityManagerMiddlewareTest extends MiddlewareTestCase
         $middleware = new DoctrineClearEntityManagerMiddleware($managerRegistry, 'default');
 
         $envelope = new Envelope(new \stdClass(), [
-            new ReceivedStamp('async'),
+            new ConsumedByWorkerStamp(),
         ]);
         $middleware->handle($envelope, $this->getStackMock());
     }

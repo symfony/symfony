@@ -7,6 +7,22 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.33 (2019-11-01)
+
+ * bug #33998 [Config] Disable default alphabet sorting in glob function due of unstable sort (hurricane-voronin)
+ * bug #34144 [Serializer] Improve messages for unexpected resources values (fancyweb)
+ * bug #34080 [SecurityBundle] correct types for default arguments for firewall configs (shieldo)
+ * bug #33999 [Form] Make sure to collect child forms created on *_SET_DATA events (yceruto)
+ * bug #34021 [TwigBridge] do not render errors for checkboxes twice (xabbuh)
+ * bug #34041 [HttpKernel] fix wrong removal of the just generated container dir (nicolas-grekas)
+ * bug #34023 [Dotenv] allow LF in single-quoted strings (nicolas-grekas)
+ * bug #33818 [Yaml] Throw exception for tagged invalid inline elements (gharlan)
+ * bug #33948 [PropertyInfo] Respect property name case when guessing from public method name (antograssiot)
+ * bug #33962 [Cache] fixed TagAwareAdapter returning invalid cache (v-m-i)
+ * bug #33965 [HttpFoundation] Add plus character `+` to legal mime subtype (ilzrv)
+ * bug #32943 [Dotenv] search variable values in ENV first then env file (soufianZantar)
+ * bug #33943 [VarDumper] fix resetting the "bold" state in CliDumper (nicolas-grekas)
+
 * 3.4.32 (2019-10-07)
 
  * bug #33834 [Validator] Fix ValidValidator group cascading usage (fancyweb)

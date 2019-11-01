@@ -11,6 +11,12 @@ CHANGELOG
  * Made all dispatched worker event classes final.
  * Added support for `from_transport` attribute on `messenger.message_handler` tag.
  * Added support for passing `dbindex` as a query parameter to the redis transport DSN.
+ * [BC BREAK] Removed `SendersLocatorInterface::getSenderByAlias` added in 4.3.
+ * [BC BREAK] Removed `$retryStrategies` argument from `Worker::__construct`.
+ * [BC BREAK] Removed `$retryStrategyLocator` argument from `ConsumeMessagesCommand::__construct`.
+ * [BC BREAK] Removed `$senderClassOrAlias` argument from `RedeliveryStamp::__construct`.
+ * [BC BREAK] Removed `UnknownSenderException`.
+ * The component is not marked as `@experimental` anymore.
 
 4.3.0
 -----

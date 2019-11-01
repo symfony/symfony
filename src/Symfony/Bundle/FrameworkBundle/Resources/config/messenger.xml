@@ -10,7 +10,7 @@
         <!-- Asynchronous -->
         <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
             <argument type="collection" /> <!-- Per message senders map -->
-            <argument /> <!-- senders locator -->
+            <argument /> <!-- senders service locator -->
         </service>
         <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
             <tag name="monolog.logger" channel="messenger" />
@@ -98,12 +98,19 @@
             <argument /> <!-- max delay ms -->
         </service>
 
+        <service id="messenger.retry.send_failed_message_for_retry_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="messenger" />
+            <argument /> <!-- senders service locator -->
+            <argument type="service" id="messenger.retry_strategy_locator" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
         <!-- failed handling -->
         <service id="messenger.failure.send_failed_message_to_failure_transport_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="messenger" />
-            <argument type="service" id="messenger.routable_message_bus" />
-            <argument /> <!-- Failure transport name -->
+            <argument /> <!-- Failure transport -->
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 

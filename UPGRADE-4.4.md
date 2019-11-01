@@ -154,6 +154,11 @@ Messenger
 
  * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
    pass a `RoutableMessageBus`  instance instead.
+ * [BC BREAK] Removed `SendersLocatorInterface::getSenderByAlias` added in 4.3.
+ * [BC BREAK] Removed `$retryStrategies` argument from `Worker::__construct`.
+ * [BC BREAK] Removed `$retryStrategyLocator` argument from `ConsumeMessagesCommand::__construct`.
+ * [BC BREAK] Removed `$senderClassOrAlias` argument from `RedeliveryStamp::__construct`.
+ * [BC BREAK] Removed `UnknownSenderException`.
 
 Mime
 ----

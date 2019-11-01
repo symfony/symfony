@@ -28,7 +28,7 @@ class FailedMessagesShowCommandTest extends TestCase
     public function testBasicRun()
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
-        $redeliveryStamp = new RedeliveryStamp(0, 'failure_receiver', 'Things are bad!');
+        $redeliveryStamp = new RedeliveryStamp(0, 'Things are bad!');
         $envelope = new Envelope(new \stdClass(), [
             new TransportMessageIdStamp(15),
             $sentToFailureStamp,
@@ -62,8 +62,8 @@ EOF
     public function testMultipleRedeliveryFails()
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
-        $redeliveryStamp1 = new RedeliveryStamp(0, 'failure_receiver', 'Things are bad!');
-        $redeliveryStamp2 = new RedeliveryStamp(0, 'failure_receiver');
+        $redeliveryStamp1 = new RedeliveryStamp(0, 'Things are bad!');
+        $redeliveryStamp2 = new RedeliveryStamp(0);
         $envelope = new Envelope(new \stdClass(), [
             new TransportMessageIdStamp(15),
             $sentToFailureStamp,

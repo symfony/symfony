@@ -25,7 +25,6 @@ class SendersLocator implements SendersLocatorInterface
 {
     private $sendersMap;
     private $sendersLocator;
-    private $useLegacyLookup = false;
 
     /**
      * @param string[][]         $sendersMap     An array, keyed by "type", set to an array of sender aliases
@@ -45,17 +44,6 @@ class SendersLocator implements SendersLocatorInterface
         $seen = [];
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
-            // the old way of looking up senders
-            if ($this->useLegacyLookup) {
-                foreach ($this->sendersMap[$type] ?? [] as $alias => $sender) {
-                    if (!\in_array($sender, $seen, true)) {
-                        yield $alias => $seen[] = $sender;
-                    }
-                }
-
-                continue;
-            }
-
             foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
                 if (!\in_array($senderAlias, $seen, true)) {
                     if (!$this->sendersLocator->has($senderAlias)) {

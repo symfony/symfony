@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Telegram;
 
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -26,7 +27,7 @@ final class TelegramTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
-        $token = $this->getUser($dsn);
+        $token = $this->getToken($dsn);
         $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
@@ -41,5 +42,18 @@ final class TelegramTransportFactory extends AbstractTransportFactory
     protected function getSupportedSchemes(): array
     {
         return ['telegram'];
+    }
+
+    private function getToken(Dsn $dsn): string
+    {
+        if (null === $dsn->getUser() && null === $dsn->getPassword()) {
+            throw new IncompleteDsnException('Missing token');
+        }
+
+        if (null === $dsn->getPassword()) {
+            throw new IncompleteDsnException('Malformed token');
+        }
+
+        return sprintf('%s:%s', $dsn->getUser(), $dsn->getPassword());
     }
 }

@@ -75,8 +75,18 @@ class JsonResponseTest extends TestCase
     {
         $response = new JsonResponse([], 200, ['ETag' => 'foo']);
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('{}', $response->getContent());
         $this->assertSame('foo', $response->headers->get('ETag'));
     }
+    
+    public function testStatusCodeNoContentDeliversEmptyArray()
+    {
+        $response = new JsonResponse([], 204);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertEquals('{}', $response->getContent());
+        $this->assertEquals(204, $response->getStatusCode());        
+    }    
 
     public function testConstructorWithCustomContentType()
     {
@@ -106,6 +116,15 @@ class JsonResponseTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals(204, $response->getStatusCode());
+    }
+    
+    public function testStatusCodeNoContentDeliversEmptyArray()
+    {
+        $response = JsonResponse::create([], 204);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertEquals('{}', $response->getContent());
+        $this->assertEquals(204, $response->getStatusCode());        
     }
 
     public function testStaticCreateEmptyJsonObject()

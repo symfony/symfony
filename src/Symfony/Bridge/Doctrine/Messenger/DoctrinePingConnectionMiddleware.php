@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Messenger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
-use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 
 /**
  * Checks whether the connection is still open or reconnects otherwise.
@@ -25,7 +25,7 @@ class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
 {
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
-        if (null !== $envelope->last(ReceivedStamp::class)) {
+        if (null !== $envelope->last(ConsumedByWorkerStamp::class)) {
             $this->pingConnection($entityManager);
         }
 

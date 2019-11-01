@@ -17,12 +17,9 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -47,12 +44,12 @@ class WorkerTest extends TestCase
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
         $bus->expects($this->at(0))->method('dispatch')->with(
-            $envelope = new Envelope($apiMessage, [new ReceivedStamp('transport')])
-        )->willReturn($envelope);
+            new Envelope($apiMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])
+        )->willReturnArgument(0);
 
         $bus->expects($this->at(1))->method('dispatch')->with(
-            $envelope = new Envelope($ipaMessage, [new ReceivedStamp('transport')])
-        )->willReturn($envelope);
+            new Envelope($ipaMessage, [new ReceivedStamp('transport'), new ConsumedByWorkerStamp()])
+        )->willReturnArgument(0);
 
         $worker = new Worker(['transport' => $receiver], $bus);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
@@ -65,95 +62,7 @@ class WorkerTest extends TestCase
         $this->assertSame(2, $receiver->getAcknowledgeCount());
     }
 
-    public function testWorkerDoesNotWrapMessagesAlreadyWrappedWithReceivedMessage()
-    {
-        $envelope = new Envelope(new DummyMessage('API'));
-        $receiver = new DummyReceiver([[$envelope]]);
-        $envelope = $envelope->with(new ReceivedStamp('transport'));
-
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->at(0))->method('dispatch')->with($envelope)->willReturn($envelope);
-
-        $worker = new Worker(['transport' => $receiver], $bus, []);
-        $worker->run([], function (?Envelope $envelope) use ($worker) {
-            // stop after the messages finish
-            if (null === $envelope) {
-                $worker->stop();
-            }
-        });
-    }
-
-    public function testDispatchCausesRetry()
-    {
-        $receiver = new DummyReceiver([
-            [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'transport1')])],
-        ]);
-
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->at(0))->method('dispatch')->willThrowException(new \InvalidArgumentException('Why not'));
-
-        // 2nd call will be the retry
-        $bus->expects($this->at(1))->method('dispatch')->with($this->callback(function (Envelope $envelope) {
-            /** @var RedeliveryStamp|null $redeliveryStamp */
-            $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
-            $this->assertNotNull($redeliveryStamp);
-            // retry count now at 1
-            $this->assertSame(1, $redeliveryStamp->getRetryCount());
-            $this->assertSame('transport1', $redeliveryStamp->getSenderClassOrAlias());
-
-            // received stamp is removed
-            $this->assertNull($envelope->last(ReceivedStamp::class));
-
-            return true;
-        }))->willReturnArgument(0);
-
-        $retryStrategy = $this->getMockBuilder(RetryStrategyInterface::class)->getMock();
-        $retryStrategy->expects($this->once())->method('isRetryable')->willReturn(true);
-
-        $worker = new Worker(['transport1' => $receiver], $bus, ['transport1' => $retryStrategy]);
-        $worker->run([], function (?Envelope $envelope) use ($worker) {
-            // stop after the messages finish
-            if (null === $envelope) {
-                $worker->stop();
-            }
-        });
-
-        // old message rejected
-        $this->assertSame(1, $receiver->getRejectCount());
-    }
-
-    public function testUnrecoverableMessageHandlingExceptionPreventsRetries()
-    {
-        $envelope1 = new Envelope(new DummyMessage('Unwrapped Exception'), [new SentStamp('Some\Sender', 'transport1')]);
-        $envelope2 = new Envelope(new DummyMessage('Wrapped Exception'), [new SentStamp('Some\Sender', 'transport1')]);
-
-        $receiver = new DummyReceiver([
-            [$envelope1],
-            [$envelope2],
-        ]);
-
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->at(0))->method('dispatch')->willThrowException(new UnrecoverableMessageHandlingException());
-        $bus->expects($this->at(1))->method('dispatch')->willThrowException(
-            new HandlerFailedException($envelope2, [new UnrecoverableMessageHandlingException()])
-        );
-
-        $retryStrategy = $this->getMockBuilder(RetryStrategyInterface::class)->getMock();
-        $retryStrategy->expects($this->never())->method('isRetryable')->willReturn(true);
-
-        $worker = new Worker(['transport1' => $receiver], $bus, ['transport1' => $retryStrategy]);
-        $worker->run([], function (?Envelope $envelope) use ($worker) {
-            // stop after the messages finish
-            if (null === $envelope) {
-                $worker->stop();
-            }
-        });
-
-        // message was rejected
-        $this->assertSame(2, $receiver->getRejectCount());
-    }
-
-    public function testDispatchCausesRejectWhenNoRetry()
+    public function testHandlingErrorCausesReject()
     {
         $receiver = new DummyReceiver([
             [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'transport1')])],
@@ -162,10 +71,7 @@ class WorkerTest extends TestCase
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
         $bus->method('dispatch')->willThrowException(new \InvalidArgumentException('Why not'));
 
-        $retryStrategy = $this->getMockBuilder(RetryStrategyInterface::class)->getMock();
-        $retryStrategy->expects($this->once())->method('isRetryable')->willReturn(false);
-
-        $worker = new Worker(['transport1' => $receiver], $bus, ['transport1' => $retryStrategy]);
+        $worker = new Worker(['transport1' => $receiver], $bus);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             // stop after the messages finish
             if (null === $envelope) {
@@ -174,28 +80,6 @@ class WorkerTest extends TestCase
         });
         $this->assertSame(1, $receiver->getRejectCount());
         $this->assertSame(0, $receiver->getAcknowledgeCount());
-    }
-
-    public function testDispatchCausesRejectOnUnrecoverableMessage()
-    {
-        $receiver = new DummyReceiver([
-            [new Envelope(new DummyMessage('Hello'))],
-        ]);
-
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->method('dispatch')->willThrowException(new UnrecoverableMessageHandlingException('Will never work'));
-
-        $retryStrategy = $this->getMockBuilder(RetryStrategyInterface::class)->getMock();
-        $retryStrategy->expects($this->never())->method('isRetryable');
-
-        $worker = new Worker(['transport1' => $receiver], $bus, ['transport1' => $retryStrategy]);
-        $worker->run([], function (?Envelope $envelope) use ($worker) {
-            // stop after the messages finish
-            if (null === $envelope) {
-                $worker->stop();
-            }
-        });
-        $this->assertSame(1, $receiver->getRejectCount());
     }
 
     public function testWorkerDoesNotSendNullMessagesToTheBus()
@@ -234,7 +118,7 @@ class WorkerTest extends TestCase
                 [$this->isInstanceOf(WorkerStoppedEvent::class)]
             );
 
-        $worker = new Worker([$receiver], $bus, [], $eventDispatcher);
+        $worker = new Worker([$receiver], $bus, $eventDispatcher);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             // stop after the messages finish
             if (null === $envelope) {
@@ -262,7 +146,7 @@ class WorkerTest extends TestCase
                 [$this->isInstanceOf(WorkerStoppedEvent::class)]
             );
 
-        $worker = new Worker([$receiver], $bus, [], $eventDispatcher);
+        $worker = new Worker([$receiver], $bus, $eventDispatcher);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             // stop after the messages finish
             if (null === $envelope) {

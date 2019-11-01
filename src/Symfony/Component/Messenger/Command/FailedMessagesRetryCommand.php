@@ -24,7 +24,6 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
@@ -39,14 +38,12 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 
     private $eventDispatcher;
     private $messageBus;
-    private $retryStrategy;
     private $logger;
 
-    public function __construct(string $receiverName, ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, RetryStrategyInterface $retryStrategy = null, LoggerInterface $logger = null)
+    public function __construct(string $receiverName, ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;
-        $this->retryStrategy = $retryStrategy;
         $this->logger = $logger;
 
         parent::__construct($receiverName, $receiver);
@@ -180,7 +177,6 @@ EOF
         $worker = new Worker(
             [$this->getReceiverName() => $receiver],
             $this->messageBus,
-            [$this->getReceiverName() => $this->retryStrategy],
             $this->eventDispatcher,
             $this->logger
         );

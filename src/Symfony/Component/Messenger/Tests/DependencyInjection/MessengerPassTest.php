@@ -281,7 +281,6 @@ class MessengerPassTest extends TestCase
         $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments([
             null,
             new Reference('messenger.receiver_locator'),
-            new Reference('messenger.retry_strategy_locator'),
             null,
             null,
             null,

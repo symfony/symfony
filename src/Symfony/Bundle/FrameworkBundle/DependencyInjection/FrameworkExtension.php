@@ -1616,27 +1616,18 @@ class FrameworkExtension extends Extension
             $container->setAlias('messenger.default_serializer', $config['serializer']['default_serializer']);
         }
 
-        $senderReferences = [];
-        $syncTransports = [];
+        $senderAliases = [];
         $transportRetryReferences = [];
         foreach ($config['transports'] as $name => $transport) {
             $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
 
-            if (0 === strpos($transport['dsn'], 'sync://')) {
-                $syncTransports[] = $name;
-            } else {
-                $transportDefinition = (new Definition(TransportInterface::class))
-                    ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
-                    ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])
-                    ->addTag('messenger.receiver', ['alias' => $name])
-                ;
-                $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
-
-                // alias => service_id
-                $senderReferences[$name] = new Reference($transportId);
-                // service_id => service_id
-                $senderReferences[$transportId] = new Reference($transportId);
-            }
+            $transportDefinition = (new Definition(TransportInterface::class))
+                ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
+                ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])
+                ->addTag('messenger.receiver', ['alias' => $name])
+            ;
+            $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
+            $senderAliases[$name] = $transportId;
 
             if (null !== $transport['retry_strategy']['service']) {
                 $transportRetryReferences[$name] = new Reference($transport['retry_strategy']['service']);
@@ -1654,41 +1645,55 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $senderReferences = [];
+        // alias => service_id
+        foreach ($senderAliases as $alias => $serviceId) {
+            $senderReferences[$alias] = new Reference($serviceId);
+        }
+        // service_id => service_id
+        foreach ($senderAliases as $serviceId) {
+            $senderReferences[$serviceId] = new Reference($serviceId);
+        }
+
         $messageToSendersMapping = [];
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                 throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
             }
 
-            // filter out "sync" senders
-            $realSenders = [];
+            // make sure senderAliases contains all senders
             foreach ($messageConfiguration['senders'] as $sender) {
-                if (isset($senderReferences[$sender])) {
-                    $realSenders[] = $sender;
-                } elseif (!\in_array($sender, $syncTransports, true)) {
+                if (!isset($senderReferences[$sender])) {
                     throw new LogicException(sprintf('Invalid Messenger routing configuration: the "%s" class is being routed to a sender called "%s". This is not a valid transport or service id.', $message, $sender));
                 }
             }
 
-            if ($realSenders) {
-                $messageToSendersMapping[$message] = $realSenders;
-            }
+            $messageToSendersMapping[$message] = $messageConfiguration['senders'];
         }
+
+        $sendersServiceLocator = ServiceLocatorTagPass::register($container, $senderReferences);
 
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
-            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $senderReferences))
+            ->replaceArgument(1, $sendersServiceLocator)
+        ;
+
+        $container->getDefinition('messenger.retry.send_failed_message_for_retry_listener')
+            ->replaceArgument(0, $sendersServiceLocator)
         ;
 
         $container->getDefinition('messenger.retry_strategy_locator')
             ->replaceArgument(0, $transportRetryReferences);
 
         if ($config['failure_transport']) {
+            if (!isset($senderReferences[$config['failure_transport']])) {
+                throw new LogicException(sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $config['failure_transport']));
+            }
+
             $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
-                ->replaceArgument(1, $config['failure_transport']);
+                ->replaceArgument(0, $senderReferences[$config['failure_transport']]);
             $container->getDefinition('console.command.messenger_failed_messages_retry')
-                ->replaceArgument(0, $config['failure_transport'])
-                ->replaceArgument(4, $transportRetryReferences[$config['failure_transport']] ?? null);
+                ->replaceArgument(0, $config['failure_transport']);
             $container->getDefinition('console.command.messenger_failed_messages_show')
                 ->replaceArgument(0, $config['failure_transport']);
             $container->getDefinition('console.command.messenger_failed_messages_remove')

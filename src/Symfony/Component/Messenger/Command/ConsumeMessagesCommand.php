@@ -42,18 +42,16 @@ class ConsumeMessagesCommand extends Command
     private $receiverLocator;
     private $logger;
     private $receiverNames;
-    private $retryStrategyLocator;
     private $eventDispatcher;
     /** @var CacheItemPoolInterface|null */
     private $restartSignalCachePool;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], ContainerInterface $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], EventDispatcherInterface $eventDispatcher = null)
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
-        $this->retryStrategyLocator = $retryStrategyLocator;
         $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
@@ -144,7 +142,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $receivers = [];
-        $retryStrategies = [];
         foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
                 $message = sprintf('The receiver "%s" does not exist.', $receiverName);
@@ -155,17 +152,12 @@ EOF
                 throw new RuntimeException($message);
             }
 
-            if (null !== $this->retryStrategyLocator && !$this->retryStrategyLocator->has($receiverName)) {
-                throw new RuntimeException(sprintf('Receiver "%s" does not have a configured retry strategy.', $receiverName));
-            }
-
             $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
-            $retryStrategies[$receiverName] = null !== $this->retryStrategyLocator ? $this->retryStrategyLocator->get($receiverName) : null;
         }
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $worker = new Worker($receivers, $bus, $retryStrategies, $this->eventDispatcher, $this->logger);
+        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
         $stopsWhen = [];
         if ($limit = $input->getOption('limit')) {
             $stopsWhen[] = "processed {$limit} messages";

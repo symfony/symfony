@@ -19,9 +19,8 @@ class RedeliveryStampTest extends TestCase
 {
     public function testGetters()
     {
-        $stamp = new RedeliveryStamp(10, 'sender_alias');
+        $stamp = new RedeliveryStamp(10);
         $this->assertSame(10, $stamp->getRetryCount());
-        $this->assertSame('sender_alias', $stamp->getSenderClassOrAlias());
         $this->assertInstanceOf(\DateTimeInterface::class, $stamp->getRedeliveredAt());
         $this->assertNull($stamp->getExceptionMessage());
         $this->assertNull($stamp->getFlattenException());
@@ -30,7 +29,7 @@ class RedeliveryStampTest extends TestCase
     public function testGettersPopulated()
     {
         $flattenException = new FlattenException();
-        $stamp = new RedeliveryStamp(10, 'sender_alias', 'exception message', $flattenException);
+        $stamp = new RedeliveryStamp(10, 'exception message', $flattenException);
         $this->assertSame('exception message', $stamp->getExceptionMessage());
         $this->assertSame($flattenException, $stamp->getFlattenException());
     }

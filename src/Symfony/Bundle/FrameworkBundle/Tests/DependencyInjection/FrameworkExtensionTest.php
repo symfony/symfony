@@ -16,8 +16,6 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
-use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
-use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\SecondMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -682,17 +680,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->expectException('LogicException');
         $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
         $this->createContainerFromFile('messenger_routing_invalid_transport');
-    }
-
-    public function testMessengerSyncTransport()
-    {
-        $container = $this->createContainerFromFile('messenger_sync_transport');
-        $senderLocatorDefinition = $container->getDefinition('messenger.senders_locator');
-
-        $sendersMapping = $senderLocatorDefinition->getArgument(0);
-        $this->assertEquals(['amqp'], $sendersMapping[DummyMessage::class]);
-        $this->assertArrayNotHasKey(SecondMessage::class, $sendersMapping);
-        $this->assertEquals(['amqp'], $sendersMapping[FooMessage::class]);
     }
 
     public function testTranslator()

@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Exception;
+namespace Symfony\Component\Messenger\Stamp;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+ * A marker that this message was consumed by a worker process.
  */
-class UnknownSenderException extends InvalidArgumentException
+class ConsumedByWorkerStamp implements NonSendableStampInterface
 {
 }

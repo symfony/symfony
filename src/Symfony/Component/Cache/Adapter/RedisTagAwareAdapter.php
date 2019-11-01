@@ -15,6 +15,7 @@ use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Response\Status;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
 use Symfony\Component\Cache\Traits\RedisTrait;
@@ -66,6 +67,16 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     {
         if ($redisClient instanceof \Predis\ClientInterface && $redisClient->getConnection() instanceof ClusterInterface && !$redisClient->getConnection() instanceof PredisCluster) {
             throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, \get_class($redisClient->getConnection())));
+        }
+
+        if (\defined('Redis::OPT_COMPRESSION') && ($redisClient instanceof \Redis || $redisClient instanceof \RedisArray || $redisClient instanceof \RedisCluster)) {
+            $compression = $redisClient->getOption(\Redis::OPT_COMPRESSION);
+
+            foreach (\is_array($compression) ? $compression : [$compression] as $c) {
+                if (\Redis::COMPRESSION_NONE !== $c) {
+                    throw new InvalidArgumentException(sprintf('phpredis compression must be disabled when using "%s", use "%s" instead.', \get_class($this), DeflateMarshaller::class));
+                }
+            }
         }
 
         $this->init($redisClient, $namespace, $defaultLifetime, new TagAwareMarshaller($marshaller));

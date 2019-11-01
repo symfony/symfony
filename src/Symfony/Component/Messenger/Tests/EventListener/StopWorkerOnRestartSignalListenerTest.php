@@ -9,39 +9,38 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Worker;
+namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Tests\Fixtures\DummyWorker;
-use Symfony\Component\Messenger\Worker\StopWhenRestartSignalIsReceived;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
+use Symfony\Component\Messenger\Worker;
 
 /**
  * @group time-sensitive
  */
-class StopWhenRestartSignalIsReceivedTest extends TestCase
+class StopWorkerOnRestartSignalListenerTest extends TestCase
 {
     /**
      * @dataProvider restartTimeProvider
      */
     public function testWorkerStopsWhenMemoryLimitExceeded(?int $lastRestartTimeOffset, bool $shouldStop)
     {
-        $decoratedWorker = new DummyWorker([
-            new Envelope(new \stdClass()),
-        ]);
-
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
         $cacheItem->expects($this->once())->method('isHIt')->willReturn(true);
         $cacheItem->expects($this->once())->method('get')->willReturn(null === $lastRestartTimeOffset ? null : time() + $lastRestartTimeOffset);
         $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
 
-        $stopOnSignalWorker = new StopWhenRestartSignalIsReceived($decoratedWorker, $cachePool);
-        $stopOnSignalWorker->run();
+        $worker = $this->createMock(Worker::class);
+        $worker->expects($shouldStop ? $this->once() : $this->never())->method('stop');
+        $event = new WorkerRunningEvent($worker, false);
 
-        $this->assertSame($shouldStop, $decoratedWorker->isStopped());
+        $stopOnSignalListener = new StopWorkerOnRestartSignalListener($cachePool);
+        $stopOnSignalListener->onWorkerStarted();
+        $stopOnSignalListener->onWorkerRunning($event);
     }
 
     public function restartTimeProvider()
@@ -53,19 +52,18 @@ class StopWhenRestartSignalIsReceivedTest extends TestCase
 
     public function testWorkerDoesNotStopIfRestartNotInCache()
     {
-        $decoratedWorker = new DummyWorker([
-            new Envelope(new \stdClass()),
-        ]);
-
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
         $cacheItem->expects($this->once())->method('isHIt')->willReturn(false);
         $cacheItem->expects($this->never())->method('get');
         $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
 
-        $stopOnSignalWorker = new StopWhenRestartSignalIsReceived($decoratedWorker, $cachePool);
-        $stopOnSignalWorker->run();
+        $worker = $this->createMock(Worker::class);
+        $worker->expects($this->never())->method('stop');
+        $event = new WorkerRunningEvent($worker, false);
 
-        $this->assertFalse($decoratedWorker->isStopped());
+        $stopOnSignalListener = new StopWorkerOnRestartSignalListener($cachePool);
+        $stopOnSignalListener->onWorkerStarted();
+        $stopOnSignalListener->onWorkerRunning($event);
     }
 }

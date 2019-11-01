@@ -16,6 +16,8 @@ use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
@@ -26,10 +28,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @final
  */
-class Worker implements WorkerInterface
+class Worker
 {
     private $receivers;
     private $bus;
@@ -54,27 +57,13 @@ class Worker implements WorkerInterface
      * Valid options are:
      *  * sleep (default: 1000000): Time in microseconds to sleep after no messages are found
      */
-    public function run(array $options = [], callable $onHandledCallback = null): void
+    public function run(array $options = []): void
     {
+        $this->dispatchEvent(new WorkerStartedEvent($this));
+
         $options = array_merge([
             'sleep' => 1000000,
         ], $options);
-
-        if (\function_exists('pcntl_signal')) {
-            pcntl_signal(SIGTERM, function () {
-                $this->stop();
-            });
-        }
-
-        $onHandled = function (?Envelope $envelope) use ($onHandledCallback) {
-            if (\function_exists('pcntl_signal_dispatch')) {
-                pcntl_signal_dispatch();
-            }
-
-            if (null !== $onHandledCallback) {
-                $onHandledCallback($envelope);
-            }
-        };
 
         while (false === $this->shouldStop) {
             $envelopeHandled = false;
@@ -85,7 +74,7 @@ class Worker implements WorkerInterface
                     $envelopeHandled = true;
 
                     $this->handleMessage($envelope, $receiver, $transportName);
-                    $onHandled($envelope);
+                    $this->dispatchEvent(new WorkerRunningEvent($this, false));
 
                     if ($this->shouldStop) {
                         break 2;
@@ -101,13 +90,13 @@ class Worker implements WorkerInterface
             }
 
             if (false === $envelopeHandled) {
-                $onHandled(null);
+                $this->dispatchEvent(new WorkerRunningEvent($this, true));
 
                 usleep($options['sleep']);
             }
         }
 
-        $this->dispatchEvent(new WorkerStoppedEvent());
+        $this->dispatchEvent(new WorkerStoppedEvent($this));
     }
 
     private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName): void

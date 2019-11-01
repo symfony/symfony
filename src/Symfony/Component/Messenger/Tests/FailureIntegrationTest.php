@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
@@ -97,6 +98,7 @@ class FailureIntegrationTest extends TestCase
         ]);
         $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
         $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener($failureTransport));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
         $runWorker = function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
             $throwable = null;
@@ -107,12 +109,7 @@ class FailureIntegrationTest extends TestCase
 
             $worker = new Worker([$transportName => $transports[$transportName]], $bus, $dispatcher);
 
-            $worker->run([], function (?Envelope $envelope) use ($worker) {
-                // handle one envelope, then stop
-                if (null !== $envelope) {
-                    $worker->stop();
-                }
-            });
+            $worker->run();
 
             $dispatcher->removeListener(WorkerMessageFailedEvent::class, $failedListener);
 
@@ -208,7 +205,8 @@ class FailureIntegrationTest extends TestCase
          * Dispatch the original message again
          */
         $bus->dispatch($envelope);
-        // handle the message, but with no retries
+        // handle the failing message so it goes into the failure transport
+        $runWorker('transport1');
         $runWorker('transport1');
         // now make the handler work!
         $transport1HandlerThatFails->setShouldThrow(false);

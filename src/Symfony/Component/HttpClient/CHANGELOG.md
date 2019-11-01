@@ -15,6 +15,7 @@ CHANGELOG
  * added `TraceableHttpClient`, `HttpClientDataCollector` and `HttpClientPass` to integrate with the web profiler
  * allow enabling buffering conditionally with a Closure
  * allow option "buffer" to be a stream resource
+ * allow arbitrary values for the "json" option
 
 4.3.0
 -----

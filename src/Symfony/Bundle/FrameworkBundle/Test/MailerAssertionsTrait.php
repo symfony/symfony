@@ -40,7 +40,7 @@ trait MailerAssertionsTrait
         self::assertThat($event, new LogicalNot(new MailerConstraint\EmailIsQueued()), $message);
     }
 
-    public static function assertEmailAttachementCount(RawMessage $email, int $count, string $message = ''): void
+    public static function assertEmailAttachmentCount(RawMessage $email, int $count, string $message = ''): void
     {
         self::assertThat($email, new MimeConstraint\EmailAttachmentCount($count), $message);
     }

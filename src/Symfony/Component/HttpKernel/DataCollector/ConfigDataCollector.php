@@ -94,6 +94,13 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             $this->data['php_version'] = $matches[1];
             $this->data['php_version_extra'] = $matches[2];
         }
+
+        if (class_exists(\PackageVersions\Versions::class)) {
+            foreach (\PackageVersions\Versions::VERSIONS as $package => $version) {
+                $this->data['installed_packages'][$package] = strtok($version, '@');
+            }
+            ksort($this->data['installed_packages']);
+        }
     }
 
     /**
@@ -329,6 +336,11 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     public function getName()
     {
         return 'config';
+    }
+
+    public function getInstalledPackages()
+    {
+        return $this->data['installed_packages'];
     }
 
     /**

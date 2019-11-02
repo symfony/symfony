@@ -223,4 +223,24 @@
             </tbody>
         </table>
     {% endif %}
+
+    {% if collector.installedPackages %}
+        <h2>Installed Packages <small>({{ collector.installedPackages|length }})</small></h2>
+        <table>
+            <thead>
+            <tr>
+                <th class="key">Package</th>
+                <th>Version</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for name, version in collector.installedPackages %}
+                <tr>
+                    <th scope="row" class="font-normal">{{ name }}</th>
+                    <td class="font-normal">{{ version }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

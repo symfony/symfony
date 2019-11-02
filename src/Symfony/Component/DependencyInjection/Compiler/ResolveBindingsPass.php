@@ -171,6 +171,23 @@ class ResolveBindingsPass extends AbstractRecursivePass
                     continue;
                 }
 
+                if (count($this->searchBindingByPropertyName($bindings, $parameter->name)) !== 0) {
+                    $binding = $this->searchBindingByPropertyName($bindings, $parameter->name);
+                    //if isset argument type
+                    if (isset(explode(' ', array_key_first($binding), 2)[1])) {
+                        list($argumentType, $argumentName) = explode(' ', array_key_first($binding), 2);
+                        if ($argumentType !== $typeHint) {
+                            $msg = sprintf('Invalid constructor argument %s for service "%s": %s expected but found %s. Check your service definition.',
+                                $argumentName,
+                                $this->currentId,
+                                $argumentType,
+                                $typeHint ? $typeHint : 'mixed'
+                            );
+                            throw new InvalidArgumentException($msg);
+                        }
+                    }
+                }
+
                 if (\array_key_exists('$'.$parameter->name, $bindings)) {
                     $arguments[$key] = $this->getBindingValue($bindings['$'.$parameter->name]);
 
@@ -213,5 +230,17 @@ class ResolveBindingsPass extends AbstractRecursivePass
         unset($this->unusedBindings[$bindingId]);
 
         return $bindingValue;
+    }
+
+    /**
+     * @param array $bindings
+     * @param string $propertyName
+     * @return array
+     */
+    private function searchBindingByPropertyName(array $bindings, string $propertyName)
+    {
+        return array_filter($bindings, function ($key) use ($propertyName) {
+            return (strpos($key, $propertyName) !== false);
+        }, ARRAY_FILTER_USE_KEY);
     }
 }

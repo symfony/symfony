@@ -150,4 +150,29 @@ class ResolveBindingsPassTest extends TestCase
 
         $this->assertSame([1 => 'bar'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     */
+    public function testBindingTypeHint()
+    {
+        $container = new ContainerBuilder();
+
+        $bindings = [
+            'string $apiKey' => new BoundArgument('foo'),
+        ];
+
+        $definition = $container->register('def1', NamedArgumentsDummy::class);
+        $definition->setBindings($bindings);
+
+        $bindings = [
+            'string $c' => new BoundArgument('bar'),
+        ];
+
+        $definition = $container->register('def2', NamedArgumentsDummy::class);
+        $definition->setBindings($bindings);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+    }
 }

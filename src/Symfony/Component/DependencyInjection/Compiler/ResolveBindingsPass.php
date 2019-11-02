@@ -171,7 +171,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
                     continue;
                 }
 
-                if (count($this->searchBindingByPropertyName($bindings, $parameter->name)) !== 0) {
+                if (0 !== \count($this->searchBindingByPropertyName($bindings, $parameter->name))) {
                     $binding = $this->searchBindingByPropertyName($bindings, $parameter->name);
                     //if isset argument type
                     if (isset(explode(' ', array_key_first($binding), 2)[1])) {
@@ -232,15 +232,10 @@ class ResolveBindingsPass extends AbstractRecursivePass
         return $bindingValue;
     }
 
-    /**
-     * @param array $bindings
-     * @param string $propertyName
-     * @return array
-     */
     private function searchBindingByPropertyName(array $bindings, string $propertyName)
     {
         return array_filter($bindings, function ($key) use ($propertyName) {
-            return (strpos($key, $propertyName) !== false);
+            return false !== strpos($key, $propertyName);
         }, ARRAY_FILTER_USE_KEY);
     }
 }

@@ -10,17 +10,9 @@ return PhpCsFixer\Config::create()
         '@Symfony:risky' => true,
         '@PHPUnit75Migration:risky' => true,
         'php_unit_dedicate_assert' => ['target' => '5.6'],
-        'phpdoc_no_empty_return' => false, // triggers almost always false positive
         'array_syntax' => ['syntax' => 'short'],
         'fopen_flags' => false,
-        'ordered_imports' => true,
-        'phpdoc_trim_consecutive_blank_line_separation' => true,
-        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
         'protected_to_private' => false,
-        // Part of @Symfony:risky in PHP-CS-Fixer 2.13.0. To be removed from the config file once upgrading
-        'native_function_invocation' => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced', 'strict' => true],
-        // Part of future @Symfony ruleset in PHP-CS-Fixer To be removed from the config file once upgrading
-        'phpdoc_types_order' => ['null_adjustment' => 'always_last', 'sort_algorithm' => 'none'],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

@@ -19,7 +19,7 @@ use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
 /**
  * @group legacy
  */
-class LegacyEventDispatcherTest extends EventDispatcherTest
+class LegacyEventDispatcherProxyTest extends EventDispatcherTest
 {
     /**
      * @group legacy

@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-10-18T17:37:44Z
+
+Did you mix things up? Group „a“ is only existent in the code change but not in the example in the PR header 🤔
+Did you mean „list“ ?
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2019-10-18T18:38:11Z
+
+> Did you mean „list“ ?
+
+Yes indeed thanks I'll update
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-20T12:59:28Z
+
+Should be for 3.4?
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2019-10-20T15:19:35Z
+
+> Should be for 3.4?
+
+`MetadataAwareNameConverter` was introduced in 4.2 @nicolas-grekas (https://github.com/symfony/symfony/pull/28505)
+ref https://symfony.com/blog/new-in-symfony-4-2-simpler-custom-serialized-names
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-21T13:58:57Z
+
+> MetadataAwareNameConverter was introduced in 4.2
+
+The patch doesn't change anything related to that, but changes `AbstractObjectNormalizer`.
+It also applies to 3.4, so it would make sense to apply it to 3.4 then. That's my reasoning at least.
+Why changing the behavior as a bug fix otherwise?
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2019-11-02T09:04:45Z
+
+> The patch doesn't change anything related to that, but changes `AbstractObjectNormalizer`.
+> It also applies to 3.4, so it would make sense to apply it to 3.4 then. That's my reasoning at least.
+> Why changing the behavior as a bug fix otherwise?
+
+I've updated the patch @nicolas-grekas as I think that the real underlying issue was in the `MetadataAwareNameConverter` caching system.
+I understood that the static properties were introduced to improve performance but they are also causing this issue.

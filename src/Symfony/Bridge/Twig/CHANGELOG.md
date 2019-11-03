@@ -10,6 +10,7 @@ CHANGELOG
  * the `LintCommand` lints all the templates stored in all configured Twig paths if none argument is provided
  * deprecated accepting STDIN implicitly when using the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
  * added `--show-deprecations` option to the `lint:twig` command
+ * added support for Bootstrap4 switches, use `switch-custom` as `label_attr` in a `CheckboxType`
 
 4.3.0
 -----

@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-11T13:58:37Z
+
+I love this ... but I have two questions:
+
+* The "discoverability" is not great because you are changing the form field look and feel by setting a CSS class in the label 🤔 . Ideally we'd have a ToggleType or SwitchType form field.
+* This makes the form themes "different". Until now, the only difference between themes was their design ... but this adds a new feature that it's exclusive to Bootstrap theme.
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2019-10-11T14:34:56Z
+
+I'm seeing it as a checkbox "skin". It still behaves exactly as a checkbox, both functionality wise (for the user) and in PHP code (for the developer). So imo adding a `SwitchType` would be cumbersome, for instance it would likely require developers to modify their Form extensions and so on. I think it should stay only a presentation concern.
+
+I think the feature is not quite exclusive to Bootstrap, other framework could read that attribute and implement switches too (for instance, Foundation [took a similar approach](https://foundation.zurb.com/sites/docs/switch.html)). Indeed, right Bootstrap has a better integration such as form help (which is displayed as a normal div for Foundation), invalid form fields, etc., but we don't break any other form themes or prevent them to use it too.

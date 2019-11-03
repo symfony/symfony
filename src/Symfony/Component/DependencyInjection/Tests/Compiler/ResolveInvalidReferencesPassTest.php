@@ -161,7 +161,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         (new DecoratorServicePass())->process($container);
         (new ResolveInvalidReferencesPass())->process($container);
 
-        $this->assertSame(null, $decoratorDefinition->getArguments()[0]);
+        $this->assertNull($decoratorDefinition->getArguments()[0]);
         $this->assertEquals($unknownArgument, $decoratorDefinition->getArguments()[1]);
     }
 

@@ -94,6 +94,11 @@ class Dummy extends ParentDummy
     public $j;
 
     /**
+     * @var int[]|null
+     */
+    public $nullableCollectionOfNonNullableElements;
+
+    /**
      * @var array
      */
     private $xTotals;

@@ -47,7 +47,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.service_locator.GU08LT9' => true,
+            '.service_locator.ZZqL6HL' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
         ];

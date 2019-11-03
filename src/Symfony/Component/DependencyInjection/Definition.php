@@ -57,6 +57,13 @@ class Definition
     public $innerServiceId;
 
     /**
+     * @internal
+     *
+     * Used to store the behavior to follow when using service decoration and the decorated service is invalid
+     */
+    public $decorationOnInvalid;
+
+    /**
      * @param string|null $class     The service class
      * @param array       $arguments An array of arguments to pass to the service constructor
      */
@@ -127,19 +134,22 @@ class Definition
     /**
      * Sets the service that this service is decorating.
      *
-     * @param string|null $id        The decorated service id, use null to remove decoration
-     * @param string|null $renamedId The new decorated service id
-     * @param int         $priority  The priority of decoration
+     * @param string|null $id              The decorated service id, use null to remove decoration
+     * @param string|null $renamedId       The new decorated service id
+     * @param int         $priority        The priority of decoration
+     * @param int         $invalidBehavior The behavior to adopt when decorated is invalid
      *
      * @return $this
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    public function setDecoratedService($id, $renamedId = null, $priority = 0)
+    public function setDecoratedService($id, $renamedId = null, $priority = 0/*, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE*/)
     {
         if ($renamedId && $id === $renamedId) {
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
+
+        $invalidBehavior = 3 < \func_num_args() ? (int) func_get_arg(3) : ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
 
         $this->changes['decorated_service'] = true;
 
@@ -147,6 +157,10 @@ class Definition
             $this->decoratedService = null;
         } else {
             $this->decoratedService = [$id, $renamedId, (int) $priority];
+
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                $this->decoratedService[] = $invalidBehavior;
+            }
         }
 
         return $this;

@@ -362,10 +362,22 @@ class XmlFileLoader extends FileLoader
             $definition->setBindings($bindings);
         }
 
-        if ($value = $service->getAttribute('decorates')) {
+        if ($decorates = $service->getAttribute('decorates')) {
+            $decorationOnInvalid = $service->getAttribute('decoration-on-invalid') ?: 'exception';
+            if ('exception' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            } elseif ('ignore' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            } elseif ('null' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+            } else {
+                throw new InvalidArgumentException(sprintf('Invalid value "%s" for attribute "decoration-on-invalid" on service "%s". Did you mean "exception", "ignore" or "null" in "%s"?', $decorationOnInvalid, (string) $service->getAttribute('id'), $file));
+            }
+
             $renameId = $service->hasAttribute('decoration-inner-name') ? $service->getAttribute('decoration-inner-name') : null;
             $priority = $service->hasAttribute('decoration-priority') ? $service->getAttribute('decoration-priority') : 0;
-            $definition->setDecoratedService($value, $renameId, $priority);
+
+            $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
         return $definition;

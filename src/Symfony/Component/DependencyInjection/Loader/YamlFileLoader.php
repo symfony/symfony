@@ -58,6 +58,7 @@ class YamlFileLoader extends FileLoader
         'decorates' => 'decorates',
         'decoration_inner_name' => 'decoration_inner_name',
         'decoration_priority' => 'decoration_priority',
+        'decoration_on_invalid' => 'decoration_on_invalid',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
@@ -538,14 +539,28 @@ class YamlFileLoader extends FileLoader
             $definition->addTag($name, $tag);
         }
 
-        if (isset($service['decorates'])) {
-            if ('' !== $service['decorates'] && '@' === $service['decorates'][0]) {
-                throw new InvalidArgumentException(sprintf('The value of the "decorates" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $id, $service['decorates'], substr($service['decorates'], 1)));
+        if (null !== $decorates = $service['decorates'] ?? null) {
+            if ('' !== $decorates && '@' === $decorates[0]) {
+                throw new InvalidArgumentException(sprintf('The value of the "decorates" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $id, $service['decorates'], substr($decorates, 1)));
+            }
+
+            $decorationOnInvalid = \array_key_exists('decoration_on_invalid', $service) ? $service['decoration_on_invalid'] : 'exception';
+            if ('exception' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            } elseif ('ignore' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            } elseif (null === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+            } elseif ('null' === $decorationOnInvalid) {
+                throw new InvalidArgumentException(sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean null (without quotes) in "%s"?', $decorationOnInvalid, $id, $file));
+            } else {
+                throw new InvalidArgumentException(sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean "exception", "ignore" or null in "%s"?', $decorationOnInvalid, $id, $file));
             }
 
             $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
             $priority = isset($service['decoration_priority']) ? $service['decoration_priority'] : 0;
-            $definition->setDecoratedService($service['decorates'], $renameId, $priority);
+
+            $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
         if (isset($service['autowire'])) {

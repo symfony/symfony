@@ -236,7 +236,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param object      $object
      * @param string|null $format
-     * @param array       $context
      *
      * @return string[]
      */

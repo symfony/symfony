@@ -1,0 +1,123 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-16T14:00:52Z
+
+> Note: input elements with type="week" are not supported in Internet Explorer or Firefox.
+
+(not tested though)
+
+Also im wondering if the underlying `DateType` can be used with a format `Y-\WW[-w]` (https://en.wikipedia.org/wiki/ISO_week_date)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-19T07:26:38Z
+
+I wonder if we need to support different input formats for this form type. Right now it only supports a string that is in the same format as  the one supported by the HTML5 week input type. However, I could imagine that some developers would like to have a kind of structure like an array with a week and a year element.
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-06-19T08:14:04Z
+
+@ro0NL `DateType` doesn't like date format without `y M d`, I doubt it can be used directly, I thing the `WeekType` will be independant, more like the `TimeType`.
+
+@xabbuh I love the idea, it will behave like the `TimeType`, right?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-19T08:46:47Z
+
+@dFayet maybe compatibility with `DateType` is too far fetched, yet i tend to believe `year-weekno-weekday` is just as valid as `year-month-day` for a date. Thus we should be able to use `DateTime` as a model... yet, im not sure what PHP is doing at this point: https://3v4l.org/7BMDB
+
+---------------------------------------------------------------------------
+
+by stof at 2019-06-19T08:54:58Z
+
+If we add a form for `type=week`, I think it would make sense to also add a validator to ensure that a string contains an ISO week. this is especially important given that some browsers will fallback to a text type (which is fine by default; projects could add some JS-based picker as fallback).
+
+If we want to improve the fallback a bit, we could add a `pattern` validation (`\d{4}-W\d{2}`) on the field so that the text fallback has client-side validation too. But I'm not sure we should do it in core (it might interact badly with a JS-based picker added by projects).
+
+Anyway, I think adding a field type rendering a `<input type=week />` makes sense.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-21T18:00:34Z
+
+@dFayet Is this still work in progress or are you waiting for a review? I don't want to put pressure on you just ensure that you are not desperately waiting for a review. :)
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-07-21T18:48:15Z
+
+Your're right to ask @xabbuh :D
+
+The WIP tag might be too much as, beside the tests, and the questions added in the edit of this PR, I think this one is ready for some reviews.
+
+The subject of the DataTransformers is my main hesitation, should I write the tests now, or wait some feedback?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-22T13:22:34Z
+
+@dFayet Looking at how the updated transformers would look like, it seems to me that having new transformers would be better. We may then also reconsider the idea that the norm data should be `DateTime` objects. IMO that's not really needed and we could use an array with two elements as norm data instead as well.
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-07-30T14:30:46Z
+
+@xabbuh Here you go :-)
+
+Note: I think the failing test for depth=high, is normal, as the type does not exists in 5.0, right?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-31T12:02:17Z
+
+@dFayet Adding `$this->requiresFeatureSet(404);` to the new tests should help here.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-31T12:02:55Z
+
+and please take a look at the things fabbot.io complains about :)
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-07-31T12:32:37Z
+
+@xabbuh Tests are green now, and fabbot now just complains about a license header in a .php template. (Not added as there is none in all the others templates)
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-08-08T19:55:50Z
+
+ping @taluu
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-08-12T07:39:03Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-08-30T08:13:43Z
+
+@dFayet Thank you for working on this. I have left you a bunch of comments. But they are actually only about a few details. The overall picture looks quite good to me. 👍
+
+---------------------------------------------------------------------------
+
+by andreybolonin at 2019-10-16T16:57:47Z
+
+no chance to be merged at 4.4 ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-11-01T14:51:57Z
+
+@dFayet I have incorporated the review feedback. This looks ready to me now. Thank you for your work on this. I have kept your commit so you will still get the full credit.
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-11-01T15:34:39Z
+
+Thank to you @xabbuh but let's not forget that this is at least a 50-50 between us (+1 for you for your quick reaction)

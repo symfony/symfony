@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-21T16:18:18Z
+
+There is a force-push collision here, the changes from https://github.com/symfony/symfony/compare/8bee11a60198ecb0729b451165f3e6036911d7db..33098d2ba8f5fbea8229ff4fc64a6215e138ea5c are lost. Please recover them :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-11-01T05:21:15Z
+
+Good to go @nicolas-grekas ❓

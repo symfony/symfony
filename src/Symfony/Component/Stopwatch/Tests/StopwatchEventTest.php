@@ -152,6 +152,27 @@ class StopwatchEventTest extends TestCase
         $this->assertEqualsWithDelta(0, $event->getStartTime(), self::DELTA);
     }
 
+    public function testStartTimeWhenStartedLater()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        usleep(100000);
+        $this->assertLessThanOrEqual(0.5, $event->getStartTime());
+
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        usleep(100000);
+        $event->start();
+        $event->stop();
+        $this->assertLessThanOrEqual(101, $event->getStartTime());
+
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        usleep(100000);
+        $event->start();
+        usleep(100000);
+        $this->assertEqualsWithDelta(100, $event->getStartTime(), self::DELTA);
+        $event->stop();
+        $this->assertEqualsWithDelta(100, $event->getStartTime(), self::DELTA);
+    }
+
     public function testInvalidOriginThrowsAnException()
     {
         $this->expectException('InvalidArgumentException');

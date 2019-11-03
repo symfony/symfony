@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class SwitchUserTokenTest extends TestCase
 {
@@ -37,5 +38,39 @@ class SwitchUserTokenTest extends TestCase
         $this->assertSame('foo', $unserializedOriginalToken->getCredentials());
         $this->assertSame('provider-key', $unserializedOriginalToken->getProviderKey());
         $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
+    }
+
+    public function testSetUserDoesNotDeauthenticate()
+    {
+        $impersonated = new class() implements UserInterface {
+            public function getUsername()
+            {
+                return 'impersonated';
+            }
+
+            public function getPassword()
+            {
+                return null;
+            }
+
+            public function eraseCredentials()
+            {
+            }
+
+            public function getRoles()
+            {
+                return ['ROLE_USER'];
+            }
+
+            public function getSalt()
+            {
+                return null;
+            }
+        };
+
+        $originalToken = new UsernamePasswordToken('impersonator', 'foo', 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
+        $token = new SwitchUserToken($impersonated, 'bar', 'provider-key', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
+        $token->setUser($impersonated);
+        $this->assertTrue($token->isAuthenticated());
     }
 }

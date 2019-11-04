@@ -6,7 +6,7 @@ CHANGELOG
 
  * deprecated finding hidden commands using an abbreviation, use the full name instead
  * added `Question::setTrimmable` default to true to allow the answer to be trimmed
- * added method `preventRedrawFasterThan()` and `forceRedrawSlowerThan()` on `ProgressBar`
+ * added method `minSecondsBetweenRedraws()` and `maxSecondsBetweenRedraws()` on `ProgressBar`
  * `Application` implements `ResetInterface`
  * marked all dispatched event classes as `@final`
  * added support for displaying table horizontally

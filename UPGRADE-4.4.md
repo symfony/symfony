@@ -19,6 +19,11 @@ Debug
  * Deprecated the `FlattenException` class, use the one from the `ErrorRenderer` component instead
  * Deprecated the component in favor of the `ErrorHandler` component
 
+Config
+------
+
+ * Deprecated overriding the `FilerLoader::import()` method without declaring the optional `$exclude` argument
+
 DependencyInjection
 -------------------
 

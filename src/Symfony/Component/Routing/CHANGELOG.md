@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecated `ServiceRouterLoader` in favor of `ContainerLoader`.
  * Deprecated `ObjectRouteLoader` in favor of `ObjectLoader`.
+ * Added a way to exclude patterns of resources from being imported by the `import()` method
 
 4.3.0
 -----

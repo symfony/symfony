@@ -283,14 +283,14 @@ class CliDumper extends AbstractDumper
 
         $class = $this->utf8Encode($class);
         if (Cursor::HASH_OBJECT === $type) {
-            $prefix = $class && 'stdClass' !== $class ? $this->style('note', $class, $attr).' {' : '{';
+            $prefix = $class && 'stdClass' !== $class ? $this->style('note', $class, $attr).(empty($attr['cut_hash']) ? ' {' : '') : '{';
         } elseif (Cursor::HASH_RESOURCE === $type) {
             $prefix = $this->style('note', $class.' resource', $attr).($hasChild ? ' {' : ' ');
         } else {
             $prefix = $class && !(self::DUMP_LIGHT_ARRAY & $this->flags) ? $this->style('note', 'array:'.$class, $attr).' [' : '[';
         }
 
-        if ($cursor->softRefCount || 0 < $cursor->softRefHandle) {
+        if (($cursor->softRefCount || 0 < $cursor->softRefHandle) && empty($attr['cut_hash'])) {
             $prefix .= $this->style('ref', (Cursor::HASH_RESOURCE === $type ? '@' : '#').(0 < $cursor->softRefHandle ? $cursor->softRefHandle : $cursor->softRefTo), ['count' => $cursor->softRefCount]);
         } elseif ($cursor->hardRefTo && !$cursor->refIndex && $class) {
             $prefix .= $this->style('ref', '&'.$cursor->hardRefTo, ['count' => $cursor->hardRefCount]);
@@ -310,8 +310,11 @@ class CliDumper extends AbstractDumper
      */
     public function leaveHash(Cursor $cursor, $type, $class, $hasChild, $cut)
     {
-        $this->dumpEllipsis($cursor, $hasChild, $cut);
-        $this->line .= Cursor::HASH_OBJECT === $type ? '}' : (Cursor::HASH_RESOURCE !== $type ? ']' : ($hasChild ? '}' : ''));
+        if (empty($cursor->attr['cut_hash'])) {
+            $this->dumpEllipsis($cursor, $hasChild, $cut);
+            $this->line .= Cursor::HASH_OBJECT === $type ? '}' : (Cursor::HASH_RESOURCE !== $type ? ']' : ($hasChild ? '}' : ''));
+        }
+
         $this->endValue($cursor);
     }
 

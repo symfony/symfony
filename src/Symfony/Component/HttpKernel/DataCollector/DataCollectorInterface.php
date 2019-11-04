@@ -25,8 +25,10 @@ interface DataCollectorInterface
 {
     /**
      * Collects data for the given Request and Response.
+     *
+     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null);
+    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/);
 
     /**
      * Returns the name of the collector.

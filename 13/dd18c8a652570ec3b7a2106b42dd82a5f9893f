@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-05-24T14:06:41Z
+
+If you change `FileLoader` in the Config component, you should test the new behavior in the Config component in the first place.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-05-27T13:03:49Z
+
+Deprecations for `4.4` must be described in `UPGRADE-4.4.md` (create if it does not exist), BC breaks must be mentioned in `UPGRADE-5.0.md`. Duplicate this info in `src/Symfony/Component/Config/CHANGELOG.md`.
+
+---------------------------------------------------------------------------
+
+by tristanbes at 2019-07-31T11:45:16Z
+
+@nicolas-grekas I've just added the modifications for the `RoutingConfigurator` are the modifications correct ?
+
+Also, I didn't find any BC rules reguarding a `final` method inside a non `final` class, so i'm not sure the `$exclude` parameter should be retrieved using `fun_get_arg`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T12:20:37Z
+
+Yes, you can change a final method, no need for the func_get_arg trick
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-31T12:24:04Z
+
+> we can bc break a final function
+
+No, we can't. This is not a BC break, that's why this change is OK :)
+
+---------------------------------------------------------------------------
+
+by tristanbes at 2019-09-30T08:14:03Z
+
+@nicolas-grekas Great, thank you; I just learnt that we're 1 week away from feature freeze ;)
+
+---------------------------------------------------------------------------
+
+by tristanbes at 2019-10-10T17:22:36Z
+
+is there anything missing to get this PR merged ?
+
+---------------------------------------------------------------------------
+
+by tristanbes at 2019-10-24T11:57:48Z
+
+I solved the conflicts on the PR. @fabpot is this PR good to merge ?

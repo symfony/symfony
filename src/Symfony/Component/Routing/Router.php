@@ -369,7 +369,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             );
 
             if ($compiled) {
-                $this->generator = new $this->options['generator_class'](require $cache->getPath(), $this->context, $this->logger);
+                $this->generator = new $this->options['generator_class'](require $cache->getPath(), $this->context, $this->logger, $this->defaultLocale);
             } else {
                 if (!class_exists($this->options['generator_cache_class'], false)) {
                     require_once $cache->getPath();

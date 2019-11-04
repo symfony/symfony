@@ -85,7 +85,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'time' => $csvTime,
                 'parent' => $csvParent,
                 'status_code' => $csvStatusCode,
-                'has_dump' => $hasDump
+                'has_dump' => $hasDump,
             ];
         }
 
@@ -200,7 +200,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getTime(),
                 $profile->getParentToken(),
                 $profile->getStatusCode(),
-                $hasDump
+                $hasDump,
             ]);
             fclose($file);
         }

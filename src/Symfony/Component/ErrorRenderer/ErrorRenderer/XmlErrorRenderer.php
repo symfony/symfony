@@ -42,14 +42,16 @@ class XmlErrorRenderer implements ErrorRendererInterface
     {
         $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
         $title = $this->escapeXml($exception->getTitle());
+        if ($debug) {
+            $message = $this->escapeXml($exception->getMessage());
+        } else {
+            $message = 404 === $exception->getStatusCode() ? 'Sorry, the page you are looking for could not be found.' : 'Whoops, looks like something went wrong.';
+        }
         $statusCode = $this->escapeXml($exception->getStatusCode());
         $charset = $this->escapeXml($this->charset);
 
         $exceptions = '';
-        $message = '';
         if ($debug) {
-            $message = '<detail>'.$this->escapeXml($exception->getMessage()).'</detail>';
-
             $exceptions .= '<exceptions>';
             foreach ($exception->toArray() as $e) {
                 $exceptions .= sprintf('<exception class="%s" message="%s"><traces>', $e['class'], $this->escapeXml($e['message']));
@@ -73,7 +75,7 @@ class XmlErrorRenderer implements ErrorRendererInterface
 <problem xmlns="urn:ietf:rfc:7807">
     <title>{$title}</title>
     <status>{$statusCode}</status>
-    {$message}
+    <detail>{$message}</detail>
     {$exceptions}
 </problem>
 EOF;

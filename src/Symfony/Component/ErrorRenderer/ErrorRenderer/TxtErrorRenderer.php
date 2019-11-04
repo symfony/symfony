@@ -39,12 +39,18 @@ class TxtErrorRenderer implements ErrorRendererInterface
     public function render(FlattenException $exception): string
     {
         $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
-        $content = sprintf("[title] %s\n", $exception->getTitle());
-        $content .= sprintf("[status] %s\n", $exception->getStatusCode());
 
         if ($debug) {
-            $content .= sprintf("[detail] %s\n", $exception->getMessage());
+            $message = $exception->getMessage();
+        } else {
+            $message = 404 === $exception->getStatusCode() ? 'Sorry, the page you are looking for could not be found.' : 'Whoops, looks like something went wrong.';
+        }
 
+        $content = sprintf("[title] %s\n", $exception->getTitle());
+        $content .= sprintf("[status] %s\n", $exception->getStatusCode());
+        $content .= sprintf("[detail] %s\n", $message);
+
+        if ($debug) {
             foreach ($exception->toArray() as $i => $e) {
                 $content .= sprintf("[%d] %s: %s\n", $i + 1, $e['class'], $e['message']);
                 foreach ($e['trace'] as $trace) {

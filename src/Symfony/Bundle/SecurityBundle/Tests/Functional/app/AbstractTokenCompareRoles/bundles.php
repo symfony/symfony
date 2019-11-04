@@ -12,9 +12,11 @@
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\SecuredPageBundle;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\TestBundle;
 
 return [
     new FrameworkBundle(),
     new SecurityBundle(),
     new SecuredPageBundle(),
+    new TestBundle(),
 ];

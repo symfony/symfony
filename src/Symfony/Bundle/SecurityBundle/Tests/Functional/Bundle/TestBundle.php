@@ -9,11 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle;
+namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle;
 
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\AnnotationReaderPass;
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\Config\CustomConfig;
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection\TranslationDebugPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -24,15 +21,9 @@ class TestBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {
-        parent::build($container);
-
-        /** @var $extension DependencyInjection\TestExtension */
-        $extension = $container->getExtension('test');
-
-        $extension->setCustomConfig(new CustomConfig());
-
-        $container->addCompilerPass(new AnnotationReaderPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new TranslationDebugPass());
+        $container->setParameter('container.build_hash', 'test_bundle');
+        $container->setParameter('container.build_time', time());
+        $container->setParameter('container.build_id', 'test_bundle');
 
         $container->addCompilerPass(new class() implements CompilerPassInterface {
             public function process(ContainerBuilder $container)

@@ -35,8 +35,6 @@ interface HttpKernelInterface
      * @param bool $catch Whether to catch exceptions or not
      *
      * @return Response A Response instance
-     *
-     * @throws \Exception When an Exception occurs during processing
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
 }

@@ -112,10 +112,6 @@ class DebugHandlersListener implements EventSubscriberInterface
                             throw $e;
                         }
 
-                        if (!$e instanceof \Exception) {
-                            $e = new ErrorException($e);
-                        }
-
                         $hasRun = true;
                         $kernel->terminateWithException($e, $request);
                     };

@@ -30,6 +30,18 @@ final class KernelEvents
     const REQUEST = 'kernel.request';
 
     /**
+     * The ERROR event occurs when an uncaught error appears.
+     *
+     * This event allows you to create a response for a thrown error.
+     *
+     * If no response is created, the error is converted into an uncaught
+     * exception (@see KernelEvents::EXCEPTION).
+     *
+     * @Event("Symfony\Component\HttpKernel\Event\ErrorEvent")
+     */
+    const ERROR = 'kernel.error';
+
+    /**
      * The EXCEPTION event occurs when an uncaught exception appears.
      *
      * This event allows you to create a response for a thrown exception or

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -331,6 +334,58 @@ class HttpKernelTest extends TestCase
         $kernel->handle($request, $kernel::MASTER_REQUEST, false);
 
         Request::setTrustedProxies([], -1);
+    }
+
+    public function testHandleErrorDirectRethrow()
+    {
+        $this->expectException(\DivisionByZeroError::class);
+        $kernel = $this->getHttpKernel(new EventDispatcher(), static function (): void { throw new \DivisionByZeroError(); });
+
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+    }
+
+    public function testHandleErrorWithNoListeners()
+    {
+        $this->expectException(\DivisionByZeroError::class);
+        $kernel = $this->getHttpKernel(new EventDispatcher(), static function (): void { throw new \DivisionByZeroError(); });
+
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+    }
+
+    public function testHandleErrorWithAnErrorListenerThatSetsAResponse()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::ERROR, static function (ErrorEvent $event): void {
+            $event->setResponse(new Response('from error'));
+        });
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (ExceptionEvent $event): void {
+            $this->fail('This listener should not be called');
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, static function (): void { throw new \DivisionByZeroError(); });
+        $response = $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+
+        $this->assertSame('from error', $response->getContent());
+    }
+
+    public function testHandleErrorWithAnErrorListenerThatDontSetAResponse()
+    {
+        $dispatcher = new EventDispatcher();
+        $errorListenerWasCalled = false;
+        $dispatcher->addListener(KernelEvents::ERROR, static function () use (&$errorListenerWasCalled): void {
+            $errorListenerWasCalled = true;
+        });
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (ExceptionEvent $event): void {
+            $this->assertInstanceOf(ErrorException::class, $event->getException());
+
+            $event->setResponse(new Response('from exception'));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, static function (): void { throw new \DivisionByZeroError(); });
+        $response = $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+
+        $this->assertTrue($errorListenerWasCalled);
+        $this->assertSame('from exception', $response->getContent());
     }
 
     private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = [])

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -66,7 +68,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         try {
             return $this->handleRaw($request, $type);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if ($e instanceof RequestExceptionInterface) {
                 $e = new BadRequestHttpException($e->getMessage(), $e);
             }
@@ -198,24 +200,35 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
     /**
      * Handles a throwable by trying to convert it to a Response.
-     *
-     * @throws \Exception
      */
     private function handleThrowable(\Throwable $e, Request $request, int $type): Response
     {
-        $event = new ExceptionEvent($this, $request, $type, $e);
-        $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+        if ($e instanceof \Error) {
+            $event = new ErrorEvent($this, $request, $type, $e);
+            $this->dispatcher->dispatch($event, KernelEvents::ERROR);
 
-        // a listener might have replaced the exception
-        $e = $event->getException();
-
-        if (!$event->hasResponse()) {
-            $this->finishRequest($request, $type);
-
-            throw $e;
+            if (!$event->hasResponse()) {
+                $e = new ErrorException($error = $e);
+            } else {
+                $response = $event->getResponse();
+            }
         }
 
-        $response = $event->getResponse();
+        if (!isset($response)) {
+            $event = new ExceptionEvent($this, $request, $type, $e);
+            $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+
+            // a listener might have replaced the exception
+            $e = $event->getException();
+
+            if (!$event->hasResponse()) {
+                $this->finishRequest($request, $type);
+
+                throw $error ?? $e;
+            }
+
+            $response = $event->getResponse();
+        }
 
         // the developer asked for a specific status code
         if (!$event->isAllowingCustomResponseCode() && !$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {

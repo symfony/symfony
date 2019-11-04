@@ -21,6 +21,7 @@ CHANGELOG
  * Marked the `RouterDataCollector::collect()` method as `@final`.
  * The `DataCollectorInterface::collect()` and `Profiler::collect()` methods third parameter signature
    will be `\Throwable $exception = null` instead of `\Exception $exception = null` in Symfony 5.0.
+ * Added the `kernel.error` event to handle uncaught `\Error`.
 
 4.3.0
 -----

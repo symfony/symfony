@@ -23,6 +23,7 @@ CHANGELOG
  * [BC BREAK] Removed `StopWhenRestartSignalIsReceived` in favor of `StopWorkerOnRestartSignalListener`.
  * The component is not marked as `@experimental` anymore.
  * Marked the `MessengerDataCollector` class as `@final`.
+ * Added support for `DelayStamp` to the `redis` transport.
 
 4.3.0
 -----

@@ -38,6 +38,7 @@ class Connection
 
     private $connection;
     private $stream;
+    private $queue;
     private $group;
     private $consumer;
     private $autoSetup;
@@ -65,6 +66,7 @@ class Connection
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];
         $this->group = $configuration['group'] ?? self::DEFAULT_OPTIONS['group'];
         $this->consumer = $configuration['consumer'] ?? self::DEFAULT_OPTIONS['consumer'];
+        $this->queue = $this->stream.'__queue';
         $this->autoSetup = $configuration['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup'];
         $this->maxEntries = $configuration['stream_max_entries'] ?? self::DEFAULT_OPTIONS['stream_max_entries'];
     }
@@ -123,6 +125,34 @@ class Connection
     {
         if ($this->autoSetup) {
             $this->setup();
+        }
+
+        try {
+            $queuedMessageCount = $this->connection->zcount($this->queue, 0, $this->getCurrentTimeInMilliseconds());
+        } catch (\RedisException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if ($queuedMessageCount) {
+            for ($i = 0; $i < $queuedMessageCount; ++$i) {
+                try {
+                    $queuedMessages = $this->connection->zpopmin($this->queue, 1);
+                } catch (\RedisException $e) {
+                    throw new TransportException($e->getMessage(), 0, $e);
+                }
+
+                foreach ($queuedMessages as $queuedMessage => $time) {
+                    $queuedMessage = json_decode($queuedMessage, true);
+                    // if a futured placed message is actually popped because of a race condition with
+                    // another running message consumer, the message is readded to the queue by add function
+                    // else its just added stream and will be available for all stream consumers
+                    $this->add(
+                        $queuedMessage['body'],
+                        $queuedMessage['headers'],
+                        $time - $this->getCurrentTimeInMilliseconds()
+                    );
+                }
+            }
         }
 
         $messageId = '>'; // will receive new messages
@@ -203,24 +233,40 @@ class Connection
         }
     }
 
-    public function add(string $body, array $headers): void
+    public function add(string $body, array $headers, int $delayInMs = 0): void
     {
         if ($this->autoSetup) {
             $this->setup();
         }
 
         try {
-            if ($this->maxEntries) {
-                $added = $this->connection->xadd($this->stream, '*', ['message' => json_encode(
-                    ['body' => $body, 'headers' => $headers]
-                )], $this->maxEntries, true);
+            if ($delayInMs > 0) { // the delay could be smaller 0 in a queued message
+                $message = json_encode([
+                    'body' => $body,
+                    'headers' => $headers,
+                    // Entry need to be unique in the sorted set else it would only be added once to the delayed messages queue
+                    'uniqid' => uniqid('', true),
+                ]);
+
+                $score = (int) ($this->getCurrentTimeInMilliseconds() + $delayInMs);
+                $added = $this->connection->zadd($this->queue, ['NX'], $score, $message);
             } else {
-                $added = $this->connection->xadd($this->stream, '*', ['message' => json_encode(
-                    ['body' => $body, 'headers' => $headers]
-                )]);
+                $message = json_encode([
+                    'body' => $body,
+                    'headers' => $headers,
+                ]);
+
+                if ($this->maxEntries) {
+                    $added = $this->connection->xadd($this->stream, '*', ['message' => $message], $this->maxEntries, true);
+                } else {
+                    $added = $this->connection->xadd($this->stream, '*', ['message' => $message]);
+                }
             }
         } catch (\RedisException $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
+            if ($error = $this->connection->getLastError() ?: null) {
+                $this->connection->clearLastError();
+            }
+            throw new TransportException($error ?? $e->getMessage(), 0, $e);
         }
 
         if (!$added) {
@@ -245,5 +291,16 @@ class Connection
         }
 
         $this->autoSetup = false;
+    }
+
+    private function getCurrentTimeInMilliseconds(): int
+    {
+        return (int) (microtime(true) * 1000);
+    }
+
+    public function cleanup(): void
+    {
+        $this->connection->del($this->stream);
+        $this->connection->del($this->queue);
     }
 }

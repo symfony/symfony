@@ -1,0 +1,181 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-27T09:45:53Z
+
+We considered these min/max names while working on this and decided they were more confusing than what we have now.
+I have a really hard time understanding what "max" and "min" led to, in term of behavior.
+While the current name make it crystal clear.
+
+-0 on my side.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-27T09:56:16Z
+
+I have a mix feeling about this. I don't find the current name very clear, but I'm not sure the proposed one are way better.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-09-28T10:11:08Z
+
+what about the actual property names? `min/maxSecondsBetweenRedraws`
+
+that seems more clear compared to `preventRedrawFasterThan/forceRedrawSlowerThan`, as it conveys the technical behavior.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-28T10:30:28Z
+
+Actually, talking about "frames per second" or "refresh rate" is much more common than "frame duration" or "refresh interval". So, why don't we rename these methods as one of the following alternatives?
+
+```php
+$progressBar->setRedrawFrequency(100);
+$progressBar->minRefreshesPerSecond(5);
+$progressBar->maxRefreshesPerSecond(10);
+
+$progressBar->setRedrawFrequency(100);
+$progressBar->minUpdatesPerSecond(5);
+$progressBar->maxUpdatesPerSecond(10);
+
+$progressBar->setRedrawFrequency(100);
+$progressBar->minRedrawsPerSecond(5);
+$progressBar->maxRedrawsPerSecond(10);
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-30T10:23:34Z
+
+My opinion: maxRefreshInterval/minRefreshInterval are better :)
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2019-09-30T11:24:41Z
+
+I'm in for `minRedrawsPerSecond` and `maxRedrawsPerSecond`, and I'd also remove `setRedrawFrequency` for `setRedrawsPerSecond`.
+
+If no consensus can be found, `minRedrawInterval` and `maxRedrawInterval` are nice too.
+
+And I give a lower score to `maxRefreshInterval/minRefreshInterval`, but it's still a good idea. It's just that "refresh" doesn't really exposes the real behavior in the end. Questions like: "what does a refresh do?" "it redraws the screen", "well, call it redraw then". To me, `refresh` is like `service` or `manager`: it's not clear enough, even if people with a lot of experience instantly understand it.
+
+---------------------------------------------------------------------------
+
+by jaikdean at 2019-09-30T11:27:52Z
+
+`minRedrawsPerSecond`/`maxRedrawsPerSecond` are the easiest to understand for me. I expect this to vary a lot between people depending on how they picture the concept in their head, and probably their native language(s).
+
+I can decipher them, but `maxRefreshInterval(0.1)` and `minRefreshInterval(0.2)` are inherently confusing to me. My first thought is “why is the max lower than the min?”. The method names feel the wrong way round, as they're mixing concepts of FPS vs frame duration.
+
+---------------------------------------------------------------------------
+
+by andrewmy at 2019-09-30T11:32:57Z
+
+First I'd like to note that `frequency` means _a number of times per some time interval_. E.g. a frequency of 100 Hz means 100 times per second.
+
+To denote _a number of iterations between actions_ I'd choose `regularity`.
+
+Now that the word _frequency_ is freed, we can use it to answer the question asked initially:
+```php
+$progressBar->setRedrawRegularity(100);
+$progressBar->minRedrawFrequency(5);
+$progressBar->maxRedrawFrequency(10);
+```
+
+If we choose to stick to time units rather than frequency, I support min/maxRedrawInterval but not inverting the meaning.
+
+```php
+// interval cannot be less than 0.1s => max freq of 10 Hz
+$progressBar->minRedrawInterval(0.1);
+
+// interval cannot be more than 0.2s => min freq of 5 Hz
+$progressBar->maxRedrawInterval(0.2);
+```
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2019-09-30T11:46:31Z
+
+Starting the methods with just `min` and `max` feels a bit weird to me. From just the name, it's unclear if it's a setter or a getter or something else entirely (the original names didn't have this issue, though). Wouldn't it make more sense to use a `setMin` and `setMax` instead?
+
+```
+$progressBar->setRedrawFrequency(100);
+$progressBar->setMaxRefreshInterval(0.1);
+$progressBar->setMinRefreshInterval(0.2);
+```
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-09-30T12:16:22Z
+
+Another proposition:
+```php
+public function setRedrawInterval(float $minPerSec, float $maxPerSec = 0.1);
+```
+
+---------------------------------------------------------------------------
+
+by cjunge-work at 2019-09-30T22:49:09Z
+
+I think @andrewmy's comment is important:
+> First I'd like to note that frequency means a number of times per some time interval. E.g. a frequency of 100 Hz means 100 times per second.
+
+Frequency in the current usage is misleading. As the top description says, `100` is the number of iterations, which is not the definition of frequency. I'm not sold on `regularity` though, seems a bit vague IMHO. Using frequency to define the redraw makes sense too.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-02T09:52:10Z
+
+Don't get mad at me 🙈 but ... now I'm the one who doesn't like my original proposal. `maxRefreshInterval(0.1)` may be easier to understand than `preventRedrawFasterThan(0.1)` ... but still requires to be explained (what's `0.1`? What's an "interval"?).
+
+The only proposal that I find self-explanatory is this one:
+
+```php
+$progressBar->minRedrawsPerSecond(5);
+$progressBar->maxRedrawsPerSecond(10);
+```
+
+Also, we already have a `setRedrawFrequency()` method, so "redraw" is a common word in this context. What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-02T09:56:27Z
+
+The existing method that contains the word "frequency" accepts... an interval as argument.
+
+I'm formally :-1: to use that term if that can help move forward :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-02T10:00:17Z
+
+@javiereguiluz please update the PR then... :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-03T11:18:22Z
+
+@ostrolucky could you please help me with the tests? I'm having lots of problems trying to understand how things work.
+
+This code for example is easy to understand:
+
+```php
+$bar = new ProgressBar($output = $this->getOutputStream(), 100);
+$bar->setRedrawFrequency(1);
+$bar->minRedrawsPerSecond(5);
+$bar->maxRedrawsPerSecond(10);
+// ...
+sleep(1);
+```
+
+The code sleeps for 1 second ... so we should have at least 5 redraws. Sadly, this is not how things work at all at the moment. Thanks for your help!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-10-03T11:37:06Z
+
+Naming things is hard 😓  So, after talking with Nicolas, I've renamed this again following his suggestion (I think that the new name is equally self-explanatory, but even easier to understand and avoids problems like the division by zero):
+
+```php
+minSecondsBetweenRedraws(float $seconds)
+maxSecondsBetweenRedraws(float $seconds)
+```

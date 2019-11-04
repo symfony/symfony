@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-31T03:12:30Z
+
+(Travis dep=high failure is normal)
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2019-10-31T09:49:24Z
+
+I disagree here, exceptions messages are never meant for the end user, even for non-500. I have lots of code that throws NotFound/AccessDenied exceptions with messages that are meant for logs/debug and not for the end user.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-31T09:51:04Z
+
+There is only one way here: in non-debug mode, do the same as 4.x did before the introduction of  the new components.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2019-10-31T09:56:42Z
+
+One example where it could leak sensitive data is when using the `Security` annotation from the `SensioFrameworkExtraBundle`, the error message contains the expression that denied access while the error is a 403.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-10-31T10:03:39Z
+
+I think we should make this configurable. By default, the exception messages would not be shown. Let people configure which exception classes / status codes are allowed to show the message. This is one of the few really useful features of the fos rest bundle and it should be part of the core IMO, see `fos_rest.exception.messages` config
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-10-31T12:33:10Z
+
+PR Updated according to comments.
+
+I like the @Tobion's idea of somehow returning the real message for specific friendly exceptions, e.g. validation errors related to the request, etc. Let's create a dedicated issue to discuss it. Thanks!

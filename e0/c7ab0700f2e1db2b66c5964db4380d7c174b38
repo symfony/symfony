@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-11-04T14:06:33Z
+
+Why making *3* retries when HTTP/2 fails ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-04T15:11:32Z
+
+> Why making 3 retries when HTTP/2 fails ?
+
+updated to 2: the first on HTTP/2, the last at HTTP/1.1

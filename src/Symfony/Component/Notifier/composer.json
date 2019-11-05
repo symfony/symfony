@@ -18,6 +18,9 @@
     "require": {
         "php": "^7.2.9"
     },
+    "conflict": {
+        "symfony/http-kernel": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\": "" },
         "exclude-from-classmap": [

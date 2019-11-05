@@ -33,7 +33,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -59,7 +59,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         if (null === $this->tokenStorage) {
             $this->data = [

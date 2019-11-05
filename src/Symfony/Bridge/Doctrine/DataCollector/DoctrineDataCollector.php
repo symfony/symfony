@@ -52,10 +52,8 @@ class DoctrineDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
-     *
-     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $queries = [];
         foreach ($this->loggers as $name => $logger) {

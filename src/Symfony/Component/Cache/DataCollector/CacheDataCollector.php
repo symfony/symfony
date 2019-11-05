@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class CacheDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -39,7 +39,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $empty = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];

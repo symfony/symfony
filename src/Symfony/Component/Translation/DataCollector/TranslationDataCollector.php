@@ -20,7 +20,7 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class TranslationDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -47,7 +47,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data['locale'] = $this->translator->getLocale();
         $this->data['fallback_locales'] = $this->translator->getFallbackLocales();

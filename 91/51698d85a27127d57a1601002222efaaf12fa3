@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-10-27T08:16:24Z
+
+Thank you for your contribution. Can you also add the translations for ids between 79 and 94?
+
+---------------------------------------------------------------------------
+
+by Tamarpe at 2019-10-27T13:23:08Z
+
+> Thank you for your contribution. Can you also add the translations for ids between 79 and 94?
+
+Done! the pull request is updated.
+
+---------------------------------------------------------------------------
+
+by Tamarpe at 2019-11-05T21:33:33Z
+
+Fixed- https://github.com/symfony/symfony/pull/34135/commits/a104eab760fd90f3a22be952c8c2edcabf07b719

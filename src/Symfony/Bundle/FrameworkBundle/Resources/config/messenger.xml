@@ -98,6 +98,7 @@
             <argument /> <!-- max delay ms -->
         </service>
 
+        <!-- worker event listeners -->
         <service id="messenger.retry.send_failed_message_for_retry_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="messenger" />
@@ -106,12 +107,26 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <!-- failed handling -->
         <service id="messenger.failure.send_failed_message_to_failure_transport_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="messenger" />
             <argument /> <!-- Failure transport -->
             <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="messenger.listener.dispatch_pcntl_signal_listener" class="Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="messenger.listener.stop_worker_on_restart_signal_listener" class="Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="messenger" />
+            <argument type="service" id="cache.messenger.restart_workers_signal" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="messenger.listener.stop_worker_on_sigterm_signal_listener" class="Symfony\Component\Messenger\EventListener\StopWorkerOnSigtermSignalListener">
+            <tag name="kernel.event_subscriber" />
         </service>
 
         <!-- routable message bus -->

@@ -14,21 +14,31 @@ namespace Symfony\Component\Messenger\Event;
 use Symfony\Component\Messenger\Worker;
 
 /**
- * Dispatched when a worker has been stopped.
+ * Dispatched after the worker processed a message or didn't receive a message at all.
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
-final class WorkerStoppedEvent
+final class WorkerRunningEvent
 {
     private $worker;
+    private $isWorkerIdle;
 
-    public function __construct(Worker $worker)
+    public function __construct(Worker $worker, bool $isWorkerIdle)
     {
         $this->worker = $worker;
+        $this->isWorkerIdle = $isWorkerIdle;
     }
 
     public function getWorker(): Worker
     {
         return $this->worker;
+    }
+
+    /**
+     * Returns true when no message has been received by the worker.
+     */
+    public function isWorkerIdle(): bool
+    {
+        return $this->isWorkerIdle;
     }
 }

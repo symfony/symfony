@@ -168,13 +168,17 @@ Lock
 Messenger
 ---------
 
- * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
-   pass a `RoutableMessageBus`  instance instead.
  * [BC BREAK] Removed `SendersLocatorInterface::getSenderByAlias` added in 4.3.
  * [BC BREAK] Removed `$retryStrategies` argument from `Worker::__construct`.
- * [BC BREAK] Removed `$retryStrategyLocator` argument from `ConsumeMessagesCommand::__construct`.
+ * [BC BREAK] Changed arguments of `ConsumeMessagesCommand::__construct`.
  * [BC BREAK] Removed `$senderClassOrAlias` argument from `RedeliveryStamp::__construct`.
  * [BC BREAK] Removed `UnknownSenderException`.
+ * [BC BREAK] Removed `WorkerInterface`.
+ * [BC BREAK] Removed `$onHandledCallback` of `Worker::run(array $options = [], callable $onHandledCallback = null)`.
+ * [BC BREAK] Removed `StopWhenMemoryUsageIsExceededWorker` in favor of `StopWorkerOnMemoryLimitListener`.
+ * [BC BREAK] Removed `StopWhenMessageCountIsExceededWorker` in favor of `StopWorkerOnMessageLimitListener`.
+ * [BC BREAK] Removed `StopWhenTimeLimitIsReachedWorker` in favor of `StopWorkerOnTimeLimitListener`.
+ * [BC BREAK] Removed `StopWhenRestartSignalIsReceived` in favor of `StopWorkerOnRestartSignalListener`.
  * Marked the `MessengerDataCollector` class as `@final`.
 
 Mime

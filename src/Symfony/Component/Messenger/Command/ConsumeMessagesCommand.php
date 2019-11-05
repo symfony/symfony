@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Command;
 
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -23,13 +22,12 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Worker;
-use Symfony\Component\Messenger\Worker\StopWhenMemoryUsageIsExceededWorker;
-use Symfony\Component\Messenger\Worker\StopWhenMessageCountIsExceededWorker;
-use Symfony\Component\Messenger\Worker\StopWhenRestartSignalIsReceived;
-use Symfony\Component\Messenger\Worker\StopWhenTimeLimitIsReachedWorker;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -43,25 +41,17 @@ class ConsumeMessagesCommand extends Command
     private $logger;
     private $receiverNames;
     private $eventDispatcher;
-    /** @var CacheItemPoolInterface|null */
-    private $restartSignalCachePool;
 
     /**
      * @param RoutableMessageBus $routableBus
      */
-    public function __construct($routableBus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], /* EventDispatcherInterface */ $eventDispatcher = null)
+    public function __construct($routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [])
     {
         if ($routableBus instanceof ContainerInterface) {
             @trigger_error(sprintf('Passing a "%s" instance as first argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance instead.', ContainerInterface::class, __METHOD__, RoutableMessageBus::class), E_USER_DEPRECATED);
             $routableBus = new RoutableMessageBus($routableBus);
         } elseif (!$routableBus instanceof RoutableMessageBus) {
             throw new \TypeError(sprintf('The first argument must be an instance of "%s".', RoutableMessageBus::class));
-        }
-
-        if (null !== $eventDispatcher && !$eventDispatcher instanceof EventDispatcherInterface) {
-            @trigger_error(sprintf('The 5th argument of the class "%s" should be a "%s"', __CLASS__, EventDispatcherInterface::class), E_USER_DEPRECATED);
-
-            $eventDispatcher = null;
         }
 
         $this->routableBus = $routableBus;
@@ -71,11 +61,6 @@ class ConsumeMessagesCommand extends Command
         $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
-    }
-
-    public function setCachePoolForRestartSignal(CacheItemPoolInterface $restartSignalCachePool)
-    {
-        $this->restartSignalCachePool = $restartSignalCachePool;
     }
 
     /**
@@ -177,29 +162,23 @@ EOF
             $receivers[$receiverName] = $this->receiverLocator->get($receiverName);
         }
 
-        $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
-
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
         $stopsWhen = [];
         if ($limit = $input->getOption('limit')) {
             $stopsWhen[] = "processed {$limit} messages";
-            $worker = new StopWhenMessageCountIsExceededWorker($worker, $limit, $this->logger);
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener($limit, $this->logger));
         }
 
         if ($memoryLimit = $input->getOption('memory-limit')) {
             $stopsWhen[] = "exceeded {$memoryLimit} of memory";
-            $worker = new StopWhenMemoryUsageIsExceededWorker($worker, $this->convertToBytes($memoryLimit), $this->logger);
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger));
         }
 
         if ($timeLimit = $input->getOption('time-limit')) {
             $stopsWhen[] = "been running for {$timeLimit}s";
-            $worker = new StopWhenTimeLimitIsReachedWorker($worker, $timeLimit, $this->logger);
+            $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
         }
 
-        if (null !== $this->restartSignalCachePool) {
-            $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
-            $worker = new StopWhenRestartSignalIsReceived($worker, $this->restartSignalCachePool, $this->logger);
-        }
+        $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
         $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 0 ? 's' : '', implode(', ', $receiverNames)));
@@ -216,6 +195,9 @@ EOF
             $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
         }
 
+        $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
+
+        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
         $worker->run([
             'sleep' => $input->getOption('sleep') * 1000000,
         ]);

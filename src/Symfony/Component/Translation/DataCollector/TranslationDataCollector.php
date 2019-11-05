@@ -19,6 +19,8 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class TranslationDataCollector extends DataCollector implements LateDataCollectorInterface
 {

@@ -75,7 +75,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 throw $e;
             }
 
-            return $this->handleException($e, $request, $type);
+            return $this->handleThrowable($e, $request, $type);
         }
     }
 
@@ -90,13 +90,13 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * @internal
      */
-    public function terminateWithException(\Exception $exception, Request $request = null)
+    public function terminateWithException(\Throwable $exception, Request $request = null)
     {
         if (!$request = $request ?: $this->requestStack->getMasterRequest()) {
             throw $exception;
         }
 
-        $response = $this->handleException($exception, $request, self::MASTER_REQUEST);
+        $response = $this->handleThrowable($exception, $request, self::MASTER_REQUEST);
 
         $response->sendHeaders();
         $response->sendContent();
@@ -196,11 +196,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Handles an exception by trying to convert it to a Response.
+     * Handles a throwable by trying to convert it to a Response.
      *
      * @throws \Exception
      */
-    private function handleException(\Exception $e, Request $request, int $type): Response
+    private function handleThrowable(\Throwable $e, Request $request, int $type): Response
     {
         $event = new ExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);

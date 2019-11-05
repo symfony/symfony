@@ -121,13 +121,10 @@ class Application implements ResetInterface
         }
 
         $renderException = function (\Throwable $e) use ($output) {
-            if (!$e instanceof \Exception) {
-                $e = class_exists(ErrorException::class) ? new ErrorException($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
-            }
             if ($output instanceof ConsoleOutputInterface) {
-                $this->renderException($e, $output->getErrorOutput());
+                $this->renderThrowable($e, $output->getErrorOutput());
             } else {
-                $this->renderException($e, $output);
+                $this->renderThrowable($e, $output);
             }
         };
         if ($phpHandler = set_exception_handler($renderException)) {
@@ -763,20 +760,77 @@ class Application implements ResetInterface
 
     /**
      * Renders a caught exception.
+     *
+     * @deprecated since Symfony 4.4, use "renderThrowable()" instead
      */
     public function renderException(\Exception $e, OutputInterface $output)
     {
+        @trigger_error(sprintf('The "%s::renderException()" method is deprecated since Symfony 4.4, use "renderThrowable()" instead.', __CLASS__), E_USER_DEPRECATED);
+
         $output->writeln('', OutputInterface::VERBOSITY_QUIET);
 
         $this->doRenderException($e, $output);
 
+        $this->finishRenderThrowableOrException($output);
+    }
+
+    public function renderThrowable(\Throwable $e, OutputInterface $output): void
+    {
+        if (__CLASS__ !== \get_class($this) && __CLASS__ === (new \ReflectionMethod($this, 'renderThrowable'))->getDeclaringClass()->getName() && __CLASS__ !== (new \ReflectionMethod($this, 'renderException'))->getDeclaringClass()->getName()) {
+            @trigger_error(sprintf('The "%s::renderException()" method is deprecated since Symfony 4.4, use "renderThrowable()" instead.', __CLASS__), E_USER_DEPRECATED);
+
+            if (!$e instanceof \Exception) {
+                $e = class_exists(ErrorException::class) ? new ErrorException($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+            }
+
+            $this->renderException($e, $output);
+
+            return;
+        }
+
+        $output->writeln('', OutputInterface::VERBOSITY_QUIET);
+
+        $this->doRenderThrowable($e, $output);
+
+        $this->finishRenderThrowableOrException($output);
+    }
+
+    private function finishRenderThrowableOrException(OutputInterface $output): void
+    {
         if (null !== $this->runningCommand) {
             $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
             $output->writeln('', OutputInterface::VERBOSITY_QUIET);
         }
     }
 
+    /**
+     * @deprecated since Symfony 4.4, use "doRenderThrowable()" instead
+     */
     protected function doRenderException(\Exception $e, OutputInterface $output)
+    {
+        @trigger_error(sprintf('The "%s::doRenderException()" method is deprecated since Symfony 4.4, use "doRenderThrowable()" instead.', __CLASS__), E_USER_DEPRECATED);
+
+        $this->doActuallyRenderThrowable($e, $output);
+    }
+
+    protected function doRenderThrowable(\Throwable $e, OutputInterface $output): void
+    {
+        if (__CLASS__ !== \get_class($this) && __CLASS__ === (new \ReflectionMethod($this, 'doRenderThrowable'))->getDeclaringClass()->getName() && __CLASS__ !== (new \ReflectionMethod($this, 'doRenderException'))->getDeclaringClass()->getName()) {
+            @trigger_error(sprintf('The "%s::doRenderException()" method is deprecated since Symfony 4.4, use "doRenderThrowable()" instead.', __CLASS__), E_USER_DEPRECATED);
+
+            if (!$e instanceof \Exception) {
+                $e = class_exists(ErrorException::class) ? new ErrorException($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+            }
+
+            $this->doRenderException($e, $output);
+
+            return;
+        }
+
+        $this->doActuallyRenderThrowable($e, $output);
+    }
+
+    private function doActuallyRenderThrowable(\Throwable $e, OutputInterface $output): void
     {
         do {
             $message = trim($e->getMessage());

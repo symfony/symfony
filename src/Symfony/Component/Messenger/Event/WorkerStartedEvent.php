@@ -14,11 +14,11 @@ namespace Symfony\Component\Messenger\Event;
 use Symfony\Component\Messenger\Worker;
 
 /**
- * Dispatched when a worker has been stopped.
+ * Dispatched when a worker has been started.
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
-final class WorkerStoppedEvent
+final class WorkerStartedEvent
 {
     private $worker;
 

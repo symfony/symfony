@@ -40,6 +40,7 @@ CHANGELOG
  * [BC Break] The `framework.messenger.routing.senders` config key is not deep merged anymore.
  * Added `secrets:*` commands and `%env(secret:...)%` processor to deal with secrets seamlessly.
  * Made `framework.session.handler_id` accept a DSN
+ * Marked the `RouterDataCollector` class as `@final`.
 
 4.3.0
 -----

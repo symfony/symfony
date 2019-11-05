@@ -25,6 +25,8 @@ CHANGELOG
  * marked all dispatched event classes as `@final`
  * added support for displaying table horizontally
  * deprecated returning `null` from `Command::execute()`, return `0` instead
+ * Deprecated the `Application::renderException()` and `Application::doRenderException()` methods,
+   use `renderThrowable()` and `doRenderThrowable()` instead.
 
 4.3.0
 -----

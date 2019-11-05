@@ -276,7 +276,7 @@ class MessengerPass implements CompilerPassInterface
                 $consumeCommandDefinition->replaceArgument(0, new Reference('messenger.routable_message_bus'));
             }
 
-            $consumeCommandDefinition->replaceArgument(3, array_values($receiverNames));
+            $consumeCommandDefinition->replaceArgument(4, array_values($receiverNames));
         }
 
         if ($container->hasDefinition('console.command.messenger_setup_transports')) {

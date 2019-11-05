@@ -32,6 +32,8 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
 {

@@ -33,6 +33,8 @@ class RouterDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @final since Symfony 4.4
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {

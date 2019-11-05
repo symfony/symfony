@@ -1,0 +1,130 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-10-11T14:14:32Z
+
+The other PRs have been merged. We should try to finish this one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-30T13:38:46Z
+
+I'm am :-1: to make `KernelInterface::handle()` catch `Error` and reinject them into the exception handling lifecycle.
+
+`Error` were made distinct from `Exception` *because* they must be handled differently.
+We could consider a separate event for them if we really want to make them catchable, but this would need a real-world use case before. I.e. we should not do it "because we think it's better" but "because it improves this use case".
+
+I don't have any issue with broadening the type to `Throwable` on methods that accept only `Exception` right now. My :-1: above is about `catch (\Throwable $e)` only.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-10-30T23:14:57Z
+
+ > Error were made distinct from Exception because they must be handled differently.
+
+Error was different from Exception in PHP to not create a BC break, not because they __must__ be handled differently.
+
+My reasoning for catching Throwable in the Kernel: The catching of exceptions and triggering of error events are for allowing people to modify the exception and return an error response as they see fit. At the end it does not matter here if it's an exception or error. There is an error condition and the kernel triggers event for developers to handle those errors. Esp. with newer PHP versions converting more and more errors (`E_*`) into `\Error` exceptions and the new SF ErrorRenderer being able to handle Throwable, I don't see why we should limit the Kernel events to \Exceptions. To me that is just due to historical reasons as Throwable didn't exist back when the Kernel events have been added.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-10-30T23:51:57Z
+
+> We could consider a separate event for them if we really want to make them catchable
+
+As far as I understand, \Error already triggers the exception event but transformed to an \ErrorException and a different code path: https://github.com/symfony/symfony/blob/aea43b27b0ae90fe86092ae7affff927d5fdcbe8/src/Symfony/Component/HttpKernel/EventListener/DebugHandlersListener.php#L120
+
+So for users of symfony there is not much of a difference between catching Exception or Throwable in the Kernel. It's just cleaner to have a single approach and we wouldn't need DebugHandlersListener for this anymore.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-10-31T22:20:39Z
+
+For the record: We've had that discussion about if we should catch errors in the kernel some time ago in #26514.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-04T16:21:46Z
+
+@Tobion
+
+> What's the point of this all these changes if ExceptionEvent cannot accept Throwable?
+> \Throwable in getException() on master directly would be a BC break
+
+There is no smooth path here: suddenly returning a throwable would still break call points that use the return value and inject it in a call that only accepts `Exception`.
+
+So, the point here is opening as many signatures to Throwable without changing the behavior.
+Then we should introduce a new `ErrorEvent` that will live next to `ExceptionEvent` - dedicated to instances of `Error`.
+That will fix all FC/BC issues we have here while allowing a separation that is needed.
+When this `ErrorEvent` is not handled, it should be re-dispatched as `ExceptionEvent` after being decorated as an `ErrorException`, for fallback.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-11-04T16:25:25Z
+
+Please reconsider this. Don't make it that complicated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-04T16:27:32Z
+
+> Please reconsider this. Don't make it that complicated.
+
+WDYM? I'm not making it complicated for fun. The way you drafted together before is not compatible with our deprecation policy.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-11-04T16:31:05Z
+
+I don't see the problem returning throwable in master. The event is final so extendability is not a problem. And chaning the return type is a simple bc break as any other BC break in master. If people can only handle exception, they can wrap the Throwable in ErrorException manually. No need to build a whole new set of events and fallbacks etc for this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-04T16:35:59Z
+
+> chaning the return type is a simple bc break as any other BC break in master
+
+*all* BC breaks in master have a corresponding deprecation in 4.4 (if you find a place where that's not the case, it should be reported and fixed).
+
+> No need to build a whole new set of events and fallbacks etc for this.
+
+Errors should not be handled like exceptions - they hold separate semantics and should follow a dedicated path. Blurring their meaning would be a mistake.
+
+Good news, both my points align to a simple enough forward solution :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-11-04T16:39:29Z
+
+ > Errors should not be handled like exceptions - they hold separate semantics and should follow a dedicated path.
+
+Following this logic, we should also handle exceptions and errors differently in the ErrorRenderer and we should not change typehints to throwable but actually have different methods for each. So all of these deprecations are not needed.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-11-04T16:53:55Z
+
+> all BC breaks in master have a corresponding deprecation in 4.4
+
+Then we can go back to what Thomas originally implemented: Just introduce a new method on ExceptionEvent: `getThrowable` and deprecate `getException`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-04T17:04:36Z
+
+> Following this logic, we should also handle exceptions and errors differently in the ErrorRenderer
+
+Not really required, because ErrorHandler is the last resort logic: it's a generic enough place who's purpose is to report what happened, no matter what.
+
+> and we should not change typehints to throwable but actually have different methods for each. So all of these deprecations are not needed.
+
+Yes, that's what I've been wondering also. So, case by case: on Application, we're on a generic enough logic that only reports back what happened - similar to ErrorHandler. On DataCollector, we collect what happened without disrupting the code flow. On listeners, that's not the same story at all - there, any userland logic can mess up with `Error` and break any reporting.
+
+> Then we can go back to what Thomas originally implemented: Just introduce a new method on ExceptionEvent: getThrowable and deprecate getException.
+
+That wouldn't be nice in terms of naming, neither in term of FC/BC (another boring thing forced on users) + skips my arguments about the necessity to split between Error and Exception :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-11-04T17:43:00Z
+
+I'm removing myself from this Throwable topic as I've already spend alot of time reviewing this. My opinion is that wrapping Error into an ErrorException just for it to comply with the ExceptionEvent typehints is nonesense and a legacy behavior. And this is what we originally wanted to fix. You argue that error and exception should be handled differently but yet the current behavior and proposed behavior is pretending an error to be an exception. So I don't know anymore where this is going.

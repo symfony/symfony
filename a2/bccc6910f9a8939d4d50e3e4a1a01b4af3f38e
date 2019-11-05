@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-11T12:27:25Z
+
+We don't do BC breaks in master when there is no prior deprecation notice in 4.4.
+But if we move this to tearDown, we could merge this lower as a bug fix, isn't it?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-10-14T15:05:31Z
+
+@nicolas-grekas sure will do that.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-10-17T09:01:59Z
+
+@nicolas-grekas done!

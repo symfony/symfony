@@ -2768,6 +2768,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testWeekSingleText()
     {
+        $this->requiresFeatureSet(404);
+
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
             'widget' => 'single_text',
@@ -2785,6 +2787,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testWeekSingleTextNoHtml5()
     {
+        $this->requiresFeatureSet(404);
+
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
             'widget' => 'single_text',
@@ -2803,11 +2807,13 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testWeekChoices()
     {
-        $data = ['year' => date('Y'), 'week' => 1];
+        $this->requiresFeatureSet(404);
+
+        $data = ['year' => (int) date('Y'), 'week' => 1];
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', $data, [
             'input' => 'array',
-            'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
@@ -2827,6 +2833,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testWeekText()
     {
+        $this->requiresFeatureSet(404);
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '2000-W01', [
             'input' => 'string',
             'widget' => 'text',

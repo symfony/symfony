@@ -65,6 +65,14 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             $class = $parameterBag->resolveValue($class);
 
             if (!$r = $container->getReflectionClass($class)) {
+                if ($id === $class) {
+                    /*
+                     * This happens when container has not been built before and if $class is missing some use-statements.
+                     * Make sure PHP loads the file to show any exceptions the user.
+                     */
+                    class_exists($class);
+                }
+
                 throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
             }
             $isContainerAware = $r->implementsInterface(ContainerAwareInterface::class) || is_subclass_of($class, AbstractController::class);

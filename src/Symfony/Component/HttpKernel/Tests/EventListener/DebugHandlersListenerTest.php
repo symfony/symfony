@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
@@ -123,7 +124,7 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertInstanceOf('Closure', $xHandler);
 
         $app->expects($this->once())
-            ->method('renderException');
+            ->method(method_exists(Application::class, 'renderThrowable') ? 'renderThrowable' : 'renderException');
 
         $xHandler(new \Exception());
     }

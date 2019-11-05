@@ -5,12 +5,15 @@ Cache
 -----
 
  * Added argument `$prefix` to `AdapterInterface::clear()`
+ * Marked the `CacheDataCollector` class as `@final`.
 
 Console
 -------
 
  * Deprecated finding hidden commands using an abbreviation, use the full name instead
  * Deprecated returning `null` from `Command::execute()`, return `0` instead
+ * Deprecated the `Application::renderException()` and `Application::doRenderException()` methods,
+   use `renderThrowable()` and `doRenderThrowable()` instead.
 
 Debug
 -----
@@ -65,6 +68,7 @@ DoctrineBridge
  * Deprecated `RegistryInterface`, use `Doctrine\Common\Persistence\ManagerRegistry`.
  * Added a new `getMetadataDriverClass` method to replace class parameters in `AbstractDoctrineExtension`. This method
    will be abstract in Symfony 5 and must be declared in extending classes.
+ * Marked the `DoctrineDataCollector` class as `@final`.
 
 Filesystem
 ----------
@@ -91,6 +95,7 @@ FrameworkBundle
  * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
  * Not tagging service route loaders with `routing.route_loader` has been deprecated.
  * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
+ * Marked the `RouterDataCollector` class as `@final`.
 
 HttpClient
 ----------
@@ -144,6 +149,12 @@ HttpKernel
    current directory or with a glob pattern. The fallback directories have never been advocated
    so you likely do not use those in any app based on the SF Standard or Flex edition.
  * Getting the container from a non-booted kernel is deprecated
+ * Marked the `AjaxDataCollector`, `ConfigDataCollector`, `EventDataCollector`,
+   `ExceptionDataCollector`, `LoggerDataCollector`, `MemoryDataCollector`,
+   `RequestDataCollector` and `TimeDataCollector` classes as `@final`.
+ * Marked the `RouterDataCollector::collect()` method as `@final`.
+ * The `DataCollectorInterface::collect()` and `Profiler::collect()` methods third parameter signature
+   will be `\Throwable $exception = null` instead of `\Exception $exception = null` in Symfony 5.0.
 
 Lock
 ----
@@ -164,6 +175,7 @@ Messenger
  * [BC BREAK] Removed `$retryStrategyLocator` argument from `ConsumeMessagesCommand::__construct`.
  * [BC BREAK] Removed `$senderClassOrAlias` argument from `RedeliveryStamp::__construct`.
  * [BC BREAK] Removed `UnknownSenderException`.
+ * Marked the `MessengerDataCollector` class as `@final`.
 
 Mime
 ----
@@ -216,6 +228,11 @@ Security
    ) {}
    ```
 
+SecurityBundle
+--------------
+
+ * Marked the `SecurityDataCollector` class as `@final`.
+
 Serializer
 ----------
 
@@ -231,6 +248,7 @@ Translation
 
  * Deprecated support for using `null` as the locale in `Translator`.
  * Deprecated accepting STDIN implicitly when using the `lint:xliff` command, use `lint:xliff -` (append a dash) instead to make it explicit.
+ * Marked the `TranslationDataCollector` class as `@final`.
 
 TwigBridge
 ----------
@@ -238,6 +256,7 @@ TwigBridge
  * Deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the
    `DebugCommand::__construct()` method, swap the variables position.
  * Deprecated accepting STDIN implicitly when using the `lint:twig` command, use `lint:twig -` (append a dash) instead to make it explicit.
+ * Marked the `TwigDataCollector` class as `@final`.
 
 TwigBundle
 ----------
@@ -342,6 +361,7 @@ Validator
  * deprecated `ValidatorBuilder::setMetadataCache`, use `ValidatorBuilder::setMappingCache` instead.
  * The `Range` constraint has a new message option `notInRangeMessage` that is used when both `min` and `max` values are set.
    In case you are using custom translations make sure to add one for this new message.
+ * Marked the `ValidatorDataCollector` class as `@final`.
 
 WebProfilerBundle
 -----------------

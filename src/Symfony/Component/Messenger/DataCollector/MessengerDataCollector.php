@@ -20,6 +20,8 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface
 {

@@ -126,11 +126,15 @@ class DebugHandlersListener implements EventSubscriberInterface
                     $output = $output->getErrorOutput();
                 }
                 $this->exceptionHandler = static function (\Throwable $e) use ($app, $output) {
-                    if (!$e instanceof \Exception) {
-                        $e = new ErrorException($e);
-                    }
+                    if (method_exists($app, 'renderThrowable')) {
+                        $app->renderThrowable($e, $output);
+                    } else {
+                        if (!$e instanceof \Exception) {
+                            $e = new ErrorException($e);
+                        }
 
-                    $app->renderException($e, $output);
+                        $app->renderException($e, $output);
+                    }
                 };
             }
         }

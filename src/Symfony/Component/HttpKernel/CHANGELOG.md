@@ -15,6 +15,12 @@ CHANGELOG
  * Marked all dispatched event classes as `@final`
  * Added `ErrorController` to enable the preview and error rendering mechanism
  * Getting the container from a non-booted kernel is deprecated.
+ * Marked the `AjaxDataCollector`, `ConfigDataCollector`, `EventDataCollector`,
+   `ExceptionDataCollector`, `LoggerDataCollector`, `MemoryDataCollector`,
+   `RequestDataCollector` and `TimeDataCollector` classes as `@final`.
+ * Marked the `RouterDataCollector::collect()` method as `@final`.
+ * The `DataCollectorInterface::collect()` and `Profiler::collect()` methods third parameter signature
+   will be `\Throwable $exception = null` instead of `\Exception $exception = null` in Symfony 5.0.
 
 4.3.0
 -----

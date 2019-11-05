@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-07-08T18:11:44Z
+
+Ping @alexander-schranz! It looks like this is technically challenging. Is the path clear? Or are we stuck on those details?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-07-09T11:01:17Z
+
+@weaverryan theoretically there is a little time where a message could get lost when the consumer crashes. Between read from the queued/delayed message sorted set list and adding to the stream.
+
+https://github.com/symfony/symfony/blob/7407abd8e5ef3672075bb897bb7518195017a194/src/Symfony/Component/Messenger/Transport/RedisExt/Connection.php#L120-L128
+
+I did now change that only one message is read and added to the stream.
+
+---------------------------------------------------------------------------
+
+by ragboyjr at 2019-07-09T21:45:05Z
+
+> theoretically there is a little time where a message could get lost when the consumer crashes.
+
+@alexander-schranz do you think utilizing a lua script similar to laravel would be able to prevent this issue?
+
+---------------------------------------------------------------------------
+
+by ragboyjr at 2019-08-03T01:07:26Z
+
+@alexander-schranz mind if I take a stab at implementing the transactions part as a lua script?
+
+---------------------------------------------------------------------------
+
+by ragboyjr at 2019-08-03T01:07:54Z
+
+I have a bit of time this weekend, and I'd love to see this feature for the redis adapter.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-08-03T13:05:37Z
+
+@ragboyjr sure. Basically its the `zpopmin` -> `zadd` / `xadd` which we need to move into a transaction. Thank you to have a look at it I'm currently short in time.
+
+---------------------------------------------------------------------------
+
+by Mrkisha at 2019-09-25T19:13:22Z
+
+Is there any progress on this PR?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-09-26T08:50:40Z
+
+@Mrkisha rebased and fixed the current implemention and added some tests. So whats currently is not handled is when the redis crash between moving a delayed message from the delayed queue to the stream it could get lost.
+
+The travis CI seems to have some changes not sure why the tests can not longer connect to the redis.
+
+---------------------------------------------------------------------------
+
+by Mrkisha at 2019-09-26T18:07:33Z
+
+@alexander-schranz I think you're doing great job. You're almost there. Probably some minor fixes to satisfy travis-ci.
+
+---------------------------------------------------------------------------
+
+by Mrkisha at 2019-09-27T13:01:26Z
+
+@alexander-schranz can I somehow help you out so we speed the whole process for this feature?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-09-27T13:21:31Z
+
+@Mrkisha I tried to change the url to the one which was given in the error. If that still don't work it would be great if you could have a look at the Travis CI problem.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-09-27T14:11:30Z
+
+@Mrkisha for questions you can also reach me in the [Symfony Slack Chat](https://symfony.com/community) under `@alex_s_`
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-10-26T14:35:45Z
+
+@sroze do you want to have a look at this :)?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-10-28T14:21:16Z
+
+@alexander-schranz Is this done & ready? Or are there still some issues?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-11-03T19:33:23Z
+
+@weaverryan ready from my side :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-11-03T19:55:01Z
+
+I'm playing with this right now, will try to leave a review tonight.

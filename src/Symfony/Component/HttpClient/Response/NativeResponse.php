@@ -80,8 +80,6 @@ final class NativeResponse implements ResponseInterface
     public function getInfo(string $type = null)
     {
         if (!$info = $this->finalInfo) {
-            self::perform($this->multi);
-
             $info = $this->info;
             $info['url'] = implode('', $info['url']);
             unset($info['size_body'], $info['request_header']);

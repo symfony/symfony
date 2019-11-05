@@ -289,7 +289,7 @@ trait ResponseTrait
                         unset($responses[$j]);
                         continue;
                     } elseif ($isTimeout) {
-                        $multi->handlesActivity[$j] = [new ErrorChunk($response->offset)];
+                        $multi->handlesActivity[$j] = [new ErrorChunk($response->offset, sprintf('Idle timeout reached for "%s".', $response->getInfo('url')))];
                     } else {
                         continue;
                     }

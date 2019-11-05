@@ -154,7 +154,15 @@ class StopwatchEvent
      */
     public function getStartTime()
     {
-        return isset($this->periods[0]) ? $this->periods[0]->getStartTime() : 0;
+        if (isset($this->periods[0])) {
+            return $this->periods[0]->getStartTime();
+        }
+
+        if ($this->started) {
+            return $this->started[0];
+        }
+
+        return 0;
     }
 
     /**
@@ -177,12 +185,10 @@ class StopwatchEvent
     public function getDuration()
     {
         $periods = $this->periods;
-        $stopped = \count($periods);
-        $left = \count($this->started) - $stopped;
+        $left = \count($this->started);
 
-        for ($i = 0; $i < $left; ++$i) {
-            $index = $stopped + $i;
-            $periods[] = new StopwatchPeriod($this->started[$index], $this->getNow(), $this->morePrecision);
+        for ($i = $left - 1; $i >= 0; --$i) {
+            $periods[] = new StopwatchPeriod($this->started[$i], $this->getNow(), $this->morePrecision);
         }
 
         $total = 0;

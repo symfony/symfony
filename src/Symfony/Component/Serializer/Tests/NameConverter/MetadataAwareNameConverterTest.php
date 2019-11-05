@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SerializedNameDummy;
 
 /**
@@ -113,6 +114,28 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['bar', 'qux'],
             ['quux', 'QUUX'],
             [0, 0],
+        ];
+    }
+
+    /**
+     * @dataProvider attributeAndContextProvider
+     */
+    public function testDenormalizeWithGroups($expected, $propertyName, $context = [])
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+
+        $this->assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
+    }
+
+    public function attributeAndContextProvider()
+    {
+        return [
+            ['buz', 'buz', ['groups' => ['a']]],
+            ['buzForExport', 'buz', ['groups' => ['b']]],
+            ['buz', 'buz', ['groups' => ['c']]],
+            ['buz', 'buz', []],
         ];
     }
 }

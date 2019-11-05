@@ -325,7 +325,7 @@ class Router implements RouterInterface, RequestMatcherInterface
                 }
             );
 
-            $this->generator = new $this->options['generator_class'](require $cache->getPath(), $this->context, $this->logger);
+            $this->generator = new $this->options['generator_class'](require $cache->getPath(), $this->context, $this->logger, $this->defaultLocale);
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {

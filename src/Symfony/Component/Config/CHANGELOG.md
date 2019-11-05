@@ -9,6 +9,11 @@ CHANGELOG
  * Added method `getChildNodeDefinitions()` to ParentNodeDefinitionInterface
  * Removed `FileLoaderLoadException`, use `LoaderLoadException` instead
 
+4.4.0
+-----
+
+ * added a way to exclude patterns of resources from being imported by the `import()` method
+
 4.3.0
 -----
 

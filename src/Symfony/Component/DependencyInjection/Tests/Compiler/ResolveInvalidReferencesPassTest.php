@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInvalidReferencesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -125,6 +126,43 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->process($container);
 
         $this->assertSame([[[]]], $def->getArguments());
+    }
+
+    public function testProcessSetDecoratedAsNullOnInvalid()
+    {
+        $container = new ContainerBuilder();
+        $decoratorDefinition = $container
+            ->register('decorator')
+            ->setArguments([
+                new Reference('decorator.inner'),
+            ])
+            ->setDecoratedService('unknown_decorated', null, 0, ContainerInterface::NULL_ON_INVALID_REFERENCE)
+        ;
+
+        (new DecoratorServicePass())->process($container);
+        (new ResolveInvalidReferencesPass())->process($container);
+
+        $this->assertSame([null], $decoratorDefinition->getArguments());
+    }
+
+    public function testProcessSetOnlyDecoratedAsNullOnInvalid()
+    {
+        $container = new ContainerBuilder();
+        $unknownArgument = new Reference('unknown_argument');
+        $decoratorDefinition = $container
+            ->register('decorator')
+            ->setArguments([
+                new Reference('decorator.inner'),
+                $unknownArgument,
+            ])
+            ->setDecoratedService('unknown_decorated', null, 0, ContainerInterface::NULL_ON_INVALID_REFERENCE)
+        ;
+
+        (new DecoratorServicePass())->process($container);
+        (new ResolveInvalidReferencesPass())->process($container);
+
+        $this->assertNull($decoratorDefinition->getArguments()[0]);
+        $this->assertEquals($unknownArgument, $decoratorDefinition->getArguments()[1]);
     }
 
     protected function process(ContainerBuilder $container)

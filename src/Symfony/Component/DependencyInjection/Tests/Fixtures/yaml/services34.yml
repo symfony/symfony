@@ -1,0 +1,17 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    decorator:
+        decorates: decorated
+        decoration_inner_name: decorated.inner
+        decoration_priority: 1
+        decoration_on_invalid: null
+    Psr\Container\ContainerInterface:
+        alias: service_container
+        public: false
+    Symfony\Component\DependencyInjection\ContainerInterface:
+        alias: service_container
+        public: false

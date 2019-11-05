@@ -224,7 +224,7 @@ class Connection
     private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $headers = [], AmqpStamp $amqpStamp = null)
     {
         $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
-        $attributes['headers'] = array_merge($headers, $attributes['headers'] ?? []);
+        $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);
 
         $exchange->publish(
             $body,

@@ -255,6 +255,17 @@
     {{ block('form_widget_simple') }}
 {%- endblock color_widget -%}
 
+{%- block week_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{ block('form_widget_simple') }}
+    {%- else -%}
+        {%- set vars = widget == 'text' ? { 'attr': { 'size': 1 }} : {} -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{ form_widget(form.year, vars) }}-{{ form_widget(form.week, vars) }}
+        </div>
+    {%- endif -%}
+{%- endblock week_widget -%}
+
 {# Labels #}
 
 {%- block form_label -%}

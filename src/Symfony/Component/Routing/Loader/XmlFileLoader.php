@@ -163,10 +163,24 @@ class XmlFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "prefix" attribute and <prefix> child nodes.', $path));
         }
 
+        $exclude = [];
+        foreach ($node->childNodes as $child) {
+            if ($child instanceof \DOMElement && $child->localName === $exclude && self::NAMESPACE_URI === $child->namespaceURI) {
+                $exclude[] = $child->nodeValue;
+            }
+        }
+
+        if ($node->hasAttribute('exclude')) {
+            if ($exclude) {
+                throw new \InvalidArgumentException('You cannot use both the attribute "exclude" and <exclude> tags at the same time.');
+            }
+            $exclude = [$node->getAttribute('exclude')];
+        }
+
         $this->setCurrentDir(\dirname($path));
 
         /** @var RouteCollection[] $imported */
-        $imported = $this->import($resource, ('' !== $type ? $type : null), false, $file) ?: [];
+        $imported = $this->import($resource, ('' !== $type ? $type : null), false, $file, $exclude) ?: [];
 
         if (!\is_array($imported)) {
             $imported = [$imported];

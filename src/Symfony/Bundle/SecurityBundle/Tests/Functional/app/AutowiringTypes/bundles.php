@@ -13,4 +13,5 @@ return [
     new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
     new Symfony\Bundle\SecurityBundle\SecurityBundle(),
     new Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AutowiringBundle\AutowiringBundle(),
+    new Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\TestBundle(),
 ];

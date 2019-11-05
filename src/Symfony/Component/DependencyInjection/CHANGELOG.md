@@ -16,6 +16,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * added `CheckTypeDeclarationsPass` to check injected parameters type during compilation
  * added support for opcache.preload by generating a preloading script in the cache folder
  * added support for dumping the container in one file instead of many files
  * deprecated support for short factories and short configurators in Yaml
@@ -27,6 +28,7 @@ CHANGELOG
  * added support for improved syntax to define method calls in Yaml
  * added `LazyString` for lazy computation of string values injected into services
  * made the `%env(base64:...)%` processor able to decode base64url
+ * added ability to choose behavior of decorations on non existent decorated services
 
 4.3.0
 -----

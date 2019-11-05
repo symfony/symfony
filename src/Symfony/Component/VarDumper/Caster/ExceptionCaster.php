@@ -206,7 +206,6 @@ class ExceptionCaster
                     $f['file'] = substr($f['file'], 0, -\strlen($match[0]));
                     $f['line'] = (int) $match[1];
                 }
-                $caller = isset($f['function']) ? sprintf('in %s() on line %d', (isset($f['class']) ? $f['class'].$f['type'] : '').$f['function'], $f['line']) : null;
                 $src = $f['line'];
                 $srcKey = $f['file'];
                 $ellipsis = new LinkStub($srcKey, 0);
@@ -226,13 +225,13 @@ class ExceptionCaster
                                 $templatePath = null;
                             }
                             if ($templateSrc) {
-                                $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, $caller, 'twig', $templatePath);
+                                $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, 'twig', $templatePath, $f);
                                 $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
                             }
                         }
                     }
                     if ($srcKey == $f['file']) {
-                        $src = self::extractSource(file_get_contents($f['file']), $f['line'], self::$srcContext, $caller, 'php', $f['file']);
+                        $src = self::extractSource(file_get_contents($f['file']), $f['line'], self::$srcContext, 'php', $f['file'], $f);
                         $srcKey .= ':'.$f['line'];
                         if ($ellipsis) {
                             $ellipsis += 1 + \strlen($f['line']);
@@ -308,7 +307,7 @@ class ExceptionCaster
         ]);
     }
 
-    private static function extractSource(string $srcLines, int $line, int $srcContext, ?string $title, string $lang, string $file = null): EnumStub
+    private static function extractSource(string $srcLines, int $line, int $srcContext, string $lang, ?string $file, array $frame): EnumStub
     {
         $srcLines = explode("\n", $srcLines);
         $src = [];
@@ -317,7 +316,32 @@ class ExceptionCaster
             $src[] = (isset($srcLines[$i]) ? $srcLines[$i] : '')."\n";
         }
 
-        $srcLines = [];
+        if ($frame['function'] ?? false) {
+            $stub = new CutStub(new \stdClass());
+            $stub->class = (isset($frame['class']) ? $frame['class'].$frame['type'] : '').$frame['function'];
+            $stub->type = Stub::TYPE_OBJECT;
+            $stub->attr['cut_hash'] = true;
+            $stub->attr['file'] = $frame['file'];
+            $stub->attr['line'] = $frame['line'];
+
+            try {
+                $caller = isset($frame['class']) ? new \ReflectionMethod($frame['class'], $frame['function']) : new \ReflectionFunction($frame['function']);
+                $stub->class .= ReflectionCaster::getSignature(ReflectionCaster::castFunctionAbstract($caller, [], $stub, true, Caster::EXCLUDE_VERBOSE));
+
+                if ($f = $caller->getFileName()) {
+                    $stub->attr['file'] = $f;
+                    $stub->attr['line'] = $caller->getStartLine();
+                }
+            } catch (\ReflectionException $e) {
+                // ignore fake class/function
+            }
+
+            $srcLines = ["\0~separator=\0" => $stub];
+        } else {
+            $stub = null;
+            $srcLines = [];
+        }
+
         $ltrim = 0;
         do {
             $pad = null;
@@ -344,7 +368,7 @@ class ExceptionCaster
             if ($i !== $srcContext) {
                 $c = new ConstStub('default', $c);
             } else {
-                $c = new ConstStub($c, $title);
+                $c = new ConstStub($c, $stub ? 'in '.$stub->class : '');
                 if (null !== $file) {
                     $c->attr['file'] = $file;
                     $c->attr['line'] = $line;

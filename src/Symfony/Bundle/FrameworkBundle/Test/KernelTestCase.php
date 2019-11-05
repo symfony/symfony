@@ -42,6 +42,7 @@ abstract class KernelTestCase extends TestCase
     protected function tearDown(): void
     {
         static::ensureKernelShutdown();
+        static::$kernel = null;
     }
 
     /**

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 trait DecorateTrait
@@ -24,9 +25,9 @@ trait DecorateTrait
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    final public function decorate(?string $id, string $renamedId = null, int $priority = 0): self
+    final public function decorate(?string $id, string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): self
     {
-        $this->definition->setDecoratedService($id, $renamedId, $priority);
+        $this->definition->setDecoratedService($id, $renamedId, $priority, $invalidBehavior);
 
         return $this;
     }

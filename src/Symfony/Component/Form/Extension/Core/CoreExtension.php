@@ -76,6 +76,7 @@ class CoreExtension extends AbstractExtension
             new Type\CurrencyType(),
             new Type\TelType(),
             new Type\ColorType(),
+            new Type\WeekType(),
         ];
     }
 

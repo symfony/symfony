@@ -134,7 +134,7 @@ class ReflectionCaster
             $trace[] = $frame;
             $a[$prefix.'trace'] = new TraceStub($trace, false, 0, -1, -1);
         } else {
-            $function = new FrameStub($frame, false, true);
+            $function = new FrameStub($frame, false, true, false);
             $function = ExceptionCaster::castFrameStub($function, [], $function, true);
             $a[$prefix.'executing'] = new EnumStub([
                 "\0~separator= \0".$frame['class'].$frame['type'].$frame['function'].'()' => $function[$prefix.'src'],

@@ -145,6 +145,7 @@ class ExceptionCaster
                     'function' => isset($f['function']) ? $f['function'] : null,
                 ] + $frames[$i - 1],
                 false,
+                true,
                 true
             );
             $f = self::castFrameStub($frame, [], $frame, true);
@@ -225,13 +226,13 @@ class ExceptionCaster
                                 $templatePath = null;
                             }
                             if ($templateSrc) {
-                                $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, 'twig', $templatePath, $f);
+                                $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, 'twig', $templatePath, $frame->displayMethod ? $f : []);
                                 $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
                             }
                         }
                     }
                     if ($srcKey == $f['file']) {
-                        $src = self::extractSource(file_get_contents($f['file']), $f['line'], self::$srcContext, 'php', $f['file'], $f);
+                        $src = self::extractSource(file_get_contents($f['file']), $f['line'], self::$srcContext, 'php', $f['file'], $frame->displayMethod ? $f : []);
                         $srcKey .= ':'.$f['line'];
                         if ($ellipsis) {
                             $ellipsis += 1 + \strlen($f['line']);

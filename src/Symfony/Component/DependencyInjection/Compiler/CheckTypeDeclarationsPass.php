@@ -37,14 +37,16 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     private const SCALAR_TYPES = ['int', 'float', 'bool', 'string'];
 
     private $autoload;
+    private $ignoredServices;
 
     /**
      * @param bool $autoload Whether services who's class in not loaded should be checked or not.
      *                       Defaults to false to save loading code during compilation.
      */
-    public function __construct(bool $autoload = false)
+    public function __construct(bool $autoload = false, array $ignoredServices = [])
     {
         $this->autoload = $autoload;
+        $this->ignoredServices = array_flip($ignoredServices);
     }
 
     /**
@@ -52,7 +54,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
-        if (!$value instanceof Definition) {
+        if (!$value instanceof Definition || isset($this->ignoredServices[$this->currentId])) {
             return parent::processValue($value, $isRoot);
         }
 

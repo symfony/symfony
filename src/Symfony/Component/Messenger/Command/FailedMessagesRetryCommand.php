@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\LogicException;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
@@ -40,7 +40,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
     private $messageBus;
     private $logger;
 
-    public function __construct(string $receiverName, ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
+    public function __construct(string $receiverName, ReceiverInterface $receiver, RoutableMessageBus $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;

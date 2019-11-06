@@ -238,6 +238,7 @@ class MessengerPass implements CompilerPassInterface
     private function registerReceivers(ContainerBuilder $container, array $busIds)
     {
         $receiverMapping = [];
+        $receiverToBusMapping = [];
 
         foreach ($container->findTaggedServiceIds($this->receiverTag) as $id => $tags) {
             $receiverClass = $container->findDefinition($id)->getClass();
@@ -247,9 +248,38 @@ class MessengerPass implements CompilerPassInterface
 
             $receiverMapping[$id] = new Reference($id);
 
+            $namesForReceiver = [$id];
+            $busIdForReceiver = null;
             foreach ($tags as $tag) {
                 if (isset($tag['alias'])) {
                     $receiverMapping[$tag['alias']] = $receiverMapping[$id];
+                    $namesForReceiver[] = $tag['alias'];
+                }
+                if (isset($tag['bus'])) {
+                    $busIdForReceiver = $tag['bus'];
+                }
+            }
+
+            // for the failure transport the bus does not need to be set as the bus is determined based on the original receiver per message
+            // if the bus is set anyway (or there is only one bus), we can use it as a fallback in case the original receiver does not exist anymore (e.g. was renamed)
+            $isFailureTransport = false;
+            if ($container->hasParameter('messenger.failure_transport')) {
+                $isFailureTransport = \in_array($container->getParameter('messenger.failure_transport'), $namesForReceiver, true);
+            }
+
+            if (\count($busIds) > 1 && null === $busIdForReceiver && !$isFailureTransport) {
+                throw new RuntimeException(sprintf('Invalid receiver "%s": As you have more than one bus, you need to set the "bus" option on the transport configuration or use such a tag attribute on the service definition.', $id));
+            }
+            if (null !== $busIdForReceiver && !\in_array($busIdForReceiver, $busIds, true)) {
+                throw new RuntimeException(sprintf('Invalid receiver "%s": Configured bus "%s" does not exist (known ones are: %s).', $id, $busIdForReceiver, implode(', ', $busIds)));
+            }
+            if (1 === \count($busIds) && null === $busIdForReceiver) {
+                $busIdForReceiver = $busIds[0];
+            }
+            if (null !== $busIdForReceiver) {
+                $busRef = new Reference($busIdForReceiver);
+                foreach ($namesForReceiver as $receiverName) {
+                    $receiverToBusMapping[$receiverName] = $busRef;
                 }
             }
         }
@@ -259,24 +289,14 @@ class MessengerPass implements CompilerPassInterface
             $receiverNames[(string) $reference] = $name;
         }
 
-        $buses = [];
-        foreach ($busIds as $busId) {
-            $buses[$busId] = new Reference($busId);
-        }
-
-        if ($hasRoutableMessageBus = $container->hasDefinition('messenger.routable_message_bus')) {
+        if ($container->hasDefinition('messenger.routable_message_bus')) {
             $container->getDefinition('messenger.routable_message_bus')
-                ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses));
+                ->replaceArgument(0, ServiceLocatorTagPass::register($container, $receiverToBusMapping));
         }
 
         if ($container->hasDefinition('console.command.messenger_consume_messages')) {
-            $consumeCommandDefinition = $container->getDefinition('console.command.messenger_consume_messages');
-
-            if ($hasRoutableMessageBus) {
-                $consumeCommandDefinition->replaceArgument(0, new Reference('messenger.routable_message_bus'));
-            }
-
-            $consumeCommandDefinition->replaceArgument(4, array_values($receiverNames));
+            $container->getDefinition('console.command.messenger_consume_messages')
+                ->replaceArgument(4, array_values($receiverNames));
         }
 
         if ($container->hasDefinition('console.command.messenger_setup_transports')) {
@@ -293,8 +313,8 @@ class MessengerPass implements CompilerPassInterface
         ];
         foreach ($failedCommandIds as $failedCommandId) {
             if ($container->hasDefinition($failedCommandId)) {
-                $definition = $container->getDefinition($failedCommandId);
-                $definition->replaceArgument(1, $receiverMapping[$definition->getArgument(0)]);
+                $container->getDefinition($failedCommandId)
+                    ->replaceArgument(1, $receiverMapping[$container->getParameter('messenger.failure_transport')]);
             }
         }
     }

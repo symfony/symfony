@@ -40,8 +40,6 @@
             </call>
         </service>
 
-        <service id="messenger.middleware.add_bus_name_stamp_middleware" class="Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware" abstract="true" />
-
         <service id="messenger.middleware.dispatch_after_current_bus" class="Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware" />
 
         <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
@@ -49,8 +47,6 @@
         </service>
 
         <service id="messenger.middleware.reject_redelivered_message_middleware" class="Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware" />
-
-        <service id="messenger.middleware.failed_message_processing_middleware" class="Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware" />
 
         <service id="messenger.middleware.traceable" class="Symfony\Component\Messenger\Middleware\TraceableMiddleware" abstract="true">
             <argument type="service" id="debug.stopwatch" />
@@ -132,7 +128,6 @@
         <!-- routable message bus -->
         <service id="messenger.routable_message_bus" class="Symfony\Component\Messenger\RoutableMessageBus">
             <argument /> <!-- Message bus locator -->
-            <argument type="service" id="messenger.default_bus" />
         </service>
     </services>
 </container>

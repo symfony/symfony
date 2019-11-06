@@ -17,7 +17,13 @@ CHANGELOG
  * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
  * Added new `error_controller` configuration to handle system exceptions
  * Added sort option for `translation:update` command.
+ * The `messenger.default_bus` config option is optional now even when having more than one bus to prevent unwanted autowiring.
+ * [BC BREAK] If you defined more than one bus, you must set the "bus" config option on the transport.
+    Messages received from this transport will be dispatched to this bus automatically. This replaces the
+    `--bus` option of `messenger:consume` command and the `BusNameStamp`.
  * [BC Break] The `framework.messenger.routing.senders` config key is not deep merged anymore.
+ * [BC Break] Removed `messenger.middleware.add_bus_name_stamp_middleware` service
+ * [BC Break] Removed `messenger.middleware.failed_message_processing_middleware` service
  * Added `secrets:*` commands and `%env(secret:...)%` processor to deal with secrets seamlessly.
  * Made `framework.session.handler_id` accept a DSN
  * Marked the `RouterDataCollector` class as `@final`.

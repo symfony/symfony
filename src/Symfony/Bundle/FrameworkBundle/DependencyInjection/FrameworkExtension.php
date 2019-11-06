@@ -1696,10 +1696,8 @@ class FrameworkExtension extends Extension
 
         $defaultMiddleware = [
             'before' => [
-                ['id' => 'add_bus_name_stamp_middleware'],
                 ['id' => 'reject_redelivered_message_middleware'],
                 ['id' => 'dispatch_after_current_bus'],
-                ['id' => 'failed_message_processing_middleware'],
             ],
             'after' => [
                 ['id' => 'send_message'],
@@ -1715,9 +1713,6 @@ class FrameworkExtension extends Extension
                 } else {
                     unset($defaultMiddleware['after'][1]['arguments']);
                 }
-
-                // argument to add_bus_name_stamp_middleware
-                $defaultMiddleware['before'][0]['arguments'] = [$busId];
 
                 $middleware = array_merge($defaultMiddleware['before'], $middleware, $defaultMiddleware['after']);
             }
@@ -1763,7 +1758,7 @@ class FrameworkExtension extends Extension
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
                 ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])
-                ->addTag('messenger.receiver', ['alias' => $name])
+                ->addTag('messenger.receiver', ['alias' => $name, 'bus' => $transport['bus']])
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
@@ -1829,14 +1824,9 @@ class FrameworkExtension extends Extension
                 throw new LogicException(sprintf('Invalid Messenger configuration: the failure transport "%s" is not a valid transport or service id.', $config['failure_transport']));
             }
 
+            $container->setParameter('messenger.failure_transport', $config['failure_transport']);
             $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
                 ->replaceArgument(0, $senderReferences[$config['failure_transport']]);
-            $container->getDefinition('console.command.messenger_failed_messages_retry')
-                ->replaceArgument(0, $config['failure_transport']);
-            $container->getDefinition('console.command.messenger_failed_messages_show')
-                ->replaceArgument(0, $config['failure_transport']);
-            $container->getDefinition('console.command.messenger_failed_messages_remove')
-                ->replaceArgument(0, $config['failure_transport']);
         } else {
             $container->removeDefinition('messenger.failure.send_failed_message_to_failure_transport_listener');
             $container->removeDefinition('console.command.messenger_failed_messages_retry');

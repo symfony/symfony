@@ -13,25 +13,25 @@ namespace Symfony\Component\Messenger;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
-use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 
 /**
- * Bus of buses that is routable using a BusNameStamp.
+ * Bus of buses that is routable by reading the ReceivedStamp and locating the bus for the given transport name.
  *
  * This is useful when passed to Worker: messages received
  * from the transport can be sent to the correct bus.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
 class RoutableMessageBus implements MessageBusInterface
 {
     private $busLocator;
-    private $fallbackBus;
 
-    public function __construct(ContainerInterface $busLocator, MessageBusInterface $fallbackBus = null)
+    public function __construct(ContainerInterface $busLocator)
     {
         $this->busLocator = $busLocator;
-        $this->fallbackBus = $fallbackBus;
     }
 
     public function dispatch($envelope, array $stamps = []): Envelope
@@ -40,29 +40,39 @@ class RoutableMessageBus implements MessageBusInterface
             throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope');
         }
 
-        /** @var BusNameStamp|null $busNameStamp */
-        $busNameStamp = $envelope->last(BusNameStamp::class);
+        /** @var ReceivedStamp|null $receivedStamp */
+        $receivedStamp = $envelope->last(ReceivedStamp::class);
 
-        if (null === $busNameStamp) {
-            if (null === $this->fallbackBus) {
-                throw new InvalidArgumentException(sprintf('Envelope is missing a BusNameStamp and no fallback message bus is configured on RoutableMessageBus.'));
+        if (null === $receivedStamp) {
+            // The RoutableMessageBus is only used in Worker context where the ReceivedStamp is added. So this should not happen.
+            throw new InvalidArgumentException('Envelope is missing a ReceivedStamp.');
+        }
+
+        $transportName = $receivedStamp->getTransportName();
+
+        /** @var SentToFailureTransportStamp|null $sentToFailureStamp */
+        $sentToFailureStamp = $envelope->last(SentToFailureTransportStamp::class);
+        if (null !== $sentToFailureStamp) {
+            // if the message was received from the failure transport, mark the message as received from the original transport and use the bus based on it
+            // this guarantees the same behavior when consuming from the failure transport (directly or via messenger:failed:retry) as when originally received
+            $originalReceiver = $sentToFailureStamp->getOriginalReceiverName();
+            // in case the original receiver does not exist anymore, use the bus configured for failure transport
+            if ($this->busLocator->has($originalReceiver)) {
+                $transportName = $originalReceiver;
             }
 
-            return $this->fallbackBus->dispatch($envelope, $stamps);
+            $envelope = $envelope->with(new ReceivedStamp($originalReceiver));
         }
 
-        return $this->getMessageBus($busNameStamp->getBusName())->dispatch($envelope, $stamps);
+        return $this->getMessageBusForTransport($transportName)->dispatch($envelope, $stamps);
     }
 
-    /**
-     * @internal
-     */
-    public function getMessageBus(string $busName): MessageBusInterface
+    private function getMessageBusForTransport(string $transportName): MessageBusInterface
     {
-        if (!$this->busLocator->has($busName)) {
-            throw new InvalidArgumentException(sprintf('Bus named "%s" does not exist.', $busName));
+        if (!$this->busLocator->has($transportName)) {
+            throw new InvalidArgumentException(sprintf('Could not find a bus for transport "%s".', $transportName));
         }
 
-        return $this->busLocator->get($busName);
+        return $this->busLocator->get($transportName);
     }
 }

@@ -17,52 +17,53 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
-use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 
 class RoutableMessageBusTest extends TestCase
 {
     public function testItRoutesToTheCorrectBus()
     {
-        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('foo_bus')]);
+        $envelope = new Envelope(new \stdClass(), [new ReceivedStamp('foo_receiver')]);
 
-        $bus1 = $this->createMock(MessageBusInterface::class);
-        $bus2 = $this->createMock(MessageBusInterface::class);
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->once())->method('has')->with('foo_bus')->willReturn(true);
-        $container->expects($this->once())->method('get')->willReturn($bus2);
+        $container->expects($this->once())->method('has')->with('foo_receiver')->willReturn(true);
+        $container->expects($this->once())->method('get')->with('foo_receiver')->willReturn($bus);
 
         $stamp = new DelayStamp(5);
-        $bus1->expects($this->never())->method('dispatch');
-        $bus2->expects($this->once())->method('dispatch')->with($envelope, [$stamp])->willReturn($envelope);
+        $bus->expects($this->once())->method('dispatch')->with($envelope, [$stamp])->willReturn($envelope);
 
         $routableBus = new RoutableMessageBus($container);
         $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
     }
 
-    public function testItRoutesToDefaultBus()
+    public function testItRoutesToTheCorrectBusWhenComingFromFailureTransport()
     {
-        $envelope = new Envelope(new \stdClass());
-        $stamp = new DelayStamp(5);
-        $defaultBus = $this->createMock(MessageBusInterface::class);
-        $defaultBus->expects($this->once())->method('dispatch')->with($envelope, [$stamp])
-            ->willReturn($envelope);
+        $envelope = new Envelope(new \stdClass(), [new ReceivedStamp('failure_transport'), new SentToFailureTransportStamp('original_receiver')]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->atLeastOnce())->method('has')->with('original_receiver')->willReturn(true);
+        $container->expects($this->once())->method('get')->with('original_receiver')->willReturn($bus);
 
-        $routableBus = new RoutableMessageBus($container, $defaultBus);
+        $stamp = new DelayStamp(5);
+        $bus->expects($this->once())->method('dispatch')->willReturnArgument(0);
 
-        $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
+        $routableBus = new RoutableMessageBus($container);
+        $this->assertEquals($envelope->with(new ReceivedStamp('original_receiver')), $routableBus->dispatch($envelope, [$stamp]));
     }
 
-    public function testItExceptionOnBusNotFound()
+    public function testExceptionOnBusNotFound()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Bus named "my_cool_bus" does not exist.');
+        $this->expectExceptionMessage('Could not find a bus for transport "my_cool_receiver".');
 
         $envelope = new Envelope(new \stdClass(), [
-            new BusNameStamp('my_cool_bus'),
+            new ReceivedStamp('my_cool_receiver'),
         ]);
 
         $container = $this->createMock(ContainerInterface::class);
@@ -70,10 +71,10 @@ class RoutableMessageBusTest extends TestCase
         $routableBus->dispatch($envelope);
     }
 
-    public function testItExceptionOnDefaultBusNotFound()
+    public function testExceptionOnReceivedStampNotFound()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Envelope is missing a BusNameStamp and no fallback message bus is configured on RoutableMessageBus.');
+        $this->expectExceptionMessage('Envelope is missing a ReceivedStamp.');
 
         $envelope = new Envelope(new \stdClass());
 

@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4.', BusNameStamp::class), E_USER_DEPRECATED);
+
 /**
  * Stamp used to identify which bus it was passed to.
+ *
+ * @deprecated since Symfony 4.4
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */

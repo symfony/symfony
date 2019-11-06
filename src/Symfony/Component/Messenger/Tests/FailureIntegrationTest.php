@@ -23,10 +23,10 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
-use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
+use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -90,24 +90,28 @@ class FailureIntegrationTest extends TestCase
             ],
         ]);
 
-        $dispatcher = new EventDispatcher();
         $bus = new MessageBus([
-            new FailedMessageProcessingMiddleware(),
             new SendMessageMiddleware($senderLocator),
             new HandleMessageMiddleware($handlerLocator),
         ]);
+        $busLocator = $this->createMock(ContainerInterface::class);
+        $busLocator->method('has')->willReturn(true);
+        $busLocator->method('get')->willReturn($bus);
+        $routableBus = new RoutableMessageBus($busLocator);
+
+        $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($locator, $retryStrategyLocator));
         $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener($failureTransport));
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
-        $runWorker = function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
+        $runWorker = function (string $transportName) use ($transports, $routableBus, $dispatcher): ?\Throwable {
             $throwable = null;
             $failedListener = function (WorkerMessageFailedEvent $event) use (&$throwable) {
                 $throwable = $event->getThrowable();
             };
             $dispatcher->addListener(WorkerMessageFailedEvent::class, $failedListener);
 
-            $worker = new Worker([$transportName => $transports[$transportName]], $bus, $dispatcher);
+            $worker = new Worker([$transportName => $transports[$transportName]], $routableBus, $dispatcher);
 
             $worker->run();
 

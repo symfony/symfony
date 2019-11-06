@@ -16,7 +16,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 class FailedMessagesRetryCommandTest extends TestCase
@@ -29,7 +29,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $receiver->expects($this->exactly(2))->method('ack');
 
         $dispatcher = new EventDispatcher();
-        $bus = $this->createMock(MessageBusInterface::class);
+        $bus = $this->createMock(RoutableMessageBus::class);
         // the bus should be called in the worker
         $bus->expects($this->exactly(2))->method('dispatch')->willReturn(new Envelope(new \stdClass()));
 

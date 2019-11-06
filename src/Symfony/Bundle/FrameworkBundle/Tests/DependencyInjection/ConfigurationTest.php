@@ -250,27 +250,6 @@ class ConfigurationTest extends TestCase
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
     }
 
-    public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
-    {
-        $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($expectedMessage);
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $processor->processConfiguration($configuration, [
-            'framework' => [
-                'messenger' => [
-                    'default_bus' => null,
-                    'buses' => [
-                        'first_bus' => [],
-                        'second_bus' => [],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
     protected static function getBundleDefaultConfig()
     {
         return [

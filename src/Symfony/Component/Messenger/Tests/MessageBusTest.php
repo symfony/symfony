@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
-use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
@@ -138,13 +138,13 @@ class MessageBusTest extends TestCase
 
     public function testItAddsTheStamps()
     {
-        $finalEnvelope = (new MessageBus())->dispatch(new \stdClass(), [new DelayStamp(5), new BusNameStamp('bar')]);
+        $finalEnvelope = (new MessageBus())->dispatch(new \stdClass(), [new DelayStamp(5), new ConsumedByWorkerStamp()]);
         $this->assertCount(2, $finalEnvelope->all());
     }
 
     public function testItAddsTheStampsToEnvelope()
     {
-        $finalEnvelope = (new MessageBus())->dispatch(new Envelope(new \stdClass()), [new DelayStamp(5), new BusNameStamp('bar')]);
+        $finalEnvelope = (new MessageBus())->dispatch(new Envelope(new \stdClass()), [new DelayStamp(5), new ConsumedByWorkerStamp()]);
         $this->assertCount(2, $finalEnvelope->all());
     }
 

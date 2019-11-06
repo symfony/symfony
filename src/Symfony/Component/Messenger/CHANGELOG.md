@@ -21,6 +21,11 @@ CHANGELOG
  * [BC BREAK] Removed `StopWhenMessageCountIsExceededWorker` in favor of `StopWorkerOnMessageLimitListener`.
  * [BC BREAK] Removed `StopWhenTimeLimitIsReachedWorker` in favor of `StopWorkerOnTimeLimitListener`.
  * [BC BREAK] Removed `StopWhenRestartSignalIsReceived` in favor of `StopWorkerOnRestartSignalListener`.
+ * Deprecated `BusNameStamp`.
+ * [BC BREAK] Removed `AddBusNameStampMiddleware`.
+ * [BC BREAK] Removed `FailedMessageProcessingMiddleware`.
+ * [BC BREAK] Removed `--bus` option of `messenger:consume` command in favor of the "bus" config on the transport.
+ * [BC BREAK] Removed `$fallbackBus` argument from `RoutableMessageBus::__construct`.
  * The component is not marked as `@experimental` anymore.
  * Marked the `MessengerDataCollector` class as `@final`.
  * Added support for `DelayStamp` to the `redis` transport.

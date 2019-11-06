@@ -42,18 +42,8 @@ class ConsumeMessagesCommand extends Command
     private $receiverNames;
     private $eventDispatcher;
 
-    /**
-     * @param RoutableMessageBus $routableBus
-     */
-    public function __construct($routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [])
     {
-        if ($routableBus instanceof ContainerInterface) {
-            @trigger_error(sprintf('Passing a "%s" instance as first argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance instead.', ContainerInterface::class, __METHOD__, RoutableMessageBus::class), E_USER_DEPRECATED);
-            $routableBus = new RoutableMessageBus($routableBus);
-        } elseif (!$routableBus instanceof RoutableMessageBus) {
-            throw new \TypeError(sprintf('The first argument must be an instance of "%s".', RoutableMessageBus::class));
-        }
-
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
@@ -77,7 +67,6 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
-                new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
             ])
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
@@ -100,12 +89,6 @@ Use the --memory-limit option to stop the worker if it exceeds a given memory us
 Use the --time-limit option to stop the worker when the given time limit (in seconds) is reached:
 
     <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
-
-Use the --bus option to specify the message bus to dispatch received messages
-to instead of trying to determine it automatically. This is required if the
-messages didn't originate from Messenger:
-
-    <info>php %command.full_name% <receiver-name> --bus=event_bus</info>
 EOF
             )
         ;
@@ -195,9 +178,7 @@ EOF
             $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
         }
 
-        $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
-
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
+        $worker = new Worker($receivers, $this->routableBus, $this->eventDispatcher, $this->logger);
         $worker->run([
             'sleep' => $input->getOption('sleep') * 1000000,
         ]);

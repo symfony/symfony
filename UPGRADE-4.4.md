@@ -96,6 +96,11 @@ FrameworkBundle
  * Not tagging service route loaders with `routing.route_loader` has been deprecated.
  * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
  * Marked the `RouterDataCollector` class as `@final`.
+ * [BC BREAK] If you defined more than one bus, you must set the "bus" config option on the transport.
+     Messages received from this transport will be dispatched to this bus automatically. This replaces the
+     `--bus` option of `messenger:consume` command and the `BusNameStamp`.
+ * [BC Break] Removed `messenger.middleware.add_bus_name_stamp_middleware` service
+ * [BC Break] Removed `messenger.middleware.failed_message_processing_middleware` service
 
 HttpClient
 ----------
@@ -179,6 +184,11 @@ Messenger
  * [BC BREAK] Removed `StopWhenMessageCountIsExceededWorker` in favor of `StopWorkerOnMessageLimitListener`.
  * [BC BREAK] Removed `StopWhenTimeLimitIsReachedWorker` in favor of `StopWorkerOnTimeLimitListener`.
  * [BC BREAK] Removed `StopWhenRestartSignalIsReceived` in favor of `StopWorkerOnRestartSignalListener`.
+ * Deprecated `BusNameStamp`.
+ * [BC BREAK] Removed `AddBusNameStampMiddleware`.
+ * [BC BREAK] Removed `FailedMessageProcessingMiddleware`.
+ * [BC BREAK] Removed `--bus` option of `messenger:consume` command in favor of the "bus" config on the transport.
+ * [BC BREAK] Removed `$fallbackBus` argument from `RoutableMessageBus::__construct`.
  * Marked the `MessengerDataCollector` class as `@final`.
 
 Mime

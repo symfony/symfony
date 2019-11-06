@@ -679,7 +679,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('messenger_transports');
         $this->assertTrue($container->hasDefinition('messenger.transport.default'));
         $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.receiver'));
-        $this->assertEquals([['alias' => 'default']], $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
+        $this->assertEquals([['alias' => 'default', 'bus' => null]], $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
         $transportArguments = $container->getDefinition('messenger.transport.default')->getArguments();
         $this->assertEquals(new Reference('messenger.default_serializer'), $transportArguments[2]);
 
@@ -737,20 +737,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('messenger.bus.commands'));
         $this->assertSame([], $container->getDefinition('messenger.bus.commands')->getArgument(0));
         $this->assertEquals([
-            ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
-            ['id' => 'failed_message_processing_middleware'],
             ['id' => 'send_message'],
             ['id' => 'handle_message'],
         ], $container->getParameter('messenger.bus.commands.middleware'));
         $this->assertTrue($container->has('messenger.bus.events'));
         $this->assertSame([], $container->getDefinition('messenger.bus.events')->getArgument(0));
         $this->assertEquals([
-            ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
-            ['id' => 'failed_message_processing_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
             ['id' => 'send_message'],
             ['id' => 'handle_message'],

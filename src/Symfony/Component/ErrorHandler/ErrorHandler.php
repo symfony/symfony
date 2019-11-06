@@ -46,7 +46,7 @@ use Symfony\Component\ErrorRenderer\Exception\FlattenException;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ErrorHandler
 {

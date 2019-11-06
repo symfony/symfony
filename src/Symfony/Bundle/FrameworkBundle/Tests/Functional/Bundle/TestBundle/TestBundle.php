@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class TestBundle extends Bundle
@@ -28,6 +29,12 @@ class TestBundle extends Bundle
 
         /** @var $extension DependencyInjection\TestExtension */
         $extension = $container->getExtension('test');
+
+        if (!$container->getParameterBag() instanceof FrozenParameterBag) {
+            $container->setParameter('container.build_hash', 'test_bundle');
+            $container->setParameter('container.build_time', time());
+            $container->setParameter('container.build_id', 'test_bundle');
+        }
 
         $extension->setCustomConfig(new CustomConfig());
 
@@ -42,6 +49,6 @@ class TestBundle extends Bundle
             }
         });
 
-        $container->addCompilerPass(new CheckTypeDeclarationsPass(true), PassConfig::TYPE_AFTER_REMOVING, -100);
+        $container->addCompilerPass(new CheckTypeDeclarationsPass(true, ['http_client', '.debug.http_client']), PassConfig::TYPE_AFTER_REMOVING, -100);
     }
 }

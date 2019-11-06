@@ -71,7 +71,7 @@ final class CurlResponse implements ResponseInterface
             // Move the pushed response to the activity list
             $buffer = $options['buffer'];
 
-            if ('headers' !== curl_getinfo($ch, CURLINFO_PRIVATE)) {
+            if ('H' !== curl_getinfo($ch, CURLINFO_PRIVATE)[0]) {
                 if ($options['buffer'] instanceof \Closure) {
                     try {
                         [$content, $buffer] = [null, $content];
@@ -249,17 +249,15 @@ final class CurlResponse implements ResponseInterface
      */
     private function close(): void
     {
-        if (self::$performing) {
-            $this->multi->handlesActivity[$this->id][] = null;
-            $this->multi->handlesActivity[$this->id][] = new TransportException('Response has been canceled.');
+        unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
+        curl_setopt($this->handle, CURLOPT_PRIVATE, '_0');
 
+        if (self::$performing) {
             return;
         }
 
-        unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
         curl_multi_remove_handle($this->multi->handle, $this->handle);
         curl_setopt_array($this->handle, [
-            CURLOPT_PRIVATE => '_0',
             CURLOPT_NOPROGRESS => true,
             CURLOPT_PROGRESSFUNCTION => null,
             CURLOPT_HEADERFUNCTION => null,
@@ -432,7 +430,12 @@ final class CurlResponse implements ResponseInterface
                 if (!$content && $options['buffer'] instanceof \Closure && $content = $options['buffer']($headers) ?: null) {
                     $content = \is_resource($content) ? $content : fopen('php://temp', 'w+');
                 }
+
+                if (null !== $info['error']) {
+                    throw new TransportException($info['error']);
+                }
             } catch (\Throwable $e) {
+                $multi->handlesActivity[$id] = $multi->handlesActivity[$id] ?? [new FirstChunk()];
                 $multi->handlesActivity[$id][] = null;
                 $multi->handlesActivity[$id][] = $e;
 

@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class GmpCaster
 {

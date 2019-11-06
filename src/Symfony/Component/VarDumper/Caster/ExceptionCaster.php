@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class ExceptionCaster
 {

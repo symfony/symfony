@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @author Baptiste Clavié <clavie.b@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class XmlReaderCaster
 {

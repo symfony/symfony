@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class MemcachedCaster
 {

@@ -7,24 +7,6 @@
     <services>
         <defaults public="false" />
 
-        <service id="lock.store.flock" class="Symfony\Component\Lock\Store\FlockStore">
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4 and will be removed in 5.0.</deprecated>
-        </service>
-
-        <service id="lock.store.semaphore" class="Symfony\Component\Lock\Store\SemaphoreStore">
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4 and will be removed in 5.0.</deprecated>
-        </service>
-
-        <service id="lock.store.memcached.abstract" class="Symfony\Component\Lock\Store\MemcachedStore" abstract="true">
-            <argument /> <!-- Memcached connection service -->
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4 and will be removed in 5.0.</deprecated>
-        </service>
-
-        <service id="lock.store.redis.abstract" class="Symfony\Component\Lock\Store\RedisStore" abstract="true">
-            <argument /> <!-- Redis connection service -->
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4 and will be removed in 5.0.</deprecated>
-        </service>
-
         <service id="lock.store.combined.abstract" class="Symfony\Component\Lock\Store\CombinedStore" abstract="true">
             <argument /> <!-- List of stores -->
             <argument type="service" id="lock.strategy.majority" /> <!-- Strategy -->

@@ -120,6 +120,18 @@ final class MetadataAwareNameConverterTest extends TestCase
     /**
      * @dataProvider attributeAndContextProvider
      */
+    public function testNormalizeWithGroups($propertyName, $expected, $context = [])
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+
+        $this->assertEquals($expected, $nameConverter->normalize($propertyName, OtherSerializedNameDummy::class, null, $context));
+    }
+
+    /**
+     * @dataProvider attributeAndContextProvider
+     */
     public function testDenormalizeWithGroups($expected, $propertyName, $context = [])
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -137,5 +149,16 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['buz', 'buz', ['groups' => ['c']]],
             ['buz', 'buz', []],
         ];
+    }
+
+    public function testDenormalizeWithCacheContext()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+
+        $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['a']]));
+        $this->assertEquals('buzForExport', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['b']]));
+        $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class));
     }
 }

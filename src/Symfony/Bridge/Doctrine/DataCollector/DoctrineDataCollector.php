@@ -54,8 +54,10 @@ class DoctrineDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
     {
         $queries = [];
         foreach ($this->loggers as $name => $logger) {
@@ -119,7 +121,7 @@ class DoctrineDataCollector extends DataCollector
         return 'db';
     }
 
-    private function sanitizeQueries(string $connectionName, array $queries)
+    private function sanitizeQueries(string $connectionName, array $queries): array
     {
         foreach ($queries as $i => $query) {
             $queries[$i] = $this->sanitizeQuery($connectionName, $query);
@@ -128,7 +130,7 @@ class DoctrineDataCollector extends DataCollector
         return $queries;
     }
 
-    private function sanitizeQuery(string $connectionName, $query)
+    private function sanitizeQuery(string $connectionName, array $query): array
     {
         $query['explainable'] = true;
         if (null === $query['params']) {

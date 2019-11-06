@@ -232,8 +232,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             $curlopts[CURLOPT_NOSIGNAL] = true;
         }
 
-        if (!isset($options['normalized_headers']['accept-encoding'])) {
-            $curlopts[CURLOPT_ENCODING] = ''; // Enable HTTP compression
+        if (!isset($options['normalized_headers']['accept-encoding']) && CURL_VERSION_LIBZ & self::$curlVersion['features']) {
+            $curlopts[CURLOPT_ENCODING] = 'gzip'; // Expose only one encoding, some servers mess up when more are provided
         }
 
         foreach ($options['headers'] as $header) {

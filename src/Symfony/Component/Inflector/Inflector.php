@@ -318,6 +318,7 @@ final class Inflector
         'esoom',
         'seires',
         'peehs',
+        'seiceps',
     ];
 
     /**

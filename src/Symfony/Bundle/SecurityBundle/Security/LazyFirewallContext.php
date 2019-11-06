@@ -51,12 +51,7 @@ class LazyFirewallContext extends FirewallContext
         $this->tokenStorage->setInitializer(function () use ($event) {
             $event = new LazyResponseEvent($event);
             foreach (parent::getListeners() as $listener) {
-                if (\is_callable($listener)) {
-                    $listener($event);
-                } else {
-                    @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, implement "__invoke()" instead.', \get_class($listener)), E_USER_DEPRECATED);
-                    $listener->handle($event);
-                }
+                $listener($event);
             }
         });
 

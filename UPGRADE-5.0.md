@@ -490,6 +490,7 @@ SecurityBundle
    changed to underscores.
    Before: `my-cookie` deleted the `my_cookie` cookie (with an underscore).
    After: `my-cookie` deletes the `my-cookie` cookie (with a dash).
+ * Removed the `security.user.provider.in_memory.user` service.
 
 Serializer
 ----------

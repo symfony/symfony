@@ -2752,11 +2752,11 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $this->requiresFeatureSet(404);
 
-        $data = ['year' => date('Y'), 'week' => 1];
+        $data = ['year' => (int) date('Y'), 'week' => 1];
 
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', $data, [
             'input' => 'array',
-            'required' => false,
+            'widget' => 'choice',
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],

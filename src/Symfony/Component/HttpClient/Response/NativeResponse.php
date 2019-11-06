@@ -181,8 +181,8 @@ final class NativeResponse implements ResponseInterface
                 $this->content = \is_resource($this->content) ? $this->content : fopen('php://temp', 'w+');
             }
 
-            if (!$this->buffer) {
-                throw new TransportException('Response has been canceled.');
+            if (null !== $this->info['error']) {
+                throw new TransportException($this->info['error']);
             }
         } catch (\Throwable $e) {
             $this->close();

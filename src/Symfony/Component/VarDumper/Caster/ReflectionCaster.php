@@ -80,10 +80,6 @@ class ReflectionCaster
 
     public static function castGenerator(\Generator $c, array $a, Stub $stub, bool $isNested)
     {
-        if (!class_exists('ReflectionGenerator', false)) {
-            return $a;
-        }
-
         // Cannot create ReflectionGenerator based on a terminated Generator
         try {
             $reflectionGenerator = new \ReflectionGenerator($c);
@@ -136,9 +132,7 @@ class ReflectionCaster
         } else {
             $function = new FrameStub($frame, false, true);
             $function = ExceptionCaster::castFrameStub($function, [], $function, true);
-            $a[$prefix.'executing'] = new EnumStub([
-                "\0~separator= \0".$frame['class'].$frame['type'].$frame['function'].'()' => $function[$prefix.'src'],
-            ]);
+            $a[$prefix.'executing'] = $function[$prefix.'src'];
         }
 
         $a[Caster::PREFIX_VIRTUAL.'closed'] = false;

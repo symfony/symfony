@@ -184,12 +184,11 @@ EOTXT
 Generator {
   this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
   executing: {
-    Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() {
-      %sGeneratorDemo.php:14 {
-        › {
-        ›     yield from bar();
-        › }
-      }
+    %sGeneratorDemo.php:14 {
+      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz()
+      › {
+      ›     yield from bar();
+      › }
     }
   }
   closed: false
@@ -208,6 +207,7 @@ array:2 [
     this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
     trace: {
       %s%eTests%eFixtures%eGeneratorDemo.php:9 {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
         › {
         ›     yield 1;
         › }
@@ -219,12 +219,11 @@ array:2 [
   }
   1 => Generator {
     executing: {
-      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo() {
-        %sGeneratorDemo.php:10 {
-          ›     yield 1;
-          › }
-          › 
-        }
+      %sGeneratorDemo.php:10 {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
+        ›     yield 1;
+        › }
+        › 
       }
     }
     closed: false

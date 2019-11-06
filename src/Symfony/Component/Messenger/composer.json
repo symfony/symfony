@@ -38,6 +38,7 @@
     },
     "conflict": {
         "symfony/event-dispatcher": "<4.3",
+        "symfony/framework-bundle": "<4.4",
         "symfony/http-kernel": "<4.4"
     },
     "suggest": {

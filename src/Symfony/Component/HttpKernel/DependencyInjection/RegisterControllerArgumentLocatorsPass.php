@@ -68,7 +68,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 if ($id === $class) {
                     /*
                      * This happens when container has not been built before and if $class is missing some use-statements.
-                     * Make sure PHP loads the file to show any exceptions the user.
+                     * Make sure PHP loads the file to show any exceptions to the user.
                      */
                     class_exists($class);
                 }

@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Traits\ProxyTrait;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Psr16Adapter extends AbstractAdapter implements PruneableInterface, ResettableInterface
+class Psr16Adapter extends AbstractAdapter implements PruneableInterface
 {
     /**
      * @internal

@@ -1045,15 +1045,14 @@ class OptionsResolver implements Options
     {
         if (\is_array($value) && '[]' === substr($type, -2)) {
             $type = substr($type, 0, -2);
-            $valid = true;
 
             foreach ($value as $val) {
                 if (!$this->verifyTypes($type, $val, $invalidTypes, $level + 1)) {
-                    $valid = false;
+                    return false;
                 }
             }
 
-            return $valid;
+            return true;
         }
 
         if (('null' === $type && null === $value) || (\function_exists($func = 'is_'.$type) && $func($value)) || $value instanceof $type) {

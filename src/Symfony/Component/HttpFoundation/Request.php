@@ -637,7 +637,7 @@ class Request
         }
 
         parse_str($qs, $qs);
-        ksort($qs);
+        ksort($qs, SORT_STRING);
 
         return http_build_query($qs, '', '&', PHP_QUERY_RFC3986);
     }

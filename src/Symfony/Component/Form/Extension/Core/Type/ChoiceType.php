@@ -118,7 +118,6 @@ class ChoiceType extends AbstractType
                     if (isset($valueMap[$value])) {
                         $data[$child->getName()] = $value;
                         unset($unknownValues[$value]);
-                        continue;
                     }
                 }
 

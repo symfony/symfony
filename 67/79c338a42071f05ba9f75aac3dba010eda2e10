@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-01T23:08:52Z
+
+I think allowing stdclass would make sense. I'm really unsure about scalars. That doesn't look like valid API design to me so I don't feel the need support them much. There is "body" if ppl really want them.
+
+---------------------------------------------------------------------------
+
+by pschultz at 2019-11-04T10:54:16Z
+
+> I think allowing stdclass would make sense.
+
+That still ignores all other object types:
+
+```php
+class Book
+{
+    public $title = '';
+    public $author = '';
+}
+```
+
+> I'm really unsure about scalars. That doesn't look like valid API design to me
+
+That's not for Symfony do decide, especially not for a *client* which has to work with existing servers. There are plenty of services that distingish between an empty object and null, for example.
+
+If the json option doesn't allow all valid values, library authors have no choice but to ignore the json option and implement the encoding themselves.
+
+What is the reason for the type restriction? I don't see any downside in removing it. Passing any value that json_encode can't work with will still throw an InvalidArgumentException.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-04T20:06:07Z
+
+> That still ignores all other object types:
+
+To me, we don't want to allow arbitrary objects, or that's quite dangerous as one can very easily provide something that is not meant to be sent on the wire.
+Yes, it's still possible to do so, but there is a small barrier at least.
+
+In you example, `(array) $book` would to it.
+
+> There are plenty of services that distingish between and empty object and null, for example.
+
+Can you provide an example please? E.g a link to a documentation?
+
+> If the json option doesn't allow all valid values, library authors have no choice but to ignore the json option and implement the encoding themselves.
+
+That'd be fair to me - such libs would take responsibility for the type broadening - ensuring some guard (or not) on their own.
+
+> What is the reason for the type restriction? I don't see any downside in removing it.
+
+On top of the small safety barrier, this is also consistent with `toArray()`.
+Let's say the client favors JSON APIs with the O enforced to array|object.
+That doesn't restrict its capabilities in any way, since there is always `body`+`getContent()`.
+
+> Passing any value that json_encode can't work with will still throw an InvalidArgumentException.
+
+That's the issue: json_encode works with way too many objects.
+
+At least that's the current reasoning.
+
+---------------------------------------------------------------------------
+
+by pschultz at 2019-11-04T20:47:43Z
+
+> In you example, (array) $book would to it.
+
+As a library author I can't do that, because JsonSerialize may be implemented.
+
+> That's the issue: json_encode works with way too many objects.
+
+I don't follow this reasoning. json_encode supports all those values that can be represented in JSON. And checking the "top-level" value doesn't change anything about that anyway. It seems silly to me to disallow class instances at the top level but allowing them as an array value (i.e. `$book` fails but `['data' => $book]` is fine).
+
+I was just surprised that the json option isn't just an equivalent for `'body' => json_encode($foo)` (plus content-type header and exception handling). I assumed that was an oversight. If it wasn't then I'll just pretend the json option doesn't exist.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-06T12:06:26Z
+
+/cc @symfony/mergers any opinion here?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-11-06T12:41:45Z
+
++1 for this. Ref. https://github.com/php-http/psr7-integration-tests/pull/40
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-07T12:05:30Z
+
+I'm not able to push on your repo to update the patch.
+Can you please squash your commits and rebase+retarget for 4.4?
+
+---------------------------------------------------------------------------
+
+by pschultz at 2019-11-07T12:45:29Z
+
+Rebased on 4.4.

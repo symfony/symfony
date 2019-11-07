@@ -13,7 +13,6 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\PruneableInterface;
-use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 
 /**

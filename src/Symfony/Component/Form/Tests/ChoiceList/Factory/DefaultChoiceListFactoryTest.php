@@ -241,7 +241,9 @@ class DefaultChoiceListFactoryTest extends TestCase
             [$this->obj2, $this->obj1, $this->obj4, $this->obj3]
         );
 
-        $preferredLabels = array_column($view->preferredChoices, 'label');
+        $preferredLabels = array_map(static function (ChoiceView $view): string {
+            return $view->label;
+        }, $view->preferredChoices);
 
         $this->assertSame(
             [

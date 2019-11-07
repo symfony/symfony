@@ -14,17 +14,12 @@ namespace Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 /**
- * Interface for classes that can render errors in a specific format.
+ * Interface for classes that can render errors in HTML format.
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-interface ErrorRendererInterface
+interface HtmlErrorRendererInterface
 {
-    /**
-     * Gets the format this renderer can return errors as.
-     */
-    public static function getFormat(): string;
-
     /**
      * Returns the response content of the rendered exception.
      */

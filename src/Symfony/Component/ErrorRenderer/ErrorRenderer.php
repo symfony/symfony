@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\ErrorRenderer;
 
-use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
-use Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Formats an exception to be used as response content.
@@ -26,30 +28,13 @@ use Symfony\Component\ErrorRenderer\Exception\FlattenException;
  */
 class ErrorRenderer
 {
-    private $renderers = [];
+    private $htmlErrorRenderer;
+    private $serializer;
 
-    /**
-     * @param ErrorRendererInterface[] $renderers
-     */
-    public function __construct(iterable $renderers)
+    public function __construct(HtmlErrorRendererInterface $htmlErrorRenderer = null, SerializerInterface $serializer = null)
     {
-        foreach ($renderers as $renderer) {
-            $this->addRenderer($renderer);
-        }
-    }
-
-    /**
-     * Registers an error renderer that is format specific.
-     *
-     * By passing an explicit format you can register a renderer for a different format than what
-     * ErrorRendererInterface::getFormat() would return in order to register the same renderer for
-     * several format aliases.
-     */
-    public function addRenderer(ErrorRendererInterface $renderer, string $format = null): self
-    {
-        $this->renderers[$format ?? $renderer::getFormat()] = $renderer;
-
-        return $this;
+        $this->htmlErrorRenderer = $htmlErrorRenderer ?? new HtmlErrorRenderer();
+        $this->serializer = $serializer;
     }
 
     /**
@@ -59,19 +44,23 @@ class ErrorRenderer
      * @param string                      $format    The request format (html, json, xml, etc.)
      *
      * @return string The Response content as a string
-     *
-     * @throws ErrorRendererNotFoundException if no renderer is found
      */
     public function render($exception, string $format = 'html'): string
     {
-        if (!isset($this->renderers[$format])) {
-            throw new ErrorRendererNotFoundException(sprintf('No error renderer found for format "%s".', $format));
-        }
-
         if ($exception instanceof \Throwable) {
             $exception = FlattenException::createFromThrowable($exception);
         }
 
-        return $this->renderers[$format]->render($exception);
+        if ('html' === $format || null === $this->serializer) {
+            return $this->htmlErrorRenderer->render($exception);
+        }
+
+        try {
+            $context = isset($exception->getHeaders()['X-Debug']) ? ['debug' => $exception->getHeaders()['X-Debug']] : [];
+
+            return $this->serializer->serialize($exception, $format, $context);
+        } catch (NotEncodableValueException $_) {
+            return $this->htmlErrorRenderer->render($exception);
+        }
     }
 }

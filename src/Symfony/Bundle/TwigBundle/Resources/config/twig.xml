@@ -163,7 +163,6 @@
         </service>
 
         <service id="twig.error_renderer.html" class="Symfony\Bundle\TwigBundle\ErrorRenderer\TwigHtmlErrorRenderer">
-            <tag name="error_renderer.renderer" priority="1" />
             <argument type="service" id="twig" />
             <argument type="service" id="error_renderer.renderer.html" />
             <argument>%kernel.debug%</argument>

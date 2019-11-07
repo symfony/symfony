@@ -12,8 +12,8 @@
 namespace Symfony\Component\ErrorRenderer\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 class HtmlErrorRendererTest extends TestCase
@@ -21,7 +21,7 @@ class HtmlErrorRendererTest extends TestCase
     /**
      * @dataProvider getRenderData
      */
-    public function testRender(FlattenException $exception, ErrorRendererInterface $errorRenderer, string $expected)
+    public function testRender(FlattenException $exception, HtmlErrorRendererInterface $errorRenderer, string $expected)
     {
         $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception));
     }

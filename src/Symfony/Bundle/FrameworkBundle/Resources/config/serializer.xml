@@ -59,6 +59,12 @@
             <tag name="serializer.normalizer" priority="-900" />
         </service>
 
+        <service id="serializer.normalizer.problem" class="Symfony\Component\Serializer\Normalizer\ProblemNormalizer">
+            <argument>%kernel.debug%</argument>
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-890" />
+        </service>
+
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
             <argument type="service" id="serializer.name_converter.metadata_aware" />

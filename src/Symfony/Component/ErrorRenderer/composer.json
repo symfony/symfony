@@ -27,7 +27,8 @@
     "require-dev": {
         "symfony/console": "^4.4",
         "symfony/dependency-injection": "^4.4",
-        "symfony/http-kernel": "^4.4"
+        "symfony/http-kernel": "^4.4",
+        "symfony/serializer": "^4.4|^5.0"
     },
     "conflict": {
         "symfony/http-kernel": "<4.4"

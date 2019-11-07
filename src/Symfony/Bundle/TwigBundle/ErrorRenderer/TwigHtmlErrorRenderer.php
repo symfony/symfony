@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\ErrorRenderer;
 
-use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -24,7 +24,7 @@ use Twig\Loader\ExistsLoaderInterface;
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class TwigHtmlErrorRenderer implements ErrorRendererInterface
+class TwigHtmlErrorRenderer implements HtmlErrorRendererInterface
 {
     private $twig;
     private $htmlErrorRenderer;
@@ -35,14 +35,6 @@ class TwigHtmlErrorRenderer implements ErrorRendererInterface
         $this->twig = $twig;
         $this->htmlErrorRenderer = $htmlErrorRenderer;
         $this->debug = $debug;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getFormat(): string
-    {
-        return 'html';
     }
 
     /**
@@ -66,7 +58,7 @@ class TwigHtmlErrorRenderer implements ErrorRendererInterface
             'legacy' => false, // to be removed in 5.0
             'exception' => $exception,
             'status_code' => $exception->getStatusCode(),
-            'status_text' => $exception->getTitle(),
+            'status_text' => $exception->getStatusText(),
         ]);
     }
 

@@ -1,6 +1,9 @@
 imports:
     - { resource: ./../config/framework.yml }
 
+framework:
+    serializer: ~
+
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext

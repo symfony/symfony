@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Controller;
 
 use Symfony\Component\ErrorRenderer\ErrorRenderer;
-use Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,11 +38,9 @@ class ErrorController
 
     public function __invoke(Request $request, FlattenException $exception): Response
     {
-        try {
-            return new Response($this->errorRenderer->render($exception, $request->getPreferredFormat()), $exception->getStatusCode(), $exception->getHeaders());
-        } catch (ErrorRendererNotFoundException $_) {
-            return new Response($this->errorRenderer->render($exception), $exception->getStatusCode(), $exception->getHeaders());
-        }
+        $content = $this->errorRenderer->render($exception, $request->getPreferredFormat());
+
+        return new Response($content, $exception->getStatusCode(), $exception->getHeaders());
     }
 
     public function preview(Request $request, int $code): Response

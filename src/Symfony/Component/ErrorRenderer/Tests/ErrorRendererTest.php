@@ -13,42 +13,39 @@ namespace Symfony\Component\ErrorRenderer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorRenderer\ErrorRenderer;
-use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRendererInterface;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ProblemNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class ErrorRendererTest extends TestCase
 {
-    public function testErrorRendererNotFound()
+    public function testDefaultContent()
     {
-        $this->expectException('Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException');
-        $this->expectExceptionMessage('No error renderer found for format "foo".');
-        $exception = FlattenException::createFromThrowable(new \Exception('foo'));
-        (new ErrorRenderer([]))->render($exception, 'foo');
+        $errorRenderer = new ErrorRenderer();
+
+        self::assertStringContainsString('<h2>The server returned a "500 Internal Server Error".</h2>', $errorRenderer->render(new \RuntimeException(), 'html'));
     }
 
-    public function testInvalidErrorRenderer()
+    public function testCustomContent()
     {
-        $this->expectException('TypeError');
-        new ErrorRenderer([new \stdClass()]);
+        $errorRenderer = new ErrorRenderer(new CustomHtmlErrorRenderer());
+
+        $this->assertSame('Foo', $errorRenderer->render(new \RuntimeException('Foo'), 'html'));
     }
 
-    public function testCustomErrorRenderer()
+    public function testSerializerContent()
     {
-        $renderers = [new FooErrorRenderer()];
-        $errorRenderer = new ErrorRenderer($renderers);
+        $exception = new \RuntimeException('Foo');
+        $errorRenderer = new ErrorRenderer(null, new Serializer([new ProblemNormalizer()], [new JsonEncoder()]));
 
-        $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
-        $this->assertSame('Foo', $errorRenderer->render($exception, 'foo'));
+        $this->assertSame('{"type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10","title":"An error occurred","status":500,"detail":"Internal Server Error"}', $errorRenderer->render($exception, 'json'));
     }
 }
 
-class FooErrorRenderer implements ErrorRendererInterface
+class CustomHtmlErrorRenderer implements HtmlErrorRendererInterface
 {
-    public static function getFormat(): string
-    {
-        return 'foo';
-    }
-
     public function render(FlattenException $exception): string
     {
         return $exception->getMessage();

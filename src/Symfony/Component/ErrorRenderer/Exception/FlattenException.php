@@ -26,7 +26,6 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  */
 class FlattenException extends LegacyFlattenException
 {
-    private $title;
     private $message;
     private $code;
     private $previous;
@@ -34,6 +33,7 @@ class FlattenException extends LegacyFlattenException
     private $traceAsString;
     private $class;
     private $statusCode;
+    private $statusText;
     private $headers;
     private $file;
     private $line;
@@ -61,12 +61,12 @@ class FlattenException extends LegacyFlattenException
         }
 
         if (class_exists(Response::class) && isset(Response::$statusTexts[$statusCode])) {
-            $title = Response::$statusTexts[$statusCode];
+            $statusText = Response::$statusTexts[$statusCode];
         } else {
-            $title = 'Whoops, looks like something went wrong.';
+            $statusText = 'Whoops, looks like something went wrong.';
         }
 
-        $e->setTitle($title);
+        $e->setStatusText($statusText);
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
         $e->setTraceFromThrowable($exception);
@@ -172,14 +172,14 @@ class FlattenException extends LegacyFlattenException
         return $this;
     }
 
-    public function getTitle()
+    public function getStatusText()
     {
-        return $this->title;
+        return $this->statusText;
     }
 
-    public function setTitle(string $title): self
+    public function setStatusText(string $statusText): self
     {
-        $this->title = $title;
+        $this->statusText = $statusText;
 
         return $this;
     }

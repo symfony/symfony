@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class HtmlErrorRenderer implements ErrorRendererInterface
+class HtmlErrorRenderer implements HtmlErrorRendererInterface
 {
     private const GHOST_ADDONS = [
         '02-14' => self::GHOST_HEART,
@@ -47,14 +47,6 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         $this->projectDir = $projectDir;
         $this->requestStack = $requestStack;
         $this->logger = $logger;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getFormat(): string
-    {
-        return 'html';
     }
 
     /**
@@ -92,7 +84,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private function renderException(FlattenException $exception, string $debugTemplate = 'views/exception_full.html.php'): string
     {
         $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
-        $statusText = $this->escape($exception->getTitle());
+        $statusText = $this->escape($exception->getStatusText());
         $statusCode = $this->escape($exception->getStatusCode());
 
         if (!$debug) {

@@ -15,6 +15,7 @@ CHANGELOG
  * Removed the `threads` encoder option
  * Removed the `security.authentication.trust_resolver.anonymous_class` parameter
  * Removed the `security.authentication.trust_resolver.rememberme_class` parameter
+ * Removed the `security.user.provider.in_memory.user` service.
 
 4.4.0
 -----

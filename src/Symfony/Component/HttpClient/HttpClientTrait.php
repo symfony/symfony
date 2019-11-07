@@ -332,17 +332,13 @@ trait HttpClientTrait
     }
 
     /**
-     * @param array|\JsonSerializable $value
+     * @param mixed $value
      *
      * @throws InvalidArgumentException When the value cannot be json-encoded
      */
     private static function jsonEncode($value, int $flags = null, int $maxDepth = 512): string
     {
         $flags = $flags ?? (JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION);
-
-        if (!\is_array($value) && !$value instanceof \JsonSerializable) {
-            throw new InvalidArgumentException(sprintf('Option "json" must be array or JsonSerializable, %s given.', \is_object($value) ? \get_class($value) : \gettype($value)));
-        }
 
         try {
             $value = json_encode($value, $flags | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0), $maxDepth);

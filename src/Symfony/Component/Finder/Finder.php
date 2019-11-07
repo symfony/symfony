@@ -711,7 +711,7 @@ class Finder implements \IteratorAggregate, \Countable
             if (!is_readable($gitignoreFilePath)) {
                 throw new \RuntimeException(sprintf('The "ignoreVCSIgnored" option cannot be used by the Finder as the "%s" file is not readable.', $gitignoreFilePath));
             }
-            $notPaths[] = Gitignore::toRegex(file_get_contents($gitignoreFilePath));
+            $notPaths = array_merge($notPaths, [Gitignore::toRegex(file_get_contents($gitignoreFilePath))]);
         }
 
         $minDepth = 0;

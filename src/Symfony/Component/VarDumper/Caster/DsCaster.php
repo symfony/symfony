@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @author Jáchym Toušek <enumag@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class DsCaster
 {

@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class DateCaster
 {

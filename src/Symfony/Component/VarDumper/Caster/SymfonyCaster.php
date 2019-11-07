@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
- * @final since Symfony 4.4
+ * @final
  */
 class SymfonyCaster
 {

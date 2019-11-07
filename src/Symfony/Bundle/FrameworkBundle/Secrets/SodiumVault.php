@@ -30,10 +30,6 @@ class SodiumVault extends AbstractVault
      */
     public function __construct(string $secretsDir, $decryptionKey = null)
     {
-        if (!\function_exists('sodium_crypto_box_seal')) {
-            throw new \LogicException('The "sodium" PHP extension is required to deal with secrets. Alternatively, try running "composer require paragonie/sodium_compat" if you cannot enable the extension."');
-        }
-
         if (null !== $decryptionKey && !\is_string($decryptionKey) && !(\is_object($decryptionKey) && method_exists($decryptionKey, '__toString'))) {
             throw new \TypeError(sprintf('Decryption key should be a string or an object that implements the __toString() method, %s given.', \gettype($decryptionKey)));
         }
@@ -107,16 +103,22 @@ class SodiumVault extends AbstractVault
             return null;
         }
 
+        if (!\function_exists('sodium_crypto_box_seal')) {
+            $this->lastMessage = sprintf('Secret "%s" cannot be revealed as the "sodium" PHP extension missing. Try running "composer require paragonie/sodium_compat" if you cannot enable the extension."', $name);
+
+            return null;
+        }
+
         $this->loadKeys();
 
         if ('' === $this->decryptionKey) {
-            $this->lastMessage = sprintf('Secrets cannot be revealed as no decryption key was found in "%s".', $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
+            $this->lastMessage = sprintf('Secret "%s" cannot be revealed as no decryption key was found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;
         }
 
         if (false === $value = sodium_crypto_box_seal_open(include $file, $this->decryptionKey)) {
-            $this->lastMessage = sprintf('Secrets cannot be revealed as the wrong decryption key was provided for "%s".', $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
+            $this->lastMessage = sprintf('Secret "%s" cannot be revealed as the wrong decryption key was provided for "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;
         }
@@ -167,6 +169,10 @@ class SodiumVault extends AbstractVault
 
     private function loadKeys(): void
     {
+        if (!\function_exists('sodium_crypto_box_seal')) {
+            throw new \LogicException('The "sodium" PHP extension is required to deal with secrets. Alternatively, try running "composer require paragonie/sodium_compat" if you cannot enable the extension."');
+        }
+
         if (null !== $this->encryptionKey || '' !== $this->decryptionKey = (string) $this->decryptionKey) {
             return;
         }

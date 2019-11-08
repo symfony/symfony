@@ -84,7 +84,7 @@ EOF
     public function testBadParentWithNoTimestamp()
     {
         $this->expectException('ReflectionException');
-        $this->expectExceptionMessage('Class Symfony\Component\Config\Tests\Fixtures\MissingParent not found');
+        $this->expectExceptionMessage('Class "Symfony\Component\Config\Tests\Fixtures\MissingParent" not found while loading "Symfony\Component\Config\Tests\Fixtures\BadParent".');
 
         $res = new ClassExistenceResource(BadParent::class, false);
         $res->isFresh(0);

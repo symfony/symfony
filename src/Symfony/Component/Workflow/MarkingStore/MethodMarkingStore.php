@@ -61,7 +61,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
         }
 
         if ($this->singleState) {
-            $marking = [$marking => 1];
+            $marking = [(string) $marking => 1];
         }
 
         return new Marking($marking);

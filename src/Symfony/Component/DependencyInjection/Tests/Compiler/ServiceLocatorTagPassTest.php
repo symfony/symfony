@@ -114,6 +114,7 @@ class ServiceLocatorTagPassTest extends TestCase
             ->setArguments([[
                 'bar' => new Reference('baz'),
                 new Reference('bar'),
+                16 => new Reference('baz'),
             ]])
             ->addTag('container.service_locator')
         ;
@@ -124,6 +125,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $locator = $container->get('foo');
 
         $this->assertSame(TestDefinition1::class, \get_class($locator('bar')));
+        $this->assertSame(TestDefinition2::class, \get_class($locator(16)));
     }
 
     public function testBindingsAreCopied()

@@ -82,7 +82,9 @@ class Translator extends BaseTranslator implements WarmableInterface
         $this->resourceFiles = $this->options['resource_files'];
         $this->scannedDirectories = $this->options['scanned_directories'];
 
-        parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug']);
+        parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug'], [
+            'scanned_directories' => $this->scannedDirectories,
+        ]);
     }
 
     /**

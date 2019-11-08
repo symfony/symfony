@@ -23,6 +23,7 @@
         "symfony/translation-contracts": "^1.1|^2"
     },
     "require-dev": {
+        "symfony/error-handler": "^4.4|^5.0",
         "symfony/http-client": "^4.4|^5.0",
         "symfony/var-exporter": "^4.4|^5.0"
     },

@@ -112,6 +112,7 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\Translator;
@@ -1390,9 +1391,15 @@ class FrameworkExtension extends Extension
                 throw new InvalidArgumentException(sprintf('Invalid value "%s" set as "decryption_env_var": only "word" characters are allowed.', $config['decryption_env_var']));
             }
 
-            $container->getDefinition('secrets.vault')->replaceArgument(1, "%env({$config['decryption_env_var']})%");
+            if (class_exists(LazyString::class)) {
+                $container->getDefinition('secrets.decryption_key')->replaceArgument(1, $config['decryption_env_var']);
+            } else {
+                $container->getDefinition('secrets.vault')->replaceArgument(1, "%env({$config['decryption_env_var']})%");
+                $container->removeDefinition('secrets.decryption_key');
+            }
         } else {
             $container->getDefinition('secrets.vault')->replaceArgument(1, null);
+            $container->removeDefinition('secrets.decryption_key');
         }
     }
 

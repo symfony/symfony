@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-06T11:00:15Z
+
+Oh, can you please add the same to
+`src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler.php` and
+`src/Symfony/Component/VarDumper/Dumper/CliDumper.php`?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-11-06T12:04:56Z
+
+Good point @johnstevenson - reading more in depth now I also see that this really only applies to color, and not things like backspace characters and other ANSI codes, I am not sure if the intent of the isDecorated is really just about color or about more than that?
+
+I see in a few places like ProgressBar, non-decorated output won't use overwrite. In Composer we also assume non-decorated means no support for ANSI characters at all in some places.
+
+So I am not so sure if it's the best way here, ideally we'd need a new API for color support independently from ANSI support. I don't know if it's best to lose all ANSI when you set NO_COLOR, or if you rather get colors anyway..
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-08T14:49:42Z
+
+I think we shouldn't care about `--ansi` - it already has higher precedence.
+Also disabling only colors but no other ansi codes would be way too challenging.
+I'm good with the patch as is - it just need to be added the some more files I listed above.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-11-08T15:43:47Z
+
+Ok updated 👍
+
+---------------------------------------------------------------------------
+
+by johnstevenson at 2019-11-08T16:01:50Z
+
+> I think we shouldn't care about --ansi - it already has higher precedence.
+
+Oops, sorry, I hadn't realized that.

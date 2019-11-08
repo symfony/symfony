@@ -44,6 +44,8 @@
 
         <service id="messenger.middleware.dispatch_after_current_bus" class="Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware" />
 
+        <service id="messenger.middleware.send_mail_after_current_bus" class="Symfony\Component\Mailer\Messenger\Middleware\SendMailAfterCurrentBusMiddleware" />
+
         <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
             <argument type="service" id="validator" />
         </service>

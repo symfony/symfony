@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Wired the `send_mail_after_current_bus` middleware by default in message buses, so mails are sent only after the main message succeeded
  * Added the `framework.router.context` configuration node to configure the `RequestContext`
  * Made `MicroKernelTrait::configureContainer()` compatible with `ContainerConfigurator`
  * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.

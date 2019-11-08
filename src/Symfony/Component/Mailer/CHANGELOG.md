@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added `SendMailAfterCurrentBusMiddleware` to send mails from message buses only after the main message succeeded
+
 4.4.0
 -----
 

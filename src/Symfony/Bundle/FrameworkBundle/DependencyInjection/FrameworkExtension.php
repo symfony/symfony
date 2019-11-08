@@ -81,6 +81,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Messenger\Middleware\SendMailAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -1581,6 +1582,7 @@ class FrameworkExtension extends Extension
             'before' => [
                 ['id' => 'add_bus_name_stamp_middleware'],
                 ['id' => 'reject_redelivered_message_middleware'],
+                ['id' => 'send_mail_after_current_bus'],
                 ['id' => 'dispatch_after_current_bus'],
                 ['id' => 'failed_message_processing_middleware'],
             ],
@@ -1589,6 +1591,13 @@ class FrameworkExtension extends Extension
                 ['id' => 'handle_message'],
             ],
         ];
+
+        if (!class_exists(SendMailAfterCurrentBusMiddleware::class)) {
+            $container->removeDefinition('messenger.middleware.send_mail_after_current_bus');
+            $beforeMiddleware = &$defaultMiddleware['before'];
+            array_splice($beforeMiddleware, 2, 1);
+        }
+
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];
 

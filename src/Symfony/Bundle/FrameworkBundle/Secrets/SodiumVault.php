@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Secrets;
 
+use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
+
 /**
  * @author Tobias Schultze <http://tobion.de>
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -18,7 +20,7 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
  *
  * @internal
  */
-class SodiumVault extends AbstractVault
+class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 {
     private $encryptionKey;
     private $decryptionKey;
@@ -56,8 +58,8 @@ class SodiumVault extends AbstractVault
             // ignore failures to load keys
         }
 
-        if ('' !== $this->decryptionKey && !file_exists($this->pathPrefix.'sodium.encrypt.public')) {
-            $this->export('sodium.encrypt.public', $this->encryptionKey);
+        if ('' !== $this->decryptionKey && !file_exists($this->pathPrefix.'encrypt.public.php')) {
+            $this->export('encrypt.public', $this->encryptionKey);
         }
 
         if (!$override && null !== $this->encryptionKey) {
@@ -69,10 +71,10 @@ class SodiumVault extends AbstractVault
         $this->decryptionKey = sodium_crypto_box_keypair();
         $this->encryptionKey = sodium_crypto_box_publickey($this->decryptionKey);
 
-        $this->export('sodium.encrypt.public', $this->encryptionKey);
-        $this->export('sodium.decrypt.private', $this->decryptionKey);
+        $this->export('encrypt.public', $this->encryptionKey);
+        $this->export('decrypt.private', $this->decryptionKey);
 
-        $this->lastMessage = sprintf('Sodium keys have been generated at "%s*.{public,private}".', $this->getPrettyPath($this->pathPrefix));
+        $this->lastMessage = sprintf('Sodium keys have been generated at "%s*.public/private.php".', $this->getPrettyPath($this->pathPrefix));
 
         return true;
     }
@@ -82,12 +84,12 @@ class SodiumVault extends AbstractVault
         $this->lastMessage = null;
         $this->validateName($name);
         $this->loadKeys();
-        $this->export($name.'.'.substr_replace(md5($name), '.sodium', -26), sodium_crypto_box_seal($value, $this->encryptionKey ?? sodium_crypto_box_publickey($this->decryptionKey)));
+        $this->export($name.'.'.substr(md5($name), 0, 6), sodium_crypto_box_seal($value, $this->encryptionKey ?? sodium_crypto_box_publickey($this->decryptionKey)));
 
         $list = $this->list();
         $list[$name] = null;
         uksort($list, 'strnatcmp');
-        file_put_contents($this->pathPrefix.'sodium.list', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), LOCK_EX));
+        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), LOCK_EX));
 
         $this->lastMessage = sprintf('Secret "%s" encrypted in "%s"; you can commit it.', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
     }
@@ -97,7 +99,7 @@ class SodiumVault extends AbstractVault
         $this->lastMessage = null;
         $this->validateName($name);
 
-        if (!file_exists($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.sodium', -26))) {
+        if (!file_exists($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.php', -26))) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;
@@ -131,7 +133,7 @@ class SodiumVault extends AbstractVault
         $this->lastMessage = null;
         $this->validateName($name);
 
-        if (!file_exists($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.sodium', -26))) {
+        if (!file_exists($file = $this->pathPrefix.$name.'.'.substr_replace(md5($name), '.php', -26))) {
             $this->lastMessage = sprintf('Secret "%s" not found in "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return false;
@@ -139,7 +141,7 @@ class SodiumVault extends AbstractVault
 
         $list = $this->list();
         unset($list[$name]);
-        file_put_contents($this->pathPrefix.'sodium.list', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), LOCK_EX));
+        file_put_contents($this->pathPrefix.'list.php', sprintf("<?php\n\nreturn %s;\n", var_export($list, true), LOCK_EX));
 
         $this->lastMessage = sprintf('Secret "%s" removed from "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
@@ -150,7 +152,7 @@ class SodiumVault extends AbstractVault
     {
         $this->lastMessage = null;
 
-        if (!file_exists($file = $this->pathPrefix.'sodium.list')) {
+        if (!file_exists($file = $this->pathPrefix.'list.php')) {
             return [];
         }
 
@@ -167,6 +169,11 @@ class SodiumVault extends AbstractVault
         return $secrets;
     }
 
+    public function loadEnvVars(): array
+    {
+        return $this->list(true);
+    }
+
     private function loadKeys(): void
     {
         if (!\function_exists('sodium_crypto_box_seal')) {
@@ -177,12 +184,12 @@ class SodiumVault extends AbstractVault
             return;
         }
 
-        if (file_exists($this->pathPrefix.'sodium.decrypt.private')) {
-            $this->decryptionKey = (string) include $this->pathPrefix.'sodium.decrypt.private';
+        if (file_exists($this->pathPrefix.'decrypt.private.php')) {
+            $this->decryptionKey = (string) include $this->pathPrefix.'decrypt.private.php';
         }
 
-        if (file_exists($this->pathPrefix.'sodium.encrypt.public')) {
-            $this->encryptionKey = (string) include $this->pathPrefix.'sodium.encrypt.public';
+        if (file_exists($this->pathPrefix.'encrypt.public.php')) {
+            $this->encryptionKey = (string) include $this->pathPrefix.'encrypt.public.php';
         } elseif ('' !== $this->decryptionKey) {
             $this->encryptionKey = sodium_crypto_box_publickey($this->decryptionKey);
         } else {
@@ -196,7 +203,7 @@ class SodiumVault extends AbstractVault
         $data = str_replace('%', '\x', rawurlencode($data));
         $data = sprintf("<?php // %s on %s\n\nreturn \"%s\";\n", $name, date('r'), $data);
 
-        if (false === file_put_contents($this->pathPrefix.$file, $data, LOCK_EX)) {
+        if (false === file_put_contents($this->pathPrefix.$file.'.php', $data, LOCK_EX)) {
             $e = error_get_last();
             throw new \ErrorException($e['message'] ?? 'Failed to write secrets data.', 0, $e['type'] ?? E_USER_WARNING);
         }

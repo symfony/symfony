@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -20,10 +21,17 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class EnvVarProcessor implements EnvVarProcessorInterface
 {
     private $container;
+    private $loaders;
+    private $loadedVars = [];
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @param EnvVarLoaderInterface[] $loaders
+     */
+    public function __construct(ContainerInterface $container, \Traversable $loaders = null)
     {
         $this->container = $container;
+        $this->loaders = new \IteratorIterator($loaders ?? new \ArrayIterator());
+        $this->loaders = $this->loaders->getInnerIterator();
     }
 
     /**
@@ -127,12 +135,31 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
             $env = $_SERVER[$name];
         } elseif (false === ($env = getenv($name)) || null === $env) { // null is a possible value because of thread safety issues
-            if (!$this->container->hasParameter("env($name)")) {
-                throw new EnvNotFoundException(sprintf('Environment variable not found: "%s".', $name));
+            foreach ($this->loadedVars as $vars) {
+                if (false !== $env = ($vars[$name] ?? false)) {
+                    break;
+                }
             }
 
-            if (null === $env = $this->container->getParameter("env($name)")) {
-                return null;
+            try {
+                while ((false === $env || null === $env) && $this->loaders->valid()) {
+                    $loader = $this->loaders->current();
+                    $this->loaders->next();
+                    $this->loadedVars[] = $vars = $loader->loadEnvVars();
+                    $env = $vars[$name] ?? false;
+                }
+            } catch (ParameterCircularReferenceException $e) {
+                // skip loaders that need an env var that is not defined
+            }
+
+            if (false === $env || null === $env) {
+                if (!$this->container->hasParameter("env($name)")) {
+                    throw new EnvNotFoundException(sprintf('Environment variable not found: "%s".', $name));
+                }
+
+                if (null === $env = $this->container->getParameter("env($name)")) {
+                    return null;
+                }
             }
         }
 

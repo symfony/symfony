@@ -5,6 +5,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
 
 class EnvVarProcessorTest extends TestCase
@@ -516,5 +517,40 @@ CSV;
             [$complex, \PHP_VERSION_ID >= 70400 ? ['', '"', 'foo"', '\\"', '\\', 'foo\\'] : ['', '"', 'foo"', '\\"",\\,foo\\']],
             [null, null],
         ];
+    }
+
+    public function testEnvLoader()
+    {
+        $loaders = function () {
+            yield new class() implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return [
+                        'FOO_ENV_LOADER' => '123',
+                    ];
+                }
+            };
+
+            yield new class() implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return [
+                        'FOO_ENV_LOADER' => '234',
+                        'BAR_ENV_LOADER' => '456',
+                    ];
+                }
+            };
+        };
+
+        $processor = new EnvVarProcessor(new Container(), $loaders());
+
+        $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
+        $this->assertSame('123', $result);
+
+        $result = $processor->getEnv('string', 'BAR_ENV_LOADER', function () {});
+        $this->assertSame('456', $result);
+
+        $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
+        $this->assertSame('123', $result); // check twice
     }
 }

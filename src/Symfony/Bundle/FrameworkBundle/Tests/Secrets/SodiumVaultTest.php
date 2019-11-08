@@ -26,19 +26,19 @@ class SodiumVaultTest extends TestCase
         $vault = new SodiumVault($this->secretsDir);
 
         $this->assertTrue($vault->generateKeys());
-        $this->assertFileExists($this->secretsDir.'/test.sodium.encrypt.public');
-        $this->assertFileExists($this->secretsDir.'/test.sodium.decrypt.private');
+        $this->assertFileExists($this->secretsDir.'/test.encrypt.public.php');
+        $this->assertFileExists($this->secretsDir.'/test.decrypt.private.php');
 
-        $encKey = file_get_contents($this->secretsDir.'/test.sodium.encrypt.public');
-        $decKey = file_get_contents($this->secretsDir.'/test.sodium.decrypt.private');
+        $encKey = file_get_contents($this->secretsDir.'/test.encrypt.public.php');
+        $decKey = file_get_contents($this->secretsDir.'/test.decrypt.private.php');
 
         $this->assertFalse($vault->generateKeys());
-        $this->assertStringEqualsFile($this->secretsDir.'/test.sodium.encrypt.public', $encKey);
-        $this->assertStringEqualsFile($this->secretsDir.'/test.sodium.decrypt.private', $decKey);
+        $this->assertStringEqualsFile($this->secretsDir.'/test.encrypt.public.php', $encKey);
+        $this->assertStringEqualsFile($this->secretsDir.'/test.decrypt.private.php', $decKey);
 
         $this->assertTrue($vault->generateKeys(true));
-        $this->assertStringNotEqualsFile($this->secretsDir.'/test.sodium.encrypt.public', $encKey);
-        $this->assertStringNotEqualsFile($this->secretsDir.'/test.sodium.decrypt.private', $decKey);
+        $this->assertStringNotEqualsFile($this->secretsDir.'/test.encrypt.public.php', $encKey);
+        $this->assertStringNotEqualsFile($this->secretsDir.'/test.decrypt.private.php', $decKey);
     }
 
     public function testEncryptAndDecrypt()

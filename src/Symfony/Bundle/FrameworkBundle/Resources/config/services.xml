@@ -121,5 +121,11 @@
             <argument type="service" id="request_stack" />
             <tag name="kernel.event_subscriber" />
         </service>
+
+        <service id="container.env_var_processor" class="Symfony\Component\DependencyInjection\EnvVarProcessor">
+            <tag name="container.env_var_processor" />
+            <argument type="service" id="service_container" />
+            <argument type="tagged_iterator" tag="container.env_var_loader" />
+        </service>
     </services>
 </container>

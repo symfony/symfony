@@ -178,9 +178,9 @@ class FileLoaderTest extends TestCase
 
         $this->assertTrue($container->has(MissingParent::class));
 
-        $this->assertSame(
-            ['While discovering services from namespace "Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\", an error was thrown when processing the class "Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent": "Class Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingClass not found".'],
-            $container->getDefinition(MissingParent::class)->getErrors()
+        $this->assertRegExp(
+            '{Class "?Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Fixtures\\\\Prototype\\\\BadClasses\\\\MissingClass"? not found}',
+            $container->getDefinition(MissingParent::class)->getErrors()[0]
         );
     }
 

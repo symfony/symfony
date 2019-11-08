@@ -572,40 +572,12 @@ class WorkflowTest extends TestCase
     }
 }
 
-class EventDispatcherMock implements \Symfony\Component\EventDispatcher\EventDispatcherInterface
+class EventDispatcherMock implements \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
 {
     public $dispatchedEvents = [];
 
     public function dispatch($event, string $eventName = null)
     {
         $this->dispatchedEvents[] = $eventName;
-    }
-
-    public function addListener($eventName, $listener, $priority = 0)
-    {
-    }
-
-    public function addSubscriber(\Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber)
-    {
-    }
-
-    public function removeListener($eventName, $listener)
-    {
-    }
-
-    public function removeSubscriber(\Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber)
-    {
-    }
-
-    public function getListeners($eventName = null)
-    {
-    }
-
-    public function getListenerPriority($eventName, $listener)
-    {
-    }
-
-    public function hasListeners($eventName = null)
-    {
     }
 }

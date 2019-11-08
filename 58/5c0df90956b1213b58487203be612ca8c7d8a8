@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by pulzarraider at 2019-06-03T03:20:20Z
+
+Thank you @nicolas-grekas, I've merged your MR and did some more small improvements.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-06-03T06:42:58Z
+
+@pulzarraider If I am correct, this must now go into `4.4` branch, could you please switch the target branch for this PR?
+
+I already did this for the corresponding Docs-PR https://github.com/symfony/symfony-docs/pull/11647
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-06-03T07:31:00Z
+
+@OskarStark That is correct, this is a new feature and the 4.3 branch is in feature freeze 👍
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-24T14:15:23Z
+
+This looks like an interesting feature. I hope we can make a final effort to finish it before Symfony 4.4/5.0 "feature freeze" start in a few days. Thanks!
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2019-09-27T18:28:37Z
+
+I will continue to work on this feature today.
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2019-09-28T20:22:08Z
+
+I think this feature is finished. @nicolas-grekas @stof @sstok please review it again.
+I hope it will be added in sf 4.4.
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2019-11-08T07:37:45Z
+
+Thank you @nicolas-grekas for your changes.

@@ -86,7 +86,7 @@ class HttpOptions
     }
 
     /**
-     * @param array|\JsonSerializable $json
+     * @param mixed $json
      *
      * @return $this
      */

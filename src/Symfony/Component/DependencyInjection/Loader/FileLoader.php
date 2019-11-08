@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
+use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -39,6 +42,42 @@ abstract class FileLoader extends BaseFileLoader
         $this->container = $container;
 
         parent::__construct($locator);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param bool|string          $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
+     * @param string|string[]|null $exclude      Glob patterns to exclude from the import
+     */
+    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null/*, $exclude = null*/)
+    {
+        $args = \func_get_args();
+
+        if ($ignoreNotFound = 'not_found' === $ignoreErrors) {
+            $args[2] = false;
+        } elseif (!\is_bool($ignoreErrors)) {
+            @trigger_error(sprintf('Invalid argument $ignoreErrors provided to %s::import(): boolean or "not_found" expected, %s given.', \get_class($this), \gettype($ignoreErrors)), E_USER_DEPRECATED);
+            $args[2] = (bool) $ignoreErrors;
+        }
+
+        try {
+            parent::import(...$args);
+        } catch (LoaderLoadException $e) {
+            if (!$ignoreNotFound || !($prev = $e->getPrevious()) instanceof FileLocatorFileNotFoundException) {
+                throw $e;
+            }
+
+            foreach ($prev->getTrace() as $frame) {
+                if ('import' === ($frame['function'] ?? null) && is_a($frame['class'] ?? '', Loader::class, true)) {
+                    break;
+                }
+            }
+
+            if ($args !== $frame['args']) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -156,12 +195,7 @@ abstract class FileLoader extends BaseFileLoader
             try {
                 $r = $this->container->getReflectionClass($class);
             } catch (\ReflectionException $e) {
-                $classes[$class] = sprintf(
-                    'While discovering services from namespace "%s", an error was thrown when processing the class "%s": "%s".',
-                    $namespace,
-                    $class,
-                    $e->getMessage()
-                );
+                $classes[$class] = $e->getMessage();
                 continue;
             }
             // check to make sure the expected class exists

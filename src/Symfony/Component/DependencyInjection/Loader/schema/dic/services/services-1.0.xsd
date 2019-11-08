@@ -78,7 +78,7 @@
       ]]></xsd:documentation>
     </xsd:annotation>
     <xsd:attribute name="resource" type="xsd:string" use="required" />
-    <xsd:attribute name="ignore-errors" type="boolean" />
+    <xsd:attribute name="ignore-errors" type="ignore_errors" />
     <xsd:attribute name="type" type="xsd:string" />
   </xsd:complexType>
 
@@ -270,6 +270,12 @@
       <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_iterator" />
       <xsd:enumeration value="tagged_locator" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="ignore_errors">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="(true|false|not_found)" />
     </xsd:restriction>
   </xsd:simpleType>
 

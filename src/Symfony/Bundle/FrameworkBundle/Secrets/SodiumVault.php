@@ -52,7 +52,7 @@ class SodiumVault extends AbstractVault
 
         try {
             $this->loadKeys();
-        } catch (\LogicException $e) {
+        } catch (\RuntimeException $e) {
             // ignore failures to load keys
         }
 
@@ -186,7 +186,7 @@ class SodiumVault extends AbstractVault
         } elseif ('' !== $this->decryptionKey) {
             $this->encryptionKey = sodium_crypto_box_publickey($this->decryptionKey);
         } else {
-            throw new \LogicException(sprintf('Encryption key not found in "%s".', \dirname($this->pathPrefix)));
+            throw new \RuntimeException(sprintf('Encryption key not found in "%s".', \dirname($this->pathPrefix)));
         }
     }
 

@@ -327,15 +327,20 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
     public function __destruct()
     {
         $this->multi->pushedResponses = [];
-        if (\defined('CURLMOPT_PUSHFUNCTION')) {
-            curl_multi_setopt($this->multi->handle, CURLMOPT_PUSHFUNCTION, null);
+
+        if (\is_resource($this->multi->handle)) {
+            if (\defined('CURLMOPT_PUSHFUNCTION')) {
+                curl_multi_setopt($this->multi->handle, CURLMOPT_PUSHFUNCTION, null);
+            }
+
+            $active = 0;
+            while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
         }
 
-        $active = 0;
-        while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
-
         foreach ($this->multi->openHandles as [$ch]) {
-            curl_setopt($ch, CURLOPT_VERBOSE, false);
+            if (\is_resource($ch)) {
+                curl_setopt($ch, CURLOPT_VERBOSE, false);
+            }
         }
     }
 

@@ -337,7 +337,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return null;
         }
 
-        $resource = null;
+        $resource = $classReflector = null;
 
         try {
             if (isset($this->classReflectors[$class])) {
@@ -352,7 +352,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if ($throw) {
                 throw $e;
             }
-            $classReflector = false;
         }
 
         if ($this->trackResources) {

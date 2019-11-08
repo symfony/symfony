@@ -181,6 +181,15 @@ abstract class ConstraintValidatorTestCase extends TestCase
             ->willReturn($validator);
     }
 
+    protected function expectValidateValue(int $i, $value, array $constraints = [], $group = null)
+    {
+        $contextualValidator = $this->context->getValidator()->inContext($this->context);
+        $contextualValidator->expects($this->at($i))
+            ->method('validate')
+            ->with($value, $constraints, $group)
+            ->willReturn($contextualValidator);
+    }
+
     protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);

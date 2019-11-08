@@ -29,6 +29,7 @@ CHANGELOG
  * deprecated returning `null` from `Command::execute()`, return `0` instead
  * Deprecated the `Application::renderException()` and `Application::doRenderException()` methods,
    use `renderThrowable()` and `doRenderThrowable()` instead.
+ * added support for the `NO_COLOR` env var (https://no-color.org/)
 
 4.3.0
 -----

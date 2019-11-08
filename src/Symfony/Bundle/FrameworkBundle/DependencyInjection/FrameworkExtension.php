@@ -48,6 +48,7 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -378,6 +379,8 @@ class FrameworkExtension extends Extension
             ->addTag('console.command');
         $container->registerForAutoconfiguration(ResourceCheckerInterface::class)
             ->addTag('config_cache.resource_checker');
+        $container->registerForAutoconfiguration(EnvVarLoaderInterface::class)
+            ->addTag('container.env_var_loader');
         $container->registerForAutoconfiguration(EnvVarProcessorInterface::class)
             ->addTag('container.env_var_processor');
         $container->registerForAutoconfiguration(ServiceLocator::class)
@@ -1348,9 +1351,13 @@ class FrameworkExtension extends Extension
         }
 
         if ($config['decryption_env_var']) {
-            $container->getDefinition('secrets.decryption_key')->replaceArgument(1, $config['decryption_env_var']);
+            if (!preg_match('/^(?:\w*+:)*+\w++$/', $config['decryption_env_var'])) {
+                throw new InvalidArgumentException(sprintf('Invalid value "%s" set as "decryption_env_var": only "word" characters are allowed.', $config['decryption_env_var']));
+            }
+
+            $container->getDefinition('secrets.vault')->replaceArgument(1, "%env({$config['decryption_env_var']})%");
         } else {
-            $container->removeDefinition('secrets.decryption_key');
+            $container->getDefinition('secrets.vault')->replaceArgument(1, null);
         }
     }
 

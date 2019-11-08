@@ -10,6 +10,7 @@ CHANGELOG
  * added the stamps of a message after it is dispatched in `TraceableMessageBus` and `MessengerDataCollector` collected data
  * added `UuidCaster`
  * made all casters final
+ * added support for the `NO_COLOR` env var (https://no-color.org/)
 
 4.3.0
 -----

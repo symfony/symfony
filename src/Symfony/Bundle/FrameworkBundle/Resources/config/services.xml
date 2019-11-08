@@ -117,6 +117,12 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
+        <service id="container.env_var_processor" class="Symfony\Component\DependencyInjection\EnvVarProcessor">
+            <tag name="container.env_var_processor" />
+            <argument type="service" id="service_container" />
+            <argument type="tagged_iterator" tag="container.env_var_loader" />
+        </service>
+
         <service id="slugger" class="Symfony\Component\String\Slugger\AsciiSlugger">
             <argument>%kernel.default_locale%</argument>
             <tag name="kernel.locale_aware" />

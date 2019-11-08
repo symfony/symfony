@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-07T13:33:32Z
+
+Now with a slightly better error message triggered from Config.

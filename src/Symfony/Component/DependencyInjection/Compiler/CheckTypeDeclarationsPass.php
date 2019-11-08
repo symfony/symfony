@@ -188,7 +188,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         $checkFunction = sprintf('is_%s', $parameter->getType()->getName());
 
         if (!$parameter->getType()->isBuiltin() || !$checkFunction($value)) {
-            throw new InvalidParameterTypeException($this->currentId, \gettype($value), $parameter);
+            throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? \get_class($value) : \gettype($value), $parameter);
         }
     }
 }

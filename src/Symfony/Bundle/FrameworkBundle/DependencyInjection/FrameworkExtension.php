@@ -49,6 +49,7 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -376,6 +377,8 @@ class FrameworkExtension extends Extension
             ->addTag('console.command');
         $container->registerForAutoconfiguration(ResourceCheckerInterface::class)
             ->addTag('config_cache.resource_checker');
+        $container->registerForAutoconfiguration(EnvVarLoaderInterface::class)
+            ->addTag('container.env_var_loader');
         $container->registerForAutoconfiguration(EnvVarProcessorInterface::class)
             ->addTag('container.env_var_processor');
         $container->registerForAutoconfiguration(ServiceLocator::class)

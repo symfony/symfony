@@ -191,7 +191,7 @@ class YamlFileLoader extends FileLoader
             }
 
             $this->setCurrentDir($defaultDirectory);
-            $this->import($import['resource'], isset($import['type']) ? $import['type'] : null, isset($import['ignore_errors']) ? (bool) $import['ignore_errors'] : false, $file);
+            $this->import($import['resource'], $import['type'] ?? null, $import['ignore_errors'] ?? false, $file);
         }
     }
 

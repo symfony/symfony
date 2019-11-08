@@ -141,15 +141,20 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 }
             }
 
+            $loaders = $this->loaders;
+            $this->loaders = new \ArrayIterator();
+
             try {
-                while ((false === $env || null === $env) && $this->loaders->valid()) {
-                    $loader = $this->loaders->current();
-                    $this->loaders->next();
+                while ((false === $env || null === $env) && $loaders->valid()) {
+                    $loader = $loaders->current();
+                    $loaders->next();
                     $this->loadedVars[] = $vars = $loader->loadEnvVars();
                     $env = $vars[$name] ?? false;
                 }
             } catch (ParameterCircularReferenceException $e) {
                 // skip loaders that need an env var that is not defined
+            } finally {
+                $this->loaders = $loaders;
             }
 
             if (false === $env || null === $env) {

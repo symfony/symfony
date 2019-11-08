@@ -34,7 +34,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -1403,20 +1403,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame($redisUrl, $url);
     }
 
-    public function testCacheDefaultRedisProviderWithEnvVar()
-    {
-        $container = $this->createContainerFromFile('cache_env_var');
-
-        $redisUrl = 'redis://paas.com';
-        $providerId = '.cache_connection.'.ContainerBuilder::hash($redisUrl);
-
-        $this->assertTrue($container->hasDefinition($providerId));
-
-        $url = $container->getDefinition($providerId)->getArgument(0);
-
-        $this->assertSame($redisUrl, $url);
-    }
-
     public function testCachePoolServices()
     {
         $container = $this->createContainerFromFile('cache', [], true, false);
@@ -1584,7 +1570,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainer(array $data = [])
     {
-        return new ContainerBuilder(new ParameterBag(array_merge([
+        return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([
             'kernel.bundles' => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],
             'kernel.bundles_metadata' => ['FrameworkBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..']],
             'kernel.cache_dir' => __DIR__,

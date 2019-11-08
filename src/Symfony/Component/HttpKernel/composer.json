@@ -48,9 +48,17 @@
     },
     "conflict": {
         "symfony/browser-kit": "<4.4",
+        "symfony/cache": "<5.0",
         "symfony/config": "<5.0",
+        "symfony/form": "<5.0",
         "symfony/dependency-injection": "<4.4",
-        "symfony/translation": "<4.4",
+        "symfony/doctrine-bridge": "<5.0",
+        "symfony/http-client": "<5.0",
+        "symfony/mailer": "<5.0",
+        "symfony/messenger": "<5.0",
+        "symfony/translation": "<5.0",
+        "symfony/twig-bridge": "<5.0",
+        "symfony/validator": "<5.0",
         "symfony/var-dumper": "<4.4",
         "twig/twig": "<2.4"
     },

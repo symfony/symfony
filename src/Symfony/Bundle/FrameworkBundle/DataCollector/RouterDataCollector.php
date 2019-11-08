@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\DataCollector\RouterDataCollector as BaseRouter
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class RouterDataCollector extends BaseRouterDataCollector
 {

@@ -51,6 +51,7 @@
         "symfony/console": "<4.4",
         "symfony/form": "<5.0",
         "symfony/http-foundation": "<4.4",
+        "symfony/http-kernel": "<4.4",
         "symfony/translation": "<5.0",
         "symfony/workflow": "<4.4"
     },

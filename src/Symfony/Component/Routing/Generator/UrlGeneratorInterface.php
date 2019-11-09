@@ -75,7 +75,7 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
      * @param mixed[] $parameters    An array of parameters
      * @param int     $referenceType The type of reference to be generated (one of the constants)
      *
-     * @return string|null The generated URL
+     * @return string The generated URL
      *
      * @throws RouteNotFoundException              If the named route doesn't exist
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route

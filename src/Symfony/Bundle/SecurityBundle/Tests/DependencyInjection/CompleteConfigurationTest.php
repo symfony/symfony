@@ -287,6 +287,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -299,6 +300,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -320,6 +322,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
@@ -348,6 +351,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -360,6 +364,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -401,6 +406,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -413,6 +419,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -430,9 +437,14 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    public function testEncodersWithBCrypt()
+    public function testMigratingEncoder()
     {
-        $container = $this->getContainer('bcrypt_encoder');
+        if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
+            $this->markTestSkipped('Argon2i algorithm is not supported.');
+        }
+
+        $container = $this->getContainer('migrating_encoder');
+
         $this->assertEquals([[
             'JMS\FooBundle\Entity\User1' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
@@ -449,6 +461,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -461,6 +474,67 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
+            'JMS\FooBundle\Entity\User5' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'algorithm' => 'argon2i',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => 256,
+                'time_cost' => 1,
+                'threads' => null,
+                'migrate_from' => ['bcrypt'],
+            ],
+        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
+    }
+
+    public function testEncodersWithBCrypt()
+    {
+        $container = $this->getContainer('bcrypt_encoder');
+
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User3' => [
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [

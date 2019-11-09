@@ -20,7 +20,7 @@
         "symfony/polyfill-intl-grapheme": "~1.0",
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/translation-contracts": "^1.1|^2.0"
+        "symfony/translation-contracts": "^1.1|^2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\String\\": "" },

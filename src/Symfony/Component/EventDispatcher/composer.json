@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^7.2.9",
-        "symfony/event-dispatcher-contracts": "^1.1|^2"
+        "symfony/event-dispatcher-contracts": "^2"
     },
     "require-dev": {
         "symfony/dependency-injection": "^4.4|^5.0",
@@ -33,7 +33,7 @@
     },
     "provide": {
         "psr/event-dispatcher-implementation": "1.0",
-        "symfony/event-dispatcher-implementation": "1.1"
+        "symfony/event-dispatcher-implementation": "2.0"
     },
     "suggest": {
         "symfony/dependency-injection": "",

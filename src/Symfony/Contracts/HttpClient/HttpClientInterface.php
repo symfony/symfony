@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\Test\HttpClientTestCase;
  * @see HttpClientTestCase for a reference test suite
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 1.1
  */
 interface HttpClientInterface
 {

@@ -44,9 +44,9 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
     {
-        $trans = $this->translator->trans($id, $parameters, $domain, $locale);
+        $trans = $this->translator->trans($id = (string) $id, $parameters, $domain, $locale);
         $this->log($id, $domain, $locale);
 
         return $trans;
@@ -55,7 +55,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale)
+    public function setLocale(string $locale)
     {
         $prev = $this->translator->getLocale();
         $this->translator->setLocale($locale);
@@ -107,13 +107,12 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
     /**
      * Logs for missing translations.
      */
-    private function log(?string $id, ?string $domain, ?string $locale)
+    private function log(string $id, ?string $domain, ?string $locale)
     {
         if (null === $domain) {
             $domain = 'messages';
         }
 
-        $id = (string) $id;
         $catalogue = $this->translator->getCatalogue($locale);
         if ($catalogue->defines($id, $domain)) {
             return;

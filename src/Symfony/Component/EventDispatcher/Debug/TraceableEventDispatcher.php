@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -129,12 +128,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function dispatch($event, string $eventName = null): object
+    public function dispatch(object $event, string $eventName = null): object
     {
-        if (!\is_object($event)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an object, %s given.', EventDispatcherInterface::class, \gettype($event)));
-        }
-
         $eventName = $eventName ?? \get_class($event);
 
         if (null === $this->callStack) {
@@ -143,7 +138,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
 
         $currentRequestHash = $this->currentRequestHash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
 
-        if (null !== $this->logger && ($event instanceof Event || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
+        if (null !== $this->logger && $event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
             $this->logger->debug(sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
         }
 

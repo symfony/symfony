@@ -15,7 +15,6 @@ use Psr\EventDispatcher\StoppableEventInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Caster\ClassStub;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -121,7 +120,7 @@ final class WrappedListener
             $e->stop();
         }
 
-        if (($event instanceof Event || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
+        if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
             $this->stoppedPropagation = true;
         }
     }

@@ -72,6 +72,7 @@ class AccessListener implements ListenerInterface
         foreach ($attributes as $key => $value) {
             if ($this->accessDecisionManager->decide($token, [$key => $value], $request)) {
                 $granted = true;
+                break;
             }
         }
 

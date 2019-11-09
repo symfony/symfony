@@ -49,7 +49,7 @@ class HttpKernelTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
-            $event->setResponse(new Response($event->getException()->getMessage()));
+            $event->setResponse(new Response($event->getThrowable()->getMessage()));
         });
 
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new \RuntimeException('foo'); });
@@ -96,7 +96,7 @@ class HttpKernelTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
-            $event->setResponse(new Response($event->getException()->getMessage()));
+            $event->setResponse(new Response($event->getThrowable()->getMessage()));
         });
 
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new MethodNotAllowedHttpException(['POST']); });

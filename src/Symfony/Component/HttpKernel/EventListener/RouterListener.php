@@ -143,7 +143,7 @@ class RouterListener implements EventSubscriberInterface
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        if (!$this->debug || !($e = $event->getException()) instanceof NotFoundHttpException) {
+        if (!$this->debug || !($e = $event->getThrowable()) instanceof NotFoundHttpException) {
             return;
         }
 

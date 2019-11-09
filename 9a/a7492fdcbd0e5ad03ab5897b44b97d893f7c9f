@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-07T17:21:12Z
+
+> Test currently fail because the translator is called with null as translation key. That possibility should be deprecated imho.
+
+We recently ensured that the implementation accepts null. Note that the interface can be `string` while the implementation (the trait) is `?string`. That'd be perfectly fine to me. You could update the PR in that direction.
+
+About the PR in general, we don't have the infrastructure to split symfony/symfony in two branches in symfony/contracts, as this PR would require.
+
+But since v1.1 is going to be frozen as soon as 4.4.0 is out, we could bump contracts to 1.2 in December and work around the issue.
+
+That'd work, right?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-07T20:11:01Z
+
+> > Test currently fail because the translator is called with null as translation key. That possibility should be deprecated imho.
+>
+> We recently ensured that the implementation accepts null. Note that the interface can be `string` while the implementation (the trait) is `?string`. That'd be perfectly fine to me. You could update the PR in that direction.
+
+All right, will do.
+
+> About the PR in general, we don't have the infrastructure to split symfony/symfony in two branches in symfony/contracts, as this PR would require.
+
+I’m not familiar with the tooling you’re using to perform the subtree splits, but since all components are already split off the monorepo with multiple branches, I’m confident that this is possible.
+
+> But since v1.1 is going to be frozen as soon as 4.4.0 is out, we could bump contracts to 1.2 in December and work around the issue.
+>
+> That'd work, right?
+
+Certainly. But since the plan is to release 4.4.0 and 5.0.0 simultaneously, we would need to wait for 5.1 to merge this PR. Also, we wouldn’t be able to ship a 1.1 patch release anymore once we’ve bumped. If we could get the subtree split with two branches to work, that would be the the option I’d prefer.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-07T20:31:11Z
+
+> we wouldn’t be able to ship a 1.1 patch release anymore once we’ve bumped.
+
+that's why we need to wait a bit, so we can freeze it completely :)
+
+> If we could get the subtree split with two branches to work, that would the the option I’d prefer.
+
+we need a plan that would survive if we don't manage to have this tool. last time we checked, we decided it was too difficult.
+
+I think we should bump to v2 btw (which means we should allow v2 in all composer.json that reference any contracts). That's how we do minor PHP bumps using Symfony policies. Relying on composer to block installing v1.2 because PHP 7.1 is used is a foot gun that hit our users before (remember symfony/intl when it shipped different versions based on the presence of ext-intl). I know others do it, but that's not a reason to do it too, IMHO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-07T20:33:12Z
+
+Oh btw, please borrow from https://github.com/nicolas-grekas/symfony/commit/8cebfcdda83c37e5c43adc2f4150f4ba77b2fccd:)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-07T20:59:04Z
+
+> > If we could get the subtree split with two branches to work, that would the the option I’d prefer.
+>
+> we need a plan that would survive if we don't manage to have this tool. last time we checked, we decided it was too difficult.
+
+I'll tinker a bit with subtree splits and get back to you. I'm not ready to give up just yet.
+
+> I think we should bump to v2 btw (which means we should allow v2 in all composer.json that reference any contracts).
+
+That would mean, we would require `^1.1|^2` in Symfony 4.4 and `^2` in Symfony 5.x (whenever we feel ready to bump). Fine by me.
+
+> That's how we do minor PHP bumps using Symfony policies.
+
+All changes in this PR including the php bump are non-breaking according to (my understanding of) SemVer. But it's of course okay to be stricter than SemVer, so 2.0 it is. 😃
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-07T21:18:32Z
+
+See #33500 for allowing Contracts 2 in Symfony 4.4.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-07T22:00:31Z
+
+I've cherry-picked #33500 into this PR and switched all contracts to 2.0.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-09-08T12:18:30Z
+
+I managed to split off a contracts repository with a 1.1 branch (from #33500) and a master branch (from this PR): https://github.com/derrabus/symfony-contracts-split
+
+```bash
+mkdir symfony-contracts
+cd symfony-contracts
+git init --bare
+cd ../symfony
+git checkout improvement/allow-contracts-2
+git subtree split --prefix=src/Symfony/Contracts -b contracts-1.1
+git push ../symfony-contracts contracts-1.1:1.1
+git checkout improvement/typed-contracts
+git subtree split --prefix=src/Symfony/Contracts -b contracts-master
+git push ../symfony-contracts contracts-master:master
+```
+
+Your current tooling is a black box for me, but as far as I can tell, the `master` of the `symfony/contracts` repository is split off of the `4.4` branch of `symfony/symfony`. It shouldn't be too hard to set up 2 branches for the split. Suggested mapping:
+
+symfony/symfony | symfony/contracts
+--- | ---
+`4.4` | `1.1` or `1.x`
+`master` | `master`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-08T17:09:42Z
+
+@derrabus could you please rebase this PR and ensure it's ready? It might be time to do it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-08T21:30:23Z
+
+Rebase done.

@@ -24,6 +24,7 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
 {
     use TranslatorTrait {
         trans as private doTrans;
+        setLocale as private doSetLocale;
     }
 
     private $selector;
@@ -43,6 +44,14 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
     public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
         return $this->doTrans($id, $parameters, $domain, $locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLocale($locale)
+    {
+        $this->doSetLocale($locale);
     }
 
     /**

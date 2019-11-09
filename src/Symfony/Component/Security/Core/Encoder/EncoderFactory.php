@@ -78,9 +78,7 @@ class EncoderFactory implements EncoderFactoryInterface
             throw new \InvalidArgumentException(sprintf('"arguments" must be set in %s.', json_encode($config)));
         }
 
-        $reflection = new \ReflectionClass($config['class']);
-
-        $encoder = $reflection->newInstanceArgs($config['arguments']);
+        $encoder = new $config['class'](...$config['arguments']);
 
         if ($isExtra || !\in_array($config['class'], [NativePasswordEncoder::class, SodiumPasswordEncoder::class], true)) {
             return $encoder;

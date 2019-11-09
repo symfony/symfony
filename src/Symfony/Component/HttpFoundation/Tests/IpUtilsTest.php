@@ -101,4 +101,30 @@ class IpUtilsTest extends TestCase
             'invalid request IP with invalid proxy wildcard' => ['0.0.0.0', '*'],
         ];
     }
+
+    /**
+     * @dataProvider anonymizedIpData
+     */
+    public function testAnonymize($ip, $expected)
+    {
+        $this->assertSame($expected, IpUtils::anonymize($ip));
+    }
+
+    public function anonymizedIpData()
+    {
+        return [
+            ['192.168.1.1', '192.168.1.0'],
+            ['1.2.3.4', '1.2.3.0'],
+            ['2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603::'],
+            ['2a01:198:603:10:396e:4789:8e99:890f', '2a01:198:603:10::'],
+            ['::1', '::'],
+            ['0:0:0:0:0:0:0:1', '::'],
+            ['1:0:0:0:0:0:0:1', '1::'],
+            ['0:0:603:50:396e:4789:8e99:0001', '0:0:603:50::'],
+            ['[0:0:603:50:396e:4789:8e99:0001]', '[0:0:603:50::]'],
+            ['[2a01:198::3]', '[2a01:198::]'],
+            ['::ffff:123.234.235.236', '::ffff:123.234.235.0'], // IPv4-mapped IPv6 addresses
+            ['::123.234.235.236', '::123.234.235.0'], // deprecated IPv4-compatible IPv6 address
+        ];
+    }
 }

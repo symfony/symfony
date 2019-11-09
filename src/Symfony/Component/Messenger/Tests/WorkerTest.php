@@ -122,6 +122,8 @@ class WorkerTest extends TestCase
                 if ($event instanceof WorkerRunningEvent) {
                     $event->getWorker()->stop();
                 }
+
+                return $event;
             });
 
         $worker = new Worker([$receiver], $bus, $eventDispatcher);
@@ -151,6 +153,8 @@ class WorkerTest extends TestCase
                 if ($event instanceof WorkerRunningEvent) {
                     $event->getWorker()->stop();
                 }
+
+                return $event;
             });
 
         $worker = new Worker([$receiver], $bus, $eventDispatcher);

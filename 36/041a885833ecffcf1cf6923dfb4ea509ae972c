@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-09T19:53:22Z
+
+I've reverted to the metapackage. Travis is green, AppVeyor failure looks unrelated.

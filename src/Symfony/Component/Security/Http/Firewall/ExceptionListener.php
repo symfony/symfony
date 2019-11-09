@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -70,11 +71,11 @@ class ExceptionListener
     }
 
     /**
-     * Registers a onKernelException listener to take care of security exceptions.
+     * Registers onKernelError listener to take care of security exceptions.
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addListener(KernelEvents::EXCEPTION, [$this, 'onKernelException'], 1);
+        $dispatcher->addListener(KernelEvents::ERROR, [$this, 'onKernelError'], 1);
     }
 
     /**
@@ -82,13 +83,28 @@ class ExceptionListener
      */
     public function unregister(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->removeListener(KernelEvents::EXCEPTION, [$this, 'onKernelException']);
+        $dispatcher->removeListener(KernelEvents::ERROR, [$this, 'onKernelError']);
     }
 
     /**
      * Handles security related exceptions.
      */
+    public function onKernelError(ErrorEvent $event)
+    {
+        $this->handleErrorEvent($event);
+    }
+
+    /**
+     * @deprecated since Symfony 4.4, use onKernelError instead
+     */
     public function onKernelException(GetResponseForExceptionEvent $event)
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "onKernelError()" instead.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->handleErrorEvent($event);
+    }
+
+    private function handleErrorEvent($event)
     {
         $exception = $event->getException();
         do {
@@ -118,7 +134,7 @@ class ExceptionListener
         } while (null !== $exception = $exception->getPrevious());
     }
 
-    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception): void
+    private function handleAuthenticationException($event, AuthenticationException $exception): void
     {
         if (null !== $this->logger) {
             $this->logger->info('An AuthenticationException was thrown; redirecting to authentication entry point.', ['exception' => $exception]);
@@ -132,7 +148,7 @@ class ExceptionListener
         }
     }
 
-    private function handleAccessDeniedException(GetResponseForExceptionEvent $event, AccessDeniedException $exception)
+    private function handleAccessDeniedException($event, AccessDeniedException $exception)
     {
         $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
 

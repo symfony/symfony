@@ -12,7 +12,6 @@
 namespace Symfony\Component\ErrorRenderer\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -128,16 +127,6 @@ class FlattenExceptionTest extends TestCase
         $this->assertEquals($exception->getMessage(), $flattened->getMessage(), 'The message is copied from the original exception.');
         $this->assertEquals($exception->getCode(), $flattened->getCode(), 'The code is copied from the original exception.');
         $this->assertInstanceOf($flattened->getClass(), $exception, 'The class is set to the class of the original exception');
-    }
-
-    public function testWrappedThrowable()
-    {
-        $exception = new ErrorException(new \DivisionByZeroError('Ouch', 42));
-        $flattened = FlattenException::createFromThrowable($exception);
-
-        $this->assertSame('Ouch', $flattened->getMessage(), 'The message is copied from the original error.');
-        $this->assertSame(42, $flattened->getCode(), 'The code is copied from the original error.');
-        $this->assertSame('DivisionByZeroError', $flattened->getClass(), 'The class is set to the class of the original error');
     }
 
     public function testThrowable()

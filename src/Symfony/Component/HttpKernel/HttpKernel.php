@@ -21,8 +21,10 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Event\InternalExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -203,8 +205,29 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleThrowable(\Throwable $e, Request $request, int $type): Response
     {
-        $event = new ExceptionEvent($this, $request, $type, $e);
-        $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+        if (!$this->dispatcher instanceof \Symfony\Component\EventDispatcher\EventDispatcherInterface) {
+            @trigger_error('Listening to the "kernel.exception" event is deprecated since Symfony 4.4, listen to "kernel.error" instead.', E_USER_DEPRECATED);
+
+            $event = new ExceptionEvent($this, $request, $type, $e);
+            $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+        } elseif ($listeners = $this->dispatcher->getListeners(KernelEvents::EXCEPTION)) {
+            @trigger_error('Listening to the "kernel.exception" event is deprecated since Symfony 4.4, listen to "kernel.error" instead.', E_USER_DEPRECATED);
+
+            foreach ($listeners as $listener) {
+                $priority = $this->dispatcher->getListenerPriority(KernelEvents::EXCEPTION, $listener);
+
+                $this->dispatcher->removeListener(KernelEvents::EXCEPTION, $listener);
+                $this->dispatcher->removeListener(KernelEvents::ERROR, $listener);
+
+                $listener = static function (ErrorEvent $event, string $eventName, EventDispatcherInterface $dispatcher) use ($listener) {
+                    $listener(new InternalExceptionEvent($event), KernelEvents::EXCEPTION, $dispatcher);
+                };
+                $this->dispatcher->addListener(KernelEvents::ERROR, $listener, $priority);
+            }
+        }
+
+        $event = new ErrorEvent($this, $request, $type, $e);
+        $this->dispatcher->dispatch($event, KernelEvents::ERROR);
 
         // a listener might have replaced the exception
         $e = $event->getException();

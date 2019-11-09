@@ -46,7 +46,7 @@ final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
 
     public function onConsoleError(ConsoleErrorEvent $event): void
     {
-        if (!$event->getError() instanceof CommandNotFoundException) {
+        if (!$event->getException() instanceof CommandNotFoundException) {
             return;
         }
 
@@ -64,14 +64,14 @@ final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
             $exact = false;
         }
 
-        $error = $event->getError();
+        $error = $event->getException();
 
         if ($error->getAlternatives() && !$exact) {
             return;
         }
 
         $message = sprintf("%s\n\nYou may be looking for a command provided by the \"%s\" which is currently not installed. Try running \"composer require %s\".", $error->getMessage(), $suggestion[0], $suggestion[1]);
-        $event->setError(new CommandNotFoundException($message));
+        $event->setException(new CommandNotFoundException($message));
     }
 
     public static function getSubscribedEvents(): array

@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Debug\Exception;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', FatalErrorException::class, \Symfony\Component\ErrorHandler\Exception\ErrorException::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', FatalErrorException::class, \Symfony\Component\ErrorHandler\Error\FatalError::class), E_USER_DEPRECATED);
 
 /**
  * Fatal Error Exception.
  *
  * @author Konstanton Myakshin <koc-dp@yandex.ru>
  *
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception\ErrorException instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Error\FatalError instead.
  */
 class FatalErrorException extends \ErrorException
 {

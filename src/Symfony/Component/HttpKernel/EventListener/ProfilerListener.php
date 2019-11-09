@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -53,11 +54,22 @@ class ProfilerListener implements EventSubscriberInterface
         $this->requestStack = $requestStack;
     }
 
+    public function onKernelError(ErrorEvent $event)
+    {
+        if ($this->onlyMasterRequests && !$event->isMasterRequest()) {
+            return;
+        }
+
+        $this->exception = $event->getException();
+    }
+
     /**
-     * Handles the onKernelException event.
+     * @deprecated since Symfony 4.4, use onKernelError instead
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "onKernelError()" instead.', __METHOD__), E_USER_DEPRECATED);
+
         if ($this->onlyMasterRequests && !$event->isMasterRequest()) {
             return;
         }
@@ -120,7 +132,7 @@ class ProfilerListener implements EventSubscriberInterface
     {
         return [
             KernelEvents::RESPONSE => ['onKernelResponse', -100],
-            KernelEvents::EXCEPTION => ['onKernelException', 0],
+            KernelEvents::ERROR => ['onKernelError', 0],
             KernelEvents::TERMINATE => ['onKernelTerminate', -1024],
         ];
     }

@@ -22,37 +22,57 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class ConsoleErrorEvent extends ConsoleEvent
 {
-    private $error;
+    private $exception;
     private $exitCode;
 
-    public function __construct(InputInterface $input, OutputInterface $output, \Throwable $error, Command $command = null)
+    public function __construct(InputInterface $input, OutputInterface $output, \Throwable $exception, Command $command = null)
     {
         parent::__construct($command, $input, $output);
 
-        $this->error = $error;
+        $this->exception = $exception;
     }
 
+    public function getException(): \Throwable
+    {
+        return $this->exception;
+    }
+
+    public function setException(\Throwable $exception): void
+    {
+        $this->exception = $exception;
+    }
+
+    /**
+     * @deprecated since Symfony 4.4, use getException() instead
+     */
     public function getError(): \Throwable
     {
-        return $this->error;
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "getException()" instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->exception;
     }
 
-    public function setError(\Throwable $error): void
+    /**
+     * @deprecated since Symfony 4.4, use setException() instead
+     */
+    public function setError(\Throwable $exception): void
     {
-        $this->error = $error;
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use "setException()" instead.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->exception = $exception;
     }
 
     public function setExitCode(int $exitCode): void
     {
         $this->exitCode = $exitCode;
 
-        $r = new \ReflectionProperty($this->error, 'code');
+        $r = new \ReflectionProperty($this->exception, 'code');
         $r->setAccessible(true);
-        $r->setValue($this->error, $this->exitCode);
+        $r->setValue($this->exception, $this->exitCode);
     }
 
     public function getExitCode(): int
     {
-        return null !== $this->exitCode ? $this->exitCode : (\is_int($this->error->getCode()) && 0 !== $this->error->getCode() ? $this->error->getCode() : 1);
+        return null !== $this->exitCode ? $this->exitCode : (\is_int($this->exception->getCode()) && 0 !== $this->exception->getCode() ? $this->exception->getCode() : 1);
     }
 }

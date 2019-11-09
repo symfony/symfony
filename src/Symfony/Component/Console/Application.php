@@ -42,9 +42,8 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Debug\ErrorHandler as LegacyErrorHandler;
-use Symfony\Component\Debug\Exception\FatalThrowableError as LegacyFatalThrowableError;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Contracts\Service\ResetInterface;
@@ -245,7 +244,7 @@ class Application implements ResetInterface
                         return 0;
                     }
 
-                    $e = $event->getError();
+                    $e = $event->getException();
                 }
 
                 throw $e;
@@ -809,7 +808,7 @@ class Application implements ResetInterface
             @trigger_error(sprintf('The "%s::renderException()" method is deprecated since Symfony 4.4, use "renderThrowable()" instead.', __CLASS__), E_USER_DEPRECATED);
 
             if (!$e instanceof \Exception) {
-                $e = class_exists(ErrorException::class) ? new ErrorException($e) : (class_exists(LegacyFatalThrowableError::class) ? new LegacyFatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()));
+                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
             }
 
             $this->renderException($e, $output);
@@ -848,7 +847,7 @@ class Application implements ResetInterface
             @trigger_error(sprintf('The "%s::doRenderException()" method is deprecated since Symfony 4.4, use "doRenderThrowable()" instead.', __CLASS__), E_USER_DEPRECATED);
 
             if (!$e instanceof \Exception) {
-                $e = class_exists(ErrorException::class) ? new ErrorException($e) : (class_exists(LegacyFatalThrowableError::class) ? new LegacyFatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()));
+                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
             }
 
             $this->doRenderException($e, $output);
@@ -1034,7 +1033,7 @@ class Application implements ResetInterface
         } catch (\Throwable $e) {
             $event = new ConsoleErrorEvent($input, $output, $e, $command);
             $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
-            $e = $event->getError();
+            $e = $event->getException();
 
             if (0 === $exitCode = $event->getExitCode()) {
                 $e = null;

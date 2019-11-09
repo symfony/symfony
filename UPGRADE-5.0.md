@@ -39,6 +39,7 @@ Console
  * Removed the `setVerticalBorderChar()` method in favor of the `setVerticalBorderChars()` method in `TableStyle`.
  * Removed the `getVerticalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
  * Removed support for returning `null` from `Command::execute()`, return `0` instead
+ * Removed `ConsoleErrorEvent::getError()/setError()`, use `getException()/setException()` instead
  * The `ProcessHelper::run()` method takes the command as an array of arguments.
 
    Before:
@@ -290,6 +291,12 @@ HttpKernel
  * Removed `TranslatorListener` in favor of `LocaleAwareListener`
  * The `DebugHandlersListener` class has been made `final`
  * Removed `SaveSessionListener` in favor of `AbstractSessionListener`
+ * Removed class `ExceptionEvent`, use `ErrorEvent` instead
+ * Removed class `ExceptionListener`, use `ErrorListener` instead
+ * Removed constant `KernelEvents::EXCEPTION`, use `KernelEvents::ERROR` instead
+ * Removed event `kernel.exception`, listen to `kernel.error` instead
+ * Removed method `ProfilerListener::onKernelException()`, use `onKernelError()` instead
+ * Removed method `RouterListener::onKernelException()`, use `onKernelError()` instead
  * Added new Bundle directory convention consistent with standard skeletons:
 
     ```
@@ -470,6 +477,7 @@ Security
  * Classes implementing the `TokenInterface` must implement the two new methods
    `__serialize` and `__unserialize`
  * Implementations of `Guard\AuthenticatorInterface::checkCredentials()` must return a boolean value now. Please explicitly return `false` to indicate invalid credentials.
+ * Removed method `ExceptionListener::onKernelException()`, use `onKernelError()` instead
 
 SecurityBundle
 --------------

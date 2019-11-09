@@ -21,6 +21,7 @@
             <parameter key="Symfony\Component\HttpKernel\Event\FinishRequestEvent">kernel.finish_request</parameter>
             <parameter key="Symfony\Component\HttpKernel\Event\RequestEvent">kernel.request</parameter>
             <parameter key="Symfony\Component\HttpKernel\Event\ViewEvent">kernel.view</parameter>
+            <parameter key="Symfony\Component\HttpKernel\Event\ErrorEvent">kernel.error</parameter>
             <parameter key="Symfony\Component\HttpKernel\Event\ExceptionEvent">kernel.exception</parameter>
             <parameter key="Symfony\Component\HttpKernel\Event\TerminateEvent">kernel.terminate</parameter>
             <parameter key="Symfony\Component\Workflow\Event\GuardEvent">workflow.guard</parameter>

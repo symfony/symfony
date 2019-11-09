@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
@@ -62,7 +62,7 @@ class ProfilerListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $masterRequest, Kernel::MASTER_REQUEST, $response));
 
         // sub request
-        $listener->onKernelException(new ExceptionEvent($kernel, $subRequest, Kernel::SUB_REQUEST, new HttpException(404)));
+        $listener->onKernelError(new ErrorEvent($kernel, $subRequest, Kernel::SUB_REQUEST, new HttpException(404)));
         $listener->onKernelResponse(new ResponseEvent($kernel, $subRequest, Kernel::SUB_REQUEST, $response));
 
         $listener->onKernelTerminate(new TerminateEvent($kernel, $masterRequest, $response));

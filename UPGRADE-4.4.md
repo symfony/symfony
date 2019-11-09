@@ -14,6 +14,7 @@ Console
  * Deprecated returning `null` from `Command::execute()`, return `0` instead
  * Deprecated the `Application::renderException()` and `Application::doRenderException()` methods,
    use `renderThrowable()` and `doRenderThrowable()` instead.
+ * Deprecated `ConsoleErrorEvent::getError()/setError()`, use `getException()/setException()` instead
 
 Debug
 -----
@@ -154,6 +155,12 @@ HttpKernel
  * Marked the `RouterDataCollector::collect()` method as `@final`.
  * The `DataCollectorInterface::collect()` and `Profiler::collect()` methods third parameter signature
    will be `\Throwable $exception = null` instead of `\Exception $exception = null` in Symfony 5.0.
+ * Deprecated class `ExceptionEvent`, use `ErrorEvent` instead
+ * Deprecated class `ExceptionListener`, use `ErrorListener` instead
+ * Deprecated constant `KernelEvents::EXCEPTION`, use `KernelEvents::ERROR` instead
+ * Deprecated event `kernel.exception`, listen to `kernel.error` instead
+ * Deprecated method `ProfilerListener::onKernelException()`, use `onKernelError()` instead
+ * Deprecated method `RouterListener::onKernelException()`, use `onKernelError()` instead
 
 Lock
 ----
@@ -212,6 +219,7 @@ Security
  * The `LdapUserProvider` class has been deprecated, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead.
  * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` should add a new `needsRehash()` method
  * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`. Please explicitly return `false` to indicate invalid credentials.
+ * Deprecated method `ExceptionListener::onKernelException()`, use `onKernelError()` instead
  * Deprecated passing more than one attribute to `AccessDecisionManager::decide()` and `AuthorizationChecker::isGranted()` (and indirectly the `is_granted()` Twig and ExpressionLanguage function)
 
    **Before**

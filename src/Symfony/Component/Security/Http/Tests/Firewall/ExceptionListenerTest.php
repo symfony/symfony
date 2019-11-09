@@ -14,8 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
@@ -37,7 +36,7 @@ class ExceptionListenerTest extends TestCase
         $event = $this->createEvent($exception);
 
         $listener = $this->createExceptionListener();
-        $listener->onKernelException($event);
+        $listener->onKernelError($event);
 
         $this->assertNull($event->getResponse());
         $this->assertEquals($eventException, $event->getException());
@@ -53,7 +52,7 @@ class ExceptionListenerTest extends TestCase
         $response = new Response('Forbidden', 403);
 
         $listener = $this->createExceptionListener(null, null, null, $this->createEntryPoint($response));
-        $listener->onKernelException($event);
+        $listener->onKernelError($event);
 
         $this->assertTrue($event->isAllowingCustomResponseCode());
 
@@ -84,7 +83,7 @@ class ExceptionListenerTest extends TestCase
         $entryPoint->expects($this->once())->method('start')->willReturn('NOT A RESPONSE');
 
         $listener = $this->createExceptionListener(null, null, null, $entryPoint);
-        $listener->onKernelException($event);
+        $listener->onKernelError($event);
         // the exception has been replaced by our LogicException
         $this->assertInstanceOf('LogicException', $event->getException());
         $this->assertStringEndsWith('start() method must return a Response object (string returned)', $event->getException()->getMessage());
@@ -98,7 +97,7 @@ class ExceptionListenerTest extends TestCase
         $event = $this->createEvent($exception);
 
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true));
-        $listener->onKernelException($event);
+        $listener->onKernelError($event);
 
         $this->assertNull($event->getResponse());
         $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
@@ -118,7 +117,7 @@ class ExceptionListenerTest extends TestCase
         $httpUtils->expects($this->once())->method('createRequest')->willReturn(Request::create('/error'));
 
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), $httpUtils, null, '/error');
-        $listener->onKernelException($event);
+        $listener->onKernelError($event);
 
         $this->assertTrue($event->isAllowingCustomResponseCode());
 
@@ -138,7 +137,7 @@ class ExceptionListenerTest extends TestCase
         $accessDeniedHandler->expects($this->once())->method('handle')->willReturn(new Response('error'));
 
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), null, null, null, $accessDeniedHandler);
-        $listener->onKernelException($event);
+        $listener->onKernelError($event);
 
         $this->assertEquals('error', $event->getResponse()->getContent());
         $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
@@ -155,7 +154,7 @@ class ExceptionListenerTest extends TestCase
         $tokenStorage->expects($this->once())->method('getToken')->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
 
         $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false), null, $this->createEntryPoint());
-        $listener->onKernelException($event);
+        $listener->onKernelError($event);
 
         $this->assertEquals('OK', $event->getResponse()->getContent());
         $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
@@ -194,11 +193,7 @@ class ExceptionListenerTest extends TestCase
             $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         }
 
-        if (class_exists(ExceptionEvent::class)) {
-            return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
-        }
-
-        return new GetResponseForExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
+        return new ErrorEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
     }
 
     private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)

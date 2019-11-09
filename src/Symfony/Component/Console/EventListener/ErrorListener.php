@@ -37,7 +37,7 @@ class ErrorListener implements EventSubscriberInterface
             return;
         }
 
-        $error = $event->getError();
+        $error = $event->getException();
 
         if (!$inputString = $this->getInputString($event)) {
             $this->logger->error('An error occurred while using the console. Message: "{message}"', ['exception' => $error, 'message' => $error->getMessage()]);

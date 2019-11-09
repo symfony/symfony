@@ -13,17 +13,14 @@ namespace Symfony\Component\HttpKernel\Tests\Event;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 
-/**
- * @group legacy
- */
-class ExceptionEventTest extends TestCase
+class ErrorEventTest extends TestCase
 {
     public function testAllowSuccessfulResponseIsFalseByDefault()
     {
-        $event = new ExceptionEvent(new TestHttpKernel(), new Request(), 1, new \Exception());
+        $event = new ErrorEvent(new TestHttpKernel(), new Request(), 1, new \Exception());
 
         $this->assertFalse($event->isAllowingCustomResponseCode());
     }

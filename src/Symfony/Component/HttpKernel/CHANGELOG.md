@@ -21,6 +21,12 @@ CHANGELOG
  * Marked the `RouterDataCollector::collect()` method as `@final`.
  * The `DataCollectorInterface::collect()` and `Profiler::collect()` methods third parameter signature
    will be `\Throwable $exception = null` instead of `\Exception $exception = null` in Symfony 5.0.
+ * Deprecated class `ExceptionEvent`, use `ErrorEvent` instead
+ * Deprecated class `ExceptionListener`, use `ErrorListener` instead
+ * Deprecated constant `KernelEvents::EXCEPTION`, use `KernelEvents::ERROR` instead
+ * Deprecated event `kernel.exception`, listen to `kernel.error` instead
+ * Deprecated method `ProfilerListener::onKernelException()`, use `onKernelError()` instead
+ * Deprecated method `RouterListener::onKernelException()`, use `onKernelError()` instead
 
 4.3.0
 -----

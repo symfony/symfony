@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecated the `Application::renderException()` and `Application::doRenderException()` methods,
    use `renderThrowable()` and `doRenderThrowable()` instead.
  * added support for the `NO_COLOR` env var (https://no-color.org/)
+ * deprecated `ConsoleErrorEvent::getError()/setError()`, use `getException()/setException()` instead
 
 4.3.0
 -----

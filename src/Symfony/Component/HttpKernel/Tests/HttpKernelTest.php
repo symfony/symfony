@@ -48,7 +48,7 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrueWithAHandlingListener()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+        $dispatcher->addListener(KernelEvents::ERROR, function ($event) {
             $event->setResponse(new Response($event->getException()->getMessage()));
         });
 
@@ -64,7 +64,7 @@ class HttpKernelTest extends TestCase
         $exception = new \RuntimeException();
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+        $dispatcher->addListener(KernelEvents::ERROR, function ($event) {
             // should set a response, but does not
         });
 
@@ -81,7 +81,7 @@ class HttpKernelTest extends TestCase
     public function testHandleExceptionWithARedirectionResponse()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+        $dispatcher->addListener(KernelEvents::ERROR, function ($event) {
             $event->setResponse(new RedirectResponse('/login', 301));
         });
 
@@ -95,7 +95,7 @@ class HttpKernelTest extends TestCase
     public function testHandleHttpException()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+        $dispatcher->addListener(KernelEvents::ERROR, function ($event) {
             $event->setResponse(new Response($event->getException()->getMessage()));
         });
 
@@ -122,7 +122,7 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenAnExceptionIsHandledWithASpecificStatusCode($expectedStatusCode)
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) use ($expectedStatusCode) {
+        $dispatcher->addListener(KernelEvents::ERROR, function ($event) use ($expectedStatusCode) {
             $event->allowCustomResponseCode();
             $event->setResponse(new Response('', $expectedStatusCode));
         });

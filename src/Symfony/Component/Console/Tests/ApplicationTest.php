@@ -1438,7 +1438,7 @@ class ApplicationTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
             $this->assertNull($event->getCommand());
-            $this->assertInstanceOf(CommandNotFoundException::class, $event->getError());
+            $this->assertInstanceOf(CommandNotFoundException::class, $event->getException());
             $event->getOutput()->write('silenced command not found');
         });
 
@@ -1727,7 +1727,7 @@ class ApplicationTest extends TestCase
         $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
             $event->getOutput()->write('error.');
 
-            $event->setError(new \LogicException('error.', $event->getExitCode(), $event->getError()));
+            $event->setException(new \LogicException('error.', $event->getExitCode(), $event->getException()));
         });
 
         return $dispatcher;

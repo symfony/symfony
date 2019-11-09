@@ -17,11 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class InlineFragmentRendererTest extends TestCase
 {
@@ -72,7 +71,7 @@ class InlineFragmentRendererTest extends TestCase
     public function testRenderExceptionNoIgnoreErrors()
     {
         $this->expectException('RuntimeException');
-        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->getMock();
         $dispatcher->expects($this->never())->method('dispatch');
 
         $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \RuntimeException('foo'))), $dispatcher);
@@ -85,9 +84,9 @@ class InlineFragmentRendererTest extends TestCase
         $exception = new \RuntimeException('foo');
         $kernel = $this->getKernel($this->throwException($exception));
         $request = Request::create('/');
-        $expectedEvent = new ExceptionEvent($kernel, $request, $kernel::SUB_REQUEST, $exception);
-        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
-        $dispatcher->expects($this->once())->method('dispatch')->with($expectedEvent, KernelEvents::EXCEPTION);
+        $expectedEvent = new ErrorEvent($kernel, $request, $kernel::SUB_REQUEST, $exception);
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->getMock();
+        $dispatcher->expects($this->once())->method('dispatch')->with($expectedEvent, KernelEvents::ERROR);
 
         $strategy = new InlineFragmentRenderer($kernel, $dispatcher);
 

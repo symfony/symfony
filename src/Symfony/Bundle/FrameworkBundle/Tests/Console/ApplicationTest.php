@@ -254,7 +254,7 @@ class ApplicationTest extends TestCase
         $subscriber = new SuggestMissingPackageSubscriber();
         $subscriber->onConsoleError($event);
 
-        return $event->getError()->getMessage();
+        return $event->getException()->getMessage();
     }
 
     private function getKernel(array $bundles, $useDispatcher = false)

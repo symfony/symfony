@@ -16,18 +16,16 @@ use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "ErrorListener" instead.', ExceptionListener::class), E_USER_DEPRECATED);
-
 /**
- * @deprecated since Symfony 4.4, use ErrorListener instead
+ * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionListener implements EventSubscriberInterface
+class ErrorListener implements EventSubscriberInterface
 {
     protected $controller;
     protected $logger;
@@ -40,14 +38,14 @@ class ExceptionListener implements EventSubscriberInterface
         $this->debug = $debug;
     }
 
-    public function logKernelException(GetResponseForExceptionEvent $event)
+    public function logKernelException(ErrorEvent $event)
     {
         $e = FlattenException::createFromThrowable($event->getException());
 
         $this->logException($event->getException(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ErrorEvent $event)
     {
         if (null === $this->controller) {
             return;
@@ -92,7 +90,7 @@ class ExceptionListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::EXCEPTION => [
+            KernelEvents::ERROR => [
                 ['logKernelException', 0],
                 ['onKernelException', -128],
             ],

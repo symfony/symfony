@@ -30,12 +30,17 @@ final class KernelEvents
     const REQUEST = 'kernel.request';
 
     /**
-     * The EXCEPTION event occurs when an uncaught exception appears.
+     * The ERROR event occurs when an uncaught exception appears.
      *
      * This event allows you to create a response for a thrown exception or
      * to modify the thrown exception.
      *
-     * @Event("Symfony\Component\HttpKernel\Event\ExceptionEvent")
+     * @Event("Symfony\Component\HttpKernel\Event\ErrorEvent")
+     */
+    const ERROR = 'kernel.error';
+
+    /**
+     * @deprecated since Symfony 4.4, use ERROR instead.
      */
     const EXCEPTION = 'kernel.exception';
 

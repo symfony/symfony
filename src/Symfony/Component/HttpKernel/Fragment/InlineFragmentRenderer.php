@@ -15,7 +15,9 @@ use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Event\ErrorEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\InternalExceptionEvent;
 use Symfony\Component\HttpKernel\HttpCache\SubRequestHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -83,9 +85,30 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             // we dispatch the exception event to trigger the logging
             // the response that comes back is ignored
             if (isset($options['ignore_errors']) && $options['ignore_errors'] && $this->dispatcher) {
-                $event = new ExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
+                if (!$this->dispatcher instanceof \Symfony\Component\EventDispatcher\EventDispatcherInterface) {
+                    @trigger_error('Listening to the "kernel.exception" event is deprecated since Symfony 4.4, listen to "kernel.error" instead.', E_USER_DEPRECATED);
 
-                $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+                    $event = new ExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
+                    $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+                } elseif ($listeners = $this->dispatcher->getListeners(KernelEvents::EXCEPTION)) {
+                    @trigger_error('Listening to the "kernel.exception" event is deprecated since Symfony 4.4, listen to "kernel.error" instead.', E_USER_DEPRECATED);
+
+                    foreach ($listeners as $listener) {
+                        $priority = $this->dispatcher->getListenerPriority(KernelEvents::EXCEPTION, $listener);
+
+                        $this->dispatcher->removeListener(KernelEvents::EXCEPTION, $listener);
+                        $this->dispatcher->removeListener(KernelEvents::ERROR, $listener);
+
+                        $listener = static function (ErrorEvent $event, string $eventName, EventDispatcherInterface $dispatcher) use ($listener) {
+                            $listener(new InternalExceptionEvent($event), KernelEvents::EXCEPTION, $dispatcher);
+                        };
+                        $this->dispatcher->addListener(KernelEvents::ERROR, $listener, $priority);
+                    }
+                }
+
+                $event = new ErrorEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
+
+                $this->dispatcher->dispatch($event, KernelEvents::ERROR);
             }
 
             // let's clean up the output buffers that were created by the sub-request

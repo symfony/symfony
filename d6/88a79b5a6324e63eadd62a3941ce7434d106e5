@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-10-30T16:22:48Z
+
+> I don't think the migrating_from option is needed at all: instead, we should always wire a MigratingPasswordEncoder when Sodium/Native encoder variants are selected.
+
+Please don't take control away from the user (again)? :pray:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-30T16:28:57Z
+
+> Please don't take control away from the user (again)? pray
+
+:man_facepalming: which control would this take away from users?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-10-30T19:42:02Z
+
+> There is one thing that is not documented correctly: when auto is selected, hash_algorithm is used as the digest algo too. But this should be fixed on 4.3, so it's unrelated to this PR.
+
+That's where I disagree. Let's say one have `sha1` hashes in the user storage, this is the config required to make migrations work:
+```yaml
+App\User:
+    algorithm: bcrypt
+    hash_algorithm: sha1
+    encode_as_base64: false # also required because of the old encoder config
+```
+
+It's really not obvious what this means to me, it just feels like hijacking existing options to achieve what a new clearly-named option would do: migrate from a specific algo.
+
+Hence I think we should rather improve the situation than documenting what currently kinda works by chance.
+And I'd even say this PR is not enough yet: we need the ability to pass the required options per legacy algo you want to migrate from, so that things are clear just by looking at the config.
+
+Built-in password migrations are great to make developers able to move forward and stop relying on old algos, I think that the support for this feature should be exhaustive and obvious for anyone reading the config, which is definitely not the case right now.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-10-31T00:58:01Z
+
+PR updated, the option now accepts encoder names in addition to algo names:
+To migrate from an old encoder which defines some custom values for options, make it a named encoder (if it is not already) and pass its name to the `migrate_from` list. Same if it's a custom encoder service.
+
+```yaml
+encoders:
+    foo:
+         id: App\FooEncoder
+    digest_sha256:
+        algorithm: sha256
+        encode_as_base64: false
+     App\User:
+         algorithm: argon2id
+         migrate_from:
+             - foo
+             - digest_sha256
+             - bcrypt # creates an encoder with default config options
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-11-09T08:22:50Z
+
+@nicolas-grekas as discussed, sodium and native encoders are now always migrating.
+PR ready

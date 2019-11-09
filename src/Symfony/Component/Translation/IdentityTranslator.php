@@ -22,7 +22,9 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  */
 class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterface
 {
-    use TranslatorTrait;
+    use TranslatorTrait {
+        trans as private doTrans;
+    }
 
     private $selector;
 
@@ -33,6 +35,14 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
         if (__CLASS__ !== \get_class($this)) {
             @trigger_error(sprintf('Calling "%s()" is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    {
+        return $this->doTrans($id, $parameters, $domain, $locale);
     }
 
     /**

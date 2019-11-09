@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-11-08T17:10:00Z
+
+Ok I updated wording/docblock, added tests and support for IPv4-mapped IPv6s (which complicates things a little, if anyone sees a better way to do this feel free, as long as the tests pass..), and now remove the last 8 bytes (/64 equivalent) of IPv6s.
+
+For me it's ready to ship now but any feedback is appreciated.

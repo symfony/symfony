@@ -68,7 +68,14 @@ class AccessListener implements ListenerInterface
             $this->tokenStorage->setToken($token);
         }
 
-        if (!$this->accessDecisionManager->decide($token, $attributes, $request)) {
+        $granted = false;
+        foreach ($attributes as $key => $value) {
+            if ($this->accessDecisionManager->decide($token, [$key => $value], $request)) {
+                $granted = true;
+            }
+        }
+
+        if (!$granted) {
             $exception = new AccessDeniedException();
             $exception->setAttributes($attributes);
             $exception->setSubject($request);

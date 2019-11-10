@@ -102,13 +102,13 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             'statusText' => $statusText,
             'statusCode' => $statusCode,
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-            'currentContent' => $request ? $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level')) : '',
+            'currentContent' => $request ? $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1)) : '',
         ]);
     }
 
-    private function getAndCleanOutputBuffering(?int $startObLevel): string
+    private function getAndCleanOutputBuffering(int $startObLevel): string
     {
-        if (null === $startObLevel || ob_get_level() <= $startObLevel) {
+        if (ob_get_level() <= $startObLevel) {
             return '';
         }
 

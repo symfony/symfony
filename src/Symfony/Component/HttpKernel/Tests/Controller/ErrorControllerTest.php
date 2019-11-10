@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,12 +26,12 @@ class ErrorControllerTest extends TestCase
     /**
      * @dataProvider getInvokeControllerDataProvider
      */
-    public function testInvokeController(Request $request, FlattenException $exception, int $statusCode, string $content)
+    public function testInvokeController(Request $request, \Exception $exception, int $statusCode, string $content)
     {
         $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $errorRenderer = new ErrorRenderer(new HtmlErrorRenderer());
+        $errorRenderer = new HtmlErrorRenderer();
         $controller = new ErrorController($kernel, null, $errorRenderer);
-        $response = $controller($request, $exception);
+        $response = $controller($exception);
 
         $this->assertSame($statusCode, $response->getStatusCode());
         self::assertStringContainsString($content, strtr($response->getContent(), ["\n" => '', '    ' => '']));
@@ -42,14 +41,14 @@ class ErrorControllerTest extends TestCase
     {
         yield 'default status code and HTML format' => [
             new Request(),
-            FlattenException::createFromThrowable(new \Exception()),
+            new \Exception(),
             500,
             'The server returned a "500 Internal Server Error".',
         ];
 
         yield 'custom status code' => [
             new Request(),
-            FlattenException::createFromThrowable(new NotFoundHttpException('Page not found.')),
+            new NotFoundHttpException('Page not found.'),
             404,
             'The server returned a "404 Not Found".',
         ];
@@ -58,7 +57,7 @@ class ErrorControllerTest extends TestCase
         $request->attributes->set('_format', 'unknown');
         yield 'default HTML format for unknown formats' => [
             $request,
-            FlattenException::createFromThrowable(new HttpException(405, 'Invalid request.')),
+            new HttpException(405, 'Invalid request.'),
             405,
             'The server returned a "405 Method Not Allowed".',
         ];
@@ -78,7 +77,7 @@ class ErrorControllerTest extends TestCase
                     $exception = $request->attributes->get('exception');
 
                     $this->assertSame($_controller, $request->attributes->get('_controller'));
-                    $this->assertInstanceOf(FlattenException::class, $exception);
+                    $this->assertInstanceOf(\Throwable::class, $exception);
                     $this->assertSame($code, $exception->getStatusCode());
                     $this->assertFalse($request->attributes->get('showException'));
 
@@ -88,7 +87,7 @@ class ErrorControllerTest extends TestCase
             )
             ->willReturn($response = new Response());
 
-        $controller = new ErrorController($kernel, $_controller, new ErrorRenderer());
+        $controller = new ErrorController($kernel, $_controller, new HtmlErrorRenderer());
 
         $this->assertSame($response, $controller->preview(new Request(), $code));
     }

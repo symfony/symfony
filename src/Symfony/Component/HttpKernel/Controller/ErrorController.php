@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpKernel\Controller;
 
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -52,7 +52,7 @@ class ErrorController
          */
         $subRequest = $request->duplicate(null, null, [
             '_controller' => $this->controller,
-            'exception' => new \Exception('This is a sample exception.'),
+            'exception' => new HttpException($code, 'This is a sample exception.'),
             'logger' => null,
             'showException' => false,
         ]);

@@ -16,9 +16,13 @@
 
         <service id="error_handler.error_renderer.serializer" class="Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer">
             <argument type="service" id="serializer" />
-            <argument type="service" id="request_stack" />
+            <argument type="service">
+                <service>
+                    <factory class="Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer" method="getPreferredFormat" />
+                    <argument type="service" id="request_stack" />
+                </service>
+            </argument>
             <argument type="service" id="error_renderer.html" />
-            <argument>%kernel.debug%</argument>
         </service>
 
         <service id="error_renderer.html" alias="error_handler.error_renderer.html" />

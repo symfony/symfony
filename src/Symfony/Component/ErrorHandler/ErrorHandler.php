@@ -21,7 +21,6 @@ use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedFunctionErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedMethodErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\CliErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 
 /**
@@ -580,7 +579,12 @@ final class ErrorHandler
         }
 
         $exceptionHandler = $this->exceptionHandler;
-        $this->exceptionHandler = null;
+        $this->exceptionHandler = [$this, 'renderException'];
+
+        if (null === $exceptionHandler || $exceptionHandler === $this->exceptionHandler) {
+            $this->exceptionHandler = null;
+        }
+
         try {
             if (null !== $exceptionHandler) {
                 return $exceptionHandler($exception);
@@ -593,7 +597,14 @@ final class ErrorHandler
             throw $exception; // Give back $exception to the native handler
         }
 
-        $this->handleException($handlerException);
+        $loggedErrors = $this->loggedErrors;
+        $this->loggedErrors = $exception === $handlerException ? 0 : $this->loggedErrors;
+
+        try {
+            $this->handleException($handlerException);
+        } finally {
+            $this->loggedErrors = $loggedErrors;
+        }
     }
 
     /**

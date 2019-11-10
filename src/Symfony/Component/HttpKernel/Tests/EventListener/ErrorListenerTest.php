@@ -12,9 +12,13 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
@@ -152,6 +156,30 @@ class ErrorListenerTest extends TestCase
 
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
         $this->assertFalse($dispatcher->hasListeners(KernelEvents::RESPONSE), 'CSP removal listener has been removed');
+    }
+
+    public function testOnControllerArguments()
+    {
+        $controller = function (FlattenException $exception) {
+            return new Response('OK: '.$exception->getMessage());
+        };
+
+        $listener = new ErrorListener($controller, $this->createMock(LoggerInterface::class), true);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel->method('handle')->willReturnCallback(function (Request $request) use ($listener, $controller, $kernel) {
+            $this->assertSame($controller, $request->attributes->get('_controller'));
+            $arguments = (new ArgumentResolver())->getArguments($request, $controller);
+            $event = new ControllerArgumentsEvent($kernel, $controller, $arguments, $request, HttpKernelInterface::SUB_REQUEST);
+            $listener->onControllerArguments($event);
+
+            return $controller(...$event->getArguments());
+        });
+
+        $event = new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+        $listener->onKernelException($event);
+
+        $this->assertSame('OK: foo', $event->getResponse()->getContent());
     }
 }
 

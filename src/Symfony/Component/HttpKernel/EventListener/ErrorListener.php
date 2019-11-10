@@ -12,10 +12,11 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -87,9 +88,28 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
+    public function onControllerArguments(ControllerArgumentsEvent $event)
+    {
+        $e = $event->getRequest()->attributes->get('exception');
+
+        if (!$e instanceof \Throwable || false === $k = array_search($e, $event->getArguments(), true)) {
+            return;
+        }
+
+        $r = new \ReflectionFunction(\Closure::fromCallable($event->getController()));
+        $r = $r->getParameters()[$k] ?? null;
+
+        if ($r && $r->hasType() && FlattenException::class === $r->getType()->getName()) {
+            $arguments = $event->getArguments();
+            $arguments[$k] = FlattenException::createFromThrowable($e);
+            $event->setArguments($arguments);
+        }
+    }
+
     public static function getSubscribedEvents()
     {
         return [
+            KernelEvents::CONTROLLER_ARGUMENTS => 'onControllerArguments',
             KernelEvents::EXCEPTION => [
                 ['logKernelException', 0],
                 ['onKernelException', -128],

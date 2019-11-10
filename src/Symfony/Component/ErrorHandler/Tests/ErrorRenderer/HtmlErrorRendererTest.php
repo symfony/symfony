@@ -20,7 +20,7 @@ class HtmlErrorRendererTest extends TestCase
     /**
      * @dataProvider getRenderData
      */
-    public function testRender(FlattenException $exception, HtmlErrorRenderer $errorRenderer, string $expected)
+    public function testRender(\Throwable $exception, HtmlErrorRenderer $errorRenderer, string $expected)
     {
         $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception)->getAsString());
     }
@@ -44,13 +44,13 @@ HTML;
 HTML;
 
         yield '->render() returns the HTML content WITH stack traces in debug mode' => [
-            FlattenException::createFromThrowable(new \RuntimeException('Foo')),
+            new \RuntimeException('Foo'),
             new HtmlErrorRenderer(true),
             $expectedDebug,
         ];
 
         yield '->render() returns the HTML content WITHOUT stack traces in non-debug mode' => [
-            FlattenException::createFromThrowable(new \RuntimeException('Foo')),
+            new \RuntimeException('Foo'),
             new HtmlErrorRenderer(false),
             $expectedNonDebug,
         ];

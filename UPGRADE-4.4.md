@@ -18,7 +18,6 @@ Console
 Debug
 -----
 
- * Deprecated the `FlattenException` class, use the one from the `ErrorRenderer` component instead
  * Deprecated the component in favor of the `ErrorHandler` component
 
 Config
@@ -305,7 +304,7 @@ TwigBundle
    ```
 
  * Deprecated the `ExceptionController` and `PreviewErrorController` controllers, use `ErrorController` from the HttpKernel component instead
- * Deprecated all built-in error templates, use the error renderer mechanism of the `ErrorRenderer` component
+ * Deprecated all built-in error templates, use the error renderer mechanism of the `ErrorHandler` component
  * Deprecated loading custom error templates in non-html formats. Custom HTML error pages based on Twig keep working as before:
 
    Before (`templates/bundles/TwigBundle/Exception/error.json.twig`):

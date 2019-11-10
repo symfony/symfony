@@ -57,7 +57,6 @@ Console
 Debug
 -----
 
- * Removed the `FlattenException` class, use the one from the `ErrorRenderer` component instead
  * Removed the component in favor of the `ErrorHandler` component
 
 DependencyInjection

@@ -9,16 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Tests\ErrorRenderer;
+namespace Symfony\Bridge\Twig\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\TwigBundle\ErrorRenderer\TwigHtmlErrorRenderer;
+use Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
-class TwigHtmlErrorRendererTest extends TestCase
+class TwigErrorRendererTest extends TestCase
 {
     public function testFallbackToNativeRendererIfDebugOn()
     {
@@ -32,7 +33,7 @@ class TwigHtmlErrorRendererTest extends TestCase
             ->with($exception)
         ;
 
-        (new TwigHtmlErrorRenderer($twig, $nativeRenderer, true))->render(new \Exception());
+        (new TwigErrorRenderer($twig, $nativeRenderer, true))->render(new \Exception());
     }
 
     public function testFallbackToNativeRendererIfCustomTemplateNotFound()
@@ -46,27 +47,19 @@ class TwigHtmlErrorRendererTest extends TestCase
             ->expects($this->once())
             ->method('render')
             ->with($exception)
+            ->willReturn(FlattenException::createFromThrowable($exception))
         ;
 
-        (new TwigHtmlErrorRenderer($twig, $nativeRenderer, false))->render($exception);
+        (new TwigErrorRenderer($twig, $nativeRenderer, false))->render($exception);
     }
 
     public function testRenderCustomErrorTemplate()
     {
-        $exception = new NotFoundHttpException();
-
         $twig = new Environment(new ArrayLoader([
             '@Twig/Exception/error404.html.twig' => '<h1>Page Not Found</h1>',
         ]));
+        $exception = (new TwigErrorRenderer($twig))->render(new NotFoundHttpException());
 
-        $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
-        $nativeRenderer
-            ->expects($this->never())
-            ->method('render')
-        ;
-
-        $content = (new TwigHtmlErrorRenderer($twig, $nativeRenderer, false))->render($exception);
-
-        $this->assertSame('<h1>Page Not Found</h1>', $content->getAsString());
+        $this->assertSame('<h1>Page Not Found</h1>', $exception->getAsString());
     }
 }

@@ -30,7 +30,7 @@ class CliErrorRenderer implements ErrorRendererInterface
             protected function supportsColors(): bool
             {
                 $outputStream = $this->outputStream;
-                $this->outputStream = STDOUT;
+                $this->outputStream = fopen('php://stdout', 'w');
 
                 try {
                     return parent::supportsColors();

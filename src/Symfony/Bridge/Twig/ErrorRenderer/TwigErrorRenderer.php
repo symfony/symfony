@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\ErrorRenderer;
+namespace Symfony\Bridge\Twig\ErrorRenderer;
 
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
@@ -24,16 +24,16 @@ use Twig\Loader\ExistsLoaderInterface;
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class TwigHtmlErrorRenderer implements ErrorRendererInterface
+class TwigErrorRenderer implements ErrorRendererInterface
 {
     private $twig;
-    private $htmlErrorRenderer;
+    private $fallbackErrorRenderer;
     private $debug;
 
-    public function __construct(Environment $twig, HtmlErrorRenderer $htmlErrorRenderer, bool $debug = false)
+    public function __construct(Environment $twig, HtmlErrorRenderer $fallbackErrorRenderer = null, bool $debug = false)
     {
         $this->twig = $twig;
-        $this->htmlErrorRenderer = $htmlErrorRenderer;
+        $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
         $this->debug = $debug;
     }
 
@@ -42,9 +42,9 @@ class TwigHtmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(\Throwable $exception): FlattenException
     {
-        $exception = $this->htmlErrorRenderer->render($exception);
+        $exception = $this->fallbackErrorRenderer->render($exception);
 
-        if ($this->debug || !$template = $this->findTemplate($exception->getStatusCode());
+        if ($this->debug || !$template = $this->findTemplate($exception->getStatusCode())) {
             return $exception;
         }
 

@@ -17,24 +17,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
- * ExceptionListenerTest.
- *
  * @author Robert Schönthal <seroscho@googlemail.com>
  *
  * @group time-sensitive
- * @group legacy
  */
-class ExceptionListenerTest extends TestCase
+class ErrorListenerTest extends TestCase
 {
     public function testConstruct()
     {
         $logger = new TestLogger();
-        $l = new ExceptionListener('foo', $logger);
+        $l = new ErrorListener('foo', $logger);
 
         $_logger = new \ReflectionProperty(\get_class($l), 'logger');
         $_logger->setAccessible(true);
@@ -52,7 +51,7 @@ class ExceptionListenerTest extends TestCase
     {
         $this->iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
-        $l = new ExceptionListener('foo');
+        $l = new ErrorListener('foo');
         $l->logKernelException($event);
         $l->onKernelException($event);
 
@@ -75,7 +74,7 @@ class ExceptionListenerTest extends TestCase
     {
         $logger = new TestLogger();
 
-        $l = new ExceptionListener('foo', $logger);
+        $l = new ErrorListener('foo', $logger);
         $l->logKernelException($event);
         $l->onKernelException($event);
 
@@ -112,7 +111,7 @@ class ExceptionListenerTest extends TestCase
 
     public function testSubRequestFormat()
     {
-        $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
+        $listener = new ErrorListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
@@ -137,7 +136,7 @@ class ExceptionListenerTest extends TestCase
             return new Response($request->getRequestFormat());
         });
 
-        $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock(), true);
+        $listener = new ErrorListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock(), true);
 
         $dispatcher->addSubscriber($listener);
 
@@ -156,4 +155,26 @@ class ExceptionListenerTest extends TestCase
     }
 }
 
-class_exists(ErrorListenerTest::class);
+class TestLogger extends Logger implements DebugLoggerInterface
+{
+    public function countErrors(Request $request = null): int
+    {
+        return \count($this->logs['critical']);
+    }
+}
+
+class TestKernel implements HttpKernelInterface
+{
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    {
+        return new Response('foo');
+    }
+}
+
+class TestKernelThatThrowsException implements HttpKernelInterface
+{
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    {
+        throw new \RuntimeException('bar');
+    }
+}

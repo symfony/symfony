@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Routing\Loader\Configurator;
 
-use Symfony\Component\Routing\Loader\PhpFileLoader;
+use Symfony\Component\Config\Exception\LoaderLoadException;
+use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -25,7 +27,7 @@ class RoutingConfigurator
     private $path;
     private $file;
 
-    public function __construct(RouteCollection $collection, PhpFileLoader $loader, string $path, string $file)
+    public function __construct(RouteCollection $collection, LoaderInterface $loader, ?string $path, string $file)
     {
         $this->collection = $collection;
         $this->loader = $loader;
@@ -38,9 +40,7 @@ class RoutingConfigurator
      */
     final public function import($resource, string $type = null, bool $ignoreErrors = false, $exclude = null): ImportConfigurator
     {
-        $this->loader->setCurrentDir(\dirname($this->path));
-
-        $imported = $this->loader->import($resource, $type, $ignoreErrors, $this->file, $exclude) ?: [];
+        $imported = $this->load($resource, $type, $ignoreErrors, $exclude) ?: [];
         if (!\is_array($imported)) {
             return new ImportConfigurator($this->collection, $imported);
         }
@@ -56,5 +56,35 @@ class RoutingConfigurator
     final public function collection(string $name = ''): CollectionConfigurator
     {
         return new CollectionConfigurator($this->collection, $name);
+    }
+
+    /**
+     * @param string|string[]|null $exclude
+     *
+     * @return RouteCollection|RouteCollection[]|null
+     */
+    private function load($resource, ?string $type, bool $ignoreErrors, $exclude)
+    {
+        $loader = $this->loader;
+
+        if (!$loader->supports($resource, $type)) {
+            if (null === $resolver = $loader->getResolver()) {
+                throw new LoaderLoadException($resource, $this->file, null, null, $type);
+            }
+
+            if (false === $loader = $resolver->resolve($resource, $type)) {
+                throw new LoaderLoadException($resource, $this->file, null, null, $type);
+            }
+        }
+
+        if (!$loader instanceof FileLoader) {
+            return $loader->load($resource, $type);
+        }
+
+        if (null !== $this->path) {
+            $this->loader->setCurrentDir(\dirname($this->path));
+        }
+
+        return $this->loader->import($resource, $type, $ignoreErrors, $this->file, $exclude);
     }
 }

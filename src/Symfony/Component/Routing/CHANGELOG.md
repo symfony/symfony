@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
+ * Added support for a generic loader to `RoutingConfigurator`.
+
 5.0.0
 -----
 

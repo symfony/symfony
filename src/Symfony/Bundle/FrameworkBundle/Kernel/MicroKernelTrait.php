@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
@@ -29,8 +30,28 @@ trait MicroKernelTrait
      *
      *     $routes->import('config/routing.yml');
      *     $routes->add('/admin', 'App\Controller\AdminController::dashboard', 'admin_dashboard');
+     *
+     * @final since Symfony 5.1, override configureRouting() instead
+     *
+     * @internal since Symfony 5.1, use configureRouting() instead
      */
-    abstract protected function configureRoutes(RouteCollectionBuilder $routes);
+    protected function configureRoutes(RouteCollectionBuilder $routes)
+    {
+    }
+
+    /**
+     * Adds or imports routes into your application.
+     *
+     *     $routes->import($this->getProjectDir().'/config/*.{yaml,php}');
+     *     $routes
+     *         ->add('admin_dashboard', '/admin')
+     *         ->controller('App\Controller\AdminController::dashboard')
+     *     ;
+     */
+    protected function configureRouting(RoutingConfigurator $routes): void
+    {
+        @trigger_error(sprintf('Not overriding the "%s()" method is deprecated since Symfony 5.1 and will trigger a fatal error in 6.0.', __METHOD__), E_USER_DEPRECATED);
+    }
 
     /**
      * Configures the container.
@@ -91,7 +112,15 @@ trait MicroKernelTrait
     {
         $routes = new RouteCollectionBuilder($loader);
         $this->configureRoutes($routes);
+        $collection = $routes->build();
 
-        return $routes->build();
+        if (0 !== \count($collection)) {
+            @trigger_error(sprintf('Adding routes via the "%s:configureRoutes()" method is deprecated since Symfony 5.1 and will have no effect in 6.0; use "configureRouting()" instead.', self::class), E_USER_DEPRECATED);
+        }
+
+        $file = (new \ReflectionObject($this))->getFileName();
+        $this->configureRouting(new RoutingConfigurator($collection, $loader, null, $file));
+
+        return $collection;
     }
 }

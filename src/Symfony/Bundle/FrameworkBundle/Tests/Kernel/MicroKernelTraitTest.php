@@ -19,6 +19,18 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MicroKernelTraitTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Adding routes via the "Symfony\Bundle\FrameworkBundle\Tests\Kernel\MicroKernelWithConfigureRoutes:configureRoutes()" method is deprecated since Symfony 5.1 and will have no effect in 6.0; use "configureRouting()" instead.
+     * @expectedDeprecation Not overriding the "Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait::configureRouting()" method is deprecated since Symfony 5.1 and will trigger a fatal error in 6.0.
+     */
+    public function testConfigureRoutingDeprecated()
+    {
+        $kernel = new MicroKernelWithConfigureRoutes('test', false);
+        $kernel->boot();
+        $kernel->handle(Request::create('/'));
+    }
+
     public function test()
     {
         $kernel = new ConcreteMicroKernel('test', false);

@@ -1,0 +1,63 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bridge\Doctrine\Messenger;
+
+use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Events;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
+
+/**
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ * @author Matthias Noback <matthiasnoback@gmail.com>
+ * @author Valentin Udaltsov <udaltsov.valentin@gmail.com>
+ */
+final class MessageRecordingEntitySubscriber implements EventSubscriber
+{
+    /**
+     * @var MessageBusInterface
+     */
+    private $bus;
+
+    public function __construct(MessageBusInterface $bus)
+    {
+        $this->bus = $bus;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubscribedEvents(): array
+    {
+        return [
+            Events::postFlush,
+        ];
+    }
+
+    public function postFlush(PostFlushEventArgs $args): void
+    {
+        foreach ($args->getEntityManager()->getUnitOfWork()->getIdentityMap() as $entities) {
+            foreach ($entities as $entity) {
+                if (!$entity instanceof MessageRecordingEntityInterface) {
+                    continue;
+                }
+
+                $entity->dispatchMessages(function (array $messages): void {
+                    foreach ($messages as $message) {
+                        $this->bus->dispatch($message, [new DispatchAfterCurrentBusStamp()]);
+                    }
+                });
+            }
+        }
+    }
+}

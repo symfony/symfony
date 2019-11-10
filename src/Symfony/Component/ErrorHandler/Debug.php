@@ -18,39 +18,19 @@ namespace Symfony\Component\ErrorHandler;
  */
 class Debug
 {
-    private static $enabled = false;
-
-    /**
-     * Enables the debug tools.
-     *
-     * This method registers an error handler and an exception handler.
-     */
-    public static function enable(int $errorReportingLevel = E_ALL, bool $displayErrors = true): void
+    public static function enable(): ErrorHandler
     {
-        if (static::$enabled) {
-            return;
-        }
-
-        static::$enabled = true;
-
-        if (null !== $errorReportingLevel) {
-            error_reporting($errorReportingLevel);
-        } else {
-            error_reporting(E_ALL);
-        }
+        error_reporting(-1);
 
         if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             ini_set('display_errors', 0);
-        } elseif ($displayErrors && (!filter_var(ini_get('log_errors'), FILTER_VALIDATE_BOOLEAN) || ini_get('error_log'))) {
+        } elseif (!filter_var(ini_get('log_errors'), FILTER_VALIDATE_BOOLEAN) || ini_get('error_log')) {
             // CLI - display errors only if they're not already logged to STDERR
             ini_set('display_errors', 1);
         }
-        if ($displayErrors) {
-            ErrorHandler::register(new ErrorHandler(new BufferingLogger()));
-        } else {
-            ErrorHandler::register()->throwAt(0, true);
-        }
 
         DebugClassLoader::enable();
+
+        return ErrorHandler::register(new ErrorHandler(new BufferingLogger()));
     }
 }

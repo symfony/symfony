@@ -9,21 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorRenderer\Tests\ErrorRenderer;
+namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
-use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class HtmlErrorRendererTest extends TestCase
 {
     /**
      * @dataProvider getRenderData
      */
-    public function testRender(FlattenException $exception, ErrorRendererInterface $errorRenderer, string $expected)
+    public function testRender(FlattenException $exception, HtmlErrorRenderer $errorRenderer, string $expected)
     {
-        $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception));
+        $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception)->getAsString());
     }
 
     public function getRenderData(): iterable
@@ -52,18 +51,6 @@ HTML;
 
         yield '->render() returns the HTML content WITHOUT stack traces in non-debug mode' => [
             FlattenException::createFromThrowable(new \RuntimeException('Foo')),
-            new HtmlErrorRenderer(false),
-            $expectedNonDebug,
-        ];
-
-        yield '->render() returns the HTML content WITHOUT stack traces in debug mode FORCING non-debug via X-Debug header' => [
-            FlattenException::createFromThrowable(new \RuntimeException('Foo'), null, ['X-Debug' => false]),
-            new HtmlErrorRenderer(true),
-            $expectedNonDebug,
-        ];
-
-        yield '->render() returns the HTML content WITHOUT stack traces in non-debug mode EVEN FORCING debug via X-Debug header' => [
-            FlattenException::createFromThrowable(new \RuntimeException('Foo'), null, ['X-Debug' => true]),
             new HtmlErrorRenderer(false),
             $expectedNonDebug,
         ];

@@ -13,8 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\TwigBundle\ErrorRenderer\TwigHtmlErrorRenderer;
-use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -23,7 +22,7 @@ class TwigHtmlErrorRendererTest extends TestCase
 {
     public function testFallbackToNativeRendererIfDebugOn()
     {
-        $exception = FlattenException::createFromThrowable(new \Exception());
+        $exception = new \Exception();
 
         $twig = $this->createMock(Environment::class);
         $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
@@ -33,12 +32,12 @@ class TwigHtmlErrorRendererTest extends TestCase
             ->with($exception)
         ;
 
-        (new TwigHtmlErrorRenderer($twig, $nativeRenderer, true))->render($exception);
+        (new TwigHtmlErrorRenderer($twig, $nativeRenderer, true))->render(new \Exception());
     }
 
     public function testFallbackToNativeRendererIfCustomTemplateNotFound()
     {
-        $exception = FlattenException::createFromThrowable(new NotFoundHttpException());
+        $exception = new NotFoundHttpException();
 
         $twig = new Environment(new ArrayLoader([]));
 
@@ -54,7 +53,7 @@ class TwigHtmlErrorRendererTest extends TestCase
 
     public function testRenderCustomErrorTemplate()
     {
-        $exception = FlattenException::createFromThrowable(new NotFoundHttpException());
+        $exception = new NotFoundHttpException();
 
         $twig = new Environment(new ArrayLoader([
             '@Twig/Exception/error404.html.twig' => '<h1>Page Not Found</h1>',
@@ -68,6 +67,6 @@ class TwigHtmlErrorRendererTest extends TestCase
 
         $content = (new TwigHtmlErrorRenderer($twig, $nativeRenderer, false))->render($exception);
 
-        $this->assertSame('<h1>Page Not Found</h1>', $content);
+        $this->assertSame('<h1>Page Not Found</h1>', $content->getAsString());
     }
 }

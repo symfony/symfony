@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\TwigBundle\ErrorRenderer;
 
-use Symfony\Component\ErrorRenderer\ErrorRenderer\ErrorRendererInterface;
-use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
@@ -40,34 +40,20 @@ class TwigHtmlErrorRenderer implements ErrorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public static function getFormat(): string
+    public function render(\Throwable $exception): FlattenException
     {
-        return 'html';
-    }
+        $exception = $this->htmlErrorRenderer->render($exception);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function render(FlattenException $exception): string
-    {
-        $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
-
-        if ($debug) {
-            return $this->htmlErrorRenderer->render($exception);
+        if ($this->debug || !$template = $this->findTemplate($exception->getStatusCode());
+            return $exception;
         }
 
-        $template = $this->findTemplate($exception->getStatusCode());
-
-        if (null === $template) {
-            return $this->htmlErrorRenderer->render($exception);
-        }
-
-        return $this->twig->render($template, [
+        return $exception->setAsString($this->twig->render($template, [
             'legacy' => false, // to be removed in 5.0
             'exception' => $exception,
             'status_code' => $exception->getStatusCode(),
-            'status_text' => $exception->getTitle(),
-        ]);
+            'status_text' => $exception->getStatusText(),
+        ]));
     }
 
     private function findTemplate(int $statusCode): ?string

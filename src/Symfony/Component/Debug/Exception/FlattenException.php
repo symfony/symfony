@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorRenderer\Exception\FlattenException instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception\FlattenException instead.
  */
 class FlattenException
 {

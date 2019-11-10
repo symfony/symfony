@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\ErrorRenderer\ErrorRenderer;
-use Symfony\Component\ErrorRenderer\Exception\ErrorRendererNotFoundException;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -30,26 +29,22 @@ class ErrorController
     private $controller;
     private $errorRenderer;
 
-    public function __construct(HttpKernelInterface $kernel, $controller, ErrorRenderer $errorRenderer)
+    public function __construct(HttpKernelInterface $kernel, $controller, ErrorRendererInterface $errorRenderer)
     {
         $this->kernel = $kernel;
         $this->controller = $controller;
         $this->errorRenderer = $errorRenderer;
     }
 
-    public function __invoke(Request $request, FlattenException $exception): Response
+    public function __invoke(\Throwable $exception): Response
     {
-        try {
-            return new Response($this->errorRenderer->render($exception, $request->getPreferredFormat()), $exception->getStatusCode(), $exception->getHeaders());
-        } catch (ErrorRendererNotFoundException $_) {
-            return new Response($this->errorRenderer->render($exception), $exception->getStatusCode(), $exception->getHeaders());
-        }
+        $exception = $this->errorRenderer->render($exception);
+
+        return new Response($exception->getAsString(), $exception->getStatusCode(), $exception->getHeaders());
     }
 
     public function preview(Request $request, int $code): Response
     {
-        $exception = FlattenException::createFromThrowable(new \Exception('This is a sample exception.'), $code, ['X-Debug' => false]);
-
         /*
          * This Request mimics the parameters set by
          * \Symfony\Component\HttpKernel\EventListener\ErrorListener::duplicateRequest, with
@@ -57,7 +52,7 @@ class ErrorController
          */
         $subRequest = $request->duplicate(null, null, [
             '_controller' => $this->controller,
-            'exception' => $exception,
+            'exception' => new \Exception('This is a sample exception.'),
             'logger' => null,
             'showException' => false,
         ]);

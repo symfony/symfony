@@ -123,7 +123,7 @@ class ErrorListener implements EventSubscriberInterface
     {
         $attributes = [
             '_controller' => $this->controller,
-            'exception' => FlattenException::createFromThrowable($exception),
+            'exception' => $exception,
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
         ];
         $request = $request->duplicate(null, null, $attributes);

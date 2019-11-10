@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorRenderer\ErrorRenderer;
+namespace Symfony\Component\ErrorHandler\ErrorRenderer;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -52,23 +52,17 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public static function getFormat(): string
+    public function render(\Throwable  $exception): FlattenException
     {
-        return 'html';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function render(FlattenException $exception): string
-    {
-        return $this->renderException($exception);
+        $exception = FlattenException::createFromThrowable($exception, null, [
+            'Content-Type' => 'text/html; charset='.$this->charset,
+        ]);
+        
+        return $exception->setAsString($this->renderException($exception));
     }
 
     /**
      * Gets the HTML content associated with the given exception.
-     *
-     * @internal
      */
     public function getBody(FlattenException $exception): string
     {
@@ -77,8 +71,6 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     /**
      * Gets the stylesheet associated with the given exception.
-     *
-     * @internal
      */
     public function getStylesheet(): string
     {
@@ -91,11 +83,10 @@ class HtmlErrorRenderer implements ErrorRendererInterface
 
     private function renderException(FlattenException $exception, string $debugTemplate = 'views/exception_full.html.php'): string
     {
-        $debug = $this->debug && ($exception->getHeaders()['X-Debug'] ?? true);
-        $statusText = $this->escape($exception->getTitle());
+        $statusText = $this->escape($exception->getStatusText());
         $statusCode = $this->escape($exception->getStatusCode());
 
-        if (!$debug) {
+        if (!$this->debug) {
             return $this->include('views/error.html.php', [
                 'statusText' => $statusText,
                 'statusCode' => $statusCode,
@@ -111,13 +102,13 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             'statusText' => $statusText,
             'statusCode' => $statusCode,
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-            'currentContent' => $request ? $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level')) : null,
+            'currentContent' => $request ? $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level')) : '',
         ]);
     }
 
-    private function getAndCleanOutputBuffering(int $startObLevel): string
+    private function getAndCleanOutputBuffering(?int $startObLevel): string
     {
-        if (ob_get_level() <= $startObLevel) {
+        if (null === $startObLevel || ob_get_level() <= $startObLevel) {
             return '';
         }
 
@@ -321,7 +312,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     {
         extract($context, EXTR_SKIP);
         ob_start();
-        include __DIR__.'/../Resources/'.$name;
+        include __DIR__ . '/../Resources/' .$name;
 
         return trim(ob_get_clean());
     }

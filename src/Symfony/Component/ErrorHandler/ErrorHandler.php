@@ -19,9 +19,10 @@ use Symfony\Component\ErrorHandler\ErrorEnhancer\ClassNotFoundErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\ErrorEnhancerInterface;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedFunctionErrorEnhancer;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedMethodErrorEnhancer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\CliErrorRenderer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
-use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 
 /**
  * A generic ErrorHandler for the PHP engine.
@@ -45,10 +46,8 @@ use Symfony\Component\ErrorRenderer\Exception\FlattenException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
- *
- * @final since Symfony 4.3
  */
-class ErrorHandler
+final class ErrorHandler
 {
     private $levels = [
         E_DEPRECATED => 'Deprecated',
@@ -145,10 +144,8 @@ class ErrorHandler
                 $handler->setExceptionHandler($p);
                 $prev[0]->setExceptionHandler($p);
             }
-        } elseif (null === $prev && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
-            $handler->setExceptionHandler([$handler, 'sendPhpResponse']);
         } else {
-            $handler->setExceptionHandler($prev);
+            $handler->setExceptionHandler($prev ?? [$handler, 'renderException']);
         }
 
         $handler->throwAt(E_ALL & $handler->thrownErrors, true);
@@ -280,7 +277,7 @@ class ErrorHandler
     /**
      * Sets a user exception handler.
      *
-     * @param callable|null $handler A handler that must support \Throwable instances that will be called on Exception
+     * @param callable(\Throwable $e)|null $handler
      *
      * @return callable|null The previous exception handler
      */
@@ -583,11 +580,7 @@ class ErrorHandler
         }
 
         $exceptionHandler = $this->exceptionHandler;
-        if ((!\is_array($exceptionHandler) || !$exceptionHandler[0] instanceof self || 'sendPhpResponse' !== $exceptionHandler[1]) && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
-            $this->exceptionHandler = [$this, 'sendPhpResponse'];
-        } else {
-            $this->exceptionHandler = null;
-        }
+        $this->exceptionHandler = null;
         try {
             if (null !== $exceptionHandler) {
                 return $exceptionHandler($exception);
@@ -684,36 +677,26 @@ class ErrorHandler
     }
 
     /**
-     * Sends the error associated with the given Exception as a plain PHP response.
+     * Renders the given exception.
      *
-     * As this method is mainly called during Kernel boot, where nothing is yet
-     * available, the Response content is always HTML.
+     * As this method is mainly called during boot where nothing is yet available,
+     * the output is always either HTML or CLI depending where PHP runs.
      */
-    private function sendPhpResponse(\Throwable $exception)
+    private function renderException(\Throwable $exception): void
     {
-        $charset = ini_get('default_charset') ?: 'UTF-8';
-        $statusCode = 500;
-        $headers = [];
+        $renderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? new CliErrorRenderer() : new HtmlErrorRenderer(0 !== $this->scopedErrors);
 
-        if (class_exists(HtmlErrorRenderer::class)) {
-            $exception = FlattenException::createFromThrowable($exception);
-            $statusCode = $exception->getStatusCode();
-            $headers = $exception->getHeaders();
-            $response = (new HtmlErrorRenderer(0 !== $this->scopedErrors))->render($exception);
-        } else {
-            $message = htmlspecialchars($exception->getMessage(), ENT_COMPAT | ENT_SUBSTITUTE, $charset);
-            $response = sprintf('<!DOCTYPE html><html><head><meta charset="%s" /><meta name="robots" content="noindex,nofollow" /></head><body>%s</body></html>', $charset, $message);
-        }
+        $exception = $renderer->render($exception);
 
         if (!headers_sent()) {
-            header(sprintf('HTTP/1.0 %s', $statusCode));
-            foreach ($headers as $name => $value) {
+            http_response_code($exception->getStatusCode());
+
+            foreach ($exception->getHeaders() as $name => $value) {
                 header($name.': '.$value, false);
             }
-            header('Content-Type: text/html; charset='.$charset);
         }
 
-        echo $response;
+        echo $exception->getAsString();
     }
 
     /**

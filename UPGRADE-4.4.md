@@ -18,7 +18,6 @@ Console
 Debug
 -----
 
- * Deprecated the `Debug` class, use the one from the `ErrorRenderer` component instead
  * Deprecated the `FlattenException` class, use the one from the `ErrorRenderer` component instead
  * Deprecated the component in favor of the `ErrorHandler` component
 
@@ -309,44 +308,34 @@ TwigBundle
  * Deprecated all built-in error templates, use the error renderer mechanism of the `ErrorRenderer` component
  * Deprecated loading custom error templates in non-html formats. Custom HTML error pages based on Twig keep working as before:
 
-   Before (`templates/bundles/TwigBundle/Exception/error.jsonld.twig`):
+   Before (`templates/bundles/TwigBundle/Exception/error.json.twig`):
    ```twig
    {
-       "@id": "https://example.com",
-       "@type": "error",
-       "@context": {
-           "title": "{{ status_text }}",
-           "code": {{ status_code }},
-           "message": "{{ exception.message }}"
-       }
+       "type": "https://example.com/error",
+       "title": "{{ status_text }}",
+       "status": {{ status_code }}
    }
    ```
 
-   After (`App\ErrorRenderer\JsonLdErrorRenderer`):
+   After (`App\Serializer\ProblemJsonNormalizer`):
    ```php
-   class JsonLdErrorRenderer implements ErrorRendererInterface
+   class ProblemJsonNormalizer implements NormalizerInterface
    {
-       public static function getFormat(): string
+       public function normalize($exception, $format = null, array $context = [])
        {
-           return 'jsonld';
+           return [
+               'type' => 'https://example.com/error',
+               'title' => $exception->getStatusText(),
+               'status' => $exception->getStatusCode(),
+           ];
        }
 
-       public function render(FlattenException $exception): string
+       public function supportsNormalization($data, $format = null)
        {
-           return json_encode([
-               '@id' => 'https://example.com',
-               '@type' => 'error',
-               '@context' => [
-                   'title' => $exception->getTitle(),
-                   'code' => $exception->getStatusCode(),
-                   'message' => $exception->getMessage(),
-               ],
-           ]);
+           return 'json' === $format && $data instanceof FlattenException;
        }
    }
    ```
-
-  Configure your rendering service tagging it with `error_renderer.renderer`.
 
 Validator
 ---------

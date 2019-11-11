@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-23T09:10:41Z
+
+That's for 4.4.
+Also `AccessDecisionManagerInterface` has the same issue, isn't it?
+Or should we remove the deprecation in that says:
+`Passing more than one Security attribute to AccessDecisionManager::decide() is deprecated since Symfony 4.4.`?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2019-10-23T09:31:21Z
+
+@nicolas-grekas the problem with the `AccessDecisionManagerInterface` is that we can't remove the current `array` type-hint without creating a BC break so the current state of things is that we still require an array but that array must have only one argument.
+
+That's kind of broken but I'm not sure how we could create a migrations path to completely remove the usage of arrays in the authorization process (the voter interface has the same problem).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-11-08T23:25:47Z
+
+PR updated:
+
+* PHPdoc says `mixed` again (but mentions string + `Expression` in the description as being supported by Core)
+* The exception on array is removed. If the single attribute is an array, it should be allowed. This makes it a bit harder if one skips the 4.4 release and upgrades van 4.3 to 5.0 immediately, but I don't recommend anyone doing that anyway.
+
+> That's for 4.4.
+> Also AccessDecisionManagerInterface has the same issue, isn't it?
+> Or should we remove the deprecation in that says:
+> Passing more than one Security attribute to AccessDecisionManager::decide() is deprecated since Symfony 4.4.?
+
+@nicolas-grekas I'm not so sure what you meant with this comment. I would say in 4.4, we still allow multiple attributes (but deprecated it), so we shouldn't have these changes there. As for the deprecation, I would prefer to keep it. Otherwise, it's impossible to provide a smooth upgrade path here.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2019-11-09T10:46:11Z
+
+Build failure seems unrelated btw

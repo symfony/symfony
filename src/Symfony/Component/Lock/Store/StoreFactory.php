@@ -70,7 +70,7 @@ class StoreFactory
             case 0 === strpos($connection, 'rediss://'):
             case 0 === strpos($connection, 'memcached://'):
                 if (!class_exists(AbstractAdapter::class)) {
-                    throw new InvalidArgumentException(sprintf('Unsupported DSN "%s". Try running "composer require symfony/cache".', $this->dsn));
+                    throw new InvalidArgumentException(sprintf('Unsupported DSN "%s". Try running "composer require symfony/cache".', $connection));
                 }
                 $storeClass = 0 === strpos($connection, 'memcached://') ? MemcachedStore::class : RedisStore::class;
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);

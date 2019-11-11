@@ -7,6 +7,26 @@ in 4.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.3.0...v4.3.1
 
+* 4.3.7 (2019-11-11)
+
+ * bug #34294 [Workflow] Fix error when we use ValueObject for the marking property (FabienSalles)
+ * bug #34297 [DI] fix locators with numeric keys (nicolas-grekas)
+ * bug #34282 [DI] Dont cache classes with missing parents (nicolas-grekas)
+ * bug #34287 [HttpClient] Fix a crash when calling CurlHttpClient::__destruct() (dunglas)
+ * bug #34129 [FrameworkBundle][Translation] Invalidate cached catalogues when the scanned directories change (fancyweb)
+ * bug #34246 [Serializer] Use context to compute MetadataAwareNameConverter cache (antograssiot)
+ * bug #34251 [HttpClient] expose only gzip when doing transparent compression (nicolas-grekas)
+ * bug #34244 [Inflector] add support for 'species' (jeffreymoelands)
+ * bug #34085 [Console] Detect dimensions using mode CON if vt100 is supported (rtek)
+ * bug #34199 [HttpClient] Retry safe requests using HTTP/1.1 when HTTP/2 fails (nicolas-grekas)
+ * bug #34192 [Routing] Fix URL generator instantiation (X-Coder264, HypeMC)
+ * bug #34134 [Messenger] fix retry of messages losing the routing key and properties (Tobion)
+ * bug #34181 [Stopwatch] Fixed bug in getDuration when counting multiple ongoing periods (TimoBakx)
+ * bug #34165 [PropertyInfo] Fixed type extraction for nullable collections of non-nullable elements (happyproff)
+ * bug #34179 [Stopwatch] Fixed a bug in StopwatchEvent::getStartTime (TimoBakx)
+ * bug #34203 [FrameworkBundle] [HttpKernel] fixed correct EOL and EOM month (erics86)
+ * bug #34035 [Serializer] Fix property name usage for denormalization (antograssiot)
+
 * 4.3.6 (2019-11-01)
 
  * bug #34198 [HttpClient] Fix perf issue when doing thousands of requests with curl (nicolas-grekas)

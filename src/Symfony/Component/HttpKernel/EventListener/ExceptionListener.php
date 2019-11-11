@@ -42,9 +42,9 @@ class ExceptionListener implements EventSubscriberInterface
 
     public function logKernelException(ExceptionEvent $event)
     {
-        $e = FlattenException::createFromThrowable($event->getException());
+        $e = FlattenException::createFromThrowable($event->getThrowable());
 
-        $this->logException($event->getException(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
+        $this->logException($event->getThrowable(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
     }
 
     public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null)
@@ -53,7 +53,7 @@ class ExceptionListener implements EventSubscriberInterface
             return;
         }
 
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         $request = $this->duplicateRequest($exception, $event->getRequest());
 
         try {
@@ -98,7 +98,7 @@ class ExceptionListener implements EventSubscriberInterface
         ];
     }
 
-    protected function logException(\Exception $exception, string $message)
+    protected function logException(\Throwable $exception, string $message)
     {
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
@@ -112,7 +112,7 @@ class ExceptionListener implements EventSubscriberInterface
     /**
      * Clones the request for the exception.
      */
-    protected function duplicateRequest(\Exception $exception, Request $request): Request
+    protected function duplicateRequest(\Throwable $exception, Request $request): Request
     {
         $attributes = [
             '_controller' => $this->controller,

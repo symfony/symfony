@@ -29,28 +29,23 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 final class ExceptionEvent extends RequestEvent
 {
-    /**
-     * The exception object.
-     *
-     * @var \Exception
-     */
-    private $exception;
+    private $throwable;
 
     /**
      * @var bool
      */
     private $allowCustomResponseCode = false;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, \Exception $e)
+    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, \Throwable $e)
     {
         parent::__construct($kernel, $request, $requestType);
 
-        $this->setException($e);
+        $this->setThrowable($e);
     }
 
-    public function getException(): \Exception
+    public function getThrowable(): \Throwable
     {
-        return $this->exception;
+        return $this->throwable;
     }
 
     /**
@@ -58,9 +53,9 @@ final class ExceptionEvent extends RequestEvent
      *
      * This exception will be thrown if no response is set in the event.
      */
-    public function setException(\Exception $exception): void
+    public function setThrowable(\Throwable $exception): void
     {
-        $this->exception = $exception;
+        $this->throwable = $exception;
     }
 
     /**

@@ -507,6 +507,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return new Reference($config['id']);
         }
 
+        if ($config['migrate_from'] ?? false) {
+            return $config;
+        }
+
         // plaintext encoder
         if ('plaintext' === $config['algorithm']) {
             $arguments = [$config['ignore_case']];

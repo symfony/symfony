@@ -32,7 +32,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     public function onKernelException(ExceptionEvent $event)
     {
-        if ($event->getException() instanceof Danger) {
+        if ($event->getThrowable() instanceof Danger) {
             $event->setResponse(Response::create('It\'s dangerous to go alone. Take this ⚔'));
         }
     }

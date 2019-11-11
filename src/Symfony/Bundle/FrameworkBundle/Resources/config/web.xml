@@ -75,7 +75,7 @@
             <argument type="service" id="error_renderer" />
         </service>
 
-        <service id="exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
+        <service id="exception_listener" class="Symfony\Component\HttpKernel\EventListener\ErrorListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument>%kernel.error_controller%</argument>

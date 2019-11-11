@@ -206,7 +206,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
 
         // a listener might have replaced the exception
-        $e = $event->getException();
+        $e = $event->getThrowable();
 
         if (!$event->hasResponse()) {
             $this->finishRequest($request, $type);

@@ -19,8 +19,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -211,7 +211,7 @@ class Application extends BaseApplication
                 $this->doRenderThrowable($error, $output);
             } else {
                 if (!$error instanceof \Exception) {
-                    $error = new ErrorException($error);
+                    $error = new FatalThrowableError($error);
                 }
 
                 $this->doRenderException($error, $output);

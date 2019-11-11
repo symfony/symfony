@@ -16,7 +16,6 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\ErrorHandler\Exception\ErrorException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -111,10 +110,6 @@ class DebugHandlersListener implements EventSubscriberInterface
                             throw $e;
                         }
 
-                        if (!$e instanceof \Exception) {
-                            $e = new ErrorException($e);
-                        }
-
                         $hasRun = true;
                         $kernel->terminateWithException($e, $request);
                     };
@@ -129,7 +124,7 @@ class DebugHandlersListener implements EventSubscriberInterface
                         $app->renderThrowable($e, $output);
                     } else {
                         if (!$e instanceof \Exception) {
-                            $e = new ErrorException($e);
+                            $e = new FatalThrowableError($e);
                         }
 
                         $app->renderException($e, $output);

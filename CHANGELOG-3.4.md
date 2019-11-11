@@ -7,6 +7,14 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.34 (2019-11-11)
+
+ * bug #34297 [DI] fix locators with numeric keys (nicolas-grekas)
+ * bug #34282 [DI] Dont cache classes with missing parents (nicolas-grekas)
+ * bug #34181 [Stopwatch] Fixed bug in getDuration when counting multiple ongoing periods (TimoBakx)
+ * bug #34179 [Stopwatch] Fixed a bug in StopwatchEvent::getStartTime (TimoBakx)
+ * bug #34203 [FrameworkBundle] [HttpKernel] fixed correct EOL and EOM month (erics86)
+
 * 3.4.33 (2019-11-01)
 
  * bug #33998 [Config] Disable default alphabet sorting in glob function due of unstable sort (hurricane-voronin)

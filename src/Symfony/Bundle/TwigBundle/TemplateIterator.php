@@ -52,7 +52,7 @@ class TemplateIterator implements \IteratorAggregate
 
         $this->templates = array_merge(
             $this->findTemplatesInDirectory($this->rootDir.'/Resources/views'),
-            $this->findTemplatesInDirectory($this->defaultPath, null, ['bundles'])
+            $this->findTemplatesInDirectory($this->defaultPath, null, ['bundles', 'node_modules'])
         );
         foreach ($this->kernel->getBundles() as $bundle) {
             $name = $bundle->getName();

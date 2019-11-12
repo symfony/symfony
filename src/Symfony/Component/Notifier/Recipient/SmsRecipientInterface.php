@@ -19,11 +19,11 @@ namespace Symfony\Component\Notifier\Recipient;
 interface SmsRecipientInterface
 {
     /**
-     * Sets the phone number (no spaces, international code like in +3312345678)
+     * Sets the phone number (no spaces, international code like in +3312345678).
      *
      * @return $this
      */
-    public function phone(string $phone);
+    public function phone(string $phone): self;
 
     public function getPhone(): string;
 }

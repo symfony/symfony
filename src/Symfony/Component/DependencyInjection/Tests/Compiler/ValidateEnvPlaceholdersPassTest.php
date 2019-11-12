@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Definition\Builder\ParentNodeDefinitionInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
@@ -220,10 +219,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $this->expectExceptionMessage('The path "env_extension.scalar_node_not_empty_validated" cannot contain an environment variable when empty values are not allowed by definition and are validated.');
-
-        if (!method_exists(ParentNodeDefinitionInterface::class, 'getChildNodeDefinitions')) {
-            $this->markTestSkipped('symfony/config >=5.0 is required.');
-        }
 
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());

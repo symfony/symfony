@@ -34,6 +34,7 @@
         "symfony/sendgrid-mailer": "^4.4|^5.0"
     },
     "conflict": {
+        "symfony/http-kernel": "<4.4",
         "symfony/sendgrid-mailer": "<4.4"
     },
     "autoload": {

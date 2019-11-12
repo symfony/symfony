@@ -60,8 +60,10 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * {@inheritdoc}
+     *
+     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
     {
         if (null === $this->tokenStorage) {
             $this->data = [

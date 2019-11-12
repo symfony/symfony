@@ -127,7 +127,7 @@ class Connection
             $now,
             $availableAt,
         ], [
-            null,
+            Type::BLOB,
             null,
             null,
             Type::DATETIME,

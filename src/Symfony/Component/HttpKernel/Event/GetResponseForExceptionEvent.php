@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 

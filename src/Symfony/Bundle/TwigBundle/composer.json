@@ -41,7 +41,7 @@
     },
     "conflict": {
         "symfony/dependency-injection": "<4.1",
-        "symfony/framework-bundle": "<4.3",
+        "symfony/framework-bundle": "<4.4",
         "symfony/translation": "<4.2"
     },
     "autoload": {

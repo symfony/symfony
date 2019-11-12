@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\ReplyStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -47,6 +48,14 @@ class AmqpSender implements SenderInterface
 
         /** @var AmqpStamp|null $amqpStamp */
         $amqpStamp = $envelope->last(AmqpStamp::class);
+        if ($replyStamp = $envelope->last(ReplyStamp::class)) {
+            $replyQueue = $this->connection->createReplyQueue();
+            $amqpReplyStamp = new AmqpReplyStamp($replyQueue);
+            $envelope = $envelope->with($amqpReplyStamp);
+
+            $amqpStamp = AmqpStamp::createWithAttributes(['reply_to' => $replyQueue->getName()], $amqpStamp);
+        }
+
         if (isset($encodedMessage['headers']['Content-Type'])) {
             $contentType = $encodedMessage['headers']['Content-Type'];
             unset($encodedMessage['headers']['Content-Type']);

@@ -72,7 +72,7 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
             throw $exception;
         }
 
-        yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope, $queueName));
+        yield $envelope->with(new AmqpReceivedStamp($this->connection, $amqpEnvelope, $queueName));
     }
 
     /**

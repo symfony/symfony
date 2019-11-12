@@ -289,6 +289,30 @@ class Connection
         return $queue;
     }
 
+    /**
+     * Create an exclusive queue to put a response to.
+     */
+    public function createReplyQueue()
+    {
+        $queue = $this->amqpFactory->createQueue($this->channel());
+        $queue->setFlags(\AMQP_EXCLUSIVE);
+        $queue->declareQueue();
+
+        return $queue;
+    }
+
+    /**
+     * Put a response to an exclusive queue
+     *
+     * @param string $response
+     * @param string $replyTo Queue name to reply to
+     */
+    public function reply(string $response, string $replyTo)
+    {
+        $defaultExchange = new \AMQPExchange($this->channel());
+        $defaultExchange->publish($response, $replyTo);
+    }
+
     private function getRoutingKeyForDelay(int $delay, ?string $finalRoutingKey): string
     {
         return str_replace(

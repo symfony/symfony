@@ -256,35 +256,4 @@ class ExpressionLanguageTest extends TestCase
             ],
         ];
     }
-
-    /**
-     * @dataProvider getLogicalOperators
-     */
-    public function testLogicalOperators($expression, $expected)
-    {
-        $this->assertSame($expected, (new ExpressionLanguage())->evaluate($expression));
-    }
-
-    public function getLogicalOperators()
-    {
-        return [
-            // AND
-            ['true and true', true],
-            ['true and false', false],
-            ['false and true', false],
-            ['false and false', false],
-
-            // OR
-            ['true or true', true],
-            ['true or false', true],
-            ['false or true', true],
-            ['false or false', false],
-
-            // XOR
-            ['true xor true', false],
-            ['true xor false', true],
-            ['false xor true', true],
-            ['false xor false', false],
-        ];
-    }
 }

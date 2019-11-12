@@ -104,6 +104,8 @@ class BinaryNode extends Node
             case 'or':
             case '||':
                 return $left || $this->nodes['right']->evaluate($functions, $values);
+            case 'xor':
+                return $left xor $this->nodes['right']->evaluate($functions, $values);
             case 'and':
             case '&&':
                 return $left && $this->nodes['right']->evaluate($functions, $values);

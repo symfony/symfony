@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * add `xor` operator
+
 4.0.0
 -----
 

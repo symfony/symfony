@@ -114,6 +114,14 @@ class LexerTest extends TestCase
                 [new Token('string', '#foo', 1)],
                 '"#foo"',
             ],
+            [
+                [
+                    new Token('name', 'a', 1),
+                    new Token('operator', 'xor', 3),
+                    new Token('name', 'b', 7),
+                ],
+                'a xor b',
+            ],
         ];
     }
 }

@@ -360,7 +360,7 @@ class FlattenException extends LegacyFlattenException
         return $array['__PHP_Incomplete_Class_Name'];
     }
 
-    public function getTraceAsString(): ?string
+    public function getTraceAsString(): string
     {
         return $this->traceAsString;
     }

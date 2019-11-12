@@ -39,6 +39,8 @@ Console
  * Removed the `setVerticalBorderChar()` method in favor of the `setVerticalBorderChars()` method in `TableStyle`.
  * Removed the `getVerticalBorderChar()` method in favor of the `getBorderChars()` method in `TableStyle`.
  * Removed support for returning `null` from `Command::execute()`, return `0` instead
+ * Renamed `Application::renderException()` and `Application::doRenderException()`
+   to `renderThrowable()` and `doRenderThrowable()` respectively.
  * The `ProcessHelper::run()` method takes the command as an array of arguments.
 
    Before:
@@ -239,6 +241,7 @@ FrameworkBundle
  * Removed `ResolveControllerNameSubscriber`.
  * Removed `routing.loader.service`.
  * Added support for PHPUnit 8. A `void` return-type was added to the `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` method.
+ * Removed the `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract` services.
 
 HttpClient
 ----------
@@ -490,6 +493,7 @@ SecurityBundle
    changed to underscores.
    Before: `my-cookie` deleted the `my_cookie` cookie (with an underscore).
    After: `my-cookie` deletes the `my-cookie` cookie (with a dash).
+ * Removed the `security.user.provider.in_memory.user` service.
 
 Serializer
 ----------

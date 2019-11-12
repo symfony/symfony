@@ -19,7 +19,7 @@ class AutowiringFailedException extends RuntimeException
     private $serviceId;
     private $messageCallback;
 
-    public function __construct(string $serviceId, $message = '', int $code = 0, \Exception $previous = null)
+    public function __construct(string $serviceId, $message = '', int $code = 0, \Throwable $previous = null)
     {
         $this->serviceId = $serviceId;
 

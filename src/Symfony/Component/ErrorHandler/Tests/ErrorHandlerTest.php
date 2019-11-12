@@ -50,23 +50,13 @@ class ErrorHandlerTest extends TestCase
                 $h = set_error_handler('var_dump');
                 restore_error_handler();
                 $this->assertSame([$newHandler, 'handleError'], $h);
-            } catch (\Exception $e) {
+            } finally {
+                restore_error_handler();
+                restore_exception_handler();
             }
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-
-            if (isset($e)) {
-                throw $e;
-            }
-        } catch (\Exception $e) {
-        }
-
-        restore_error_handler();
-        restore_exception_handler();
-
-        if (isset($e)) {
-            throw $e;
         }
     }
 
@@ -86,11 +76,9 @@ class ErrorHandlerTest extends TestCase
                 'line' => __LINE__ - 5,
             ];
             $this->assertSame($expected, error_get_last());
-        } catch (\Exception $e) {
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -323,14 +311,9 @@ class ErrorHandlerTest extends TestCase
             unset($undefVar);
             $line = __LINE__ + 1;
             @$undefVar++;
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -406,6 +389,7 @@ class ErrorHandlerTest extends TestCase
             ;
 
             $handler->setDefaultLogger($logger, E_ERROR);
+            $handler->setExceptionHandler(null);
 
             try {
                 $handler->handleException($exception);
@@ -530,16 +514,12 @@ class ErrorHandlerTest extends TestCase
             ;
 
             $handler->setDefaultLogger($logger, E_PARSE);
+            $handler->setExceptionHandler(null);
 
             $handler->handleFatalError($error);
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -563,6 +543,7 @@ class ErrorHandlerTest extends TestCase
         $this->expectException('Exception');
         $handler = new ErrorHandler();
         $handler->setExceptionHandler(function ($e) use ($handler) {
+            $handler->setExceptionHandler(null);
             $handler->handleException($e);
         });
 
@@ -572,7 +553,7 @@ class ErrorHandlerTest extends TestCase
     public function testSendPhpResponse()
     {
         $handler = new ErrorHandler();
-        $handler->setExceptionHandler([$handler, 'sendPhpResponse']);
+        $handler->setExceptionHandler([$handler, 'renderException']);
 
         ob_start();
         $handler->handleException(new \RuntimeException('Class Foo not found'));

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -42,11 +42,7 @@ class ExceptionController
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->debug = $debug;
-        $this->errorRenderer = $errorRenderer;
-
-        if (null === $errorRenderer) {
-            $this->errorRenderer = new HtmlErrorRenderer($debug, $this->twig->getCharset(), $fileLinkFormat);
-        }
+        $this->errorRenderer = $errorRenderer ?? new HtmlErrorRenderer($debug, $this->twig->getCharset(), $fileLinkFormat);
     }
 
     /**

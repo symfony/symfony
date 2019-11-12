@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Mime;
 
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Twig\Extra\CssInliner\CssInlinerExtension;

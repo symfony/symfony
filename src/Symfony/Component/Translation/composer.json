@@ -27,7 +27,6 @@
         "symfony/http-kernel": "^5.0",
         "symfony/intl": "^4.4|^5.0",
         "symfony/service-contracts": "^1.1.2|^2",
-        "symfony/var-dumper": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
         "psr/log": "~1.0"

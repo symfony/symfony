@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
@@ -161,6 +162,7 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserIsDisallowed()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
+        $user = new User('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
@@ -168,6 +170,33 @@ class SwitchUserListenerTest extends TestCase
         $this->accessDecisionManager->expects($this->once())
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'])
             ->willReturn(false);
+
+        $this->userProvider->expects($this->exactly(2))
+            ->method('loadUserByUsername')
+            ->withConsecutive(['kuba'])
+            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener->handle($this->event);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     */
+    public function testSwitchUserTurnsAuthenticationExceptionTo403()
+    {
+        $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_ALLOWED_TO_SWITCH']);
+
+        $this->tokenStorage->setToken($token);
+        $this->request->query->set('_switch_user', 'kuba');
+
+        $this->accessDecisionManager->expects($this->never())
+            ->method('decide');
+
+        $this->userProvider->expects($this->exactly(2))
+            ->method('loadUserByUsername')
+            ->withConsecutive(['kuba'], ['username'])
+            ->will($this->onConsecutiveCalls($this->throwException(new UsernameNotFoundException())));
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
@@ -185,9 +214,10 @@ class SwitchUserListenerTest extends TestCase
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
             ->willReturn(true);
 
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')->with('kuba')
-            ->willReturn($user);
+        $this->userProvider->expects($this->exactly(2))
+            ->method('loadUserByUsername')
+            ->withConsecutive(['kuba'])
+            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')->with($user);
 
@@ -215,9 +245,10 @@ class SwitchUserListenerTest extends TestCase
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
             ->willReturn(true);
 
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')->with('kuba')
-            ->willReturn($user);
+        $this->userProvider->expects($this->exactly(2))
+            ->method('loadUserByUsername')
+            ->withConsecutive(['kuba'])
+            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')->with($user);
 
@@ -243,9 +274,10 @@ class SwitchUserListenerTest extends TestCase
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
             ->willReturn(true);
 
-        $this->userProvider->expects($this->any())
-            ->method('loadUserByUsername')->with('kuba')
-            ->willReturn($user);
+        $this->userProvider->expects($this->exactly(2))
+            ->method('loadUserByUsername')
+            ->withConsecutive(['kuba'])
+            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
 
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher
@@ -290,9 +322,10 @@ class SwitchUserListenerTest extends TestCase
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
             ->willReturn(true);
 
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')->with('kuba')
-            ->willReturn($user);
+        $this->userProvider->expects($this->exactly(2))
+            ->method('loadUserByUsername')
+            ->withConsecutive(['kuba'])
+            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')->with($user);
 

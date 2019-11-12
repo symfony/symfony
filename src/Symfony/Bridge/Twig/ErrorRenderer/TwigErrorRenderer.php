@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\ErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
@@ -30,8 +31,15 @@ class TwigErrorRenderer implements ErrorRendererInterface
     private $fallbackErrorRenderer;
     private $debug;
 
-    public function __construct(Environment $twig, HtmlErrorRenderer $fallbackErrorRenderer = null, bool $debug = false)
+    /**
+     * @param bool|callable $debug The debugging mode as a boolean or a callable that should return it
+     */
+    public function __construct(Environment $twig, HtmlErrorRenderer $fallbackErrorRenderer = null, $debug = false)
     {
+        if (!\is_bool($debug) && !\is_callable($debug)) {
+            throw new \TypeError(sprintf('Argument 2 passed to %s() must be a boolean or a callable, %s given.', __METHOD__, \is_object($debug) ? \get_class($debug) : \gettype($debug)));
+        }
+
         $this->twig = $twig;
         $this->fallbackErrorRenderer = $fallbackErrorRenderer ?? new HtmlErrorRenderer();
         $this->debug = $debug;
@@ -43,8 +51,9 @@ class TwigErrorRenderer implements ErrorRendererInterface
     public function render(\Throwable $exception): FlattenException
     {
         $exception = $this->fallbackErrorRenderer->render($exception);
+        $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
 
-        if ($this->debug || !$template = $this->findTemplate($exception->getStatusCode())) {
+        if ($debug || !$template = $this->findTemplate($exception->getStatusCode())) {
             return $exception;
         }
 
@@ -54,6 +63,17 @@ class TwigErrorRenderer implements ErrorRendererInterface
             'status_code' => $exception->getStatusCode(),
             'status_text' => $exception->getStatusText(),
         ]));
+    }
+
+    public static function isDebug(RequestStack $requestStack, bool $debug): \Closure
+    {
+        return static function () use ($requestStack, $debug): bool {
+            if (!$request = $requestStack->getCurrentRequest()) {
+                return $debug;
+            }
+
+            return $debug && $request->attributes->getBoolean('showException', true);
+        };
     }
 
     private function findTemplate(int $statusCode): ?string

@@ -31,10 +31,12 @@
         "php-http/httplug": "^1.0|^2.0",
         "psr/http-client": "^1.0",
         "symfony/dependency-injection": "^4.3|^5.0",
-        "symfony/http-kernel": "^4.3",
+        "symfony/http-kernel": "^4.4",
         "symfony/process": "^4.2|^5.0",
-        "symfony/service-contracts": "^1.0|^2",
-        "symfony/var-dumper": "^4.3|^5.0"
+        "symfony/service-contracts": "^1.0|^2"
+    },
+    "conflict": {
+        "symfony/http-kernel": "<4.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },

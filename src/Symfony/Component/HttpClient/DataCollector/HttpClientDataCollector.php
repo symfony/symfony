@@ -33,8 +33,10 @@ final class HttpClientDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
     {
         $this->initData();
 

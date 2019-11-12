@@ -23,7 +23,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AjaxDataCollector extends DataCollector
 {
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    /**
+     * {@inheritdoc}
+     *
+     * @param \Throwable|null $exception
+     */
+    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
     {
         // all collecting is done client side
     }

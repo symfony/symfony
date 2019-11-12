@@ -193,12 +193,6 @@
             <tag name="console.command" command="debug:form" />
         </service>
 
-        <service id="console.command.error_renderer_debug" class="Symfony\Component\ErrorRenderer\Command\DebugCommand">
-            <argument type="collection" /> <!-- All error renderers are injected here by ErrorRendererPass -->
-            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
-            <tag name="console.command" command="debug:error-renderer" />
-        </service>
-
         <service id="console.command.secrets_set" class="Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand">
             <argument type="service" id="secrets.vault" />
             <argument type="service" id="secrets.local_vault" on-invalid="ignore" />

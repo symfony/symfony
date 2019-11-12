@@ -32,7 +32,6 @@ class UnusedTagsPass implements CompilerPassInterface
         'controller.service_arguments',
         'config_cache.resource_checker',
         'data_collector',
-        'error_renderer.renderer',
         'form.type',
         'form.type_extension',
         'form.type_guesser',

@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 
 class TwigExtensionTest extends TestCase
 {
@@ -249,6 +250,7 @@ class TwigExtensionTest extends TestCase
         $container->setParameter('foo', 'FooClass');
         $container->register('http_kernel', 'FooClass');
         $container->register('foo', '%foo%')->addTag('twig.runtime');
+        $container->register('error_renderer.html', HtmlErrorRenderer::class);
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);

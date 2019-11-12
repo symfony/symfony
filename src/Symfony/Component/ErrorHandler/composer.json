@@ -17,16 +17,12 @@
     ],
     "require": {
         "php": "^7.2.9",
-        "psr/log": "~1.0"
+        "psr/log": "^1.0",
+        "symfony/var-dumper": "^4.4|^5.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "^3.4|^4.0|^5.0"
-    },
-    "suggest": {
-        "symfony/error-renderer": "For better error rendering"
-    },
-    "conflict": {
-        "symfony/http-kernel": "<3.4"
+        "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/serializer": "^4.4|^5.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ErrorHandler\\": "" },

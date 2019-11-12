@@ -16,8 +16,7 @@ CHANGELOG
 
  * marked the `TemplateIterator` as `internal`
  * added HTML comment to beginning and end of `exception_full.html.twig`
- * added a new `TwigHtmlErrorRenderer` for `html` format, integrated with the `ErrorRenderer` component 
- * deprecated `ExceptionController` and `PreviewErrorController` controllers, use `ErrorController` from the `HttpKernel` component instead 
+ * deprecated `ExceptionController` and `PreviewErrorController` controllers, use `ErrorController` from the `HttpKernel` component instead
  * deprecated all built-in error templates in favor of the new error renderer mechanism
  * deprecated `twig.exception_controller` configuration option, set it to "null" and use `framework.error_controller` configuration instead
 

@@ -18,7 +18,6 @@
     "require": {
         "php": "^7.2.9",
         "symfony/error-handler": "^4.4|^5.0",
-        "symfony/error-renderer": "^4.4|^5.0",
         "symfony/event-dispatcher": "^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/polyfill-ctype": "^1.8",
@@ -39,7 +38,6 @@
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
         "symfony/translation-contracts": "^1.1|^2",
-        "symfony/var-dumper": "^4.4|^5.0",
         "psr/cache": "~1.0",
         "twig/twig": "^2.4|^3.0"
     },
@@ -59,15 +57,13 @@
         "symfony/translation": "<5.0",
         "symfony/twig-bridge": "<5.0",
         "symfony/validator": "<5.0",
-        "symfony/var-dumper": "<4.4",
         "twig/twig": "<2.4"
     },
     "suggest": {
         "symfony/browser-kit": "",
         "symfony/config": "",
         "symfony/console": "",
-        "symfony/dependency-injection": "",
-        "symfony/var-dumper": ""
+        "symfony/dependency-injection": ""
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpKernel\\": "" },

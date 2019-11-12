@@ -39,7 +39,6 @@
         "symfony/security-http": "^4.4|^5.0",
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/console": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/web-link": "^4.4|^5.0",
         "symfony/workflow": "^4.4|^5.0",

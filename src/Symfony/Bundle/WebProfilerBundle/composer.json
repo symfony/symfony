@@ -18,11 +18,9 @@
     "require": {
         "php": "^7.2.9",
         "symfony/config": "^4.4|^5.0",
-        "symfony/error-renderer": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/routing": "^4.4|^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.4|^5.0",
         "twig/twig": "^2.10|^3.0"
     },
     "require-dev": {
@@ -31,9 +29,7 @@
         "symfony/stopwatch": "^4.4|^5.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<4.4",
         "symfony/messenger": "<4.4",
-        "symfony/var-dumper": "<4.4",
         "symfony/form": "<4.4"
     },
     "autoload": {

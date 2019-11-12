@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\ErrorRenderer\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -25,12 +25,12 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  */
 class ExceptionPanelController
 {
-    private $htmlErrorRenderer;
+    private $errorRenderer;
     private $profiler;
 
-    public function __construct(HtmlErrorRenderer $htmlErrorRenderer, ?Profiler $profiler)
+    public function __construct(HtmlErrorRenderer $errorRenderer, Profiler $profiler = null)
     {
-        $this->htmlErrorRenderer = $htmlErrorRenderer;
+        $this->errorRenderer = $errorRenderer;
         $this->profiler = $profiler;
     }
 
@@ -48,7 +48,7 @@ class ExceptionPanelController
             ->getException()
         ;
 
-        return new Response($this->htmlErrorRenderer->getBody($exception), 200, ['Content-Type' => 'text/html']);
+        return new Response($this->errorRenderer->getBody($exception), 200, ['Content-Type' => 'text/html']);
     }
 
     /**
@@ -56,6 +56,6 @@ class ExceptionPanelController
      */
     public function stylesheet(): Response
     {
-        return new Response($this->htmlErrorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
+        return new Response($this->errorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
     }
 }

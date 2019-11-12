@@ -24,6 +24,7 @@ CHANGELOG
 
  * deprecated the `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant, use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead
  * added option to output a UTF-8 BOM in CSV encoder via `CsvEncoder::OUTPUT_UTF8_BOM_KEY` context option
+ * added `ProblemNormalizer` to normalize errors according to the API Problem spec (RFC 7807)
 
 4.3.0
 -----

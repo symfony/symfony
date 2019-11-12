@@ -23,7 +23,7 @@
         </service>
 
         <service id="web_profiler.controller.exception_panel" class="Symfony\Bundle\WebProfilerBundle\Controller\ExceptionPanelController" public="true">
-            <argument type="service" id="error_renderer.renderer.html" />
+            <argument type="service" id="error_handler.error_renderer.html" />
             <argument type="service" id="profiler" on-invalid="null" />
         </service>
 

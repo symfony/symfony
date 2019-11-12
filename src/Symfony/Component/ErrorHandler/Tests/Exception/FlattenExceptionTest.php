@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorRenderer\Tests\Exception;
+namespace Symfony\Component\ErrorHandler\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

@@ -20,18 +20,19 @@
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
-        "symfony/yaml": "^4.4|^5.0",
+        "doctrine/annotations": "~1.0",
+        "doctrine/cache": "~1.0",
+        "phpdocumentor/reflection-docblock": "^3.2|^4.0",
+        "symfony/cache": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
-        "symfony/property-access": "^4.4|^5.0",
+        "symfony/dependency-injection": "^4.4|^5.0",
+        "symfony/error-handler": "^4.4|^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
-        "symfony/cache": "^4.4|^5.0",
+        "symfony/property-access": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
         "symfony/validator": "^4.4|^5.0",
-        "doctrine/annotations": "~1.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
-        "doctrine/cache": "~1.0",
-        "phpdocumentor/reflection-docblock": "^3.0|^4.0"
+        "symfony/yaml": "^4.4|^5.0"
     },
     "conflict": {
         "phpdocumentor/type-resolver": "<0.2.1",

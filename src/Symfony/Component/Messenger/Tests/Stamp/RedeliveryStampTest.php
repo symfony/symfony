@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
 class RedeliveryStampTest extends TestCase

@@ -130,10 +130,9 @@
             <argument /> <!-- runtime locator -->
         </service>
 
-        <service id="twig.error_renderer.html" class="Symfony\Bundle\TwigBundle\ErrorRenderer\TwigHtmlErrorRenderer">
-            <tag name="error_renderer.renderer" priority="1" />
+        <service id="twig.error_renderer.html" class="Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer" decorates="error_renderer.html">
             <argument type="service" id="twig" />
-            <argument type="service" id="error_renderer.renderer.html" />
+            <argument type="service" id="twig.error_renderer.html.inner" />
             <argument>%kernel.debug%</argument>
         </service>
     </services>

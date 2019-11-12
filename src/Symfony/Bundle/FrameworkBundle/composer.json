@@ -21,7 +21,6 @@
         "symfony/cache": "^4.4|^5.0",
         "symfony/config": "^5.0",
         "symfony/dependency-injection": "^5.0",
-        "symfony/error-renderer": "^4.4|^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^5.0",
         "symfony/polyfill-mbstring": "~1.0",
@@ -55,7 +54,6 @@
         "symfony/translation": "^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
         "symfony/validator": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.4|^5.0",
         "symfony/workflow": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
@@ -86,7 +84,6 @@
         "symfony/twig-bridge": "<4.4",
         "symfony/twig-bundle": "<4.4",
         "symfony/validator": "<4.4",
-        "symfony/var-dumper": "<4.4",
         "symfony/workflow": "<4.4"
     },
     "suggest": {

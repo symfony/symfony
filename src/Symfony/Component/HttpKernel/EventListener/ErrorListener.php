@@ -106,7 +106,7 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER_ARGUMENTS => 'onControllerArguments',
@@ -119,11 +119,8 @@ class ErrorListener implements EventSubscriberInterface
 
     /**
      * Logs an exception.
-     *
-     * @param \Exception $exception The \Exception instance
-     * @param string     $message   The error message to log
      */
-    protected function logException(\Exception $exception, $message)
+    protected function logException(\Throwable $exception, string $message): void
     {
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
@@ -136,10 +133,8 @@ class ErrorListener implements EventSubscriberInterface
 
     /**
      * Clones the request for the exception.
-     *
-     * @return Request The cloned request
      */
-    protected function duplicateRequest(\Exception $exception, Request $request)
+    protected function duplicateRequest(\Throwable $exception, Request $request): Request
     {
         $attributes = [
             '_controller' => $this->controller,

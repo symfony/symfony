@@ -45,8 +45,10 @@ use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final
  */
-final class ErrorHandler
+class ErrorHandler
 {
     private $levels = [
         E_DEPRECATED => 'Deprecated',

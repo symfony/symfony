@@ -21,6 +21,7 @@
         "symfony/http-foundation": "~2.7.36|~2.8.29|~3.1.6",
         "symfony/debug": "^2.6.2",
         "symfony/polyfill-ctype": "~1.8",
+        "symfony/polyfill-php56": "~1.8",
         "psr/log": "~1.0"
     },
     "require-dev": {

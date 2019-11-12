@@ -550,7 +550,7 @@ class ErrorHandlerTest extends TestCase
         $handler->handleException(new \Exception());
     }
 
-    public function testSendPhpResponse()
+    public function testRenderException()
     {
         $handler = new ErrorHandler();
         $handler->setExceptionHandler([$handler, 'renderException']);

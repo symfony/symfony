@@ -133,7 +133,13 @@
         <service id="twig.error_renderer.html" class="Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer" decorates="error_renderer.html">
             <argument type="service" id="twig" />
             <argument type="service" id="twig.error_renderer.html.inner" />
-            <argument>%kernel.debug%</argument>
+            <argument type="service">
+                <service>
+                    <factory class="Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer" method="isDebug" />
+                    <argument type="service" id="request_stack" />
+                    <argument>%kernel.debug%</argument>
+                </service>
+            </argument>
         </service>
     </services>
 </container>

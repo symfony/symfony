@@ -30,7 +30,7 @@ class AdminRecipient extends Recipient implements SmsRecipientInterface
     /**
      * @return $this
      */
-    public function phone(string $phone): self
+    public function phone(string $phone): SmsRecipientInterface
     {
         $this->phone = $phone;
 

@@ -18,7 +18,6 @@
     "require": {
         "php": "^7.2.9",
         "symfony/config": "^4.4|^5.0",
-        "symfony/error-renderer": "^4.4|^5.0",
         "symfony/twig-bridge": "^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^5.0",

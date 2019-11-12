@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added `yaml-lint` binary.
+
 5.0.0
 -----
 

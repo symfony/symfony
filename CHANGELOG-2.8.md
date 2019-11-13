@@ -7,6 +7,15 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.52 (2019-11-13)
+
+ * security #cve-2019-18888 [HttpFoundation] fix guessing mime-types of files with leading dash (nicolas-grekas)
+ * security #cve-2019-18887 [HttpKernel] Use constant time comparison in UriSigner (stof)
+
+* 2.8.51 (2019-04-17)
+
+ * no changes
+
 * 2.8.50 (2019-04-17)
 
  * security #cve-2019-10910 [DI] Check service IDs are valid (nicolas-grekas)

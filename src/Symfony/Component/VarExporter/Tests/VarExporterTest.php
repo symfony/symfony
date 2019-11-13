@@ -112,6 +112,7 @@ class VarExporterTest extends TestCase
     public function provideExport()
     {
         yield ['multiline-string', ["\0\0\r\nA" => "B\rC\n\n"], true];
+        yield ['lf-ending-string', "'BOOM'\n.var_dump(123)//'", true];
 
         yield ['bool', true, true];
         yield ['simple-array', [123, ['abc']], true];

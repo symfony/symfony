@@ -38,7 +38,7 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
     /**
      * {@inheritdoc}
      */
-    public function normalize($exception, $format = null, array $context = [])
+    public function normalize($exception, string $format = null, array $context = [])
     {
         $context += $this->defaultContext;
 
@@ -59,7 +59,7 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, string $format = null): bool
     {
         return $data instanceof FlattenException;
     }

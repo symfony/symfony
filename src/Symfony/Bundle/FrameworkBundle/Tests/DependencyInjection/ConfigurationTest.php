@@ -271,6 +271,64 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testBusMiddlewareDontMerge()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'messenger' => [
+                    'default_bus' => 'existing_bus',
+                    'buses' => [
+                        'existing_bus' => [
+                            'middleware' => 'existing_bus.middleware',
+                        ],
+                        'common_bus' => [
+                            'default_middleware' => false,
+                            'middleware' => 'common_bus.old_middleware',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'messenger' => [
+                    'buses' => [
+                        'common_bus' => [
+                            'middleware' => 'common_bus.new_middleware',
+                        ],
+                        'new_bus' => [
+                            'middleware' => 'new_bus.middleware',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(
+            [
+                'existing_bus' => [
+                    'default_middleware' => true,
+                    'middleware' => [
+                        ['id' => 'existing_bus.middleware', 'arguments' => []],
+                    ],
+                ],
+                'common_bus' => [
+                    'default_middleware' => false,
+                    'middleware' => [
+                        ['id' => 'common_bus.new_middleware', 'arguments' => []],
+                    ],
+                ],
+                'new_bus' => [
+                    'default_middleware' => true,
+                    'middleware' => [
+                        ['id' => 'new_bus.middleware', 'arguments' => []],
+                    ],
+                ],
+            ],
+            $config['messenger']['buses']
+        );
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [

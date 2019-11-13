@@ -1293,6 +1293,7 @@ class Configuration implements ConfigurationInterface
                                         ->defaultTrue()
                                     ->end()
                                     ->arrayNode('middleware')
+                                        ->performNoDeepMerging()
                                         ->beforeNormalization()
                                             ->ifTrue(function ($v) { return \is_string($v) || (\is_array($v) && !\is_int(key($v))); })
                                             ->then(function ($v) { return [$v]; })

@@ -7,6 +7,13 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.35 (2019-11-13)
+
+ * bug #34344 [Console] Constant STDOUT might be undefined (nicolas-grekas)
+ * security #cve-2019-18889 [Cache] forbid serializing AbstractAdapter and TagAwareAdapter instances (nicolas-grekas)
+ * security #cve-2019-18888 [HttpFoundation] fix guessing mime-types of files with leading dash (nicolas-grekas)
+ * security #cve-2019-18887 [HttpKernel] Use constant time comparison in UriSigner (stof)
+
 * 3.4.34 (2019-11-11)
 
  * bug #34297 [DI] fix locators with numeric keys (nicolas-grekas)

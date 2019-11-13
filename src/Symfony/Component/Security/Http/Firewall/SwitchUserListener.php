@@ -101,7 +101,8 @@ class SwitchUserListener
             try {
                 $this->tokenStorage->setToken($this->attemptSwitchUser($request, $username));
             } catch (AuthenticationException $e) {
-                throw new \LogicException(sprintf('Switch User failed: "%s"', $e->getMessage()));
+                // Generate 403 in any conditions to prevent user enumeration vulnerabilities
+                throw new AccessDeniedException('Switch User failed: '.$e->getMessage(), $e);
             }
         }
 
@@ -133,7 +134,24 @@ class SwitchUserListener
             throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
         }
 
-        $user = $this->provider->loadUserByUsername($username);
+        $currentUsername = $token->getUsername();
+        $nonExistentUsername = '_'.md5(random_bytes(8).$username);
+
+        // To protect against user enumeration via timing measurements
+        // we always load both successfully and unsuccessfully
+        try {
+            $user = $this->provider->loadUserByUsername($username);
+
+            try {
+                $this->provider->loadUserByUsername($nonExistentUsername);
+                throw new \LogicException('AuthenticationException expected');
+            } catch (AuthenticationException $e) {
+            }
+        } catch (AuthenticationException $e) {
+            $this->provider->loadUserByUsername($currentUsername);
+
+            throw $e;
+        }
 
         if (false === $this->accessDecisionManager->decide($token, [$this->role], $user)) {
             $exception = new AccessDeniedException();

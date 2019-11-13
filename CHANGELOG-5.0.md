@@ -7,6 +7,17 @@ in 5.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.0.0...v5.0.1
 
+* 5.0.0-BETA2 (2019-11-13)
+
+ * bug #34344 [Console] Constant STDOUT might be undefined (nicolas-grekas)
+ * bug #34348 [Serializer] Fix ProblemNormalizer signature mismatch (chalasr)
+ * security #cve-2019-18886 [Security\Core] throw AccessDeniedException when switch user fails (nicolas-grekas)
+ * security #cve-2019-18888 [Mime] fix guessing mime-types of files with leading dash (nicolas-grekas)
+ * security #cve-2019-11325 [VarExporter] fix exporting some strings (nicolas-grekas)
+ * security #cve-2019-18889 [Cache] forbid serializing AbstractAdapter and TagAwareAdapter instances (nicolas-grekas)
+ * security #cve-2019-18888 [HttpFoundation] fix guessing mime-types of files with leading dash (nicolas-grekas)
+ * security #cve-2019-18887 [HttpKernel] Use constant time comparison in UriSigner (stof)
+
 * 5.0.0-BETA1 (2019-11-12)
 
  * feature #34333 Revert "feature #34329 [ExpressionLanguage] add XOR operator (ottaviano)" (nicolas-grekas)

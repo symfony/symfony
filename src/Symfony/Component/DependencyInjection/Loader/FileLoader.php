@@ -112,7 +112,7 @@ abstract class FileLoader extends BaseFileLoader
                     continue;
                 }
                 foreach (class_implements($class, false) as $interface) {
-                    $this->singlyImplemented[$interface] = isset($this->singlyImplemented[$interface]) ? false : $class;
+                    $this->singlyImplemented[$interface] = ($this->singlyImplemented[$interface] ?? $class) !== $class ? false : $class;
                 }
             }
         }

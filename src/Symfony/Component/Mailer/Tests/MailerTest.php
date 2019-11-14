@@ -24,6 +24,7 @@ class MailerTest extends TestCase
     public function testSendingRawMessages()
     {
         $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot send a "Symfony\Component\Mime\RawMessage" instance without an explicit Envelope.');
 
         $transport = new Mailer($this->createMock(TransportInterface::class), $this->createMock(MessageBusInterface::class), $this->createMock(EventDispatcherInterface::class));
         $transport->send(new RawMessage('Some raw email message'));

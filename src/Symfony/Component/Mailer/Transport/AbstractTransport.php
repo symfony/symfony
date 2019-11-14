@@ -13,11 +13,13 @@ namespace Symfony\Component\Mailer\Transport;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -55,6 +57,11 @@ abstract class AbstractTransport implements TransportInterface
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         $message = clone $message;
+
+        if (null === $envelope && !$message instanceof Message) {
+            throw new LogicException(sprintf('Cannot send a "%s" instance without an explicit Envelope.', \get_class($message)));
+        }
+
         $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
 
         if (null !== $this->dispatcher) {

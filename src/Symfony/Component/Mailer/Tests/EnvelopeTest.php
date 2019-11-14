@@ -13,11 +13,9 @@ namespace Symfony\Component\Mailer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
-use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
-use Symfony\Component\Mime\RawMessage;
 
 class EnvelopeTest extends TestCase
 {
@@ -101,12 +99,5 @@ class EnvelopeTest extends TestCase
         $headers->addMailboxListHeader('Bcc', [new Address('bcc@symfony.com', 'bcc')]);
         $e = Envelope::create(new Message($headers));
         $this->assertEquals([new Address('to@symfony.com', 'to'), new Address('cc@symfony.com', 'cc'), new Address('bcc@symfony.com', 'bcc')], $e->getRecipients());
-    }
-
-    public function testFromRawMessages()
-    {
-        $this->expectException(LogicException::class);
-
-        Envelope::create(new RawMessage('Some raw email message'));
     }
 }

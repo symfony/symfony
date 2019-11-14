@@ -3,7 +3,10 @@ CHANGELOG
 
 4.4.0
 -----
-
+ * Added `Dsn` class which represents connection dsn.
+ * [BC BREAK] The `TransportFactoryInterface` interface
+   changed: `supports(Dsn $dsn)`, `createTransport(Dsn $dsn, SerializerInterface $serializer, string $name)`.
+ * [BC BREAK] Options from dsn overwrite options from options array in Doctrine transport.
  * Added support for auto trimming of Redis streams.
  * `InMemoryTransport` handle acknowledged and rejected messages.
  * Made all dispatched worker event classes final.

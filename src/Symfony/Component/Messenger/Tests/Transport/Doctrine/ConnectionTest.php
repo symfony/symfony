@@ -207,7 +207,6 @@ class ConnectionTest extends TestCase
             'expectedAutoSetup' => false,
         ];
 
-        //FIXME: document BC-break in behavior
         yield 'options from dsn wins over options from options array' => [
             'dsn' => 'doctrine://default?table_name=name_from_dsn&redeliver_timeout=1200&queue_name=normal&auto_setup=true',
             'options' => [

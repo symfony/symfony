@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * [BC BREAK] changed the `NullTransport` DSN from `smtp://null` to `null://null`
  * [BC BREAK] renamed `SmtpEnvelope` to `Envelope`, renamed `DelayedSmtpEnvelope` to
    `DelayedEnvelope`
  * [BC BREAK] changed the syntax for failover and roundrobin DSNs

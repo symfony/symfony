@@ -26,8 +26,8 @@
 
         <service id="Http\Client\HttpClient" class="Symfony\Component\HttpClient\HttplugClient">
             <argument type="service" id="http_client" />
-            <argument type="service" id="Http\Message\ResponseFactory" on-invalid="ignore" />
-            <argument type="service" id="Http\Message\StreamFactory" on-invalid="ignore" />
+            <argument type="service" id="Psr\Http\Message\ResponseFactoryInterface" on-invalid="ignore" />
+            <argument type="service" id="Psr\Http\Message\StreamFactoryInterface" on-invalid="ignore" />
         </service>
     </services>
 </container>

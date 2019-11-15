@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-11-13T11:23:52Z
+
+isn't this breaking the support for lazy firewalls by always using the token, even when you try to disable checks for some URL patterns ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-11-13T11:29:46Z
+
+I really don't know. I open the PR to get some feedbacks...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-13T11:39:40Z
+
+Yes, it breaks lazyness. Can you please add a test case that reproduces the situation you have?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-11-13T12:47:44Z
+
+1. I reverted my commit to show the bug
+2. I added a new test case to ... show the bug :)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-11-13T13:16:12Z
+
+@nicolas-grekas maybe lazyness should be enabled only for firewalls enabling anonymous access (as such firewalls are expected to be able to deal with cases where the user might not be forced to be actually authenticated already). The lazyness indeed breaks the previous assumption that a firewall will force to have an authenticated token on all requests even when no check is performed. And when authenticated tokens can only be created for an authenticated user and not for anonymous users, the previous implementation was implicitly adding a check on all requests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-14T22:40:27Z
+
+@stof implemented, can you please have a look?
+
+@lyrixx I push-forced on your fork - can you also please have a look at the reason why the test is failing now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-14T22:43:49Z
+
+> can you also please have a look at the reason why the test is failing now?
+
+I figured out on my own :)
+
+PR ready.

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-11-14T15:38:24Z
+
+It can break Silex. I know, it's not maintained anymore, but that's just an example.
+Why is it broken now in 3.4? Anything we should revert instead?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-11-14T16:11:40Z
+
+> Why is it broken now in 3.4? Anything we should revert instead?
+
+The `twig` service dependency is there from the begining. Looks like it never worked without TwigBundle installed.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-11-14T16:45:18Z
+
+> It can break Silex.
+
+`silexphp/Silex-WebProfiler` requires `"symfony/twig-bundle": "^2.8|^3.0"` what is the conflict with this? 🤔
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-11-15T11:20:55Z
+
+Sorry, my comment is not on the right PR :) It should have been on #34389

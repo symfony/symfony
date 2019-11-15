@@ -96,6 +96,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         $eviction = $this->getRedisEvictionPolicy();
         if ('noeviction' !== $eviction && 0 !== strpos($eviction, 'volatile-')) {
             CacheItem::log($this->logger, sprintf('Redis maxmemory-policy setting "%s" is *not* supported by RedisTagAwareAdapter, use "noeviction" or  "volatile-*" eviction policies', $eviction));
+
             return false;
         }
 

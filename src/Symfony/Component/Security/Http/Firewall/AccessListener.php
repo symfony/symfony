@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\AccessMapInterface;
+use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 
 /**
  * AccessListener enforces access control rules.
@@ -51,6 +52,10 @@ class AccessListener implements ListenerInterface
      */
     public function __invoke(RequestEvent $event)
     {
+        if (!$event instanceof LazyResponseEvent && null === $token = $this->tokenStorage->getToken()) {
+            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
+        }
+
         $request = $event->getRequest();
 
         list($attributes) = $this->map->getPatterns($request);
@@ -59,7 +64,7 @@ class AccessListener implements ListenerInterface
             return;
         }
 
-        if (null === $token = $this->tokenStorage->getToken()) {
+        if ($event instanceof LazyResponseEvent && null === $token = $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
         }
 

@@ -34,6 +34,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         'debug' => false,
         'resource_files' => [],
         'scanned_directories' => [],
+        'cache_vary' => [],
     ];
 
     /**
@@ -61,9 +62,10 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * Available options:
      *
-     *   * cache_dir: The cache directory (or null to disable caching)
-     *   * debug:     Whether to enable debugging or not (false by default)
+     *   * cache_dir:      The cache directory (or null to disable caching)
+     *   * debug:          Whether to enable debugging or not (false by default)
      *   * resource_files: List of translation resources available grouped by locale.
+     *   * cache_vary:     An array of data that is serialized to generate the cached catalogue name.
      *
      * @throws InvalidArgumentException
      */
@@ -82,9 +84,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         $this->resourceFiles = $this->options['resource_files'];
         $this->scannedDirectories = $this->options['scanned_directories'];
 
-        parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug'], [
-            'scanned_directories' => $this->scannedDirectories,
-        ]);
+        parent::__construct($defaultLocale, $formatter, $this->options['cache_dir'], $this->options['debug'], $this->options['cache_vary']);
     }
 
     /**

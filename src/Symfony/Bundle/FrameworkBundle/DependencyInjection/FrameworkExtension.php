@@ -1184,11 +1184,18 @@ class FrameworkExtension extends Extension
                 $files[$locale][] = (string) $file;
             }
 
+            $projectDir = $container->getParameter('kernel.project_dir');
+
             $options = array_merge(
                 $translator->getArgument(4),
                 [
                     'resource_files' => $files,
-                    'scanned_directories' => array_merge($dirs, $nonExistingDirs),
+                    'scanned_directories' => $scannedDirectories = array_merge($dirs, $nonExistingDirs),
+                    'cache_vary' => [
+                        'scanned_directories' => array_map(static function (string $dir) use ($projectDir): string {
+                            return 0 === strpos($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir;
+                        }, $scannedDirectories),
+                    ],
                 ]
             );
 

@@ -4,13 +4,14 @@ CHANGELOG
 4.4.0
 -----
 
+ * added `Request::isCorsPreflightRequest()`.
  * passing arguments to `Request::isMethodSafe()` is deprecated.
  * `ApacheRequest` is deprecated, use the `Request` class instead.
- * passing a third argument to `HeaderBag::get()` is deprecated, use method `all()` instead
+ * passing a third argument to `HeaderBag::get()` is deprecated, use method `all()` instead.
  * `PdoSessionHandler` now precalculates the expiry timestamp in the lifetime column,
     make sure to run `CREATE INDEX EXPIRY ON sessions (sess_lifetime)` to update your database
     to speed up garbage collection of expired sessions.
- * added `SessionHandlerFactory` to create session handlers with a DSN
+ * added `SessionHandlerFactory` to create session handlers with a DSN.
  * added `IpUtils::anonymize()` to help with GDPR compliance.
 
 4.3.0

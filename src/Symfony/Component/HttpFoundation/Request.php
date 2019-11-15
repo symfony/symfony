@@ -1734,6 +1734,16 @@ class Request
         return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
     }
 
+    /**
+     * Returns true if the request is a CORS-preflight request.
+     *
+     * @see https://fetch.spec.whatwg.org/#http-requests
+     */
+    public function isCorsPreflightRequest(): bool
+    {
+        return $this->isMethod('OPTIONS') && $this->headers->has('Access-Control-Request-Method');
+    }
+
     /*
      * The following methods are derived from code of the Zend Framework (1.10dev - 2010-01-24)
      *

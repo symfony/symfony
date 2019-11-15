@@ -1493,6 +1493,18 @@ class RequestTest extends TestCase
         $this->assertFalse($request->isXmlHttpRequest());
     }
 
+    public function testIsCorsPreflightRequest()
+    {
+        $request = new Request();
+        $this->assertFalse($request->isCorsPreflightRequest());
+
+        $request->setMethod('OPTIONS');
+        $this->assertFalse($request->isCorsPreflightRequest());
+
+        $request->headers->set('Access-Control-Request-Method', 'POST');
+        $this->assertTrue($request->isCorsPreflightRequest());
+    }
+
     /**
      * @requires extension intl
      */

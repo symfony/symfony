@@ -74,6 +74,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $requestStackSize = 0;
     private $resetServices = false;
 
+    private static $freshCache = [];
+
     const VERSION = '4.4.0-DEV';
     const VERSION_ID = 40400;
     const MAJOR_VERSION = 4;
@@ -511,7 +513,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
 
         try {
-            if (file_exists($cachePath) && \is_object($this->container = include $cachePath) && (!$this->debug || $cache->isFresh())) {
+            if (file_exists($cachePath) && \is_object($this->container = include $cachePath)
+                && (!$this->debug || (self::$freshCache[$k = $cachePath.'.'.$this->environment] ?? self::$freshCache[$k] = $cache->isFresh()))
+            ) {
                 $this->container->set('kernel', $this);
                 error_reporting($errorLevel);
 

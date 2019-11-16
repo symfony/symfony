@@ -75,10 +75,6 @@
             <tag name="messenger.transport_factory" />
         </service>
 
-        <service id="messenger.transport.semaphore.factory" class="Symfony\Component\Messenger\Transport\Semaphore\SemaphoreTransportFactory">
-            <tag name="messenger.transport_factory" />
-        </service>
-
         <service id="messenger.transport.sync.factory" class="Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory">
             <tag name="messenger.transport_factory" />
             <argument type="service" id="messenger.routable_message_bus" />

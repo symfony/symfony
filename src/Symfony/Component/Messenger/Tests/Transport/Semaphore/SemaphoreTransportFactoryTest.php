@@ -15,10 +15,20 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreTransport;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreTransportFactory;
+use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class SemaphoreTransportFactoryTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (true === PlatformUtil::isWindows()) {
+            $this->markTestSkipped('Semaphore extension is not available on Windows platforms.');
+        }
+    }
+
     public function testSupportsOnlySemaphoreTransports()
     {
         $factory = new SemaphoreTransportFactory();

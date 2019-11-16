@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Transport\Semaphore;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Transport\Semaphore\Exception\SemaphoreException;
+use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * A Semaphore connection.
@@ -45,6 +47,10 @@ class Connection
 
     public function __construct(array $configuration)
     {
+        if (true === PlatformUtil::isWindows()) {
+            throw new TransportException('Semaphore extension is not available on Windows platforms');
+        }
+
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->setup = false;
 

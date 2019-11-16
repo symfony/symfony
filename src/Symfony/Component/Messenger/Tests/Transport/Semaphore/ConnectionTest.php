@@ -13,9 +13,19 @@ namespace Symfony\Component\Messenger\Tests\Transport\Semaphore;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
+use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
 
 class ConnectionTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (true === PlatformUtil::isWindows()) {
+            $this->markTestSkipped('Semaphore extension is not available on Windows platforms.');
+        }
+    }
+
     public function testItCannotBeConstructedWithAWrongDsn()
     {
         $this->expectException('InvalidArgumentException');

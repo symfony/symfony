@@ -99,7 +99,7 @@ class ErrorListener implements EventSubscriberInterface
         $r = new \ReflectionFunction(\Closure::fromCallable($event->getController()));
         $r = $r->getParameters()[$k] ?? null;
 
-        if ($r && $r->hasType() && FlattenException::class === $r->getType()->getName()) {
+        if ($r && (!$r->hasType() || FlattenException::class === $r->getType()->getName())) {
             $arguments = $event->getArguments();
             $arguments[$k] = FlattenException::createFromThrowable($e);
             $event->setArguments($arguments);

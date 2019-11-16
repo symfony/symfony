@@ -13,8 +13,8 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
@@ -158,12 +158,11 @@ class ErrorListenerTest extends TestCase
         $this->assertFalse($dispatcher->hasListeners(KernelEvents::RESPONSE), 'CSP removal listener has been removed');
     }
 
-    public function testOnControllerArguments()
+    /**
+     * @dataProvider controllerProvider
+     */
+    public function testOnControllerArguments(callable $controller)
     {
-        $controller = function (FlattenException $exception) {
-            return new Response('OK: '.$exception->getMessage());
-        };
-
         $listener = new ErrorListener($controller, $this->createMock(LoggerInterface::class), true);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
@@ -180,6 +179,23 @@ class ErrorListenerTest extends TestCase
         $listener->onKernelException($event);
 
         $this->assertSame('OK: foo', $event->getResponse()->getContent());
+    }
+
+    public function controllerProvider()
+    {
+        yield [function (FlattenException $exception) {
+            return new Response('OK: '.$exception->getMessage());
+        }];
+
+        yield [function ($exception) {
+            $this->assertInstanceOf(FlattenException::class, $exception);
+
+            return new Response('OK: '.$exception->getMessage());
+        }];
+
+        yield [function (\Throwable $exception) {
+            return new Response('OK: '.$exception->getMessage());
+        }];
     }
 }
 

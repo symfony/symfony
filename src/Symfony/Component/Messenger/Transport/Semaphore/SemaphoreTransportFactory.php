@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Messenger\Transport\Semaphore;
 
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Cedrick Oka Baidai <okacedrick@gmail.com>
@@ -35,7 +35,7 @@ class SemaphoreTransportFactory implements TransportFactoryInterface
      *
      * @see \Symfony\Component\Messenger\Transport\TransportFactoryInterface::supports()
      */
-    public function supports($dsn, array $options): bool
+    public function supports(string $dsn, array $options): bool
     {
         return 0 === strpos($dsn, 'semaphore://');
     }

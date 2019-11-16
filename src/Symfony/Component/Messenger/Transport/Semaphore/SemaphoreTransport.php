@@ -12,11 +12,11 @@
 namespace Symfony\Component\Messenger\Transport\Semaphore;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Cedrick Oka Baidai <okacedrick@gmail.com>

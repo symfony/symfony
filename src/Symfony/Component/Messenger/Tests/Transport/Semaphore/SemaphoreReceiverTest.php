@@ -23,31 +23,31 @@ use PHPUnit\Framework\TestCase;
 
 class SemaphoreReceiverTest extends TestCase
 {
-	public function testItReturnsTheDecodedMessageToTheHandler()
-	{
-		$serializer = new Serializer(
-				new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
-		);
-		
-		$semaphoreEnvelope = $this->createSemaphoreEnvelope();
-		$connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-		$connection->method('get')->willReturn($semaphoreEnvelope);
-		
-		$receiver = new SemaphoreReceiver($connection, $serializer);
-		$actualEnvelopes = iterator_to_array($receiver->get());
-		
-		$this->assertCount(1, $actualEnvelopes);
-		$this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
-	}
-	
-	private function createSemaphoreEnvelope(): SemaphoreEnvelope
-	{
-		$envelope = $this->getMockBuilder(SemaphoreEnvelope::class)->disableOriginalConstructor()->getMock();
-		$envelope->method('getBody')->willReturn('{"message": "Hi"}');
-		$envelope->method('getHeaders')->willReturn([
-				'type' => DummyMessage::class,
-		]);
-		
-		return $envelope;
-	}
+    public function testItReturnsTheDecodedMessageToTheHandler()
+    {
+        $serializer = new Serializer(
+                new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+
+        $semaphoreEnvelope = $this->createSemaphoreEnvelope();
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->method('get')->willReturn($semaphoreEnvelope);
+
+        $receiver = new SemaphoreReceiver($connection, $serializer);
+        $actualEnvelopes = iterator_to_array($receiver->get());
+
+        $this->assertCount(1, $actualEnvelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+    }
+
+    private function createSemaphoreEnvelope(): SemaphoreEnvelope
+    {
+        $envelope = $this->getMockBuilder(SemaphoreEnvelope::class)->disableOriginalConstructor()->getMock();
+        $envelope->method('getBody')->willReturn('{"message": "Hi"}');
+        $envelope->method('getHeaders')->willReturn([
+                'type' => DummyMessage::class,
+        ]);
+
+        return $envelope;
+    }
 }

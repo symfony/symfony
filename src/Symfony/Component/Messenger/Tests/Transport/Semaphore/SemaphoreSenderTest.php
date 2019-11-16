@@ -22,64 +22,64 @@ use PHPUnit\Framework\TestCase;
 
 class SemaphoreSenderTest extends TestCase
 {
-	public function testItSendsTheEncodedMessage()
-	{
-		$envelope = new Envelope(new DummyMessage('Oy'));
-		$encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+    public function testItSendsTheEncodedMessage()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-		$serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-		$serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
-		$connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-		$connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers']);
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers']);
 
-		$sender = new SemaphoreSender($connection, $serializer);
-		$sender->send($envelope);
-	}
+        $sender = new SemaphoreSender($connection, $serializer);
+        $sender->send($envelope);
+    }
 
-	public function testItSendsTheEncodedMessageUsingAType()
-	{
-		$envelope = (new Envelope(new DummyMessage('Oy')))->with($stamp = new SemaphoreStamp(1));
-		$encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+    public function testItSendsTheEncodedMessageUsingAType()
+    {
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with($stamp = new SemaphoreStamp(1));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-		$serializer = $this->createMock(SerializerInterface::class);
-		$serializer->method('encode')->with($envelope)->willReturn($encoded);
-		
-		$connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-		$connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0, $stamp);
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->with($envelope)->willReturn($encoded);
 
-		$sender = new SemaphoreSender($connection, $serializer);
-		$sender->send($envelope);
-	}
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0, $stamp);
 
-	public function testItSendsTheEncodedMessageWithoutHeaders()
-	{
-		$envelope = new Envelope(new DummyMessage('Oy'));
-		$encoded = ['body' => '...'];
+        $sender = new SemaphoreSender($connection, $serializer);
+        $sender->send($envelope);
+    }
 
-		$serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-		$serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+    public function testItSendsTheEncodedMessageWithoutHeaders()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...'];
 
-		$connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-		$connection->expects($this->once())->method('send')->with($encoded['body'], []);
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
-		$sender = new SemaphoreSender($connection, $serializer);
-		$sender->send($envelope);
-	}
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())->method('send')->with($encoded['body'], []);
 
-	public function testItThrowsATransportExceptionIfItCannotSendTheMessage()
-	{
-		$this->expectException('Symfony\Component\Messenger\Exception\TransportException');
-		$envelope = new Envelope(new DummyMessage('Oy'));
-		$encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+        $sender = new SemaphoreSender($connection, $serializer);
+        $sender->send($envelope);
+    }
 
-		$serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-		$serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+    public function testItThrowsATransportExceptionIfItCannotSendTheMessage()
+    {
+        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
-		$connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-		$connection->method('send')->with($encoded['body'], $encoded['headers'])->willThrowException(new SemaphoreException());
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
-		$sender = new SemaphoreSender($connection, $serializer);
-		$sender->send($envelope);
-	}
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->method('send')->with($encoded['body'], $encoded['headers'])->willThrowException(new SemaphoreException());
+
+        $sender = new SemaphoreSender($connection, $serializer);
+        $sender->send($envelope);
+    }
 }

@@ -19,22 +19,22 @@ use PHPUnit\Framework\TestCase;
 
 class SemaphoreTransportFactoryTest extends TestCase
 {
-	public function testSupportsOnlySemaphoreTransports()
-	{
-		$factory = new SemaphoreTransportFactory();
-		
-		$this->assertTrue($factory->supports('semaphore://localhost', []));
-		$this->assertFalse($factory->supports('sqs://localhost', []));
-		$this->assertFalse($factory->supports('invalid-dsn', []));
-	}
-	
-	public function testItCreatesTheTransport()
-	{
-		$factory = new SemaphoreTransportFactory();
-		$serializer = $this->createMock(SerializerInterface::class);
-		
-		$expectedTransport = new SemaphoreTransport(Connection::fromDsn('semaphore:///.env', ['foo' => 'bar']), $serializer);
-		
-		$this->assertEquals($expectedTransport, $factory->createTransport('semaphore:///.env', ['foo' => 'bar'], $serializer));
-	}
+    public function testSupportsOnlySemaphoreTransports()
+    {
+        $factory = new SemaphoreTransportFactory();
+
+        $this->assertTrue($factory->supports('semaphore://localhost', []));
+        $this->assertFalse($factory->supports('sqs://localhost', []));
+        $this->assertFalse($factory->supports('invalid-dsn', []));
+    }
+
+    public function testItCreatesTheTransport()
+    {
+        $factory = new SemaphoreTransportFactory();
+        $serializer = $this->createMock(SerializerInterface::class);
+
+        $expectedTransport = new SemaphoreTransport(Connection::fromDsn('semaphore:///.env', ['foo' => 'bar']), $serializer);
+
+        $this->assertEquals($expectedTransport, $factory->createTransport('semaphore:///.env', ['foo' => 'bar'], $serializer));
+    }
 }

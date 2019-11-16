@@ -14,9 +14,6 @@ namespace Symfony\Component\Messenger\Tests\Transport\Semaphore;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires extension amqp
- */
 class ConnectionTest extends TestCase
 {
 	public function testItCannotBeConstructedWithAWrongDsn()

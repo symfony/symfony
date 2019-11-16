@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Semaphore;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreTransport;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use PHPUnit\Framework\TestCase;
 
 class SemaphoreTransportFactoryTest extends TestCase
 {

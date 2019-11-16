@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Semaphore;
 
-use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 
 class ConnectionTest extends TestCase
 {

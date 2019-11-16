@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Semaphore;
 
-use Symfony\Component\Serializer as SerializerComponent;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreEnvelope;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreReceiver;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use PHPUnit\Framework\TestCase;
 
 class SemaphoreReceiverTest extends TestCase
 {

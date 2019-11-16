@@ -92,9 +92,9 @@ class Connection
 
     /**
      * Send message on semaphore queue.
-     * 
+     *
      * @param SemaphoreStamp $semaphoreStamp
-     * 
+     *
      * @throws SemaphoreException
      */
     public function send(string $body, array $headers = [], int $delay = 0, SemaphoreStamp $semaphoreStamp = null): void

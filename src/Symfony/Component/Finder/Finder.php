@@ -784,7 +784,7 @@ class Finder implements \IteratorAggregate, \Countable
     {
         $dir = rtrim($dir, '/'.\DIRECTORY_SEPARATOR);
 
-        if (preg_match('#^s?ftp://#', $dir)) {
+        if (preg_match('#^(ssh2\.)?s?ftp://#', $dir)) {
             $dir .= '/';
         }
 

@@ -41,6 +41,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
      */
     public function __construct(string $prefix, string $pattern, bool $recursive, bool $forExclusion = false, array $excludedPrefixes = [])
     {
+        ksort($excludedPrefixes);
         $this->prefix = realpath($prefix) ?: (file_exists($prefix) ? $prefix : false);
         $this->pattern = $pattern;
         $this->recursive = $recursive;
@@ -62,7 +63,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
      */
     public function __toString(): string
     {
-        return 'glob.'.$this->prefix.$this->pattern.(int) $this->recursive;
+        return 'glob.'.$this->prefix.(int) $this->recursive.$this->pattern.(int) $this->forExclusion.implode("\0", $this->excludedPrefixes);
     }
 
     /**

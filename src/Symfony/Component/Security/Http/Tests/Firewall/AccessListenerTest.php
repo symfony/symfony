@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Http\AccessMapInterface;
+use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 use Symfony\Component\Security\Http\Firewall\AccessListener;
 
 class AccessListenerTest extends TestCase
@@ -219,7 +220,7 @@ class AccessListenerTest extends TestCase
             ->willReturn($request)
         ;
 
-        $listener($event);
+        $listener(new LazyResponseEvent($event));
     }
 
     public function testHandleWhenTheSecurityTokenStorageHasNoToken()

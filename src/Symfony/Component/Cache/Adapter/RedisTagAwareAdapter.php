@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Adapter;
 use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Response\Status;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -59,6 +60,11 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     private const DEFAULT_CACHE_TTL = 8640000;
 
     /**
+     * @var string|null detected eviction policy used on Redis server
+     */
+    private $redisEvictionPolicy;
+
+    /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redisClient     The redis client
      * @param string                                                   $namespace       The default namespace
      * @param int                                                      $defaultLifetime The default lifetime
@@ -87,6 +93,13 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
      */
     protected function doSave(array $values, int $lifetime, array $addTagData = [], array $delTagData = []): array
     {
+        $eviction = $this->getRedisEvictionPolicy();
+        if ('noeviction' !== $eviction && 0 !== strpos($eviction, 'volatile-')) {
+            CacheItem::log($this->logger, sprintf('Redis maxmemory-policy setting "%s" is *not* supported by RedisTagAwareAdapter, use "noeviction" or  "volatile-*" eviction policies', $eviction));
+
+            return false;
+        }
+
         // serialize values
         if (!$serialized = $this->marshaller->marshall($values, $failed)) {
             return $failed;
@@ -259,5 +272,21 @@ EOLUA;
         }
 
         return $newIds;
+    }
+
+    private function getRedisEvictionPolicy(): string
+    {
+        if (null !== $this->redisEvictionPolicy) {
+            return $this->redisEvictionPolicy;
+        }
+
+        foreach ($this->getHosts() as $host) {
+            $info = $host->info('Memory');
+            $info = isset($info['Memory']) ? $info['Memory'] : $info;
+
+            return $this->redisEvictionPolicy = $info['maxmemory_policy'];
+        }
+
+        return $this->redisEvictionPolicy = '';
     }
 }

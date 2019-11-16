@@ -164,6 +164,11 @@ Lock
  * Deprecated services `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract`, 
    use `StoreFactory::createStore` instead. 
 
+Mailer
+------
+
+ * [BC BREAK] Changed the DSN to use for disabling delivery (using the `NullTransport`) from `smtp://null` to `null://null` (host doesn't matter).
+
 Messenger
 ---------
 

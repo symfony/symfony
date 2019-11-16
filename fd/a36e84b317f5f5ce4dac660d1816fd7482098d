@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-11-15T17:24:02Z
+
+Given that the bundle name is the short class name, does it even make sense to have both columns ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-15T17:25:13Z
+
+> does it even make sense to have both columns ?
+
+I wondered about this too. Having two columns might help readability. Also I wanted the minimum change :)

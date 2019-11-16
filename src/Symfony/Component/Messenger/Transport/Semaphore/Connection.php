@@ -12,9 +12,9 @@
 namespace Symfony\Component\Messenger\Transport\Semaphore;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Semaphore\Exception\SemaphoreException;
 use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
-use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * A Semaphore connection.

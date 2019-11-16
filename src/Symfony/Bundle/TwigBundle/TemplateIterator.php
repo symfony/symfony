@@ -27,16 +27,20 @@ class TemplateIterator implements \IteratorAggregate
     private $templates;
     private $paths;
     private $defaultPath;
+    private $patternFiles;
+    private $excludePaths;
 
     /**
      * @param array       $paths       Additional Twig paths to warm
      * @param string|null $defaultPath The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null)
+    public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null, array $patternFiles = [], array $excludePaths = ['bundles'])
     {
         $this->kernel = $kernel;
         $this->paths = $paths;
         $this->defaultPath = $defaultPath;
+        $this->patternFiles = $patternFiles;
+        $this->excludePaths = $excludePaths;
     }
 
     public function getIterator(): \Traversable
@@ -45,7 +49,7 @@ class TemplateIterator implements \IteratorAggregate
             return $this->templates;
         }
 
-        $templates = null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath, null, ['bundles']) : [];
+        $templates = null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath, null, $this->excludePaths) : [];
 
         foreach ($this->kernel->getBundles() as $bundle) {
             $name = $bundle->getName();
@@ -74,14 +78,22 @@ class TemplateIterator implements \IteratorAggregate
      *
      * @return string[]
      */
-    private function findTemplatesInDirectory(string $dir, string $namespace = null, array $excludeDirs = []): array
+    private function findTemplatesInDirectory(string $dir, string $namespace = null, array $excludePaths = []): array
     {
         if (!is_dir($dir)) {
             return [];
         }
 
+        $finder = Finder::create()
+            ->files()
+            ->followLinks()
+            ->name($this->patternFiles)
+            ->in($dir)
+            ->exclude($excludePaths)
+        ;
+
         $templates = [];
-        foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs) as $file) {
+        foreach ($finder as $file) {
             $templates[] = (null !== $namespace ? '@'.$namespace.'/' : '').str_replace('\\', '/', $file->getRelativePathname());
         }
 

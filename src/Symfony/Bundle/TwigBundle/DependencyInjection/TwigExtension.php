@@ -124,6 +124,11 @@ class TwigExtension extends Extension
             }
         }
 
+        $container->getDefinition('twig.template_iterator')
+            ->setArgument(3, $config['cache_pattern_files'])
+            ->setArgument(4, $config['cache_exclude_paths'])
+        ;
+
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
             $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method']];
         }

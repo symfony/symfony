@@ -25,7 +25,9 @@ class TemplateIteratorTest extends TestCase
         $kernel->expects($this->any())->method('getBundles')->willReturn([
             $bundle,
         ]);
-        $iterator = new TemplateIterator($kernel, [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
+        $patternFiles = ['/.*(?<!\.txt)$/']; // excluding *.txt files
+        $excludePaths = ['bundles', 'node_modules'];
+        $iterator = new TemplateIterator($kernel, [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates', $patternFiles, $excludePaths);
 
         $sorted = iterator_to_array($iterator);
         sort($sorted);

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * added `cache_pattern_files` and `cache_exclude_paths` options, allowing to configure the files and directories to warmup on cache
+
 5.0.0
 -----
 

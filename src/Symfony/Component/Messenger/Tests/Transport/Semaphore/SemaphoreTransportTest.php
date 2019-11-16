@@ -14,11 +14,11 @@ namespace Symfony\Component\Messenger\Tests\Transport\Semaphore;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreEnvelope;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreTransport;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Cedrick Oka Baidai <okacedrick@gmail.com>

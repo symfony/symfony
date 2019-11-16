@@ -24,6 +24,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
     private $unusedEnvPlaceholders = [];
     private $providedTypes = [];
 
+    private static $counter = 0;
+
     /**
      * {@inheritdoc}
      */
@@ -57,7 +59,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 }
             }
 
-            $uniqueName = md5($name.uniqid(mt_rand(), true));
+            $uniqueName = md5($name.'_'.self::$counter++);
             $placeholder = sprintf('%s_%s_%s', $this->getEnvPlaceholderUniquePrefix(), str_replace(':', '_', $env), $uniqueName);
             $this->envPlaceholders[$env][$placeholder] = $placeholder;
 
@@ -72,7 +74,13 @@ class EnvPlaceholderParameterBag extends ParameterBag
      */
     public function getEnvPlaceholderUniquePrefix(): string
     {
-        return $this->envPlaceholderUniquePrefix ?? $this->envPlaceholderUniquePrefix = 'env_'.bin2hex(random_bytes(8));
+        if (null === $this->envPlaceholderUniquePrefix) {
+            $reproducibleEntropy = unserialize(serialize($this->parameters));
+            array_walk_recursive($reproducibleEntropy, function (&$v) { $v = null; });
+            $this->envPlaceholderUniquePrefix = 'env_'.substr(md5(serialize($reproducibleEntropy)), -16);
+        }
+
+        return $this->envPlaceholderUniquePrefix;
     }
 
     /**

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\VarDumper\Caster\LinkStub;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -30,7 +30,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     private $kernel;
     private $name;
     private $version;
-    private $hasVarDumper;
 
     public function __construct(string $name = null, string $version = null)
     {
@@ -43,7 +42,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
         $this->name = $name;
         $this->version = $version;
-        $this->hasVarDumper = class_exists(LinkStub::class);
     }
 
     /**
@@ -82,7 +80,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
-                $this->data['bundles'][$name] = $this->hasVarDumper ? new LinkStub($bundle->getPath()) : $bundle->getPath();
+                $this->data['bundles'][$name] = new ClassStub(\get_class($bundle));
             }
 
             $this->data['symfony_state'] = $this->determineSymfonyState();

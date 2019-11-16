@@ -10,6 +10,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * Added `semaphore` transport.
  * Added support for auto trimming of Redis streams.
  * `InMemoryTransport` handle acknowledged and rejected messages.
  * Made all dispatched worker event classes final.

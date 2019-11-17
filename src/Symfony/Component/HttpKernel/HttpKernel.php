@@ -62,7 +62,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        $request->headers->set('X-Php-Ob-Level', ob_get_level());
+        $request->headers->set('X-Php-Ob-Level', (string) ob_get_level());
 
         try {
             return $this->handleRaw($request, $type);

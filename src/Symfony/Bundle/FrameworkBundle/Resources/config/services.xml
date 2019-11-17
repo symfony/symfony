@@ -127,5 +127,9 @@
             <argument type="service" id="service_container" />
             <argument type="tagged_iterator" tag="container.env_var_loader" />
         </service>
+
+        <service id="monolog.http_client" class="Symfony\Contracts\HttpClient\HttpClientInterface">
+            <factory class="Symfony\Component\HttpClient\HttpClient" method="create" />
+        </service>
     </services>
 </container>

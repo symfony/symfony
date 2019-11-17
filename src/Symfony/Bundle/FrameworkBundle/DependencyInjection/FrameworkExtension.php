@@ -19,6 +19,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
+use Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,6 +44,7 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -445,6 +447,11 @@ class FrameworkExtension extends Extension
             ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
+
+        $handlerAutoconfiguration = $container->registerForAutoconfiguration(ElasticsearchLogstashHandler::class);
+        $handlerAutoconfiguration->setBindings($handlerAutoconfiguration->getBindings() + [
+            HttpClientInterface::class => new BoundArgument(new Reference('monolog.http_client'), false),
+        ]);
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers

@@ -736,7 +736,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Normalizes given directory names by removing trailing slashes.
      *
-     * Excluding: (s)ftp:// wrapper
+     * Excluding: (s)ftp:// or ssh2.(s)ftp:// wrapper
      *
      * @param string $dir
      *

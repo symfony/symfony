@@ -184,6 +184,8 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             $delete = $this->getConnection()->prepare($deleteSql);
         } catch (TableNotFoundException $e) {
             return true;
+        } catch (\PDOException $e) {
+            return true;
         }
         $delete->bindValue(':time', time(), \PDO::PARAM_INT);
 
@@ -193,6 +195,8 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         try {
             return $delete->execute();
         } catch (TableNotFoundException $e) {
+            return true;
+        } catch (\PDOException $e) {
             return true;
         }
     }
@@ -269,6 +273,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         try {
             $conn->exec($sql);
         } catch (TableNotFoundException $e) {
+        } catch (\PDOException $e) {
         }
 
         return true;
@@ -285,6 +290,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
             $stmt = $this->getConnection()->prepare($sql);
             $stmt->execute(array_values($ids));
         } catch (TableNotFoundException $e) {
+        } catch (\PDOException $e) {
         }
 
         return true;
@@ -341,6 +347,11 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 $this->createTable();
             }
             $stmt = $conn->prepare($sql);
+        } catch (\PDOException $e) {
+            if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+                $this->createTable();
+            }
+            $stmt = $conn->prepare($sql);
         }
 
         if ('sqlsrv' === $driver || 'oci' === $driver) {
@@ -372,6 +383,11 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 $stmt->execute();
             } catch (TableNotFoundException $e) {
                 if (!$conn->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+                    $this->createTable();
+                }
+                $stmt->execute();
+            } catch (\PDOException $e) {
+                if (!$conn->inTransaction() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
                     $this->createTable();
                 }
                 $stmt->execute();

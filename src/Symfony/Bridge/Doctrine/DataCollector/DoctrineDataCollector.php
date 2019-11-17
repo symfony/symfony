@@ -18,6 +18,8 @@ use Doctrine\DBAL\Types\Type;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * DoctrineDataCollector.
@@ -117,6 +119,38 @@ class DoctrineDataCollector extends DataCollector
         return 'db';
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCasters()
+    {
+        return parent::getCasters() + [
+            ObjectParameter::class => static function (ObjectParameter $o, array $a, Stub $s): array {
+                $s->class = $o->getClass();
+                $s->value = $o->getObject();
+
+                $r = new \ReflectionClass($o->getClass());
+                if ($f = $r->getFileName()) {
+                    $s->attr['file'] = $f;
+                    $s->attr['line'] = $r->getStartLine();
+                } else {
+                    unset($s->attr['file']);
+                    unset($s->attr['line']);
+                }
+
+                if ($error = $o->getError()) {
+                    return [Caster::PREFIX_VIRTUAL.'⚠' => $error->getMessage()];
+                }
+
+                if ($o->isStringable()) {
+                    return [Caster::PREFIX_VIRTUAL.'__toString()' => (string) $o->getObject()];
+                }
+
+                return [Caster::PREFIX_VIRTUAL.'⚠' => sprintf('Object of class "%s" could not be converted to string.', $o->getClass())];
+            },
+        ];
+    }
+
     private function sanitizeQueries(string $connectionName, array $queries): array
     {
         foreach ($queries as $i => $query) {
@@ -129,6 +163,7 @@ class DoctrineDataCollector extends DataCollector
     private function sanitizeQuery(string $connectionName, array $query): array
     {
         $query['explainable'] = true;
+        $query['runnable'] = true;
         if (null === $query['params']) {
             $query['params'] = [];
         }
@@ -139,6 +174,7 @@ class DoctrineDataCollector extends DataCollector
             $query['types'] = [];
         }
         foreach ($query['params'] as $j => $param) {
+            $e = null;
             if (isset($query['types'][$j])) {
                 // Transform the param according to the type
                 $type = $query['types'][$j];
@@ -150,17 +186,18 @@ class DoctrineDataCollector extends DataCollector
                     try {
                         $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
                     } catch (\TypeError $e) {
-                        // Error thrown while processing params, query is not explainable.
-                        $query['explainable'] = false;
                     } catch (ConversionException $e) {
-                        $query['explainable'] = false;
                     }
                 }
             }
 
-            list($query['params'][$j], $explainable) = $this->sanitizeParam($param);
+            list($query['params'][$j], $explainable, $runnable) = $this->sanitizeParam($param, $e);
             if (!$explainable) {
                 $query['explainable'] = false;
+            }
+
+            if (!$runnable) {
+                $query['runnable'] = false;
             }
         }
 
@@ -176,32 +213,33 @@ class DoctrineDataCollector extends DataCollector
      * indicating if the original value was kept (allowing to use the sanitized
      * value to explain the query).
      */
-    private function sanitizeParam($var): array
+    private function sanitizeParam($var, ?\Throwable $error): array
     {
         if (\is_object($var)) {
-            $className = \get_class($var);
+            return [$o = new ObjectParameter($var, $error), false, $o->isStringable() && !$error];
+        }
 
-            return method_exists($var, '__toString') ?
-                [sprintf('/* Object(%s): */"%s"', $className, $var->__toString()), false] :
-                [sprintf('/* Object(%s) */', $className), false];
+        if ($error) {
+            return ['⚠ '.$error->getMessage(), false, false];
         }
 
         if (\is_array($var)) {
             $a = [];
-            $original = true;
+            $explainable = $runnable = true;
             foreach ($var as $k => $v) {
-                list($value, $orig) = $this->sanitizeParam($v);
-                $original = $original && $orig;
+                list($value, $e, $r) = $this->sanitizeParam($v, null);
+                $explainable = $explainable && $e;
+                $runnable = $runnable && $r;
                 $a[$k] = $value;
             }
 
-            return [$a, $original];
+            return [$a, $explainable, $runnable];
         }
 
         if (\is_resource($var)) {
-            return [sprintf('/* Resource(%s) */', get_resource_type($var)), false];
+            return [sprintf('/* Resource(%s) */', get_resource_type($var)), false, false];
         }
 
-        return [$var, true];
+        return [$var, true, true];
     }
 }

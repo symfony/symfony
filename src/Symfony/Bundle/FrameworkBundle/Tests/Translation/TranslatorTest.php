@@ -217,8 +217,10 @@ class TranslatorTest extends TestCase
                     __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
                 ],
             ],
-            'scanned_directories' => [
-                __DIR__.'/../Fixtures/Resources/translations/',
+            'cache_vary' => [
+                'scanned_directories' => [
+                    '/Fixtures/Resources/translations/',
+                ],
             ],
         ], 'yml');
 
@@ -233,9 +235,11 @@ class TranslatorTest extends TestCase
                     __DIR__.'/../Fixtures/Resources/translations2/ccc.fr.yml',
                 ],
             ],
-            'scanned_directories' => [
-                __DIR__.'/../Fixtures/Resources/translations/',
-                __DIR__.'/../Fixtures/Resources/translations2/',
+            'cache_vary' => [
+                'scanned_directories' => [
+                    '/Fixtures/Resources/translations/',
+                    '/Fixtures/Resources/translations2/',
+                ],
             ],
         ], 'yml');
 

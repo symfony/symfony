@@ -38,10 +38,11 @@ CHANGELOG
  * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
  * Added new `error_controller` configuration to handle system exceptions
  * Added sort option for `translation:update` command.
- * [BC Break] The `framework.messenger.routing.senders` config key is not deep merged anymore.
+ * [BC Break] The `framework.messenger.routing.senders` config key is not deeply merged anymore.
  * Added `secrets:*` commands and `%env(secret:...)%` processor to deal with secrets seamlessly.
  * Made `framework.session.handler_id` accept a DSN
  * Marked the `RouterDataCollector` class as `@final`.
+ * [BC Break] The `framework.messenger.buses.<name>.middleware` config key is not deeply merged anymore.
 
 4.3.0
 -----

@@ -16,6 +16,5 @@ Additionally (see https://symfony.com/roadmap):
  - Never break backward compatibility (see https://symfony.com/bc).
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too.)
- - Features and deprecations must be submitted against branch 4.4.
- - Legacy code removals go to the master branch.
+ - Features and deprecations must be submitted against branch master.
 -->

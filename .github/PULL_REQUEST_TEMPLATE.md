@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | 4.4 for features / 3.4 or 4.3 for bug fixes <!-- see below -->
+| Branch?       | master for features / 3.4, 4.3, 4.4 or 5.0 for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->
@@ -16,6 +16,5 @@ Additionally (see https://symfony.com/roadmap):
  - Never break backward compatibility (see https://symfony.com/bc).
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too.)
- - Features and deprecations must be submitted against branch 4.4.
- - Legacy code removals go to the master branch.
+ - Features and deprecations must be submitted against branch master.
 -->

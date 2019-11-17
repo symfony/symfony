@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-13T07:51:30Z
+
+Looks similar to #32970, on a different node. Looks like a changelog entry would be needed. Please also check the discussion in case it makes sense here too.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-11-13T09:33:36Z
+
+@nicolas-grekas , added a changelog entry and a test that proves the changes are correct from my POV.

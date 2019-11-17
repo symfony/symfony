@@ -27,6 +27,7 @@ CHANGELOG
  * removed the second and third argument of `FileLocator::__construct`
  * removed loading resources from `%kernel.root_dir%/Resources` and `%kernel.root_dir%` as
    fallback directories.
+ * removed class `ExceptionListener`, use `ErrorListener` instead
 
 4.4.0
 -----

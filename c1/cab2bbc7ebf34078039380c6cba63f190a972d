@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-15T11:18:57Z
+
+Oh, please check tests on Windows, they fail.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-11-15T12:42:37Z
+
+@nicolas-grekas CI is green but I had to disable colors for the cli dumper for Windows.

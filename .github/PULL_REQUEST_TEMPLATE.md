@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | 4.4 for features / 3.4 or 4.3 for bug fixes <!-- see below -->
+| Branch?       | master for features / 3.4, 4.3, 4.4 or 5.0 for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-10T08:39:06Z
+
+Not sure this works: this won't prevent composer from selecting any already released version.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2019-07-10T11:28:40Z
+
+Yeah this sounds like it'll introduce more confusion than anything really.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-10T11:42:45Z
+
+I'm sure it'll work, but I might have tried to take a sledgehammer to crack a nut here. 🤔
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-15T17:26:44Z
+
+@derrabus can you please resubmit this PR? We're going to merge it anyway.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-17T13:21:00Z
+
+Reopened.

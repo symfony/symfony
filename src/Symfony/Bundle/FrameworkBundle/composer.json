@@ -50,7 +50,7 @@
         "symfony/security-http": "^4.4|^5.0",
         "symfony/serializer": "^4.4|^5.0",
         "symfony/stopwatch": "^4.4|^5.0",
-        "symfony/string": "~5.0.0",
+        "symfony/string": "^5.0",
         "symfony/translation": "^5.0",
         "symfony/twig-bundle": "^4.4|^5.0",
         "symfony/validator": "^4.4|^5.0",

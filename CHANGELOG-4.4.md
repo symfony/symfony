@@ -7,6 +7,30 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.0-RC1 (2019-11-17)
+
+ * bug #34419 [Cache] Disable igbinary on PHP >= 7.4 (nicolas-grekas)
+ * bug #34347 [Messenger] Perform no deep merging of bus middleware (vudaltsov)
+ * bug #34366 [HttpFoundation] Allow redirecting to URLs that contain a semicolon (JayBizzle)
+ * feature #34405 [HttpFoundation] Added possibility to configure expiration time in redis session handler (mantulo)
+ * bug #34397 [FrameworkBundle] Remove project dir from Translator cache vary scanned directories (fancyweb)
+ * bug #34384 [DoctrineBridge] Improve queries parameters display in Profiler (fancyweb)
+ * bug #34408 [Cache] catch exceptions when using PDO directly (xabbuh)
+ * bug #34411 [HttpKernel] Flatten "exception" controller argument if not typed (chalasr)
+ * bug #34410 [HttpFoundation] Fix MySQL column type definition. (jbroutier)
+ * bug #34403 [Cache] Redis Tag Aware warn on wrong eviction policy (andrerom)
+ * bug #34400 [HttpKernel] collect bundle classes, not paths (nicolas-grekas)
+ * bug #34398 [Config] fix id-generation for GlobResource (nicolas-grekas)
+ * bug #34404 [HttpClient] fix HttpClientDataCollector (nicolas-grekas)
+ * bug #34396 [Finder] Allow ssh2 stream wrapper for sftp (damienalexandre)
+ * bug #34383 [DI] Use reproducible entropy to generate env placeholders (nicolas-grekas)
+ * bug #34389 [WebProfilerBundle] add FrameworkBundle requirement (xabbuh)
+ * bug #34381 [WebProfilerBundle] Require symfony/twig-bundle (fancyweb)
+ * bug #34358  [Security] always check the token on non-lazy firewalls  (nicolas-grekas, lyrixx)
+ * bug #34390 [FrameworkBundle] fix wiring of httplug client (nicolas-grekas)
+ * bug #34369 [FrameworkBundle] Disallow WebProfilerBundle < 4.4 (derrabus)
+ * bug #34370 [DI] fix detecting singly implemented interfaces (nicolas-grekas)
+
 * 4.4.0-BETA2 (2019-11-13)
 
  * bug #34344 [Console] Constant STDOUT might be undefined (nicolas-grekas)

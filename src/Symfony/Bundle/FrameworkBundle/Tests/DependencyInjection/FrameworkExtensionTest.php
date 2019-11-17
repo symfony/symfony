@@ -838,6 +838,8 @@ abstract class FrameworkExtensionTest extends TestCase
         );
 
         $this->assertNotEmpty($nonExistingDirectories, 'FrameworkBundle should pass non existing directories to Translator');
+
+        $this->assertSame('Fixtures/translations', $options['cache_vary']['scanned_directories'][3]);
     }
 
     /**

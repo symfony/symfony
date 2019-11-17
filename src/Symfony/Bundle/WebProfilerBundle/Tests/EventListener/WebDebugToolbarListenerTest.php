@@ -234,6 +234,22 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }
 
+    /***
+     * @depends testToolbarIsInjected
+     */
+    public function testToolbarIsNotInjectedWhenDisablingHeaderIsPresent()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('Symfony-Debug-Toolbar', 'disable');
+
+        $event = new ResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
     public function testXDebugUrlHeader()
     {
         $response = new Response();

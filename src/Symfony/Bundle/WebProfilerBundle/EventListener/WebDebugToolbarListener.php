@@ -104,6 +104,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()
             || false !== stripos($response->headers->get('Content-Disposition'), 'attachment;')
+            || ($response->headers->has('Symfony-Debug-Toolbar') && 'disable' === $response->headers->get('Symfony-Debug-Toolbar'))
         ) {
             return;
         }

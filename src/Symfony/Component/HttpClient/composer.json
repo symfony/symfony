@@ -15,6 +15,7 @@
         }
     ],
     "provide": {
+        "php-http/async-client-implementation": "*",
         "php-http/client-implementation": "*",
         "psr/http-client-implementation": "1.0",
         "symfony/http-client-implementation": "1.1"

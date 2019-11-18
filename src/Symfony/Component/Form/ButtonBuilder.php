@@ -50,18 +50,14 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     private $options;
 
     /**
-     * @throws InvalidArgumentException if the name is empty
+     * @throws InvalidArgumentException if the name is empty or invalid
      */
     public function __construct(?string $name, array $options = [])
     {
-        if ('' === $name || null === $name) {
-            throw new InvalidArgumentException('Buttons cannot have empty names.');
-        }
+        self::validateName($name);
 
         $this->name = $name;
         $this->options = $options;
-
-        FormConfigBuilder::validateName($name);
     }
 
     /**
@@ -756,5 +752,32 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function getIterator()
     {
         return new \EmptyIterator();
+    }
+
+    /**
+     * Validates whether the given variable is a valid button name.
+     *
+     * @throws InvalidArgumentException if the name is empty or contains invalid characters
+     *
+     * @internal
+     */
+    final public static function validateName(?string $name): void
+    {
+        if ('' === $name || null === $name) {
+            throw new InvalidArgumentException('Buttons cannot have empty names.');
+        }
+
+        if (!self::isValidName($name)) {
+            throw new InvalidArgumentException(sprintf('The name "%s" contains illegal characters. Names should start with a lowercase letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").', $name));
+        }
+    }
+
+    /**
+     * A name is accepted if it starts with a lowercase letter, digit or underscore
+     * and contains only letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").
+     */
+    final public static function isValidName(string $name): bool
+    {
+        return (bool) preg_match('/^[a-z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }
 }

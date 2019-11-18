@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+*  a form button widget will now have its `title` attribute translated
+   even if its `label` option is `null` or `false`
+
 5.0.0
 -----
 

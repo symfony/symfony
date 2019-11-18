@@ -87,8 +87,14 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     {
         if (($format & self::PRETTY_DATE) && $value instanceof \DateTimeInterface) {
             if (class_exists('IntlDateFormatter')) {
+                $timezone = $value->getTimezone();
+                // Timezone 'Z' is a valid ISO8601 indicator for UTC
+                $timezone = 'Z' === strtoupper($timezone->getName()) ? new \DateTimeZone('UTC') : $timezone;
+                // Only use timezone if it's valid, otherwise fall back to system default
+                $timezone = \in_array($timezone->getName(), \DateTimeZone::listIdentifiers(), true) ? $timezone : null;
+
                 $locale = \Locale::getDefault();
-                $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $value->getTimezone());
+                $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $timezone);
 
                 // neither the native nor the stub IntlDateFormatter support
                 // DateTimeImmutable as of yet

@@ -25,6 +25,22 @@ final class ConstraintValidatorTest extends TestCase
         $this->assertSame($expected, (new TestFormatValueConstraintValidator())->formatValueProxy($value, $format));
     }
 
+    public function testInvalidTimezoneFallback()
+    {
+        if (!class_exists(\IntlDateFormatter::class)) {
+            $this->markTestSkipped('Test is only valid if IntlDateFormatter is present.');
+        }
+
+        $dateTime = new \DateTimeImmutable('1970-01-01T00:00:00X');
+
+        $locale = \Locale::getDefault();
+        $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
+        $expected = $formatter->format($dateTime);
+
+        $this->assertSame('X', $dateTime->getTimezone()->getName());
+        $this->assertSame($expected, (new TestFormatValueConstraintValidator())->formatValueProxy($dateTime, ConstraintValidator::PRETTY_DATE));
+    }
+
     public function formatValueProvider()
     {
         $data = [
@@ -38,6 +54,7 @@ final class ConstraintValidatorTest extends TestCase
             ['ccc', $toString, ConstraintValidator::OBJECT_TO_STRING],
             ['object', $dateTime = (new \DateTimeImmutable('@0'))->setTimezone(new \DateTimeZone('UTC'))],
             [class_exists(\IntlDateFormatter::class) ? 'Jan 1, 1970, 12:00 AM' : '1970-01-01 00:00:00', $dateTime, ConstraintValidator::PRETTY_DATE],
+            [class_exists(\IntlDateFormatter::class) ? 'Jan 1, 1970, 12:00 AM' : '1970-01-01 00:00:00', (new \DateTimeImmutable('@0'))->setTimezone(new \DateTimeZone('Z')), ConstraintValidator::PRETTY_DATE],
         ];
 
         return $data;

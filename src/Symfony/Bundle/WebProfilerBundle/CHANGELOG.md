@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+*  added ability to prevent toolbar being displayed by setting
+   `Symfony-Debug-Toolbar header` to `disable`
+
 5.0.0
 -----
 

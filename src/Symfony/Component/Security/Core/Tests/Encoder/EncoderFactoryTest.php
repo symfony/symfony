@@ -143,9 +143,7 @@ class EncoderFactoryTest extends TestCase
 
         $factory = new EncoderFactory([
             'digest_encoder' => $digest = new MessageDigestPasswordEncoder('sha256'),
-            'pbdkf2' => $digest = new MessageDigestPasswordEncoder('sha256'),
-            'bcrypt_encoder' => ['algorithm' => 'bcrypt'],
-            SomeUser::class => ['algorithm' => 'sodium', 'migrate_from' => ['bcrypt_encoder', 'digest_encoder']],
+            SomeUser::class => ['algorithm' => 'sodium', 'migrate_from' => ['bcrypt', 'digest_encoder']],
         ]);
 
         $encoder = $factory->getEncoder(SomeUser::class);
@@ -154,6 +152,7 @@ class EncoderFactoryTest extends TestCase
         $this->assertTrue($encoder->isPasswordValid((new SodiumPasswordEncoder())->encodePassword('foo', null), 'foo', null));
         $this->assertTrue($encoder->isPasswordValid((new NativePasswordEncoder(null, null, null, \PASSWORD_BCRYPT))->encodePassword('foo', null), 'foo', null));
         $this->assertTrue($encoder->isPasswordValid($digest->encodePassword('foo', null), 'foo', null));
+        $this->assertStringStartsWith(SODIUM_CRYPTO_PWHASH_STRPREFIX, $encoder->encodePassword('foo', null));
     }
 
     public function testDefaultMigratingEncoders()

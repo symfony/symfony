@@ -114,7 +114,9 @@ class EncoderFactory implements EncoderFactoryInterface
         }
 
         if ($fromEncoders = ($config['migrate_from'] ?? false)) {
-            $encoderChain = [];
+            unset($config['migrate_from']);
+            $encoderChain = [$this->createEncoder($config, true)];
+
             foreach ($fromEncoders as $name) {
                 if ($encoder = $this->encoders[$name] ?? false) {
                     $encoder = $encoder instanceof PasswordEncoderInterface ? $encoder : $this->createEncoder($encoder, true);

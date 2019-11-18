@@ -52,7 +52,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function render(\Throwable  $exception): FlattenException
+    public function render(\Throwable $exception): FlattenException
     {
         $exception = FlattenException::createFromThrowable($exception, null, [
             'Content-Type' => 'text/html; charset='.$this->charset,

@@ -30,7 +30,7 @@ class ContainerLoader extends ObjectLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return 'service' === $type;
     }

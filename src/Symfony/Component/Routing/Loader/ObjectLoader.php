@@ -52,7 +52,7 @@ abstract class ObjectLoader extends Loader
         $loaderObject = $this->getObject($parts[0]);
 
         if (!\is_object($loaderObject)) {
-            throw new \LogicException(sprintf('%s:getObject() must return an object: %s returned', \get_class($this), \gettype($loaderObject)));
+            throw new \TypeError(sprintf('%s:getObject() must return an object: %s returned', \get_class($this), \gettype($loaderObject)));
         }
 
         if (!\is_callable([$loaderObject, $method])) {

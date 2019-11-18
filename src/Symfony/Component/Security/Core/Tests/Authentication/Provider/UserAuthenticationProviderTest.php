@@ -62,9 +62,6 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    /**
-     * @group legacy
-     */
     public function testAuthenticateWhenProviderDoesNotReturnAnUserInterface()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationServiceException');

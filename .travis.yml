@@ -17,7 +17,7 @@ addons:
 
 env:
     global:
-        - MIN_PHP=7.2.9
+        - MIN_PHP=7.2.5
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
         - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
         - MESSENGER_REDIS_DSN=redis://127.0.0.1:7006/messages

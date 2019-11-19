@@ -191,4 +191,21 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->getBoolean('string_false'), '->getBoolean() gets the string false as boolean false');
         $this->assertFalse($bag->getBoolean('unknown'), '->getBoolean() returns false if a parameter is not defined');
     }
+
+    public function testJsonArray()
+    {
+        $obj = new \stdClass ();
+        $obj->foo = 'bar';
+        $obj->hello = 'world';
+
+        $array = (array) $obj;
+        $bag = new ParameterBag([
+            'json' => json_encode($array),
+            'object' => $obj,
+        ]);
+
+        $this->assertEquals($array, $bag->getJsonArray('object'), '->getJsonArray() gets a value of parameter as array');
+        $this->assertEquals($array, $bag->getJsonArray('json'), '->getJsonArray() gets a value of parameter as array');
+        $this->assertEquals([], $bag->getJsonArray('unknown'), '->getJsonArray() returns empty array if a parameter is not defined');
+    }
 }

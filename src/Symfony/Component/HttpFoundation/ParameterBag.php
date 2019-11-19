@@ -202,4 +202,22 @@ class ParameterBag implements \IteratorAggregate, \Countable
     {
         return \count($this->parameters);
     }
+
+    /**
+     * Returns the parameter value converted to array.
+     *
+     * @param string $key
+     * @param array $default
+     * @return array
+     */
+    public function getJsonArray($key, $default = [])
+    {
+        $value = $this->get($key, $default);
+
+        if (is_string($value)) {
+            $value = json_decode ($value);
+        }
+
+        return (array) $value;
+    }
 }

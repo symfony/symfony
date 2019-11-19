@@ -553,6 +553,39 @@ YAML;
         $this->assertSame($expected, $this->dumper->dump($data, 2));
     }
 
+    public function testDumpingMultiLineStringAsScalarBlockTaggedValue()
+    {
+        $data = [
+            'foo' => new TaggedValue('bar', "foo\nline with trailing spaces:\n  \nbar\ninteger like line:\n123456789\nempty line:\n\nbaz"),
+        ];
+        $expected = <<<YAML
+foo: !bar |
+    foo
+    line with trailing spaces:
+      
+    bar
+    integer like line:
+    123456789
+    empty line:
+    
+    baz
+
+YAML;
+
+        $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
+    public function testDumpingInlinedMultiLineIfRnBreakLineInTaggedValue()
+    {
+        $data = [
+            'data' => [
+                'foo' => new TaggedValue('bar', "foo\r\nline with trailing spaces:\n  \nbar\ninteger like line:\n123456789\nempty line:\n\nbaz"),
+            ],
+        ];
+
+        $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block_for_tagged_values.yml'), $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
     public function testDumpMultiLineStringAsScalarBlock()
     {
         $data = [

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added context to `TransitionException` and its child classes whenever they are thrown in `Workflow::apply()`
+
 5.0.0
 -----
 

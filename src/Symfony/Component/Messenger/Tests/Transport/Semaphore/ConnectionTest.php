@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Tests\Transport\Semaphore;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
-use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
 
 class ConnectionTest extends TestCase
 {
@@ -21,8 +20,8 @@ class ConnectionTest extends TestCase
     {
         parent::setUp();
 
-        if (true === PlatformUtil::isWindows()) {
-            $this->markTestSkipped('Semaphore extension is not available on Windows platforms.');
+        if (false === \extension_loaded('sysvmsg')) {
+            $this->markTestSkipped('Semaphore extension (sysvmsg) is required.');
         }
     }
 

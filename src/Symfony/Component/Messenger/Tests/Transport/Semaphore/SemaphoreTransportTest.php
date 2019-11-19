@@ -17,7 +17,6 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreEnvelope;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreTransport;
-use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -30,8 +29,8 @@ class SemaphoreTransportTest extends TestCase
     {
         parent::setUp();
 
-        if (true === PlatformUtil::isWindows()) {
-            $this->markTestSkipped('Semaphore extension is not available on Windows platforms.');
+        if (false === \extension_loaded('sysvmsg')) {
+            $this->markTestSkipped('Semaphore extension (sysvmsg) is required.');
         }
     }
 

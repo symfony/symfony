@@ -18,7 +18,6 @@ use Symfony\Component\Messenger\Transport\Semaphore\Connection;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreReceiver;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreSender;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreStamp;
-use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -40,8 +39,8 @@ class SemaphoreIntegrationTest extends TestCase
     {
         parent::setUp();
 
-        if (true === PlatformUtil::isWindows()) {
-            $this->markTestSkipped('Semaphore extension is not available on Windows platforms.');
+        if (false === \extension_loaded('sysvmsg')) {
+            $this->markTestSkipped('Semaphore extension (sysvmsg) is required.');
 
             return;
         }

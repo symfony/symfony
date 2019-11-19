@@ -61,8 +61,8 @@ class SemaphoreReceiver implements ReceiverInterface
 
         try {
             $envelope = $this->serializer->decode([
-                    'body' => $semaphoreEnvelope->getBody(),
-                    'headers' => $semaphoreEnvelope->getHeaders(),
+                'body' => $semaphoreEnvelope->getBody(),
+                'headers' => $semaphoreEnvelope->getHeaders(),
             ]);
         } catch (MessageDecodingFailedException $exception) {
             // TODO: [Researh] Implements nack strategy for semaphore

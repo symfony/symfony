@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Transport\Semaphore;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Semaphore\Exception\SemaphoreException;
-use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
 
 /**
  * A Semaphore connection.
@@ -47,8 +46,8 @@ class Connection
 
     public function __construct(array $configuration)
     {
-        if (true === PlatformUtil::isWindows()) {
-            throw new TransportException('Semaphore extension is not available on Windows platforms');
+        if (false === \extension_loaded('sysvmsg')) {
+            throw new TransportException('Semaphore extension (sysvmsg) is required.');
         }
 
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
@@ -109,7 +108,7 @@ class Connection
         $message = json_encode(['body' => $body, 'headers' => $headers]);
 
         if ($this->configuration['message_max_size'] < \strlen($message)) {
-            throw new SemaphoreException(sprintf('The semaphore message is too long to be sent, the maximum size accepted is 10 bytes.', $this->configuration['message_max_size']));
+            throw new SemaphoreException(sprintf('The semaphore message is too long to be sent, the maximum size accepted is %s bytes.', $this->configuration['message_max_size']));
         }
 
         if (false === msg_send($this->getQueue(), $messageType, $message, false, false, $errorCode)) {

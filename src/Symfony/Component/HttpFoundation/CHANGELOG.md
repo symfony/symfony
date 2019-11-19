@@ -22,6 +22,7 @@ CHANGELOG
     to speed up garbage collection of expired sessions.
  * added `SessionHandlerFactory` to create session handlers with a DSN
  * added `IpUtils::anonymize()` to help with GDPR compliance.
+ * added a new method `getJsonArray` to `ParameterBag` for getting the `json` value and converting into `array`.
 
 4.3.0
 -----

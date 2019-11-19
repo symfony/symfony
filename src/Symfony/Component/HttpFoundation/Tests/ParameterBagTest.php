@@ -194,7 +194,7 @@ class ParameterBagTest extends TestCase
 
     public function testJsonArray()
     {
-        $obj = new \stdClass ();
+        $obj = new \stdClass();
         $obj->foo = 'bar';
         $obj->hello = 'world';
 

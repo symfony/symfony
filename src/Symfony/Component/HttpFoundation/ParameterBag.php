@@ -205,11 +205,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the parameter value converted to array.
-     *
-     * @param string $key
-     * @param array|null  $default
-     *
-     * @return array
      */
     public function getJsonArray(string $key, ?array $default = []): array
     {

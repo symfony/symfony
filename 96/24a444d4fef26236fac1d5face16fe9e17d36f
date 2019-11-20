@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-18T17:43:03Z
+
+Looks good to me (appveyor failure is unrelated - existed before)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-18T20:40:35Z
+
+Out of curiosity: Do you know why `7.2.9` was originally picked as minimal requirement?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-18T21:56:05Z
+
+I think it's the version Debian ships
+
+---------------------------------------------------------------------------
+
+by k00ni at 2019-11-19T12:37:41Z
+
+Why was the min PHP-version lowered to `7.2.5` and not `7.2`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-19T18:05:16Z
+
+.0 versions are always buggy and we don't want to test with them and workaround these early bugs.
+
+---------------------------------------------------------------------------
+
+by Defcon0 at 2019-11-19T18:38:53Z
+
+mhm, seems to not being accepted?
+
+---------------------------------------------------------------------------
+
+by Matts at 2019-11-19T18:39:03Z
+
+Note:
+7.2.5 -> Security fix
+7.2.8 -> Security fix
+
+https://www.php.net/ChangeLog-7.php#PHP_7_2
+
+Maybe a good idea to note somewhere that, although Symfony supports 7.2.5, it is advised to always update to latest patch?
+
+Also, I would guess the core team already has ideas/has thought about this, but 7.1 security support is being dropped at the end of the month. Same for 7.2 only receiving security patches as of 30 nov. Haven't seen documentation specifically relating to this? (Symfony 3.4 LTS supports 7.0 and up?)
+
+---------------------------------------------------------------------------
+
+by Defcon0 at 2019-11-19T18:39:55Z
+
+Could be, but SUSE Linux (up to 15) only has php 7.2.5. This is a major show stopper.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-19T18:53:16Z
+
+Distributions backport security fixes, that's why ppl pay for them. It's not our job to safeguard ppl from themselves :)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-11-20T10:02:00Z
+
+tests are failing for the Cache PdoAdapter and the Lock PdoStore. Not sure whether this is related to the new PHP version or whether they were already broken on Windows.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-20T10:04:05Z
+
+@stof not related to this PR, I noticed these failures before, reported in #34444

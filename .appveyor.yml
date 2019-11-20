@@ -17,8 +17,8 @@ init:
 
 install:
     - mkdir c:\php && cd c:\php
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.2.9-Win32-VC15-x86.zip
-    - 7z x php-7.2.9-Win32-VC15-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.2.5-Win32-VC15-x86.zip
+    - 7z x php-7.2.5-Win32-VC15-x86.zip -y >nul
     - cd ext
     - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.17-7.2-ts-vc15-x86.zip
     - 7z x php_apcu-5.1.17-7.2-ts-vc15-x86.zip -y >nul

@@ -1283,6 +1283,30 @@ class PhpDumperTest extends TestCase
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "deprecated1" service alias is deprecated. You should stop using it, as it will be removed in the future.
+     * @expectedDeprecation The "deprecated2" service alias is deprecated. You should stop using it, as it will be removed in the future.
+     */
+    public function testMultipleDeprecatedAliasesWorking()
+    {
+        $container = new ContainerBuilder();
+        $container->setDefinition('bar', new Definition('stdClass'))->setPublic(true);
+        $container->setAlias('deprecated1', 'bar')->setPublic(true)->setDeprecated('%alias_id% is deprecated');
+        $container->setAlias('deprecated2', 'bar')->setPublic(true)->setDeprecated('%alias_id% is deprecated');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => $class = __FUNCTION__]);
+
+        eval('?>'.$dump);
+        $container = new $class();
+
+        $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
+        $this->assertInstanceOf(\stdClass::class, $container->get('deprecated1'));
+        $this->assertInstanceOf(\stdClass::class, $container->get('deprecated2'));
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface

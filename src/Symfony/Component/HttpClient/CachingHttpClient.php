@@ -59,9 +59,7 @@ class CachingHttpClient implements HttpClientInterface
         ]; 
         
         foreach ($defaultOptionsArrayKeys as $defaultOptionsArrayKey) {
-            if (true === isset($defaultOptions[$defaultOptionsArrayKey])) {
-                unset($defaultOptions[$defaultOptionsArrayKey]; 
-            }
+            unset($defaultOptions[$defaultOptionsArrayKey]); 
         }
 
         if ($defaultOptions) {

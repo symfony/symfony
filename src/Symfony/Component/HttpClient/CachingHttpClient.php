@@ -48,13 +48,21 @@ class CachingHttpClient implements HttpClientInterface
         $kernel = new HttpClientKernel($client);
         $this->cache = new HttpCache($kernel, $store, null, $defaultOptions);
 
-        unset($defaultOptions['debug']);
-        unset($defaultOptions['default_ttl']);
-        unset($defaultOptions['private_headers']);
-        unset($defaultOptions['allow_reload']);
-        unset($defaultOptions['allow_revalidate']);
-        unset($defaultOptions['stale_while_revalidate']);
-        unset($defaultOptions['stale_if_error']);
+        $defaultOptionsArrayKeys = [
+            'debug',
+            'default_ttl',
+            'private_headers', 
+            'allow_reload', 
+            'allow_revalidate', 
+            'stale_while_revalidate', 
+            'stale_if_error'
+        ]; 
+        
+        foreach ($defaultOptionsArrayKeys as $defaultOptionsArrayKey) {
+            if (true === isset($defaultOptions[$defaultOptionsArrayKey])) {
+                unset($defaultOptions[$defaultOptionsArrayKey]; 
+            }
+        }
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);

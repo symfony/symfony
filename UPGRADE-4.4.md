@@ -372,6 +372,11 @@ WebServerBundle
 
  * The bundle is deprecated and will be removed in 5.0.
 
+Workflow
+--------
+
+  * Deprecated `GuardEvent::setBlocked()` method, use `GuardEvent::addTransitionBlocker()` instead.
+
 Yaml
 ----
 

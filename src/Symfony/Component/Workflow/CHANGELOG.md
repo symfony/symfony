@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Marked all dispatched event classes as `@final`
+ * Deprecated `GuardEvent::setBlocked()` method, use `GuardEvent::addTransitionBlocker()` instead.
 
 4.3.0
 -----

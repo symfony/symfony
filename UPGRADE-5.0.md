@@ -660,6 +660,8 @@ Workflow
                type: state_machine
    ```
 
+  * Deprecated `GuardEvent::setBlocked()` method, use `GuardEvent::addTransitionBlocker()` instead.
+
 Yaml
 ----
 

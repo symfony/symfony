@@ -142,8 +142,6 @@ class WebProfilerExtensionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     *
      * @dataProvider getInterceptRedirectsToolbarConfig
      */
     public function testToolbarConfigUsingInterceptRedirects(

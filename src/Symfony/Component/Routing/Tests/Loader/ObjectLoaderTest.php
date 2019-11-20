@@ -62,12 +62,9 @@ class ObjectLoaderTest extends TestCase
         ];
     }
 
-    /**
-     * @group legacy
-     */
     public function testExceptionOnNoObjectReturned()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\TypeError::class);
         $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => 'NOT_AN_OBJECT'];
         $loader->load('my_service::method');

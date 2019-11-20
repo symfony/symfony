@@ -60,8 +60,6 @@ class ConfigurationTest extends TestCase
     }
 
     /**
-     * @group legacy
-     *
      * @dataProvider getInterceptRedirectsConfiguration
      */
     public function testConfigTreeUsingInterceptRedirects(bool $interceptRedirects, array $expectedResult)

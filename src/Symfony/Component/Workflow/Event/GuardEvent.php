@@ -44,11 +44,11 @@ class GuardEvent extends Event
     /**
      * @deprecated Deprecated since Symfony 5.0, use addTransitionBlocker instead.
      *
-     * @param  bool  $blocked
+     * @param bool $blocked
      */
     public function setBlocked($blocked)
     {
-        @trigger_error(sprintf('The "%s" function is deprecated since Symfony 5.0, use "%s" instead.', 'setBlocked' , 'addTransitionBlocker'), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s" function is deprecated since Symfony 5.0, use "%s" instead.', 'setBlocked', 'addTransitionBlocker'), E_USER_DEPRECATED);
 
         if (!$blocked) {
             $this->transitionBlockerList->clear();

@@ -168,6 +168,8 @@ Mailer
 ------
 
  * [BC BREAK] Changed the DSN to use for disabling delivery (using the `NullTransport`) from `smtp://null` to `null://null` (host doesn't matter).
+ * [BC BREAK] Renamed class `SmtpEnvelope` to `Envelope` and `DelayedSmtpEnvelope` to `DelayedEnvelope`.
+ * [BC BREAK] Added a required `string $transport` argument to `MessageEvent::__construct`.
 
 Messenger
 ---------

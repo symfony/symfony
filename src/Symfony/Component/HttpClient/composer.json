@@ -15,12 +15,13 @@
         }
     ],
     "provide": {
+        "php-http/async-client-implementation": "*",
         "php-http/client-implementation": "*",
         "psr/http-client-implementation": "1.0",
         "symfony/http-client-implementation": "1.1"
     },
     "require": {
-        "php": "^7.2.9",
+        "php": "^7.2.5",
         "psr/log": "^1.0",
         "symfony/http-client-contracts": "^1.1.8|^2",
         "symfony/polyfill-php73": "^1.11"

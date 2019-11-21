@@ -26,6 +26,7 @@ use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -77,10 +78,11 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
         $constraint1 = new NotNull(['groups' => ['group1', 'group2']]);
         $constraint2 = new NotBlank(['groups' => 'group2']);
+        $constraint3 = new Length(['groups' => 'group2', 'min' => 3]);
 
         $options = [
             'validation_groups' => ['group1', 'group2'],
-            'constraints' => [$constraint1, $constraint2],
+            'constraints' => [$constraint1, $constraint2, $constraint3],
         ];
         $form = $this->getCompoundForm($object, $options);
         $form->submit([]);
@@ -89,8 +91,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
         // Then custom constraints
-        $this->expectValidateValueAt(1, 'data', $object, $constraint1, 'group1');
-        $this->expectValidateValueAt(2, 'data', $object, $constraint2, 'group2');
+        $this->expectValidateValueAt(1, 'data', $object, [$constraint1], 'group1');
+        $this->expectValidateValueAt(2, 'data', $object, [$constraint2, $constraint3], 'group2');
 
         $this->validator->validate($form, new Form());
 
@@ -172,8 +174,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $parent->add($form);
         $parent->submit([]);
 
-        $this->expectValidateValueAt(0, 'data', $object, $constraint1, 'group1');
-        $this->expectValidateValueAt(1, 'data', $object, $constraint2, 'group2');
+        $this->expectValidateValueAt(0, 'data', $object, [$constraint1], 'group1');
+        $this->expectValidateValueAt(1, 'data', $object, [$constraint2], 'group2');
 
         $this->validator->validate($form, new Form());
 

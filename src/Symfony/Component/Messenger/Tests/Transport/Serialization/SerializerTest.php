@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\HeaderStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
@@ -104,6 +105,23 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('type', $encoded['headers']);
         $this->assertArrayHasKey('X-Message-Stamp-'.SerializerStamp::class, $encoded['headers']);
         $this->assertArrayHasKey('X-Message-Stamp-'.ValidationStamp::class, $encoded['headers']);
+    }
+
+    public function testEncodedWithHeaderStamps()
+    {
+        $serializer = new Serializer();
+
+        $envelope = (new Envelope(new DummyMessage('test')))
+            ->with(new HeaderStamp('X-Custom-Header', 'foo'))
+            ->with(new HeaderStamp('X-Custom-Header-Bis', 'bar'));
+
+        $encoded = $serializer->encode($envelope);
+
+        $this->assertArrayHasKey('headers', $encoded);
+        $this->assertArrayHasKey('X-Custom-Header', $encoded['headers']);
+        $this->assertSame($encoded['headers']['X-Custom-Header'], 'foo');
+        $this->assertArrayHasKey('X-Custom-Header-Bis', $encoded['headers']);
+        $this->assertSame($encoded['headers']['X-Custom-Header-Bis'], 'bar');
     }
 
     public function testDecodeWithSymfonySerializerStamp()

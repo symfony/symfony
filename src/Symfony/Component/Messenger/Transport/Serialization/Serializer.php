@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\HeaderStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
@@ -136,6 +137,14 @@ class Serializer implements SerializerInterface
 
         $headers = [];
         foreach ($allStamps as $class => $stamps) {
+            if (HeaderStamp::class === $class) {
+                foreach ($stamps as $stamp) {
+                    $headers[$stamp->getHeaderName()] = $stamp->getHeaderValue();
+                }
+
+                continue;
+            }
+
             $headers[self::STAMP_HEADER_PREFIX.$class] = $this->serializer->serialize($stamps, $this->format, $this->context);
         }
 

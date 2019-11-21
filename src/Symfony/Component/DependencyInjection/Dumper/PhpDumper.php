@@ -1302,7 +1302,7 @@ EOF;
             $methodNameAlias = $this->generateMethodName($alias);
             $idExported = $this->export($id);
             $messageExported = $this->export($definition->getDeprecationMessage($alias));
-            $code = <<<EOF
+            $code .= <<<EOF
 
     /*{$this->docStar}
      * Gets the $public '$alias' alias.

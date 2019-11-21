@@ -76,6 +76,8 @@ class FormValidator extends ConstraintValidator
                     }
                 }
             } else {
+                $groupedConstraints = [];
+
                 foreach ($constraints as $constraint) {
                     // For the "Valid" constraint, validate the data in all groups
                     if ($constraint instanceof Valid) {
@@ -88,7 +90,7 @@ class FormValidator extends ConstraintValidator
                     // matching group
                     foreach ($groups as $group) {
                         if (\in_array($group, $constraint->groups)) {
-                            $validator->atPath('data')->validate($form->getData(), $constraint, $group);
+                            $groupedConstraints[$group][] = $constraint;
 
                             // Prevent duplicate validation
                             if (!$constraint instanceof Composite) {
@@ -96,6 +98,10 @@ class FormValidator extends ConstraintValidator
                             }
                         }
                     }
+                }
+
+                foreach ($groupedConstraints as $group => $constraint) {
+                    $validator->atPath('data')->validate($form->getData(), $constraint, $group);
                 }
             }
         } elseif (!$form->isSynchronized()) {

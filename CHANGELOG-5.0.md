@@ -7,6 +7,14 @@ in 5.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.0.0...v5.0.1
 
+* 5.0.0 (2019-11-21)
+
+ * bug #34464 [Form] group constraints when calling the validator (nicolas-grekas)
+ * bug #34451 [DependencyInjection] Fix dumping multiple deprecated aliases (shyim)
+ * bug #34448 [Form] allow button names to start with uppercase letter (xabbuh)
+ * bug #34434 [Routing] Fix ContainerLoader and ObjectLoaderTest (fancyweb)
+ * bug #34428 [Security] Fix best encoder not wired using migrate_from (chalasr)
+
 * 5.0.0-RC1 (2019-11-17)
 
  * bug #34419 [Cache] Disable igbinary on PHP >= 7.4 (nicolas-grekas)

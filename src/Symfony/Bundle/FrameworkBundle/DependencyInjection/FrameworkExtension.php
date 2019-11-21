@@ -1816,14 +1816,16 @@ class FrameworkExtension extends Extension
                 throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
             }
 
+            $senders = $container->resolveEnvPlaceholders($messageConfiguration['senders'], true);
+
             // make sure senderAliases contains all senders
-            foreach ($messageConfiguration['senders'] as $sender) {
+            foreach ($senders as $sender) {
                 if (!isset($senderReferences[$sender])) {
                     throw new LogicException(sprintf('Invalid Messenger routing configuration: the "%s" class is being routed to a sender called "%s". This is not a valid transport or service id.', $message, $sender));
                 }
             }
 
-            $messageToSendersMapping[$message] = $messageConfiguration['senders'];
+            $messageToSendersMapping[$message] = $senders;
         }
 
         $sendersServiceLocator = ServiceLocatorTagPass::register($container, $senderReferences);

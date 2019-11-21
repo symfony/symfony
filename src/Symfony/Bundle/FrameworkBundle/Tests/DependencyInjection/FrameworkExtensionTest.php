@@ -16,6 +16,7 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -720,6 +721,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $sendersMapping = $senderLocatorDefinition->getArgument(0);
         $this->assertEquals(['amqp', 'messenger.transport.audit'], $sendersMapping[DummyMessage::class]);
+        $this->assertEquals(['amqp'], $sendersMapping[FooMessage::class]);
+        $this->assertEquals(['amqp'], $sendersMapping['*']);
         $sendersLocator = $container->getDefinition((string) $senderLocatorDefinition->getArgument(1));
         $this->assertSame(['amqp', 'audit', 'messenger.transport.amqp', 'messenger.transport.audit'], array_keys($sendersLocator->getArgument(0)));
         $this->assertEquals(new Reference('messenger.transport.amqp'), $sendersLocator->getArgument(0)['amqp']->getValues()[0]);

@@ -7,6 +7,13 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.0 (2019-11-21)
+
+ * bug #34464 [Form] group constraints when calling the validator (nicolas-grekas)
+ * bug #34451 [DependencyInjection] Fix dumping multiple deprecated aliases (shyim)
+ * bug #34448 [Form] allow button names to start with uppercase letter (xabbuh)
+ * bug #34428 [Security] Fix best encoder not wired using migrate_from (chalasr)
+
 * 4.4.0-RC1 (2019-11-17)
 
  * bug #34419 [Cache] Disable igbinary on PHP >= 7.4 (nicolas-grekas)

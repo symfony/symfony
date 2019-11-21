@@ -194,6 +194,15 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isOptional(int $index)
+    {
+        // Nothing is optional
+        return false;
+    }
+
+    /**
      * Returns whether an element maps directly to a form.
      *
      * Consider the following violation path:

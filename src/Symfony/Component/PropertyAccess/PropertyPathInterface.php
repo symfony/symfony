@@ -83,4 +83,15 @@ interface PropertyPathInterface extends \Traversable
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
     public function isIndex(int $index);
+
+    /**
+     * Returns whether the element at the given index is optional.
+     *
+     * @param int $index The index in the property path
+     *
+     * @return bool Whether the element at this index is an array index
+     *
+     * @throws Exception\OutOfBoundsException If the offset is invalid
+     */
+    public function isOptional(int $index);
 }

@@ -50,6 +50,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     private $isIndex = [];
 
     /**
+     * Contains a Boolean for each property in $elements denoting whether this
+     * element is optional or not.
+     *
+     * @var array
+     */
+    private $isOptional = [];
+
+    /**
      * String representation of the path.
      *
      * @var string
@@ -72,6 +80,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $this->elements = $propertyPath->elements;
             $this->length = $propertyPath->length;
             $this->isIndex = $propertyPath->isIndex;
+            $this->isOptional = $propertyPath->isOptional;
             $this->pathAsString = $propertyPath->pathAsString;
 
             return;
@@ -100,6 +109,13 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $this->isIndex[] = true;
             }
 
+            // Mark as optional when last character is "?".
+            if ('?' === substr($element, -1, 1)) {
+                $this->isOptional[] = true;
+                $element = substr($element, 0, -1);
+            } else {
+                $this->isOptional[] = false;
+            }
             $this->elements[] = $element;
 
             $position += \strlen($matches[1]);
@@ -145,6 +161,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $parent->pathAsString = substr($parent->pathAsString, 0, max(strrpos($parent->pathAsString, '.'), strrpos($parent->pathAsString, '[')));
         array_pop($parent->elements);
         array_pop($parent->isIndex);
+        array_pop($parent->isOptional);
 
         return $parent;
     }
@@ -201,5 +218,17 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         }
 
         return $this->isIndex[$index];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isOptional(int $index)
+    {
+        if (!isset($this->isOptional[$index])) {
+            throw new OutOfBoundsException(sprintf('The index %s is not within the property path', $index));
+        }
+
+        return $this->isOptional[$index];
     }
 }

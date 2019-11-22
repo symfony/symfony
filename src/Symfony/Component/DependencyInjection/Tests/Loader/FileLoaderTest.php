@@ -92,7 +92,6 @@ class FileLoaderTest extends TestCase
 
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*');
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*'); // loading twice should not be an issue
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertEquals(
             ['service_container', Bar::class],
@@ -121,7 +120,6 @@ class FileLoaderTest extends TestCase
             // load everything, except OtherDir/AnotherSub & Foo.php
             'Prototype/{%other_dir%/AnotherSub,Foo.php}'
         );
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertTrue($container->has(Bar::class));
         $this->assertTrue($container->has(Baz::class));
@@ -151,7 +149,6 @@ class FileLoaderTest extends TestCase
                 'Prototype/OtherDir/AnotherSub/DeeperBaz.php',
             ]
         );
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertTrue($container->has(Foo::class));
         $this->assertTrue($container->has(Baz::class));
@@ -167,7 +164,6 @@ class FileLoaderTest extends TestCase
         $prototype = new Definition();
         $prototype->setPublic(true)->setPrivate(true);
         $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertTrue($container->has(Bar::class));
         $this->assertTrue($container->has(Baz::class));
@@ -199,7 +195,6 @@ class FileLoaderTest extends TestCase
             'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\\',
             'Prototype/%bad_classes_dir%/*'
         );
-        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertTrue($container->has(MissingParent::class));
 
@@ -218,7 +213,6 @@ class FileLoaderTest extends TestCase
 
         // the Sub is missing from namespace prefix
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/Sub/*');
-        $loader->registerAliasesForSinglyImplementedInterfaces();
     }
 
     public function testRegisterClassesWithIncompatibleExclude()
@@ -234,7 +228,6 @@ class FileLoaderTest extends TestCase
             'Prototype/*',
             'yaml/*'
         );
-        $loader->registerAliasesForSinglyImplementedInterfaces();
     }
 }
 

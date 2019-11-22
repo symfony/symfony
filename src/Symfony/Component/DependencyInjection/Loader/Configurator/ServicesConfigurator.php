@@ -139,9 +139,4 @@ class ServicesConfigurator extends AbstractConfigurator
     {
         return $this->set($id, $class);
     }
-
-    public function __destruct()
-    {
-        $this->loader->registerAliasesForSinglyImplementedInterfaces();
-    }
 }

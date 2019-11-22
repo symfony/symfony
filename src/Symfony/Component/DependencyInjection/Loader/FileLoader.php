@@ -116,17 +116,17 @@ abstract class FileLoader extends BaseFileLoader
                 }
             }
         }
+
+        $this->registerAliasesForSinglyImplementedInterfaces();
     }
 
-    public function registerAliasesForSinglyImplementedInterfaces()
+    protected function registerAliasesForSinglyImplementedInterfaces()
     {
         foreach ($this->interfaces as $interface) {
             if (!empty($this->singlyImplemented[$interface]) && !$this->container->hasAlias($interface)) {
                 $this->container->setAlias($interface, $this->singlyImplemented[$interface])->setPublic(false);
             }
         }
-
-        $this->interfaces = $this->singlyImplemented = [];
     }
 
     /**

@@ -103,7 +103,7 @@ class ServerLogHandler extends AbstractHandler
 
     private function formatRecord(array $record): string
     {
-        if ($this->processors) {
+        if (property_exists($this, 'processors') && $this->processors) {
             foreach ($this->processors as $processor) {
                 $record = $processor($record);
             }

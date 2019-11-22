@@ -218,6 +218,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
             $value = (array) $value;
         }
 
-        return $value;
+        return is_array($value) ? $value : $default;
     }
 }

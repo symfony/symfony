@@ -40,7 +40,8 @@
         "symfony/http-kernel": "<4.4"
     },
     "suggest": {
-        "enqueue/messenger-adapter": "For using the php-enqueue library as a transport."
+        "enqueue/messenger-adapter": "For using the php-enqueue library as a transport.",
+        "ext-redis": "4.3.0 or higher for using Redis as a transport through the redis PHP extension."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\": "" },

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by sroze at 2019-11-22T13:50:28Z
+
+Instead of the BC layer here, we could have a conflict with `doctrine-bundle` 2.0 instead on < 4.4 🤔
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-11-22T13:51:46Z
+
+Unfortunately, that would only land in 2.0.1 and thus wouldn't prevent Composer from installing 2.0.0.

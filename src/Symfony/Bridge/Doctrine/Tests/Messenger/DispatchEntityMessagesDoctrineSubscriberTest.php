@@ -15,13 +15,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\Messenger\MessageRecordingEntitySubscriber;
+use Symfony\Bridge\Doctrine\Messenger\DispatchEntityMessagesDoctrineSubscriber;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\MessageRecordingEntity;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 
-class MessageRecordingEntitySubscriberTest extends TestCase
+class DispatchEntityMessagesDoctrineSubscriberTest extends TestCase
 {
     public function testPostFlush(): void
     {
@@ -59,7 +59,7 @@ class MessageRecordingEntitySubscriberTest extends TestCase
             ->willReturn(new Envelope(new \stdClass()))
         ;
 
-        $subscriber = new MessageRecordingEntitySubscriber($bus);
+        $subscriber = new DispatchEntityMessagesDoctrineSubscriber($bus);
 
         $subscriber->postFlush($args);
     }

@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
  * @author Matthias Noback <matthiasnoback@gmail.com>
  * @author Valentin Udaltsov <udaltsov.valentin@gmail.com>
  */
-final class MessageRecordingEntitySubscriber implements EventSubscriber
+final class DispatchEntityMessagesDoctrineSubscriber implements EventSubscriber
 {
     /**
      * @var MessageBusInterface

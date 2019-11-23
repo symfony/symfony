@@ -40,7 +40,7 @@ class DispatchEntityMessagesDoctrineSubscriberTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [Envelope::wrap($message1, [new DispatchAfterCurrentBusStamp()])],
-                [Envelope::wrap($message2, [new DispatchAfterCurrentBusStamp()])],
+                [Envelope::wrap($message2, [new DispatchAfterCurrentBusStamp()])]
             )
             ->willReturn(new Envelope(new \stdClass()))
         ;

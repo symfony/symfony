@@ -84,6 +84,7 @@ final class CacheItem implements ItemInterface
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given', \is_object($expiration) ? \get_class($expiration) : \gettype($expiration)));
         }
+        $this->setMetadataExpiry();
 
         return $this;
     }
@@ -104,6 +105,7 @@ final class CacheItem implements ItemInterface
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', \is_object($time) ? \get_class($time) : \gettype($time)));
         }
+        $this->setMetadataExpiry();
 
         return $this;
     }
@@ -186,5 +188,21 @@ final class CacheItem implements ItemInterface
             }
             @trigger_error(strtr($message, $replace), E_USER_WARNING);
         }
+    }
+
+    /**
+     * Set the expiry metadata tag.
+     */
+    private function setMetadataExpiry(): void
+    {
+        if (!\is_float($this->expiry)) {
+            return;
+        }
+
+        if (false === $expiryDateTime = \DateTime::createFromFormat('U.u', $this->expiry)) {
+            return;
+        }
+
+        $this->metadata[ItemInterface::METADATA_EXPIRY] = $expiryDateTime;
     }
 }

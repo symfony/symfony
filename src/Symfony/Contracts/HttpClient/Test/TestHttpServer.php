@@ -19,31 +19,22 @@ use Symfony\Component\Process\Process;
  */
 class TestHttpServer
 {
-    private static $server;
+    private static $started;
 
     public static function start()
     {
-        if (null !== self::$server) {
+        if (self::$started) {
             return;
         }
 
         $finder = new PhpExecutableFinder();
         $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', '127.0.0.1:8057']));
         $process->setWorkingDirectory(__DIR__.'/Fixtures/web');
-        $process->setTimeout(300);
         $process->start();
 
-        self::$server = new class() {
-            public $process;
-
-            public function __destruct()
-            {
-                $this->process->stop();
-            }
-        };
-
-        self::$server->process = $process;
-
+        register_shutdown_function([$process, 'stop']);
         sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
+
+        self::$started = true;
     }
 }

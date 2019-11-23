@@ -458,7 +458,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                     $cache = new class($cachePath, $this->debug) extends ConfigCache {
                         public $lock;
 
-                        public function write($content, array $metadata = null)
+                        public function write(string $content, array $metadata = null)
                         {
                             rewind($this->lock);
                             ftruncate($this->lock, 0);

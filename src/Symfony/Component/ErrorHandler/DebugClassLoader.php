@@ -399,7 +399,6 @@ class DebugClassLoader
         if (
             'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV7' === $class
             || 'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV6' === $class
-            || 'Test\Symfony\Component\Debug\Tests' === $refl->getNamespaceName()
         ) {
             return [];
         }

@@ -585,7 +585,7 @@ class SecurityExtension extends Extension
     {
         $encoderMap = [];
         foreach ($encoders as $class => $encoder) {
-            $encoderMap[$class] = $this->createEncoder($encoder, $container);
+            $encoderMap[$class] = $this->createEncoder($encoder);
         }
 
         $container
@@ -594,7 +594,7 @@ class SecurityExtension extends Extension
         ;
     }
 
-    private function createEncoder($config, ContainerBuilder $container)
+    private function createEncoder($config)
     {
         // a custom encoder service
         if (isset($config['id'])) {

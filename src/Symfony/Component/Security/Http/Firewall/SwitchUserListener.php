@@ -153,7 +153,6 @@ class SwitchUserListener implements ListenerInterface
 
             try {
                 $this->provider->loadUserByUsername($nonExistentUsername);
-                throw new \LogicException('AuthenticationException expected');
             } catch (AuthenticationException $e) {
             }
         } catch (AuthenticationException $e) {

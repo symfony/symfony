@@ -14,8 +14,10 @@ namespace Symfony\Bridge\Doctrine\Messenger;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -24,14 +26,13 @@ use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
  */
 final class DispatchEntityMessagesDoctrineSubscriber implements EventSubscriber
 {
-    /**
-     * @var MessageBusInterface
-     */
     private $bus;
+    private $dispatcher;
 
-    public function __construct(MessageBusInterface $bus)
+    public function __construct(MessageBusInterface $bus, EventDispatcherInterface $dispatcher)
     {
         $this->bus = $bus;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -52,9 +53,12 @@ final class DispatchEntityMessagesDoctrineSubscriber implements EventSubscriber
                     continue;
                 }
 
-                $entity->dispatchMessages(function (array $messages): void {
+                $entity->dispatchMessages(function (array $messages) use ($entity): void {
                     foreach ($messages as $message) {
-                        $this->bus->dispatch($message, [new DispatchAfterCurrentBusStamp()]);
+                        $envelope = Envelope::wrap($message, [new DispatchAfterCurrentBusStamp()]);
+                        $event = new EntityMessagePreDispatchEvent($entity, $envelope);
+                        $this->dispatcher->dispatch($event);
+                        $this->bus->dispatch($event->getEnvelope());
                     }
                 });
             }

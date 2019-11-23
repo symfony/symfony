@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-11-15T09:23:32Z
+
+Can you add a test covering this ?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-11-18T13:03:23Z
+
+@stof You agree it makes sense to put this into the existing test method?
+
+(Yes, that test now fails if I revert the initial change.)

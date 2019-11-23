@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
+use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
@@ -43,6 +44,7 @@ class Transport
         NexmoTransportFactory::class,
         RocketChatTransportFactory::class,
         TwilioTransportFactory::class,
+        OvhCloudTransportFactory::class,
         FirebaseTransportFactory::class,
     ];
 

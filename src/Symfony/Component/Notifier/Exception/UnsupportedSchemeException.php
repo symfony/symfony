@@ -50,6 +50,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Firebase\FirebaseTransportFactory::class,
             'package' => 'symfony/firebase-notifier',
         ],
+        'ovhcloud' => [
+            'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
+            'package' => 'symfony/ovhcloud-notifier',
+        ],
     ];
 
     /**

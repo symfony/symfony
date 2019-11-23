@@ -49,7 +49,7 @@ class XmlDumper extends Dumper
         $container->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         $container->setAttribute('xsi:schemaLocation', 'http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd');
 
-        $this->addParameters($container);
+        $this->addParameters($container, isset($options['force_parameters_escape']) ? $options['force_parameters_escape'] : false);
         $this->addServices($container);
 
         $this->document->appendChild($container);
@@ -59,14 +59,17 @@ class XmlDumper extends Dumper
         return $this->container->resolveEnvPlaceholders($xml);
     }
 
-    private function addParameters(\DOMElement $parent)
+    /**
+     * @param bool $forceEscape
+     */
+    private function addParameters(\DOMElement $parent, $forceEscape)
     {
         $data = $this->container->getParameterBag()->all();
         if (!$data) {
             return;
         }
 
-        if ($this->container->isCompiled()) {
+        if ($this->container->isCompiled() || $forceEscape) {
             $data = $this->escape($data);
         }
 

@@ -51,7 +51,7 @@ class YamlDumper extends Dumper
             $this->dumper = new YmlDumper();
         }
 
-        return $this->container->resolveEnvPlaceholders($this->addParameters()."\n".$this->addServices());
+        return $this->container->resolveEnvPlaceholders($this->addParameters(isset($options['force_parameters_escape']) ? $options['force_parameters_escape'] : false)."\n".$this->addServices());
     }
 
     /**
@@ -212,15 +212,17 @@ class YamlDumper extends Dumper
     /**
      * Adds parameters.
      *
+     * @param bool $forceEscape
+     *
      * @return string
      */
-    private function addParameters()
+    private function addParameters($forceEscape)
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
         }
 
-        $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isCompiled());
+        $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isCompiled() || $forceEscape);
 
         return $this->dumper->dump(['parameters' => $parameters], 2);
     }

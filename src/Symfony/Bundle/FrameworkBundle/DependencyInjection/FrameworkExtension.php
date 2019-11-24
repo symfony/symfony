@@ -1941,7 +1941,9 @@ class FrameworkExtension extends Extension
 
             // as we have a bus, the channels don't need the transports
             $container->getDefinition('notifier.channel.chat')->setArgument(0, null);
-            $container->getDefinition('notifier.channel.email')->setArgument(0, null);
+            if ($container->hasDefinition('notifier.channel.email')) {
+                $container->getDefinition('notifier.channel.email')->setArgument(0, null);
+            }
             $container->getDefinition('notifier.channel.sms')->setArgument(0, null);
         }
 

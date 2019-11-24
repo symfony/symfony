@@ -466,7 +466,7 @@ final class Dotenv
                 $value = '';
             }
 
-            if ('' === $value && isset($matches['default_value'])) {
+            if ('' === $value && isset($matches['default_value']) && '' !== $matches['default_value']) {
                 $unsupportedChars = strpbrk($matches['default_value'], '\'"{$');
                 if (false !== $unsupportedChars) {
                     throw $this->createFormatException(sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));

@@ -50,7 +50,6 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      *
      * For backwards compatibility, objects are cast to strings by default.
      *
-     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */

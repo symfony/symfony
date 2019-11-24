@@ -56,6 +56,7 @@ class RouterDebugCommand extends Command
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
+                new InputOption('sort', null, InputOption::VALUE_REQUIRED, 'The sorting field (name, path)'),
             ])
             ->setDescription('Displays current routes for an application')
             ->setHelp(<<<'EOF'
@@ -79,6 +80,11 @@ EOF
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper($this->fileLinkFormatter);
         $routes = $this->router->getRouteCollection();
+        $sortOption = $input->getOption('sort');
+
+        if (null !== $sortOption) {
+            $routes = $this->sortRoutes($routes, $sortOption);
+        }
 
         if ($name) {
             if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {
@@ -119,5 +125,31 @@ EOF
         }
 
         return $foundRoutesNames;
+    }
+
+    private function sortRoutes($routes, $propertyName)
+    {
+        $sortedRoutes = $routes->all();
+        if ('name' === $propertyName) {
+            ksort($sortedRoutes);
+        }
+        if ('path' === $propertyName) {
+            $sortedRoutesByPath = [];
+            foreach ($sortedRoutes as $routeName => $route) {
+                $sortedRoutesByPath[$route->getPath()][] = [$routeName => $route];
+            }
+            ksort($sortedRoutesByPath);
+            $sortedRoutes = [];
+            foreach ($sortedRoutesByPath as $item) {
+                foreach($item as $routeName => $route) {
+                    $sortedRoutes[key($route)] = reset($route);
+                }
+            }
+        }
+        $routeCollection = new RouteCollection();
+        foreach ($sortedRoutes as $routeName => $route) {
+            $routeCollection->add($routeName, $route);
+        }
+        return $routeCollection;
     }
 }

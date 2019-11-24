@@ -56,7 +56,7 @@ The <info>%command.name%</info> command stores a secret in the vault.
     <info>%command.full_name% <name></info>
 
 To reference secrets in services.yaml or any other config
-files, use <info>"%env(secret:<name>)%"</info>.
+files, use <info>"%env(<name>)%"</info>.
 
 By default, the secret value should be entered interactively.
 Alternatively, provide a file where to read the secret from:

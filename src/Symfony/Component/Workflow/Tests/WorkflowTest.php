@@ -9,6 +9,7 @@ use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Event\TransitionEvent;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
+use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
@@ -249,13 +250,21 @@ class WorkflowTest extends TestCase
 
     public function testApplyWithNotExisingTransition()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\UndefinedTransitionException');
-        $this->expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
+        $context = [
+            'lorem' => 'ipsum',
+        ];
 
-        $workflow->apply($subject, '404 Not Found');
+        try {
+            $workflow->apply($subject, '404 Not Found', $context);
+
+            $this->fail('Should throw an exception');
+        } catch (UndefinedTransitionException $e) {
+            $this->assertSame('Transition "404 Not Found" is not defined for workflow "unnamed".', $e->getMessage());
+            $this->assertSame($e->getContext(), $context);
+        }
     }
 
     public function testApplyWithNotEnabledTransition()
@@ -263,9 +272,12 @@ class WorkflowTest extends TestCase
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();
         $workflow = new Workflow($definition, new MethodMarkingStore());
+        $context = [
+            'lorem' => 'ipsum',
+        ];
 
         try {
-            $workflow->apply($subject, 't2');
+            $workflow->apply($subject, 't2', $context);
 
             $this->fail('Should throw an exception');
         } catch (NotEnabledTransitionException $e) {
@@ -276,6 +288,7 @@ class WorkflowTest extends TestCase
             $this->assertSame($e->getWorkflow(), $workflow);
             $this->assertSame($e->getSubject(), $subject);
             $this->assertSame($e->getTransitionName(), 't2');
+            $this->assertSame($e->getContext(), $context);
         }
     }
 

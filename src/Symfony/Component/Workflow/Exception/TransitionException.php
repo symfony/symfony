@@ -22,14 +22,16 @@ class TransitionException extends LogicException
     private $subject;
     private $transitionName;
     private $workflow;
+    private $context;
 
-    public function __construct(object $subject, string $transitionName, WorkflowInterface $workflow, string $message)
+    public function __construct(object $subject, string $transitionName, WorkflowInterface $workflow, string $message, array $context = [])
     {
         parent::__construct($message);
 
         $this->subject = $subject;
         $this->transitionName = $transitionName;
         $this->workflow = $workflow;
+        $this->context = $context;
     }
 
     public function getSubject()
@@ -45,5 +47,10 @@ class TransitionException extends LogicException
     public function getWorkflow(): WorkflowInterface
     {
         return $this->workflow;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 }

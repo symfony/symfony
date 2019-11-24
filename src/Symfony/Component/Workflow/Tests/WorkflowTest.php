@@ -234,9 +234,12 @@ class WorkflowTest extends TestCase
         $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
             $event->setBlocked(true);
         });
+        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+            $event->setBlocked(true, 'You should not pass !!');
+        });
 
         $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't1');
-        $this->assertCount(4, $transitionBlockerList);
+        $this->assertCount(5, $transitionBlockerList);
         $blockers = iterator_to_array($transitionBlockerList);
         $this->assertSame('Transition blocker 1', $blockers[0]->getMessage());
         $this->assertSame('blocker_1', $blockers[0]->getCode());
@@ -244,8 +247,10 @@ class WorkflowTest extends TestCase
         $this->assertSame('blocker_2', $blockers[1]->getCode());
         $this->assertSame('Transition blocker 3', $blockers[2]->getMessage());
         $this->assertSame('blocker_3', $blockers[2]->getCode());
-        $this->assertSame('Unknown reason.', $blockers[3]->getMessage());
+        $this->assertSame('The transition has been blocked by a guard (Symfony\Component\Workflow\Tests\WorkflowTest).', $blockers[3]->getMessage());
         $this->assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[3]->getCode());
+        $this->assertSame('You should not pass !!', $blockers[4]->getMessage());
+        $this->assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[4]->getCode());
     }
 
     public function testApplyWithNotExisingTransition()

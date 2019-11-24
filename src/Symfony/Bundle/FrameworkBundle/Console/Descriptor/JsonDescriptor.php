@@ -166,7 +166,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeCallable($callable, array $options = [])
     {
-        $this->writeData($this->getCallableData($callable, $options), $options);
+        $this->writeData($this->getCallableData($callable), $options);
     }
 
     /**
@@ -321,7 +321,7 @@ class JsonDescriptor extends Descriptor
      *
      * @return array
      */
-    private function getCallableData($callable, array $options = [])
+    private function getCallableData($callable)
     {
         $data = [];
 

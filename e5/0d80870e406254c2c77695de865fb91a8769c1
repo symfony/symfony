@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by jewome62 at 2019-11-23T12:59:11Z
+
+Appveyor CI fail is not related to this PR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-23T14:03:53Z
+
+Shouldn't this target 4.4?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-11-23T14:14:26Z
+
+If we treat this as a bugfix, it must be merged into the `4.3` branch where the `DateTimeZoneNormalizer` was added.

@@ -143,8 +143,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
                     $options['em'],
                     $options['class'],
                     $options['id_reader'],
-                    $entityLoader,
-                    false
+                    $entityLoader
                 );
 
                 if (null !== $hash) {

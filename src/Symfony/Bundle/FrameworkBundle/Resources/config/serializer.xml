@@ -38,6 +38,11 @@
             <tag name="serializer.normalizer" priority="-915" />
         </service>
 
+        <service id="serializer.normalizer.datetimezone" class="Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-915" />
+        </service>
+
         <service id="serializer.normalizer.dateinterval" class="Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer">
             <!-- Run before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-915" />

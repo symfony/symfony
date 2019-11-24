@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Sander-Toonen at 2019-11-23T11:23:18Z
+
+Isn't the requirement for `symfony/monolog-bridge` already greater than 1.4.0?
+
+4.4 requires ^1.25.1, 4.3 and 3.4 require ~1.19.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-11-24T17:40:15Z
+
+So, this one should be merged in 3.4, right?

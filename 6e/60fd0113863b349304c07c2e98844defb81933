@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-11-23T07:11:38Z
+
+For the record, this logic was borrowed from `ContainerDebugCommand` which really needs `TYPE_REMOVING` passes to be excluded (as `debug:container` and `debug:autowiring` are also about discovering services that you don't know yet, and knowing which services have been actually removed during compilation).
+
+> when debug is off (why only in this case btw?)
+
+Because the container used by the command is dumped by `ContainerBuilderDebugDumpPass`, which is registered in debug mode only and is of type `BEFORE_REMOVING` for the reason explained above.
+And the difference here is that `debug:*` commands do _not_  compile this container when it's available (in debug mode), while this one always compile it.

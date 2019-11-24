@@ -49,7 +49,7 @@ $getEnvVar = function ($name, $default = false) {
 
 if (PHP_VERSION_ID >= 70200) {
     // PHPUnit 8 requires PHP 7.2+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.3');
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.4');
 } elseif (PHP_VERSION_ID >= 70100) {
     // PHPUnit 7 requires PHP 7.1+
     $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5');

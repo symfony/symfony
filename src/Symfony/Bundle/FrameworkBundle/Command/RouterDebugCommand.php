@@ -141,7 +141,7 @@ EOF
             ksort($sortedRoutesByPath);
             $sortedRoutes = [];
             foreach ($sortedRoutesByPath as $item) {
-                foreach($item as $routeName => $route) {
+                foreach ($item as $routeName => $route) {
                     $sortedRoutes[key($route)] = reset($route);
                 }
             }
@@ -150,6 +150,7 @@ EOF
         foreach ($sortedRoutes as $routeName => $route) {
             $routeCollection->add($routeName, $route);
         }
+
         return $routeCollection;
     }
 }

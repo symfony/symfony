@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -52,7 +51,7 @@ class RouterDebugCommandTest extends TestCase
         $this->assertRegExp(
             '/(\/second.*?)(.)*\s(.)*(\/second.*?)(.)*\s(.)*(\/first.*?)(.)*\s(.)*/mi',
             $tester->getDisplay()
-        );    
+        );
     }
 
     public function testWithSortByPathParameter()
@@ -68,7 +67,7 @@ class RouterDebugCommandTest extends TestCase
         $this->assertRegExp(
             '/(\/first.*?)(.)*\s(.)*(\/second.*?)(.)*\s(.)*(\/second.*?)(.)*\s(.)*/mi',
             $tester->getDisplay()
-        );    
+        );
     }
 
     public function testWithSortByPathParameterDoesNotMissAliases()
@@ -84,7 +83,7 @@ class RouterDebugCommandTest extends TestCase
         $this->assertRegExp(
             '/(\/first.*?)(.)*\s(.)*(\/second.*?)(.)*\s(.)*(\/second.*?)(.)*\s(.)*/mi',
             $tester->getDisplay()
-        );    
+        );
     }
 
     private function createCommandTester(): CommandTester

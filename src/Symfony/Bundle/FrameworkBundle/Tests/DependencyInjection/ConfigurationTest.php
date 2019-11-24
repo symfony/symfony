@@ -271,6 +271,27 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testItErrorsWhenDefaultBusDoesNotExist()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The specified default bus "foo" is not configured. Available buses are "bar", "baz".');
+
+        $processor->processConfiguration($configuration, [
+            [
+                'messenger' => [
+                    'default_bus' => 'foo',
+                    'buses' => [
+                        'bar' => null,
+                        'baz' => null,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [

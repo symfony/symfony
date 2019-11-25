@@ -132,8 +132,7 @@ EOF
         $sortedRoutes = $routes->all();
         if ('name' === $propertyName) {
             ksort($sortedRoutes);
-        }
-        if ('path' === $propertyName) {
+        } elseif ('path' === $propertyName) {
             $sortedRoutesByPath = [];
             foreach ($sortedRoutes as $routeName => $route) {
                 $sortedRoutesByPath[$route->getPath()][] = [$routeName => $route];

@@ -22,7 +22,7 @@ class DebugProcessor implements DebugLoggerInterface
     public function __invoke(array $record)
     {
         $this->records[] = [
-            'timestamp' => $record['datetime']->getTimestamp(),
+            'timestamp' => $record['datetime'] instanceof \DateTimeInterface ? $record['datetime']->getTimestamp() : strtotime($record['datetime']),
             'message' => $record['message'],
             'priority' => $record['level'],
             'priorityName' => $record['level_name'],

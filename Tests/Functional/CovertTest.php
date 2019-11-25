@@ -36,7 +36,7 @@ class CovertTest extends TestCase
 {
     private $tmpDir;
 
-    public function setup()
+    public function setUp(): void
     {
         if (!class_exists('Nyholm\Psr7\ServerRequest')) {
             $this->markTestSkipped('nyholm/psr7 is not installed.');

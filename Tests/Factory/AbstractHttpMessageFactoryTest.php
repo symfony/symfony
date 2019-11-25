@@ -29,12 +29,9 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
     private $factory;
     private $tmpDir;
 
-    /**
-     * @return HttpMessageFactoryInterface
-     */
-    abstract protected function buildHttpMessageFactory();
+    abstract protected function buildHttpMessageFactory(): HttpMessageFactoryInterface;
 
-    public function setup()
+    public function setUp(): void
     {
         $this->factory = $this->buildHttpMessageFactory();
         $this->tmpDir = sys_get_temp_dir();
@@ -158,7 +155,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
         $this->assertEquals(['3.4'], $psrResponse->getHeader('X-Symfony'));
 
         $cookieHeader = $psrResponse->getHeader('Set-Cookie');
-        $this->assertInternalType('array', $cookieHeader);
+        $this->assertIsArray($cookieHeader);
         $this->assertCount(1, $cookieHeader);
         $this->assertRegExp('{city=Lille; expires=Wed, 13-Jan-2021 22:23:01 GMT;( max-age=\d+;)? path=/; httponly}i', $cookieHeader[0]);
     }

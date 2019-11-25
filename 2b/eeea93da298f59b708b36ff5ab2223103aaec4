@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-24T18:32:35Z
+
+That's for 4.3, isn't it? Can you please check existing similar messages? I think we use a slightly different wording usually.
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2019-11-24T18:51:49Z
+
+switched to 4.3 and changed the message
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2019-11-24T19:17:19Z
+
+looks like we need to add `php_amqp.dll` to `symfony/binary-utils` to fix those tests on appveyor.
+https://pecl.php.net/package/amqp/1.9.4/windows
+
+not sure if it's worth the trouble...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-24T19:18:54Z
+
+Shouldn't the tests be skipped?
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2019-11-24T19:22:49Z
+
+ah, yes, you're right :)

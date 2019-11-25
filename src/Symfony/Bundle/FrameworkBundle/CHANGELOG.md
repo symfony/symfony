@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Marked `MicroKernelTrait::configureRoutes()` as `@internal` and `@final`.
+ * Deprecated not overriding `MicroKernelTrait::configureRouting()`.
+
 5.0.0
 -----
 

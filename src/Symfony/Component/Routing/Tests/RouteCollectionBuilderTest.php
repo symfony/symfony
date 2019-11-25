@@ -19,6 +19,9 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
+/**
+ * @group legacy
+ */
 class RouteCollectionBuilderTest extends TestCase
 {
     public function testImport()

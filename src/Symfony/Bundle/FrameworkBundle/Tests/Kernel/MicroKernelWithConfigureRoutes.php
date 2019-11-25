@@ -16,36 +16,15 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\RouteCollectionBuilder;
 
-class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
+class MicroKernelWithConfigureRoutes extends Kernel
 {
     use MicroKernelTrait;
 
     private $cacheDir;
-
-    public function onKernelException(ExceptionEvent $event)
-    {
-        if ($event->getThrowable() instanceof Danger) {
-            $event->setResponse(Response::create('It\'s dangerous to go alone. Take this ⚔'));
-        }
-    }
-
-    public function halloweenAction()
-    {
-        return new Response('halloween');
-    }
-
-    public function dangerousAction()
-    {
-        throw new Danger();
-    }
 
     public function registerBundles(): iterable
     {
@@ -56,7 +35,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     public function getCacheDir(): string
     {
-        return $this->cacheDir = sys_get_temp_dir().'/sf_micro_kernel';
+        return $this->cacheDir = sys_get_temp_dir().'/sf_micro_kernel_with_configured_routes';
     }
 
     public function getLogDir(): string
@@ -80,10 +59,9 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $fs->remove($this->cacheDir);
     }
 
-    protected function configureRouting(RoutingConfigurator $routes): void
+    protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->add('halloween', '/')->controller('kernel::halloweenAction');
-        $routes->add('danger', '/danger')->controller('kernel::dangerousAction');
+        $routes->add('/', 'kernel::halloweenAction');
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
@@ -92,22 +70,5 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $c->loadFromExtension('framework', [
             'secret' => '$ecret',
         ]);
-
-        $c->setParameter('halloween', 'Have a great day!');
-        $c->register('halloween', 'stdClass')->setPublic(true);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::EXCEPTION => 'onKernelException',
-        ];
-    }
-}
-
-class Danger extends \RuntimeException
-{
 }

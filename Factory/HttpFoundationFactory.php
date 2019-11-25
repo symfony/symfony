@@ -43,7 +43,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createRequest(ServerRequestInterface $psrRequest)
+    public function createRequest(ServerRequestInterface $psrRequest, bool $streamed = false)
     {
         $server = [];
         $uri = $psrRequest->getUri();
@@ -69,7 +69,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $psrRequest->getCookieParams(),
             $this->getFiles($psrRequest->getUploadedFiles()),
             $server,
-            $psrRequest->getBody()->__toString()
+            $streamed ? $psrRequest->getBody()->detach() : $psrRequest->getBody()->__toString()
         );
         $request->headers->replace($psrRequest->getHeaders());
 
@@ -78,8 +78,6 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
     /**
      * Converts to the input array to $_FILES structure.
-     *
-     * @param array $uploadedFiles
      *
      * @return array
      */
@@ -100,8 +98,6 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
     /**
      * Creates Symfony UploadedFile instance from PSR-7 ones.
-     *
-     * @param UploadedFileInterface $psrUploadedFile
      *
      * @return UploadedFile
      */
@@ -183,13 +179,11 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      *
      * Some snippets have been taken from the Guzzle project: https://github.com/guzzle/guzzle/blob/5.3/src/Cookie/SetCookie.php#L34
      *
-     * @param string $cookie
-     *
      * @return Cookie
      *
      * @throws \InvalidArgumentException
      */
-    private function createCookie($cookie)
+    private function createCookie(string $cookie)
     {
         foreach (explode(';', $cookie) as $part) {
             $part = trim($part);

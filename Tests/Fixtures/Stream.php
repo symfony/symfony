@@ -37,6 +37,7 @@ class Stream implements StreamInterface
 
     public function detach()
     {
+        return fopen('data://text/plain,'.$this->stringContent, 'r');
     }
 
     public function getSize()

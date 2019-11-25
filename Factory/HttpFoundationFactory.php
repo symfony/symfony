@@ -18,7 +18,6 @@ use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -78,10 +77,8 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
     /**
      * Converts to the input array to $_FILES structure.
-     *
-     * @return array
      */
-    private function getFiles(array $uploadedFiles)
+    private function getFiles(array $uploadedFiles): array
     {
         $files = [];
 
@@ -98,27 +95,10 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
     /**
      * Creates Symfony UploadedFile instance from PSR-7 ones.
-     *
-     * @return UploadedFile
      */
-    private function createUploadedFile(UploadedFileInterface $psrUploadedFile)
+    private function createUploadedFile(UploadedFileInterface $psrUploadedFile): UploadedFile
     {
-        $temporaryPath = '';
-        $clientFileName = '';
-        if (UPLOAD_ERR_NO_FILE !== $psrUploadedFile->getError()) {
-            $temporaryPath = $this->getTemporaryPath();
-            $psrUploadedFile->moveTo($temporaryPath);
-
-            $clientFileName = $psrUploadedFile->getClientFilename();
-        }
-
-        return new UploadedFile(
-            $temporaryPath,
-            null === $clientFileName ? '' : $clientFileName,
-            $psrUploadedFile->getClientMediaType(),
-            $psrUploadedFile->getError(),
-            true
-        );
+        return new UploadedFile($psrUploadedFile, function () { return $this->getTemporaryPath(); });
     }
 
     /**
@@ -167,11 +147,9 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      *
      * Some snippets have been taken from the Guzzle project: https://github.com/guzzle/guzzle/blob/5.3/src/Cookie/SetCookie.php#L34
      *
-     * @return Cookie
-     *
      * @throws \InvalidArgumentException
      */
-    private function createCookie(string $cookie)
+    private function createCookie(string $cookie): Cookie
     {
         foreach (explode(';', $cookie) as $part) {
             $part = trim($part);

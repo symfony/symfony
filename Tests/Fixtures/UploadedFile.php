@@ -35,7 +35,7 @@ class UploadedFile implements UploadedFileInterface
 
     public function getStream()
     {
-        throw new \RuntimeException('No stream is available.');
+        return new Stream(file_get_contents($this->filePath));
     }
 
     public function moveTo($targetPath)

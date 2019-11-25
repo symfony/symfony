@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-* 1.3.0 (2019-11-26)
+* 1.3.0 (2019-11-25)
 
   * Added support for streamed requests
   * Added support for Symfony 5.0+

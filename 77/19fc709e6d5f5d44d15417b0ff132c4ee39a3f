@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-09-03T07:31:48Z
+
+@nicolas-grekas , @Tobion , could you please give me some feedback so that I can move on?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-27T17:01:05Z
+
+@Tobion would you have time to help move this one forward soonish? Otherwise, I'd suggest to close (and keep the issue open)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-10-26T19:17:45Z
+
+I won't be able to work on this as other issues have more priority to me like #33065 and #32077
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-10-26T21:14:59Z
+
+@nicolas-grekas , don't close the PR, please. I will have time to make it ready for review soon. At least we'll discuss it at the hack day in Lisbon ;)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-11-10T16:31:33Z
+
+@nicolas-grekas , ready for review with tests and deprecations!
+
+I will finish the CHANGELOG and add the docs once you agree with the implementation.
+
+For now I rebased onto master. Do we have any chance to get this in 4.4? Or it's too late?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-11-24T22:54:07Z
+
+@nicolas-grekas , fully ready for you review
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-11-24T23:07:35Z
+
+Yes, I already started in the airplane yesterday ;)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-11-25T10:41:47Z
+
+@fabpot, thanx, corrected!

@@ -230,7 +230,7 @@ Security
 
    **After**
    ```php
-   if ($this->authorizationChecker->isGranted(new Expression("has_role('ROLE_USER') or has_role('ROLE_ADMIN')"))) {}
+   if ($this->authorizationChecker->isGranted(new Expression("is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"))) {}
 
    // or:
    if ($this->authorizationChecker->isGranted('ROLE_USER')

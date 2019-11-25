@@ -127,7 +127,7 @@ EOF
         return $foundRoutesNames;
     }
 
-    private function sortRoutes($routes, $propertyName)
+    private function sortRoutes($routes, $propertyName): RouteCollection
     {
         $sortedRoutes = $routes->all();
         if ('name' === $propertyName) {

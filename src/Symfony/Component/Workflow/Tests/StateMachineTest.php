@@ -5,6 +5,7 @@ namespace Symfony\Component\Workflow\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\StateMachine;
 use Symfony\Component\Workflow\TransitionBlocker;
 
@@ -84,27 +85,52 @@ class StateMachineTest extends TestCase
         $subject = new Subject();
 
         // There may be multiple transitions with the same name. Make sure that transitions
-        // that are not enabled by the marking are evaluated.
+        // that are enabled by the marking are evaluated.
         // see https://github.com/symfony/symfony/issues/28432
 
-        // Test if when you are in place "a"trying transition "t1" then returned
+        // Test if when you are in place "a" and trying to apply "t1" then it returns
         // blocker list contains guard blocker instead blockedByMarking
         $subject->setMarking('a');
         $transitionBlockerList = $net->buildTransitionBlockerList($subject, 't1');
         $this->assertCount(1, $transitionBlockerList);
         $blockers = iterator_to_array($transitionBlockerList);
-
         $this->assertSame('Transition blocker of place a', $blockers[0]->getMessage());
         $this->assertSame('blocker', $blockers[0]->getCode());
 
-        // Test if when you are in place "d" trying transition "t1" then
-        // returned blocker list contains guard blocker instead blockedByMarking
+        // Test if when you are in place "d" and trying to apply  "t1" then
+        // it returns blocker list contains guard blocker instead blockedByMarking
         $subject->setMarking('d');
         $transitionBlockerList = $net->buildTransitionBlockerList($subject, 't1');
         $this->assertCount(1, $transitionBlockerList);
         $blockers = iterator_to_array($transitionBlockerList);
-
         $this->assertSame('Transition blocker of place d', $blockers[0]->getMessage());
         $this->assertSame('blocker', $blockers[0]->getCode());
+    }
+
+    public function testApplyReturnsExpectedReasonOnBranchMerge()
+    {
+        $definition = $this->createComplexStateMachineDefinition();
+
+        $dispatcher = new EventDispatcher();
+        $net = new StateMachine($definition, null, $dispatcher);
+
+        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+            $event->addTransitionBlocker(new TransitionBlocker(sprintf('Transition blocker of place %s', $event->getTransition()->getFroms()[0]), 'blocker'));
+        });
+
+        $subject = new Subject();
+
+        // There may be multiple transitions with the same name. Make sure that all transitions
+        // that are enabled by the marking are evaluated.
+        // see https://github.com/symfony/symfony/issues/34489
+
+        try {
+            $net->apply($subject, 't1');
+            $this->fail();
+        } catch (NotEnabledTransitionException $e) {
+            $blockers = iterator_to_array($e->getTransitionBlockerList());
+            $this->assertSame('Transition blocker of place a', $blockers[0]->getMessage());
+            $this->assertSame('blocker', $blockers[0]->getCode());
+        }
     }
 }

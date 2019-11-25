@@ -133,17 +133,9 @@ EOF
         if ('name' === $propertyName) {
             ksort($sortedRoutes);
         } elseif ('path' === $propertyName) {
-            $sortedRoutesByPath = [];
-            foreach ($sortedRoutes as $routeName => $route) {
-                $sortedRoutesByPath[$route->getPath()][] = [$routeName => $route];
-            }
-            ksort($sortedRoutesByPath);
-            $sortedRoutes = [];
-            foreach ($sortedRoutesByPath as $item) {
-                foreach ($item as $routeName => $route) {
-                    $sortedRoutes[key($route)] = reset($route);
-                }
-            }
+            uasort($sortedRoutes, function($a, $b) {
+                return $a->getPath() <=> $b->getPath();
+            });
         }
         $routeCollection = new RouteCollection();
         foreach ($sortedRoutes as $routeName => $route) {

@@ -103,6 +103,7 @@ $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar')
     ? $PHP.' '.escapeshellarg($COMPOSER)
     : 'composer';
 
+$SYMFONY_PHPUNIT_COMPOSER_OPTION = $getEnvVar('SYMFONY_PHPUNIT_COMPOSER_OPTION','');
 $SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy'.($PHPUNIT_VERSION < 6.0 ? ' symfony/yaml': ''));
 $configurationHash = md5(implode(PHP_EOL, array(md5_file(__FILE__), $SYMFONY_PHPUNIT_REMOVE, (int) $PHPUNIT_REMOVE_RETURN_TYPEHINT)));
 $PHPUNIT_VERSION_DIR=sprintf('phpunit-%s-%d', $PHPUNIT_VERSION, $PHPUNIT_REMOVE_RETURN_TYPEHINT);
@@ -116,7 +117,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         rename("$PHPUNIT_VERSION_DIR", "$PHPUNIT_VERSION_DIR.old");
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s': 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
     }
-    passthru("$COMPOSER create-project --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
+    passthru("$COMPOSER create-project $SYMFONY_PHPUNIT_COMPOSER_OPTION --no-install --prefer-dist --no-scripts --no-plugins --no-progress --ansi phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
     @copy("$PHPUNIT_VERSION_DIR/phpunit.xsd", 'phpunit.xsd');
     chdir("$PHPUNIT_VERSION_DIR");
     if ($SYMFONY_PHPUNIT_REMOVE) {
@@ -140,7 +141,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
     $q = '\\' === DIRECTORY_SEPARATOR ? '"' : '';
     // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
-    $exit = proc_close(proc_open("$q$COMPOSER install --no-dev --prefer-dist --no-progress --ansi$q", array(), $p, getcwd()));
+    $exit = proc_close(proc_open("$q$COMPOSER install $SYMFONY_PHPUNIT_COMPOSER_OPTION --no-dev --prefer-dist --no-progress --ansi$q", array(), $p, getcwd()));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
     if ($exit) {
         exit($exit);

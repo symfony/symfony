@@ -12,8 +12,6 @@
     <services>
         <defaults public="false" />
 
-        <service id="error_renderer" alias="error_renderer.serializer" />
-
         <service id="serializer" class="Symfony\Component\Serializer\Serializer" public="true">
             <argument type="collection" />
             <argument type="collection" />
@@ -146,6 +144,20 @@
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
 
             <tag name="property_info.list_extractor" priority="-999" />
+        </service>
+
+        <!-- ErrorRenderer integration -->
+        <service id="error_renderer" alias="error_renderer.serializer" />
+        <service id="error_renderer.serializer" alias="error_handler.error_renderer.serializer" />
+        <service id="error_handler.error_renderer.serializer" class="Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer">
+            <argument type="service" id="serializer" />
+            <argument type="service">
+                <service>
+                    <factory class="Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer" method="getPreferredFormat" />
+                    <argument type="service" id="request_stack" />
+                </service>
+            </argument>
+            <argument type="service" id="error_renderer.html" />
         </service>
     </services>
 </container>

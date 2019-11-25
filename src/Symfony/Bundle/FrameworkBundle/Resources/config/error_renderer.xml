@@ -14,19 +14,7 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="error_handler.error_renderer.serializer" class="Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer">
-            <argument type="service" id="serializer" />
-            <argument type="service">
-                <service>
-                    <factory class="Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer" method="getPreferredFormat" />
-                    <argument type="service" id="request_stack" />
-                </service>
-            </argument>
-            <argument type="service" id="error_renderer.html" />
-        </service>
-
         <service id="error_renderer.html" alias="error_handler.error_renderer.html" />
-        <service id="error_renderer.serializer" alias="error_handler.error_renderer.serializer" />
         <service id="error_renderer" alias="error_renderer.html" />
     </services>
 </container>

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\LogicException;
 
 /**
  * An AMQP connection.
@@ -60,6 +61,10 @@ class Connection
 
     public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, AmqpFactory $amqpFactory = null)
     {
+        if (!\extension_loaded('amqp')) {
+            throw new LogicException(sprintf('You cannot use the "%s" as the "amqp" extension is not installed.', __CLASS__));
+        }
+
         $this->connectionOptions = array_replace_recursive([
             'delay' => [
                 'exchange_name' => 'delays',

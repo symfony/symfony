@@ -28,6 +28,9 @@ class AmqpTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
+    /**
+     * @requires extension amqp
+     */
     public function testItCreatesTheTransport()
     {
         $factory = new AmqpTransportFactory();

@@ -20,13 +20,12 @@ CHANGELOG
 
 * 1.1.1 (2019-03-11)
 
+  * Deprecated DiactorosFactory, use PsrHttpFactory instead
   * Removed triggering of deprecation
 
 * 1.1.0 (2018-08-30)
 
-  * Deprecated DiactorosFactory, use PsrHttpFactory instead
-  * Added option to stream the response on the HttpFoundationFactory createResponse
-  * Added more tests and improved code style
+  * Added support for creating PSR-7 messages using PSR-17 factories
 
 * 1.0.2 (2017-12-19)
 

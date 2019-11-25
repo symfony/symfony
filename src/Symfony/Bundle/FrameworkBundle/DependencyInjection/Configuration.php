@@ -1014,6 +1014,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->children()
                                     ->arrayNode('adapters')
+                                        ->performNoDeepMerging()
                                         ->info('One or more adapters to chain for creating the pool, defaults to "cache.app".')
                                         ->beforeNormalization()
                                             ->always()->then(function ($values) {

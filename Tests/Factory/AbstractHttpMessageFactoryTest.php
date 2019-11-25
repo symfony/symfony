@@ -132,12 +132,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
         $path = tempnam($this->tmpDir, uniqid());
         file_put_contents($path, $content);
 
-        if (class_exists('Symfony\Component\HttpFoundation\HeaderUtils')) {
-            // Symfony 4.1+
-            return new UploadedFile($path, $originalName, $mimeType, $error, true);
-        }
-
-        return new UploadedFile($path, $originalName, $mimeType, filesize($path), $error, true);
+        return new UploadedFile($path, $originalName, $mimeType, $error, true);
     }
 
     public function testCreateResponse()
@@ -189,12 +184,8 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
 
     public function testUploadErrNoFile()
     {
-        if (class_exists('Symfony\Component\HttpFoundation\HeaderUtils')) {
-            // Symfony 4.1+
-            $file = new UploadedFile('', '', null, UPLOAD_ERR_NO_FILE, true);
-        } else {
-            $file = new UploadedFile('', '', null, 0, UPLOAD_ERR_NO_FILE, true);
-        }
+        $file = new UploadedFile('', '', null, UPLOAD_ERR_NO_FILE, true);
+
         $this->assertEquals(0, $file->getSize());
         $this->assertEquals(UPLOAD_ERR_NO_FILE, $file->getError());
         $this->assertFalse($file->getSize(), 'SplFile::getSize() returns false on error');

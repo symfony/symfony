@@ -282,6 +282,7 @@ abstract class DoctrineType extends AbstractType
 
     public function reset()
     {
+        $this->idReaders = [];
         $this->choiceLoaders = [];
     }
 }

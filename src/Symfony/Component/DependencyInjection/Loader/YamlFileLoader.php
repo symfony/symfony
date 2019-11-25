@@ -362,8 +362,8 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($service as $key => $value) {
-                if (!\in_array($key, ['alias', 'public'])) {
-                    @trigger_error(sprintf('The configuration key "%s" is unsupported for the service "%s" which is defined as an alias in "%s". Allowed configuration keys for service aliases are "alias" and "public". The YamlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $key, $id, $file), E_USER_DEPRECATED);
+                if (!\in_array($key, ['alias', 'public', 'deprecated'])) {
+                    @trigger_error(sprintf('The configuration key "%s" is unsupported for the service "%s" which is defined as an alias in "%s". Allowed configuration keys for service aliases are "alias", "public" and "deprecated". The YamlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $key, $id, $file), E_USER_DEPRECATED);
                 }
             }
 

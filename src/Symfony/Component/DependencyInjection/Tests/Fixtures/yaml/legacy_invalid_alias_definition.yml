@@ -3,3 +3,4 @@ services:
         alias: bar
         factory: foo
         parent: quz
+        deprecated: The "%service_id%" service is deprecated.

@@ -645,7 +645,11 @@ EOF
         }
 
         foreach ($alias->childNodes as $child) {
-            if ($child instanceof \DOMElement && self::NS === $child->namespaceURI) {
+            if (!$child instanceof \DOMElement || self::NS !== $child->namespaceURI) {
+                continue;
+            }
+
+            if ('deprecated' !== $child->localName) {
                 @trigger_error(sprintf('Using the element "%s" is deprecated for the service "%s" which is defined as an alias in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
             }
         }

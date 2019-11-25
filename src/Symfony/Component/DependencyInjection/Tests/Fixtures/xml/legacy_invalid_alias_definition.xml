@@ -6,6 +6,7 @@
     <service id="bar" alias="foo" class="Foo">
         <tag name="foo.bar" />
         <factory service="foobar" method="getBar" />
+        <deprecated>The "%service_id%" service is deprecated.</deprecated>
     </service>
   </services>
 </container>

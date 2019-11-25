@@ -55,7 +55,7 @@ final class Countries extends ResourceBundle
     /**
      * Gets the country name from alpha2 code.
      *
-     * @throws MissingResourceException if the country code does not exists
+     * @throws MissingResourceException if the country code does not exist
      */
     public static function getName(string $country, string $displayLocale = null): string
     {

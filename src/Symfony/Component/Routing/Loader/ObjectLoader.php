@@ -42,8 +42,13 @@ abstract class ObjectLoader extends Loader
      */
     public function load($resource, $type = null)
     {
-        if (!preg_match('/^[^\:]+(?:::(?:[^\:]+))?$/', $resource)) {
+        if (!preg_match('/^[^\:]+(?:::?(?:[^\:]+))?$/', $resource)) {
             throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the %s route loader: use the format "object_id::method" or "object_id" if your object class has an "__invoke" method.', $resource, \is_string($type) ? '"'.$type.'"' : 'object'));
+        }
+
+        if (1 === substr_count($resource, ':')) {
+            $resource = str_replace(':', '::', $resource);
+            @trigger_error(sprintf('Referencing object route loaders with a single colon is deprecated since Symfony 4.1. Use %s instead.', $resource), E_USER_DEPRECATED);
         }
 
         $parts = explode('::', $resource);

@@ -157,6 +157,21 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $types[0])];
     }
+    
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getTags(string $class, string $property, array $context = []): ?array
+    {
+        /** @var $docBlock DocBlock */
+        list($docBlock, $source, $prefix) = $this->getDocBlock($class, $property);
+        if (!$docBlock) {
+            return null;
+        }
+        
+        return $docBlock->getTags();
+    }     
 
     private function getDocBlock(string $class, string $property): array
     {

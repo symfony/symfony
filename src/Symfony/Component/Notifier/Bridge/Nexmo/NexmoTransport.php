@@ -30,12 +30,14 @@ final class NexmoTransport extends AbstractTransport
 
     private $apiKey;
     private $apiSecret;
+    private $callback;
     private $from;
 
-    public function __construct(string $apiKey, string $apiSecret, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $apiKey, string $apiSecret, string $from, string $callback = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;
+        $this->callback = $callback;
         $this->from = $from;
 
         parent::__construct($client, $dispatcher);
@@ -57,14 +59,20 @@ final class NexmoTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
         }
 
+        $body = [
+            'from' => $this->from,
+            'to' => $message->getPhone(),
+            'text' => $message->getSubject(),
+            'api_key' => $this->apiKey,
+            'api_secret' => $this->apiSecret,
+        ];
+
+        if ($this->callback) {
+            $body['callback'] = $this->callback;
+        }
+
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/sms/json', [
-            'body' => [
-                'from' => $this->from,
-                'to' => $message->getPhone(),
-                'text' => $message->getSubject(),
-                'api_key' => $this->apiKey,
-                'api_secret' => $this->apiSecret,
-            ],
+            'body' => $body,
         ]);
 
         $result = $response->toArray(false);

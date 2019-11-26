@@ -30,12 +30,14 @@ final class TwilioTransport extends AbstractTransport
 
     private $accountSid;
     private $authToken;
+    private $callback;
     private $from;
 
-    public function __construct(string $accountSid, string $authToken, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accountSid, string $authToken, string $from, string $callback = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accountSid = $accountSid;
         $this->authToken = $authToken;
+        $this->callback = $callback;
         $this->from = $from;
 
         parent::__construct($client, $dispatcher);
@@ -57,14 +59,20 @@ final class TwilioTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
         }
 
+        $body = [
+            'From' => $this->from,
+            'To' => $message->getPhone(),
+            'Body' => $message->getSubject(),
+        ];
+
+        if ($this->callback) {
+            $body['StatusCallback'] = $this->callback;
+        }
+
         $endpoint = sprintf('https://%s/2010-04-01/Accounts/%s/Messages.json', $this->getEndpoint(), $this->accountSid);
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => $this->accountSid.':'.$this->authToken,
-            'body' => [
-                'From' => $this->from,
-                'To' => $message->getPhone(),
-                'Body' => $message->getSubject(),
-            ],
+            'body' => $body,
         ]);
 
         if (201 !== $response->getStatusCode()) {

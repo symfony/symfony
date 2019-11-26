@@ -28,12 +28,13 @@ final class TwilioTransportFactory extends AbstractTransportFactory
         $scheme = $dsn->getScheme();
         $accountSid = $this->getUser($dsn);
         $authToken = $this->getPassword($dsn);
+        $callback = $dsn->getOption('callback');
         $from = $dsn->getOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
         if ('twilio' === $scheme) {
-            return (new TwilioTransport($accountSid, $authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+            return (new TwilioTransport($accountSid, $authToken, $from, $callback, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
         throw new UnsupportedSchemeException($dsn, 'twilio', $this->getSupportedSchemes());

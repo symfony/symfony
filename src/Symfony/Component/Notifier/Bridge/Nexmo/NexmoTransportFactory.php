@@ -28,12 +28,13 @@ final class NexmoTransportFactory extends AbstractTransportFactory
         $scheme = $dsn->getScheme();
         $apiKey = $this->getUser($dsn);
         $apiSecret = $this->getPassword($dsn);
+        $callback = $dsn->getOption('callback');
         $from = $dsn->getOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
         if ('nexmo' === $scheme) {
-            return (new NexmoTransport($apiKey, $apiSecret, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+            return (new NexmoTransport($apiKey, $apiSecret, $from, $callback, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
         throw new UnsupportedSchemeException($dsn, 'nexmo', $this->getSupportedSchemes());

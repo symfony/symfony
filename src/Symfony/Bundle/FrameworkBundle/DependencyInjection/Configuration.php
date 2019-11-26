@@ -1628,6 +1628,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        ->scalarNode('use_bus')->defaultTrue()->end()
                     ->end()
                 ->end()
             ->end()

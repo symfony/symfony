@@ -34,6 +34,8 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'bool' => ['bool'],
             'const' => ['bool', 'int', 'float', 'string', 'array'],
             'csv' => ['array'],
+            'datetime' => ['string'],
+            'datetime_immutable' => ['string'],
             'file' => ['string'],
             'float' => ['float'],
             'int' => ['int'],

@@ -44,6 +44,8 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'bool' => 'bool',
             'const' => 'bool|int|float|string|array',
             'csv' => 'array',
+            'datetime' => 'string',
+            'datetime_immutable' => 'string',
             'file' => 'string',
             'float' => 'float',
             'int' => 'int',
@@ -273,6 +275,22 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('trim' === $prefix) {
             return trim($env);
+        }
+
+        if ('datetime' === $prefix) {
+            try {
+                return new \DateTime($env, new \DateTimeZone(date_default_timezone_get()));
+            } catch (\Exception $e) {
+                throw new RuntimeException(sprintf('Invalid DateTime string in env var "%s"', $name), 0, $e);
+            }
+        }
+
+        if ('datetime_immutable' === $prefix) {
+            try {
+                return new \DateTimeImmutable($env, new \DateTimeZone(date_default_timezone_get()));
+            } catch (\Exception $e) {
+                throw new RuntimeException(sprintf('Invalid DateTimeImmutable string in env var "%s"', $name), 0, $e);
+            }
         }
 
         throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));

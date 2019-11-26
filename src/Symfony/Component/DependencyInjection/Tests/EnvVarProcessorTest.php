@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class EnvVarProcessorTest extends TestCase
 {
@@ -552,5 +553,46 @@ CSV;
 
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
         $this->assertSame('123', $result); // check twice
+    }
+
+    /**
+     * @dataProvider dateTimeClasses
+     */
+    public function testEnvDateTimeValid($prefix, $class)
+    {
+        $processor = new EnvVarProcessor(new Container());
+        $expected = new $class('11/21/19 08:00');
+
+        $result = $processor->getEnv($prefix, 'NOW', function ($name) {
+            $this->assertSame('NOW', $name);
+
+            return '11/21/19 08:00';
+        });
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @dataProvider dateTimeClasses
+     */
+    public function testEnvDateTimeInvalid($prefix)
+    {
+        $processor = new EnvVarProcessor(new Container());
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageRegExp('@Invalid (DateTime|DateTimeImmutable) string in env var "NOW"@');
+
+        $processor->getEnv($prefix, 'NOW', function ($name) {
+            $this->assertSame('NOW', $name);
+
+            return 'abcdefgh';
+        });
+    }
+
+    public function dateTimeClasses()
+    {
+        return [
+            ['datetime', \DateTime::class],
+            ['datetime_immutable', \DateTimeImmutable::class],
+        ];
     }
 }

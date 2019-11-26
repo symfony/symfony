@@ -22,6 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * A console command for retrieving information about routes.
@@ -127,13 +128,13 @@ EOF
         return $foundRoutesNames;
     }
 
-    private function sortRoutes($routes, $propertyName): RouteCollection
+    private function sortRoutes(RouteCollection $routes, string $propertyName): RouteCollection
     {
         $sortedRoutes = $routes->all();
         if ('name' === $propertyName) {
             ksort($sortedRoutes);
         } elseif ('path' === $propertyName) {
-            uasort($sortedRoutes, function($a, $b) {
+            uasort($sortedRoutes, static function (Route $a, Route $b): int {
                 return $a->getPath() <=> $b->getPath();
             });
         }

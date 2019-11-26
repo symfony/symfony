@@ -152,7 +152,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         if ((isset($this->context['lastCircularObjectFound']) && $this->context['lastCircularObjectFound'] == \get_class($object))
             || $this->isCircularReference($object, $context)) {
             $this->context['lastCircularObjectFound'] = \get_class($object);
-        
+
             return $this->handleCircularReference($object, $format, $context);
         }
 

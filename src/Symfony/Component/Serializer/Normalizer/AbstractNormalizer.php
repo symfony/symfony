@@ -213,7 +213,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return $circularReferenceHandler($object, $format, $context);
         }
 
-        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $context[self::CIRCULAR_REFERENCE_LIMIT] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_LIMIT]));
+        if(method_exists($object, "getId")) {
+            return $object->getId();
+        } else {
+            throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured  limit: %d)', \get_class($object), $context[self::CIRCULAR_REFERENCE_LIMIT] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_LIMIT]));
+        }
     }
 
     /**

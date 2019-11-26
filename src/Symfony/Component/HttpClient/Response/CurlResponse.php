@@ -208,15 +208,7 @@ final class CurlResponse implements ResponseInterface
         } finally {
             $this->close();
 
-            // Clear local caches when the only remaining handles are about pushed responses
             if (!$this->multi->openHandles) {
-                if ($this->logger) {
-                    foreach ($this->multi->pushedResponses as $url => $response) {
-                        $this->logger->debug(sprintf('Unused pushed response: "%s"', $url));
-                    }
-                }
-
-                $this->multi->pushedResponses = [];
                 // Schedule DNS cache eviction for the next request
                 $this->multi->dnsCache->evictions = $this->multi->dnsCache->evictions ?: $this->multi->dnsCache->removals;
                 $this->multi->dnsCache->removals = $this->multi->dnsCache->hostnames = [];

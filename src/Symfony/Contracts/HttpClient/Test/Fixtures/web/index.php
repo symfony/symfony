@@ -145,6 +145,27 @@ switch ($vars['REQUEST_URI']) {
         header('Content-Encoding: gzip');
         echo str_repeat('-', 1000);
         exit;
+
+    case '/json':
+        header("Content-Type: application/json");
+        echo json_encode([
+            'documents' => [
+                ['id' => '/json/1'],
+                ['id' => '/json/2'],
+                ['id' => '/json/3'],
+            ],
+        ]);
+        exit;
+
+    case '/json/1':
+    case '/json/2':
+    case '/json/3':
+        header("Content-Type: application/json");
+        echo json_encode([
+            'title' => $vars['REQUEST_URI'],
+        ]);
+
+        exit;
 }
 
 header('Content-Type: application/json', true);

@@ -23,6 +23,7 @@ use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * A performant implementation of the HttpClientInterface contracts based on the curl extension.
@@ -34,7 +35,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  *
  * @experimental in 4.3
  */
-final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
+final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
     use HttpClientTrait;
     use LoggerAwareTrait;
@@ -298,9 +299,17 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         return new ResponseStream(CurlResponse::stream($responses, $timeout));
     }
 
-    public function __destruct()
+    public function reset()
     {
+        if ($this->logger) {
+            foreach ($this->multi->pushedResponses as $url => $response) {
+                $this->logger->debug(sprintf('Unused pushed response: "%s"', $url));
+            }
+        }
+
         $this->multi->pushedResponses = [];
+        $this->multi->dnsCache->evictions = $this->multi->dnsCache->evictions ?: $this->multi->dnsCache->removals;
+        $this->multi->dnsCache->removals = $this->multi->dnsCache->hostnames = [];
 
         if (\is_resource($this->multi->handle)) {
             if (\defined('CURLMOPT_PUSHFUNCTION')) {
@@ -316,6 +325,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
                 curl_setopt($ch, CURLOPT_VERBOSE, false);
             }
         }
+    }
+
+    public function __destruct()
+    {
+        $this->reset();
     }
 
     private static function handlePush($parent, $pushed, array $requestHeaders, CurlClientState $multi, int $maxPendingPushes, ?LoggerInterface $logger): int
@@ -337,12 +351,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
 
         $url = $headers[':scheme'][0].'://'.$headers[':authority'][0];
 
-        if ($maxPendingPushes <= \count($multi->pushedResponses)) {
-            $logger && $logger->debug(sprintf('Rejecting pushed response from "%s" for "%s": the queue is full', $origin, $url));
-
-            return CURL_PUSH_DENY;
-        }
-
         // curl before 7.65 doesn't validate the pushed ":authority" header,
         // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
         // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
@@ -350,6 +358,12 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             $logger && $logger->debug(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
 
             return CURL_PUSH_DENY;
+        }
+
+        if ($maxPendingPushes <= \count($multi->pushedResponses)) {
+            $fifoUrl = key($multi->pushedResponses);
+            unset($multi->pushedResponses[$fifoUrl]);
+            $logger && $logger->debug(sprintf('Evicting oldest pushed response: "%s"', $fifoUrl));
         }
 
         $url .= $headers[':path'][0];

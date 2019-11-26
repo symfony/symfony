@@ -142,6 +142,12 @@ before_install:
       fi
 
     - |
+      # Install vulcain
+      wget https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz
+      sudo mv vulcain /usr/local/bin
+      docker pull php:7.3-alpine
+
+    - |
       # php.ini configuration
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
           phpenv global $PHP 2>/dev/null || (cd / && wget https://s3.amazonaws.com/travis-php-archives/binaries/ubuntu/14.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
@@ -277,8 +283,14 @@ install:
               echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable) && $PHPUNIT_X'"
               echo "$COMPONENTS" | xargs -n1 -I{} tar --append -f ~/php-ext/composer-lowest.lock.tar {}/composer.lock
           else
+              if [[ $PHP = ${MIN_PHP%.*} ]]; then
+                  tfold src/Symfony/Component/HttpClient.h2push docker run -it --rm -v $(pwd):/app -v /usr/local/bin/vulcain:/usr/local/bin/vulcain -w /app php:7.3-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
+              fi
+
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
-              tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
+
+              tfold src/Symfony/Component/Console.tty $PHPUNIT --group tty
+
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
                   export PHP=$MIN_PHP
                   tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/

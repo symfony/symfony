@@ -15,12 +15,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgumentNotNull;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -384,6 +386,21 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $container->register('bar', BarMethodCall::class)
             ->addMethodCall('setIterable', [new IteratorArgument([])]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @requires PHP 7.2
+     */
+    public function testProcessSuccessWhenPassingDefinitionForObjectType()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo_object', FooObject::class)
+            ->addArgument(new Definition(Foo::class));
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

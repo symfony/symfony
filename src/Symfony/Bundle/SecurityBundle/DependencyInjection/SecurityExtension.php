@@ -459,8 +459,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                             throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$key]['provider']));
                         }
                         $userProvider = $providerIds[$normalizedName];
-                    } elseif ('remember_me' === $key) {
-                        // RememberMeFactory will use the firewall secret when created
+                    } elseif ('remember_me' === $key || 'anonymous' === $key) {
+                        // RememberMeFactory will use the firewall secret when created, AnonymousAuthenticationListener does not load users.
                         $userProvider = null;
                     } elseif ($defaultProvider) {
                         $userProvider = $defaultProvider;

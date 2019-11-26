@@ -6,11 +6,22 @@
 
     <services>
         <service id="error_handler.error_renderer.html" class="Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer">
-            <argument>%kernel.debug%</argument>
+            <argument type="service">
+                <service>
+                    <factory class="Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer" method="isDebug" />
+                    <argument type="service" id="request_stack" />
+                    <argument>%kernel.debug%</argument>
+                </service>
+            </argument>
             <argument>%kernel.charset%</argument>
             <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <argument>%kernel.project_dir%</argument>
-            <argument type="service" id="request_stack" />
+            <argument type="service">
+                <service>
+                    <factory class="Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer" method="getAndCleanOutputBuffer" />
+                    <argument type="service" id="request_stack" />
+                </service>
+            </argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 

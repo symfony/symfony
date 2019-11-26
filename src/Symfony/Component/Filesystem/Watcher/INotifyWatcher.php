@@ -31,11 +31,16 @@ class INotifyWatcher implements WatcherInterface
         stream_set_blocking($inotifyInit, false);
 
         $isDir = is_dir($path);
+        $watchers = [];
 
         if ($isDir) {
-            $watchId = inotify_add_watch($inotifyInit, $path, IN_CREATE | IN_DELETE | IN_MODIFY);
+            $watchers[] = inotify_add_watch($inotifyInit, $path, IN_CREATE | IN_DELETE | IN_MODIFY);
+
+            foreach ($this->scanPath("$path/*") as $path) {
+                $watchers[] = inotify_add_watch($inotifyInit, $path, IN_CREATE | IN_DELETE | IN_MODIFY);
+            }
         } else {
-            $watchId = inotify_add_watch($inotifyInit, $path, IN_MODIFY);
+            $watchers[] = inotify_add_watch($inotifyInit, $path, IN_MODIFY);
         }
 
         try {
@@ -77,8 +82,19 @@ class INotifyWatcher implements WatcherInterface
                 }
             }
         } finally {
-            inotify_rm_watch($inotifyInit, $watchId);
+            foreach ($watchers as $watchId) {
+                inotify_rm_watch($inotifyInit, $watchId);
+            }
+
             fclose($inotifyInit);
+        }
+    }
+
+    private function scanPath($path)
+    {
+        foreach (glob($path, GLOB_ONLYDIR) as $directory) {
+            yield $directory;
+            yield from $this->scanPath("$directory/*");
         }
     }
 }

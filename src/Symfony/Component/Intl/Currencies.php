@@ -46,7 +46,7 @@ final class Currencies extends ResourceBundle
     }
 
     /**
-     * @throws MissingResourceException if the currency code does not exists
+     * @throws MissingResourceException if the currency code does not exist
      */
     public static function getName(string $currency, string $displayLocale = null): string
     {
@@ -78,7 +78,7 @@ final class Currencies extends ResourceBundle
     }
 
     /**
-     * @throws MissingResourceException if the currency code does not exists
+     * @throws MissingResourceException if the currency code does not exist
      */
     public static function getSymbol(string $currency, string $displayLocale = null): string
     {
@@ -115,7 +115,7 @@ final class Currencies extends ResourceBundle
     }
 
     /**
-     * @throws MissingResourceException if the numeric code does not exists
+     * @throws MissingResourceException if the numeric code does not exist
      */
     public static function forNumericCode(int $numericCode): array
     {

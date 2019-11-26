@@ -121,7 +121,7 @@ EOF
                 continue;
             }
 
-            $this->displayLog($input, $output, $clientId, $record);
+            $this->displayLog($output, $clientId, $record);
         }
 
         return 0;
@@ -150,7 +150,7 @@ EOF
         }
     }
 
-    private function displayLog(InputInterface $input, OutputInterface $output, int $clientId, array $record)
+    private function displayLog(OutputInterface $output, int $clientId, array $record)
     {
         if (isset($record['log_id'])) {
             $clientId = unpack('H*', $record['log_id'])[1];

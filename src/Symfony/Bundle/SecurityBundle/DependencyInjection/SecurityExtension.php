@@ -409,9 +409,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         // Access listener
-        if ($firewall['stateless'] || empty($firewall['anonymous']['lazy'])) {
-            $listeners[] = new Reference('security.access_listener');
-        }
+        $listeners[] = new Reference('security.access_listener');
 
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));

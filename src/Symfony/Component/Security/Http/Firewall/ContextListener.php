@@ -41,7 +41,7 @@ use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
  *
  * @final since Symfony 4.3
  */
-class ContextListener implements ListenerInterface
+class ContextListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
@@ -85,9 +85,17 @@ class ContextListener implements ListenerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        return null; // always run authenticate() lazily with lazy firewalls
+    }
+
+    /**
      * Reads the Security Token from the session.
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         if (!$this->registered && null !== $this->dispatcher && $event->isMasterRequest()) {
             $this->dispatcher->addListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);

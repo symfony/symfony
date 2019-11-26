@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  *
  * @final since Symfony 4.3
  */
-class BasicAuthenticationListener implements ListenerInterface
+class BasicAuthenticationListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
@@ -56,9 +56,17 @@ class BasicAuthenticationListener implements ListenerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        return null !== $request->headers->get('PHP_AUTH_USER');
+    }
+
+    /**
      * Handles basic authentication.
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();
 

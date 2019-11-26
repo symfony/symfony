@@ -1884,6 +1884,13 @@ class FrameworkExtension extends Extension
         $container->getDefinition('mailer.transports')->setArgument(0, $transports);
         $container->getDefinition('mailer.default_transport')->setArgument(0, current($transports));
 
+        $mailer = $container->getDefinition('mailer.mailer');
+        if (false === $messageBus = $config['message_bus']) {
+            $mailer->replaceArgument(1, null);
+        } else {
+            $mailer->replaceArgument(1, $messageBus ? new Reference($messageBus) : new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        }
+
         $classToServices = [
             SesTransportFactory::class => 'mailer.transport_factory.amazon',
             GmailTransportFactory::class => 'mailer.transport_factory.gmail',

@@ -1469,6 +1469,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->fixXmlConfig('transport')
                     ->children()
+                        ->scalarNode('message_bus')->defaultNull()->info('The message bus to use. Defaults to the default bus if the Messenger component is installed.')->end()
                         ->scalarNode('dsn')->defaultNull()->end()
                         ->arrayNode('transports')
                             ->useAttributeAsKey('name')

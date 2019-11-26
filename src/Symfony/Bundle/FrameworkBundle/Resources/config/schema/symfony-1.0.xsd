@@ -549,6 +549,7 @@
             <xsd:element name="envelope" type="mailer_envelope" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
         <xsd:attribute name="dsn" type="xsd:string" />
+        <xsd:attribute name="message-bus" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="mailer_envelope">

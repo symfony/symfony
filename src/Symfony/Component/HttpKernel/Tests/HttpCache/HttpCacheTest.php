@@ -859,6 +859,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testValidatesCachedResponsesWithETagAndNoFreshnessInformation()
     {
         $this->setNextResponse(200, [], 'Hello World', function ($request, $response) {
+            $this->assertFalse($request->headers->has('If-Modified-Since'));
             $response->headers->set('Cache-Control', 'public');
             $response->headers->set('ETag', '"12345"');
             if ($response->getETag() == $request->headers->get('IF_NONE_MATCH')) {

@@ -523,7 +523,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         $encoderMap = [];
         foreach ($encoders as $class => $encoder) {
-            $encoderMap[$class] = $this->createEncoder($encoder, $container);
+            $encoderMap[$class] = $this->createEncoder($encoder);
         }
 
         $container
@@ -532,7 +532,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         ;
     }
 
-    private function createEncoder($config, ContainerBuilder $container)
+    private function createEncoder($config)
     {
         // a custom encoder service
         if (isset($config['id'])) {

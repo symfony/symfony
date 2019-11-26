@@ -114,7 +114,7 @@ EOF
                 continue;
             }
 
-            $this->displayLog($input, $output, $clientId, $record);
+            $this->displayLog($output, $clientId, $record);
         }
     }
 
@@ -141,7 +141,7 @@ EOF
         }
     }
 
-    private function displayLog(InputInterface $input, OutputInterface $output, $clientId, array $record)
+    private function displayLog(OutputInterface $output, $clientId, array $record)
     {
         if ($this->handler->isHandling($record)) {
             if (isset($record['log_id'])) {

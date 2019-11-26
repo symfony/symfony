@@ -41,7 +41,7 @@ class XliffFileDumper extends FileDumper
             return $this->dumpXliff1($defaultLocale, $messages, $domain, $options);
         }
         if ('2.0' === $xliffVersion) {
-            return $this->dumpXliff2($defaultLocale, $messages, $domain, $options);
+            return $this->dumpXliff2($defaultLocale, $messages, $domain);
         }
 
         throw new InvalidArgumentException(sprintf('No support implemented for dumping XLIFF version "%s".', $xliffVersion));
@@ -129,7 +129,7 @@ class XliffFileDumper extends FileDumper
         return $dom->saveXML();
     }
 
-    private function dumpXliff2($defaultLocale, MessageCatalogue $messages, $domain, array $options = [])
+    private function dumpXliff2($defaultLocale, MessageCatalogue $messages, $domain)
     {
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;

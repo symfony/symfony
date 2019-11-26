@@ -29,7 +29,7 @@ trait ClassResolverTrait
      *
      * @return string
      *
-     * @throws InvalidArgumentException If the class does not exists
+     * @throws InvalidArgumentException If the class does not exist
      */
     private function getClass($value)
     {

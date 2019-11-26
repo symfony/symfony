@@ -304,7 +304,7 @@ class XmlFileLoader extends FileLoader
             $definition->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
         }
 
-        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', $file, false, $definition instanceof ChildDefinition));
+        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', $file, $definition instanceof ChildDefinition));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property', $file));
 
         if ($factories = $this->getChildren($service, 'factory')) {
@@ -468,11 +468,10 @@ class XmlFileLoader extends FileLoader
      *
      * @param string $name
      * @param string $file
-     * @param bool   $lowercase
      *
      * @return mixed
      */
-    private function getArgumentsAsPhp(\DOMElement $node, $name, $file, $lowercase = true, $isChildDefinition = false)
+    private function getArgumentsAsPhp(\DOMElement $node, $name, $file, $isChildDefinition = false)
     {
         $arguments = [];
         foreach ($this->getChildren($node, $name) as $arg) {
@@ -519,10 +518,10 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = new Expression($arg->nodeValue);
                     break;
                 case 'collection':
-                    $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, $file, false);
+                    $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, $file);
                     break;
                 case 'iterator':
-                    $arg = $this->getArgumentsAsPhp($arg, $name, $file, false);
+                    $arg = $this->getArgumentsAsPhp($arg, $name, $file);
                     try {
                         $arguments[$key] = new IteratorArgument($arg);
                     } catch (InvalidArgumentException $e) {

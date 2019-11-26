@@ -52,7 +52,7 @@ final class Languages extends ResourceBundle
     /**
      * Gets the language name from alpha2 code.
      *
-     * @throws MissingResourceException if the language code does not exists
+     * @throws MissingResourceException if the language code does not exist
      */
     public static function getName(string $language, string $displayLocale = null): string
     {

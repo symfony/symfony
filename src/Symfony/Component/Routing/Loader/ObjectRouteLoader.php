@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Routing\RouteCollection;
-
 @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ObjectRouteLoader::class, ObjectLoader::class), E_USER_DEPRECATED);
 
 /**
@@ -35,28 +33,6 @@ abstract class ObjectRouteLoader extends ObjectLoader
      * @return object
      */
     abstract protected function getServiceObject($id);
-
-    /**
-     * Calls the service that will load the routes.
-     *
-     * @param string      $resource Some value that will resolve to a callable
-     * @param string|null $type     The resource type
-     *
-     * @return RouteCollection
-     */
-    public function load($resource, $type = null)
-    {
-        if (!preg_match('/^[^\:]+(?:::?(?:[^\:]+))?$/', $resource)) {
-            throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the "service" route loader: use the format "service::method" or "service" if your service has an "__invoke" method.', $resource));
-        }
-
-        if (1 === substr_count($resource, ':')) {
-            $resource = str_replace(':', '::', $resource);
-            @trigger_error(sprintf('Referencing service route loaders with a single colon is deprecated since Symfony 4.1. Use %s instead.', $resource), E_USER_DEPRECATED);
-        }
-
-        return parent::load($resource, $type);
-    }
 
     /**
      * {@inheritdoc}

@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-25T12:39:44Z
+
+@lyrixx I force-pushed the fix on your fork, tests are green - can you please check if the PR is good to you?
+@dunglas maybe also since you were the first to spot the issue?

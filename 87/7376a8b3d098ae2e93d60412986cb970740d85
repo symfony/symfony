@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-11-25T16:30:36Z
+
+Please open a PR against the 3.4 branch (oldest supported branch) fixing all occurrences there. Then, we'll need additional PRs for newer branches (4.3 and then 4.4) only for phpdoc which does not exist in older versions (which might mean we don't need the PR at all).
+
+---------------------------------------------------------------------------
+
+by hhamon at 2019-11-25T16:32:28Z
+
+@stof yes I'll open a PR against 3.4 to fix the other occurrences. This class was introduced in Symfony 4.3 so this is the reason why I isolated the patch in this PR.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-11-25T16:32:47Z
+
+And that's why I :+1: the PR

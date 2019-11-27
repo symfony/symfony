@@ -179,7 +179,13 @@ trait RedisTrait
                 }
             });
         } else {
-            $values = array_combine($ids, $this->redis->mget($ids));
+            $values = $this->redis->mget($ids);
+
+            if (!\is_array($values) || \count($values) !== \count($ids)) {
+                return [];
+            }
+
+            $values = array_combine($ids, $values);
         }
 
         foreach ($values as $id => $v) {

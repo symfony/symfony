@@ -152,6 +152,10 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 return;
             }
 
+            if ('object' === $type) {
+                return;
+            }
+
             if (is_a($class, $type, true)) {
                 return;
             }

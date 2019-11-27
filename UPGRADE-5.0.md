@@ -410,7 +410,7 @@ Security
 
    **After**
    ```php
-   if ($this->authorizationChecker->isGranted(new Expression("has_role('ROLE_USER') or has_role('ROLE_ADMIN')"))) {}
+   if ($this->authorizationChecker->isGranted(new Expression("is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"))) {}
 
    // or:
    if ($this->authorizationChecker->isGranted('ROLE_USER')
@@ -473,6 +473,7 @@ Security
  * Classes implementing the `TokenInterface` must implement the two new methods
    `__serialize` and `__unserialize`
  * Implementations of `Guard\AuthenticatorInterface::checkCredentials()` must return a boolean value now. Please explicitly return `false` to indicate invalid credentials.
+ * Removed the `has_role()` function from security expressions, use `is_granted()` instead.
 
 SecurityBundle
 --------------

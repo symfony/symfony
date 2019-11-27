@@ -210,7 +210,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testPerListenerProviderWithRememberMe()
+    public function testPerListenerProviderWithRememberMeAndAnonymous()
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -223,6 +223,7 @@ class SecurityExtensionTest extends TestCase
                 'default' => [
                     'form_login' => ['provider' => 'second'],
                     'remember_me' => ['secret' => 'baz'],
+                    'anonymous' => true,
                 ],
             ],
         ]);

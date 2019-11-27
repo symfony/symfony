@@ -265,6 +265,38 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
+     * Returns a rendered view resolved for several templates.
+     */
+    protected function resolveRenderView(array $views, array $parameters = []): Response
+    {
+        if (!$views) {
+            throw new \InvalidArgumentException('No templates to resolve.');
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".');
+        }
+
+        return $this->container->get('twig')->resolveTemplate($views)->render($parameters);
+    }
+
+    /**
+     * Renders a view resolved for several templates.
+     */
+    protected function resolveRender(array $views, array $parameters = [], Response $response = null): Response
+    {
+        $content = $this->resolveRenderView($views, $parameters);
+
+        if (null === $response) {
+            $response = new Response();
+        }
+
+        $response->setContent($content);
+
+        return $response;
+    }
+
+    /**
      * Streams a view.
      */
     protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse

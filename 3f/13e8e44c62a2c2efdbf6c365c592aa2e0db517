@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-11-26T16:11:37Z
+
+the question is how it is possible to have these non-existent keys in the output of `debug_backtrace`
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-11-26T16:30:55Z
+
+Also if it is possible, we should probably not just fallback to null here, it may have other impacts on this code path.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-27T19:15:33Z
+
+> the question is how it is possible to have these non-existent keys in the output of debug_backtrace
+
+it is, PHP inserts virtual frames in a few cases (can't remember exactly which ones)
+
+---------------------------------------------------------------------------
+
+by sylvainmetayer at 2019-11-27T22:08:22Z
+
+I have been trying to reproduce the error today to provide more context but I haven't be able to reproduce it yet.

@@ -349,6 +349,9 @@ class YamlFileLoaderTest extends TestCase
         $lazyDefinition = $container->getDefinition('lazy_context');
 
         $this->assertEquals([new IteratorArgument(['k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')]), new IteratorArgument([])], $lazyDefinition->getArguments(), '->load() parses lazy arguments');
+
+        $message = 'The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.';
+        $this->assertSame($message, $container->getDefinition('deprecated_service')->getDeprecationMessage('deprecated_service'));
     }
 
     public function testAutowire()
@@ -716,5 +719,18 @@ class YamlFileLoaderTest extends TestCase
         (new ResolveBindingsPass())->process($container);
 
         $this->assertSame('overridden', $container->get('bar')->quz);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The configuration key "factory" is unsupported for the service "foo" which is defined as an alias in %s.
+     * @expectedDeprecation The configuration key "parent" is unsupported for the service "foo" which is defined as an alias in %s.
+     */
+    public function testAliasDefinitionContainsUnsupportedElements()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('legacy_invalid_alias_definition.yml');
+        $this->assertTrue($container->has('foo'));
     }
 }

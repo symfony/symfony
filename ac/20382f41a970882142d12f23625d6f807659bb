@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-11-25T23:24:59Z
+
+We already have `TwigErrorRenderer` in TwigBridge, what about move the `SerializerErrorRenderer` + definition to the Serializer component instead?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-11-26T08:21:29Z
+
+Good idea @yceruto, done
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-11-26T16:24:36Z
+
+Could we move the `SerializerErrorRenderer` class too? or it's too late :( ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-11-26T16:26:25Z
+
+I was wondering if we could make these error renderers `@experimental` or `@internal` ... ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-26T16:36:09Z
+
+> I was wondering if we could make these error renderers `@experimental` or `@internal` ... ?
+
+internal: no, api platform uses it
+experimental: no, that's 4.4
+
+> Could we move the SerializerErrorRenderer class too? or it's too late :( ?
+
+I think we still can, wdyt @dunglas ?

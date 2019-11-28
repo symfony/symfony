@@ -267,7 +267,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Returns a rendered view resolved for several templates.
      */
-    protected function resolveRenderView(array $views, array $parameters = []): Response
+    protected function resolveRenderView(array $views, array $parameters = []): string
     {
         if (!$views) {
             throw new \InvalidArgumentException('No templates to resolve.');

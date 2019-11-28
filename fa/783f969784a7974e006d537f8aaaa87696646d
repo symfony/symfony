@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by Bilge at 2019-10-31T09:01:27Z
+
+> It also changes the keys sorting to display the numeric namespaces first.
+
+Why not just stick to fixing the bug? It's not strictly a bug that numeric entries come before or after alphabet entries; that's a personal preference and probably breaks someone's workflow.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-10-31T13:15:25Z
+
+This bug proves that numeric namespaces were not taken into account when the code was written. Therefore it's a good occasion to improve their support in addition to purely fixing it.
+
+Displaying the numeric namespaces first is a change that makes sense to me, not because it's a personal preference but because comparing items as strings with the `SORT_STRING` flag seems the best option since we are displaying strings. Turns out numerics come before letters with this flag...
+
+I doubt this is going to break someone workflow since numeric namespaces are currently not displayed correctly at all (except 0). By fixing the bug, we are already changing the output anyway. Also, I doubt we have a BC break policy on commands output.
+
+Of course, this change is a proposition that I will gladly revert if it is considered useless / bad / not backward compatible by a majority.
+
+---------------------------------------------------------------------------
+
+by Bilge at 2019-11-01T11:46:22Z
+
+>I doubt this is going to break someone workflow
+
+I was trying not to make this about me, but the implication was that it breaks *my* workflow. I like my custom commands to appear at the end of the list so they don't always scroll off the top of the terminal when listing commands. Using numeric namespaces currently accomplishes this, but with your proposed change, one would have to rename everything to begin with *z* or some other late-sorted character to achieve the same result.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-28T09:53:10Z
+
+Could you please add a test case?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-11-28T13:24:32Z
+
+I added a test. There is one edge case we don't support: when you have "0" as the command namespace, its sorted order depends of its processing order. See https://3v4l.org/SJcMB.

@@ -202,6 +202,24 @@ CSV
         ]));
     }
 
+    public function testEncodeCustomSettingsPassedInConstructor()
+    {
+        $encoder = new CsvEncoder([
+            CsvEncoder::DELIMITER_KEY => ';',
+            CsvEncoder::ENCLOSURE_KEY => "'",
+            CsvEncoder::ESCAPE_CHAR_KEY => '|',
+            CsvEncoder::KEY_SEPARATOR_KEY => '-',
+        ]);
+        $value = ['a' => 'he\'llo', 'c' => ['d' => 'foo']];
+
+        $this->assertSame(<<<'CSV'
+a;c-d
+'he''llo';foo
+
+CSV
+        , $encoder->encode($value, 'csv'));
+    }
+
     public function testEncodeEmptyArray()
     {
         $this->assertEquals("\n\n", $this->encoder->encode([], 'csv'));
@@ -373,6 +391,15 @@ CSV
             , $this->encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
                 CsvEncoder::NO_HEADERS_KEY => true,
             ]));
+        $encoder = new CsvEncoder([CsvEncoder::NO_HEADERS_KEY => true]);
+        $this->assertSame(<<<'CSV'
+a,b
+c,d
+
+CSV
+            , $encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+            ]));
     }
 
     public function testSupportsDecoding()
@@ -524,6 +551,23 @@ CSV
         ]));
     }
 
+    public function testDecodeCustomSettingsPassedInConstructor()
+    {
+        $encoder = new CsvEncoder([
+            CsvEncoder::DELIMITER_KEY => ';',
+            CsvEncoder::ENCLOSURE_KEY => "'",
+            CsvEncoder::ESCAPE_CHAR_KEY => '|',
+            CsvEncoder::KEY_SEPARATOR_KEY => '-',
+            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
+        ]);
+        $expected = [['a' => 'hell\'o', 'bar' => ['baz' => 'b']]];
+        $this->assertEquals($expected, $encoder->decode(<<<'CSV'
+a;bar-baz
+'hell''o';b;c
+CSV
+        , 'csv'));
+    }
+
     public function testDecodeMalformedCollection()
     {
         $expected = [
@@ -550,6 +594,15 @@ CSV
     public function testDecodeWithoutHeader()
     {
         $this->assertEquals([['a', 'b'], ['c', 'd']], $this->encoder->decode(<<<'CSV'
+a,b
+c,d
+
+CSV
+        , 'csv', [
+            CsvEncoder::NO_HEADERS_KEY => true,
+        ]));
+        $encoder = new CsvEncoder([CsvEncoder::NO_HEADERS_KEY => true]);
+        $this->assertEquals([['a', 'b'], ['c', 'd']], $encoder->decode(<<<'CSV'
 a,b
 c,d
 

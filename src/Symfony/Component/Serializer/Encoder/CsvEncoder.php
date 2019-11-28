@@ -40,6 +40,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         self::HEADERS_KEY => [],
         self::KEY_SEPARATOR_KEY => '.',
         self::NO_HEADERS_KEY => false,
+        self::AS_COLLECTION_KEY => false,
     ];
 
     /**
@@ -101,7 +102,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         $headers = array_merge(array_values($headers), array_diff($this->extractHeaders($data), $headers));
 
-        if (!($context[self::NO_HEADERS_KEY] ?? false)) {
+        if (!($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY])) {
             fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
         }
 
@@ -147,7 +148,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             if (null === $headers) {
                 $nbHeaders = $nbCols;
 
-                if ($context[self::NO_HEADERS_KEY] ?? false) {
+                if ($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY]) {
                     for ($i = 0; $i < $nbCols; ++$i) {
                         $headers[] = [$i];
                     }
@@ -187,7 +188,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         fclose($handle);
 
-        if ($context[self::AS_COLLECTION_KEY] ?? false) {
+        if ($context[self::AS_COLLECTION_KEY] ?? $this->defaultContext[self::AS_COLLECTION_KEY]) {
             return $result;
         }
 

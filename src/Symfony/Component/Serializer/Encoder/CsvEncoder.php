@@ -37,7 +37,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     private $formulasStartCharacters = ['=', '-', '+', '@'];
     private $defaultContext = [
-        self::AS_COLLECTION_KEY => true,
         self::DELIMITER_KEY => ',',
         self::ENCLOSURE_KEY => '"',
         self::ESCAPE_CHAR_KEY => '',
@@ -45,7 +44,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         self::HEADERS_KEY => [],
         self::KEY_SEPARATOR_KEY => '.',
         self::NO_HEADERS_KEY => false,
-        self::AS_COLLECTION_KEY => false,
+        self::AS_COLLECTION_KEY => true,
         self::OUTPUT_UTF8_BOM_KEY => false,
     ];
 

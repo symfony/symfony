@@ -145,7 +145,7 @@ class Configuration
     {
         parse_str($serializedConfiguration, $normalizedConfiguration);
         foreach (array_keys($normalizedConfiguration) as $key) {
-            if (!\in_array($key, ['max', 'disabled', 'verbose'], true)) {
+            if (!\in_array($key, ['max', 'disabled', 'verbose', 'regex'], true)) {
                 throw new \InvalidArgumentException(sprintf('Unknown configuration option "%s"', $key));
             }
         }
@@ -161,7 +161,7 @@ class Configuration
 
         return new self(
             isset($normalizedConfiguration['max']) ? $normalizedConfiguration['max'] : [],
-            '',
+            $normalizedConfiguration['regex'] ?? '',
             $verboseOutput
         );
     }

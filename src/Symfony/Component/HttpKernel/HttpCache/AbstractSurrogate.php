@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Abstract class implementing Surrogate capabilities to Request and Response instances.
@@ -93,7 +94,13 @@ abstract class AbstractSurrogate implements SurrogateInterface
         $subRequest = Request::create($uri, Request::METHOD_GET, [], $cache->getRequest()->cookies->all(), [], $cache->getRequest()->server->all());
 
         try {
-            $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+            $kernel = $cache->getKernel();
+
+            if ($kernel instanceof KernelInterface) {
+                $kernel->shutdown();
+            }
+
+            $response = $cache->handle($subRequest, HttpKernelInterface::MASTER_REQUEST, true);
 
             if (!$response->isSuccessful()) {
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $subRequest->getUri(), $response->getStatusCode()));

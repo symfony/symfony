@@ -49,6 +49,6 @@ class TestBundle extends Bundle
             }
         });
 
-        $container->addCompilerPass(new CheckTypeDeclarationsPass(true, ['http_client', '.debug.http_client']), PassConfig::TYPE_AFTER_REMOVING, -100);
+        $container->addCompilerPass(new CheckTypeDeclarationsPass(true), PassConfig::TYPE_AFTER_REMOVING, -100);
     }
 }

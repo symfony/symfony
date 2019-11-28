@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -37,16 +38,14 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     private const SCALAR_TYPES = ['int', 'float', 'bool', 'string'];
 
     private $autoload;
-    private $ignoredServices;
 
     /**
      * @param bool $autoload Whether services who's class in not loaded should be checked or not.
      *                       Defaults to false to save loading code during compilation.
      */
-    public function __construct(bool $autoload = false, array $ignoredServices = [])
+    public function __construct(bool $autoload = false)
     {
         $this->autoload = $autoload;
-        $this->ignoredServices = array_flip($ignoredServices);
     }
 
     /**
@@ -54,7 +53,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
-        if (!$value instanceof Definition || isset($this->ignoredServices[$this->currentId])) {
+        if (!$value instanceof Definition || $value->hasErrors()) {
             return parent::processValue($value, $isRoot);
         }
 
@@ -71,7 +70,15 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         }
 
         foreach ($value->getMethodCalls() as $methodCall) {
-            $reflectionMethod = $this->getReflectionMethod($value, $methodCall[0]);
+            try {
+                $reflectionMethod = $this->getReflectionMethod($value, $methodCall[0]);
+            } catch (RuntimeException $e) {
+                if ($value->getFactory()) {
+                    continue;
+                }
+
+                throw $e;
+            }
 
             $this->checkTypeDeclarations($value, $reflectionMethod, $methodCall[1]);
         }

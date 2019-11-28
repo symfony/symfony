@@ -46,4 +46,16 @@ class PhpExecutableFinderTest extends TestCase
             $this->assertEquals($f->findArguments(), [], '::findArguments() returns no arguments');
         }
     }
+
+    public function testNotExitsBinaryFile()
+    {
+        $f = new PhpExecutableFinder();
+        $phpBinaryEnv = PHP_BINARY;
+        putenv('PHP_BINARY=/usr/local/php/bin/php-invalid');
+
+        $this->assertFalse($f->find(), '::find() returns false because of not exist file');
+        $this->assertFalse($f->find(false), '::find(false) returns false because of not exist file');
+
+        putenv('PHP_BINARY='.$phpBinaryEnv);
+    }
 }

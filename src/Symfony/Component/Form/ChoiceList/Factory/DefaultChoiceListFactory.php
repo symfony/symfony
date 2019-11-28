@@ -105,6 +105,14 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                     unset($otherViews[$key]);
                 }
             }
+
+            foreach ($preferredViewsOrder as $key => $groupViewsOrder) {
+                if ($groupViewsOrder) {
+                    $preferredViewsOrder[$key] = min($groupViewsOrder);
+                } else {
+                    unset($preferredViewsOrder[$key]);
+                }
+            }
         } else {
             // Otherwise use the original structure of the choices
             self::addChoiceViewsFromStructuredValues(
@@ -249,6 +257,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $preferredViews[$groupLabel] = new ChoiceGroupView($groupLabel);
                 $otherViews[$groupLabel] = new ChoiceGroupView($groupLabel);
             }
+            if (!isset($preferredViewsOrder[$groupLabel])) {
+                $preferredViewsOrder[$groupLabel] = [];
+            }
 
             self::addChoiceView(
                 $choice,
@@ -259,7 +270,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $attr,
                 $isPreferred,
                 $preferredViews[$groupLabel]->choices,
-                $preferredViewsOrder,
+                $preferredViewsOrder[$groupLabel],
                 $otherViews[$groupLabel]->choices
             );
         }

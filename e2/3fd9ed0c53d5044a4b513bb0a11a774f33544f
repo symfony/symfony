@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-11-26T15:05:00Z
+
+how does your ArrayInput looks like ? this is meant to be an array of strings, so why is there an integer there ?
+
+---------------------------------------------------------------------------
+
+by Tavafi at 2019-11-26T15:09:34Z
+
+@stof I am using [lorisleiva/laravel-deployer](https://github.com/lorisleiva/laravel-deployer).
+I get this error when I run `php artisan deploy --hosts='IP' -vvv`.
+The error happens when I pass `-vvv`.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-11-26T16:04:07Z
+
+OK, then we would have to see what `artisan deploy` does. It is probably the one instantiating an ArrayInput (the console itself is meant to use the ArgvInput implementation)

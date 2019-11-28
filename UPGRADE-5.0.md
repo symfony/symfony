@@ -271,6 +271,9 @@ HttpFoundation
  * `ApacheRequest` has been removed, use the `Request` class instead.
  * The third argument of the `HeaderBag::get()` method has been removed, use method `all()` instead.
  * Getting the container from a non-booted kernel is not possible anymore.
+ * [BC BREAK] `PdoSessionHandler` with MySQL changed the type of the lifetime column,
+   make sure to run `ALTER TABLE sessions MODIFY sess_lifetime INTEGER UNSIGNED NOT NULL` to
+   update your database.
 
 HttpKernel
 ----------

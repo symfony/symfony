@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by andrew-demb at 2019-11-28T07:51:06Z
+
+My use case:
+I replaced `ExceptionListener` usage in favor `ErrorListener` (as deprecation message describes) and I expect, that my (not updated - with used old-namespaced exception class in argument typehint) controller will work.

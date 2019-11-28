@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-28T11:14:31Z
+
+It looks like we broke a test case sorry.
+
+---------------------------------------------------------------------------
+
+by rimas-kudelis at 2019-11-28T11:20:50Z
+
+Should I revert to checking for actual classes then, or change tests instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-28T11:27:43Z
+
+> revert to checking for actual classes
+
+yes please

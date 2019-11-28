@@ -146,6 +146,8 @@ final class MetadataAwareNameConverterTest extends TestCase
         return [
             ['buz', 'buz', ['groups' => ['a']]],
             ['buzForExport', 'buz', ['groups' => ['b']]],
+            ['buz', 'buz', ['groups' => 'a']],
+            ['buzForExport', 'buz', ['groups' => 'b']],
             ['buz', 'buz', ['groups' => ['c']]],
             ['buz', 'buz', []],
         ];

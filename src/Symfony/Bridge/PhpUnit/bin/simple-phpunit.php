@@ -14,15 +14,21 @@
 
 error_reporting(-1);
 
-$getEnvVar = function ($name, $default = false) {
+global $argv, $argc;
+$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
+$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
+$getEnvVar = function ($name, $default = false) use ($argv) {
     if (false !== $value = getenv($name)) {
         return $value;
     }
 
     static $phpunitConfig = null;
     if (null === $phpunitConfig) {
+        $opt = min(array_search('-c', $opts = array_reverse($argv), true) ?: INF, array_search('--configuration', $opts, true) ?: INF);
         $phpunitConfigFilename = null;
-        if (file_exists('phpunit.xml')) {
+        if (INF !== $opt && isset($opts[$opt - 1])) {
+            $phpunitConfigFilename = $opts[$opt - 1];
+        } elseif (file_exists('phpunit.xml')) {
             $phpunitConfigFilename = 'phpunit.xml';
         } elseif (file_exists('phpunit.xml.dist')) {
             $phpunitConfigFilename = 'phpunit.xml.dist';
@@ -184,10 +190,6 @@ EOPHP
     file_put_contents(".$PHPUNIT_VERSION_DIR.md5", $configurationHash);
     chdir($oldPwd);
 }
-
-global $argv, $argc;
-$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
-$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
 
 if ($PHPUNIT_VERSION < 8.0) {
     $argv = array_filter($argv, function ($v) use (&$argc) { if ('--do-not-cache-result' !== $v) return true; --$argc; return false; });

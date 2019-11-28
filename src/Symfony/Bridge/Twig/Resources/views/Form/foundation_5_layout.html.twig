@@ -277,7 +277,7 @@
     {%- if help is not empty -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
-    <div class="row">
+    <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="large-12 columns{% if (not compound or force_error|default(false)) and not valid %} error{% endif %}">
             {{- form_label(form) -}}
             {{- form_widget(form, widget_attr) -}}
@@ -308,7 +308,7 @@
 {%- endblock datetime_row %}
 
 {% block checkbox_row -%}
-    <div class="row">
+    <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="large-12 columns{% if not valid %} error{% endif %}">
             {{ form_widget(form) }}
             {{ form_errors(form) }}
@@ -317,7 +317,7 @@
 {%- endblock checkbox_row %}
 
 {% block radio_row -%}
-    <div class="row">
+    <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="large-12 columns{% if not valid %} error{% endif %}">
             {{ form_widget(form) }}
             {{ form_errors(form) }}

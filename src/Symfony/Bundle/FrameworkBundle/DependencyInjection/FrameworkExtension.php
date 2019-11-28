@@ -1510,7 +1510,7 @@ class FrameworkExtension extends Extension
             $storeDefinitions = [];
             foreach ($resourceStores as $storeDsn) {
                 $storeDsn = $container->resolveEnvPlaceholders($storeDsn, null, $usedEnvs);
-                $storeDefinition = new Definition(PersistingStoreInterface::class);
+                $storeDefinition = new Definition(interface_exists(StoreInterface::class) ? StoreInterface::class : PersistingStoreInterface::class);
                 $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
                 $storeDefinition->setArguments([$storeDsn]);
 

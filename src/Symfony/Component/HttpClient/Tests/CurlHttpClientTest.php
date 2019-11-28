@@ -128,7 +128,7 @@ class CurlHttpClientTest extends HttpClientTestCase
             return $client;
         }
 
-        if (200 !== $client->request('GET', 'http://127.0.0.1:8057/json')->getStatusCode()) {
+        if (['application/json'] !== $client->request('GET', 'http://127.0.0.1:8057/json')->getHeaders()['content-type']) {
             $this->markTestSkipped('symfony/http-client-contracts >= 2.0.1 required');
         }
 

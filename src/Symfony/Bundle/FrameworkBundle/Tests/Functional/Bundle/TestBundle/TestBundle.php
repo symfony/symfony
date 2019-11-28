@@ -37,6 +37,6 @@ class TestBundle extends Bundle
         $extension->setCustomConfig(new CustomConfig());
 
         $container->addCompilerPass(new AnnotationReaderPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new CheckTypeDeclarationsPass(true, ['http_client', '.debug.http_client']), PassConfig::TYPE_AFTER_REMOVING, -100);
+        $container->addCompilerPass(new CheckTypeDeclarationsPass(true), PassConfig::TYPE_AFTER_REMOVING, -100);
     }
 }

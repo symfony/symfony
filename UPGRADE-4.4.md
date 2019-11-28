@@ -274,7 +274,17 @@ TwigBridge
 TwigBundle
 ----------
 
- * Deprecated `twig.exception_controller` configuration option, set it to "null" and use `framework.error_controller` instead:
+ * Deprecated `twig.exception_controller` configuration option.
+
+   If you were not using this option previously, set it to `null`:
+
+   After:
+   ```yaml
+   twig:
+       exception_controller: null
+   ```
+
+   If you were using this option previously, set it to `null` and use `framework.error_controller` instead:
 
    Before:
    ```yaml

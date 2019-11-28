@@ -431,10 +431,12 @@ class EventDispatcherTest extends TestCase
         $this->dispatcher->dispatch('foo', new Event());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling the "Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch()" method with the event name as the first argument is deprecated since Symfony 4.3, pass it as the second argument and provide the event object as the first argument instead.
+     */
     public function testLegacySignatureWithNewEventObject()
     {
-        $this->expectException('TypeError');
-        $this->expectExceptionMessage('Argument 1 passed to "Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch()" must be an object, string given.');
         $this->dispatcher->dispatch('foo', new ContractsEvent());
     }
 }

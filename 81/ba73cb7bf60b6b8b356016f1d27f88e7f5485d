@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-09-25T10:13:17Z
+
+@fancyweb FYI, #33688 has been merged
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-09-26T15:56:47Z
+
+Here is what I did :
+
+1. Remove all defaults (cf https://github.com/symfony/symfony/pull/33688)
+
+2. About https://github.com/symfony/symfony/pull/33573#discussion_r324256780 -> Always add current attr values (like what we do for the label attr class). That means end users can easily add attr values but not remove them. That's consistent with the current codebase + better for DX. If end users wants to remove default classes, they just have to override the whole block like currently. Creating dedicated blocks as I suggested is possible but requires more code and is probably not needed. Removing default classes makes no sense anyway (since it probably break the display).
+
+---------------------------------------------------------------------------
+
+by loevgaard at 2019-11-21T08:57:49Z
+
+What's the status with this PR? :)

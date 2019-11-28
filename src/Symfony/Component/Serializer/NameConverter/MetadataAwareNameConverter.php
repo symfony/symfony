@@ -123,7 +123,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             if (!$groups && ($context[AbstractNormalizer::GROUPS] ?? [])) {
                 continue;
             }
-            if ($groups && !array_intersect($groups, $context[AbstractNormalizer::GROUPS] ?? [])) {
+            if ($groups && !array_intersect($groups, (array) ($context[AbstractNormalizer::GROUPS] ?? []))) {
                 continue;
             }
 

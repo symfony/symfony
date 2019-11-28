@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-10-18T11:09:39Z
+
+It looks like reading `$context[self::AS_COLLECTION_KEY]` has the same issue.
+Wouldn't it make sense to patch and use `getCsvOptions()` instead?
+
+---------------------------------------------------------------------------
+
+by savedario at 2019-10-18T11:58:38Z
+
+As in: make getCsvOptions() return two extra variables ?
+
+---------------------------------------------------------------------------
+
+by savedario at 2019-10-23T14:45:02Z
+
+I tried, but when it was time to update the test, I realized that getCsvOptions() returns a different set of variables in encode() v/s decode().
+The original version seemed less invasive... and AS_COLLECTION_KEY will soon be deprecated.
+
+---------------------------------------------------------------------------
+
+by savedario at 2019-10-25T13:36:04Z
+
+My proposed changes are done, but I don't know how to correct the failing AppVeyor...

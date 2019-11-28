@@ -81,7 +81,11 @@ class RememberMeFactory implements SecurityFactoryInterface
                     throw new \RuntimeException('Each "security.remember_me_aware" tag must have a provider attribute.');
                 }
 
-                $userProviders[] = new Reference($attribute['provider']);
+                // context listeners don't need a provider
+                if ('none' !== $attribute['provider']) {
+                    $userProviders[] = new Reference($attribute['provider']);
+                }
+
                 $container
                     ->getDefinition($serviceId)
                     ->addMethodCall('setRememberMeServices', [new Reference($rememberMeServicesId)])

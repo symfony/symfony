@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-11-24T12:23:14Z
+
+For us this now gives the following error:
+
+```
+Invalid definition for service ".errored..service_locator.a6hFUa8.App\Entity\Some":
+"App\Entity\Some::__construct()" requires 3 arguments, 0 passed.
+```
+
+which is excluded from PSR loading in services.yaml

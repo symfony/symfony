@@ -46,13 +46,13 @@ class ServerBag extends ParameterBag
             /*
              * php-cgi under Apache does not pass HTTP Basic user/pass to PHP by default
              * For this workaround to work, add these lines to your .htaccess file:
-             * RewriteCond %{HTTP:Authorization} ^(.+)$
-             * RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+             * RewriteCond %{HTTP:Authorization} .+
+             * RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
              *
              * A sample .htaccess file:
              * RewriteEngine On
-             * RewriteCond %{HTTP:Authorization} ^(.+)$
-             * RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+             * RewriteCond %{HTTP:Authorization} .+
+             * RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
              * RewriteCond %{REQUEST_FILENAME} !-f
              * RewriteRule ^(.*)$ app.php [QSA,L]
              */

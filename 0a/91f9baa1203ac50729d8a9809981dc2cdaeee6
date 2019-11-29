@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-11-27T08:11:06Z
+
+@lyrixx thanks for this contribution. In order to make this ready to be documented, could you please add some little example to the pull request description. Also, please tell us if there are some things to keep in mind about this feature (e.g. edge cases where it doesn't work, etc.) Thanks!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-11-27T09:42:13Z
+
+@javiereguiluz I'm not sure it worth documenting it. This method is discoverable easily with autocomplete and It make what it is supposed to without edge case. Anyway I added a s mall example

@@ -63,6 +63,10 @@ trait ServiceLocatorTrait
 
         $this->loading[$id] = $id;
         try {
+            if (!\is_callable($this->factories[$id])) {
+                return $this->factories[$id];
+            }
+
             return $this->factories[$id]($this);
         } finally {
             unset($this->loading[$id]);

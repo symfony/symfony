@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-29T15:45:06Z
+
+If we can prevent the BC break, it's better, isn't it?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-11-29T16:01:37Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-11-29T16:31:34Z
+
+I fail to see how this prevents the BC break when Monolog 2 is installed. In that case we still add the return type declaration.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-11-29T16:37:25Z
+
+In Monolog 2, the interfaces `ProcessableHandlerInterface` and `FormattableHandlerInterface have been removed from `AbstractHandler`.
+
+If you don't ilmplement them, things won't behave as expected
+
+Your PR has a bug, as the method `formatRecord` call `getFormater` which does not exists anymore https://github.com/symfony/symfony/blob/0a2a7fe46d7aaca231a163642e52728e3d384c75/src/Symfony/Bridge/Monolog/Handler/ServerLogHandler.php#L112
+
+the BC break is coming from `Monolog: 2`. if one stays at Monolog 1, there is no PB break
+if one moves to 2, we follow `Monolog2` API.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-11-29T16:37:54Z
+
+sounds reasonable 👍

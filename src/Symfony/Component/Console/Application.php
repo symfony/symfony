@@ -1187,6 +1187,6 @@ class Application implements ResetInterface
 
     private function getPhpVersion(): string
     {
-        return sprintf('PHP <info>%s</info> (binary: %s)', PHP_VERSION, PHP_BINARY);
+        return sprintf('PHP <info>%s.%s.%s</info>', PHP_MAJOR_VERSION, PHP_MINOR_VERSION, PHP_RELEASE_VERSION);
     }
 }

@@ -36,9 +36,6 @@
         "symfony/http-kernel": "^4.4",
         "symfony/process": "^4.2|^5.0"
     },
-    "conflict": {
-        "symfony/http-kernel": "<4.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },
         "exclude-from-classmap": [

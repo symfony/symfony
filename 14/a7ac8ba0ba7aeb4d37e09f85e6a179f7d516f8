@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-28T09:33:35Z
+
+Oh, and please add a test case if possible :)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-11-29T09:49:56Z
+
+I used existing helper functions and added a test case.

@@ -49,4 +49,16 @@ class HandlerFailedException extends RuntimeException
     {
         return $this->exceptions;
     }
+
+    public function getNestedExceptionOfClass(string $exceptionClassName): array
+    {
+        return array_values(
+            array_filter(
+                $this->exceptions,
+                function ($exception) use ($exceptionClassName) {
+                    return is_a($exception, $exceptionClassName);
+                }
+            )
+        );
+    }
 }

@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
 /**
@@ -431,7 +432,7 @@ trait ControllerTrait
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return object|null
+     * @return UserInterface|object|null
      *
      * @throws \LogicException If SecurityBundle is not available
      *

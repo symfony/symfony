@@ -190,7 +190,7 @@ class Application implements ResetInterface
     public function doRun(InputInterface $input, OutputInterface $output)
     {
         if (true === $input->hasParameterOption(['--version', '-V'], true)) {
-            $output->writeln($this->getLongVersion());
+            $output->writeln($this->getLongVersion().', '.$this->getPhpVersion());
 
             return 0;
         }
@@ -327,7 +327,7 @@ class Application implements ResetInterface
      */
     public function getHelp()
     {
-        return $this->getLongVersion();
+        return $this->getLongVersion().', '.$this->getPhpVersion();
     }
 
     /**
@@ -1183,5 +1183,10 @@ class Application implements ResetInterface
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);
         }
+    }
+
+    private function getPhpVersion(): string
+    {
+        return sprintf('PHP <info>%s</info> (binary: %s)', PHP_VERSION, PHP_BINARY);
     }
 }

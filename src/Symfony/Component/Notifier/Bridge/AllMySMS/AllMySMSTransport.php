@@ -55,21 +55,20 @@ final class AllMySMSTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
         }
 
-        $endpoint = sprintf('https://%s/http/9.0/', $this->getEndpoint());
+        $endpoint = sprintf('https://%s/sms/send/', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
+            'auth_basic' => base64_encode($this->login.':'.$this->apiKey),
             'body' => [
-                'login' => $this->login,
-                'apiKey' => $this->apiKey,
-                'tpoa' => $this->tpoa,
-                'mobile' => $message->getPhone(),
-                'message' => $message->getSubject(),
+                'from' => $this->tpoa,
+                'to' => $message->getPhone(),
+                'text' => $message->getSubject(),
             ],
         ]);
 
-        $result = $response->toArray();
+        if (201 != $response->getStatusCode()) {
+            $error = $response->toArray(false);
 
-        if (100 != $result['status']) {
-            throw new TransportException(sprintf('Unable to send the SMS: %s (%s).', $result['statusText'], $result['status']), $response);
+            throw new TransportException(sprintf('Unable to send the SMS: %s (%s).', $error['description'], $error['code']), $response);
         }
     }
 }

@@ -128,7 +128,8 @@ class TwigExtension extends Extension
             $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method']];
         }
 
-        $container->getDefinition('twig')->replaceArgument(1, array_intersect_key($config, [
+        $definition = $container->getDefinition('twig');
+        $definition->replaceArgument(1, array_intersect_key($config, [
             'debug' => true,
             'charset' => true,
             'base_template_class' => true,
@@ -138,6 +139,7 @@ class TwigExtension extends Extension
             'auto_reload' => true,
             'optimizations' => true,
         ]));
+        $definition->setArgument(2, $config['event_dispatcher'] ? new Reference($config['event_dispatcher']) : null);
 
         $container->registerForAutoconfiguration(\Twig_ExtensionInterface::class)->addTag('twig.extension');
         $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)->addTag('twig.loader');

@@ -164,8 +164,8 @@ Lock
  * Deprecated `Symfony\Component\Lock\StoreInterface` in favor of `Symfony\Component\Lock\BlockingStoreInterface` and
    `Symfony\Component\Lock\PersistingStoreInterface`.
  * `Factory` is deprecated, use `LockFactory` instead
- * Deprecated services `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract`, 
-   use `StoreFactory::createStore` instead. 
+ * Deprecated services `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract`,
+   use `StoreFactory::createStore` instead.
 
 Mailer
 ------
@@ -360,6 +360,7 @@ TwigBundle
 Validator
 ---------
 
+ * [BC BREAK] Using null as `$classValidatorRegexp` value in `DoctrineLoader::__construct` or `PropertyInfoLoader::__construct` will not enable auto-mapping for all classes anymore, use `'{.*}'` instead.
  * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`.
  * Deprecated using anything else than a `string` as the code of a `ConstraintViolation`, a `string` type-hint will
    be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`

@@ -29,6 +29,6 @@ trait AutoMappingTrait
         }
 
         // Fallback on the config
-        return null === $classValidatorRegexp || preg_match($classValidatorRegexp, $metadata->getClassName());
+        return null !== $classValidatorRegexp && preg_match($classValidatorRegexp, $metadata->getClassName());
     }
 }

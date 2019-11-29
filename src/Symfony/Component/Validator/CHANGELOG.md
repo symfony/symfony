@@ -4,19 +4,20 @@ CHANGELOG
 4.4.0
 -----
 
- * added `EnableAutoMapping` and `DisableAutoMapping` constraints to enable or disable auto mapping for class or a property 
+ * [BC BREAK] using null as `$classValidatorRegexp` value in `PropertyInfoLoader::__construct` will not enable auto-mapping for all classes anymore, use `'{.*}'` instead.
+ * added `EnableAutoMapping` and `DisableAutoMapping` constraints to enable or disable auto mapping for class or a property
  * using anything else than a `string` as the code of a `ConstraintViolation` is deprecated, a `string` type-hint will
    be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`
    method in 5.0
  * deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. Pass it as the first argument instead.
- * added the `compared_value_path` parameter in violations when using any 
+ * added the `compared_value_path` parameter in violations when using any
    comparison constraint with the `propertyPath` option.
  * added support for checking an array of types in `TypeValidator`
  * added a new `allowEmptyString` option to the `Length` constraint to allow rejecting empty strings when `min` is set, by setting it to `false`.
  * Added new `minPropertyPath` and `maxPropertyPath` options
    to `Range` constraint in order to get the value to compare
    from an array or object
- * added the `min_limit_path` and `max_limit_path` parameters in violations when using 
+ * added the `min_limit_path` and `max_limit_path` parameters in violations when using
    `Range` constraint with respectively the `minPropertyPath` and
    `maxPropertyPath` options
  * added a new `notInRangeMessage` option to the `Range` constraint that will

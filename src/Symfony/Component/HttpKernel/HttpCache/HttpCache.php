@@ -18,6 +18,7 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 
 /**
@@ -465,6 +466,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function forward(Request $request, $catch = false, Response $entry = null)
     {
+        // Shut down the kernel for every forwarded request so services etc. are fresh
+        $kernel = $this->getKernel();
+        if ($kernel instanceof KernelInterface) {
+            $kernel->shutdown();
+        }
+
         if ($this->surrogate) {
             $this->surrogate->addSurrogateCapability($request);
         }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
+use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -118,6 +119,10 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('templating')) {
             $loader = $container->getDefinition('twig.loader.filesystem');
             $loader->setMethodCalls(array_merge($twigLoader->getMethodCalls(), $loader->getMethodCalls()));
+
+            if (!method_exists(AssetExtension::class, 'getName')) {
+                $container->removeDefinition('templating.engine.twig');
+            }
 
             $twigLoader->clearTag('twig.loader');
         } else {

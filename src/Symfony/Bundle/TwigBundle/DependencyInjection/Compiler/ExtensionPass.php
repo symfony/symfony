@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
+use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

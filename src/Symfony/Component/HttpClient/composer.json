@@ -37,9 +37,6 @@
         "symfony/service-contracts": "^1.0|^2",
         "symfony/var-dumper": "^4.4|^5.0"
     },
-    "conflict": {
-        "symfony/http-kernel": "<4.4"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },
         "exclude-from-classmap": [

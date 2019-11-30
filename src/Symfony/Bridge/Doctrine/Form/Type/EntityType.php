@@ -50,6 +50,10 @@ class EntityType extends DoctrineType
      */
     public function getLoader(ObjectManager $manager, QueryBuilder $queryBuilder, string $class)
     {
+        if (!$queryBuilder instanceof QueryBuilder) {
+            throw new \TypeError(sprintf('Expected an instance of %s, but got %s.', QueryBuilder::class, \is_object($queryBuilder) ? \get_class($queryBuilder) : \gettype($queryBuilder)));
+        }
+
         return new ORMQueryBuilderLoader($queryBuilder);
     }
 
@@ -65,11 +69,17 @@ class EntityType extends DoctrineType
      * We consider two query builders with an equal SQL string and
      * equal parameters to be equal.
      *
+     * @param QueryBuilder $queryBuilder
+     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder): ?array
+    public function getQueryBuilderPartsForCachingHash($queryBuilder): ?array
     {
+        if (!$queryBuilder instanceof QueryBuilder) {
+            throw new \TypeError(sprintf('Expected an instance of %s, but got %s.', QueryBuilder::class, \is_object($queryBuilder) ? \get_class($queryBuilder) : \gettype($queryBuilder)));
+        }
+
         return [
             $queryBuilder->getQuery()->getSQL(),
             array_map([$this, 'parameterToArray'], $queryBuilder->getParameters()->toArray()),

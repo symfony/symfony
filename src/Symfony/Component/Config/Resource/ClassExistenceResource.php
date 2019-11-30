@@ -183,15 +183,17 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             }
 
             $props = [
-                'file' => $trace[$i]['file'],
-                'line' => $trace[$i]['line'],
+                'file' => isset($trace[$i]['file']) ? $trace[$i]['file'] : null,
+                'line' => isset($trace[$i]['line']) ? $trace[$i]['line'] : null,
                 'trace' => \array_slice($trace, 1 + $i),
             ];
 
             foreach ($props as $p => $v) {
-                $r = new \ReflectionProperty('Exception', $p);
-                $r->setAccessible(true);
-                $r->setValue($e, $v);
+                if (null !== $v) {
+                    $r = new \ReflectionProperty('Exception', $p);
+                    $r->setAccessible(true);
+                    $r->setValue($e, $v);
+                }
             }
         }
 

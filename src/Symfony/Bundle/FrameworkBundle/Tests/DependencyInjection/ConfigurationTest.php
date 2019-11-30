@@ -490,6 +490,7 @@ class ConfigurationTest extends TestCase
                 'dsn' => null,
                 'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
+                'message_bus' => null,
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),

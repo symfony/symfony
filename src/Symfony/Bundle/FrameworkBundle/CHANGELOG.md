@@ -6,6 +6,7 @@ CHANGELOG
 
  * Marked `MicroKernelTrait::configureRoutes()` as `@internal` and `@final`.
  * Deprecated not overriding `MicroKernelTrait::configureRouting()`.
+ * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
 
 5.0.0
 -----

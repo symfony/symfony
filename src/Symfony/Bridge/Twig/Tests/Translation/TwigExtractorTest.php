@@ -17,7 +17,6 @@ use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
-use Twig\Error\Error;
 use Twig\Loader\ArrayLoader;
 
 class TwigExtractorTest extends TestCase
@@ -101,23 +100,15 @@ class TwigExtractorTest extends TestCase
     /**
      * @dataProvider resourcesWithSyntaxErrorsProvider
      */
-    public function testExtractSyntaxError($resources)
+    public function testExtractSyntaxError($resources, array $messages)
     {
-        $this->expectException('Twig\Error\Error');
         $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
         $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
 
         $extractor = new TwigExtractor($twig);
-
-        try {
-            $extractor->extract($resources, new MessageCatalogue('en'));
-        } catch (Error $e) {
-            $this->assertSame(\dirname(__DIR__).strtr('/Fixtures/extractor/syntax_error.twig', '/', \DIRECTORY_SEPARATOR), $e->getFile());
-            $this->assertSame(1, $e->getLine());
-            $this->assertSame('Unclosed "block".', $e->getMessage());
-
-            throw $e;
-        }
+        $catalogue = new MessageCatalogue('en');
+        $extractor->extract($resources, $catalogue);
+        $this->assertSame($messages, $catalogue->all());
     }
 
     /**
@@ -126,9 +117,9 @@ class TwigExtractorTest extends TestCase
     public function resourcesWithSyntaxErrorsProvider()
     {
         return [
-            [__DIR__.'/../Fixtures'],
-            [__DIR__.'/../Fixtures/extractor/syntax_error.twig'],
-            [new \SplFileInfo(__DIR__.'/../Fixtures/extractor/syntax_error.twig')],
+            [__DIR__.'/../Fixtures', ['messages' => ['Hi!' => 'Hi!']]],
+            [__DIR__.'/../Fixtures/extractor/syntax_error.twig', []],
+            [new \SplFileInfo(__DIR__.'/../Fixtures/extractor/syntax_error.twig'), []],
         ];
     }
 

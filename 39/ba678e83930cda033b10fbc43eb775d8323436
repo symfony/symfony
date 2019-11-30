@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-11-09T06:41:35Z
+
+Can you point us to an official source for that association?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-11-09T07:04:27Z
+
+Here's a reliable source about this: https://www.loc.gov/preservation/digital/formats/fdd/fdd000379.shtml
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-11-09T07:08:03Z
+
+I'm not very comfortable with this PR as `.msg` seems very generic. Why isn't it in the official list we get from Apache?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-11-09T07:23:56Z
+
+Yes, this is tricky. For what is worth, here's some Apache source code using this MIME type: https://github.com/search?q=org%3Aapache+application%2Fvnd.ms-outlook&type=Code

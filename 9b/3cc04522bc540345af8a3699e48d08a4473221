@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by dbu at 2019-11-27T09:52:31Z
+
+hm, should i have done this against the 5.0 branch? i will port the fix there if maintainers agree with the fix...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-27T19:06:08Z
+
+This looks like something for 3.4 to me.
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-11-28T10:57:01Z
+
+o wow :-D
+guess it only became visible now with the strict type declarations... anything i can help further, or do you pick it up from here? i see that the ci is failing but it does not look related.

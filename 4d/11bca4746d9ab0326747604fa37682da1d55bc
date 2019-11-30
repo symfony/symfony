@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-26T11:04:34Z
+
+~Not that we might consider always calling guard's "supports()" methods non-lazily, but I don't think the current design allows it easily. Let me check.~ PR updated.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-11-26T11:06:49Z
+
+> In this case, it looks legit to me to require either the corresponding firewall to be stateless or anonymous to be set to `true` (both options disabling laziness).
+
+maybe we should allow to define a list of path for which you want to disable lazyness (the check paths of your OAuth callbacks could then be registered there)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-11-26T13:38:03Z
+
+> Not that we might consider always calling guard's "supports()" methods non-lazily, but I don't think the current design allows it easily. Let me check
+
+I was wondering about this too. On a high-level, with `anonymous: lazy`, it "should" be ok to call `supports()` on authentiicators. If the request should truly remain anonymous, then they authenticator will do nothing (i.e. return false from `supports()`). In other words: the authenticators would always be called, but then they could decide to allow the lazy anonymous to continue by doing nothing *or* to authenticate. However, I realize on a technical level, that might be difficult :).
+
+> Here's another problematic example: OAuth. When an OAuth server redirects back to my site...
+
+> In this case, it looks legit to me to require either the corresponding firewall to be stateless or
+> anonymous to be set to true (both options disabling laziness).
+
+Also, what about the `json_login` example @dunglas gave here: https://github.com/symfony/symfony/issues/34614#issuecomment-558356111 - I use `json_login` on stateful firewalls as a simple way to allow my JavaScript to authenticate. Would this also still require manually changing to `anonymous: true`?
+
+Thanks :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-26T19:11:13Z
+
+PR green in a minute :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-26T21:33:25Z
+
+PR ready, now with functional tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-27T20:45:55Z
+
+PR updated, last change: laziness now mandates extending `AbstractListener`.
+This makes things more BC/FC: one needs to explicitly opt-in to benefit from laziness.
+We might consider deprecating *not* extending `AbstractListener` in 5.1.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-29T15:19:55Z
+
+> Why not just skip/lazy-load the ContextListener and always call all other listeners?
+
+I don't understand what you mean sorry. The order is important so we cannot call one listener lazily. "just" here is missing the fact all this work is happening in the Security component, nothing is simple there :)

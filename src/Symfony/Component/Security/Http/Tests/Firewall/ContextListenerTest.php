@@ -36,6 +36,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class ContextListenerTest extends TestCase
@@ -262,8 +263,21 @@ class ContextListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $badRefreshedUser = new User('foobar', 'baz');
         $goodRefreshedUser = new User('foobar', 'bar');
-        $tokenStorage = $this->handleEventWithPreviousSession([new SupportingUserProvider($badRefreshedUser), new SupportingUserProvider($goodRefreshedUser)], $goodRefreshedUser, true);
+        $tokenStorage = $this->handleEventWithPreviousSession([new SupportingUserProvider($badRefreshedUser), new SupportingUserProvider($goodRefreshedUser)], $goodRefreshedUser);
         $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
+    }
+
+    public function testRememberMeGetsCanceledIfTokenIsDeauthenticated()
+    {
+        $tokenStorage = new TokenStorage();
+        $refreshedUser = new User('foobar', 'baz');
+
+        $rememberMeServices = $this->createMock(RememberMeServicesInterface::class);
+        $rememberMeServices->expects($this->once())->method('loginFail');
+
+        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)], null, $rememberMeServices);
+
+        $this->assertNull($tokenStorage->getToken());
     }
 
     public function testTryAllUserProvidersUntilASupportingUserProviderIsFound()
@@ -374,7 +388,7 @@ class ContextListenerTest extends TestCase
         return $session;
     }
 
-    private function handleEventWithPreviousSession($userProviders, UserInterface $user = null)
+    private function handleEventWithPreviousSession($userProviders, UserInterface $user = null, RememberMeServicesInterface $rememberMeServices = null)
     {
         $user = $user ?: new User('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
@@ -399,6 +413,10 @@ class ContextListenerTest extends TestCase
         }
 
         $listener = new ContextListener($tokenStorage, $userProviders, 'context_key', null, null, null, $sessionTrackerEnabler);
+
+        if ($rememberMeServices) {
+            $listener->setRememberMeServices($rememberMeServices);
+        }
         $listener(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
 
         if (null !== $usageIndex) {

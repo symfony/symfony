@@ -32,6 +32,7 @@ use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
  * ContextListener manages the SecurityContext persistence through a session.
@@ -52,6 +53,7 @@ class ContextListener extends AbstractListener implements ListenerInterface
     private $dispatcher;
     private $registered;
     private $trustResolver;
+    private $rememberMeServices;
     private $sessionTrackerEnabler;
 
     /**
@@ -136,6 +138,10 @@ class ContextListener extends AbstractListener implements ListenerInterface
 
         if ($token instanceof TokenInterface) {
             $token = $this->refreshUser($token);
+
+            if (!$token && $this->rememberMeServices) {
+                $this->rememberMeServices->loginFail($request);
+            }
         } elseif (null !== $token) {
             if (null !== $this->logger) {
                 $this->logger->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);
@@ -314,5 +320,10 @@ class ContextListener extends AbstractListener implements ListenerInterface
     public static function handleUnserializeCallback($class)
     {
         throw new \ErrorException('Class not found: '.$class, 0x37313bc);
+    }
+
+    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
+    {
+        $this->rememberMeServices = $rememberMeServices;
     }
 }

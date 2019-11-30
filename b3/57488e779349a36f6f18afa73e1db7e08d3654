@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-29T15:21:09Z
+
+What's the context? Doesn't the container already remove the service? How did you spot this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-29T15:21:45Z
+
+Oups, this triggers a deprecation :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-11-29T16:00:44Z
+
+Here is an example: https://travis-ci.org/FriendsOfSymfony/FOSRestBundle/jobs/618583998#L305

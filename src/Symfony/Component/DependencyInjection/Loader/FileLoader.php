@@ -36,6 +36,7 @@ abstract class FileLoader extends BaseFileLoader
     protected $instanceof = [];
     protected $interfaces = [];
     protected $singlyImplemented = [];
+    protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator)
     {
@@ -115,6 +116,10 @@ abstract class FileLoader extends BaseFileLoader
                     $this->singlyImplemented[$interface] = ($this->singlyImplemented[$interface] ?? $class) !== $class ? false : $class;
                 }
             }
+        }
+
+        if ($this->autoRegisterAliasesForSinglyImplementedInterfaces) {
+            $this->registerAliasesForSinglyImplementedInterfaces();
         }
     }
 

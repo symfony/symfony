@@ -4,7 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
- * Add event dispatcher to the config, by default escaped to null. related to: https://github.com/twigphp/Twig/pull/3207
+ * Add event dispatcher to the config for twig, when given, twig will fire an pre-render event before rendering a template.
  * updated default value for the `strict_variables` option to `%kernel.debug%` parameter
  * removed support to load templates from the legacy directories `src/Resources/views/` and `src/Resources/<BundleName>/views/`
  * removed `TwigEngine` class, use `Twig\Environment` instead

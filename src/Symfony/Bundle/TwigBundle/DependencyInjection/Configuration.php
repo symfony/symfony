@@ -210,7 +210,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->variableNode('event_dispatcher')
-                    ->info('The event dispatcher')
+                    ->info('When given an event dispatcher, twig will fire a pre-render event, just before rendering a template.')
                     ->defaultNull()->end()
                 ->end()
             ->end()

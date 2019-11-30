@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by chr-hertel at 2019-11-25T07:55:14Z
+
+maybe we should add a test to ensure channel is optional? not sure if it fits better in factory or transport test 🤔

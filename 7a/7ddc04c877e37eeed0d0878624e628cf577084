@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-11-29T12:40:52Z
+
+This is not the right fix IMO: this catches the errors at the level of a Twig top-level folder. So it will ignore any other template in the same folder if one of them has an issue (so ignoring twig-bridge entirely for instance). We should rather catch things for each template separately, to keep processing others.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-11-29T12:41:28Z
+
+Also, doing this in the extractor would also mean that it applies to other tools using the extractor.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-11-29T12:53:26Z
+
+I would not do it at the extractor level as it would mean that we would not be able to emit a notice (which might be fine after all). Ignoring a directory is not a problem IMO as there is a syntax error that should be fixed if this is a directory in the user project, and for built-in templates, we don't really care.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-11-29T13:51:06Z
+
+well, bundles might have some templates used for specific case like that. And this extractor would then skip the whole bundle templates.
+
+The translation extractor is not responsible for linting templates (we have a command for that), and ignoring valid templates makes it less useful.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-11-29T13:54:31Z
+
+@stof code updated :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-29T15:33:31Z
+
+But tests should be updated :)

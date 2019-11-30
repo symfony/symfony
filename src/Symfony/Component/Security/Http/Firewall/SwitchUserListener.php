@@ -37,7 +37,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final
  */
-class SwitchUserListener
+class SwitchUserListener extends AbstractListener
 {
     const EXIT_VALUE = '_exit';
 
@@ -71,14 +71,10 @@ class SwitchUserListener
     }
 
     /**
-     * Handles the switch to another user.
-     *
-     * @throws \LogicException if switching to a user failed
+     * {@inheritdoc}
      */
-    public function __invoke(RequestEvent $event)
+    public function supports(Request $request): ?bool
     {
-        $request = $event->getRequest();
-
         // usernames can be falsy
         $username = $request->get($this->usernameParameter);
 
@@ -88,8 +84,25 @@ class SwitchUserListener
 
         // if it's still "empty", nothing to do.
         if (null === $username || '' === $username) {
-            return;
+            return false;
         }
+
+        $request->attributes->set('_switch_user_username', $username);
+
+        return true;
+    }
+
+    /**
+     * Handles the switch to another user.
+     *
+     * @throws \LogicException if switching to a user failed
+     */
+    public function authenticate(RequestEvent $event)
+    {
+        $request = $event->getRequest();
+
+        $username = $request->attributes->get('_switch_user_username');
+        $request->attributes->remove('_switch_user_username');
 
         if (null === $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');

@@ -13,11 +13,8 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
-use Symfony\Component\Security\Core\Exception\LazyResponseException;
-use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
-use Symfony\Component\Security\Http\Firewall\AccessListener;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
@@ -28,17 +25,13 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
  */
 class LazyFirewallContext extends FirewallContext
 {
-    private $accessListener;
     private $tokenStorage;
-    private $map;
 
-    public function __construct(iterable $listeners, ?ExceptionListener $exceptionListener, ?LogoutListener $logoutListener, ?FirewallConfig $config, AccessListener $accessListener, TokenStorage $tokenStorage, AccessMapInterface $map)
+    public function __construct(iterable $listeners, ?ExceptionListener $exceptionListener, ?LogoutListener $logoutListener, ?FirewallConfig $config, TokenStorage $tokenStorage)
     {
         parent::__construct($listeners, $exceptionListener, $logoutListener, $config);
 
-        $this->accessListener = $accessListener;
         $this->tokenStorage = $tokenStorage;
-        $this->map = $map;
     }
 
     public function getListeners(): iterable
@@ -48,21 +41,37 @@ class LazyFirewallContext extends FirewallContext
 
     public function __invoke(RequestEvent $event)
     {
-        $this->tokenStorage->setInitializer(function () use ($event) {
+        $listeners = [];
+        $request = $event->getRequest();
+        $lazy = $request->isMethodCacheable();
+
+        foreach (parent::getListeners() as $listener) {
+            if (!$lazy || !$listener instanceof AbstractListener) {
+                $listeners[] = $listener;
+                $lazy = $lazy && $listener instanceof AbstractListener;
+            } elseif (false !== $supports = $listener->supports($request)) {
+                $listeners[] = [$listener, 'authenticate'];
+                $lazy = null === $supports;
+            }
+        }
+
+        if (!$lazy) {
+            foreach ($listeners as $listener) {
+                $listener($event);
+
+                if ($event->hasResponse()) {
+                    return;
+                }
+            }
+
+            return;
+        }
+
+        $this->tokenStorage->setInitializer(function () use ($event, $listeners) {
             $event = new LazyResponseEvent($event);
-            foreach (parent::getListeners() as $listener) {
+            foreach ($listeners as $listener) {
                 $listener($event);
             }
         });
-
-        try {
-            [$attributes] = $this->map->getPatterns($event->getRequest());
-
-            if ($attributes && [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes) {
-                ($this->accessListener)($event);
-            }
-        } catch (LazyResponseException $e) {
-            $event->setResponse($e->getResponse());
-        }
     }
 }

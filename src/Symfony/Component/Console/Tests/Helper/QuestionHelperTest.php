@@ -189,19 +189,20 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         // Acm<NEWLINE>
         // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
         // <NEWLINE>
-        // <UP ARROW><UP ARROW><NEWLINE>
-        // <UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><TAB>Test<NEWLINE>
+        // <UP ARROW><UP ARROW><UP ARROW><NEWLINE>
+        // <UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><TAB>Test<NEWLINE>
         // <DOWN ARROW><NEWLINE>
         // S<BACKSPACE><BACKSPACE><DOWN ARROW><DOWN ARROW><NEWLINE>
         // F00<BACKSPACE><BACKSPACE>oo<TAB><NEWLINE>
-        $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\n");
+        // F⭐<TAB><BACKSPACE><BACKSPACE>⭐<TAB><NEWLINE>
+        $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\nF⭐\t\177\177⭐\t\n");
 
         $dialog = new QuestionHelper();
         $helperSet = new HelperSet([new FormatterHelper()]);
         $dialog->setHelperSet($helperSet);
 
         $question = new Question('Please select a bundle', 'FrameworkBundle');
-        $question->setAutocompleterValues(['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle']);
+        $question->setAutocompleterValues(['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle', 'F⭐Y']);
 
         $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('AsseticBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
@@ -211,6 +212,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('F⭐Y', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
     public function testAskWithAutocompleteTrimmable()

@@ -437,7 +437,7 @@ Security
  * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
    `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
    `SimplePreAuthenticationListener` have been removed. Use Guard instead.
- * The `ListenerInterface` has been removed, turn your listeners into callables instead.
+ * The `ListenerInterface` has been removed, extend `AbstractListener` instead.
  * The `Firewall::handleRequest()` method has been removed, use `Firewall::callListeners()` instead.
  * `\Serializable` interface has been removed from `AbstractToken` and `AuthenticationException`,
    thus `serialize()` and `unserialize()` aren't available.

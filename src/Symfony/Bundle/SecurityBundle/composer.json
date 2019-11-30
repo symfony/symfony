@@ -24,7 +24,7 @@
         "symfony/security-core": "^4.4|^5.0",
         "symfony/security-csrf": "^4.4|^5.0",
         "symfony/security-guard": "^4.4|^5.0",
-        "symfony/security-http": "^4.4|^5.0"
+        "symfony/security-http": "^4.4.1|^5.0.1"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^1.5|^2.0",

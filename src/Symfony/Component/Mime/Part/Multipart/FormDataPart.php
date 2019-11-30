@@ -56,11 +56,20 @@ final class FormDataPart extends AbstractMultipartPart
     private function prepareFields(array $fields): array
     {
         $values = [];
-        array_walk_recursive($fields, function ($item, $key) use (&$values) {
-            if (!\is_array($item)) {
-                $values[] = $this->preparePart($key, $item);
+
+        $prepare = function ($item, $key, $root = null) use (&$values, &$prepare) {
+            $fieldName = $root ? sprintf('%s[%s]', $root, $key) : $key;
+
+            if (\is_array($item)) {
+                array_walk($item, $prepare, $fieldName);
+
+                return;
             }
-        });
+
+            $values[] = $this->preparePart($fieldName, $item);
+        };
+
+        array_walk($fields, $prepare);
 
         return $values;
     }

@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
@@ -82,13 +81,16 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * For instance in ORM two query builders with an equal SQL string and
      * equal parameters are considered to be equal.
      *
+     * @param object $queryBuilder A query builder, type declaration is not present here as there
+     *                             is no common base class for the different implementations
+     *
      * @return array|null Array with important QueryBuilder parts or null if
      *                    they can't be determined
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder): ?array
+    public function getQueryBuilderPartsForCachingHash($queryBuilder): ?array
     {
         return null;
     }

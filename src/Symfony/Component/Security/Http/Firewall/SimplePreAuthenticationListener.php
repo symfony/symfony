@@ -41,7 +41,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  *
  * @deprecated since Symfony 4.2, use Guard instead.
  */
-class SimplePreAuthenticationListener implements ListenerInterface
+class SimplePreAuthenticationListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
@@ -79,10 +79,28 @@ class SimplePreAuthenticationListener implements ListenerInterface
         $this->sessionStrategy = $sessionStrategy;
     }
 
+    public function supports(Request $request): ?bool
+    {
+        if ((null !== $token = $this->tokenStorage->getToken()) && !$this->trustResolver->isAnonymous($token)) {
+            return false;
+        }
+
+        $token = $this->simpleAuthenticator->createToken($request, $this->providerKey);
+
+        // allow null to be returned to skip authentication
+        if (null === $token) {
+            return false;
+        }
+
+        $request->attributes->set('_simple_pre_authenticator_token', $token);
+
+        return true;
+    }
+
     /**
      * Handles basic authentication.
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();
 
@@ -91,16 +109,14 @@ class SimplePreAuthenticationListener implements ListenerInterface
         }
 
         if ((null !== $token = $this->tokenStorage->getToken()) && !$this->trustResolver->isAnonymous($token)) {
+            $request->attributes->remove('_simple_pre_authenticator_token');
+
             return;
         }
 
         try {
-            $token = $this->simpleAuthenticator->createToken($request, $this->providerKey);
-
-            // allow null to be returned to skip authentication
-            if (null === $token) {
-                return;
-            }
+            $token = $request->attributes->get('_simple_pre_authenticator_token');
+            $request->attributes->remove('_simple_pre_authenticator_token');
 
             $token = $this->authenticationManager->authenticate($token);
 

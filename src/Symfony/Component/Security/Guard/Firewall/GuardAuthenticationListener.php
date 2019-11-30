@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\LegacyListenerTrait;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
@@ -33,7 +34,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  *
  * @final since Symfony 4.3
  */
-class GuardAuthenticationListener implements ListenerInterface
+class GuardAuthenticationListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
@@ -62,9 +63,9 @@ class GuardAuthenticationListener implements ListenerInterface
     }
 
     /**
-     * Iterates over each authenticator to see if each wants to authenticate the request.
+     * {@inheritdoc}
      */
-    public function __invoke(RequestEvent $event)
+    public function supports(Request $request): ?bool
     {
         if (null !== $this->logger) {
             $context = ['firewall_key' => $this->providerKey];
@@ -76,7 +77,39 @@ class GuardAuthenticationListener implements ListenerInterface
             $this->logger->debug('Checking for guard authentication credentials.', $context);
         }
 
+        $guardAuthenticators = [];
+
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Checking support on guard authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
+            }
+
+            if ($guardAuthenticator->supports($request)) {
+                $guardAuthenticators[$key] = $guardAuthenticator;
+            } elseif (null !== $this->logger) {
+                $this->logger->debug('Guard authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
+            }
+        }
+
+        if (!$guardAuthenticators) {
+            return false;
+        }
+
+        $request->attributes->set('_guard_authenticators', $guardAuthenticators);
+
+        return true;
+    }
+
+    /**
+     * Iterates over each authenticator to see if each wants to authenticate the request.
+     */
+    public function authenticate(RequestEvent $event)
+    {
+        $request = $event->getRequest();
+        $guardAuthenticators = $request->attributes->get('_guard_authenticators');
+        $request->attributes->remove('_guard_authenticators');
+
+        foreach ($guardAuthenticators as $key => $guardAuthenticator) {
             // get a key that's unique to *this* guard authenticator
             // this MUST be the same as GuardAuthenticationProvider
             $uniqueGuardKey = $this->providerKey.'_'.$key;
@@ -97,19 +130,6 @@ class GuardAuthenticationListener implements ListenerInterface
     {
         $request = $event->getRequest();
         try {
-            if (null !== $this->logger) {
-                $this->logger->debug('Checking support on guard authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
-            }
-
-            // abort the execution of the authenticator if it doesn't support the request
-            if (!$guardAuthenticator->supports($request)) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('Guard authenticator does not support the request.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
-                }
-
-                return;
-            }
-
             if (null !== $this->logger) {
                 $this->logger->debug('Calling getCredentials() on guard authenticator.', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
             }

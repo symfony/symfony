@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -31,7 +32,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final since Symfony 4.3
  */
-class RememberMeListener implements ListenerInterface
+class RememberMeListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
@@ -55,9 +56,17 @@ class RememberMeListener implements ListenerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        return null; // always run authenticate() lazily with lazy firewalls
+    }
+
+    /**
      * Handles remember-me cookie based authentication.
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         if (null !== $this->tokenStorage->getToken()) {
             return;

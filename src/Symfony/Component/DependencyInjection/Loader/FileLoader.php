@@ -121,7 +121,7 @@ abstract class FileLoader extends BaseFileLoader
     public function registerAliasesForSinglyImplementedInterfaces()
     {
         foreach ($this->interfaces as $interface) {
-            if (!empty($this->singlyImplemented[$interface]) && !$this->container->hasAlias($interface)) {
+            if (!empty($this->singlyImplemented[$interface]) && !$this->container->has($interface)) {
                 $this->container->setAlias($interface, $this->singlyImplemented[$interface])->setPublic(false);
             }
         }

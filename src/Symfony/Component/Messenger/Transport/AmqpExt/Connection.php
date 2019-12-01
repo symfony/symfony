@@ -426,7 +426,7 @@ class Connection
             $this->amqpExchange->setType($this->exchangeOptions['type'] ?? AMQP_EX_TYPE_FANOUT);
             $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? AMQP_DURABLE);
 
-            foreach ($this->exchangeOptions['bindings'] ?? [null] as $bindingExchangeName => $bindingExchangeOption) {
+            foreach ($this->exchangeOptions['bindings'] ?? [] as $bindingExchangeName => $bindingExchangeOption) {
                 $this->amqpExchange->declareExchange();
 
                 $bindingArguments = $bindingExchangeOption['binding_arguments'] ?? [];

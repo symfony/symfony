@@ -7,6 +7,26 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.36 (2019-12-01)
+
+ * bug #34649 more robust initialization from request (dbu)
+ * bug #34671 [Security] Fix clearing remember-me cookie after deauthentication (chalasr)
+ * bug #34711 Fix the translation commands when a template contains a syntax error (fabpot)
+ * bug #34560 [Config][ReflectionClassResource] Handle parameters with undefined constant as their default values (fancyweb)
+ * bug #34695 [Config] don't break on virtual stack frames in ClassExistenceResource (nicolas-grekas)
+ * bug #34716 [DependencyInjection] fix dumping number-like string parameters (xabbuh)
+ * bug #34558 [Console] Fix autocomplete multibyte input support (fancyweb)
+ * bug #34130 [Console] Fix commands description with numeric namespaces (fancyweb)
+ * bug #34632 [Console] Fix trying to access array offset on value of type int (Tavafi)
+ * bug #34668 [Cache] Make sure we get the correct number of values from redis::mget() (thePanz)
+ * bug #34533 [Monolog Bridge] Fixed accessing static property as non static. (Sander-Toonen)
+ * bug #34385 Avoid empty "If-Modified-Since" header in validation request (mpdude)
+ * bug #34458 [Validator] ConstraintValidatorTestCase: add missing return value to mocked validate method calls (ogizanagi)
+ * bug #34366 [HttpFoundation] Allow redirecting to URLs that contain a semicolon (JayBizzle)
+ * bug #34410 [HttpFoundation] Fix MySQL column type definition. (jbroutier)
+ * bug #34396 [Finder] Allow ssh2 stream wrapper for sftp (damienalexandre)
+ * bug #34381 [WebProfilerBundle] Require symfony/twig-bundle (fancyweb)
+
 * 3.4.35 (2019-11-13)
 
  * bug #34344 [Console] Constant STDOUT might be undefined (nicolas-grekas)

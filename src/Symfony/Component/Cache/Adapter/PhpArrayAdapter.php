@@ -305,7 +305,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     public static function throwOnRequiredClass($class)
     {
         $e = new \ReflectionException("Class $class does not exist");
-        $trace = $e->getTrace();
+        $trace = debug_backtrace();
         $autoloadFrame = [
             'function' => 'spl_autoload_call',
             'args' => [$class],

@@ -113,7 +113,7 @@ EOF
     public function testListMessages()
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
-        $redeliveryStamp = new RedeliveryStamp(0, 'failure_receiver', 'Things are bad!');
+        $redeliveryStamp = new RedeliveryStamp(0, 'Things are bad!');
         $envelope = new Envelope(new \stdClass(), [
             new TransportMessageIdStamp(15),
             $sentToFailureStamp,
@@ -158,7 +158,7 @@ EOF
         $envelope = new Envelope(new \stdClass(), [
             new TransportMessageIdStamp(15),
             $sentToFailureStamp,
-            new RedeliveryStamp(0, 'failure_receiver', 'Things are bad!'),
+            new RedeliveryStamp(0, 'Things are bad!'),
         ]);
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('all')->with()->willReturn([$envelope]);

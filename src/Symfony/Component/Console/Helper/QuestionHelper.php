@@ -230,7 +230,7 @@ class QuestionHelper extends Helper
             } elseif ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
-                    $fullChoice = self::substr($fullChoice, 0, -1);
+                    $fullChoice = self::substr($fullChoice, 0, $i);
                     // Move cursor backwards
                     $output->write("\033[1D");
                 }
@@ -286,6 +286,8 @@ class QuestionHelper extends Helper
                         $output->write($c);
                         break;
                     }
+
+                    $numMatches = 0;
                 }
 
                 continue;

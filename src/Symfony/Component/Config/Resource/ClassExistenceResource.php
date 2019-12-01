@@ -72,7 +72,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
                 spl_autoload_register(__CLASS__.'::throwOnRequiredClass');
             }
             $autoloadedClass = self::$autoloadedClass;
-            self::$autoloadedClass = $this->resource;
+            self::$autoloadedClass = ltrim($this->resource, '\\');
 
             try {
                 $exists = class_exists($this->resource) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
@@ -153,7 +153,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             throw $e;
         }
 
-        $trace = $e->getTrace();
+        $trace = debug_backtrace();
         $autoloadFrame = [
             'function' => 'spl_autoload_call',
             'args' => [$class],

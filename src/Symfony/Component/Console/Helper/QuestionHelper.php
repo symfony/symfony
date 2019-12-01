@@ -282,6 +282,8 @@ class QuestionHelper extends Helper
                         $output->write($c);
                         break;
                     }
+
+                    $numMatches = 0;
                 }
 
                 continue;

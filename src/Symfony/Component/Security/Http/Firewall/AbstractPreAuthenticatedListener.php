@@ -35,7 +35,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @internal
  */
 abstract class AbstractPreAuthenticatedListener extends AbstractListener
-
+{
     protected $logger;
     private $tokenStorage;
     private $authenticationManager;

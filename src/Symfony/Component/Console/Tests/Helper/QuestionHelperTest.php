@@ -180,7 +180,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         // <DOWN ARROW><NEWLINE>
         // S<BACKSPACE><BACKSPACE><DOWN ARROW><DOWN ARROW><NEWLINE>
         // F00<BACKSPACE><BACKSPACE>oo<TAB><NEWLINE>
-        // F⭐<TAB><BACKSPACE><BACKSPACE>⭐<TAB><NEWLINE>
+        // F⭐<TAB><BACKSPACE><BACKSPACE>⭐<TAB><NEWLINE>
         $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\nF⭐\t\177\177⭐\t\n");
 
         $dialog = new QuestionHelper();

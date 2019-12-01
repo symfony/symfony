@@ -80,9 +80,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             throw new NoConfigurationException();
         }
 
-        throw 0 < \count($this->allow)
-            ? new MethodNotAllowedException(array_unique($this->allow))
-            : new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
+        throw 0 < \count($this->allow) ? new MethodNotAllowedException(array_unique($this->allow)) : new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
     }
 
     /**

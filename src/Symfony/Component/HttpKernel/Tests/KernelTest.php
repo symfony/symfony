@@ -651,8 +651,6 @@ EOF;
      *
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
-     *
-     * @return Kernel
      */
     protected function getKernel(array $methods = [], array $bundles = [], bool $debug = false): Kernel
     {

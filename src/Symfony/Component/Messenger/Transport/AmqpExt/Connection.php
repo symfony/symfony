@@ -94,6 +94,9 @@ class Connection
      *     * type: Type of exchange (Default: fanout)
      *     * default_publish_routing_key: Routing key to use when publishing, if none is specified on the message
      *     * flags: Exchange flags (Default: AMQP_DURABLE)
+     *     * bindings[name]: An array of exchanges to bind, keyed by the name
+     *       * binding_keys: The binding keys (if any) to bind to this exchange
+     *       * binding_arguments: Arguments to be used while binding the exchange
      *     * arguments: Extra arguments
      *   * delay:
      *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_%exchange_name%_%routing_key%_%delay%")
@@ -422,6 +425,16 @@ class Connection
             $this->amqpExchange->setName($this->exchangeOptions['name']);
             $this->amqpExchange->setType($this->exchangeOptions['type'] ?? AMQP_EX_TYPE_FANOUT);
             $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? AMQP_DURABLE);
+
+            foreach ($this->exchangeOptions['bindings'] ?? [null] as $bindingExchangeName => $bindingExchangeOption) {
+                $this->amqpExchange->declareExchange();
+
+                $bindingArguments = $bindingExchangeOption['binding_arguments'] ?? [];
+
+                foreach ($bindingExchangeOption['binding_keys'] ?? [''] as $bindingKey) {
+                    $this->amqpExchange->bind($bindingExchangeName, $bindingKey, $bindingArguments);
+                }
+            }
 
             if (isset($this->exchangeOptions['arguments'])) {
                 $this->amqpExchange->setArguments($this->exchangeOptions['arguments']);

@@ -222,14 +222,14 @@ class Exporter
                 ));
 
                 if ("'" === $m[2]) {
-                   return substr($m[1], 0, -2);
+                    return substr($m[1], 0, -2);
                 }
 
                 if ('n".\'' === substr($m[1], -4)) {
-                   return substr_replace($m[1], "\n".$subIndent.".'".$m[2], -2);
+                    return substr_replace($m[1], "\n".$subIndent.".'".$m[2], -2);
                 }
 
-               return $m[1].$m[2];
+                return $m[1].$m[2];
             }, $code, -1, $count);
 
             if ($count && 0 === strpos($code, "''.")) {

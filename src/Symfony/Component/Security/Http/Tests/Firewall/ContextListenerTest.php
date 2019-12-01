@@ -222,7 +222,7 @@ class ContextListenerTest extends TestCase
             ->willReturn(true);
         $request->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($session));
+            ->willReturn($session);
 
         $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
 
@@ -365,7 +365,7 @@ class ContextListenerTest extends TestCase
         $request->cookies->set('MOCKSESSID', true);
 
         $sessionId = $session->getId();
-        $usageIndex = \method_exists(Request::class, 'getPreferredFormat') ? $session->getUsageIndex() : null;
+        $usageIndex = method_exists(Request::class, 'getPreferredFormat') ? $session->getUsageIndex() : null;
 
         $event = new ResponseEvent(
             $this->getMockBuilder(HttpKernelInterface::class)->getMock(),
@@ -402,7 +402,7 @@ class ContextListenerTest extends TestCase
         $usageIndex = null;
         $sessionTrackerEnabler = null;
 
-        if (\method_exists(Request::class, 'getPreferredFormat')) {
+        if (method_exists(Request::class, 'getPreferredFormat')) {
             $usageIndex = $session->getUsageIndex();
             $tokenStorage = new UsageTrackingTokenStorage($tokenStorage, new class([
                 'session' => function () use ($session) { return $session; }

@@ -222,6 +222,7 @@
     <xsd:attribute name="key" type="xsd:string" use="required" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
     <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="tag" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="argument" mixed="true">

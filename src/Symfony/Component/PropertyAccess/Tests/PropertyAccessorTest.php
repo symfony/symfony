@@ -532,7 +532,7 @@ class PropertyAccessorTest extends TestCase
     public function testThrowTypeErrorWithNullArgument()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Expected argument of type "DateTime", "NULL" given');
+        $this->expectExceptionMessage('Expected argument of type "DateTime", "null" given');
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', null);

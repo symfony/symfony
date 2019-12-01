@@ -260,13 +260,14 @@ class PropertyAccessor implements PropertyAccessorInterface
             return;
         }
 
-        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file'] && \array_key_exists(0, $trace[$i]['args'])) {
+        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file']) {
             $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
             $pos += \strlen($delim);
-            $type = $trace[$i]['args'][0];
-            $type = \is_object($type) ? \get_class($type) : \gettype($type);
+            $j = strpos($message, ',', $pos);
+            $type = substr($message, 2 + $j, strpos($message, ' given', $j) - $j - 2);
+            $message = substr($message, $pos, $j - $pos);
 
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given', substr($message, $pos, strpos($message, ',', $pos) - $pos), $type));
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given', $message, 'NULL' === $type ? 'null' : $type));
         }
     }
 

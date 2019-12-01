@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormTypeExtensionInterface;

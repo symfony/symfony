@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.0
 -----
+
  * Added support for exchange binding to another exchange in AMQP transport
  * The `LoggingMiddleware` class has been removed, pass a logger to `SendMessageMiddleware` instead.
  * made `SendersLocator` require a `ContainerInterface` as 2nd argument

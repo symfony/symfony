@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * TokenInterface is the interface for the user authentication information.
  *
@@ -55,10 +57,7 @@ interface TokenInterface extends \Serializable
     /**
      * Sets the user in the token.
      *
-     * The user can be a UserInterface instance, or an object implementing
-     * a __toString method or the username as a regular string.
-     *
-     * @param string|object $user The user
+     * @param UserInterface $user The user
      *
      * @throws \InvalidArgumentException
      */

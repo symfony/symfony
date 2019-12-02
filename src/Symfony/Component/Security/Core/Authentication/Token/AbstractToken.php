@@ -76,6 +76,10 @@ abstract class AbstractToken implements TokenInterface
             throw new \InvalidArgumentException('$user must be an instanceof UserInterface, an object implementing a __toString method, or a primitive string.');
         }
 
+        if (!$user instanceof UserInterface) {
+            @trigger_error(sprintf('Storing a user not implementing the %s is deprecated since Symfony 5.1.', UserInterface::class));
+        }
+
         if (null === $this->user) {
             $changed = false;
         } elseif ($this->user instanceof UserInterface) {

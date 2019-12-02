@@ -390,6 +390,30 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
+    public function testSwitchUserWithSeveralDefinedProvidersButNoFirewallRootProviderConfigured()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'bar'],
+            ],
+
+            'firewalls' => [
+                'foobar' => [
+                    'switch_user' => [
+                        'provider' => 'second',
+                    ],
+                    'anonymous' => true,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertEquals(new Reference('security.user.provider.concrete.second'), $container->getDefinition('security.authentication.switchuser_listener.foobar')->getArgument(1));
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

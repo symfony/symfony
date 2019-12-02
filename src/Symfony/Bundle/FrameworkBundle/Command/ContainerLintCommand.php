@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 final class ContainerLintCommand extends Command
 {
@@ -72,8 +74,40 @@ final class ContainerLintCommand extends Command
             $container = $buildContainer();
         } else {
             (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
+
+            $this->escapeParameters($container->getParameterBag());
         }
 
         return $this->containerBuilder = $container;
+    }
+
+    private function escapeParameters(ParameterBagInterface $parameterBag): void
+    {
+        $isEnvPlaceholderParameterBag = $parameterBag instanceof EnvPlaceholderParameterBag;
+
+        foreach ($parameterBag->all() as $name => $value) {
+            $parameterBag->set($name, $this->escape($value, $isEnvPlaceholderParameterBag));
+        }
+    }
+
+    private function escape($value, bool $isEnvPlaceholderParameterBag)
+    {
+        if (\is_string($value)) {
+            $escapedValue = str_replace('%', '%%', $value);
+
+            return !$isEnvPlaceholderParameterBag ? $escapedValue : preg_replace('/%(%env\((?:\w*+:)*+\w++\)%)%/', '$1', $escapedValue);
+        }
+
+        if (\is_array($value)) {
+            $escapedValue = [];
+
+            foreach ($value as $k => $v) {
+                $escapedValue[$k] = $this->escape($v, $isEnvPlaceholderParameterBag);
+            }
+
+            return $escapedValue;
+        }
+
+        return $value;
     }
 }

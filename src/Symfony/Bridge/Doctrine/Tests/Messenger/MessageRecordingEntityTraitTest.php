@@ -40,4 +40,21 @@ class MessageRecordingEntityTraitTest extends TestCase
             static::assertCount(0, $messages);
         });
     }
+
+    public function testMessagesClearedOnDispatchFailure(): void
+    {
+        $entity = new MessageRecordingEntity();
+        $entity->doRecordMessage(new \stdClass());
+
+        try {
+            $entity->dispatchMessages(static function (): void {
+                throw new \Exception();
+            });
+        } catch (\Exception $exception) {
+        }
+
+        $entity->dispatchMessages(static function (array $messages): void {
+            static::assertCount(0, $messages);
+        });
+    }
 }

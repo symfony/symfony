@@ -28,8 +28,8 @@ trait MessageRecordingEntityTrait
      */
     final public function dispatchMessages(callable $dispatcher): void
     {
-        $dispatcher($this->messages);
-        $this->messages = [];
+        [$messages, $this->messages] = [$this->messages, []];
+        $dispatcher($messages);
     }
 
     final protected function recordMessage(object $message): void

@@ -14,11 +14,13 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -104,19 +106,21 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         $reflectionParameters = $reflectionFunction->getParameters();
         $checksCount = min($reflectionFunction->getNumberOfParameters(), \count($values));
 
+        $envPlaceholderUniquePrefix = $this->container->getParameterBag() instanceof EnvPlaceholderParameterBag ? $this->container->getParameterBag()->getEnvPlaceholderUniquePrefix() : null;
+
         for ($i = 0; $i < $checksCount; ++$i) {
             if (!$reflectionParameters[$i]->hasType() || $reflectionParameters[$i]->isVariadic()) {
                 continue;
             }
 
-            $this->checkType($checkedDefinition, $values[$i], $reflectionParameters[$i]);
+            $this->checkType($checkedDefinition, $values[$i], $reflectionParameters[$i], $envPlaceholderUniquePrefix);
         }
 
         if ($reflectionFunction->isVariadic() && ($lastParameter = end($reflectionParameters))->hasType()) {
             $variadicParameters = \array_slice($values, $lastParameter->getPosition());
 
             foreach ($variadicParameters as $variadicParameter) {
-                $this->checkType($checkedDefinition, $variadicParameter, $lastParameter);
+                $this->checkType($checkedDefinition, $variadicParameter, $lastParameter, $envPlaceholderUniquePrefix);
             }
         }
     }
@@ -124,7 +128,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     /**
      * @throws InvalidParameterTypeException When a parameter is not compatible with the declared type
      */
-    private function checkType(Definition $checkedDefinition, $value, \ReflectionParameter $parameter): void
+    private function checkType(Definition $checkedDefinition, $value, \ReflectionParameter $parameter, ?string $envPlaceholderUniquePrefix): void
     {
         $type = $parameter->getType()->getName();
 
@@ -178,8 +182,22 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             $value = $this->container->getParameter($value);
         } elseif ($value instanceof Expression) {
             $value = $this->getExpressionLanguage()->evaluate($value, ['container' => $this->container]);
-        } elseif (\is_string($value) && '%' === ($value[0] ?? '') && preg_match('/^%([^%]+)%$/', $value, $match)) {
-            $value = $this->container->getParameter($match[1]);
+        } elseif (\is_string($value)) {
+            if ('%' === ($value[0] ?? '') && preg_match('/^%([^%]+)%$/', $value, $match)) {
+                // Only array parameters are not inlined when dumped.
+                $value = [];
+            } elseif ($envPlaceholderUniquePrefix && false !== strpos($value, 'env_')) {
+                // If the value is an env placeholder that is either mixed with a string or with another env placeholder, then its resolved value will always be a string, so we don't need to resolve it.
+                // We don't need to change the value because it is already a string.
+                if ('' === preg_replace('/'.$envPlaceholderUniquePrefix.'_\w+_[a-f0-9]{32}/U', '', $value, -1, $c) && 1 === $c) {
+                    try {
+                        $value = $this->container->resolveEnvPlaceholders($value, true);
+                    } catch (EnvNotFoundException | RuntimeException $e) {
+                        // If an env placeholder cannot be resolved, we skip the validation.
+                        return;
+                    }
+                }
+            }
         }
 
         if (null === $value && $parameter->allowsNull()) {

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-05T12:12:05Z
+
+> when I try to catch the exact exception, the exception is not caught.
+
+:thinking: that's confusing :) if you iterate getNames for codes it should be fine by default.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-08T05:56:17Z
+
+The PR related to `root` has been merged now.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-12-03T07:58:38Z
+
+Rebased. Thanks.

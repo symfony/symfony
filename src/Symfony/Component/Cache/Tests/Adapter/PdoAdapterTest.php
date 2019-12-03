@@ -94,9 +94,9 @@ class PdoAdapterTest extends AdapterTestCase
     public function provideDsn()
     {
         $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
-        yield ['sqlite://localhost/'.$dbFile, ''.$dbFile];
-        yield ['sqlite:'.$dbFile, ''.$dbFile];
-        yield ['sqlite3:///'.$dbFile, ''.$dbFile];
+        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
+        yield ['sqlite:'.$dbFile.'2', $dbFile.'2'];
+        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
         yield ['sqlite://localhost/:memory:'];
         yield ['sqlite::memory:'];
     }

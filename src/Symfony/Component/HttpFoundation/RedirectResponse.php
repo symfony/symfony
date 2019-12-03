@@ -53,9 +53,13 @@ class RedirectResponse extends Response
      * @param string $url The URL to redirect to
      *
      * @return static
+     *
+     * @deprecated since Symfony 5.1, use __construct() instead.
      */
     public static function create($url = '', int $status = 302, array $headers = [])
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 5.1; use __construct() instead.', __METHOD__), E_USER_DEPRECATED);
+
         return new static($url, $status, $headers);
     }
 

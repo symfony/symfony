@@ -517,7 +517,7 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
             [
                 ['symfony_5_ist_äußerst_cool', 'symfony5IstÄußerstCool'],
                 ['8_äußerst', '8äußerst'],
-                ['i_reversed_aussert_tsreßuä8', 'iReversedAussertTsreßuä8'],
+                ['i_reversed_aussert_tsreßuä_8', 'iReversedAussertTsreßuä8'],
             ]
         );
     }

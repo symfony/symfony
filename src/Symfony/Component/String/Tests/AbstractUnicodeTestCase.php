@@ -516,7 +516,8 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
             parent::provideUnderscore(),
             [
                 ['symfony_5_ist_äußerst_cool', 'symfony5IstÄußerstCool'],
-                ['8_äußerst', '8äußerst'],
+                ['8äußerst', '8äußerst'],
+                ['8_äußerst', '8Äußerst'],
                 ['i_reversed_aussert_tsreßuä_8', 'iReversedAussertTsreßuä8'],
             ]
         );

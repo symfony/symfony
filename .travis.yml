@@ -1,6 +1,6 @@
 language: php
 
-dist: trusty
+dist: xenial
 
 git:
     depth: 2
@@ -24,9 +24,10 @@ matrix:
     include:
         - php: 5.5
           env: php_extra="5.6 7.0 7.1 7.2"
+          dist: trusty
         - php: 7.3
           env: deps=high
-        - php: 7.4snapshot
+        - php: 7.4
           env: deps=low
     fast_finish: true
 

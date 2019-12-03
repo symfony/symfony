@@ -444,9 +444,9 @@ class ByteString extends AbstractString
         $str = $this->camel()->title();
         $str->string = strtolower(
             preg_replace(
-                ['~(?<=[a-z])([0-9])~u'],
-                '_$1',
-                preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $str->string)
+                ['/([A-Z]+)([A-Z][a-z])/u', '/([[a-z0-9])([A-Z])/u', '/([a-z])([0-9])/u'],
+                '\1_\2',
+                $str->string
             )
         );
 

@@ -401,9 +401,9 @@ abstract class AbstractUnicodeString extends AbstractString
         $str = $this->camel()->title();
         $str->string = mb_strtolower(
             preg_replace(
-                ['~(?<=[a-z])([0-9])~u'],
-                '_$1',
-                preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $str->string)
+                ['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u', '/(\p{Ll})([0-9])/u'],
+                '\1_\2',
+                $str->string
             ),
             'UTF-8'
         );

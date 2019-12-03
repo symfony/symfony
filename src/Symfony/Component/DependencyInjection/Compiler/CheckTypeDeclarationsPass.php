@@ -17,9 +17,11 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Checks whether injected parameters are compatible with type declarations.
@@ -38,6 +40,8 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     private const SCALAR_TYPES = ['int', 'float', 'bool', 'string'];
 
     private $autoload;
+
+    private $expressionLanguage;
 
     /**
      * @param bool $autoload Whether services who's class in not loaded should be checked or not.
@@ -172,6 +176,8 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
 
         if ($value instanceof Parameter) {
             $value = $this->container->getParameter($value);
+        } elseif ($value instanceof Expression) {
+            $value = $this->getExpressionLanguage()->evaluate($value, ['container' => $this->container]);
         } elseif (\is_string($value) && '%' === ($value[0] ?? '') && preg_match('/^%([^%]+)%$/', $value, $match)) {
             $value = $this->container->getParameter($match[1]);
         }
@@ -201,5 +207,14 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         if (!$parameter->getType()->isBuiltin() || !$checkFunction($value)) {
             throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? \get_class($value) : \gettype($value), $parameter);
         }
+    }
+
+    private function getExpressionLanguage(): ExpressionLanguage
+    {
+        if (null === $this->expressionLanguage) {
+            $this->expressionLanguage = new ExpressionLanguage(null, $this->container->getExpressionLanguageProviders());
+        }
+
+        return $this->expressionLanguage;
     }
 }

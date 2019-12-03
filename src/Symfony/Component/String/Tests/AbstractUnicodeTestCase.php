@@ -510,7 +510,7 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         );
     }
 
-    public static function provideUnderscore() : array
+    public static function provideUnderscore(): array
     {
         return array_merge(
             parent::provideUnderscore(),

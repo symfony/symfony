@@ -931,6 +931,32 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
+     * @dataProvider provideUnderscore
+     */
+    public function testUnderscore(string $expectedString, string $origin): void
+    {
+        $instance = static::createFromString($origin)->underscore();
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+    }
+
+    public static function provideUnderscore(): array
+    {
+        return [
+            ['', ''],
+            ['symfony_is_great', 'symfonyIsGreat'],
+            ['symfony_44_is_great', 'symfony44IsGreat'],
+            ['symfony_is_great_5', 'symfonyIsGreat5'],
+            ['symfony_5_is_great', 'symfony5IsGreat'],
+            ['symfony_5is_great', 'symfony5isGreat'],
+            ['symfony_is_great', 'Symfony is great'],
+            ['symfony_is_a_great_framework', 'symfonyIsAGreatFramework'],
+            ['symfony_is_great', 'symfonyIsGREAT'],
+            ['symfony_is_really_great', 'symfonyIsREALLYGreat'],
+        ];
+    }
+
+    /**
      * @dataProvider provideStartsWith
      */
     public function testStartsWith(bool $expected, string $origin, $prefix, int $form = null)

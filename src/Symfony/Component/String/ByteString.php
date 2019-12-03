@@ -439,6 +439,14 @@ class ByteString extends AbstractString
         return $str;
     }
 
+    public function underscore(): parent
+    {
+        $str = $this->camel()->snake();
+        $str->string = mb_strtolower(preg_replace('~(?<=[a-z])([0-9])~u', '_$1', $str->string), 'UTF-8');
+
+        return $str;
+    }
+
     public function upper(): parent
     {
         $str = clone $this;

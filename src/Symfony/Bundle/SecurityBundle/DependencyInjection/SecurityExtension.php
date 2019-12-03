@@ -681,7 +681,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $exceptionListenerId;
     }
 
-    private function createSwitchUserListener(ContainerBuilder $container, string $id, array $config, string $defaultProvider, bool $stateless): string
+    private function createSwitchUserListener(ContainerBuilder $container, string $id, array $config, ?string $defaultProvider, bool $stateless): string
     {
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
 

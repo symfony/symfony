@@ -636,6 +636,9 @@ abstract class AbstractString implements \JsonSerializable
         return $ellipsisLength ? $str->trimEnd()->append($ellipsis) : $str;
     }
 
+    /**
+     * @return static
+     */
     abstract public function underscore(): self;
 
     /**

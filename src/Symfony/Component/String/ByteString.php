@@ -441,8 +441,14 @@ class ByteString extends AbstractString
 
     public function underscore(): parent
     {
-        $str = $this->camel()->snake();
-        $str->string = mb_strtolower(preg_replace('~(?<=[a-z])([0-9])~u', '_$1', $str->string), 'UTF-8');
+        $str = $this->camel()->title();
+        $str->string = strtolower(
+            preg_replace(
+                ['~(?<=[a-z])([0-9])~u'],
+                '_$1',
+                preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $str->string)
+            )
+        );
 
         return $str;
     }

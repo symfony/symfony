@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Deprecate `Response::create()`, `JsonResponse::create()`,
+   `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
+   `__construct()` instead)
+
 5.0.0
 -----
 

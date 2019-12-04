@@ -22,7 +22,7 @@ use Symfony\Component\Cache\ResettableInterface;
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TraceableAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
+class TraceableAdapter implements AdapterInterface, PruneableInterface, ResettableInterface, TagAwareAdapterInterface
 {
     protected $pool;
     private $calls = [];
@@ -219,6 +219,12 @@ class TraceableAdapter implements AdapterInterface, PruneableInterface, Resettab
         $event->start = microtime(true);
 
         return $event;
+    }
+
+    public function invalidateTags(array $tags)
+    {
+        // TODO: add logic here and in the rest of this class to trace tags for profiler.
+        // This stub was only added to prevent issue https://github.com/symfony/symfony/issues/34800
     }
 }
 

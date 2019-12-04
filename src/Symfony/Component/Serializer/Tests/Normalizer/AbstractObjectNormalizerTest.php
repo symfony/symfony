@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
@@ -24,6 +25,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -227,6 +229,26 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
     }
 
+    public function testDenormalizeXmlStringNodeWithoutAttributesToObject()
+    {
+        $denormalizer = $this->getDenormalizerForStringNode();
+        // if an xml-node can have children which should be deserialized as string[]
+        // and only one child exists
+        $object = $denormalizer->denormalize('string-value', DummyObjectWithOptionalAttributes::class, 'xml');
+        $this->assertInstanceOf(DummyObjectWithOptionalAttributes::class, $object);
+        $this->assertEquals('string-value', $object->value);
+        $this->assertNull($object->foo);
+    }
+
+    public function getDenormalizerForStringNode()
+    {
+        $denormalizer = new AbstractObjectNormalizerWithMetadataAndNameConverter();
+        $serializer = new Serializer([$denormalizer]);
+        $denormalizer->setSerializer($serializer);
+
+        return $denormalizer;
+    }
+
     /**
      * Test that additional attributes throw an exception if no metadata factory is specified.
      */
@@ -300,6 +322,44 @@ class StringCollection
 {
     /** @var string[] */
     public $children;
+}
+
+class AbstractObjectNormalizerWithMetadataAndNameConverter extends AbstractObjectNormalizer
+{
+    public function __construct()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        parent::__construct($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+    }
+
+    protected function extractAttributes($object, $format = null, array $context = [])
+    {
+    }
+
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
+    {
+    }
+
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    {
+        $object->$attribute = $value;
+    }
+}
+
+class DummyObjectWithOptionalAttributes
+{
+    /**
+     * @SerializedName("#")
+     *
+     * @var string
+     */
+    public $value;
+    /**
+     * @SerializedName("@foo")
+     *
+     * @var string
+     */
+    public $foo = null;
 }
 
 class DummyCollection

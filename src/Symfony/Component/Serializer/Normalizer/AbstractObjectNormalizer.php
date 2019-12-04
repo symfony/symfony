@@ -329,6 +329,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
+        if (\is_string($data) && 'xml' === $format && $this->classMetadataFactory->hasMetadataFor($type)) {
+            $attributes = $this->classMetadataFactory->getMetadataFor($type)->getAttributesMetadata();
+            foreach ($attributes as $attribute) {
+                if ('#' === $attribute->getSerializedName()) {
+                    $normalizedData = ['#' => $data];
+                    break;
+                }
+            }
+        }
+
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);

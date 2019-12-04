@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\AccountStatusException;
-
 /**
  * Implement to throw AccountStatusException during the authentication process.
  *
@@ -21,19 +19,6 @@ use Symfony\Component\Security\Core\Exception\AccountStatusException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface UserCheckerInterface
+interface UserCheckerInterface extends PreAuthUserCheckerInterface, PostAuthUserCheckerInterface
 {
-    /**
-     * Checks the user account before authentication.
-     *
-     * @throws AccountStatusException
-     */
-    public function checkPreAuth(UserInterface $user);
-
-    /**
-     * Checks the user account after authentication.
-     *
-     * @throws AccountStatusException
-     */
-    public function checkPostAuth(UserInterface $user);
 }

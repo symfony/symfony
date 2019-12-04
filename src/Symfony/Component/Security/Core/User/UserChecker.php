@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\AccountExpiredException;
-use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
-use Symfony\Component\Security\Core\Exception\DisabledException;
-use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\User\UserChecker\AccountNonExpired;
+use Symfony\Component\Security\Core\User\UserChecker\AccountNonLockedChecker;
+use Symfony\Component\Security\Core\User\UserChecker\CredentialsNonExpired;
+use Symfony\Component\Security\Core\User\UserChecker\EnabledChecker;
 
 /**
  * UserChecker checks the user account flags.
@@ -23,32 +23,25 @@ use Symfony\Component\Security\Core\Exception\LockedException;
  */
 class UserChecker implements UserCheckerInterface
 {
+    private $chain;
+
+    public function __construct()
+    {
+        @trigger_error('Usage of class is deprecated. Use the ChainUserChecker instead.', E_USER_DEPRECATED);
+
+        $this->chain = new ChainUserChecker();
+        $this->chain->add(new AccountNonLockedChecker());
+        $this->chain->add(new EnabledChecker());
+        $this->chain->add(new AccountNonExpired());
+        $this->chain->add(new CredentialsNonExpired());
+    }
+
     /**
      * {@inheritdoc}
      */
     public function checkPreAuth(UserInterface $user)
     {
-        if (!$user instanceof User) {
-            return;
-        }
-
-        if (!$user->isAccountNonLocked()) {
-            $ex = new LockedException('User account is locked.');
-            $ex->setUser($user);
-            throw $ex;
-        }
-
-        if (!$user->isEnabled()) {
-            $ex = new DisabledException('User account is disabled.');
-            $ex->setUser($user);
-            throw $ex;
-        }
-
-        if (!$user->isAccountNonExpired()) {
-            $ex = new AccountExpiredException('User account has expired.');
-            $ex->setUser($user);
-            throw $ex;
-        }
+        $this->chain->checkPreAuth($user);
     }
 
     /**
@@ -56,14 +49,6 @@ class UserChecker implements UserCheckerInterface
      */
     public function checkPostAuth(UserInterface $user)
     {
-        if (!$user instanceof User) {
-            return;
-        }
-
-        if (!$user->isCredentialsNonExpired()) {
-            $ex = new CredentialsExpiredException('User credentials have expired.');
-            $ex->setUser($user);
-            throw $ex;
-        }
+        $this->chain->checkPostAuth($user);
     }
 }

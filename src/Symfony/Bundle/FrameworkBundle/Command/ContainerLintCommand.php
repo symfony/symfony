@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
 final class ContainerLintCommand extends Command
 {
@@ -71,7 +72,11 @@ final class ContainerLintCommand extends Command
             $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
             $container = $buildContainer();
         } else {
-            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
+            (new XmlFileLoader($container = new ContainerBuilder($parameterBag = new EnvPlaceholderParameterBag()), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
+
+            $refl = new \ReflectionProperty($parameterBag, 'resolved');
+            $refl->setAccessible(true);
+            $refl->setValue($parameterBag, true);
         }
 
         return $this->containerBuilder = $container;

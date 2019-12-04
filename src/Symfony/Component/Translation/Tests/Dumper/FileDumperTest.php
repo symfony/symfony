@@ -27,11 +27,15 @@ class FileDumperTest extends TestCase
         $dumper = new ConcreteFileDumper();
         $dumper->dump($catalogue, ['path' => $tempDir]);
 
-        $this->assertFileExists($tempDir.'/messages.en.concrete');
+        $suffix = class_exists(\MessageFormatter::class) ? '+intl-icu' : '';
+        $this->assertFileExists($tempDir."/messages$suffix.en.concrete");
 
-        @unlink($tempDir.'/messages.en.concrete');
+        @unlink($tempDir."/messages$suffix.en.concrete");
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testDumpIntl()
     {
         $tempDir = sys_get_temp_dir();
@@ -42,13 +46,11 @@ class FileDumperTest extends TestCase
         $catalogue->add(['bar' => 'foo'], 'd2+intl-icu');
 
         $dumper = new ConcreteFileDumper();
-        @unlink($tempDir.'/d2.en.concrete');
         $dumper->dump($catalogue, ['path' => $tempDir]);
 
-        $this->assertStringEqualsFile($tempDir.'/d1.en.concrete', 'foo=bar');
-        @unlink($tempDir.'/d1.en.concrete');
+        $this->assertFileNotExists($tempDir.'/d1.en.concrete');
 
-        $this->assertStringEqualsFile($tempDir.'/d1+intl-icu.en.concrete', 'bar=foo');
+        $this->assertStringEqualsFile($tempDir.'/d1+intl-icu.en.concrete', 'bar=foo&foo=bar');
         @unlink($tempDir.'/d1+intl-icu.en.concrete');
 
         $this->assertFileNotExists($tempDir.'/d2.en.concrete');
@@ -60,7 +62,8 @@ class FileDumperTest extends TestCase
     {
         $tempDir = sys_get_temp_dir();
         $translationsDir = $tempDir.'/test/translations';
-        $file = $translationsDir.'/messages.en.concrete';
+        $suffix = class_exists(\MessageFormatter::class) ? '+intl-icu' : '';
+        $file = $translationsDir."/messages$suffix.en.concrete";
 
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(['foo' => 'bar']);

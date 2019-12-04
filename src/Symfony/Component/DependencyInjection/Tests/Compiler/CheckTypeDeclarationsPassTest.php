@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgumentNotNull;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -568,5 +569,19 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->assertInstanceOf(\stdClass::class, $container->get('bar')->foo);
+    }
+
+    public function testProcessResolveExpressions()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('ccc', ['array']);
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', [new Expression("parameter('ccc')")]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
     }
 }

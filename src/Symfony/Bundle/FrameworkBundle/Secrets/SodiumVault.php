@@ -25,6 +25,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
     private $encryptionKey;
     private $decryptionKey;
     private $pathPrefix;
+    private $secretsDir;
 
     /**
      * @param string|object|null $decryptionKey A string or a stringable object that defines the private key to use to decrypt the vault
@@ -36,12 +37,9 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
             throw new \TypeError(sprintf('Decryption key should be a string or an object that implements the __toString() method, %s given.', \gettype($decryptionKey)));
         }
 
-        if (!is_dir($secretsDir) && !@mkdir($secretsDir, 0777, true) && !is_dir($secretsDir)) {
-            throw new \RuntimeException(sprintf('Unable to create the secrets directory (%s)', $secretsDir));
-        }
-
         $this->pathPrefix = rtrim(strtr($secretsDir, '/', \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.basename($secretsDir).'.';
         $this->decryptionKey = $decryptionKey;
+        $this->secretsDir = $secretsDir;
     }
 
     public function generateKeys(bool $override = false): bool
@@ -203,9 +201,20 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $data = str_replace('%', '\x', rawurlencode($data));
         $data = sprintf("<?php // %s on %s\n\nreturn \"%s\";\n", $name, date('r'), $data);
 
+        $this->createSecretsDir();
+
         if (false === file_put_contents($this->pathPrefix.$file.'.php', $data, LOCK_EX)) {
             $e = error_get_last();
             throw new \ErrorException($e['message'] ?? 'Failed to write secrets data.', 0, $e['type'] ?? E_USER_WARNING);
         }
+    }
+
+    private function createSecretsDir(): void
+    {
+        if ($this->secretsDir && !is_dir($this->secretsDir) && !@mkdir($this->secretsDir, 0777, true) && !is_dir($this->secretsDir)) {
+            throw new \RuntimeException(sprintf('Unable to create the secrets directory (%s)', $this->secretsDir));
+        }
+
+        $this->secretsDir = null;
     }
 }

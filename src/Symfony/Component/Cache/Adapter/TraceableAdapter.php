@@ -224,7 +224,7 @@ class TraceableAdapter implements AdapterInterface, PruneableInterface, Resettab
     public function invalidateTags(array $tags)
     {
         // TODO: add logic here and in the rest of this class to trace tags for profiler.
-        // This stub was only added to prevent issue https://github.com/symfony/symfony/issues/34800
+        // This stub was only added to prevent issue https://github.com/symfony/symfony/issues/34800.
     }
 }
 

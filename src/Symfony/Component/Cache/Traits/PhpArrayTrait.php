@@ -28,6 +28,8 @@ trait PhpArrayTrait
     private $values;
     private $zendDetectUnicode;
 
+    private static $valuesCache = [];
+
     /**
      * Store an array of cached values.
      *
@@ -107,6 +109,7 @@ EOF;
         unset($serialized, $unserialized, $value, $dump);
 
         @rename($tmpFile, $this->file);
+        unset(self::$valuesCache[$this->file]);
 
         $this->initialize();
     }
@@ -119,6 +122,7 @@ EOF;
         $this->values = [];
 
         $cleared = @unlink($this->file) || !file_exists($this->file);
+        unset(self::$valuesCache[$this->file]);
 
         return $this->pool->clear() && $cleared;
     }
@@ -128,11 +132,17 @@ EOF;
      */
     private function initialize()
     {
+        if (isset(self::$valuesCache[$this->file])) {
+            $this->values = self::$valuesCache[$this->file];
+
+            return;
+        }
+
         if ($this->zendDetectUnicode) {
             $zmb = ini_set('zend.detect_unicode', 0);
         }
         try {
-            $this->values = file_exists($this->file) ? (include $this->file ?: []) : [];
+            $this->values = self::$valuesCache[$this->file] = file_exists($this->file) ? (include $this->file ?: []) : [];
         } finally {
             if ($this->zendDetectUnicode) {
                 ini_set('zend.detect_unicode', $zmb);

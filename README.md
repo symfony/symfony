@@ -7,13 +7,14 @@
 BlaBlaCar.com and Spotify.com) and most of the [popular PHP projects][2] (including
 Drupal and Magento).
 
+Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
+Support" (LTS) versions and has a [release process][6] that is predictable and
+business-friendly.
+
 Installation
 ------------
 
-* [Install Symfony][4] with Composer (see [requirements details][3]).
-* Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
-  Support" (LTS) versions and has a [release process][6] that is predictable and
-  business-friendly.
+* [Install Symfony][4] with Composer and the Symfony CLI (see [requirements details][3]).
 
 Documentation
 -------------
@@ -29,7 +30,7 @@ Community
 * [Join the Symfony Community][11] and meet other members at the [Symfony events][12].
 * [Get Symfony support][13] on Stack Overflow, Slack, IRC, etc.
 * Follow us on [GitHub][14], [Twitter][15] and [Facebook][16].
-* Read our [Code of Conduct][24] and meet the [CARE Team][25]
+* Read our [Code of Conduct][24] and meet the [CARE Team][25].
 
 Contributing
 ------------

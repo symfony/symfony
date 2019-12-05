@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by bykclk at 2019-12-04T13:13:47Z
+
+I just tested this in a real project - I couldn't find bug. How to reproduce ?
+
+---------------------------------------------------------------------------
+
+by sabruss at 2019-12-04T16:34:26Z
+
+for a test case:
+
+in a FormType
+```php
+->add(
+                'categories',
+                EntityType::class,
+                [
+                    'label' => false,
+                    'required' => false,
+                    'class' => Category::class,
+                    'expanded' => true,
+                    'multiple' => true,
+                    'label_attr' => ['class' => 'switch-custom']
+                ]
+            )
+```
+
+before
+![image](https://user-images.githubusercontent.com/17797150/70161296-2219cb80-16bc-11ea-9252-c87142e0de35.png)
+
+after
+![image](https://user-images.githubusercontent.com/17797150/70161337-34940500-16bc-11ea-9745-3624759e2086.png)

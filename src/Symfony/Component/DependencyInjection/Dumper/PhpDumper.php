@@ -209,7 +209,7 @@ class PhpDumper extends Dumper
 
             if (3 <= $i) {
                 $regex = '';
-                $lastOptionalDir = $i > 8 ? $i - 5 : 3;
+                $lastOptionalDir = $i > 8 ? $i - 5 : $i - 3;
                 $this->targetDirMaxMatches = $i - $lastOptionalDir;
 
                 while (--$i >= $lastOptionalDir) {

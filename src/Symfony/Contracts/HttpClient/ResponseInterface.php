@@ -74,6 +74,18 @@ interface ResponseInterface
     public function toArray(bool $throw = true): array;
 
     /**
+     * Casts the response to a PHP stream resource.
+     *
+     * @return resource
+     *
+     * @throws TransportExceptionInterface   When a network error occurs
+     * @throws RedirectionExceptionInterface On a 3xx when $throw is true and the "max_redirects" option has been reached
+     * @throws ClientExceptionInterface      On a 4xx when $throw is true
+     * @throws ServerExceptionInterface      On a 5xx when $throw is true
+     */
+    public function toStream(bool $throw = true);
+
+    /**
      * Closes the response stream and all related buffers.
      *
      * No further chunk will be yielded after this method has been called.

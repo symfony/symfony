@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-06T16:47:27Z
+
+Could we tag the xml definition instead?
+https://github.com/symfony/symfony/blob/0d2f4111d3a0a8d50800dc12316f9e3faa470cb4/src/Symfony/Bundle/SecurityBundle/Resources/config/security.xml#L32
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-06T16:49:29Z
+
+> Could we tag the xml definition instead?
+
+that would do an extra call because UsageTrackingTokenStorage already resets the storage it decorates.

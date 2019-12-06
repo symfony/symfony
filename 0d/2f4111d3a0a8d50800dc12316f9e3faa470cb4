@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-01T13:11:55Z
+
+Now targetting 4.4 to not break 4-to-5 compat between security-bundle and security-http.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-12-04T06:42:11Z
+
+It's not a bug fix, that's for 5.1 IMHO.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-04T07:55:11Z
+
+Rebased on master.

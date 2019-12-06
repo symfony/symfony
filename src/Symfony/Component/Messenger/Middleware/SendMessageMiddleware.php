@@ -39,7 +39,13 @@ class SendMessageMiddleware implements MiddlewareInterface
     public function __construct(SendersLocatorInterface $sendersLocator, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->sendersLocator = $sendersLocator;
-        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+
+        if (null !== $eventDispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        } else {
+            $this->eventDispatcher = $eventDispatcher;
+        }
+
         $this->logger = new NullLogger();
     }
 

@@ -152,7 +152,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
         $method->invoke(
             $provider,
-            $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(),
+            new User('username', 'password'),
             $token
         );
     }
@@ -176,7 +176,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(), $token);
+        $method->invoke($provider, new User('username', 'password'), $token);
     }
 
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
@@ -248,7 +248,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(), $token);
+        $method->invoke($provider, new User('username', 'password'), $token);
     }
 
     public function testPasswordUpgrades()

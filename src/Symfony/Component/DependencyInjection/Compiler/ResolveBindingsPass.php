@@ -96,6 +96,11 @@ class ResolveBindingsPass extends AbstractRecursivePass
         if ($value instanceof TypedReference && $value->getType() === (string) $value) {
             // Already checked
             $bindings = $this->container->getDefinition($this->currentId)->getBindings();
+            $name = $value->getName();
+
+            if (isset($name, $bindings[$name = $value.' $'.$name])) {
+                return $this->getBindingValue($bindings[$name]);
+            }
 
             if (isset($bindings[$value->getType()])) {
                 return $this->getBindingValue($bindings[$value->getType()]);

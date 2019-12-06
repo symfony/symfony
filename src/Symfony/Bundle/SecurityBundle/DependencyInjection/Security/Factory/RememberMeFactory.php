@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -104,7 +105,7 @@ class RememberMeFactory implements SecurityFactoryInterface
             throw new \RuntimeException('You must configure at least one remember-me aware listener (such as form-login) for each firewall that has remember-me enabled.');
         }
 
-        $rememberMeServices->replaceArgument(0, array_unique($userProviders));
+        $rememberMeServices->replaceArgument(0, new IteratorArgument(array_unique($userProviders)));
 
         // remember-me listener
         $listenerId = 'security.authentication.listener.rememberme.'.$id;

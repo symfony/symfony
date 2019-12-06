@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by dbrekelmans at 2019-12-06T09:41:03Z
+
+@xabbuh Based on https://github.com/symfony/symfony/issues/34824#issuecomment-562091321 I could make some additional changes in this PR if you agree.
+
+Which option would have your preference?
+
+1. Check if `$user->getPassword()` is `null` before call `needsRehash()` (as are the current changes in this PR, I'd just have to add it to `isPasswordValid()` as well)
+2. throw `BadCredentialsException` (or another exception) when `$user->getPassword()` is `null`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-12-06T13:41:20Z
+
+@dbrekelmans I think `needsRehash()` should return `false` when the user's password is `null`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-12-06T13:42:06Z
+
+By the way, #34779 has been merged up to 4.4. You can rebase your changes now. :)
+
+---------------------------------------------------------------------------
+
+by dbrekelmans at 2019-12-06T19:14:14Z
+
+@xabbuh I rebased on 4.4. I think the PR is good to go :)

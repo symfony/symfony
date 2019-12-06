@@ -59,7 +59,7 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         $transportNames = $this->transportNames;
-        // do we want to setup only one transport?
+        // do we want to set up only one transport?
         if ($transport = $input->getArgument('transport')) {
             if (!$this->transportLocator->has($transport)) {
                 throw new \RuntimeException(sprintf('The "%s" transport does not exist.', $transport));
@@ -71,7 +71,7 @@ EOF
             $transport = $this->transportLocator->get($transportName);
             if ($transport instanceof SetupableTransportInterface) {
                 $transport->setup();
-                $io->success(sprintf('The "%s" transport was setup successfully.', $transportName));
+                $io->success(sprintf('The "%s" transport was set up successfully.', $transportName));
             } else {
                 $io->note(sprintf('The "%s" transport does not support setup.', $transportName));
             }

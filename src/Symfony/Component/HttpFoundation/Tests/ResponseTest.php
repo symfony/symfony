@@ -1040,6 +1040,24 @@ class ResponseTest extends ResponseTestCase
     {
         $this->assertEquals($reasonPhrase, Response::$statusTexts[$code]);
     }
+
+    public function testSetContentSafe()
+    {
+        $response = new Response();
+
+        $this->assertFalse($response->headers->has('Preference-Applied'));
+        $this->assertFalse($response->headers->has('Vary'));
+
+        $response->setContentSafe();
+
+        $this->assertSame('safe', $response->headers->get('Preference-Applied'));
+        $this->assertSame('Prefer', $response->headers->get('Vary'));
+
+        $response->setContentSafe(false);
+
+        $this->assertFalse($response->headers->has('Preference-Applied'));
+        $this->assertSame('Prefer', $response->headers->get('Vary'));
+    }
 }
 
 class StringableObject

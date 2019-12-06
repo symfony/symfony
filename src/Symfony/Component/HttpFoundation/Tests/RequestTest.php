@@ -2325,6 +2325,64 @@ class RequestTest extends TestCase
             [null, ['REMOTE_ADDR', '2.2.2.2'], ['2.2.2.2']],
         ];
     }
+
+    /**
+     * @dataProvider preferSafeContentData
+     */
+    public function testPreferSafeContent($server, bool $safePreferenceExpected)
+    {
+        $request = new Request([], [], [], [], [], $server);
+
+        $this->assertEquals($safePreferenceExpected, $request->preferSafeContent());
+    }
+
+    public function preferSafeContentData()
+    {
+        return [
+            [[], false],
+            [
+                [
+                    'HTTPS' => 'on',
+                ],
+                false,
+            ],
+            [
+                [
+                    'HTTPS' => 'off',
+                    'HTTP_PREFER' => 'safe',
+                ],
+                false,
+            ],
+            [
+                [
+                    'HTTPS' => 'on',
+                    'HTTP_PREFER' => 'safe',
+                ],
+                true,
+            ],
+            [
+                [
+                    'HTTPS' => 'on',
+                    'HTTP_PREFER' => 'unknown-preference',
+                ],
+                false,
+            ],
+            [
+                [
+                    'HTTPS' => 'on',
+                    'HTTP_PREFER' => 'unknown-preference=42, safe',
+                ],
+                true,
+            ],
+            [
+                [
+                    'HTTPS' => 'on',
+                    'HTTP_PREFER' => 'safe, unknown-preference=42',
+                ],
+                true,
+            ],
+        ];
+    }
 }
 
 class RequestContentProxy extends Request

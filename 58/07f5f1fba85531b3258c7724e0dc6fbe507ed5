@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-02T21:20:14Z
+
+Adding a doc comment or updating the command test case would be nice though :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-03T16:18:55Z
+
+> Adding a doc comment or updating the command test case would be nice though :)
+
+This command has no test case, I'd prefer moving on here, this is a debug tool, nothing critical.

@@ -1944,10 +1944,18 @@ class Request
             $truncatedRequestUri = substr($requestUri, 0, $pos);
         }
 
-        $basename = basename($baseUrl);
-        if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri), $basename)) {
-            // no match whatsoever; set it blank
-            return '';
+        $autoindexRemoved = false;
+        if (empty(basename($baseUrl)) || !strpos(rawurldecode($truncatedRequestUri), basename($baseUrl))) {
+            // fix "index.php" autoindex 1/2, fix #34866
+            if ('/index.php' === substr($baseUrl, -10)) {
+                $baseUrl = substr($baseUrl, 0, -9);
+                $autoindexRemoved = true;
+            }
+
+            if (empty(basename($baseUrl)) || !strpos(rawurldecode($truncatedRequestUri), basename($baseUrl))) {
+                // no match whatsoever; set it blank
+                return '';
+            }
         }
 
         // If using mod_rewrite or ISAPI_Rewrite strip the script filename
@@ -1955,6 +1963,10 @@ class Request
         // from PATH_INFO or QUERY_STRING
         if (\strlen($requestUri) >= \strlen($baseUrl) && (false !== $pos = strpos($requestUri, $baseUrl)) && 0 !== $pos) {
             $baseUrl = substr($requestUri, 0, $pos + \strlen($baseUrl));
+        }
+
+        if ($autoindexRemoved) {
+            $baseUrl .= 'index.php';
         }
 
         return rtrim($baseUrl, '/'.\DIRECTORY_SEPARATOR);
@@ -2009,6 +2021,12 @@ class Request
             return $requestUri;
         }
 
+        // fix "index.php" autoindex 2/2, fix #34866
+        if (\strlen($baseUrl) >= 10 && 0 !== strpos($requestUri, $baseUrl)
+                && '/index.php' === substr($baseUrl, -10)
+                && 0 === strpos($requestUri, substr($baseUrl, 0, -9))) {
+            $baseUrl = substr($baseUrl, 0, -10);
+        }
         $pathInfo = substr($requestUri, \strlen($baseUrl));
         if (false === $pathInfo || '' === $pathInfo) {
             // If substr() returns false then PATH_INFO is set to an empty string

@@ -14,8 +14,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall;
@@ -571,6 +573,20 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $container->get('bar')->foo);
     }
 
+    public function testProcessResolveArrayParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('ccc', ['foobar']);
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['%ccc%']);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testProcessResolveExpressions()
     {
         $container = new ContainerBuilder();
@@ -580,6 +596,75 @@ class CheckTypeDeclarationsPassTest extends TestCase
             ->register('foobar', BarMethodCall::class)
             ->addMethodCall('setArray', [new Expression("parameter('ccc')")]);
 
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessHandleMixedEnvPlaceholder()
+    {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "foobar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "string" passed.');
+
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'ccc' => '%env(FOO)%',
+        ]));
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['foo%ccc%']);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+    }
+
+    public function testProcessHandleMultipleEnvPlaceholder()
+    {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "foobar": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall::setArray" accepts "array", "string" passed.');
+
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'ccc' => '%env(FOO)%',
+            'fcy' => '%env(int:BAR)%',
+        ]));
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['%ccc%%fcy%']);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+    }
+
+    public function testProcessHandleExistingEnvPlaceholder()
+    {
+        putenv('ARRAY={"foo":"bar"}');
+
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'ccc' => '%env(json:ARRAY)%',
+        ]));
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['%ccc%']);
+
+        (new ResolveParameterPlaceHoldersPass())->process($container);
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+
+        putenv('ARRAY=');
+    }
+
+    public function testProcessHandleNotFoundEnvPlaceholder()
+    {
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
+            'ccc' => '%env(json:ARRAY)%',
+        ]));
+
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['%ccc%']);
+
+        (new ResolveParameterPlaceHoldersPass())->process($container);
         (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->addToAssertionCount(1);

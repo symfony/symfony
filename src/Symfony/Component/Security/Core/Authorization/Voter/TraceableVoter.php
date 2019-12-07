@@ -31,7 +31,12 @@ class TraceableVoter implements VoterInterface
     public function __construct(VoterInterface $voter, EventDispatcherInterface $eventDispatcher)
     {
         $this->voter = $voter;
-        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+
+        if (class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        } else {
+            $this->eventDispatcher = $eventDispatcher;
+        }
     }
 
     public function vote(TokenInterface $token, $subject, array $attributes): int

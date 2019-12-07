@@ -30,6 +30,8 @@ trait PhpArrayTrait
     private $keys;
     private $values;
 
+    private static $valuesCache = [];
+
     /**
      * Store an array of cached values.
      *
@@ -116,6 +118,7 @@ EOF;
         unset($serialized, $value, $dump);
 
         @rename($tmpFile, $this->file);
+        unset(self::$valuesCache[$this->file]);
 
         $this->initialize();
     }
@@ -133,6 +136,7 @@ EOF;
         $this->keys = $this->values = [];
 
         $cleared = @unlink($this->file) || !file_exists($this->file);
+        unset(self::$valuesCache[$this->file]);
 
         if ($this->pool instanceof AdapterInterface) {
             return $this->pool->clear($prefix) && $cleared;
@@ -146,12 +150,15 @@ EOF;
      */
     private function initialize()
     {
-        if (!file_exists($this->file)) {
+        if (isset(self::$valuesCache[$this->file])) {
+            $values = self::$valuesCache[$this->file];
+        } elseif (!file_exists($this->file)) {
             $this->keys = $this->values = [];
 
             return;
+        } else {
+            $values = self::$valuesCache[$this->file] = (include $this->file) ?: [[], []];
         }
-        $values = (include $this->file) ?: [[], []];
 
         if (2 !== \count($values) || !isset($values[0], $values[1])) {
             $this->keys = $this->values = [];

@@ -93,7 +93,13 @@ abstract class AbstractAuthenticationListener extends AbstractListener implement
             'require_previous_session' => true,
         ], $options);
         $this->logger = $logger;
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+
+        if (null !== $dispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        } else {
+            $this->dispatcher = $dispatcher;
+        }
+
         $this->httpUtils = $httpUtils;
     }
 

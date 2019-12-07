@@ -57,6 +57,7 @@ class PassConfig
             new ResolveFactoryClassPass(),
             new ResolveNamedArgumentsPass(),
             new AutowireRequiredMethodsPass(),
+            new AutowireRequiredPropertiesPass(),
             new ResolveBindingsPass(),
             new ServiceLocatorTagPass(),
             new CheckDefinitionValidityPass(),

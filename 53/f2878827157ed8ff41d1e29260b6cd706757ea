@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-05T13:56:11Z
+
+There's something we do in Config: we replace env placeholders with credible values.
+But honestly, it can only go back to false-positives. And the false-negatives don't matter: as long as the app works, it doesn't exist.
+
+The goal of the command is not to prove a theoretical point but to help spot errors quickly.
+
+We should skip instead.

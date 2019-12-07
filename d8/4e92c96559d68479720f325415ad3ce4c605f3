@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-12-03T07:09:38Z
+
+Maybe `@autowired` annotation will be better instead of `@required` just like in Spring?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-03T07:17:42Z
+
+> Maybe `@autowired` annotation will be better instead of `@required` just like in Spring?
+
+there is a fundamental difference between them: `@autowired` is a piece of *configuration* of the DIC. `@required` is a declarative annotation stating that a property (or a method) is part of the instantiation stage of a class. The latter is useful info to the reader, human or computer, and is totally independent of the DIC logic. It happens that the autowiring system knows about it and can wire them *when there is no preexisting configuration* for that property/method. `@autowired` being configuration, it's mostly targeting the DIC logic without adding any useful piece of semantics to the code: it's just configuration in the code - it could be anywhere else without reducing the semantics of said code (e.g. in Yaml). But e.g. what should happen when a class is loaded as a service by some yaml, and the annotation conflicts with that yaml config? That's part of the reason why configuration via annotations is a no go.
+
+So, definitely not `@autowired` as it doesn't convey the meaning we want here.
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2019-12-03T07:21:27Z
+
+@nicolas-grekas Thank you for the explanation :)
+
+---------------------------------------------------------------------------
+
+by Plopix at 2019-12-03T08:52:34Z
+
+also, we might have detected a bug. I was trying to do:
+
+```
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+         MyInterface $service: '@App\MySuperServiceA'
+```
+```
+class MySuperServiceB {
+
+  /**
+   * @required
+   */
+  public MyInterface $service;
+```
+
+but I get a
+```
+In ResolveBindingsPass.php line 82:
+  A binding is configured for an argument of type "PlopInterface" named "$service" under "_defaults" in file "/private/tmp/testinjection/config/services.yaml
+  ", but no corresponding argument has been found. It may be unused and should be removed, or it may have a typo.
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-03T09:38:32Z
+
+> also, we might have detected a bug. [...]
+
+good catch, fixed in #34776

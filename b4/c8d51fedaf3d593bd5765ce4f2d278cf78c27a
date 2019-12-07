@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-12-02T16:44:56Z
+
+Is it possible to write a test covering this, to prevent regressions ?
+
+---------------------------------------------------------------------------
+
+by DjLeChuck at 2019-12-02T16:54:48Z
+
+Yes off course @stof !
+
+Can I use some fixed EHLO exchanges like the one above or should I connect to a real server?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-12-02T17:07:47Z
+
+@DjLeChuck We tend to avoid connecting to real servers to have fast and stable tests. So, replaying a real scenario is best.
+
+---------------------------------------------------------------------------
+
+by DjLeChuck at 2019-12-02T19:39:23Z
+
+I'm stuck, I don't know how to test without having to connect to a real server.
+
+I don't know well PHPUnit and I lose myself in the mocking system. If someone wants to take the problem or help me, you're welcome!

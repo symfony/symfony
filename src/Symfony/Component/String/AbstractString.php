@@ -473,11 +473,15 @@ abstract class AbstractString implements \JsonSerializable
     abstract public function slice(int $start = 0, int $length = null): self;
 
     /**
+     * Converts to snake case: words separated with underscore.
+     *
      * @return static
      */
     abstract public function snake(): self;
 
     /**
+     * Converts to snake case: words and numbers separated with underscore.
+     *
      * @return static
      */
     abstract public function snakeNumeric(): self;

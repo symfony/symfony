@@ -69,7 +69,13 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $this->successHandler = $successHandler;
         $this->failureHandler = $failureHandler;
         $this->logger = $logger;
-        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+
+        if (null !== $eventDispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        } else {
+            $this->eventDispatcher = $eventDispatcher;
+        }
+
         $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }

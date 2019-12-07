@@ -70,7 +70,13 @@ class SwitchUserListener implements ListenerInterface
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
         $this->logger = $logger;
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+
+        if (null !== $dispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        } else {
+            $this->dispatcher = $dispatcher;
+        }
+
         $this->stateless = $stateless;
     }
 

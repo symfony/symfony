@@ -52,7 +52,13 @@ class Worker implements WorkerInterface
         $this->receivers = $receivers;
         $this->bus = $bus;
         $this->retryStrategies = $retryStrategies;
-        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+
+        if (null !== $eventDispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        } else {
+            $this->eventDispatcher = $eventDispatcher;
+        }
+
         $this->logger = $logger;
     }
 

@@ -13,8 +13,10 @@ namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
@@ -26,20 +28,6 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
 trait MicroKernelTrait
 {
     /**
-     * Add or import routes into your application.
-     *
-     *     $routes->import('config/routing.yml');
-     *     $routes->add('/admin', 'App\Controller\AdminController::dashboard', 'admin_dashboard');
-     *
-     * @final since Symfony 5.1, override configureRouting() instead
-     *
-     * @internal since Symfony 5.1, use configureRouting() instead
-     */
-    protected function configureRoutes(RouteCollectionBuilder $routes)
-    {
-    }
-
-    /**
      * Adds or imports routes into your application.
      *
      *     $routes->import($this->getProjectDir().'/config/*.{yaml,php}');
@@ -48,29 +36,26 @@ trait MicroKernelTrait
      *         ->controller('App\Controller\AdminController::dashboard')
      *     ;
      */
-    protected function configureRouting(RoutingConfigurator $routes): void
-    {
-        @trigger_error(sprintf('Not overriding the "%s()" method is deprecated since Symfony 5.1 and will trigger a fatal error in 6.0.', __METHOD__), E_USER_DEPRECATED);
-    }
+    abstract protected function configureRoutes(RoutingConfigurator $routes);
 
     /**
      * Configures the container.
      *
      * You can register extensions:
      *
-     *     $c->loadFromExtension('framework', [
+     *     $c->extension('framework', [
      *         'secret' => '%secret%'
      *     ]);
      *
      * Or services:
      *
-     *     $c->register('halloween', 'FooBundle\HalloweenProvider');
+     *     $c->services()->set('halloween', 'FooBundle\HalloweenProvider');
      *
      * Or parameters:
      *
-     *     $c->setParameter('halloween', 'lot of fun');
+     *     $c->parameters()->set('halloween', 'lot of fun');
      */
-    abstract protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader);
+    abstract protected function configureContainer(ContainerConfigurator $c);
 
     /**
      * {@inheritdoc}
@@ -120,9 +105,31 @@ trait MicroKernelTrait
                 $kernelDefinition->addTag('kernel.event_subscriber');
             }
 
-            $this->configureContainer($container, $loader);
             $container->addObjectResource($this);
             $container->fileExists($this->getProjectDir().'/config/bundles.php');
+
+            try {
+                $this->configureContainer($container, $loader);
+
+                return;
+            } catch (\TypeError $e) {
+                $file = $e->getFile();
+
+                if (0 !== strpos($e->getMessage(), sprintf('Argument 1 passed to %s::configureContainer() must be an instance of %s,', static::class, ContainerConfigurator::class))) {
+                    throw $e;
+                }
+            }
+
+            $kernelLoader = $loader->getResolver()->resolve($file);
+            $kernelLoader->setCurrentDir(\dirname($file));
+            $instanceof = &\Closure::bind(function &() { return $this->instanceof; }, $kernelLoader, $kernelLoader)();
+
+            try {
+                $this->configureContainer(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file), $loader);
+            } finally {
+                $instanceof = [];
+                $kernelLoader->registerAliasesForSinglyImplementedInterfaces();
+            }
         });
     }
 
@@ -131,17 +138,26 @@ trait MicroKernelTrait
      */
     public function loadRoutes(LoaderInterface $loader)
     {
-        $routes = new RouteCollectionBuilder($loader);
-        $this->configureRoutes($routes);
-        $collection = $routes->build();
+        $file = (new \ReflectionObject($this))->getFileName();
+        $kernelLoader = $loader->getResolver()->resolve($file);
+        $kernelLoader->setCurrentDir(\dirname($file));
+        $collection = new RouteCollection();
 
-        if (0 !== \count($collection)) {
-            @trigger_error(sprintf('Adding routes via the "%s:configureRoutes()" method is deprecated since Symfony 5.1 and will have no effect in 6.0; use "configureRouting()" instead.', self::class), E_USER_DEPRECATED);
+        try {
+            $this->configureRoutes(new RoutingConfigurator($collection, $kernelLoader, $file, $file));
+
+            return $collection;
+        } catch (\TypeError $e) {
+            if (0 !== strpos($e->getMessage(), sprintf('Argument 1 passed to %s::configureRoutes() must be an instance of %s,', static::class, RouteCollectionBuilder::class))) {
+                throw $e;
+            }
         }
 
-        $file = (new \ReflectionObject($this))->getFileName();
-        $this->configureRouting(new RoutingConfigurator($collection, $loader, null, $file));
+        @trigger_error(sprintf('Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated since Symfony 5.1, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class), E_USER_DEPRECATED);
 
-        return $collection;
+        $routes = new RouteCollectionBuilder($loader);
+        $this->configureRoutes($routes);
+
+        return $routes->build();
     }
 }

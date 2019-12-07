@@ -41,18 +41,14 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
     /**
      * This adapter takes advantage of how PHP stores arrays in its latest versions.
      *
-     * @param string $file The PHP file were values are cached
+     * @param string         $file         The PHP file were values are cached
+     * @param CacheInterface $fallbackPool A pool to fallback on when an item is not hit
      *
      * @return Psr16CacheInterface
      */
     public static function create($file, Psr16CacheInterface $fallbackPool)
     {
-        // Shared memory is available in PHP 7.0+ with OPCache enabled
-        if (filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
-            return new static($file, $fallbackPool);
-        }
-
-        return $fallbackPool;
+        return new static($file, $fallbackPool);
     }
 
     /**

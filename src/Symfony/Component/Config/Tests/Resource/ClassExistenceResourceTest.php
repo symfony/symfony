@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\Config\Tests\Fixtures\BadFileName;
 use Symfony\Component\Config\Tests\Fixtures\BadParent;
 use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
 
@@ -87,6 +88,24 @@ EOF
         $this->expectExceptionMessage('Class "Symfony\Component\Config\Tests\Fixtures\MissingParent" not found while loading "Symfony\Component\Config\Tests\Fixtures\BadParent".');
 
         $res = new ClassExistenceResource(BadParent::class, false);
+        $res->isFresh(0);
+    }
+
+    public function testBadFileName()
+    {
+        $this->expectException('ReflectionException');
+        $this->expectExceptionMessage('Mismatch between file name and class name.');
+
+        $res = new ClassExistenceResource(BadFileName::class, false);
+        $res->isFresh(0);
+    }
+
+    public function testBadFileNameBis()
+    {
+        $this->expectException('ReflectionException');
+        $this->expectExceptionMessage('Mismatch between file name and class name.');
+
+        $res = new ClassExistenceResource(BadFileName::class, false);
         $res->isFresh(0);
     }
 

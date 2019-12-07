@@ -931,16 +931,16 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
-     * @dataProvider provideUnderscore
+     * @dataProvider provideSnakeNumeric
      */
-    public function testUnderscore(string $expectedString, string $origin): void
+    public function testSnakeNumeric(string $expectedString, string $origin): void
     {
-        $instance = static::createFromString($origin)->underscore();
+        $instance = static::createFromString($origin)->snakeNumeric();
 
         $this->assertEquals(static::createFromString($expectedString), $instance);
     }
 
-    public static function provideUnderscore(): array
+    public static function provideSnakeNumeric(): array
     {
         return [
             ['', ''],

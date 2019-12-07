@@ -510,10 +510,10 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         );
     }
 
-    public static function provideUnderscore(): array
+    public static function provideSnakeNumeric(): array
     {
         return array_merge(
-            parent::provideUnderscore(),
+            parent::provideSnakeNumeric(),
             [
                 ['symfony_5_ist_äußerst_cool', 'symfony5IstÄußerstCool'],
                 ['8äußerst', '8äußerst'],

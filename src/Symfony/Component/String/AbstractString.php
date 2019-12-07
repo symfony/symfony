@@ -480,6 +480,11 @@ abstract class AbstractString implements \JsonSerializable
     /**
      * @return static
      */
+    abstract public function snakeNumeric(): self;
+
+    /**
+     * @return static
+     */
     abstract public function splice(string $replacement, int $start = 0, int $length = null): self;
 
     /**
@@ -635,11 +640,6 @@ abstract class AbstractString implements \JsonSerializable
 
         return $ellipsisLength ? $str->trimEnd()->append($ellipsis) : $str;
     }
-
-    /**
-     * @return static
-     */
-    abstract public function underscore(): self;
 
     /**
      * @return static

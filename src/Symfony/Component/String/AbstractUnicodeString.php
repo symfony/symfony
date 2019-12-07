@@ -344,6 +344,17 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
+    public function snakeNumeric(): parent
+    {
+        $str = $this->camel()->title();
+        $str->string = mb_strtolower(
+            preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u', '/(\p{Ll})([0-9])/u'], '\1_\2', $str->string),
+            'UTF-8'
+        );
+
+        return $str;
+    }
+
     public function title(bool $allWords = false): parent
     {
         $str = clone $this;
@@ -392,21 +403,6 @@ abstract class AbstractUnicodeString extends AbstractString
 
         $str = clone $this;
         $str->string = preg_replace("{^[$chars]++}uD", '', $str->string);
-
-        return $str;
-    }
-
-    public function underscore(): parent
-    {
-        $str = $this->camel()->title();
-        $str->string = mb_strtolower(
-            preg_replace(
-                ['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u', '/(\p{Ll})([0-9])/u'],
-                '\1_\2',
-                $str->string
-            ),
-            'UTF-8'
-        );
 
         return $str;
     }

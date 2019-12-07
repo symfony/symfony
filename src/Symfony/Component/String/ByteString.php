@@ -439,7 +439,7 @@ class ByteString extends AbstractString
         return $str;
     }
 
-    public function underscore(): parent
+    public function snakeNumeric(): parent
     {
         $str = $this->camel()->title();
         $str->string = strtolower(

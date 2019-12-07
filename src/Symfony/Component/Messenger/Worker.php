@@ -47,8 +47,13 @@ class Worker
     {
         $this->receivers = $receivers;
         $this->bus = $bus;
-        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
         $this->logger = $logger;
+
+        if (null !== $eventDispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        } else {
+            $this->eventDispatcher = $eventDispatcher;
+        }
     }
 
     /**

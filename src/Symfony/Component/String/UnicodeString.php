@@ -347,6 +347,11 @@ class UnicodeString extends AbstractUnicodeString
         return $prefix === grapheme_extract($this->string, \strlen($prefix), GRAPHEME_EXTR_MAXBYTES);
     }
 
+    public function __wakeup()
+    {
+        normalizer_is_normalized($this->string) ?: $this->string = normalizer_normalize($this->string);
+    }
+
     public function __clone()
     {
         if (null === $this->ignoreCase) {

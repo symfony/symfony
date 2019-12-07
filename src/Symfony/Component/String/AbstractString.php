@@ -692,6 +692,11 @@ abstract class AbstractString implements \JsonSerializable
         return $str;
     }
 
+    public function __sleep(): array
+    {
+        return ['string'];
+    }
+
     public function __clone()
     {
         $this->ignoreCase = false;

@@ -115,6 +115,7 @@ class EsmtpTransport extends SmtpTransport
 
             try {
                 $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
+                $capabilities = $this->getCapabilities($response);
             } catch (TransportExceptionInterface $e) {
                 parent::doHeloCommand();
 

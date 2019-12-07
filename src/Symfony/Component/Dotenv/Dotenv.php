@@ -35,7 +35,7 @@ final class Dotenv
     private $data;
     private $end;
     private $values;
-    private $usePutenv = true;
+    private $usePutenv;
 
     /**
      * @var bool If `putenv()` should be used to define environment variables or not.

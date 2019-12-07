@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-12-04T11:42:57Z
+
+while working on #34807 I realised that we actually do not correctly parse negative octal numbers
+
+---------------------------------------------------------------------------
+
+by stof at 2019-12-04T11:46:20Z
+
+Based on https://yaml.org/spec/1.2/spec.html#id2805071, I don't think negative octal actually make sense in YAML
+
+---------------------------------------------------------------------------
+
+by stof at 2019-12-04T11:50:58Z
+
+OK, according to https://yaml.org/type/int.html, they do make sense in YAML 1.1 (and this octal without `0o` is the 1.1 octal syntax). I think we need to clarify which YAML spec we follow in the component (I think the current answer is "a mix of 1.1 and 1.2, being compliant with none of the 2 due to the mix")
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-12-04T11:53:18Z
+
+In #34813 I am working on a deprecation. Looks like I need to improve that a bit so that in the future we will only support the `0o` prefix.

@@ -34,6 +34,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
+use Symfony\Component\Serializer\Tests\Fixtures\EmptyDummy;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
@@ -252,6 +253,18 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizedData = $normalizer->normalize(new EmptyDummy(), 'any', ['preserve_empty_objects' => true]);
         $this->assertEquals(new \ArrayObject(), $normalizedData);
     }
+
+    public function testNormalizeStdClassObjectLogicException()
+    {
+        $this->expectException('Symfony\Component\Serializer\Exception\LogicException');
+        $this->expectExceptionMessage('Cannot normalize value for attribute "foo" because the injected serializer is not a normalizer');
+
+        $std = new \stdClass();
+        $std->foo = 'bar';
+        $normalizer = new ObjectNormalizer();
+
+        $normalizer->normalize($std);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -289,10 +302,6 @@ class Dummy
     public $foo;
     public $bar;
     public $baz;
-}
-
-class EmptyDummy
-{
 }
 
 class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer

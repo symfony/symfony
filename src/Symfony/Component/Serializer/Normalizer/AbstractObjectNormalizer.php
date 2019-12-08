@@ -139,7 +139,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (\stdClass::class === get_class($object)) {
+        if (\stdClass::class === \get_class($object)) {
             return $this->normalizeStdClassObject($object, $format, $context);
         }
 
@@ -636,11 +636,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * @param \stdClass   $object
      * @param string|null $format
-     * @param array       $context
      *
-     * @return mixed
+     * @return array
      *
      * @throws LogicException
      */
@@ -649,7 +647,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $normalized = [];
         foreach ($object as $key => $val) {
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(sprintf('Cannot normalize value for key "%s" because the injected serializer is not a normalizer', $key));
+                throw new LogicException(sprintf('Cannot normalize value for attribute "%s" because the injected serializer is not a normalizer', $key));
             }
 
             $normalized[$key] = $this->serializer->normalize($val, $format, $context);

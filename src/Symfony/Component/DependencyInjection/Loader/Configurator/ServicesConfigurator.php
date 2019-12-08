@@ -32,16 +32,19 @@ class ServicesConfigurator extends AbstractConfigurator
     private $path;
     private $anonymousHash;
     private $anonymousCount;
+    private $defaultDefinition;
 
-    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path = null, int &$anonymousCount = 0)
+    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path = null, int &$anonymousCount = 0, Definition $defaultDefinition = null)
     {
-        $this->defaults = new Definition();
+        $defaultDefinition = $defaultDefinition ?? new Definition();
+        $this->defaults = clone $defaultDefinition;
         $this->container = $container;
         $this->loader = $loader;
         $this->instanceof = &$instanceof;
         $this->path = $path;
         $this->anonymousHash = ContainerBuilder::hash($path ?: mt_rand());
         $this->anonymousCount = &$anonymousCount;
+        $this->defaultDefinition = $defaultDefinition;
         $instanceof = [];
     }
 
@@ -50,7 +53,7 @@ class ServicesConfigurator extends AbstractConfigurator
      */
     final public function defaults(): DefaultsConfigurator
     {
-        return new DefaultsConfigurator($this, $this->defaults = new Definition(), $this->path);
+        return new DefaultsConfigurator($this, $this->defaults = clone $this->defaultDefinition, $this->path);
     }
 
     /**

@@ -1601,6 +1601,24 @@ class ContainerBuilderTest extends TestCase
         $wither = $container->get('wither');
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
+
+    public function testAutoAliasing()
+    {
+        $container = new ContainerBuilder();
+        $container->register(C::class);
+        $container->register(D::class);
+
+        $container->setParameter('foo', D::class);
+
+        $definition = new Definition(X::class);
+        $definition->setPublic(true);
+        $definition->addTag('auto_alias', ['format' => '%foo%']);
+        $container->setDefinition(X::class, $definition);
+
+        $container->compile();
+
+        $this->assertInstanceOf(D::class, $container->get(X::class));
+    }
 }
 
 class FooClass
@@ -1616,4 +1634,16 @@ class B
     public function __construct(A $a)
     {
     }
+}
+
+interface X
+{
+}
+
+class C implements X
+{
+}
+
+class D implements X
+{
 }

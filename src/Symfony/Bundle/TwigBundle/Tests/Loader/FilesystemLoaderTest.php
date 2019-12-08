@@ -123,6 +123,6 @@ class FilesystemLoaderTest extends TestCase
 
         $method = new \ReflectionMethod('Symfony\Bundle\TwigBundle\Loader\FilesystemLoader', 'findTemplate');
         $method->setAccessible(true);
-        $this->assertFalse($method->invoke($loader, 'name.format.engine', false));
+        $this->assertNull($method->invoke($loader, 'name.format.engine', false));
     }
 }

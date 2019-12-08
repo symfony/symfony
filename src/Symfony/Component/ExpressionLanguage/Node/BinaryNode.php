@@ -147,8 +147,16 @@ class BinaryNode extends Node
             case '*':
                 return $left * $right;
             case '/':
+                if (0 == $right) {
+                    throw new \DivisionByZeroError('Division by zero');
+                }
+
                 return $left / $right;
             case '%':
+                if (0 == $right) {
+                    throw new \DivisionByZeroError('Modulo by zero');
+                }
+
                 return $left % $right;
             case 'matches':
                 return preg_match($right, $left);

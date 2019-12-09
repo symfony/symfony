@@ -41,7 +41,7 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
     public function normalize($exception, $format = null, array $context = [])
     {
         $context += $this->defaultContext;
-        $debug = $this->debug && $context['debug'] ?? true;
+        $debug = $this->debug && ($context['debug'] ?? true);
 
         $data = [
             'type' => $context['type'],

@@ -18,9 +18,6 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class SemaphoreStamp implements NonSendableStampInterface
 {
-    /**
-     * @var int
-     */
     private $type;
 
     public function __construct(int $type)

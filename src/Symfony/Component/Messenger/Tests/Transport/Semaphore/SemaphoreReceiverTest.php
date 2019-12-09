@@ -35,7 +35,7 @@ class SemaphoreReceiverTest extends TestCase
     public function testItReturnsTheDecodedMessageToTheHandler()
     {
         $serializer = new Serializer(
-                new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $semaphoreEnvelope = $this->createSemaphoreEnvelope();
@@ -54,7 +54,7 @@ class SemaphoreReceiverTest extends TestCase
         $envelope = $this->getMockBuilder(SemaphoreEnvelope::class)->disableOriginalConstructor()->getMock();
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
         $envelope->method('getHeaders')->willReturn([
-                'type' => DummyMessage::class,
+            'type' => DummyMessage::class,
         ]);
 
         return $envelope;

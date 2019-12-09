@@ -83,7 +83,6 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreTransportFactory;
-use Symfony\Component\Messenger\Transport\Semaphore\Util\PlatformUtil;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -1628,7 +1627,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.amqp.factory');
             $container->removeDefinition('messenger.transport.redis.factory');
         } else {
-            if (false === PlatformUtil::isWindows()) {
+            if (true === \extension_loaded('sysvmsg')) {
                 $semaphoreTransportFactoryDefinition = (new Definition(SemaphoreTransportFactory::class))
                     ->addTag('messenger.transport_factory');
                 $container->setDefinition('messenger.transport.semaphore.factory', $semaphoreTransportFactoryDefinition);

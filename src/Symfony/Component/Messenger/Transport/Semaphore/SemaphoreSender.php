@@ -12,9 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Semaphore;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Transport\Semaphore\Exception\SemaphoreException;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -26,9 +24,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class SemaphoreSender implements SenderInterface
 {
-    /**
-     * @var SerializerInterface
-     */
+    private $connection;
     private $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
@@ -50,16 +46,12 @@ class SemaphoreSender implements SenderInterface
         $delayStamp = $envelope->last(DelayStamp::class);
         $delay = null !== $delayStamp ? $delayStamp->getDelay() : 0;
 
-        try {
-            $this->connection->send(
-                    $encodedMessage['body'],
-                    $encodedMessage['headers'] ?? [],
-                    $delay,
-                    $envelope->last(SemaphoreStamp::class)
-            );
-        } catch (SemaphoreException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
+        $this->connection->send(
+            $encodedMessage['body'],
+            $encodedMessage['headers'] ?? [],
+            $delay,
+            $envelope->last(SemaphoreStamp::class)
+        );
 
         return $envelope;
     }

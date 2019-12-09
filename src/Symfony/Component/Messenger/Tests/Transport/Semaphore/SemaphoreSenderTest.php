@@ -13,11 +13,12 @@ namespace Symfony\Component\Messenger\Tests\Transport\Semaphore;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Semaphore\Connection;
-use Symfony\Component\Messenger\Transport\Semaphore\Exception\SemaphoreException;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreSender;
 use Symfony\Component\Messenger\Transport\Semaphore\SemaphoreStamp;
+use Symfony\Component\Messenger\Transport\Semaphore\Exception\SemaphoreException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class SemaphoreSenderTest extends TestCase
@@ -78,7 +79,7 @@ class SemaphoreSenderTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotSendTheMessage()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
+        $this->expectException(TransportException::class);
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 

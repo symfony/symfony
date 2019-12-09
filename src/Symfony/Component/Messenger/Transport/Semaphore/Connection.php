@@ -23,15 +23,11 @@ use Symfony\Component\Messenger\Transport\Semaphore\Exception\SemaphoreException
 class Connection
 {
     private const DEFAULT_OPTIONS = [
-        'path' => __FILE__,
         'project' => 'M',
         'message_max_size' => 131072,
         'auto_setup' => true,
     ];
 
-    /**
-     * @var array
-     */
     private $configuration;
 
     /**
@@ -84,7 +80,7 @@ class Connection
         parse_str($parsedUrl['query'] ?? '', $parsedQuery);
 
         $queueOptions = array_replace_recursive([
-            'path' => $parsedUrl['path'] ?? self::DEFAULT_OPTIONS['path'],
+            'path' => $parsedUrl['path']
         ], $options, $parsedQuery);
 
         return new self($queueOptions);

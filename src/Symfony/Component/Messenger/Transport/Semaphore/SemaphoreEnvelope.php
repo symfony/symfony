@@ -16,19 +16,8 @@ namespace Symfony\Component\Messenger\Transport\Semaphore;
  */
 class SemaphoreEnvelope
 {
-    /**
-     * @var int
-     */
     private $type;
-
-    /**
-     * @var string
-     */
     private $body;
-
-    /**
-     * @var array
-     */
     private $headers;
 
     public function __construct(int $type, string $body, array $headers = [])

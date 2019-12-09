@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Messenger\Transport\Semaphore\Exception;
 
-use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * @author Cedrick Oka Baidai <okacedrick@gmail.com>
  */
-class SemaphoreException extends RuntimeException
+class SemaphoreException extends TransportException
 {
 }

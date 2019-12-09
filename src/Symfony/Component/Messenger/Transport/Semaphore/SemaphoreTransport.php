@@ -23,14 +23,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class SemaphoreTransport implements TransportInterface
 {
-    /**
-     * @var Connection
-     */
     private $connection;
-
-    /**
-     * @var SerializerInterface
-     */
     private $serializer;
 
     /**

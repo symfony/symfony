@@ -13,9 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Semaphore;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
-use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
-use Symfony\Component\Messenger\Transport\Semaphore\Exception\SemaphoreException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
@@ -26,14 +24,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  */
 class SemaphoreReceiver implements ReceiverInterface
 {
-    /**
-     * @var Connection
-     */
     private $connection;
-
-    /**
-     * @var SerializerInterface
-     */
     private $serializer;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
@@ -49,11 +40,7 @@ class SemaphoreReceiver implements ReceiverInterface
      */
     public function get(): iterable
     {
-        try {
-            $semaphoreEnvelope = $this->connection->get();
-        } catch (SemaphoreException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
+        $semaphoreEnvelope = $this->connection->get();
 
         if (null === $semaphoreEnvelope) {
             return;

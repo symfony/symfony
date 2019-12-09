@@ -439,6 +439,22 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeNumericNodeValue()
+    {
+        $source = '<?xml version="1.0"?>'."\n".
+            '<response><foo>7643796</foo><bar>3.14</bar></response>'."\n";
+
+        $expected = [
+            'foo' => 7643796,
+            'bar' => 3.14,
+        ];
+
+        $result = $this->encoder->decode($source, 'xml');
+        $this->assertEquals($expected, $result);
+        $this->assertIsInt($result['foo']);
+        $this->assertIsFloat($result['bar']);
+    }
+
     public function testDecodeRootAttributes()
     {
         $source = '<?xml version="1.0"?>'."\n".

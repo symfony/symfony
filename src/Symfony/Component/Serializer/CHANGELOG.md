@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+ * Cast to PHP type numeric value from node for XML
+
 5.0.0
 -----
 

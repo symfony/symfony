@@ -326,6 +326,14 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [XML_TEXT_NODE, XML_CDATA_SECTION_NODE])) {
+            if (false !== $val = filter_var($node->firstChild->nodeValue, FILTER_VALIDATE_INT)) {
+                return $val;
+            }
+
+            if (false !== $val = filter_var($node->firstChild->nodeValue, FILTER_VALIDATE_FLOAT)) {
+                return $val;
+            }
+
             return $node->firstChild->nodeValue;
         }
 

@@ -35,12 +35,13 @@ trait PhpFilesTrait
     private $files = [];
 
     private static $startTime;
+    private static $valuesCache = [];
 
     public static function isSupported()
     {
         self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
 
-        return \function_exists('opcache_invalidate') && ('cli' !== \PHP_SAPI || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN)) && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN);
+        return \function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN) && (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN));
     }
 
     /**
@@ -54,7 +55,7 @@ trait PhpFilesTrait
 
         set_error_handler($this->includeHandler);
         try {
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
                 try {
                     if (\is_array($expiresAt = include $file)) {
                         $expiresAt = $expiresAt[0];
@@ -100,7 +101,6 @@ trait PhpFilesTrait
             } elseif (!\is_object($value)) {
                 $values[$id] = $value;
             } elseif (!$value instanceof LazyValue) {
-                // calling a Closure is for @deprecated BC and should be removed in Symfony 5.0
                 $values[$id] = $value();
             } elseif (false === $values[$id] = include $value->file) {
                 unset($values[$id], $this->values[$id]);
@@ -123,14 +123,20 @@ trait PhpFilesTrait
                 try {
                     $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
 
-                    if (\is_array($expiresAt = include $file)) {
+                    if (isset(self::$valuesCache[$file])) {
+                        [$expiresAt, $this->values[$id]] = self::$valuesCache[$file];
+                    } elseif (\is_array($expiresAt = include $file)) {
+                        if ($this->appendOnly) {
+                            self::$valuesCache[$file] = $expiresAt;
+                        }
+
                         [$expiresAt, $this->values[$id]] = $expiresAt;
                     } elseif ($now < $expiresAt) {
                         $this->values[$id] = new LazyValue($file);
                     }
 
                     if ($now >= $expiresAt) {
-                        unset($this->values[$id], $missingIds[$k]);
+                        unset($this->values[$id], $missingIds[$k], self::$valuesCache[$file]);
                     }
                 } catch (\ErrorException $e) {
                     unset($missingIds[$k]);
@@ -159,7 +165,13 @@ trait PhpFilesTrait
             $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
             $getExpiry = true;
 
-            if (\is_array($expiresAt = include $file)) {
+            if (isset(self::$valuesCache[$file])) {
+                [$expiresAt, $value] = self::$valuesCache[$file];
+            } elseif (\is_array($expiresAt = include $file)) {
+                if ($this->appendOnly) {
+                    self::$valuesCache[$file] = $expiresAt;
+                }
+
                 [$expiresAt, $value] = $expiresAt;
             } elseif ($this->appendOnly) {
                 $value = new LazyValue($file);
@@ -211,12 +223,14 @@ trait PhpFilesTrait
                 $value = var_export($value, true);
             }
 
-            if (!$isStaticValue) {
+            if ($isStaticValue) {
+                $value = "<?php return [{$expiry}, {$value}];\n";
+            } elseif ($this->appendOnly) {
+                $value = "<?php return [{$expiry}, static function () { return {$value}; }];\n";
+            } else {
                 // We cannot use a closure here because of https://bugs.php.net/76982
                 $value = str_replace('\Symfony\Component\VarExporter\Internal\\', '', $value);
                 $value = "<?php\n\nnamespace Symfony\Component\VarExporter\Internal;\n\nreturn \$getExpiry ? {$expiry} : {$value};\n";
-            } else {
-                $value = "<?php return [{$expiry}, {$value}];\n";
             }
 
             $file = $this->files[$key] = $this->getFile($key, true);
@@ -227,6 +241,7 @@ trait PhpFilesTrait
                 @opcache_invalidate($file, true);
                 @opcache_compile_file($file);
             }
+            unset(self::$valuesCache[$file]);
         }
 
         if (!$ok && !is_writable($this->directory)) {
@@ -260,6 +275,8 @@ trait PhpFilesTrait
 
     protected function doUnlink($file)
     {
+        unset(self::$valuesCache[$file]);
+
         if (self::isSupported()) {
             @opcache_invalidate($file, true);
         }

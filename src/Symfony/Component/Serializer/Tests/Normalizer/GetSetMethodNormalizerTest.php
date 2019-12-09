@@ -38,6 +38,10 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\IgnoredAttributesTest
 use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectToPopulateTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
+use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceParent;
+use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceSecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceGrandChild;
 
 class GetSetMethodNormalizerTest extends TestCase
 {
@@ -439,6 +443,50 @@ class GetSetMethodNormalizerTest extends TestCase
             $this->normalizer->normalize($obj, 'any')
         );
     }
+
+    /**
+     * @group circularId
+    */
+    public function testCircularReferenceHandlerObjectWithId() 
+    {
+        $normalizer = $this->getNormalizerForCircularReference();
+
+        $parent = new CircularReferenceParent();
+        $child1 = new CircularReferenceFirstChild();
+        $child2 = new CircularReferenceSecondChild();
+        $grandChild = new CircularReferenceGrandChild();
+
+        $parent->setId(12);
+
+        $grandChild->setId(15);
+        $grandChild->setGrandParent($parent);
+        $grandChild->setParent($child1);
+
+        $child1->setId(42);
+        $parent->setChild1($child1);
+        $child1->setParent($parent);
+        $child1->setChild($grandChild);
+
+        //var_dump($child1);
+
+        $child2->setId(144);
+        $parent->setChild2($child2);
+        $child2->setParent($parent);
+
+        //var_dump($child2);
+
+        $normilizedParent = $normalizer->normalize($parent);
+
+        //var_dump($parent);
+        //var_dump($normilizedParent);
+        $expected = ["id" => 12, 
+                     "child1"=> ["id" => 42,  "parent" => 12, "child" => ["id" => 15, "parent" => 42, "grandParent" => 12]],
+                     "child2"=> ["id" => 144, "parent" => 12]
+                    ];       
+        $this->assertEquals($expected, $normilizedParent);
+    }
+
+
 }
 
 class GetSetDummy

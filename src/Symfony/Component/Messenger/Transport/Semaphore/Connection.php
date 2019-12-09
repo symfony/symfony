@@ -80,7 +80,7 @@ class Connection
         parse_str($parsedUrl['query'] ?? '', $parsedQuery);
 
         $queueOptions = array_replace_recursive([
-            'path' => $parsedUrl['path']
+            'path' => $parsedUrl['path'],
         ], $options, $parsedQuery);
 
         return new self($queueOptions);

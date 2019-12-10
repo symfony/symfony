@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-11-29T08:44:59Z
+
+Tested on my side, it solves the issue, no-side effects noticed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-11-29T15:49:16Z
+
+Would it not make sense to not let both classes extend `Constraint` instead?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-11-29T16:02:12Z
+
+If I understand your suggestion, extending Constraint is required for now to leverage the existing infrastructure to load this annotations & call `\Symfony\Component\Validator\Mapping\ClassMetadata::addConstraint`.
+
+That's why I mentioned the `GroupSequence` annotation in the description, which has its own parsing layer in `\Symfony\Component\Validator\Mapping\Loader\LoaderInterface` implems. We could do the same for these annotations, but we're late to find and implement another syntax to parse for this, right?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-12-05T13:51:52Z
+
+ping @mpiot & @dunglas

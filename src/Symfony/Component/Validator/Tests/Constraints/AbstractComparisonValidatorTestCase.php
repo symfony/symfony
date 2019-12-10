@@ -53,10 +53,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
             foreach ($comparison as $i => $value) {
                 if ($value instanceof \DateTime) {
-                    $comparison[$i] = new \DateTimeImmutable(
-                        $value->format('Y-m-d H:i:s.u e'),
-                        $value->getTimezone()
-                    );
+                    $comparison[$i] = new \DateTimeImmutable($value->format('Y-m-d H:i:s.u e'));
                     $add = true;
                 } elseif ('DateTime' === $value) {
                     $comparison[$i] = 'DateTimeImmutable';

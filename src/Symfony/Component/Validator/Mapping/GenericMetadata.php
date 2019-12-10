@@ -12,6 +12,13 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
+<<<<<<< HEAD
+=======
+use Symfony\Component\Validator\Constraints\DisableAutoMapping;
+use Symfony\Component\Validator\Constraints\EnableAutoMapping;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+>>>>>>> 4.4
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -74,6 +81,19 @@ class GenericMetadata implements MetadataInterface
     public $traversalStrategy = TraversalStrategy::NONE;
 
     /**
+     * Is auto-mapping enabled?
+     *
+     * @var int
+     *
+     * @see AutoMappingStrategy
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getAutoMappingStrategy()} instead.
+     */
+    public $autoMappingStrategy = AutoMappingStrategy::NONE;
+
+    /**
      * Returns the names of the properties that should be serialized.
      *
      * @return string[]
@@ -85,6 +105,7 @@ class GenericMetadata implements MetadataInterface
             'constraintsByGroup',
             'cascadingStrategy',
             'traversalStrategy',
+            'autoMappingStrategy',
         ];
     }
 
@@ -134,6 +155,13 @@ class GenericMetadata implements MetadataInterface
                 $this->traversalStrategy = TraversalStrategy::NONE;
             }
 
+            return $this;
+        }
+
+        if ($constraint instanceof DisableAutoMapping || $constraint instanceof EnableAutoMapping) {
+            $this->autoMappingStrategy = $constraint instanceof EnableAutoMapping ? AutoMappingStrategy::ENABLED : AutoMappingStrategy::DISABLED;
+
+            // The constraint is not added
             return $this;
         }
 
@@ -204,5 +232,13 @@ class GenericMetadata implements MetadataInterface
     public function getTraversalStrategy()
     {
         return $this->traversalStrategy;
+    }
+
+    /**
+     * @see AutoMappingStrategy
+     */
+    public function getAutoMappingStrategy(): int
+    {
+        return $this->autoMappingStrategy;
     }
 }

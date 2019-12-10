@@ -1463,7 +1463,7 @@ EOTXT;
 
     public function testPreparedCommand()
     {
-        $p = Process::fromShellCommandline('echo "$abc"DEF');
+        $p = Process::fromShellCommandline('echo "${:abc}"DEF');
         $p->run(null, ['abc' => 'ABC']);
 
         $this->assertSame('ABCDEF', rtrim($p->getOutput()));
@@ -1471,7 +1471,7 @@ EOTXT;
 
     public function testPreparedCommandMulti()
     {
-        $p = Process::fromShellCommandline('echo "$abc""$def"');
+        $p = Process::fromShellCommandline('echo "${:abc}""${:def}"');
         $p->run(null, ['abc' => 'ABC', 'def' => 'DEF']);
 
         $this->assertSame('ABCDEF', rtrim($p->getOutput()));
@@ -1479,7 +1479,7 @@ EOTXT;
 
     public function testPreparedCommandWithQuoteInIt()
     {
-        $p = Process::fromShellCommandline('php -r "$code" "$def"');
+        $p = Process::fromShellCommandline('php -r "${:code}" "${:def}"');
         $p->run(null, ['code' => 'echo $argv[1];', 'def' => '"DEF"']);
 
         $this->assertSame('"DEF"', rtrim($p->getOutput()));
@@ -1488,16 +1488,16 @@ EOTXT;
     public function testPreparedCommandWithMissingValue()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Command line is missing a value for key "$abc": echo "$abc".');
-        $p = Process::fromShellCommandline('echo "$abc"');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, ['bcd' => 'BCD']);
     }
 
     public function testPreparedCommandWithNoValues()
     {
         $this->expectException('Symfony\Component\Process\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Command line is missing a value for key "$abc": echo "$abc".');
-        $p = Process::fromShellCommandline('echo "$abc"');
+        $this->expectExceptionMessage('Command line is missing a value for parameter "abc": echo "${:abc}".');
+        $p = Process::fromShellCommandline('echo "${:abc}"');
         $p->run(null, []);
     }
 

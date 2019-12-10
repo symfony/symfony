@@ -1643,12 +1643,12 @@ class Process implements \IteratorAggregate
 
     private function replacePlaceholders(string $commandline, array $env)
     {
-        return preg_replace_callback('/"\$([_a-zA-Z]++[_a-zA-Z0-9]*+)"/', function ($matches) use ($commandline, $env) {
+        return preg_replace_callback('/"\$\{:([_a-zA-Z]++[_a-zA-Z0-9]*+)\}"/', function ($matches) use ($commandline, $env) {
             if (!isset($env[$matches[1]]) || false === $env[$matches[1]]) {
-                throw new InvalidArgumentException(sprintf('Command line is missing a value for key %s: %s.', $matches[0], $commandline));
+                throw new InvalidArgumentException(sprintf('Command line is missing a value for parameter "%s": %s.', $matches[1], $commandline));
             }
 
-            return '\\' === \DIRECTORY_SEPARATOR ? $this->escapeArgument($env[$matches[1]]) : $matches[0];
+            return $this->escapeArgument($env[$matches[1]]);
         }, $commandline);
     }
 

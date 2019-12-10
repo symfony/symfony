@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-12-03T12:32:40Z
+
+According to the build output this is not available yet.
+
+---------------------------------------------------------------------------
+
+by fre5h at 2019-12-03T12:45:48Z
+
+Yes. I tested Travis config on my own bundles, and `php7.4` worked there, CI passed. But I didn't notice that symfony uses different dist `dist: trusty`.
+
+For this dist `php7.4` is still not available. Missing file https://storage.googleapis.com/travis-ci-language-archives/php/binaries/ubuntu/14.04/x86_64/php-7.4.tar.bz2
+
+But for Ubunty 16.04 it is already there https://storage.googleapis.com/travis-ci-language-archives/php/binaries/ubuntu/16.04/x86_64/php-7.4.tar.bz2
+
+---------------------------------------------------------------------------
+
+by stof at 2019-12-03T14:27:04Z
+
+Add `dist: xenial` in this job
+
+---------------------------------------------------------------------------
+
+by stof at 2019-12-03T14:46:46Z
+
+this won't work, because xenial does not have PHP 5.5

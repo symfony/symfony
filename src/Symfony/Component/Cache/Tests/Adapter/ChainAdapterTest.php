@@ -28,7 +28,7 @@ class ChainAdapterTest extends AdapterTestCase
     public function createCachePool($defaultLifetime = 0, $testMethod = null)
     {
         if ('testGetMetadata' === $testMethod) {
-            return new ChainAdapter([new FilesystemAdapter('', $defaultLifetime)], $defaultLifetime);
+            return new ChainAdapter([new FilesystemAdapter('a', $defaultLifetime), new FilesystemAdapter('b', $defaultLifetime)], $defaultLifetime);
         }
 
         return new ChainAdapter([new ArrayAdapter($defaultLifetime), new ExternalAdapter(), new FilesystemAdapter('', $defaultLifetime)], $defaultLifetime);

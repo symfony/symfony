@@ -16,11 +16,10 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as PropertyInfoType;
 use Symfony\Component\Validator\Constraints\All;
-use Symfony\Component\Validator\Constraints\DisableAutoMapping;
-use Symfony\Component\Validator\Constraints\EnableAutoMapping;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -77,16 +76,16 @@ final class PropertyInfoLoader implements LoaderInterface
             $hasNotBlankConstraint = false;
             $allConstraint = null;
             foreach ($metadata->getPropertyMetadata($property) as $propertyMetadata) {
+                // Enabling or disabling auto-mapping explicitly always takes precedence
+                if (AutoMappingStrategy::DISABLED === $propertyMetadata->getAutoMappingStrategy()) {
+                    continue 2;
+                }
+
+                if (AutoMappingStrategy::ENABLED === $propertyMetadata->getAutoMappingStrategy()) {
+                    $enabledForProperty = true;
+                }
+
                 foreach ($propertyMetadata->getConstraints() as $constraint) {
-                    // Enabling or disabling auto-mapping explicitly always takes precedence
-                    if ($constraint instanceof DisableAutoMapping) {
-                        continue 3;
-                    }
-
-                    if ($constraint instanceof EnableAutoMapping) {
-                        $enabledForProperty = true;
-                    }
-
                     if ($constraint instanceof Type) {
                         $hasTypeConstraint = true;
                     } elseif ($constraint instanceof NotNull) {

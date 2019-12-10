@@ -48,8 +48,7 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
         }
 
         // only show the first error so the user can focus on it
-        $errors = $value->getErrors();
-        $message = reset($errors);
+        $message = $value->getFirstError();
 
         throw new RuntimeException($message);
     }

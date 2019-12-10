@@ -1667,7 +1667,7 @@ EOF;
                             continue;
                         }
                         $definition = $this->container->findDefinition($id = (string) $v);
-                        $load = !($definition->hasErrors() && $e = $definition->getErrors()) ? $this->asFiles && !$this->inlineFactories && !$this->isHotPath($definition) : reset($e);
+                        $load = !($e = $definition->getFirstError()) ? $this->asFiles && !$this->inlineFactories && !$this->isHotPath($definition) : $e;
                         $serviceMap .= sprintf("\n            %s => [%s, %s, %s, %s],",
                             $this->export($k),
                             $this->export($definition->isShared() ? ($definition->isPublic() ? 'services' : 'privates') : false),
@@ -1686,10 +1686,10 @@ EOF;
                 list($this->definitionVariables, $this->referenceVariables) = $scope;
             }
         } elseif ($value instanceof Definition) {
-            if ($value->hasErrors() && $e = $value->getErrors()) {
+            if ($e = $value->getFirstError()) {
                 $this->addThrow = true;
 
-                return sprintf('$this->throw(%s)', $this->export(reset($e)));
+                return sprintf('$this->throw(%s)', $this->export($e));
             }
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
                 return $this->dumpValue($this->definitionVariables[$value], $interpolate);
@@ -1800,10 +1800,10 @@ EOF;
                     return $code;
                 }
             } elseif ($this->isTrivialInstance($definition)) {
-                if ($definition->hasErrors() && $e = $definition->getErrors()) {
+                if ($e = $definition->getFirstError()) {
                     $this->addThrow = true;
 
-                    return sprintf('$this->throw(%s)', $this->export(reset($e)));
+                    return sprintf('$this->throw(%s)', $this->export($e));
                 }
                 $code = $this->addNewInstance($definition, '', $id);
                 if ($definition->isShared() && !isset($this->singleUsePrivateIds[$id])) {

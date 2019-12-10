@@ -937,4 +937,26 @@ class Definition
     {
         return (bool) $this->errors;
     }
+
+    /**
+     * @internal
+     */
+    public function getFirstError(): ?string
+    {
+        if (!$this->hasErrors()) {
+            return null;
+        }
+
+        $error = $this->errors[0];
+
+        if ($error instanceof \Closure) {
+            return (string) $error();
+        }
+
+        if (!\is_string($error)) {
+            return (string) $error;
+        }
+
+        return $error;
+    }
 }

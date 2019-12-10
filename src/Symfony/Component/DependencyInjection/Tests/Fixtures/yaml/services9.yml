@@ -177,3 +177,4 @@ services:
         public: true
     errored_definition:
         class: stdClass
+        error: Service "errored_definition" is broken.

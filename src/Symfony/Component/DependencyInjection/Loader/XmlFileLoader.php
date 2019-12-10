@@ -382,6 +382,10 @@ class XmlFileLoader extends FileLoader
             $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
+        if ($e = $service->getAttribute('error')) {
+            $definition->addError($e);
+        }
+
         return $definition;
     }
 

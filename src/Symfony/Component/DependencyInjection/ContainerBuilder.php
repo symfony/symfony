@@ -606,8 +606,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw $e;
         }
 
-        if ($definition->hasErrors() && $e = $definition->getErrors()) {
-            throw new RuntimeException(reset($e));
+        if ($e = $definition->getFirstError()) {
+            throw new RuntimeException($e);
         }
 
         if ($isConstructorArgument) {

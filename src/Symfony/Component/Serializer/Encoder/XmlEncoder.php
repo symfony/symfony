@@ -52,6 +52,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     const ROOT_NODE_NAME = 'xml_root_node_name';
     const STANDALONE = 'xml_standalone';
     const TYPE_CAST_ATTRIBUTES = 'xml_type_cast_attributes';
+    const TYPE_CAST_NODES = 'xml_type_cast_nodes';
     const VERSION = 'xml_version';
 
     private $defaultContext = [
@@ -62,6 +63,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::REMOVE_EMPTY_TAGS => false,
         self::ROOT_NODE_NAME => 'response',
         self::TYPE_CAST_ATTRIBUTES => true,
+        self::TYPE_CAST_NODES => true,
     ];
 
     /**
@@ -325,16 +327,18 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $node->nodeValue;
         }
 
+        $typeCastNodes = (bool) ($context[self::TYPE_CAST_NODES] ?? $this->defaultContext[self::TYPE_CAST_NODES]);
+
         if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [XML_TEXT_NODE, XML_CDATA_SECTION_NODE])) {
+            if (!is_numeric($node->firstChild->nodeValue) || !$typeCastNodes) {
+                return $node->firstChild->nodeValue;
+            }
+
             if (false !== $val = filter_var($node->firstChild->nodeValue, FILTER_VALIDATE_INT)) {
                 return $val;
             }
 
-            if (false !== $val = filter_var($node->firstChild->nodeValue, FILTER_VALIDATE_FLOAT)) {
-                return $val;
-            }
-
-            return $node->firstChild->nodeValue;
+            return (float) $node->firstChild->nodeValue;
         }
 
         $value = [];

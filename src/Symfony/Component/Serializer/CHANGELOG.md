@@ -3,7 +3,7 @@ CHANGELOG
 
 5.1.0
 -----
- * Cast to PHP type numeric value from node for XML
+ * Cast to PHP type numeric value from node for XML if `XmlEncoder::TYPE_CAST_NODES` set to true into context
 
 5.0.0
 -----

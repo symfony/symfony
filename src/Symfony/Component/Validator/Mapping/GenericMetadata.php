@@ -12,13 +12,8 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
-<<<<<<< HEAD
-=======
 use Symfony\Component\Validator\Constraints\DisableAutoMapping;
 use Symfony\Component\Validator\Constraints\EnableAutoMapping;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
->>>>>>> 4.4
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;

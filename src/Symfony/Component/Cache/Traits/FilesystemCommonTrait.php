@@ -26,7 +26,7 @@ trait FilesystemCommonTrait
     private function init($namespace, $directory)
     {
         if (!isset($directory[0])) {
-            $directory = sys_get_temp_dir().'/symfony-cache';
+            $directory = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'symfony-cache';
         } else {
             $directory = realpath($directory) ?: $directory;
         }
@@ -55,8 +55,8 @@ trait FilesystemCommonTrait
     {
         $ok = true;
 
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            $ok = ($file->isDir() || $this->doUnlink($file) || !file_exists($file)) && $ok;
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+            $ok = ($this->doUnlink($file) || !file_exists($file)) && $ok;
         }
 
         return $ok;

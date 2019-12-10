@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-11-18T13:44:42Z
+
+> An `ETag` alone does not give the response a lifetime
+
+`Last-Modified` doesn't either, does it?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-11-18T14:36:55Z
+
+TIL that if the status code is [cacheable by default](https://tools.ietf.org/html/rfc7231#section-6.1) or a response without explicit freshness has been marked as explicitly cacheable (e.g., with a `public`  response directive), then [heuristic freshness](https://tools.ietf.org/html/rfc7234#section-4.2.2) based on `Last-Modified` may be applied.
+
+Until now, I always thought this was a browser quirk.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-18T17:39:07Z
+
+Should the PR target 3.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-28T09:42:58Z
+
+I don't understand the change. When there is an ETag, we should send `private, must-revalidate`, because that's what an ETag allows: revalidation.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-11-28T14:20:14Z
+
+`no-cache` is the default, which tells a cache that it *must revalidate* the resource upon *every* request. `must-revalidate` means that revalidation must occur *once the response has become stale*.
+
+As an `ETag` alone does not define a lifetime, my suggestion was to switch from `no-cache` to `must-revalidate` only if a header is present that defines the lifetime (as `Expires` or `Cache-Control: max-age=...`) or that allows for a heuristic expiration to be applied (`Last-Modified` is provided).
+
+Nit-picking, really.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-11-28T14:21:33Z
+
+I agree the RFC might have chosen more intention-revealing names.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-28T14:40:41Z
+
+An ETag without a lifetime is considered as having a zero lifetime by browsers AFAIK.
+I don't think no-cache is appropriate: a conditional request is possible today and works, whereas this change would kill this conditional request.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-11-28T14:59:27Z
+
+No, it would not.
+
+If the lifetime is considered to be zero, `no-cache` and `must-revalidate` would have the same effect, namely that a revalidation has to happen right from the start/after 0 seconds.
+
+`no-store`: Prohibits caching, thus no revalidation/conditional requests.
+
+`no-cache`: Response can be cached, but must be revalidated every time.
+
+`must-revalidate`: Response may be used without validation as long as it is fresh; must be revalidated afterwards and must not be used when stale.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-28T15:02:38Z
+
+Oh, so no-cache <=> must-revalidate,maxage=0 got it. Works then.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-11-30T13:15:10Z
+
+Tests do not pass apparently.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-12-02T08:48:24Z
+
+Failing tests come from `ResponseCacheStrategy` ([here](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategy.php)).
+
+With the change from this PR, we now have `Cache-Control: no-cache` in some cases where previously we had `Cache-Control: must-revalidate`.
+
+If this change applies to an ESI subrequest, `ResponseCacheStrategy` now decides ([here](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategy.php#L163-L167)) that the resulting, ESI-tags-merged response can no longer be cached using the expiration model ([here](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/HttpCache/ResponseCacheStrategy.php#L112-L122)).
+
+It thus adds an `Expires` header and sets it to the response `Date`. This is where the tests break: Now the lifetime is `0`, previously it was `null`.
+
+I need to think through the `ResponseCacheStrategy` behaviour because it *feels* as if there might be a bug. The change here should not make a difference for the decision if something is cacheable or not.
+
+Second, I'll try to remove the `Expires` header which IMO is not really necessary; not having it might already make tests pass again.
+
+TL;DR: Working on it ;-)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-12-02T08:55:19Z
+
+Maybe @nicolas-grekas can confirm that the `deps=high` build failure is due to the change being in one component, the fix for the test in another one?

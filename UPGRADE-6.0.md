@@ -35,6 +35,7 @@ Messenger
  * Removed AmqpExt transport. Run `composer require symfony/amqp-messenger` to keep the transport in your application.
  * Removed Doctrine transport. Run `composer require symfony/doctrine-messenger` to keep the transport in your application.
  * Removed RedisExt transport. Run `composer require symfony/redis-messenger` to keep the transport in your application.
+ * Use of invalid options in Redis and AMQP connections now throws an error.
 
 Routing
 -------

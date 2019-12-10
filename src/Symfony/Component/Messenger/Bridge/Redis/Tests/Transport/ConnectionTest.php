@@ -108,6 +108,15 @@ class ConnectionTest extends TestCase
         );
     }
 
+    /**
+     * @expectedDeprecation Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated since Symfony 5.1.
+     * @group legacy
+     */
+    public function testDeprecationIfInvalidOptionIsPassedWithDsn()
+    {
+        Connection::fromDsn('redis://localhost/queue?foo=bar');
+    }
+
     public function testKeepGettingPendingMessages()
     {
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();

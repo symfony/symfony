@@ -32,6 +32,47 @@ class Connection
         'x-message-ttl',
     ];
 
+    private const AVAILABLE_OPTIONS = [
+        'host',
+        'port',
+        'vhost',
+        'user',
+        'password',
+        'queues',
+        'exchange',
+        'delay',
+        'auto_setup',
+        'prefetch_count',
+        'retry',
+        'persistent',
+        'frame_max',
+        'channel_max',
+        'heartbeat',
+        'read_timeout',
+        'write_timeout',
+        'connect_timeout',
+        'cacert',
+        'cert',
+        'key',
+        'verify',
+        'sasl_method',
+    ];
+
+    private const AVAILABLE_QUEUE_OPTIONS = [
+        'binding_keys',
+        'binding_arguments',
+        'flags',
+        'arguments',
+    ];
+
+    private const AVAILABLE_EXCHANGE_OPTIONS = [
+        'name',
+        'type',
+        'default_publish_routing_key',
+        'flags',
+        'arguments',
+    ];
+
     private $connectionOptions;
     private $exchangeOptions;
     private $queuesOptions;
@@ -84,6 +125,9 @@ class Connection
      *   * vhost: Virtual Host to use with the AMQP service
      *   * user: Username to use to connect the the AMQP service
      *   * password: Password to use the connect to the AMQP service
+     *   * read_timeout: Timeout in for income activity. Note: 0 or greater seconds. May be fractional.
+     *   * write_timeout: Timeout in for outcome activity. Note: 0 or greater seconds. May be fractional.
+     *   * connect_timeout: Connection timeout. Note: 0 or greater seconds. May be fractional.
      *   * queues[name]: An array of queues, keyed by the name
      *     * binding_keys: The binding keys (if any) to bind to this queue
      *     * binding_arguments: Arguments to be used while binding the queue.
@@ -100,6 +144,22 @@ class Connection
      *     * exchange_name: Name of the exchange to be used for the delayed/retried messages (Default: "delays")
      *   * auto_setup: Enable or not the auto-setup of queues and exchanges (Default: true)
      *   * prefetch_count: set channel prefetch count
+     *
+     *   * Connection tuning options (see http://www.rabbitmq.com/amqp-0-9-1-reference.html#connection.tune for details):
+     *     * channel_max: Specifies highest channel number that the server permits. 0 means standard extension limit
+     *       (see PHP_AMQP_MAX_CHANNELS constant)
+     *     * frame_max: The largest frame size that the server proposes for the connection, including frame header
+     *       and end-byte. 0 means standard extension limit (depends on librabbimq default frame size limit)
+     *     * heartbeat: The delay, in seconds, of the connection heartbeat that the server wants.
+     *       0 means the server does not want a heartbeat. Note, librabbitmq has limited heartbeat support,
+     *       which means heartbeats checked only during blocking calls.
+     *
+     *   TLS support (see https://www.rabbitmq.com/ssl.html for details):
+     *     * cacert: Path to the CA cert file in PEM format..
+     *     * cert: Path to the client certificate in PEM foramt.
+     *     * key: Path to the client key in PEM format.
+     *     * verify: Enable or disable peer verification. If peer verification is enabled then the common name in the
+     *       server certificate must match the server name. Peer verification is enabled by default.
      */
     public static function fromDsn(string $dsn, array $options = [], AmqpFactory $amqpFactory = null): self
     {
@@ -124,6 +184,8 @@ class Connection
                 'name' => $exchangeName,
             ],
         ], $options, $parsedQuery);
+
+        self::validateOptions($amqpOptions);
 
         if (isset($parsedUrl['user'])) {
             $amqpOptions['login'] = $parsedUrl['user'];
@@ -153,6 +215,30 @@ class Connection
         }, $queuesOptions);
 
         return new self($amqpOptions, $exchangeOptions, $queuesOptions, $amqpFactory);
+    }
+
+    private static function validateOptions(array $options): void
+    {
+        if (0 < \count($invalidOptions = array_diff(array_keys($options), self::AVAILABLE_OPTIONS))) {
+            @trigger_error(sprintf('Invalid option(s) "%s" passed to the AMQP Messenger transport. Passing invalid options is deprecated since Symfony 5.1.', implode('", "', $invalidOptions)), E_USER_DEPRECATED);
+        }
+
+        if (\is_array($options['queues'] ?? false)) {
+            foreach ($options['queues'] as $queue) {
+                if (!\is_array($queue)) {
+                    continue;
+                }
+
+                if (0 < \count($invalidQueueOptions = array_diff(array_keys($queue), self::AVAILABLE_QUEUE_OPTIONS))) {
+                    @trigger_error(sprintf('Invalid queue option(s) "%s" passed to the AMQP Messenger transport. Passing invalid queue options is deprecated since Symfony 5.1.', implode('", "', $invalidQueueOptions)), E_USER_DEPRECATED);
+                }
+            }
+        }
+
+        if (\is_array($options['exchange'] ?? false)
+            && 0 < \count($invalidExchangeOptions = array_diff(array_keys($options['exchange']), self::AVAILABLE_EXCHANGE_OPTIONS))) {
+            @trigger_error(sprintf('Invalid exchange option(s) "%s" passed to the AMQP Messenger transport. Passing invalid exchange options is deprecated since Symfony 5.1.', implode('", "', $invalidExchangeOptions)), E_USER_DEPRECATED);
+        }
     }
 
     private static function normalizeQueueArguments(array $arguments): array

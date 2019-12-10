@@ -302,8 +302,8 @@ EOF;
             $id = hash('crc32', $hash.$time);
             $this->asFiles = false;
 
-            if ($preload && null !== $autoloadFile = $this->getAutoloadFile()) {
-                $autoloadFile = substr($this->export($autoloadFile), 2, -1);
+            if ($preload && null !== $vendorDir = $this->getVendorDir()) {
+                $vendorDir = substr($this->export($vendorDir), 2, -1);
 
                 $code[$options['class'].'.preload.php'] = <<<EOF
 <?php
@@ -313,8 +313,29 @@ EOF;
 
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
 
-require $autoloadFile;
-require __DIR__.'/Container{$hash}/{$options['class']}.php';
+require $vendorDir.'/ClassLoader.php';
+\$loader = new \Composer\Autoload\ClassLoader();
+
+\$map = require $vendorDir.'/autoload_namespaces.php';
+foreach (\$map as \$namespace => \$path) {
+    \$loader->set(\$namespace, \$path);
+}
+
+\$map = require $vendorDir.'/autoload_psr4.php';
+foreach (\$map as \$namespace => \$path) {
+    \$loader->setPsr4(\$namespace, \$path);
+}
+
+\$classMap = require $vendorDir.'/autoload_classmap.php';
+if (\$classMap) {
+    \$loader->addClassMap(\$classMap);
+}
+
+\$includeFiles = require $vendorDir.'/autoload_files.php';
+
+foreach (\$includeFiles as \$includeFile) {
+    opcache_compile_file(\$includeFile);
+}
 
 \$classes = [];
 
@@ -324,9 +345,13 @@ EOF;
                     $code[$options['class'].'.preload.php'] .= sprintf("\$classes[] = '%s';\n", $class);
                 }
 
-                $code[$options['class'].'.preload.php'] .= <<<'EOF'
+                $code[$options['class'].'.preload.php'] .= <<<EOF
 
-Preloader::preload($classes);
+require_once \$loader->findFile(Preloader::class);
+
+Preloader::preload(\$classes, \$loader);
+
+opcache_compile_file(__DIR__.'/Container{$hash}/{$options['class']}.php');
 
 EOF;
             }
@@ -2027,7 +2052,7 @@ EOF;
         return $export;
     }
 
-    private function getAutoloadFile(): ?string
+    private function getVendorDir(): ?string
     {
         if (null === $this->targetDirRegex) {
             return null;
@@ -2048,7 +2073,7 @@ EOF;
 
             foreach (get_declared_classes() as $class) {
                 if (0 === strpos($class, 'ComposerAutoloaderInit') && $class::getLoader() === $autoloader[0]) {
-                    $file = \dirname((new \ReflectionClass($class))->getFileName(), 2).'/autoload.php';
+                    $file = \dirname((new \ReflectionClass($class))->getFileName(), 2).'/composer';
 
                     if (preg_match($this->targetDirRegex.'A', $file)) {
                         return $file;

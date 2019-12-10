@@ -49,21 +49,10 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                 }
                 if (class_exists($id) || interface_exists($id, false)) {
                     if (0 === strpos($id, '\\') && 1 < substr_count($id, '\\')) {
-                        throw new RuntimeException(sprintf(
-                            'The definition for "%s" has no class attribute, and appears to reference a class or interface. '
-                            .'Please specify the class attribute explicitly or remove the leading backslash by renaming '
-                            .'the service to "%s" to get rid of this error.',
-                            $id, substr($id, 1)
-                        ));
+                        throw new RuntimeException(sprintf('The definition for "%s" has no class attribute, and appears to reference a class or interface. Please specify the class attribute explicitly or remove the leading backslash by renaming the service to "%s" to get rid of this error.', $id, substr($id, 1)));
                     }
 
-                    throw new RuntimeException(sprintf(
-                         'The definition for "%s" has no class attribute, and appears to reference a '
-                        .'class or interface in the global namespace. Leaving out the "class" attribute '
-                        .'is only allowed for namespaced classes. Please specify the class attribute '
-                        .'explicitly to get rid of this error.',
-                        $id
-                    ));
+                    throw new RuntimeException(sprintf('The definition for "%s" has no class attribute, and appears to reference a class or interface in the global namespace. Leaving out the "class" attribute is only allowed for namespaced classes. Please specify the class attribute explicitly to get rid of this error.', $id));
                 }
 
                 throw new RuntimeException(sprintf('The definition for "%s" has no class. If you intend to inject this service dynamically at runtime, please mark it as synthetic=true. If this is an abstract definition solely used by child definitions, please add abstract=true, otherwise specify a class to get rid of this error.', $id));

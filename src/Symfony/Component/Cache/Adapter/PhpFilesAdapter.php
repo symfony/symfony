@@ -35,6 +35,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     private $files = [];
 
     private static $startTime;
+    private static $valuesCache = [];
 
     /**
      * @param $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.

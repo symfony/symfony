@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by trvrnrth at 2019-12-04T12:28:45Z
+
+I'm currently seeing test failures on the travis build for PHP 7.3. I'm not sure why this is as PHP 7.2 is fine and the test pass for me when run locally against 7.3.12.
+
+---------------------------------------------------------------------------
+
+by trvrnrth at 2019-12-09T15:41:34Z
+
+> I'm currently seeing test failures on the travis build for PHP 7.3. I'm not sure why this is as PHP 7.2 is fine and the test pass for me when run locally against 7.3.12.
+
+The penny has just dropped. The failures were a result of the use of the lowest possible dependencies for the 7.3 build for 4.2. Presumably the cache contracts.
+
+Of course, this is all moot as the real problem here is that I was incorrectly targeting 4.2 rather than 4.3. I've re-targeted this PR accordingly and all tests are now OK.

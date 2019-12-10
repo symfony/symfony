@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by mRoca at 2019-11-25T17:32:57Z
+
+Target branch is now 3.4, and tests have been added.
+
+The bug is still present in the [DebugHandler](https://github.com/symfony/monolog-bridge/blob/3.4/Handler/DebugHandler.php#L37), which have been deprecated in 3.2, then deleted in 4.0. Should I fix it and add tests ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-25T17:50:54Z
+
+> The bug is still present in the DebugHandler
+
+let's fix it then, branch 4.3 because 4.2 is not maintained anymore
+
+> What should the timestamp field contain if datetime is not a valid value ?
+
+I don't know, this looks good enough to me.

@@ -229,7 +229,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $value = $zval[self::VALUE];
             }
         } catch (\TypeError $e) {
-            self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0);
+            self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0, $e);
 
             // It wasn't thrown in this class so rethrow it
             throw $e;
@@ -253,7 +253,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         return null !== self::$previousErrorHandler && false !== \call_user_func(self::$previousErrorHandler, $type, $message, $file, $line, $context);
     }
 
-    private static function throwInvalidArgumentException($message, $trace, $i)
+    private static function throwInvalidArgumentException($message, $trace, $i, $previous = null)
     {
         // the type mismatch is not caused by invalid arguments (but e.g. by an incompatible return type hint of the writer method)
         if (0 !== strpos($message, 'Argument ')) {
@@ -267,7 +267,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $type = substr($message, 2 + $j, strpos($message, ' given', $j) - $j - 2);
             $message = substr($message, $pos, $j - $pos);
 
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given', $message, 'NULL' === $type ? 'null' : $type));
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given', $message, 'NULL' === $type ? 'null' : $type), 0, $previous);
         }
     }
 

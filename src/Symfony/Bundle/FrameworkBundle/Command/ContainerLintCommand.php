@@ -87,6 +87,16 @@ final class ContainerLintCommand extends Command
             $refl = new \ReflectionProperty($parameterBag, 'resolved');
             $refl->setAccessible(true);
             $refl->setValue($parameterBag, true);
+
+            // To keep in sync with the default removing passes of PassConfig minus DefinitionErrorExceptionPass
+            $container->getCompilerPassConfig()->setRemovingPasses([
+                new RemovePrivateAliasesPass(),
+                new ReplaceAliasByActualDefinitionPass(),
+                new RemoveAbstractDefinitionsPass(),
+                new RemoveUnusedDefinitionsPass(),
+                new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()),
+                new AnalyzeServiceReferencesPass(),
+            ]);
         }
 
         return $this->containerBuilder = $container;

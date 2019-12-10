@@ -341,7 +341,7 @@ foreach (\$includeFiles as \$includeFile) {
 
 EOF;
 
-                foreach ($preload as $class) {
+                foreach ($this->getClassesToPreload($preload) as $class) {
                     $code[$options['class'].'.preload.php'] .= sprintf("\$classes[] = '%s';\n", $class);
                 }
 
@@ -2083,5 +2083,81 @@ EOF;
         }
 
         return null;
+    }
+
+    private function getClassesToPreload(array $classes)
+    {
+        $preload = $loading = [];
+
+        foreach ($classes as $class) {
+            foreach ($this->getClassDependencies($class, $preload, $loading) as $c) {
+                $preload[$c] = true;
+            }
+        }
+
+        return array_keys($preload);
+    }
+
+    private function getClassDependencies($class, array &$preload, array &$loading)
+    {
+        if (isset($preload[$class]) || isset($loading[$class]) || \in_array($class, ['self', 'static', 'parent'], true)) {
+            return;
+        }
+
+        try {
+            $r = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return;
+        }
+
+        if ($r->isInternal()) {
+            return;
+        }
+
+        $loading[$class] = true;
+
+        if (false !== $parent = $r->getParentClass()) {
+            yield from $this->getClassDependencies($parent->getName(), $preload, $loading);
+        }
+
+        foreach ($r->getInterfaceNames() as $interface) {
+            yield from $this->getClassDependencies($interface, $preload, $loading);
+        }
+
+        foreach ($r->getTraitNames() as $interface) {
+            yield from $this->getClassDependencies($interface, $preload, $loading);
+        }
+
+        if (\PHP_VERSION_ID >= 70400) {
+            foreach ($r->getProperties(\ReflectionProperty::IS_PUBLIC) as $p) {
+                if (($t = $p->getType()) && !$t->isBuiltin()) {
+                    yield from $this->getClassDependencies($t->getName(), $preload, $loading);
+                }
+            }
+        }
+
+        foreach ($r->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
+            foreach ($m->getParameters() as $p) {
+                if ($p->isDefaultValueAvailable() && $p->isDefaultValueConstant()) {
+                    $c = $p->getDefaultValueConstantName();
+
+                    if ($i = strpos($c, '::')) {
+                        yield from $this->getClassDependencies(substr($c, 0, $i), $preload, $loading);
+                    }
+                }
+
+                if (($t = $p->getType()) && !$t->isBuiltin()) {
+                    yield from $this->getClassDependencies($t->getName(), $preload, $loading);
+                }
+            }
+
+            if (($t = $m->getReturnType()) && !$t->isBuiltin()) {
+                yield from $this->getClassDependencies($t->getName(), $preload, $loading);
+            }
+        }
+
+        unset($loading[$r->getName()]);
+
+        yield $r->getName();
     }
 }

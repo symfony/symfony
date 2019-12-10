@@ -29,7 +29,7 @@ matrix:
           env: php_extra="7.2"
         - php: 7.3
           env: deps=high
-        - php: 7.4snapshot
+        - php: 7.4
           env: deps=low
     fast_finish: true
 

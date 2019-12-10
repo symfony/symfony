@@ -1240,7 +1240,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/', [], [], true);
         $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
         $this->assertNull($this->response->getTtl());
-        $this->assertTrue($this->response->mustRevalidate());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
     }
@@ -1271,7 +1270,6 @@ class HttpCacheTest extends HttpCacheTestCase
         // This can neither be cached nor revalidated, so it should be private/no cache
         $this->assertEmpty($this->response->getContent());
         $this->assertNull($this->response->getTtl());
-        $this->assertTrue($this->response->mustRevalidate());
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
     }

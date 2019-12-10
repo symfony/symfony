@@ -35,7 +35,7 @@
         "symfony/proxy-manager-bridge": "^4.4|^5.0",
         "symfony/security-core": "^5.0",
         "symfony/expression-language": "^4.4|^5.0",
-        "symfony/validator": "^5.0",
+        "symfony/validator": "^5.0.1",
         "symfony/translation": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0",
         "doctrine/annotations": "~1.7",
@@ -55,7 +55,7 @@
         "symfony/property-info": "<5",
         "symfony/security-bundle": "<5",
         "symfony/security-core": "<5",
-        "symfony/validator": "<5"
+        "symfony/validator": "<5.0.1"
     },
     "suggest": {
         "symfony/form": "",

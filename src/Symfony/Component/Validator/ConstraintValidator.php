@@ -93,10 +93,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
                 // neither the native nor the stub IntlDateFormatter support
                 // DateTimeImmutable as of yet
                 if (!$value instanceof \DateTime) {
-                    $value = new \DateTime(
-                        $value->format('Y-m-d H:i:s.u e'),
-                        $value->getTimezone()
-                    );
+                    $value = new \DateTime($value->format('Y-m-d H:i:s.u e'));
                 }
 
                 return $formatter->format($value);

@@ -42,16 +42,19 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     private const SCALAR_TYPES = ['int', 'float', 'bool', 'string'];
 
     private $autoload;
+    private $skippedIds;
 
     private $expressionLanguage;
 
     /**
-     * @param bool $autoload Whether services who's class in not loaded should be checked or not.
-     *                       Defaults to false to save loading code during compilation.
+     * @param bool  $autoload   Whether services who's class in not loaded should be checked or not.
+     *                          Defaults to false to save loading code during compilation.
+     * @param array $skippedIds An array indexed by the service ids to skip
      */
-    public function __construct(bool $autoload = false)
+    public function __construct(bool $autoload = false, array $skippedIds = [])
     {
         $this->autoload = $autoload;
+        $this->skippedIds = $skippedIds;
     }
 
     /**
@@ -59,6 +62,10 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
+        if (isset($this->skippedIds[$this->currentId])) {
+            return $value;
+        }
+
         if (!$value instanceof Definition || $value->hasErrors()) {
             return parent::processValue($value, $isRoot);
         }

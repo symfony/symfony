@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-12-10T15:02:04Z
+
+The static cache should be keyed by cache file. Otherwise, this will break things in case you have multiple router instances in the project with different config (I already saw such cases, for instance when using https://github.com/hautelook/TemplatedUriRouter in parallel of the normal router)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-12-10T15:02:53Z
+
+OK, I'm tired. That's already the case.

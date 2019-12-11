@@ -96,7 +96,7 @@ class FilesystemLoader extends BaseFilesystemLoader
                 throw $twigLoaderException;
             }
 
-            return false;
+            return null;
         }
 
         return $this->cache[$logicalName] = $file;

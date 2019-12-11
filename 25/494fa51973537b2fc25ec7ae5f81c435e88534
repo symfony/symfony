@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-10T10:46:23Z
+
+@dpesch can you please squash your PR? I cannot do it as you did allow pushing on your fork.
+
+---------------------------------------------------------------------------
+
+by dpesch at 2019-12-10T11:15:43Z
+
+@nicolas-grekas Thank you for your message. Is it better now? And how could/should I make it better? Should *Allow edits from maintainers.* be turned off?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-10T12:01:13Z
+
+Thanks. It should be turned on actually.

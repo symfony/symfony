@@ -97,21 +97,18 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function boot()
     {
+        if ($this->debug) {
+            $this->startTime = microtime(true);
+        }
         if (true === $this->booted) {
             if (!$this->requestStackSize && $this->resetServices) {
                 if ($this->container->has('services_resetter')) {
                     $this->container->get('services_resetter')->reset();
                 }
                 $this->resetServices = false;
-                if ($this->debug) {
-                    $this->startTime = microtime(true);
-                }
             }
 
             return;
-        }
-        if ($this->debug) {
-            $this->startTime = microtime(true);
         }
         if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
             putenv('SHELL_VERBOSITY=3');

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use MongoDB\Client;
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
+use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\MongoDbStore;
@@ -70,7 +72,7 @@ class MongoDbStoreTest extends AbstractStoreTest
 
     public function testNonBlocking()
     {
-        $this->expectException(\Symfony\Component\Lock\Exception\NotSupportedException::class);
+        $this->expectException(NotSupportedException::class);
 
         $store = $this->getStore();
 
@@ -113,7 +115,7 @@ class MongoDbStoreTest extends AbstractStoreTest
      */
     public function testInvalidConstructionMethods($mongo, array $options)
     {
-        $this->expectException('Symfony\Component\Lock\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
 
         new MongoDbStore($mongo, $options);
     }

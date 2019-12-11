@@ -44,8 +44,6 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
  *
- * @requires extension mongodb
- *
  * @author Joe Bennett <joe@assimtech.com>
  */
 class MongoDbStore implements StoreInterface
@@ -109,10 +107,10 @@ class MongoDbStore implements StoreInterface
             $this->collection = $mongo;
         } elseif ($mongo instanceof Client) {
             if (null === $this->options['database']) {
-                throw new InvalidArgumentException(sprintf('%s() requires the "database" option when constructing with a %s', __METHOD__, Client::class));
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" option when constructing with a "%s".', __METHOD__, Client::class));
             }
             if (null === $this->options['collection']) {
-                throw new InvalidArgumentException(sprintf('%s() requires the "collection" option when constructing with a %s', __METHOD__, Client::class));
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" option when constructing with a "%s".', __METHOD__, Client::class));
             }
 
             $this->client = $mongo;
@@ -127,28 +125,28 @@ class MongoDbStore implements StoreInterface
             $this->options['collection'] = $this->options['collection'] ?? $query['collection'] ?? null;
             $this->options['database'] = $this->options['database'] ?? ltrim($parsedUrl['path'] ?? '', '/') ?: null;
             if (null === $this->options['database']) {
-                throw new InvalidArgumentException(sprintf('%s() requires the "database" in the uri path or option when constructing with a uri', __METHOD__));
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "database" in the URI path or option when constructing with a URI.', __METHOD__));
             }
             if (null === $this->options['collection']) {
-                throw new InvalidArgumentException(sprintf('%s() requires the "collection" in the uri querystring or option when constructing with a uri', __METHOD__));
+                throw new InvalidArgumentException(sprintf('"%s()" requires the "collection" in the URI querystring or option when constructing with a URI.', __METHOD__));
             }
 
             $this->uri = $mongo;
         } else {
-            throw new InvalidArgumentException(sprintf('%s() requires %s or %s or URI as first argument, %s given.', __METHOD__, Collection::class, Client::class, \is_object($mongo) ? \get_class($mongo) : \gettype($mongo)));
+            throw new InvalidArgumentException(sprintf('"%s()" requires "%s" or "%s" or URI as first argument, "%s" given.', __METHOD__, Collection::class, Client::class, \is_object($mongo) ? \get_class($mongo) : \gettype($mongo)));
         }
 
         if ($this->options['gcProbablity'] < 0.0 || $this->options['gcProbablity'] > 1.0) {
-            throw new InvalidArgumentException(sprintf('%s() gcProbablity must be a float from 0.0 to 1.0, %f given.', __METHOD__, $this->options['gcProbablity']));
+            throw new InvalidArgumentException(sprintf('"%s()" gcProbablity must be a float from 0.0 to 1.0, "%f" given.', __METHOD__, $this->options['gcProbablity']));
         }
 
         if ($this->initialTtl <= 0) {
-            throw new InvalidTtlException(sprintf('%s() expects a strictly positive TTL. Got %d.', __METHOD__, $this->initialTtl));
+            throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL, got "%d".', __METHOD__, $this->initialTtl));
         }
     }
 
     /**
-     * Create a TTL index to automatically remove expired locks.
+     * Creates a TTL index to automatically remove expired locks.
      *
      * If the gcProbablity option is set higher than 0.0 (defaults to 0.001);
      * there is a chance this will be called on self::save().
@@ -205,12 +203,7 @@ class MongoDbStore implements StoreInterface
             throw new LockAcquiringException('Failed to acquire lock', 0, $e);
         }
 
-        if ($this->options['gcProbablity'] > 0.0
-            && (
-                1.0 === $this->options['gcProbablity']
-                || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->options['gcProbablity']
-            )
-        ) {
+        if ($this->options['gcProbablity'] > 0.0 && (1.0 === $this->options['gcProbablity'] || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->options['gcProbablity'])) {
             $this->createTtlIndex();
         }
 

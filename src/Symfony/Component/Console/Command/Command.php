@@ -158,7 +158,24 @@ class Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        throw new LogicException('You must override the execute() method in the concrete command class.');
+        $throwOverrideException = false;
+
+        try {
+            $abstractMethodClass = (new \ReflectionClass(self::class))->getMethod('execute')->class;
+            $concreteMethodClass = (new \ReflectionClass(\get_class($this)))->getMethod('execute')->class;
+
+            if ($abstractMethodClass === $concreteMethodClass) {
+                $throwOverrideException = true;
+            }
+        } catch (\ReflectionException $e) {
+            $throwOverrideException = true;
+        }
+
+        if ($throwOverrideException) {
+            throw new LogicException('You must override the execute() method in the concrete command class.');
+        }
+
+        return 0;
     }
 
     /**

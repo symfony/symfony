@@ -276,12 +276,40 @@ class CommandTest extends TestCase
         $this->assertEquals('execute called'.PHP_EOL, $tester->getDisplay(), '->run() does not call the interact() method if the input is not interactive');
     }
 
-    public function testExecuteMethodNeedsToBeOverridden()
+    public function testExecuteMethodThrowsExceptionWhenNotOverridden()
     {
         $this->expectException('LogicException');
         $this->expectExceptionMessage('You must override the execute() method in the concrete command class.');
         $command = new Command('foo');
         $command->run(new StringInput(''), new NullOutput());
+    }
+
+    public function testExecuteMethodThrowsExceptionWhenExtendedButNotOverridden()
+    {
+        $childCommand = new class() extends Command {
+        };
+
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('You must override the execute() method in the concrete command class.');
+
+        $command = new $childCommand('foo');
+        $exitCode = $command->run(new StringInput(''), new NullOutput());
+    }
+
+    public function testExecuteMethodDoesNotThrowExceptionWhenExtendedAndOverridden()
+    {
+        $childCommand = new class() extends Command {
+            /** {@inheritdoc} */
+            protected function execute(InputInterface $input, OutputInterface $output)
+            {
+                return 0;
+            }
+        };
+
+        $command = new $childCommand('foo');
+        $exitCode = $command->run(new StringInput(''), new NullOutput());
+
+        $this->assertEquals(0, $exitCode);
     }
 
     public function testRunWithInvalidOption()

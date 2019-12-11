@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by kralos at 2019-06-06T06:38:35Z
+
+@fabpot Sorry, this was supposed to be part of https://github.com/symfony/symfony/pull/27648 but got missed due to a messed up force push.
+
+~~I've based this PR on `4.3`, is that ok?~~
+
+rebased to `4.4`
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-06-06T06:51:46Z
+
+This PR was based on the version approved by @jderusse  https://github.com/symfony/symfony/commit/1f4d601ff4fe93a9dcf7402a34f497dc830a95c9
+
+which had a failing test (we last minute removed the return index name from `MongoDbStore::createTtlIndex`).
+
+I have then fixed that failing test 71091fab5e..d319a2a0ca
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-06T07:08:22Z
+
+Please target ~master~ 4.4, that's a new feature for sure.
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-06-06T09:26:52Z
+
+rebased from `4.4`
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-06-06T09:37:46Z
+
+I've stripped it from `symfony/symfony-docs` `4.3` https://github.com/symfony/symfony-docs/pull/11686
+
+~~Will add back to `symfony/symfony-docs` `4.4` once the above PR is merged and upstreamed to `symfony/symfony-docs` `4.4`~~
+
+Added in symfony/symfony-docs#11735
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-07-04T02:04:16Z
+
+I'm looking into the failing test later today
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-07-06T01:45:14Z
+
+Will squash etc once you're all happy
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-08-14T10:05:48Z
+
+@nicolas-grekas can we merge this one?
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-08-22T04:28:55Z
+
+`git rebase origin/4.4` and squashed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-24T09:31:36Z
+
+This one looks ready for Symfony 4.4/5.0 👍
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-10-15T00:54:29Z
+
+@nicolas-grekas can you let me know if you're happy for this to be merged? I'll rebase/squash etc if everyone is happy. The appveyor CI failure is not Lock component by the way...
+
+```
+Testing src\Symfony/Component/HttpClient
+
+1) Symfony\Component\HttpClient\Tests\CurlHttpClientTest::testToStream
+Symfony\Component\HttpClient\Exception\TransportException: Couldn't connect to server for "http://localhost:8057/".
+```
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-11-05T01:24:29Z
+
+> Could you update the `StoreFactory` to add the `MongoDB\Client` and `mongodb://` in the list of managed DSN.
+> Need to update the `CHANGELOG.md`
+
+In order to add `MongoDbStore` support to `StoreFactory` the `MongoDbStore::__construct` needs to be able to construct without `$options`.
+
+I have therefore added support for passing a `MongoDB\Collection` to `MongoDbStore::__construct`.
+
+I have also added DSN support to `MongoDbStore::__construct`.
+
+Neither `Client` nor DSN alone will be enough to construct a `MongoDbStore` as the `database` needs to be specified in `$options` therefore `StoreFactory` only supports `MongoDB\Collection`.
+
+`CHANGELOG.md` has been updated.
+
+CI is currently passing (the errors from travis are related to components other then `Component\Lock`). All `Component\Lock` tests are passing.
+
+I've left the commit history for review purposes, if we are happy with the current iteration let me know and I can squash (if required).
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-11-11T00:31:56Z
+
+@jderusse happy with current implementation? want me to squash?
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-11-20T03:34:39Z
+
+@nicolas-grekas can we get this merged? do you need a squash first? I don't want to miss `v4.4`

@@ -65,19 +65,23 @@ class FileLocator extends BaseFileLocator
             || (\strlen($file) > 3 && ctype_alpha($file[0]) && ':' === $file[1] && ('\\' === $file[2] || '/' === $file[2]))
             || null !== parse_url($file, PHP_URL_SCHEME)
         )) {
+            $triggerDeprecation = false;
+
             // no need to trigger deprecations when the loaded file is given as absolute path
             foreach ($this->paths as $deprecatedPath) {
-                if (\is_array($locations)) {
-                    foreach ($locations as $location) {
-                        if (0 === strpos($location, $deprecatedPath) && (null === $currentPath || false === strpos($location, $currentPath))) {
-                            @trigger_error(sprintf('Loading the file "%s" from the global resource directory "%s" is deprecated since Symfony 4.4 and will be removed in 5.0.', $file, $deprecatedPath), E_USER_DEPRECATED);
-                        }
+                foreach ((array) $locations as $location) {
+                    if (null !== $currentPath && 0 === strpos($location, $currentPath)) {
+                        return $locations;
                     }
-                } else {
-                    if (0 === strpos($locations, $deprecatedPath) && (null === $currentPath || false === strpos($locations, $currentPath))) {
-                        @trigger_error(sprintf('Loading the file "%s" from the global resource directory "%s" is deprecated since Symfony 4.4 and will be removed in 5.0.', $file, $deprecatedPath), E_USER_DEPRECATED);
+
+                    if (0 === strpos($location, $deprecatedPath) && (null === $currentPath || false === strpos($location, $currentPath))) {
+                        $triggerDeprecation = true;
                     }
                 }
+            }
+
+            if ($triggerDeprecation) {
+                @trigger_error(sprintf('Loading the file "%s" from the global resource directory "%s" is deprecated since Symfony 4.4 and will be removed in 5.0.', $file, $deprecatedPath), E_USER_DEPRECATED);
             }
         }
 

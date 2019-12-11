@@ -16,8 +16,14 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
+use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\RemoveAbstractDefinitionsPass;
+use Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
+use Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -81,6 +87,16 @@ final class ContainerLintCommand extends Command
             $refl = new \ReflectionProperty($parameterBag, 'resolved');
             $refl->setAccessible(true);
             $refl->setValue($parameterBag, true);
+
+            // To keep in sync with the default removing passes of PassConfig minus DefinitionErrorExceptionPass
+            $container->getCompilerPassConfig()->setRemovingPasses([
+                new RemovePrivateAliasesPass(),
+                new ReplaceAliasByActualDefinitionPass(),
+                new RemoveAbstractDefinitionsPass(),
+                new RemoveUnusedDefinitionsPass(),
+                new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()),
+                new AnalyzeServiceReferencesPass(),
+            ]);
         }
 
         return $this->containerBuilder = $container;

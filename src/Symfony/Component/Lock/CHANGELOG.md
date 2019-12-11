@@ -11,7 +11,8 @@ CHANGELOG
 4.4.0
 -----
 
- * added InvalidTtlException  
+ * added InvalidTtlException
+ * added the MongoDbStore supporting MongoDB servers >=2.2
  * deprecated `StoreInterface` in favor of `BlockingStoreInterface` and `PersistingStoreInterface`
  * `Factory` is deprecated, use `LockFactory` instead
  * `StoreFactory::createStore` allows PDO and Zookeeper DSN. 

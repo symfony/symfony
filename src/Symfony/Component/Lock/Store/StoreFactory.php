@@ -26,7 +26,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 class StoreFactory
 {
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy|\Memcached|\PDO|Connection|\Zookeeper|string $connection Connection or DSN or Store short name
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy|\Memcached|\MongoDB\Collection|\PDO|Connection|\Zookeeper|string $connection Connection or DSN or Store short name
      *
      * @return PersistingStoreInterface
      */
@@ -47,6 +47,9 @@ class StoreFactory
 
             case $connection instanceof \Memcached:
                 return new MemcachedStore($connection);
+
+            case $connection instanceof \MongoDB\Collection:
+                return new MongoDbStore($connection);
 
             case $connection instanceof \PDO:
             case $connection instanceof Connection:
@@ -76,6 +79,9 @@ class StoreFactory
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
                 return new $storeClass($connection);
+
+            case 0 === strpos($connection, 'mongodb'):
+                return new MongoDbStore($connection);
 
             case 0 === strpos($connection, 'mssql://'):
             case 0 === strpos($connection, 'mysql:'):

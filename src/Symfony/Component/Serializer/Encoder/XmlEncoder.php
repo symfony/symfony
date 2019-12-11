@@ -323,11 +323,15 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     private function parseXmlValue(\DOMNode $node, array $context = [])
     {
+        $typeCastNodes = (bool) ($context[self::TYPE_CAST_NODES] ?? $this->defaultContext[self::TYPE_CAST_NODES]);
+
         if (!$node->hasChildNodes()) {
+            if ($typeCastNodes && '' === $node->nodeValue) {
+                return null;
+            }
+
             return $node->nodeValue;
         }
-
-        $typeCastNodes = (bool) ($context[self::TYPE_CAST_NODES] ?? $this->defaultContext[self::TYPE_CAST_NODES]);
 
         if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [XML_TEXT_NODE, XML_CDATA_SECTION_NODE])) {
             if (!is_numeric($node->firstChild->nodeValue) || !$typeCastNodes) {

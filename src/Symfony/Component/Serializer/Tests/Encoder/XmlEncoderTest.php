@@ -301,7 +301,11 @@ XML;
 </document>
 XML;
 
-        $data = $this->encoder->decode($source, 'xml', ['xml_type_cast_attributes' => false]);
+        $data = $this->encoder->decode($source, 'xml', [
+            XmlEncoder::TYPE_CAST_ATTRIBUTES => false,
+            XmlEncoder::TYPE_CAST_NODES => false,
+        ]);
+
         $expected = [
             '@a' => '018',
             '@b' => '-12.11',
@@ -453,6 +457,20 @@ XML;
         $this->assertEquals($expected, $result);
         $this->assertIsInt($result['foo']);
         $this->assertIsFloat($result['bar']);
+    }
+
+    public function testDecodeEmptyNodeValue()
+    {
+        $source = '<?xml version="1.0"?>'."\n".
+            '<response><foo/></response>'."\n";
+
+        $expected = [
+            'foo' => null,
+        ];
+
+        $result = $this->encoder->decode($source, 'xml');
+        $this->assertEquals($expected, $result);
+        $this->assertNull($result['foo']);
     }
 
     public function testDecodeRootAttributes()

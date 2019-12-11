@@ -408,12 +408,10 @@ class RequestTest extends TestCase
 
         $request->setRequestFormat('atom');
         $request->headers->set('Accept', 'application/ld+json');
-        $request->headers->set('Content-Type', 'application/merge-patch+json');
         $this->assertSame('atom', $request->getPreferredFormat());
 
         $request = new Request();
         $request->headers->set('Accept', 'application/xml');
-        $request->headers->set('Content-Type', 'application/json');
         $this->assertSame('xml', $request->getPreferredFormat());
 
         $request = new Request();

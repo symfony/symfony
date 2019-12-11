@@ -1586,20 +1586,17 @@ class Request
      */
     public function getPreferredFormat(?string $default = 'html'): ?string
     {
-        if (null !== $this->preferredFormat) {
+        if (null !== $this->preferredFormat || null !== $this->preferredFormat = $this->getRequestFormat(null)) {
             return $this->preferredFormat;
         }
 
-        $preferredFormat = null;
-        foreach ($this->getAcceptableContentTypes() as $contentType) {
-            if ($preferredFormat = $this->getFormat($contentType)) {
-                break;
+        foreach ($this->getAcceptableContentTypes() as $mimeType) {
+            if ($this->preferredFormat = $this->getFormat($mimeType)) {
+                return $this->preferredFormat;
             }
         }
 
-        $this->preferredFormat = $this->getRequestFormat($preferredFormat ?: $this->getContentType());
-
-        return $this->preferredFormat ?: $default;
+        return $default;
     }
 
     /**

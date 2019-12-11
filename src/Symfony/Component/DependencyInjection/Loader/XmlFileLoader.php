@@ -382,6 +382,10 @@ class XmlFileLoader extends FileLoader
             $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
+        if (($value = $service->getAttribute('has-error')) && XmlUtils::phpize($value)) {
+            $definition->addError(sprintf('The service "%s" was loaded with an error.', $service->getAttribute('id')));
+        }
+
         return $definition;
     }
 

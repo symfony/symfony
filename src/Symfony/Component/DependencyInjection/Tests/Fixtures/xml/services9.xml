@@ -147,7 +147,7 @@
     <service id="runtime_error" class="stdClass" public="true">
       <argument type="service" id="errored_definition"/>
     </service>
-    <service id="errored_definition" class="stdClass"/>
+    <service id="errored_definition" class="stdClass" has-error="true"/>
     <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
     <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
     <service id="alias_for_foo" alias="foo" public="true"/>

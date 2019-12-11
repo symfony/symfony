@@ -62,6 +62,7 @@ class YamlFileLoader extends FileLoader
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
+        'has_error' => 'has_error',
     ];
 
     private static $prototypeKeywords = [
@@ -600,6 +601,10 @@ class YamlFileLoader extends FileLoader
 
         if (\array_key_exists('namespace', $service) && !\array_key_exists('resource', $service)) {
             throw new InvalidArgumentException(sprintf('A "resource" attribute must be set when the "namespace" attribute is set for service "%s" in %s. Check your YAML syntax.', $id, $file));
+        }
+
+        if ($service['has_error'] ?? false) {
+            $definition->addError(sprintf('The service "%s" was loaded with an error.', $id));
         }
 
         if (\array_key_exists('resource', $service)) {

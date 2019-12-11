@@ -211,6 +211,10 @@ class XmlDumper extends Dumper
             $service->appendChild($configurator);
         }
 
+        if ($definition->hasErrors()) {
+            $service->setAttribute('has-error', 'true');
+        }
+
         $parent->appendChild($service);
     }
 

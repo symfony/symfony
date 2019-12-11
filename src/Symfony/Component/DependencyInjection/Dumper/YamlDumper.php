@@ -156,6 +156,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        configurator: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
         }
 
+        if ($definition->hasErrors()) {
+            $code .= sprintf("        has_error: true\n");
+        }
+
         return $code;
     }
 

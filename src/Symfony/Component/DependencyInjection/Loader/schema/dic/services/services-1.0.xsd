@@ -134,6 +134,7 @@
     <xsd:attribute name="decoration-priority" type="xsd:integer" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="autoconfigure" type="boolean" />
+    <xsd:attribute name="has-error" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="instanceof">

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
-use Doctrine\Common\Persistence\ConnectionRegistry;
+use Doctrine\Persistence\ConnectionRegistry;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;

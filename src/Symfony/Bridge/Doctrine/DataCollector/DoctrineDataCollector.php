@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\DataCollector;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
@@ -36,10 +35,7 @@ class DoctrineDataCollector extends DataCollector
      */
     private $loggers = [];
 
-    /**
-     * @param ManagerRegistry|LegacyManagerRegistry $registry
-     */
-    public function __construct($registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
         $this->connections = $registry->getConnectionNames();

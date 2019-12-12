@@ -13,8 +13,6 @@ namespace Symfony\Bridge\Doctrine\Test;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain as LegacyMappingDriverChain;
-use Doctrine\Common\Persistence\Mapping\Driver\SymfonyFileLocator as LegacySymfonyFileLocator;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -76,13 +74,11 @@ class DoctrineTestHelper
     public static function createTestConfigurationWithXmlLoader()
     {
         $config = static::createTestConfiguration();
-        $symfonyFileLocator = class_exists(SymfonyFileLocator::class) ? SymfonyFileLocator::class : LegacySymfonyFileLocator::class;
-        $driverChain = class_exists(MappingDriverChain::class) ? MappingDriverChain::class : LegacyMappingDriverChain::class;
 
-        $driverChain = new $driverChain();
+        $driverChain = new MappingDriverChain();
         $driverChain->addDriver(
             new XmlDriver(
-                new $symfonyFileLocator(
+                new SymfonyFileLocator(
                     [__DIR__.'/../Tests/Resources/orm' => 'Symfony\\Bridge\\Doctrine\\Tests\\Fixtures'], '.orm.xml'
                 )
             ),

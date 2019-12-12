@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Fig\Link\Link;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -524,7 +523,7 @@ abstract class ControllerTraitTest extends TestCase
 
     public function testGetDoctrine()
     {
-        $doctrine = $this->getMockBuilder(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class)->getMock();
+        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->getMock();
 
         $container = new Container();
         $container->set('doctrine', $doctrine);

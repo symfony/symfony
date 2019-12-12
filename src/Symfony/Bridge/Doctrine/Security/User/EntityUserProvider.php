@@ -11,8 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Security\User;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -34,10 +36,7 @@ class EntityUserProvider implements UserProviderInterface
     private $class;
     private $property;
 
-    /**
-     * @param ManagerRegistry|LegacyManagerRegistry $registry
-     */
-    public function __construct($registry, string $classOrAlias, string $property = null, string $managerName = null)
+    public function __construct(ManagerRegistry $registry, string $classOrAlias, string $property = null, string $managerName = null)
     {
         $this->registry = $registry;
         $this->managerName = $managerName;
@@ -107,17 +106,17 @@ class EntityUserProvider implements UserProviderInterface
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
     }
 
-    private function getObjectManager()
+    private function getObjectManager(): ObjectManager
     {
         return $this->registry->getManager($this->managerName);
     }
 
-    private function getRepository()
+    private function getRepository(): ObjectRepository
     {
         return $this->getObjectManager()->getRepository($this->classOrAlias);
     }
 
-    private function getClass()
+    private function getClass(): string
     {
         if (null === $this->class) {
             $class = $this->classOrAlias;
@@ -132,7 +131,7 @@ class EntityUserProvider implements UserProviderInterface
         return $this->class;
     }
 
-    private function getClassMetadata()
+    private function getClassMetadata(): ClassMetadata
     {
         return $this->getObjectManager()->getClassMetadata($this->classOrAlias);
     }

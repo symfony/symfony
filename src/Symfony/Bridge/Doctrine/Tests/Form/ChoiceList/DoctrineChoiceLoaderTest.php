@@ -11,8 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
-use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository as LegacyObjectRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
@@ -78,8 +76,8 @@ class DoctrineChoiceLoaderTest extends TestCase
     protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
-        $this->om = $this->getMockBuilder(interface_exists(ObjectManager::class) ? ObjectManager::class : LegacyObjectManager::class)->getMock();
-        $this->repository = $this->getMockBuilder(interface_exists(ObjectRepository::class) ? ObjectRepository::class : LegacyObjectRepository::class)->getMock();
+        $this->om = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $this->repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $this->class = 'stdClass';
         $this->idReader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader')
             ->disableOriginalConstructor()
@@ -408,7 +406,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             })
         ;
 
-        $this->om = $this->createMock(interface_exists(ObjectManager::class) ? ObjectManager::class : LegacyObjectManager::class);
+        $this->om = $this->createMock(ObjectManager::class);
         $this->om->expects($this->once())
             ->method('getClassMetadata')
             ->with(SingleIntIdEntity::class)

@@ -12,10 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata as LegacyClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository as LegacyObjectRepository;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
@@ -83,7 +79,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected function createRegistryMock($em = null)
     {
-        $registry = $this->getMockBuilder(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class)->getMock();
+        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $registry->expects($this->any())
                  ->method('getManager')
                  ->with($this->equalTo(self::EM_NAME))
@@ -94,7 +90,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected function createRepositoryMock()
     {
-        $repository = $this->getMockBuilder(interface_exists(ObjectRepository::class) ? ObjectRepository::class : LegacyObjectRepository::class)
+        $repository = $this->getMockBuilder(ObjectRepository::class)
             ->setMethods(['findByCustom', 'find', 'findAll', 'findOneBy', 'findBy', 'getClassName'])
             ->getMock()
         ;
@@ -104,7 +100,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected function createEntityManagerMock($repositoryMock)
     {
-        $em = $this->getMockBuilder(interface_exists(ObjectManager::class) ? ObjectManager::class : LegacyObjectManager::class)
+        $em = $this->getMockBuilder(ObjectManager::class)
             ->getMock()
         ;
         $em->expects($this->any())
@@ -112,7 +108,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($repositoryMock)
         ;
 
-        $classMetadata = $this->getMockBuilder(interface_exists(ClassMetadata::class) ? ClassMetadata::class : LegacyClassMetadata::class)->getMock();
+        $classMetadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
         $classMetadata
             ->expects($this->any())
             ->method('hasField')

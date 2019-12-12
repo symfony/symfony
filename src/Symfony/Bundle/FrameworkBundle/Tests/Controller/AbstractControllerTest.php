@@ -532,7 +532,7 @@ class AbstractControllerTest extends TestCase
 
     public function testGetDoctrine()
     {
-        $doctrine = $this->getMockBuilder(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class)->getMock();
+        $doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')->getMock();
 
         $container = new Container();
         $container->set('doctrine', $doctrine);

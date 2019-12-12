@@ -11,12 +11,14 @@
 
 namespace Symfony\Bridge\Doctrine\Form;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\MappingException as LegacyCommonMappingException;
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -28,7 +30,10 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
     private $cache = [];
 
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @param ManagerRegistry|LegacyManagerRegistry $registry
+     */
+    public function __construct($registry)
     {
         $this->registry = $registry;
     }
@@ -182,6 +187,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
                 return $this->cache[$class] = [$em->getClassMetadata($class), $name];
             } catch (MappingException $e) {
                 // not an entity or mapped super class
+            } catch (LegacyCommonMappingException $e) {
+                // not an entity or mapped super class
             } catch (LegacyMappingException $e) {
                 // not an entity or mapped super class, using Doctrine ORM 2.2
             }
@@ -192,10 +199,12 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
     private static function getRealClass(string $class): string
     {
-        if (false === $pos = strrpos($class, '\\'.Proxy::MARKER.'\\')) {
+        $marker = interface_exists(Proxy::class) ? '\\'.Proxy::MARKER.'\\' : '\__CG__\\';
+
+        if (false === $pos = strrpos($class, $marker)) {
             return $class;
         }
 
-        return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
+        return substr($class, $pos + \strlen($marker));
     }
 }

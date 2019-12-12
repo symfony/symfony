@@ -143,7 +143,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
 
         $mappingDriverDef = $this->getDriver($container);
         $chainDriverDefService = $this->getChainDriverServiceName($container);
-        // Definition for a Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain
+        // Definition for a Doctrine\Persistence\Mapping\Driver\MappingDriverChain
         $chainDriverDef = $container->getDefinition($chainDriverDefService);
         foreach ($this->namespaces as $namespace) {
             $chainDriverDef->addMethodCall('addDriver', [$mappingDriverDef, $namespace]);

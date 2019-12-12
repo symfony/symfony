@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Psr\Container\ContainerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
@@ -39,7 +40,7 @@ class AbstractControllerTest extends ControllerTraitTest
             'security.authorization_checker' => '?Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationCheckerInterface',
             'templating' => '?Symfony\\Component\\Templating\\EngineInterface',
             'twig' => '?Twig\\Environment',
-            'doctrine' => '?Doctrine\\Common\\Persistence\\ManagerRegistry',
+            'doctrine' => interface_exists(ManagerRegistry::class) ? '?'.ManagerRegistry::class : '?Doctrine\\Common\\Persistence\\ManagerRegistry',
             'form.factory' => '?Symfony\\Component\\Form\\FormFactoryInterface',
             'parameter_bag' => '?Symfony\\Component\\DependencyInjection\\ParameterBag\\ContainerBagInterface',
             'message_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',

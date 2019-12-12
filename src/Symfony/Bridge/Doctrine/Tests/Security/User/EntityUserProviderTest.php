@@ -11,8 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository as LegacyObjectRepository;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
@@ -61,7 +66,7 @@ class EntityUserProviderTest extends TestCase
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->createMock([ObjectRepository::class, UserLoaderInterface::class]);
+        $repository = $this->createMock([interface_exists(ObjectRepository::class) ? ObjectRepository::class : LegacyObjectRepository::class, UserLoaderInterface::class]);
         $repository
             ->expects($this->once())
             ->method('loadUserByUsername')
@@ -147,7 +152,7 @@ class EntityUserProviderTest extends TestCase
 
     public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()
     {
-        $repository = $this->createMock([ObjectRepository::class, UserLoaderInterface::class]);
+        $repository = $this->createMock([interface_exists(ObjectRepository::class) ? ObjectRepository::class : LegacyObjectRepository::class, UserLoaderInterface::class]);
         $repository->expects($this->once())
             ->method('loadUserByUsername')
             ->with('name')
@@ -166,7 +171,7 @@ class EntityUserProviderTest extends TestCase
     public function testLoadUserByUserNameShouldDeclineInvalidInterface()
     {
         $this->expectException('InvalidArgumentException');
-        $repository = $this->createMock(ObjectRepository::class);
+        $repository = $this->createMock(interface_exists(ObjectRepository::class) ? ObjectRepository::class : LegacyObjectRepository::class);
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
@@ -180,7 +185,7 @@ class EntityUserProviderTest extends TestCase
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->createMock([ObjectRepository::class, PasswordUpgraderInterface::class]);
+        $repository = $this->createMock([interface_exists(ObjectRepository::class) ? ObjectRepository::class : LegacyObjectRepository::class, PasswordUpgraderInterface::class]);
         $repository->expects($this->once())
             ->method('upgradePassword')
             ->with($user, 'foobar');
@@ -195,7 +200,7 @@ class EntityUserProviderTest extends TestCase
 
     private function getManager($em, $name = null)
     {
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
+        $manager = $this->getMockBuilder(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class)->getMock();
         $manager->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))
@@ -206,7 +211,7 @@ class EntityUserProviderTest extends TestCase
 
     private function getObjectManager($repository)
     {
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $em = $this->getMockBuilder(interface_exists(ObjectManager::class) ? ObjectManager::class : LegacyObjectManager::class)
             ->setMethods(['getClassMetadata', 'getRepository'])
             ->getMockForAbstractClass();
         $em->expects($this->any())

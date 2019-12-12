@@ -11,13 +11,15 @@
 
 namespace Symfony\Bridge\Doctrine\PropertyInfo;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
-use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory as LegacyClassMetadataFactory;
+use Doctrine\Common\Persistence\Mapping\MappingException as LegacyMappingException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -40,7 +42,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         if ($entityManager instanceof EntityManagerInterface) {
             $this->entityManager = $entityManager;
-        } elseif ($entityManager instanceof ClassMetadataFactory) {
+        } elseif ($entityManager instanceof ClassMetadataFactory || $entityManager instanceof LegacyClassMetadataFactory) {
             @trigger_error(sprintf('Injecting an instance of "%s" in "%s" is deprecated since Symfony 4.2, inject an instance of "%s" instead.', ClassMetadataFactory::class, __CLASS__, EntityManagerInterface::class), E_USER_DEPRECATED);
             $this->classMetadataFactory = $entityManager;
         } else {

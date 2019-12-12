@@ -199,6 +199,16 @@ class StopwatchEvent
         return $total;
     }
 
+    public function getDurationMacroPrecision(): int
+    {
+        return (int) $this->getDuration();
+    }
+
+    public function getDurationMicroPrecision(): float
+    {
+        return (float) $this->getDuration();
+    }
+
     /**
      * Gets the max memory usage of all periods.
      *

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\DataCollector;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Version;
 use Doctrine\Persistence\ManagerRegistry;
@@ -237,7 +236,7 @@ EOTXT
             ->method('getDatabasePlatform')
             ->willReturn(new MySqlPlatform());
 
-        $registry = $this->getMockBuilder(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class)->getMock();
+        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $registry
             ->expects($this->any())
             ->method('getConnectionNames')

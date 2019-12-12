@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\ErrorHandler;
 
-use Doctrine\Common\Persistence\Proxy;
+use Doctrine\Common\Persistence\Proxy as LegacyProxy;
+use Doctrine\Persistence\Proxy;
 use PHPUnit\Framework\MockObject\Matcher\StatelessInvocation;
 use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Prophecy\ProphecySubjectInterface;
@@ -298,6 +299,7 @@ class DebugClassLoader
                     && !is_subclass_of($symbols[$i], ProphecySubjectInterface::class)
                     && !is_subclass_of($symbols[$i], Proxy::class)
                     && !is_subclass_of($symbols[$i], ProxyInterface::class)
+                    && !is_subclass_of($symbols[$i], LegacyProxy::class)
                 ) {
                     $loader->checkClass($symbols[$i]);
                 }

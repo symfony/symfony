@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
-use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\Options;
@@ -50,7 +50,7 @@ class EntityType extends DoctrineType
      *
      * @return ORMQueryBuilderLoader
      */
-    public function getLoader(LegacyObjectManager $manager, $queryBuilder, string $class)
+    public function getLoader(ObjectManager $manager, $queryBuilder, string $class)
     {
         if (!$queryBuilder instanceof QueryBuilder) {
             throw new \TypeError(sprintf('Expected an instance of %s, but got %s.', QueryBuilder::class, \is_object($queryBuilder) ? \get_class($queryBuilder) : \gettype($queryBuilder)));

@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -1229,7 +1228,7 @@ class EntityTypeTest extends BaseTypeTest
 
     protected function createRegistryMock($name, $em)
     {
-        $registry = $this->getMockBuilder(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class)->getMock();
+        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $registry->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))

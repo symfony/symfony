@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\CacheWarmer;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
@@ -27,10 +26,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
 {
     private $registry;
 
-    /**
-     * @param ManagerRegistry|LegacyManagerRegistry $registry
-     */
-    public function __construct($registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }

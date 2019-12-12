@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
@@ -337,7 +336,7 @@ trait ControllerTrait
     /**
      * Shortcut to return the Doctrine Registry service.
      *
-     * @return ManagerRegistry|LegacyManagerRegistry
+     * @return ManagerRegistry
      *
      * @throws \LogicException If DoctrineBundle is not available
      *

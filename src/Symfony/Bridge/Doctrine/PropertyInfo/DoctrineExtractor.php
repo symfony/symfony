@@ -11,8 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\PropertyInfo;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory as LegacyClassMetadataFactory;
-use Doctrine\Common\Persistence\Mapping\MappingException as LegacyMappingException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -42,7 +40,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         if ($entityManager instanceof EntityManagerInterface) {
             $this->entityManager = $entityManager;
-        } elseif ($entityManager instanceof ClassMetadataFactory || $entityManager instanceof LegacyClassMetadataFactory) {
+        } elseif ($entityManager instanceof ClassMetadataFactory) {
             @trigger_error(sprintf('Injecting an instance of "%s" in "%s" is deprecated since Symfony 4.2, inject an instance of "%s" instead.', ClassMetadataFactory::class, __CLASS__, EntityManagerInterface::class), E_USER_DEPRECATED);
             $this->classMetadataFactory = $entityManager;
         } else {
@@ -202,7 +200,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         try {
             return $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
-        } catch (MappingException | OrmMappingException | LegacyMappingException $exception) {
+        } catch (MappingException | OrmMappingException $exception) {
             return null;
         }
     }

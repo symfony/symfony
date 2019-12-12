@@ -11,7 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
@@ -40,12 +41,12 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      * passed which optimizes the object loading for one of the Doctrine
      * mapper implementations.
      *
-     * @param ObjectManager              $manager      The object manager
-     * @param string                     $class        The class name of the loaded objects
-     * @param IdReader|null              $idReader     The reader for the object IDs
-     * @param EntityLoaderInterface|null $objectLoader The objects loader
+     * @param ObjectManager|LegacyObjectManager $manager      The object manager
+     * @param string                            $class        The class name of the loaded objects
+     * @param IdReader                          $idReader     The reader for the object IDs
+     * @param EntityLoaderInterface|null        $objectLoader The objects loader
      */
-    public function __construct(ObjectManager $manager, string $class, IdReader $idReader = null, EntityLoaderInterface $objectLoader = null)
+    public function __construct($manager, string $class, IdReader $idReader = null, EntityLoaderInterface $objectLoader = null)
     {
         $classMetadata = $manager->getClassMetadata($class);
 

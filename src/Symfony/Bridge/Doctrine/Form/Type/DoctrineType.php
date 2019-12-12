@@ -12,8 +12,10 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
@@ -101,7 +103,10 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         return false;
     }
 
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @param ManagerRegistry|LegacyManagerRegistry $registry
+     */
+    public function __construct($registry)
     {
         $this->registry = $registry;
     }
@@ -191,9 +196,8 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         };
 
         $emNormalizer = function (Options $options, $em) {
-            /* @var ManagerRegistry $registry */
             if (null !== $em) {
-                if ($em instanceof ObjectManager) {
+                if ($em instanceof ObjectManager || $em instanceof LegacyObjectManager) {
                     return $em;
                 }
 
@@ -263,7 +267,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
         $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
-        $resolver->setAllowedTypes('em', ['null', 'string', 'Doctrine\Common\Persistence\ObjectManager']);
+        $resolver->setAllowedTypes('em', ['null', 'string', ObjectManager::class, LegacyObjectManager::class]);
     }
 
     /**
@@ -274,7 +278,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      *
      * @return EntityLoaderInterface
      */
-    abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class);
+    abstract public function getLoader(LegacyObjectManager $manager, $queryBuilder, $class);
 
     public function getParent()
     {

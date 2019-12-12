@@ -92,6 +92,8 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     private $expressionLanguageProviders = [];
 
+    private static $cache = [];
+
     /**
      * @param mixed $resource The main resource to load
      */
@@ -295,7 +297,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             }
         );
 
-        return $this->matcher = new $this->options['matcher_class'](require $cache->getPath(), $this->context);
+        return $this->matcher = new $this->options['matcher_class'](self::getCompiledRoutes($cache->getPath()), $this->context);
     }
 
     /**
@@ -325,7 +327,7 @@ class Router implements RouterInterface, RequestMatcherInterface
                 }
             );
 
-            $this->generator = new $this->options['generator_class'](require $cache->getPath(), $this->context, $this->logger, $this->defaultLocale);
+            $this->generator = new $this->options['generator_class'](self::getCompiledRoutes($cache->getPath()), $this->context, $this->logger, $this->defaultLocale);
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {
@@ -367,5 +369,22 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         return $this->configCacheFactory;
+    }
+
+    private static function getCompiledRoutes(string $path): array
+    {
+        if ([] === self::$cache && \function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN) && (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN))) {
+            self::$cache = null;
+        }
+
+        if (null === self::$cache) {
+            return require $path;
+        }
+
+        if (isset(self::$cache[$path])) {
+            return self::$cache[$path];
+        }
+
+        return self::$cache[$path] = require $path;
     }
 }

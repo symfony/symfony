@@ -11,10 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Security\User;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -37,7 +35,10 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
     private $class;
     private $property;
 
-    public function __construct(ManagerRegistry $registry, string $classOrAlias, string $property = null, string $managerName = null)
+    /**
+     * @param ManagerRegistry|LegacyManagerRegistry $registry
+     */
+    public function __construct($registry, string $classOrAlias, string $property = null, string $managerName = null)
     {
         $this->registry = $registry;
         $this->managerName = $managerName;
@@ -50,7 +51,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
      */
     public function loadUserByUsername(string $username)
     {
-        $repository = $this->getRepository();
+        $repository = $this->registry->getManager($this->managerName)->getRepository($this->classOrAlias);
         if (null !== $this->property) {
             $user = $repository->findOneBy([$this->property => $username]);
         } else {
@@ -78,7 +79,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
-        $repository = $this->getRepository();
+        $repository = $this->registry->getManager($this->managerName)->getRepository($this->classOrAlias);
         if ($repository instanceof UserProviderInterface) {
             $refreshedUser = $repository->refreshUser($user);
         } else {
@@ -86,7 +87,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
             // might have changed without proper persistence in the database.
             // That's the case when the user has been changed by a form with
             // validation errors.
-            if (!$id = $this->getClassMetadata()->getIdentifierValues($user)) {
+            if (!$id = $this->registry->getManager($this->managerName)->getClassMetadata($this->classOrAlias)->getIdentifierValues($user)) {
                 throw new \InvalidArgumentException('You cannot refresh a user from the EntityUserProvider that does not contain an identifier. The user object has to be serialized with its own identifier mapped by Doctrine.');
             }
 
@@ -117,20 +118,10 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
-        $repository = $this->getRepository();
+        $repository = $this->registry->getManager($this->managerName)->getRepository($this->classOrAlias);
         if ($repository instanceof PasswordUpgraderInterface) {
             $repository->upgradePassword($user, $newEncodedPassword);
         }
-    }
-
-    private function getObjectManager(): ObjectManager
-    {
-        return $this->registry->getManager($this->managerName);
-    }
-
-    private function getRepository(): ObjectRepository
-    {
-        return $this->getObjectManager()->getRepository($this->classOrAlias);
     }
 
     private function getClass(): string
@@ -139,17 +130,12 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
             $class = $this->classOrAlias;
 
             if (false !== strpos($class, ':')) {
-                $class = $this->getClassMetadata()->getName();
+                $class = $this->registry->getManager($this->managerName)->getClassMetadata($this->classOrAlias)->getName();
             }
 
             $this->class = $class;
         }
 
         return $this->class;
-    }
-
-    private function getClassMetadata(): ClassMetadata
-    {
-        return $this->getObjectManager()->getClassMetadata($this->classOrAlias);
     }
 }

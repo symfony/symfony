@@ -11,10 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Test;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Persistence\ObjectRepository as LegacyObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Repository\RepositoryFactory;
+use Doctrine\Persistence\ObjectRepository;
 
 /**
  * @author Andreas Braun <alcaeus@alcaeus.org>
@@ -40,14 +41,17 @@ final class TestRepositoryFactory implements RepositoryFactory
         return $this->repositoryList[$repositoryHash] = $this->createRepository($entityManager, $entityName);
     }
 
-    public function setRepository(EntityManagerInterface $entityManager, string $entityName, ObjectRepository $repository)
+    public function setRepository(EntityManagerInterface $entityManager, string $entityName, LegacyObjectRepository $repository)
     {
         $repositoryHash = $this->getRepositoryHash($entityManager, $entityName);
 
         $this->repositoryList[$repositoryHash] = $repository;
     }
 
-    private function createRepository(EntityManagerInterface $entityManager, string $entityName): ObjectRepository
+    /**
+     * @return ObjectRepository|LegacyObjectRepository
+     */
+    private function createRepository(EntityManagerInterface $entityManager, string $entityName)
     {
         /* @var $metadata ClassMetadata */
         $metadata = $entityManager->getClassMetadata($entityName);

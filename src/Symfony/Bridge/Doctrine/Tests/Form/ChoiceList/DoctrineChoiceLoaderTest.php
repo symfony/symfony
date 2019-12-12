@@ -408,7 +408,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             })
         ;
 
-        $this->om = $this->createMock(ObjectManager::class);
+        $this->om = $this->createMock(interface_exists(ObjectManager::class) ? ObjectManager::class : LegacyObjectManager::class);
         $this->om->expects($this->once())
             ->method('getClassMetadata')
             ->with(SingleIntIdEntity::class)

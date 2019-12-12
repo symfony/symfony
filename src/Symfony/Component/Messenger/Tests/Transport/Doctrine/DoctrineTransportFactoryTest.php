@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
-use Doctrine\Common\Persistence\ConnectionRegistry;
+use Doctrine\Common\Persistence\ConnectionRegistry as LegacyConnectionRegistry;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
+use Doctrine\Persistence\ConnectionRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport;
@@ -25,7 +26,7 @@ class DoctrineTransportFactoryTest extends TestCase
     public function testSupports()
     {
         $factory = new DoctrineTransportFactory(
-            $this->createMock(ConnectionRegistry::class)
+            $this->createMock(interface_exists(ConnectionRegistry::class) ? ConnectionRegistry::class : LegacyConnectionRegistry::class)
         );
 
         $this->assertTrue($factory->supports('doctrine://default', []));
@@ -39,7 +40,7 @@ class DoctrineTransportFactoryTest extends TestCase
         $schemaConfig = $this->createMock(SchemaConfig::class);
         $schemaManager->method('createSchemaConfig')->willReturn($schemaConfig);
         $driverConnection->method('getSchemaManager')->willReturn($schemaManager);
-        $registry = $this->createMock(ConnectionRegistry::class);
+        $registry = $this->createMock(interface_exists(ConnectionRegistry::class) ? ConnectionRegistry::class : LegacyConnectionRegistry::class);
 
         $registry->expects($this->once())
             ->method('getConnection')
@@ -58,7 +59,7 @@ class DoctrineTransportFactoryTest extends TestCase
     {
         $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN "doctrine://default".');
-        $registry = $this->createMock(ConnectionRegistry::class);
+        $registry = $this->createMock(interface_exists(ConnectionRegistry::class) ? ConnectionRegistry::class : LegacyConnectionRegistry::class);
         $registry->expects($this->once())
             ->method('getConnection')
             ->willReturnCallback(function () {

@@ -11,11 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\PropertyInfo;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
-use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory as LegacyClassMetadataFactory;
+use Doctrine\Common\Persistence\Mapping\MappingException as LegacyMappingException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -29,7 +31,10 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 {
     private $classMetadataFactory;
 
-    public function __construct(ClassMetadataFactory $classMetadataFactory)
+    /**
+     * @param ClassMetadataFactory|LegacyClassMetadataFactory $classMetadataFactory
+     */
+    public function __construct($classMetadataFactory)
     {
         $this->classMetadataFactory = $classMetadataFactory;
     }
@@ -44,6 +49,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         } catch (MappingException $exception) {
             return null;
         } catch (OrmMappingException $exception) {
+            return null;
+        } catch (LegacyMappingException $exception) {
             return null;
         }
 
@@ -70,6 +77,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         } catch (MappingException $exception) {
             return null;
         } catch (OrmMappingException $exception) {
+            return null;
+        } catch (LegacyMappingException $exception) {
             return null;
         }
 

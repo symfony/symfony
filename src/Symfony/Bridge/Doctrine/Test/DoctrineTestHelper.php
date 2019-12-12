@@ -79,7 +79,7 @@ class DoctrineTestHelper
         $symfonyFileLocator = class_exists(SymfonyFileLocator::class) ? SymfonyFileLocator::class : LegacySymfonyFileLocator::class;
         $driverChain = class_exists(MappingDriverChain::class) ? MappingDriverChain::class : LegacyMappingDriverChain::class;
 
-        $driverChain = new MappingDriverChain();
+        $driverChain = new $driverChain();
         $driverChain->addDriver(
             new XmlDriver(
                 new $symfonyFileLocator(

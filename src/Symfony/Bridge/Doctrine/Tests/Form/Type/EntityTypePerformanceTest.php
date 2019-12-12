@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
@@ -36,7 +35,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
     protected function getExtensions()
     {
-        $manager = $this->getMockBuilder(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class)->getMock();
+        $manager = $this->getMockBuilder(ManagerRegistry::class)->getMock();
 
         $manager->expects($this->any())
             ->method('getManager')

@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -25,7 +25,7 @@ class ContainerAwareFixture implements FixtureInterface, ContainerAwareInterface
         $this->container = $container;
     }
 
-    public function load(LegacyObjectManager $manager)
+    public function load(ObjectManager $manager)
     {
     }
 }

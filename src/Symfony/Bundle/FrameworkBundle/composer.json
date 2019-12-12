@@ -64,6 +64,7 @@
         "twig/twig": "^2.10|^3.0"
     },
     "conflict": {
+        "doctrine/persistence": "<1.3",
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.1",
         "phpunit/phpunit": "<5.4.3",

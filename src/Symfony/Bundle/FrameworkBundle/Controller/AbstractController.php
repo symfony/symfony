@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
@@ -95,7 +94,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'session' => '?'.SessionInterface::class,
             'security.authorization_checker' => '?'.AuthorizationCheckerInterface::class,
             'twig' => '?'.Environment::class,
-            'doctrine' => '?'.(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class),
+            'doctrine' => '?'.ManagerRegistry::class,
             'form.factory' => '?'.FormFactoryInterface::class,
             'security.token_storage' => '?'.TokenStorageInterface::class,
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
@@ -338,11 +337,9 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Shortcut to return the Doctrine Registry service.
      *
-     * @return ManagerRegistry|LegacyManagerRegistry
-     *
      * @throws \LogicException If DoctrineBundle is not available
      */
-    protected function getDoctrine()
+    protected function getDoctrine(): ManagerRegistry
     {
         if (!$this->container->has('doctrine')) {
             throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require symfony/orm-pack".');

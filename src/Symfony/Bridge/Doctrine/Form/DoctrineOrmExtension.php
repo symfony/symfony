@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Form;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractExtension;
@@ -20,10 +19,7 @@ class DoctrineOrmExtension extends AbstractExtension
 {
     protected $registry;
 
-    /**
-     * @param ManagerRegistry|LegacyManagerRegistry $registry
-     */
-    public function __construct($registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }

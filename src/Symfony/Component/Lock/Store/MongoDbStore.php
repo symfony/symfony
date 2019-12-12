@@ -27,7 +27,7 @@ use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\LockStorageException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Lock\BlockingStoreInterface;
 
 /**
  * MongoDbStore is a StoreInterface implementation using MongoDB as a storage
@@ -46,7 +46,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Joe Bennett <joe@assimtech.com>
  */
-class MongoDbStore implements StoreInterface
+class MongoDbStore implements BlockingStoreInterface
 {
     private $collection;
     private $client;

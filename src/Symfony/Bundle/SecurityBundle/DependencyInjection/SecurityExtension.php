@@ -264,11 +264,24 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // add authentication providers to authentication manager
         $authenticationProviders = array_map(function ($id) {
             return new Reference($id);
-        }, array_values(array_unique($authenticationProviders)));
+        }, array_unique($authenticationProviders));
         $authenticationManagerId = 'security.authentication.manager.provider';
         if ($this->guardAuthenticationManagerEnabled) {
             $authenticationManagerId = 'security.authentication.manager.guard';
             $container->setAlias('security.authentication.manager', new Alias($authenticationManagerId));
+
+            // guard authentication manager listener
+            $container
+                ->setDefinition('security.firewall.guard.'.$name.'locator', new ChildDefinition('security.firewall.guard.locator'))
+                ->setArguments([$authenticationProviders])
+                ->addTag('container.service_locator')
+            ;
+            $container
+                ->setDefinition('security.firewall.guard.'.$name, new ChildDefinition('security.firewall.guard'))
+                ->replaceArgument(2, new Reference('security.firewall.guard.'.$name.'locator'))
+                ->replaceArgument(3, $name)
+                ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
+            ;
         }
         $container
             ->getDefinition($authenticationManagerId)
@@ -498,7 +511,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                         list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
 
                         $listeners[] = new Reference($listenerId);
-                        $authenticationProviders[] = $provider;
+                        $authenticationProviders[$id.'_'.$key] = $provider;
                     }
                     $hasListeners = true;
                 }

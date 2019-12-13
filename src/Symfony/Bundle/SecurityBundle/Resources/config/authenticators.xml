@@ -4,6 +4,21 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="security.firewall.guard.locator"
+                 class="Symfony\Component\DependencyInjection\ServiceLocator"
+                 abstract="true" />
+
+        <service id="security.firewall.guard"
+                 class="Symfony\Bundle\SecurityBundle\EventListener\LazyGuardManagerListener"
+                 abstract="true">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="security.authentication.manager"/>
+            <argument type="service" id="security.authentication.guard_handler"/>
+            <argument/> <!-- guard authenticator locator -->
+            <argument/> <!-- provider key -->
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
         <service id="security.authenticator.http_basic"
                  class="Symfony\Component\Security\Core\Authentication\Authenticator\HttpBasicAuthenticator"
                  abstract="true">

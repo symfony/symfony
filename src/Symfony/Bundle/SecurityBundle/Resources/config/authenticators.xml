@@ -12,5 +12,20 @@
             <argument type="service" id="security.encoder_factory" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
+
+        <service id="security.authenticator.form_login"
+                 class="Symfony\Component\Security\Core\Authentication\Authenticator\FormLoginAuthenticator"
+                 abstract="true">
+            <argument type="service" id="security.http_utils" />
+            <argument /> <!-- csrf token generator -->
+            <argument type="service" id="security.encoder_factory" />
+            <argument type="abstract">options</argument>
+        </service>
+
+        <service id="security.authenticator.anonymous"
+                 class="Symfony\Component\Security\Core\Authentication\Authenticator\AnonymousAuthenticator"
+                 abstract="true">
+            <argument /> <!-- secret -->
+        </service>
     </services>
 </container>

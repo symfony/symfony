@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class AnonymousFactory implements SecurityFactoryInterface
+class AnonymousFactory implements SecurityFactoryInterface, GuardFactoryInterface
 {
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
@@ -40,6 +40,20 @@ class AnonymousFactory implements SecurityFactoryInterface
         ;
 
         return [$providerId, $listenerId, $defaultEntryPoint];
+    }
+
+    public function createGuard(ContainerBuilder $container, string $id, array $config, ?string $userProviderId): string
+    {
+        if (null === $config['secret']) {
+            $config['secret'] = new Parameter('container.build_hash');
+        }
+
+        $authenticatorId = 'security.authenticator.anonymous.'.$id;
+        $container
+            ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.anonymous'))
+            ->replaceArgument(0, $config['secret']);
+
+        return $authenticatorId;
     }
 
     public function getPosition()

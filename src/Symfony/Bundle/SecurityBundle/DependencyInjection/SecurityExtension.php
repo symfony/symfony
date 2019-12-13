@@ -138,7 +138,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
-        $this->guardAuthenticationManagerEnabled = $config['guard_authentication_manager'];
+        if ($this->guardAuthenticationManagerEnabled = $config['guard_authentication_manager']) {
+            $loader->load('authenticators.xml');
+        }
 
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);

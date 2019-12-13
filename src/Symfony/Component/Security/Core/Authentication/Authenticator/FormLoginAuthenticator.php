@@ -1,0 +1,142 @@
+<?php
+
+namespace Symfony\Component\Security\Core\Authentication\Authenticator;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
+use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\ParameterBagUtils;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
+
+/**
+ * @author Wouter de Jong <wouter@wouterj.nl>
+ */
+class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
+{
+    use TargetPathTrait, UsernamePasswordTrait, UserProviderTrait {
+        UsernamePasswordTrait::checkCredentials as checkPassword;
+    }
+
+    private $options;
+    private $httpUtils;
+    private $csrfTokenManager;
+    private $encoderFactory;
+
+    public function __construct(HttpUtils $httpUtils, ?CsrfTokenManagerInterface $csrfTokenManager, EncoderFactoryInterface $encoderFactory, array $options)
+    {
+        $this->httpUtils = $httpUtils;
+        $this->csrfTokenManager = $csrfTokenManager;
+        $this->encoderFactory = $encoderFactory;
+        $this->options = array_merge([
+            'username_parameter' => '_username',
+            'password_parameter' => '_password',
+            'csrf_parameter' => '_csrf_token',
+            'csrf_token_id' => 'authenticate',
+            'post_only' => true,
+
+            'always_use_default_target_path' => false,
+            'default_target_path' => '/',
+            'login_path' => '/login',
+            'target_path_parameter' => '_target_path',
+            'use_referer' => false,
+        ], $options);
+    }
+
+    protected function getLoginUrl(): string
+    {
+        return $this->options['login_path'];
+    }
+
+    public function supports(Request $request): bool
+    {
+        return ($this->options['post_only'] ? $request->isMethod('POST') : true)
+            && $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
+    }
+
+    public function getCredentials(Request $request): array
+    {
+        $credentials = [];
+
+        if (null !== $this->csrfTokenManager) {
+            $credentials['csrf_token'] = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
+        }
+
+        if ($this->options['post_only']) {
+            $credentials['username'] = ParameterBagUtils::getParameterBagValue($request->request, $this->options['username_parameter']);
+            $credentials['password'] = ParameterBagUtils::getParameterBagValue($request->request, $this->options['password_parameter']);
+        } else {
+            $credentials['username'] = ParameterBagUtils::getRequestParameterValue($request, $this->options['username_parameter']);
+            $credentials['password'] = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']);
+        }
+
+        if (!\is_string($credentials['username']) && (!\is_object($credentials['username']) || !method_exists($credentials['username'], '__toString'))) {
+            throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], \gettype($credentials['username'])));
+        }
+
+        $credentials['username'] = trim($credentials['username']);
+
+        if (\strlen($credentials['username']) > Security::MAX_USERNAME_LENGTH) {
+            throw new BadCredentialsException('Invalid username.');
+        }
+
+        $request->getSession()->set(Security::LAST_USERNAME, $username);
+
+        return $credentials;
+    }
+
+    public function checkCredentials($credentials, UserInterface $user): bool
+    {
+        if (null !== $this->csrfTokenManager) {
+            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['csrf_token_id'], $credentials['csrf_token']))) {
+                throw new InvalidCsrfTokenException('Invalid CSRF token.');
+            }
+        }
+
+        return $this->checkPassword($credentials, $user);
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
+    {
+        return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request, $providerKey));
+    }
+
+    private function determineTargetUrl(Request $request, string $providerKey)
+    {
+        if ($this->options['always_use_default_target_path']) {
+            return $this->options['default_target_path'];
+        }
+
+        if ($targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter'])) {
+            return $targetUrl;
+        }
+
+        if ($targetUrl = $this->getTargetPath($request->getSession(), $providerKey)) {
+            $this->removeTargetPath($request->getSession(), $providerKey);
+
+            return $targetUrl;
+        }
+
+        if ($this->options['use_referer'] && $targetUrl = $request->headers->get('Referer')) {
+            if (false !== $pos = strpos($targetUrl, '?')) {
+                $targetUrl = substr($targetUrl, 0, $pos);
+            }
+            if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
+                return $targetUrl;
+            }
+        }
+
+        return $this->options['default_target_path'];
+    }
+}

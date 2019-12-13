@@ -23,5 +23,5 @@ interface GuardFactoryInterface
      *
      * @return string|string[] The Guard service ID(s) to be used by the firewall
      */
-    public function createGuard(ContainerBuilder $container, string $id, array $config, string $userProviderId);
+    public function createGuard(ContainerBuilder $container, string $id, array $config, ?string $userProviderId);
 }

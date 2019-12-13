@@ -75,6 +75,27 @@ trait MicroKernelTrait
     /**
      * {@inheritdoc}
      */
+    public function getProjectDir(): string
+    {
+        return \dirname((new \ReflectionObject($this))->getFileName(), 2);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function registerBundles(): iterable
+    {
+        $contents = require $this->getProjectDir().'/config/bundles.php';
+        foreach ($contents as $class => $envs) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+                yield new $class();
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {
@@ -100,8 +121,8 @@ trait MicroKernelTrait
             }
 
             $this->configureContainer($container, $loader);
-
             $container->addObjectResource($this);
+            $container->fileExists($this->getProjectDir().'/config/bundles.php');
         });
     }
 

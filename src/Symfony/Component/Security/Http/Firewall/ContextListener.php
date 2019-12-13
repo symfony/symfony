@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -66,12 +67,7 @@ class ContextListener extends AbstractListener
         $this->userProviders = $userProviders;
         $this->sessionKey = '_security_'.$contextKey;
         $this->logger = $logger;
-
-        if (null !== $dispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
-            $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
-        } else {
-            $this->dispatcher = $dispatcher;
-        }
+        $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
 
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
         $this->sessionTrackerEnabler = $sessionTrackerEnabler;

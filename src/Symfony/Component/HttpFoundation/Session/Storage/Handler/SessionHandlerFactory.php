@@ -50,13 +50,13 @@ class SessionHandlerFactory
             case 0 === strpos($connection, 'file://'):
                 return new StrictSessionHandler(new NativeFileSessionHandler(substr($connection, 7)));
 
-            case 0 === strpos($connection, 'redis://'):
-            case 0 === strpos($connection, 'rediss://'):
-            case 0 === strpos($connection, 'memcached://'):
+            case 0 === strpos($connection, 'redis:'):
+            case 0 === strpos($connection, 'rediss:'):
+            case 0 === strpos($connection, 'memcached:'):
                 if (!class_exists(AbstractAdapter::class)) {
                     throw new InvalidArgumentException(sprintf('Unsupported DSN "%s". Try running "composer require symfony/cache".', $connection));
                 }
-                $handlerClass = 0 === strpos($connection, 'memcached://') ? MemcachedSessionHandler::class : RedisSessionHandler::class;
+                $handlerClass = 0 === strpos($connection, 'memcached:') ? MemcachedSessionHandler::class : RedisSessionHandler::class;
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
                 return new $handlerClass($connection);

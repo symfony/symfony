@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Lctrs at 2019-12-10T16:29:30Z
+
+Test failure in the `Process` component. Not related.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-11T12:15:48Z
+
+Can you please add a corresponding line in the CHANGELOG of the component?
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2019-12-11T12:24:39Z
+
+@nicolas-grekas Done. Is the wording okay for you ?

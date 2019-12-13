@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -23,6 +24,21 @@ use Symfony\Component\Lock\StoreInterface;
 class LockFactoryTest extends TestCase
 {
     public function testCreateLock()
+    {
+        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $factory = new LockFactory($store);
+        $factory->setLogger($logger);
+
+        $lock = $factory->createLock('foo');
+
+        $this->assertInstanceOf(LockInterface::class, $lock);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCreateLockWithLegacyStoreImplementation()
     {
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
         $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();

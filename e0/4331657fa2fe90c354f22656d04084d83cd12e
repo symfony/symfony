@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-12-09T22:52:59Z
+
+Tests pass on my machine with both implem (polyfill and native) but fails on CI 😕 Looks like the good value is not returned when using UTC.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-12-09T23:19:40Z
+
+Also we have to think of what is the goal here: display the passed date relatively to its timezone (the same datetime in all timezones must display the same thing basically). Can't we just always set the formatter to UTC, copy the passed value in a temp var and set the timezone to UTC, so we don't have to deal with this timezone stuff?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-12-10T08:00:55Z
+
+> Can't we just always set the formatter to UTC, copy the passed value in a temp var and set the timezone to UTC, so we don't have to deal with this timezone stuff?
+
+Looks like we can. It simplifies everything. I just pushed it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-10T08:12:14Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-12-10T08:56:28Z
+
+Rebased + tests pass. I modified the tests to strenghten them.

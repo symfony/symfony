@@ -90,12 +90,6 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
                 $locale = \Locale::getDefault();
                 $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $value->getTimezone());
 
-                // neither the native nor the stub IntlDateFormatter support
-                // DateTimeImmutable as of yet
-                if (!$value instanceof \DateTime) {
-                    $value = new \DateTime($value->format('Y-m-d H:i:s.u e'));
-                }
-
                 return $formatter->format($value);
             }
 

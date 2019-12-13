@@ -178,6 +178,28 @@ class StreamWrapper
         return '';
     }
 
+    public function stream_set_option(int $option, int $arg1, ?int $arg2): bool
+    {
+        if (null === $this->handle || 'stream' !== get_resource_type($this->handle)) {
+            trigger_error(sprintf('The "$handle" property of "%s" need to be a stream.', __CLASS__), E_USER_WARNING);
+
+            return false;
+        }
+
+        switch ($option) {
+            case STREAM_OPTION_BLOCKING:
+                return \stream_set_blocking($this->handle, $arg1);
+            case STREAM_OPTION_READ_TIMEOUT:
+                return \stream_set_timeout($this->handle, $arg1, $arg2);
+            case STREAM_OPTION_WRITE_BUFFER:
+                return \stream_set_write_buffer($this->handle, $arg1);
+            default:
+                trigger_error(sprintf('The option "%s" is unknown for "stream_set_option" method', $option), E_ERROR);
+
+                return false;
+        }
+    }
+
     public function stream_tell(): int
     {
         return $this->offset;

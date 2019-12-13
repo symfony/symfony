@@ -85,6 +85,9 @@
 
                             <dt>Token</dt>
                             <dd>{{ profile.token }}</dd>
+
+                            <dt>Label</dt>
+                            <dd><input type="text" id="js-profile-label" placeholder="Set label ..."></dd>
                         </dl>
                     </div>
                 </div>
@@ -143,11 +146,24 @@
         </div>
     </div>
     <script>
+        let profileKey = 'profile_label_' + '{{ profile.token }}';
+        let labelInput = document.getElementById('js-profile-label');
+
         (function () {
             Sfjs.addEventListener(document.getElementById('sidebarShortcutsMenu'), 'click', function (event) {
                 event.preventDefault();
                 Sfjs.toggleClass(document.getElementById('sidebar'), 'expanded');
-            })
+            });
+
+            Sfjs.addEventListener(document, 'DOMContentLoaded', function() {
+                labelInput.value = localStorage.getItem(profileKey) || '';
+                document.title = localStorage.getItem(profileKey) || '{{ block('title') }}';
+            });
+
+            Sfjs.addEventListener(labelInput, 'input', function(e) {
+                localStorage[profileKey] = e.target.value;
+                document.title = e.target.value || '{{ block('title') }}';
+            });
         }());
     </script>
 {% endblock %}

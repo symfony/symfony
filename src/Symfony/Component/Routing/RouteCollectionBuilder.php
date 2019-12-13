@@ -14,6 +14,9 @@ namespace Symfony\Component\Routing;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 5.1, use "%s" instead.', RouteCollectionBuilder::class, RoutingConfigurator::class), E_USER_DEPRECATED);
 
 /**
  * Helps add and import routes into a RouteCollection.

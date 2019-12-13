@@ -4,8 +4,7 @@ UPGRADE FROM 5.0 to 5.1
 FrameworkBundle
 ---------------
 
- * Marked `MicroKernelTrait::configureRoutes()` as `@internal` and `@final`.
- * Deprecated not overriding `MicroKernelTrait::configureRouting()`.
+ * Deprecated passing a `RouteCollectionBuiler` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
 
 HttpFoundation
 --------------

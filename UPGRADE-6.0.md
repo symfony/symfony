@@ -4,8 +4,7 @@ UPGRADE FROM 5.x to 6.0
 FrameworkBundle
 ---------------
 
- * Removed `MicroKernelTrait::configureRoutes()`.
- * Made `MicroKernelTrait::configureRouting()` abstract.
+ * `MicroKernelTrait::configureRoutes()` is now always called with a `RoutingConfigurator`
 
 HttpFoundation
 --------------

@@ -80,7 +80,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $fs->remove($this->cacheDir);
     }
 
-    protected function configureRouting(RoutingConfigurator $routes): void
+    protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $routes->add('halloween', '/')->controller('kernel::halloweenAction');
         $routes->add('danger', '/danger')->controller('kernel::dangerousAction');

@@ -1,0 +1,5 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    ide:  "debug://open?url=file://%%f&line=%%l"

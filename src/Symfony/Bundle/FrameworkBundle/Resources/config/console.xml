@@ -21,6 +21,14 @@
             <tag name="console.command" command="about" />
         </service>
 
+        <service id="console.command.list" class="Symfony\Bundle\FrameworkBundle\Command\ListCommand">
+            <argument type="service">
+                <service class="Symfony\Component\Console\Command\ListCommand"/>
+            </argument>
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null"/>
+            <tag name="console.command" command="list" />
+        </service>
+
         <service id="console.command.assets_install" class="Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand">
             <argument type="service" id="filesystem" />
             <argument>%kernel.project_dir%</argument>

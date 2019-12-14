@@ -38,6 +38,7 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
             ->setDefinition([
                 new InputArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Specific message id(s) to remove'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
+                new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport'),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
             ])
             ->setDescription(self::$defaultDescription)
@@ -59,20 +60,25 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        $receiver = $this->getReceiver();
+        $failureTransportName = $input->getOption('transport');
+        if (null === $failureTransportName) {
+            $failureTransportName = $this->getGlobalFailureReceiverName();
+        }
+
+        $receiver = $this->getReceiver($failureTransportName);
 
         $shouldForce = $input->getOption('force');
         $ids = (array) $input->getArgument('id');
         $shouldDisplayMessages = $input->getOption('show-messages') || 1 === \count($ids);
-        $this->removeMessages($ids, $receiver, $io, $shouldForce, $shouldDisplayMessages);
+        $this->removeMessages($failureTransportName, $ids, $receiver, $io, $shouldForce, $shouldDisplayMessages);
 
         return 0;
     }
 
-    private function removeMessages(array $ids, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void
+    private function removeMessages(string $failureTransportName, array $ids, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void
     {
         if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(sprintf('The "%s" receiver does not support removing specific messages.', $this->getReceiverName()));
+            throw new RuntimeException(sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
         }
 
         foreach ($ids as $id) {

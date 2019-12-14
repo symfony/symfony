@@ -35,16 +35,17 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
     {
         $this
             ->setDefinition([
-                new InputArgument('id', InputArgument::REQUIRED, 'Specific message id to remove'),
+                new InputArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Specific message id(s) to remove'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
+                new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
             ])
-            ->setDescription('Remove a message from the failure transport.')
+            ->setDescription('Remove given messages from the failure transport.')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> removes a message that is pending in the failure transport.
+The <info>%command.name%</info> removes given messages that are pending in the failure transport.
 
-    <info>php %command.full_name% {id}</info>
+    <info>php %command.full_name% {id1} [{id2} ...]</info>
 
-The specific id can be found via the messenger:failed:show command.
+The specific ids can be found via the messenger:failed:show command.
 EOF
             )
         ;
@@ -60,29 +61,37 @@ EOF
         $receiver = $this->getReceiver();
 
         $shouldForce = $input->getOption('force');
-        $this->removeSingleMessage($input->getArgument('id'), $receiver, $io, $shouldForce);
+        $ids = $input->getArgument('id');
+        $shouldDisplayMessages = $input->getOption('show-messages') || 1 === \count($ids);
+        $this->removeMessages($ids, $receiver, $io, $shouldForce, $shouldDisplayMessages);
 
         return 0;
     }
 
-    private function removeSingleMessage(string $id, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce)
+    private function removeMessages(array $ids, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldDisplayMessages): void
     {
         if (!$receiver instanceof ListableReceiverInterface) {
             throw new RuntimeException(sprintf('The "%s" receiver does not support removing specific messages.', $this->getReceiverName()));
         }
 
-        $envelope = $receiver->find($id);
-        if (null === $envelope) {
-            throw new RuntimeException(sprintf('The message with id "%s" was not found.', $id));
-        }
-        $this->displaySingleMessage($envelope, $io);
+        foreach ($ids as $id) {
+            $envelope = $receiver->find($id);
+            if (null === $envelope) {
+                $io->error(sprintf('The message with id "%s" was not found.', $id));
+                continue;
+            }
 
-        if ($shouldForce || $io->confirm('Do you want to permanently remove this message?', false)) {
-            $receiver->reject($envelope);
+            if ($shouldDisplayMessages) {
+                $this->displaySingleMessage($envelope, $io);
+            }
 
-            $io->success('Message removed.');
-        } else {
-            $io->note('Message not removed.');
+            if ($shouldForce || $io->confirm('Do you want to permanently remove this message?', false)) {
+                $receiver->reject($envelope);
+
+                $io->success(sprintf('Message with id %s removed.', $id));
+            } else {
+                $io->note(sprintf('Message with id %s not removed.', $id));
+            }
         }
     }
 }

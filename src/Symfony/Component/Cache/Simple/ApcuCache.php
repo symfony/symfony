@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Cache\Simple;
 
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Traits\ApcuTrait;
+use Symfony\Contracts\Cache\CacheInterface;
 
 @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', ApcuCache::class, ApcuAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
 

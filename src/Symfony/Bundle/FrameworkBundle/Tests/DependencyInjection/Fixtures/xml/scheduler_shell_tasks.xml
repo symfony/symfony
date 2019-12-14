@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:framework="http://symfony.com/schema/dic/symfony"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:scheduler timezone="Europe/Paris" path="/_tasks" output_path="%kernel.project_dir%/var/scheduler">
+            <framework:transports>
+                <framework:transports name="local">
+                    <framework:dsn>local://</framework:dsn>
+                </framework:transports>
+            </framework:transports>
+            <framework:schedulers>
+                <framework:schedulers name="foo" transport="local" />
+            </framework:schedulers>
+            <framework:tasks>
+                <framework:tasks name="app.foo" scheduler="foo" type="shell" expression="* * * * *" command="echo Symfony!" />
+            </framework:tasks>
+        </framework:scheduler>
+    </framework:config>
+</container>

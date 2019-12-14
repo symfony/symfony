@@ -1,0 +1,53 @@
+{
+  "name": "symfony/scheduler",
+  "type": "library",
+  "description": "Symfony Scheduler Component",
+  "keywords": ["schedule", "scheduler", "tasks"],
+  "homepage": "https://symfony.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Fabien Potencier",
+      "email": "fabien@symfony.com"
+    },
+    {
+      "name": "Symfony Community",
+      "homepage": "https://symfony.com/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.2.5",
+    "ext-pcntl": "*",
+    "psr/log": "~1.0",
+    "dragonmantank/cron-expression": "^2.3",
+    "symfony/console": "^4.4|^5.0",
+    "symfony/expression-language": "^4.4|^5.0",
+    "symfony/filesystem": "^4.4|^5.0",
+    "symfony/lock": "^4.4|^5.0",
+    "symfony/options-resolver": "^4.4|^5.0",
+    "symfony/process": "^4.4|^5.0",
+    "symfony/serializer": "^4.4|^5.0"
+  },
+  "require-dev": {
+    "symfony/event-dispatcher": "^4.4|^5.0",
+    "symfony/http-kernel": "^4.4|^5.0",
+    "symfony/messenger": "^4.4|^5.0"
+  },
+  "suggest": {
+    "symfony/event-dispatcher": "For dispatching and listening to tasks & worker lifecycle events",
+    "symfony/messenger": "For dispatching tasks to queue",
+    "symfony/stopwatch": "For tracking and sorting the tasks depending on their execution duration"
+  },
+  "autoload": {
+    "psr-4": { "Symfony\\Component\\Scheduler\\": "" },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "5.1-dev"
+    }
+  }
+}

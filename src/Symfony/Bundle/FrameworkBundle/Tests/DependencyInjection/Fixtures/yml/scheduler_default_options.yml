@@ -1,0 +1,5 @@
+framework:
+  scheduler:
+    timezone: 'Europe/Paris'
+    output_path: '%kernel.project_dir%/var/scheduler'
+    path: '/_tasks'

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 
 /**
- * Recursive implementation of {@link ValidatorInterface}.
+ * Recursive implementation of {@link ExpressionValidatorInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

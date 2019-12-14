@@ -1,0 +1,16 @@
+framework:
+  scheduler:
+    timezone: 'Europe/Paris'
+    transports:
+      local:
+        dsn: 'local://'
+    schedulers:
+      foo:
+        transport: 'local'
+    tasks:
+      app.foo:
+        scheduler: 'foo'
+        type: 'shell'
+        expression: '* * * * *'
+        options:
+          command: 'echo Symfony!'

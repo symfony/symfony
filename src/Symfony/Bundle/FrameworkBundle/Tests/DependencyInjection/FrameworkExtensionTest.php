@@ -42,6 +42,7 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Scheduler\ExecutionModeOrchestratorInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -719,7 +720,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessengerMiddlewareFactoryErroneousFormat()
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, {"foo":["qux"],"bar":["baz"]} given.');
+        $this->expectExceptionMessage('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, "{"foo":["qux"],"bar":["baz"]}" given.');
         $this->createContainerFromFile('messenger_middleware_factory_erroneous_format');
     }
 
@@ -1467,6 +1468,78 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('mailer_with_specific_message_bus');
 
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('mailer.mailer')->getArgument(1));
+    }
+
+    public function testSchedulerWithDefaultOptions(): void
+    {
+        $container = $this->createContainerFromFile('scheduler_default_options');
+
+        static::assertTrue($container->hasParameter('scheduler.timezone'));
+        static::assertTrue($container->hasParameter('scheduler.export_directory'));
+        static::assertTrue($container->hasParameter('scheduler.output_path'));
+        static::assertTrue($container->hasParameter('scheduler.trigger_path'));
+        static::assertTrue($container->has('scheduler.transport_factory'));
+        static::assertTrue($container->has('scheduler.transport_factory.local'));
+        static::assertTrue($container->has('scheduler.transport_factory.null'));
+        static::assertTrue($container->has('scheduler.expression_factory'));
+        static::assertTrue($container->hasAlias(ExecutionModeOrchestratorInterface::class));
+        static::assertTrue($container->has('scheduler.task_normalizer'));
+        static::assertTrue($container->has('scheduler.shell_runner'));
+        static::assertTrue($container->has('scheduler.command_runner'));
+        static::assertTrue($container->has('scheduler.stop_watch'));
+        static::assertTrue($container->has('scheduler.task_execution_watcher'));
+        static::assertTrue($container->has('scheduler.worker.registry'));
+        static::assertTrue($container->has('scheduler.task_message.handler'));
+        static::assertTrue($container->has('scheduler.registry'));
+    }
+
+    public function testSchedulerWithShellTasks(): void
+    {
+        $container = $this->createContainerFromFile('scheduler_shell_tasks');
+
+        static::assertTrue($container->hasParameter('scheduler.timezone'));
+        static::assertTrue($container->hasParameter('scheduler.export_directory'));
+        static::assertTrue($container->hasParameter('scheduler.output_path'));
+        static::assertTrue($container->hasParameter('scheduler.trigger_path'));
+        static::assertTrue($container->has('scheduler.hub.foo'));
+        static::assertTrue($container->has('scheduler.expression_factory'));
+        static::assertTrue($container->has('scheduler.transport_factory'));
+        static::assertTrue($container->has('scheduler.transport_factory.local'));
+        static::assertTrue($container->has('scheduler.transport_factory.null'));
+        static::assertTrue($container->has('scheduler.transport.local'));
+        static::assertTrue($container->has('scheduler.execution_mode_orchestrator'));
+        static::assertTrue($container->hasAlias(ExecutionModeOrchestratorInterface::class));
+        static::assertTrue($container->has('scheduler.task_normalizer'));
+        static::assertTrue($container->has('scheduler.shell_runner'));
+        static::assertTrue($container->has('scheduler.command_runner'));
+        static::assertTrue($container->has('scheduler.stop_watch'));
+        static::assertTrue($container->has('scheduler.task_execution_watcher'));
+        static::assertTrue($container->has('scheduler.worker.registry'));
+        static::assertTrue($container->has('scheduler.task_message.handler'));
+        static::assertTrue($container->has('scheduler.registry'));
+    }
+
+    public function testSchedulerWithCommandTasks(): void
+    {
+        $container = $this->createContainerFromFile('scheduler_command_tasks');
+
+        static::assertTrue($container->hasParameter('scheduler.timezone'));
+        static::assertTrue($container->hasParameter('scheduler.export_directory'));
+        static::assertTrue($container->hasParameter('scheduler.output_path'));
+        static::assertTrue($container->hasParameter('scheduler.trigger_path'));
+        static::assertTrue($container->hasParameter('scheduler.export_directory'));
+        static::assertTrue($container->has('scheduler.hub.foo'));
+        static::assertTrue($container->has('scheduler.expression_factory'));
+        static::assertTrue($container->has('scheduler.execution_mode_orchestrator'));
+        static::assertTrue($container->hasAlias(ExecutionModeOrchestratorInterface::class));
+        static::assertTrue($container->has('scheduler.task_normalizer'));
+        static::assertTrue($container->has('scheduler.shell_runner'));
+        static::assertTrue($container->has('scheduler.command_runner'));
+        static::assertTrue($container->has('scheduler.stop_watch'));
+        static::assertTrue($container->has('scheduler.task_execution_watcher'));
+        static::assertTrue($container->has('scheduler.worker.registry'));
+        static::assertTrue($container->has('scheduler.task_message.handler'));
+        static::assertTrue($container->has('scheduler.registry'));
     }
 
     protected function createContainer(array $data = [])

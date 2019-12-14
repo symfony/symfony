@@ -34,6 +34,7 @@
             <xsd:element name="http-client" type="http_client" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mailer" type="mailer" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-cache" type="http_cache" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="scheduler" type="scheduler" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -605,4 +606,68 @@
             <xsd:enumeration value="full" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="scheduler">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="transports" type="scheduler_transports" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="schedulers" type="scheduler_schedulers" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="tasks" type="scheduler_tasks" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="export_directory" type="xsd:string" />
+        <xsd:attribute name="output_path" type="xsd:string" />
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="timezone" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="scheduler_transports">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="transports" type="scheduler_transport_config" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="scheduler_transport_config">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="dsn" type="xsd:string" />
+            <xsd:element name="options" type="metadata" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="scheduler_schedulers">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="schedulers" type="scheduler_config" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="scheduler_config">
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="transport" type="xsd:string" />
+        <xsd:attribute name="timezone" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="scheduler_tasks">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="tasks" type="scheduler_task_config" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="scheduler_task_config">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="tags" type="scheduler_tasks_tags" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="options" type="scheduler_tasks_options" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="scheduler" type="xsd:string" />
+        <xsd:attribute name="type" type="xsd:string" />
+        <xsd:attribute name="expression" type="xsd:string" />
+        <xsd:attribute name="command" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="scheduler_tasks_tags">
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="scheduler_tasks_options">
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
 </xsd:schema>

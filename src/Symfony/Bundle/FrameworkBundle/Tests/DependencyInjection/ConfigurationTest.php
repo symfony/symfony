@@ -22,6 +22,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\Scheduler\SchedulerInterface;
 
 class ConfigurationTest extends TestCase
 {
@@ -332,6 +333,166 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    /**
+     * @dataProvider provideValidSchedulerConfiguration
+     */
+    public function testValidSchedulerConfiguration($schedulerConfig, $processedConfig)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'scheduler' => $schedulerConfig,
+            ],
+        ]);
+
+        $this->assertArrayHasKey('scheduler', $config);
+        $this->assertEquals($processedConfig, $config['scheduler']);
+    }
+
+    public function provideValidSchedulerConfiguration(): \Generator
+    {
+        yield [
+            [
+                'enabled' => true,
+                'timezone' => 'Europe/Paris',
+                'transports' => [
+                    'local' => [
+                        'dsn' => 'local://',
+                        'options' => [],
+                    ],
+                ],
+                'output_path' => '%kernel.project_dir%/var/scheduler',
+                'export_directory' => '%kernel.project_dir%/var/scheduler/exports',
+                'path' => '/_tasks',
+                'schedulers' => [
+                    'app.foo' => [
+                        'timezone' => 'Europe/London',
+                        'transport' => 'local',
+                    ],
+                ],
+                'tasks' => [
+                    'app.foo_task' => [
+                        'scheduler' => 'app.foo',
+                        'type' => 'shell',
+                        'command' => 'echo Symfony!',
+                        'options' => [
+                            'description' => 'random task',
+                            'output' => true,
+                        ],
+                        'tags' => [],
+                    ],
+                    'app.foo_command' => [
+                        'scheduler' => 'app.foo',
+                        'type' => 'command',
+                        'command' => 'cache:clear',
+                        'expression' => '*/30 * * * *',
+                        'options' => [
+                            'description' => 'Cache clear task',
+                            'output' => true,
+                            'options' => [
+                                '--env' => 'dev',
+                            ],
+                        ],
+                        'tags' => [],
+                    ],
+                ],
+                'lock_store' => null,
+            ],
+            [
+                'enabled' => true,
+                'timezone' => 'Europe/Paris',
+                'transports' => [
+                    'local' => [
+                        'dsn' => 'local://',
+                        'options' => [],
+                    ],
+                ],
+                'output_path' => '%kernel.project_dir%/var/scheduler',
+                'export_directory' => '%kernel.project_dir%/var/scheduler/exports',
+                'path' => '/_tasks',
+                'schedulers' => [
+                    'app.foo' => [
+                        'timezone' => 'Europe/London',
+                        'transport' => 'local',
+                    ],
+                ],
+                'tasks' => [
+                    'app.foo_task' => [
+                        'scheduler' => 'app.foo',
+                        'type' => 'shell',
+                        'command' => 'echo Symfony!',
+                        'options' => [
+                            'description' => 'random task',
+                            'output' => true,
+                        ],
+                        'tags' => [],
+                    ],
+                    'app.foo_command' => [
+                        'scheduler' => 'app.foo',
+                        'type' => 'command',
+                        'command' => 'cache:clear',
+                        'expression' => '*/30 * * * *',
+                        'options' => [
+                            'description' => 'Cache clear task',
+                            'output' => true,
+                            'options' => [
+                                '--env' => 'dev',
+                            ],
+                        ],
+                        'tags' => [],
+                    ],
+                ],
+                'lock_store' => null,
+            ],
+        ];
+
+        yield [
+            [
+                'enabled' => true,
+                'timezone' => 'Europe/Paris',
+                'transports' => [
+                    'local' => [
+                        'dsn' => 'local://',
+                        'options' => [],
+                    ],
+                ],
+                'output_path' => '%kernel.project_dir%/var/scheduler',
+                'export_directory' => '%kernel.project_dir%/var/scheduler/exports',
+                'path' => '/_tasks',
+                'schedulers' => [
+                    'app.foo' => [
+                        'timezone' => 'Europe/London',
+                        'transport' => 'local',
+                    ],
+                ],
+                'tasks' => [],
+                'lock_store' => null,
+            ],
+            [
+                'enabled' => true,
+                'timezone' => 'Europe/Paris',
+                'transports' => [
+                    'local' => [
+                        'dsn' => 'local://',
+                        'options' => [],
+                    ],
+                ],
+                'output_path' => '%kernel.project_dir%/var/scheduler',
+                'export_directory' => '%kernel.project_dir%/var/scheduler/exports',
+                'path' => '/_tasks',
+                'schedulers' => [
+                    'app.foo' => [
+                        'timezone' => 'Europe/London',
+                        'transport' => 'local',
+                    ],
+                ],
+                'tasks' => [],
+                'lock_store' => null,
+            ],
+        ];
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [
@@ -519,6 +680,17 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'debug' => '%kernel.debug%',
                 'private_headers' => [],
+            ],
+            'scheduler' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(SchedulerInterface::class),
+                'timezone' => 'UTC',
+                'transports' => [],
+                'output_path' => '%kernel.project_dir%/var/scheduler',
+                'path' => '/_tasks',
+                'export_directory' => '%kernel.project_dir%/var/scheduler/exports',
+                'schedulers' => [],
+                'tasks' => [],
+                'lock_store' => null,
             ],
         ];
     }

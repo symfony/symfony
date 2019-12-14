@@ -30,6 +30,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\Scheduler\SchedulerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -133,6 +134,7 @@ class Configuration implements ConfigurationInterface
         $this->addMailerSection($rootNode);
         $this->addSecretsSection($rootNode);
         $this->addNotifierSection($rootNode);
+        $this->addSchedulerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -1254,7 +1256,7 @@ class Configuration implements ConfigurationInterface
                                                         return $middleware;
                                                     }
                                                     if (1 < \count($middleware)) {
-                                                        throw new \InvalidArgumentException(sprintf('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, %s given.', json_encode($middleware)));
+                                                        throw new \InvalidArgumentException(sprintf('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, "%s" given.', json_encode($middleware)));
                                                     }
 
                                                     return [
@@ -1633,6 +1635,105 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('email')->cannotBeEmpty()->end()
                                     ->scalarNode('phone')->defaultValue('')->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addSchedulerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('scheduler')
+                    ->info('Scheduler configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(SchedulerInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->scalarNode('export_directory')
+                            ->info('The path where the tasks should be exported')
+                            ->defaultValue('%kernel.project_dir%/var/scheduler/exports')
+                        ->end()
+                        ->scalarNode('output_path')
+                            ->info('The path where the output should be sent')
+                            ->defaultValue('%kernel.project_dir%/var/scheduler')
+                        ->end()
+                        ->scalarNode('path')
+                            ->info('The path used to trigger tasks using http request, default to "/_tasks"')
+                            ->defaultValue('/_tasks')
+                        ->end()
+                        ->scalarNode('timezone')
+                            ->info('The timezone used by every scheduler (if not override in each one), if not defined, the default value will be "UTC"')
+                            ->defaultValue('UTC')
+                        ->end()
+                        ->scalarNode('lock_store')
+                            ->info('The store used by every worker to prevent overlapping, by default, a FlockStore is created')
+                            ->defaultNull()
+                        ->end()
+                    ->end()
+                    ->fixXmlConfig('transport')
+                    ->children()
+                        ->arrayNode('transports')
+                            ->useAttributeAsKey('name')
+                            ->normalizeKeys(false)
+                            ->prototype('array')
+                                ->fixXmlConfig('option')
+                                ->children()
+                                    ->scalarNode('dsn')->end()
+                                    ->arrayNode('options')
+                                        ->normalizeKeys(false)
+                                        ->defaultValue([])
+                                        ->prototype('variable')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->fixXmlConfig('scheduler')
+                    ->children()
+                        ->arrayNode('schedulers')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('transport')
+                                        ->info('A valid transport defined in the related configuration')
+                                        ->cannotBeEmpty()
+                                        ->isRequired()
+                                    ->end()
+                                    ->scalarNode('timezone')
+                                        ->info('The timezone used by this scheduler, if not defined, the default value will be the one defined in "scheduler.timezone"')
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->fixXmlConfig('task')
+                    ->children()
+                        ->arrayNode('tasks')
+                            ->useAttributeAsKey('name')
+                            ->normalizeKeys(false)
+                            ->fixXmlConfig('tag')
+                            ->fixXmlConfig('option')
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('scheduler')
+                                            ->cannotBeEmpty()
+                                            ->isRequired()
+                                        ->end()
+                                        ->scalarNode('command')->end()
+                                        ->scalarNode('expression')->end()
+                                        ->scalarNode('type')->end()
+                                        ->arrayNode('options')
+                                            ->defaultValue([])
+                                            ->prototype('variable')->end()
+                                        ->end()
+                                        ->arrayNode('tags')
+                                            ->defaultValue([])
+                                            ->prototype('variable')->end()
+                                        ->end()
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()

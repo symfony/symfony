@@ -56,6 +56,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
@@ -120,6 +121,17 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Scheduler\ExecutionModeOrchestrator;
+use Symfony\Component\Scheduler\Export\ExporterInterface;
+use Symfony\Component\Scheduler\Export\FormatterInterface;
+use Symfony\Component\Scheduler\RegistryInterface;
+use Symfony\Component\Scheduler\Runner\RunnerInterface;
+use Symfony\Component\Scheduler\Scheduler;
+use Symfony\Component\Scheduler\SchedulerInterface;
+use Symfony\Component\Scheduler\Task\TaskInterface;
+use Symfony\Component\Scheduler\Transport\TransportFactoryInterface as SchedulerTransportFactoryInterface;
+use Symfony\Component\Scheduler\Transport\TransportInterface as SchedulerTransportInterface;
+use Symfony\Component\Scheduler\Worker\WorkerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -370,6 +382,10 @@ class FrameworkExtension extends Extension
             $this->registerNotifierConfiguration($config['notifier'], $container, $loader);
         }
 
+        if ($this->isConfigEnabled($container, $config['scheduler'])) {
+            $this->registerSchedulerConfiguration($config['scheduler'], $container, $loader);
+        }
+
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
         $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
         $this->registerHttpCacheConfiguration($config['http_cache'], $container);
@@ -491,7 +507,18 @@ class FrameworkExtension extends Extension
             ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
-
+        $container->registerForAutoconfiguration(ExporterInterface::class)
+            ->addTag('scheduler.exporter');
+        $container->registerForAutoconfiguration(FormatterInterface::class)
+            ->addTag('scheduler.formatter');
+        $container->registerForAutoconfiguration(SchedulerTransportFactoryInterface::class)
+            ->addTag('scheduler.transport_factory');
+        $container->registerForAutoconfiguration(RegistryInterface::class)
+            ->addTag('scheduler.registry');
+        $container->registerForAutoconfiguration(SchedulerTransportInterface::class)
+            ->addTag('scheduler.transport');
+        $container->registerForAutoconfiguration(RunnerInterface::class)
+            ->addTag('scheduler.runner');
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers
             $container->getDefinition('config_cache_factory')->setArguments([]);
@@ -2131,6 +2158,104 @@ class FrameworkExtension extends Extension
         }
 
         return $trustedHeaders;
+    }
+
+    private function registerSchedulerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader): void
+    {
+        if (!interface_exists(SchedulerInterface::class)) {
+            throw new LogicException('Scheduler support cannot be enabled as the Scheduler component is not installed. Try running "composer require symfony/scheduler".');
+        }
+
+        $container->setParameter('scheduler.timezone', new \DateTimeZone($config['timezone']));
+        $container->setParameter('scheduler.export_directory', $config['export_directory']);
+        $container->setParameter('scheduler.output_path', $config['output_path']);
+        $container->setParameter('scheduler.trigger_path', $config['path']);
+
+        $loader->load('scheduler.xml');
+
+        if (null !== $config['lock_store'] && 0 !== strpos('@', $config['lock_store'])) {
+            $store = $container->getDefinition($config['lock_store']);
+            $container->getDefinition('scheduler.worker_lock')->setArgument(0, $store);
+        }
+
+        foreach ($config['transports'] as $name => $transportConfiguration) {
+            if (\array_key_exists('execution_mode', $transportConfiguration)) {
+                if (!\in_array($transportConfiguration['execution_mode'], ExecutionModeOrchestrator::EXECUTION_MODES)) {
+                    throw new \InvalidArgumentException(sprintf('The execution mode is invalid, must be "%s", given "%s".', implode(', ', ExecutionModeOrchestrator::EXECUTION_MODES), $transportConfiguration['execution_mode']));
+                }
+                $container->setParameter(sprintf('scheduler.execution_mode.%s', $name), $transportConfiguration['execution_mode']);
+            }
+            $transportDefinition = (new Definition(SchedulerTransportInterface::class))
+                ->setFactory([new Reference('scheduler.transport_factory'), 'createTransport'])
+                ->setArguments([$transportConfiguration['dsn'], $transportConfiguration['options'], new Reference('serializer')])
+                ->addTag('scheduler.transport', ['alias' => $name])
+            ;
+            $container->setDefinition('scheduler.transport.'.$name, $transportDefinition);
+            $container->registerAliasForArgument($name, SchedulerTransportInterface::class);
+        }
+
+        foreach ($config['schedulers'] as $name => $schedulerConfig) {
+            if (!\array_key_exists('transport', $schedulerConfig)) {
+                throw new \RuntimeException('A scheduler must have a transport!');
+            }
+
+            $schedulerDefinition = (new Definition(SchedulerInterface::class))
+                ->setFactory([Scheduler::class, 'forSpecificTimezone'])
+                ->setArguments([
+                    \array_key_exists('timezone', $schedulerConfig) && $config['timezone'] !== $schedulerConfig['timezone']
+                        ? new \DateTimeZone($schedulerConfig['timezone'])
+                        : $container->getParameter('scheduler.timezone'),
+                    new Reference('scheduler.transport.'.$schedulerConfig['transport']),
+                    new Reference(EventDispatcherInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                    new Reference(MessageBusInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                ])
+                ->addTag('scheduler.hub', [
+                    'alias' => $name,
+                    'transport' => 'scheduler.transport.'.$schedulerConfig['transport'],
+                ])
+            ;
+            $container->setDefinition('scheduler.hub.'.$name, $schedulerDefinition);
+            $container->registerAliasForArgument($name, SchedulerInterface::class);
+            $container->getDefinition('scheduler.registry')->addMethodCall('register', [$name, $schedulerDefinition]);
+
+            $runners = $container->findTaggedServiceIds('scheduler.runner');
+            $defaultRunners = [];
+            foreach ($runners as $id => $service) {
+                $defaultRunners[] = $container->getDefinition($id);
+            }
+
+            $workerDefinition = (new Definition(WorkerInterface::class))
+                ->setArguments([
+                    $defaultRunners,
+                    new Reference('scheduler.task_execution_watcher'),
+                    new Reference('scheduler.worker_lock'),
+                    new Reference('event_dispatcher'),
+                    new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                ])
+                ->addTag('scheduler.worker', [
+                    'alias' => $name,
+                    'scheduler' => 'scheduler.hub'.$name,
+                ])
+            ;
+
+            $container->setDefinition('scheduler.worker.'.$name, $workerDefinition);
+            $container->registerAliasForArgument($name, WorkerInterface::class);
+            $container->getDefinition('scheduler.worker.registry')->addMethodCall('register', [$name, $workerDefinition]);
+        }
+
+        foreach ($config['tasks'] as $task => $taskConfiguration) {
+            $taskDefinition = (new Definition(TaskInterface::class))
+                ->setFactory([new Reference('scheduler.task_factory'), 'create'])
+                ->setArguments($taskConfiguration)
+                ->setAutoconfigured(false)
+                ->setAutowired(false)
+                ->addTag('scheduler.task', ['alias' => $task])
+            ;
+            $container->setDefinition('scheduler.task.'.$task, $taskDefinition);
+            $container->getDefinition('scheduler.hub.'.$taskConfiguration['scheduler'])->addMethodCall('schedule', [$taskDefinition]);
+        }
+
+        $container->getDefinition('scheduler.task_subscriber')->setArgument(2, $config['path']);
     }
 
     /**

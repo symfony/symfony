@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <!-- data collector -->
+        <service id="scheduler.data_collector" class="Symfony\Component\Scheduler\DataCollector\SchedulerDataCollector">
+            <tag name="data_collector" />
+        </service>
+
+        <service id="scheduler.transport_factory" class="Symfony\Component\Scheduler\Transport\TransportFactory">
+            <argument type="tagged_iterator" tag="scheduler.transport_factory" />
+        </service>
+
+        <!-- cron -->
+        <service id="scheduler.cron.registry" class="Symfony\Component\Scheduler\Cron\CronRegistry" />
+        <service id="scheduler.cron.factory" class="Symfony\Component\Scheduler\Cron\CronFactory">
+            <argument type="service" id="scheduler.cron.registry" />
+        </service>
+
+        <!-- registries -->
+        <service id="scheduler.registry" class="Symfony\Component\Scheduler\SchedulerRegistry" />
+        <service id="Symfony\Component\Scheduler\SchedulerRegistryInterface" alias="scheduler.registry" />
+
+        <service id="scheduler.worker.registry" class="Symfony\Component\Scheduler\Worker\WorkerRegistry" />
+        <service id="Symfony\Component\Scheduler\Worker\WorkerRegistryInterface" alias="scheduler.worker.registry" />
+
+        <!-- transports -->
+        <service id="scheduler.transport_factory.local" class="Symfony\Component\Scheduler\Transport\LocalTransportFactory">
+            <tag name="scheduler.transport_factory" />
+        </service>
+        <service id="scheduler.transport_factory.null" class="Symfony\Component\Scheduler\Transport\NullTransportFactory">
+            <tag name="scheduler.transport_factory" />
+        </service>
+
+        <service id="scheduler.application" class="Symfony\Bundle\FrameworkBundle\Console\Application">
+            <argument type="service" id="kernel" />
+        </service>
+
+        <service id="scheduler.cron_generator" class="Symfony\Component\Scheduler\Cron\CronGenerator">
+            <argument type="service" id="filesystem" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="scheduler.expression_factory" class="Symfony\Component\Scheduler\Expression\ExpressionFactory" />
+
+        <service id="scheduler.execution_mode_orchestrator" class="Symfony\Component\Scheduler\ExecutionModeOrchestrator" />
+        <service id="Symfony\Component\Scheduler\ExecutionModeOrchestratorInterface" alias="scheduler.execution_mode_orchestrator" />
+
+        <!-- tasks factories -->
+        <service id="scheduler.shell_task.factory" class="Symfony\Component\Scheduler\Task\ShellTaskFactory">
+            <tag name="scheduler.task_factory" />
+        </service>
+        <service id="scheduler.command_task.factory" class="Symfony\Component\Scheduler\Task\CommandTaskFactory">
+            <tag name="scheduler.task_factory" />
+        </service>
+
+        <service id="scheduler.task_factory" class="Symfony\Component\Scheduler\Task\TaskFactory">
+            <argument type="tagged_iterator" tag="scheduler.task_factory" />
+        </service>
+        <service id="Symfony\Component\Scheduler\Task\TaskFactoryInterface" alias="scheduler.task_factory" />
+
+        <!-- runners -->
+        <service id="scheduler.shell_runner" class="Symfony\Component\Scheduler\Runner\ShellTaskRunner">
+            <tag name="scheduler.runner" />
+        </service>
+
+        <service id="scheduler.command_runner" class="Symfony\Component\Scheduler\Runner\CommandTaskRunner">
+            <argument type="service" id="scheduler.application" />
+            <tag name="scheduler.runner" />
+        </service>
+
+        <service id="scheduler.callback_runner" class="Symfony\Component\Scheduler\Runner\CallBackTaskRunner">
+            <tag name="scheduler.runner" />
+        </service>
+
+        <service id="scheduler.null_runner" class="Symfony\Component\Scheduler\Runner\NullRunner">
+            <tag name="scheduler.runner" />
+        </service>
+
+        <!-- task execution watcher -->
+        <service id="scheduler.stop_watch" class="Symfony\Component\Stopwatch\Stopwatch" />
+        <service id="scheduler.task_execution_watcher" class="Symfony\Component\Scheduler\Task\TaskExecutionWatcher">
+            <argument type="service" id="scheduler.stop_watch" />
+        </service>
+        <service id="Symfony\Component\Scheduler\Task\TaskExecutionWatcherInterface" alias="scheduler.task_execution_watcher" />
+
+        <service id="scheduler.worker_lock" class="Symfony\Component\Scheduler\Worker\WorkerLock" />
+        <service id="Symfony\Component\Scheduler\Worker\WorkerLockInterface" alias="scheduler.worker_lock" />
+
+        <!-- serializer -->
+        <service id="scheduler.task_normalizer" class="Symfony\Component\Scheduler\Serializer\TaskNormalizer">
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <!-- messenger -->
+        <service id="scheduler.task_message.handler" class="Symfony\Component\Scheduler\Messenger\TaskMessageHandler">
+            <argument type="service" id="scheduler.worker.registry" />
+            <tag name="messenger.message_handler" />
+        </service>
+
+        <!-- subscriber -->
+        <service id="scheduler.task_subscriber" class="Symfony\Component\Scheduler\EventListener\TaskSubscriber">
+            <argument type="service" id="scheduler.registry" />
+            <argument type="service" id="scheduler.worker.registry" />
+            <tag name="kernel.event_subscriber" />
+        </service>
+    </services>
+</container>

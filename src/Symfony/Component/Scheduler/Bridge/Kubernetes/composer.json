@@ -1,0 +1,38 @@
+{
+  "name": "symfony/kubernetes-scheduler",
+  "type": "symfony-bridge",
+  "description": "Symfony Kubernetes Scheduler Bridge",
+  "keywords": ["schedule", "scheduler", "kubernetes", "k8s"],
+  "homepage": "https://symfony.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Fabien Potencier",
+      "email": "fabien@symfony.com"
+    },
+    {
+      "name": "Symfony Community",
+      "homepage": "https://symfony.com/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.2.5",
+    "symfony/http-client": "^4.4|^5.0",
+    "symfony/scheduler": "^4.4|^5.0"
+  },
+  "require-dev": {
+    "symfony/event-dispatcher": "^4.4|^5.0"
+  },
+  "autoload": {
+    "psr-4": { "Symfony\\Component\\Scheduler\\Bridge\\Kubernetes\\": "" },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "5.1-dev"
+    }
+  }
+}

@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
@@ -39,14 +40,15 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
     private $eventDispatcher;
     private $messageBus;
     private $logger;
+    private $failedTransportsByName;
 
-    public function __construct(string $receiverName, ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
+    public function __construct(?string $receiverName, ?ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, ServiceLocator $failedTransportsByName)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;
         $this->logger = $logger;
 
-        parent::__construct($receiverName, $receiver);
+        parent::__construct($receiverName, $receiver, $failedTransportsByName);
     }
 
     /**
@@ -58,6 +60,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
             ->setDefinition([
                 new InputArgument('id', InputArgument::IS_ARRAY, 'Specific message id(s) to retry'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
+                new InputOption('failed-transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failed transport'),
             ])
             ->setDescription('Retries one or more messages from the failure transport')
             ->setHelp(<<<'EOF'
@@ -95,10 +98,11 @@ EOF
             $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
         }
 
-        $receiver = $this->getReceiver();
+        $failedTransportName = $input->getOption('failed-transport');
+        $receiver = $this->getReceiver($failedTransportName);
         $this->printPendingMessagesMessage($receiver, $io);
 
-        $io->writeln(sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $this->getReceiverName()));
+        $io->writeln(sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $this->getReceiverName($failedTransportName)));
 
         $shouldForce = $input->getOption('force');
         $ids = $input->getArgument('id');
@@ -107,20 +111,20 @@ EOF
                 throw new RuntimeException('Message id must be passed when in non-interactive mode.');
             }
 
-            $this->runInteractive($io, $shouldForce);
+            $this->runInteractive($receiver, $io, $shouldForce);
 
             return 0;
         }
 
-        $this->retrySpecificIds($ids, $io, $shouldForce);
+        $this->retrySpecificIds($failedTransportName, $ids, $io, $shouldForce);
         $io->success('All done!');
 
         return 0;
     }
 
-    private function runInteractive(SymfonyStyle $io, bool $shouldForce)
+    private function runInteractive(ReceiverInterface $failedTransport, SymfonyStyle $io, bool $shouldForce)
     {
-        $receiver = $this->getReceiver();
+        $receiver = $this->getReceiver($failedTransport);
         $count = 0;
         if ($receiver instanceof ListableReceiverInterface) {
             // for listable receivers, find the messages one-by-one
@@ -135,7 +139,7 @@ EOF
 
                     $id = $this->getMessageId($envelope);
                     if (null === $id) {
-                        throw new LogicException(sprintf('The "%s" receiver is able to list messages by id but the envelope is missing the TransportMessageIdStamp stamp.', $this->getReceiverName()));
+                        throw new LogicException(sprintf('The "%s" receiver is able to list messages by id but the envelope is missing the TransportMessageIdStamp stamp.', $this->getReceiverName($failedTransport)));
                     }
                     $ids[] = $id;
                 }
@@ -145,11 +149,11 @@ EOF
                     break;
                 }
 
-                $this->retrySpecificIds($ids, $io, $shouldForce);
+                $this->retrySpecificIds($failedTransport, $ids, $io, $shouldForce);
             }
         } else {
             // get() and ask messages one-by-one
-            $count = $this->runWorker($this->getReceiver(), $io, $shouldForce);
+            $count = $this->runWorker($failedTransport, $this->getReceiver($failedTransport), $io, $shouldForce);
         }
 
         // avoid success message if nothing was processed
@@ -158,7 +162,7 @@ EOF
         }
     }
 
-    private function runWorker(ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce): int
+    private function runWorker(?string $failedTransport, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce): int
     {
         $count = 0;
         $listener = function (WorkerMessageReceivedEvent $messageReceivedEvent) use ($io, $receiver, $shouldForce, &$count) {
@@ -179,7 +183,7 @@ EOF
         $this->eventDispatcher->addListener(WorkerMessageReceivedEvent::class, $listener);
 
         $worker = new Worker(
-            [$this->getReceiverName() => $receiver],
+            [$this->getReceiverName($failedTransport) => $receiver],
             $this->messageBus,
             $this->eventDispatcher,
             $this->logger
@@ -194,12 +198,12 @@ EOF
         return $count;
     }
 
-    private function retrySpecificIds(array $ids, SymfonyStyle $io, bool $shouldForce)
+    private function retrySpecificIds(?string $failedTransport, array $ids, SymfonyStyle $io, bool $shouldForce)
     {
-        $receiver = $this->getReceiver();
+        $receiver = $this->getReceiver($failedTransport);
 
         if (!$receiver instanceof ListableReceiverInterface) {
-            throw new RuntimeException(sprintf('The "%s" receiver does not support retrying messages by id.', $this->getReceiverName()));
+            throw new RuntimeException(sprintf('The "%s" receiver does not support retrying messages by id.', $this->getReceiverName($failedTransport)));
         }
 
         foreach ($ids as $id) {
@@ -209,7 +213,7 @@ EOF
             }
 
             $singleReceiver = new SingleMessageReceiver($receiver, $envelope);
-            $this->runWorker($singleReceiver, $io, $shouldForce);
+            $this->runWorker($failedTransport, $singleReceiver, $io, $shouldForce);
         }
     }
 }

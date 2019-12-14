@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -30,18 +31,27 @@ abstract class AbstractFailedMessagesCommand extends Command
 {
     private $receiverName;
     private $receiver;
+    /**
+     * @var ServiceLocator
+     */
+    private $failureTransports;
 
-    public function __construct(string $receiverName, ReceiverInterface $receiver)
+    public function __construct(?string $receiverName, ?ReceiverInterface $receiver, ServiceLocator $failureTransports)
     {
         $this->receiverName = $receiverName;
         $this->receiver = $receiver;
+        $this->failureTransports = $failureTransports;
 
         parent::__construct();
     }
 
-    protected function getReceiverName(): string
+    protected function getReceiverName(?string $name): string
     {
-        return $this->receiverName;
+        if (null === $name) {
+            return $this->receiverName;
+        }
+
+        return $name;
     }
 
     /**
@@ -115,9 +125,13 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    protected function getReceiver(): ReceiverInterface
+    protected function getReceiver(?string $name): ReceiverInterface
     {
-        return $this->receiver;
+        if (null === $name) {
+            return $this->receiver;
+        }
+
+        return $this->failureTransports->get($name);
     }
 
     protected function getLastRedeliveryStampWithException(Envelope $envelope): ?RedeliveryStamp

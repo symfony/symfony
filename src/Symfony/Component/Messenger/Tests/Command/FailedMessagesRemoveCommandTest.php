@@ -13,24 +13,31 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 class FailedMessagesRemoveCommandTest extends TestCase
 {
-    public function testRemoveSingleMessage()
+    public function testRemoveUniqueMessageSpecificFailedTransport()
     {
+        $messageId = 20;
+        $anotherFailedTransport = 'another_failure_receiver';
+
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
+        $receiver->expects($this->once())->method('find')->with($messageId)->willReturn(new Envelope(new \stdClass()));
+        $serviceLocator = $this->createMock(ServiceLocator::class);
+        $serviceLocator->expects($this->once())->method('get')->with($anotherFailedTransport)->willReturn($receiver);
 
         $command = new FailedMessagesRemoveCommand(
-            'failure_receiver',
-            $receiver
+            null,
+            null,
+            $serviceLocator
         );
 
         $tester = new CommandTester($command);
-        $tester->execute(['id' => 20, '--force' => true]);
+        $tester->execute(['id' => [$messageId], '--failed-transport' => $anotherFailedTransport, '--force' => true]);
 
         $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
         $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
@@ -40,10 +47,12 @@ class FailedMessagesRemoveCommandTest extends TestCase
     {
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('find')->with(20)->willReturn(new Envelope(new \stdClass()));
+        $serviceLocator = $this->createMock(ServiceLocator::class);
 
         $command = new FailedMessagesRemoveCommand(
             'failure_receiver',
-            $receiver
+            $receiver,
+            $serviceLocator
         );
 
         $tester = new CommandTester($command);
@@ -61,10 +70,12 @@ class FailedMessagesRemoveCommandTest extends TestCase
             null,
             new Envelope(new \stdClass())
         );
+        $serviceLocator = $this->createMock(ServiceLocator::class);
 
         $command = new FailedMessagesRemoveCommand(
             'failure_receiver',
-            $receiver
+            $receiver,
+            $serviceLocator
         );
 
         $tester = new CommandTester($command);
@@ -83,10 +94,12 @@ class FailedMessagesRemoveCommandTest extends TestCase
             new Envelope(new \stdClass()),
             new Envelope(new \stdClass())
         );
+        $serviceLocator = $this->createMock(ServiceLocator::class);
 
         $command = new FailedMessagesRemoveCommand(
             'failure_receiver',
-            $receiver
+            $receiver,
+            $serviceLocator
         );
 
         $tester = new CommandTester($command);

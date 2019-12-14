@@ -22,6 +22,20 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 class SendFailedMessageToFailureTransportListenerTest extends TestCase
 {
+    public function testDoNothingIfFailureTransportIsNotDefined()
+    {
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->never())->method('send');
+
+        $listener = new SendFailedMessageToFailureTransportListener(null);
+
+        $exception = new \Exception('no!');
+        $envelope = new Envelope(new \stdClass());
+        $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
+
+        $listener->onMessageFailed($event);
+    }
+
     public function testItSendsToTheFailureTransport()
     {
         $sender = $this->createMock(SenderInterface::class);

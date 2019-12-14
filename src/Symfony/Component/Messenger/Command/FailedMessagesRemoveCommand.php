@@ -37,6 +37,7 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
             ->setDefinition([
                 new InputArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Specific message id(s) to remove'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
+                new InputOption('failed-transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failed transport'),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
             ])
             ->setDescription('Remove given messages from the failure transport')
@@ -58,7 +59,8 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
-        $receiver = $this->getReceiver();
+        $failedTransport = $input->getOption('failed-transport');
+        $receiver = $this->getReceiver($failedTransport);
 
         $shouldForce = $input->getOption('force');
         $ids = (array) $input->getArgument('id');

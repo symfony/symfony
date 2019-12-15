@@ -80,7 +80,7 @@ final class ContainerLintCommand extends Command
 
         if (!$kernel->isDebug() || !(new ConfigCache($kernelContainer->getParameter('debug.container.dump'), true))->isFresh()) {
             if (!$kernel instanceof Kernel) {
-                throw new RuntimeException("This command does not support the console application's kernel.");
+                throw new RuntimeException(sprintf('This command does not support the application kernel: "%s" does not extend "%s".', \get_class($kernel), Kernel::class));
             }
 
             $buildContainer = \Closure::bind(function (): ContainerBuilder {
@@ -93,7 +93,7 @@ final class ContainerLintCommand extends Command
             $skippedIds = [];
         } else {
             if (!$kernelContainer instanceof Container) {
-                throw new RuntimeException("This command does not support the console application kernel's container.");
+                throw new RuntimeException(sprintf('This command does not support the application container: "%s" does not extend "%s".', \get_class($kernelContainer), Container::class));
             }
 
             (new XmlFileLoader($container = new ContainerBuilder($parameterBag = new EnvPlaceholderParameterBag()), new FileLocator()))->load($kernelContainer->getParameter('debug.container.dump'));

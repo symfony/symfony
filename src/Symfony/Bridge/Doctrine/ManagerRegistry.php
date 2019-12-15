@@ -12,17 +12,32 @@
 namespace Symfony\Bridge\Doctrine;
 
 use Doctrine\Common\Persistence\AbstractManagerRegistry as LegacyAbstractManagerRegistry;
+use Doctrine\Persistence\AbstractManagerRegistry;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 
+if (class_exists(AbstractManagerRegistry::class)) {
+    abstract class ManagerRegistry extends AbstractManagerRegistry implements ContainerAwareInterface
+    {
+        use ManagerRegistryTrait;
+    }
+} else {
+    abstract class ManagerRegistry extends LegacyAbstractManagerRegistry implements ContainerAwareInterface
+    {
+        use ManagerRegistryTrait;
+    }
+}
+
 /**
  * References Doctrine connections and entity/document managers.
  *
  * @author  Lukas Kahwe Smith <smith@pooteeweet.org>
+ *
+ * @internal
  */
-abstract class ManagerRegistry extends LegacyAbstractManagerRegistry implements ContainerAwareInterface
+trait ManagerRegistryTrait
 {
     /**
      * @var Container

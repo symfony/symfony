@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2019-12-03T18:46:22Z
+
+Hi, and thanks for contributing to Symfony!
+
+Reading a non-initialized property having a type must trigger an error. In my opinion, it's not a bug in the Symfony Serializer but in the user's app. Adding this check will slow down a bit the serializer, and defeats the purpose of using Typed Properties.
+
+👎 on my side.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-12-03T19:00:51Z
+
+@dunglas , agree, an error might be the desired behavior. On the other hand allowing to ignore the error might ease the migration to PHP 7.4. What if we add a context option to allow for uninitialized properties? It will be `false` by default.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-12-03T19:05:06Z
+
+What would be a valid use case of serializing an object with uninitialized properties? I fear that this change might hide a potential problem from the developer.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-12-03T19:20:20Z
+
+If you never touch an uninitialized property of an object in the php 7.4 code, you will never get an error. So an object with some uninitialized properties is absolutely valid. The problem is that when you pass that absolutely valid object with uninitialized properties to the Symfony Serializer, you all of a sudden get an error.
+
+Another solution would be to skip uninitialized properties when normalizing. So that they don't appear in the resulting array.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-12-03T19:31:16Z
+
+@derrabus , any use case of serializing an object with uninitialized properties is valid, because an object with uninitialized properties is a valid object.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-12-03T19:37:26Z
+
+```php
+final class SomeClass
+{
+    private string $property;
+}
+
+$obj = new SomeClass();
+
+echo json_encode($obj);
+```
+
+If this is a valid case (see https://3v4l.org/rKfHb), then why this is not?
+
+```php
+echo $serializer->serialize($obj, 'json');
+```
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-12-03T19:48:08Z
+
+Fair enough. But even php itself makes a difference between uninitialized properties and `null` properties when serializing: https://3v4l.org/hkHp7
+
+So, if we wanted the serializer to behave like php, we would need to skip an uninitialized property when normalizing the object.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-12-03T19:51:55Z
+
+> So, if we wanted the serializer to behave like php, we would need to skip an uninitialized property when normalizing the object.
+
+Agree here. We can do exactly like `json_encode` does, we can make it configurable via the `$context` for more flexibility. @dunglas , what do you think?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-12-03T21:09:14Z
+
+You make a good point!
+Let's copy the behavior of `json_encode`. I don't think that a context option is necessary as long as we don't change the existing behavior for non-typed properties.
+
+By the way, shouldn't `ObjectNormalizer` be updated accordingly?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-12-05T12:54:35Z
+
+@dunglas , done for both. The Travis failure is unrelated.
+
+It appears that `ReflectionProperty::isInitialized` can be called only on accessible properties, see https://travis-ci.org/symfony/symfony/jobs/621094371#L4416. Therefore, [this `if`](https://github.com/symfony/symfony/pull/34791/files#diff-1d6479801264d459a22ed5fb9ba48ca0R107) is is required.

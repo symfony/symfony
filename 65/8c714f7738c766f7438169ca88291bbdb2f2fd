@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-11T12:18:24Z
+
+We could also consider the original issue as unsupported: doing a LIMIT query for a choice list looks very strange to me.
+We'd better reduce complexity rather than increasing it...
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-12-11T19:46:29Z
+
+I agree, I also felt that way. But we might consider some kind of "paginated" choices as a valid use case, or whatever reason leading to open the related issue.
+Moreover is there any reason to forbid it since this has the cost of a BC break?
+
+Finally the expected behavior covered here by the test seems a legit bug fix to me, but we could still deprecate that `if` in master and get back to simple code in 6.0, also documenting the limitations this time. WDYT?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-12-11T19:49:02Z
+
+Also note that forbidding the usage in such case does lead to adding complexity and/or throwing or new specialized exception form the entity loader to catch in the DoctrineChoiceLoader as I propose in my comment above.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-12-11T20:02:00Z
+
+If we were to forbid it purely and simply I think this should better be done when normalizing the `query_builder` option to throw as soon as possible a configuration exception.

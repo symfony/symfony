@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-10T12:43:49Z
+
+Could you please add a test case?
+
+---------------------------------------------------------------------------
+
+by mvorisek at 2019-12-10T13:14:57Z
+
+I just updated the existing tests.
+
+Absolute path support has been removed in Symfony 4.0, so this PR should be:
+- fully merged in all maintained 3.x branches (i.e. 3.4)
+- and only the file `src/Symfony/Bundle/FrameworkBundle/Templating/TemplateNameParser.php` should be merged to 4.x branches (to remove the issue residue, but the tests are no longer relevant for 4.x versions)
+- in 5.x/develop branches there is no such code (not even under different file name)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-12-11T14:43:10Z
+
+Could this class help in this case?
+
+https://github.com/symfony/symfony/pull/30969
+
+---------------------------------------------------------------------------
+
+by mvorisek at 2019-12-11T15:03:01Z
+
+@OskarStark
+> Could this class help in this case?
+> #30969
+
+No, the mentioned PR does not update the destructive change done at this line https://github.com/symfony/symfony/pull/34915/files#diff-b696dd35180a8539992b7a209a0c9defL47 in any way.
+
+---------------------------------------------------------------------------
+
+by mvorisek at 2019-12-13T10:06:26Z
+
+@nicolas-grekas Tests updated, see above, can you please review and merge?

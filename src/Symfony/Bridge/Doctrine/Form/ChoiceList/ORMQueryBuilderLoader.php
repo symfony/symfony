@@ -55,6 +55,21 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      */
     public function getEntitiesByIds($identifier, array $values)
     {
+        if (null !== $this->queryBuilder->getMaxResults() || null !== $this->queryBuilder->getFirstResult()) {
+            // an offset or a limit would apply on results including the where clause with submitted id values
+            // that could make invalid choices valid
+            $choices = [];
+            $metadata = $this->queryBuilder->getEntityManager()->getClassMetadata(current($this->queryBuilder->getRootEntities()));
+
+            foreach ($this->getEntities() as $entity) {
+                if (\in_array(current($metadata->getIdentifierValues($entity)), $values, true)) {
+                    $choices[] = $entity;
+                }
+            }
+
+            return $choices;
+        }
+
         $qb = clone $this->queryBuilder;
         $alias = current($qb->getRootAliases());
         $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_'.$identifier;

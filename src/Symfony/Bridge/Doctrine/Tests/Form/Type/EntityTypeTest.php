@@ -956,6 +956,31 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleIdentifierWithLimit()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $entity3 = new SingleIntIdEntity(3, 'Baz');
+
+        $this->persist([$entity1, $entity2, $entity3]);
+
+        $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $repository->createQueryBuilder('e')
+                ->where('e.id IN (1, 2, 3)')
+                ->setMaxResults(1),
+            'choice_label' => 'name',
+        ]);
+
+        $field->submit('3');
+
+        $this->assertFalse($field->isSynchronized());
+        $this->assertNull($field->getData());
+    }
+
     public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleAssocIdentifier()
     {
         $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');

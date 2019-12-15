@@ -86,17 +86,13 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $deny = 0;
         foreach ($this->voters as $voter) {
             $result = $this->vote($voter, $token, $object, $attributes);
-            switch ($result) {
-                case VoterInterface::ACCESS_GRANTED:
-                    return true;
 
-                case VoterInterface::ACCESS_DENIED:
-                    ++$deny;
+            if (VoterInterface::ACCESS_GRANTED === $result) {
+                return true;
+            }
 
-                    break;
-
-                default:
-                    break;
+            if (VoterInterface::ACCESS_DENIED === $result) {
+                ++$deny;
             }
         }
 
@@ -128,16 +124,10 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         foreach ($this->voters as $voter) {
             $result = $this->vote($voter, $token, $object, $attributes);
 
-            switch ($result) {
-                case VoterInterface::ACCESS_GRANTED:
-                    ++$grant;
-
-                    break;
-
-                case VoterInterface::ACCESS_DENIED:
-                    ++$deny;
-
-                    break;
+            if (VoterInterface::ACCESS_GRANTED === $result) {
+                ++$grant;
+            } elseif (VoterInterface::ACCESS_DENIED === $result) {
+                ++$deny;
             }
         }
 
@@ -169,17 +159,12 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             foreach ($attributes as $attribute) {
                 $result = $this->vote($voter, $token, $object, [$attribute]);
 
-                switch ($result) {
-                    case VoterInterface::ACCESS_GRANTED:
-                        ++$grant;
+                if (VoterInterface::ACCESS_DENIED === $result) {
+                    return false;
+                }
 
-                        break;
-
-                    case VoterInterface::ACCESS_DENIED:
-                        return false;
-
-                    default:
-                        break;
+                if (VoterInterface::ACCESS_GRANTED === $result) {
+                    ++$grant;
                 }
             }
         }

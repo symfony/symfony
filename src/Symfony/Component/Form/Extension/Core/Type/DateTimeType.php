@@ -158,8 +158,8 @@ class DateTimeType extends AbstractType
                         'time' => $timeParts,
                     ]),
                 ]))
-                ->add('date', __NAMESPACE__.'\DateType', $dateOptions)
-                ->add('time', __NAMESPACE__.'\TimeType', $timeOptions)
+                ->add('date', DateType::class, $dateOptions)
+                ->add('time', TimeType::class, $timeOptions)
             ;
         }
 

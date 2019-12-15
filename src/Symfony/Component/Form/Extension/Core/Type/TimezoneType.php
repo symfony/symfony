@@ -77,7 +77,7 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
      */
     public function getParent()
     {
-        return __NAMESPACE__.'\ChoiceType';
+        return ChoiceType::class;
     }
 
     /**

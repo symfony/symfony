@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-12T16:00:01Z
+
+I have tested it:
+
+```php
+<?php
+
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
+use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
+
+require __DIR__.'/vendor/autoload.php';
+
+$connection = Connection::fromDsn('amqp://rabbitmq-3.lxd?exchange[name]=test');
+$connection->publish('body', [], 0, new AmqpStamp('test'));
+```
+
+I have created an exchange (fanout) and a queue by hand.
+
+---
+
+This is not related, but I notice something strange: The component created the a queue `messages` for me :/ Why? Where does "messages" comes? I know it's the default exchange name but in my case, I forced the exchange name to `test` and my routing key was `test`. More over the exchange was in a fanout mode, so IMHO it does really make sens here to create the queue since a queue is already bound. Is there a way to avoid that?
+
+OK, I tried
+```php
+$connection = Connection::fromDsn('amqp://rabbitmq-3.lxd?exchange[name]=test&queues[test]=&queues[test2]=');
+$connection->publish('body', [], 0, new AmqpStamp('test'));
+```
+And it does what I want :+1:
+
+So now I have another question: If I want to publish to 2 different exchanges, I have to create 2 connection?
+
+---------------------------------------------------------------------------
+
+by pyrech at 2019-12-13T10:16:47Z
+
+Shouldn't this PR be considered as a bug fix? If not, that means that Symfony 4.4 & 5.0 will provide an AMQP connection that is not safe to use by default.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-13T10:18:59Z
+
+I agree with @pyrech here.
+
+To be really clear : Right now if you restart rabbitmq, you will loose all messages. This is really not safe.
+
+@fabpot Are you OK to treat this PR as a bug fix ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-13T13:44:03Z
+
+I updated the PR to target 4.3

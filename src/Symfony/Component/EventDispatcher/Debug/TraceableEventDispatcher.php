@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\EventDispatcher\Debug;
 
+use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Contracts\EventDispatcher\ListenerProviderAwareInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -27,7 +29,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterface
+class TraceableEventDispatcher implements EventDispatcherInterface, ListenerProviderAwareInterface, ResetInterface
 {
     protected $logger;
     protected $stopwatch;
@@ -47,6 +49,10 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         $this->wrappedListeners = [];
         $this->orphanedEvents = [];
         $this->requestStack = $requestStack;
+
+        if (!$dispatcher instanceof ListenerProviderAwareInterface) {
+            @trigger_error(sprintf('Implementing %s without %s is deprecated since Symfony 5.1.', EventDispatcherInterface::class, ListenerProviderAwareInterface::class), E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -89,6 +95,14 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
         return $this->dispatcher->removeSubscriber($subscriber);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setListenerProvider(string $eventName, ListenerProviderInterface $listenerProvider): void
+    {
+        $this->dispatcher->setListenerProvider($eventName, $listenerProvider);
     }
 
     /**

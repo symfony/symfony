@@ -88,6 +88,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('error_controller')
                     ->defaultValue('error_controller')
                 ->end()
+                ->booleanNode('freeze_kernel_events')->defaultValue(false)->end()
             ->end()
         ;
 

@@ -39,6 +39,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -1382,6 +1383,32 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('mailer_with_specific_message_bus');
 
         $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('mailer.mailer')->getArgument(1));
+    }
+
+    public function testFreezeKernelEvents(): void
+    {
+        $container = $this->createContainerFromFile('freeze_events');
+
+        $this->assertSame(
+            [
+                KernelEvents::REQUEST,
+                KernelEvents::EXCEPTION,
+                KernelEvents::VIEW,
+                KernelEvents::CONTROLLER,
+                KernelEvents::CONTROLLER_ARGUMENTS,
+                KernelEvents::RESPONSE,
+                KernelEvents::TERMINATE,
+                KernelEvents::FINISH_REQUEST,
+            ],
+            $container->getParameter('event_dispatcher.freeze_events')
+        );
+    }
+
+    public function testDontFreezeKernelEventsByDefault(): void
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertSame([], $container->getParameter('event_dispatcher.freeze_events'));
     }
 
     protected function createContainer(array $data = [])

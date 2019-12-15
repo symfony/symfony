@@ -69,6 +69,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
@@ -223,6 +224,19 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
         $container->setParameter('kernel.error_controller', $config['error_controller']);
+        $container->setParameter(
+            'event_dispatcher.freeze_events',
+            $config['freeze_kernel_events'] ? [
+                KernelEvents::REQUEST,
+                KernelEvents::EXCEPTION,
+                KernelEvents::VIEW,
+                KernelEvents::CONTROLLER,
+                KernelEvents::CONTROLLER_ARGUMENTS,
+                KernelEvents::RESPONSE,
+                KernelEvents::TERMINATE,
+                KernelEvents::FINISH_REQUEST,
+            ] : []
+        );
 
         if (!$container->hasParameter('debug.file_link_format')) {
             $links = [

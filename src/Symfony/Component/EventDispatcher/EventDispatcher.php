@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\EventDispatcher\StoppableEventInterface;
 use Symfony\Component\EventDispatcher\Debug\WrappedListener;
+use Symfony\Component\EventDispatcher\Exception\RuntimeException;
+use Symfony\Contracts\EventDispatcher\ListenerProviderAwareInterface;
 
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
@@ -29,11 +32,15 @@ use Symfony\Component\EventDispatcher\Debug\WrappedListener;
  * @author Jordan Alliot <jordan.alliot@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class EventDispatcher implements EventDispatcherInterface
+class EventDispatcher implements EventDispatcherInterface, ListenerProviderAwareInterface
 {
     private $listeners = [];
     private $sorted = [];
     private $optimized;
+    /**
+     * @var ListenerProviderInterface[]
+     */
+    private $listenerProviders = [];
 
     public function __construct()
     {
@@ -49,7 +56,9 @@ class EventDispatcher implements EventDispatcherInterface
     {
         $eventName = $eventName ?? \get_class($event);
 
-        if (null !== $this->optimized && null !== $eventName) {
+        if (isset($this->listenerProviders[$eventName])) {
+            $listeners = $this->listenerProviders[$eventName]->getListenersForEvent($event);
+        } elseif (null !== $this->optimized && null !== $eventName) {
             $listeners = $this->optimized[$eventName] ?? (empty($this->listeners[$eventName]) ? [] : $this->optimizeListeners($eventName));
         } else {
             $listeners = $this->getListeners($eventName);
@@ -140,6 +149,10 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function addListener(string $eventName, $listener, int $priority = 0)
     {
+        if (isset($this->listenerProviders[$eventName])) {
+            throw new RuntimeException(sprintf('The "%s" event is frozen. You cannot attache listeners to it.', $eventName));
+        }
+
         $this->listeners[$eventName][$priority][] = $listener;
         unset($this->sorted[$eventName], $this->optimized[$eventName]);
     }
@@ -149,6 +162,10 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function removeListener(string $eventName, $listener)
     {
+        if (isset($this->listenerProviders[$eventName])) {
+            throw new RuntimeException(sprintf('The "%s" event is frozen. You cannot remove listeners from it.', $eventName));
+        }
+
         if (empty($this->listeners[$eventName])) {
             return;
         }
@@ -207,6 +224,18 @@ class EventDispatcher implements EventDispatcherInterface
                 $this->removeListener($eventName, [$subscriber, \is_string($params) ? $params : $params[0]]);
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setListenerProvider(string $eventName, ListenerProviderInterface $listenerProvider): void
+    {
+        if (isset($this->listeners[$eventName])) {
+            throw new RuntimeException(sprintf('There are already listeners attached to the "%s" event. You cannot set a listener provider for it.', $eventName));
+        }
+
+        $this->listenerProviders[$eventName] = $listenerProvider;
     }
 
     /**

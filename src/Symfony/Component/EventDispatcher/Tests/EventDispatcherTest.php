@@ -12,8 +12,10 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\ListenerProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Exception\RuntimeException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class EventDispatcherTest extends TestCase
@@ -405,6 +407,48 @@ class EventDispatcherTest extends TestCase
         $this->dispatcher->dispatch(new Event(), 'foo');
 
         $this->assertTrue($testLoaded);
+    }
+
+    public function testListenerProvider(): void
+    {
+        $event = new Event();
+        $calls = 0;
+        $provider = $this->createMock(ListenerProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('getListenersForEvent')
+            ->with($this->identicalTo($event))
+            ->willReturn([static function () use (&$calls): void {
+                ++$calls;
+            }])
+        ;
+
+        $this->dispatcher->setListenerProvider('foo', $provider);
+        $this->assertSame($event, $this->dispatcher->dispatch($event, 'foo'));
+        $this->assertSame(1, $calls);
+    }
+
+    public function testAddListenerToNestedDispatcher(): void
+    {
+        $this->dispatcher->setListenerProvider('foo', $this->createMock(ListenerProviderInterface::class));
+        $this->expectException(RuntimeException::class);
+
+        $this->dispatcher->addListener('foo', static function () {});
+    }
+
+    public function testRemoveListenerFromNestedDispatcher(): void
+    {
+        $this->dispatcher->setListenerProvider('foo', $this->createMock(ListenerProviderInterface::class));
+        $this->expectException(RuntimeException::class);
+
+        $this->dispatcher->removeListener('foo', static function () {});
+    }
+
+    public function testSetListenerProviderAfterAddingListeners(): void
+    {
+        $this->dispatcher->addListener('foo', static function () {});
+        $this->expectException(RuntimeException::class);
+
+        $this->dispatcher->setListenerProvider('foo', $this->createMock(ListenerProviderInterface::class));
     }
 }
 

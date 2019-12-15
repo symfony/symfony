@@ -14,11 +14,14 @@ namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\ListenerProvider\LazyListenerProvider;
+use Symfony\Component\EventDispatcher\ListenerProvider\SimpleListenerProvider;
 
 class RegisterListenersPassTest extends TestCase
 {
@@ -354,6 +357,51 @@ class RegisterListenersPassTest extends TestCase
             ],
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
+
+    public function testFrozenEvent(): void
+    {
+        $builder = new ContainerBuilder();
+        $builder->setParameter('event_dispatcher.freeze_events', ['event']);
+        $eventDispatcherDefinition = $builder->register('event_dispatcher');
+        $builder->register('my_event_listener', 'stdClass')
+            ->addTag('kernel.event_listener', ['event' => 'event', 'method' => 'onEarlyEvent', 'priority' => 42])
+            ->addTag('kernel.event_listener', ['event' => 'event', 'method' => 'onLateEvent', 'priority' => -42])
+            ->addTag('kernel.event_listener', ['event' => 'another_event', 'method' => 'onAnotherEvent']);
+        $builder->register('my_event_subscriber', SubscriberService::class)
+            ->addTag('kernel.event_subscriber');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($builder);
+
+        $expectedProviderService = new Definition(SimpleListenerProvider::class, [[
+            [new Reference('my_event_listener'), 'onEarlyEvent'],
+            [new Reference('my_event_subscriber'), 'onEvent'],
+            [new Reference('my_event_listener'), 'onLateEvent'],
+        ]]);
+        $this->assertEquals($expectedProviderService, $builder->getDefinition('__event_dispatcher.listener_provider.event'));
+
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    'another_event',
+                    [new ServiceClosureArgument(new Reference('my_event_listener')), 'onAnotherEvent'],
+                    0,
+                ],
+            ],
+            [
+                'setListenerProvider',
+                [
+                    'event',
+                    new Definition(
+                        LazyListenerProvider::class,
+                        [new ServiceClosureArgument(new Reference('__event_dispatcher.listener_provider.event'))]
+                    ),
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $eventDispatcherDefinition->getMethodCalls());
     }
 }
 

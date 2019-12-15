@@ -501,6 +501,7 @@ class ConfigurationTest extends TestCase
                 'notification_on_failed_messages' => false,
             ],
             'error_controller' => 'error_controller',
+            'freeze_kernel_events' => false,
             'secrets' => [
                 'enabled' => true,
                 'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',

@@ -23,6 +23,6 @@ class FooTypeBazExtension extends AbstractTypeExtension
 
     public static function getExtendedTypes(): iterable
     {
-        return [__NAMESPACE__.'\FooType'];
+        return [FooType::class];
     }
 }

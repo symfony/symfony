@@ -101,9 +101,20 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     {
         $reflectionObject = new \ReflectionObject($object);
         $attributes = [];
+        $checkPropertyInitialization = \PHP_VERSION_ID >= 70400;
 
         do {
             foreach ($reflectionObject->getProperties() as $property) {
+                if ($checkPropertyInitialization) {
+                    if (!$property->isPublic()) {
+                        $property->setAccessible(true);
+                    }
+
+                    if (!$property->isInitialized($object)) {
+                        continue;
+                    }
+                }
+
                 if (!$this->isAllowedAttribute($reflectionObject->getName(), $property->name, $format, $context)) {
                     continue;
                 }

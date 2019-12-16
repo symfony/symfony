@@ -861,6 +861,11 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('auto_mapping')
+                            ->info('A collection of namespaces for which auto-mapping will be enabled.')
+                            ->example([
+                                'App\\Entity\\' => [],
+                                'App\\WithSpecificLoaders\\' => ['validator.property_info_loader'],
+                            ])
                             ->useAttributeAsKey('namespace')
                             ->normalizeKeys(false)
                             ->beforeNormalization()

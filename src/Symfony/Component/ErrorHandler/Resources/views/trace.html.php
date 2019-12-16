@@ -5,7 +5,7 @@
     <?php } ?>
 
     <?php if ('compact' !== $style && $trace['function']) { ?>
-        <span class="trace-class"><?= $this->abbrClass($trace['class']); ?></span><?php if ($trace['type']) { ?><span class="trace-type"><?= $trace['type']; ?></span><?php } ?><span class="trace-method"><?= $trace['function']; ?></span><span class="trace-arguments">(<?= $this->formatArgs($trace['args']); ?>)</span>
+        <span class="trace-class"><?= $this->abbrClass($trace['class']); ?></span><?php if ($trace['type']) { ?><span class="trace-type"><?= $trace['type']; ?></span><?php } ?><span class="trace-method"><?= $trace['function']; ?></span><?php if (isset($trace['args'])) { ?><span class="trace-arguments">(<?= $this->formatArgs($trace['args']); ?>)</span><?php } ?>
     <?php } ?>
 
     <?php if ($trace['file']) { ?>

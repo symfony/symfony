@@ -28,7 +28,7 @@
                     foreach ($exception['trace'] as $trace) {
                         echo "\n  ";
                         if ($trace['function']) {
-                            echo 'at '.$trace['class'].$trace['type'].$trace['function'].'('.$this->formatArgsAsText($trace['args']).')';
+                            echo 'at '.$trace['class'].$trace['type'].$trace['function'].'('.(isset($trace['args']) ? $this->formatArgsAsText($trace['args']) : '').')';
                         }
                         if ($trace['file'] && $trace['line']) {
                             echo($trace['function'] ? "\n     (" : 'at ').strtr(strip_tags($this->formatFile($trace['file'], $trace['line'])), [' at line '.$trace['line'] => '']).':'.$trace['line'].($trace['function'] ? ')' : '');

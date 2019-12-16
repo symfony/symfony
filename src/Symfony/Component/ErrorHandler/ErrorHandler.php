@@ -761,7 +761,7 @@ class ErrorHandler
      */
     private function parseAnonymousClass(string $message): string
     {
-        return preg_replace_callback('/class@anonymous\x00.*?\.php0x?[0-9a-fA-F]++/', static function ($m) {
+        return preg_replace_callback('/class@anonymous\x00.*?\.php(?:0x?|:)[0-9a-fA-F]++/', static function ($m) {
             return class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
         }, $message);
     }

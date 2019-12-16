@@ -44,7 +44,7 @@ class CurrencyType extends AbstractType
      */
     public function getParent()
     {
-        return __NAMESPACE__.'\ChoiceType';
+        return ChoiceType::class;
     }
 
     /**

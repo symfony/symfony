@@ -94,7 +94,7 @@ class CollectionType extends AbstractType
             'prototype' => true,
             'prototype_data' => null,
             'prototype_name' => '__name__',
-            'entry_type' => __NAMESPACE__.'\TextType',
+            'entry_type' => TextType::class,
             'entry_options' => [],
             'delete_empty' => false,
         ]);

@@ -101,7 +101,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar'],
-            __NAMESPACE__.'\PropertyDummy',
+            PropertyDummy::class,
             'any'
         );
         $this->assertEquals('foo', $obj->foo);
@@ -140,7 +140,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar'],
-            __NAMESPACE__.'\PropertyConstructorDummy',
+            PropertyConstructorDummy::class,
             'any'
         );
         $this->assertEquals('foo', $obj->getFoo());
@@ -151,7 +151,7 @@ class PropertyNormalizerTest extends TestCase
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => null, 'bar' => 'bar'],
-            __NAMESPACE__.'\PropertyConstructorDummy', '
+            PropertyConstructorDummy::class, '
             any'
         );
         $this->assertNull($obj->getFoo());
@@ -313,13 +313,13 @@ class PropertyNormalizerTest extends TestCase
     {
         $this->assertEquals(
             new PropertyDummy(),
-            $this->normalizer->denormalize(['non_existing' => true], __NAMESPACE__.'\PropertyDummy')
+            $this->normalizer->denormalize(['non_existing' => true], PropertyDummy::class)
         );
     }
 
     public function testDenormalizeShouldIgnoreStaticProperty()
     {
-        $obj = $this->normalizer->denormalize(['outOfScope' => true], __NAMESPACE__.'\PropertyDummy');
+        $obj = $this->normalizer->denormalize(['outOfScope' => true], PropertyDummy::class);
 
         $this->assertEquals(new PropertyDummy(), $obj);
         $this->assertEquals('out_of_scope', PropertyDummy::$outOfScope);

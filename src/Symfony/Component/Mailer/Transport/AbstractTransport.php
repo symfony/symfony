@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Transport;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
@@ -33,7 +34,7 @@ abstract class AbstractTransport implements TransportInterface
 
     public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
         $this->logger = $logger ?: new NullLogger();
     }
 

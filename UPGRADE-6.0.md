@@ -1,6 +1,11 @@
 UPGRADE FROM 5.x to 6.0
 =======================
 
+EventDispatcher
+---------------
+
+ * Removed `LegacyEventDispatcherProxy`. Use the event dispatcher without the proxy.
+
 FrameworkBundle
 ---------------
 

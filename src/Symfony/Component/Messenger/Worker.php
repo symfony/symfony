@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -48,12 +49,7 @@ class Worker
         $this->receivers = $receivers;
         $this->bus = $bus;
         $this->logger = $logger;
-
-        if (null !== $eventDispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
-            $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
-        } else {
-            $this->eventDispatcher = $eventDispatcher;
-        }
+        $this->eventDispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($eventDispatcher) : $eventDispatcher;
     }
 
     /**

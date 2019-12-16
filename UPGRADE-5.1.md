@@ -1,6 +1,11 @@
 UPGRADE FROM 5.0 to 5.1
 =======================
 
+EventDispatcher
+---------------
+
+ * Deprecated `LegacyEventDispatcherProxy`. Use the event dispatcher without the proxy.
+
 FrameworkBundle
 ---------------
 

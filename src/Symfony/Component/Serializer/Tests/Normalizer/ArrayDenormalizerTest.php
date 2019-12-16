@@ -68,7 +68,7 @@ class ArrayDenormalizerTest extends TestCase
     {
         $this->serializer->expects($this->once())
             ->method('supportsDenormalization')
-            ->with($this->anything(), __NAMESPACE__.'\ArrayDummy', $this->anything())
+            ->with($this->anything(), ArrayDummy::class, $this->anything())
             ->willReturn(true);
 
         $this->assertTrue(
@@ -104,7 +104,7 @@ class ArrayDenormalizerTest extends TestCase
         $this->assertFalse(
             $this->denormalizer->supportsDenormalization(
                 ['foo' => 'one', 'bar' => 'two'],
-                __NAMESPACE__.'\ArrayDummy'
+                ArrayDummy::class
             )
         );
     }

@@ -45,7 +45,7 @@ class UrlValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Url) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Url');
+            throw new UnexpectedTypeException($constraint, Url::class);
         }
 
         if (null === $value || '' === $value) {

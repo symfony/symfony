@@ -129,7 +129,7 @@ EOTXT;
 
     public function testReflectionParameter()
     {
-        $var = new \ReflectionParameter(__NAMESPACE__.'\reflectionParameterFixture', 0);
+        $var = new \ReflectionParameter(reflectionParameterFixture::class, 0);
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'

@@ -391,12 +391,12 @@ class ChoiceType extends AbstractType
         ];
 
         if ($options['multiple']) {
-            $choiceType = __NAMESPACE__.'\CheckboxType';
+            $choiceType = CheckboxType::class;
             // The user can check 0 or more checkboxes. If required
             // is true, they are required to check all of them.
             $choiceOpts['required'] = false;
         } else {
-            $choiceType = __NAMESPACE__.'\RadioType';
+            $choiceType = RadioType::class;
         }
 
         $builder->add($name, $choiceType, $choiceOpts);

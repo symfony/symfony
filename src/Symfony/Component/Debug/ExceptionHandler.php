@@ -256,7 +256,11 @@ EOF
                 foreach ($e['trace'] as $trace) {
                     $content .= '<tr><td>';
                     if ($trace['function']) {
-                        $content .= sprintf('at <span class="trace-class">%s</span><span class="trace-type">%s</span><span class="trace-method">%s</span>(<span class="trace-arguments">%s</span>)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
+                        $content .= sprintf('at <span class="trace-class">%s</span><span class="trace-type">%s</span><span class="trace-method">%s</span>', $this->formatClass($trace['class']), $trace['type'], $trace['function']);
+
+                        if (isset($trace['args'])) {
+                            $content .= sprintf('(<span class="trace-arguments">%s</span>)', $this->formatArgs($trace['args']));
+                        }
                     }
                     if (isset($trace['file']) && isset($trace['line'])) {
                         $content .= $this->formatPath($trace['file'], $trace['line']);

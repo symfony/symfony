@@ -130,7 +130,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeDisabled()
                     ->children()
                         ->scalarNode('vault_directory')->defaultValue('%kernel.project_dir%/config/secrets/%kernel.environment%')->cannotBeEmpty()->end()
-                        ->scalarNode('local_dotenv_file')->defaultValue('%kernel.project_dir%/.env.local')->end()
+                        ->scalarNode('local_dotenv_file')->defaultValue('%kernel.project_dir%/.env.%kernel.environment%.local')->end()
                         ->scalarNode('decryption_env_var')->defaultValue('base64:default::SYMFONY_DECRYPTION_SECRET')->end()
                     ->end()
                 ->end()
@@ -724,6 +724,11 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('auto_mapping')
+                            ->info('A collection of namespaces for which auto-mapping will be enabled.')
+                            ->example([
+                                'App\\Entity\\' => [],
+                                'App\\WithSpecificLoaders\\' => ['validator.property_info_loader'],
+                            ])
                             ->useAttributeAsKey('namespace')
                             ->normalizeKeys(false)
                             ->beforeNormalization()

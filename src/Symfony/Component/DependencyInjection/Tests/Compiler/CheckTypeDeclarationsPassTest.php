@@ -669,4 +669,16 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $this->addToAssertionCount(1);
     }
+
+    public function testProcessSkipSkippedIds()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setArray', ['a string']);
+
+        (new CheckTypeDeclarationsPass(true, ['foobar' => true]))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
 }

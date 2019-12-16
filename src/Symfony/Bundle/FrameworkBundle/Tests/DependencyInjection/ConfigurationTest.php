@@ -503,7 +503,7 @@ class ConfigurationTest extends TestCase
             'secrets' => [
                 'enabled' => true,
                 'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
-                'local_dotenv_file' => '%kernel.project_dir%/.env.local',
+                'local_dotenv_file' => '%kernel.project_dir%/.env.%kernel.environment%.local',
                 'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
             ],
         ];

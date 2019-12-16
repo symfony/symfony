@@ -1353,7 +1353,9 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('secrets.vault')->replaceArgument(0, $config['vault_directory']);
 
-        if (!$config['local_dotenv_file']) {
+        if ($config['local_dotenv_file']) {
+            $container->getDefinition('secrets.local_vault')->replaceArgument(0, $config['local_dotenv_file']);
+        } else {
             $container->removeDefinition('secrets.local_vault');
         }
 

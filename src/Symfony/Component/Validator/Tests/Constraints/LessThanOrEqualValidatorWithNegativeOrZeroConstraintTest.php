@@ -108,4 +108,12 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     {
         $this->markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
     }
+
+    /**
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithNullValueAtPropertyAt($dirtyValue, $dirtyValueAsString, $isValid)
+    {
+        $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
+    }
 }

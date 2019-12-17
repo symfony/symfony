@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T21:38:14Z
+
+Would you mind investigating what the fix could be?
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-09-26T22:02:12Z
+
+I'm not familiar with DI internals but can give it a shot in upcoming days :)
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-10-05T11:44:14Z
+
+@nicolas-grekas bugfix is ready, travis is happy :)
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-10-22T14:44:36Z
+
+@nicolas-grekas any chance this could be reviewed and hopefully included in 4.3.6?
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-12-13T12:50:02Z
+
+@nicolas-grekas I've tweaked the order so all existing tests are happy, but I'm not sure what the fail on PHP 7.1 is

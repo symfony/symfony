@@ -177,11 +177,9 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * @param string $tag
-     *
      * @return string[]
      */
-    protected function formatChoiceQuestionChoices(ChoiceQuestion $question, $tag)
+    protected function formatChoiceQuestionChoices(ChoiceQuestion $question, string $tag)
     {
         $messages = [];
 

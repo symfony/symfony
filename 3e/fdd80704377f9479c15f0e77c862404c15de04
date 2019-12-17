@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-12-09T08:52:11Z
+
+Alright, I've removed the BC layer and documented the BC break & alternative in CHANGELOG & UPGRADE files.
+
+I'd suggest to:
+- allow to disable auto-mapping entirely by setting [`framework.validation.auto_mapping: false`](https://github.com/symfony/symfony/issues/34860#issuecomment-562632458) in another PR. It's not critical to me and could go in 5.1. Auto-mapping is for now enabled by default, services are loaded, but have no effect unless the `EnableAutoMapping` constraint is set, or a configured namespace matches.
+- backport `->info()` and add `->example()` in 4.3 configuration following @weaverryan's suggestion in https://github.com/symfony/symfony/pull/34707#discussion_r354929157
+
+Failure high is expected. First build is failing but does not seems related to these changes.

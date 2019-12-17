@@ -1187,7 +1187,7 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('validator.auto_mapping', $config['auto_mapping']);
-        if (!$propertyInfoEnabled || !$config['auto_mapping'] || !class_exists(PropertyInfoLoader::class)) {
+        if (!$propertyInfoEnabled || !class_exists(PropertyInfoLoader::class)) {
             $container->removeDefinition('validator.property_info_loader');
         }
 

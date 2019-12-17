@@ -86,7 +86,7 @@ class PropertyInfoLoaderTest extends TestCase
             ))
         ;
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub);
+        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
 
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
@@ -197,7 +197,8 @@ class PropertyInfoLoaderTest extends TestCase
     public function regexpProvider()
     {
         return [
-            [true, null],
+            [false, null],
+            [true, '{.*}'],
             [true, '{^'.preg_quote(PropertyInfoLoaderEntity::class).'$|^'.preg_quote(Entity::class).'$}'],
             [false, '{^'.preg_quote(Entity::class).'$}'],
         ];
@@ -217,7 +218,7 @@ class PropertyInfoLoaderTest extends TestCase
                 [new Type(Type::BUILTIN_TYPE_BOOL)]
             );
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub);
+        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
             ->addLoader($propertyInfoLoader)

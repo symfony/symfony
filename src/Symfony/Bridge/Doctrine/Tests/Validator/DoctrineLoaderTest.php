@@ -30,7 +30,6 @@ use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -151,10 +150,6 @@ class DoctrineLoaderTest extends TestCase
 
     public function testFieldMappingsConfiguration()
     {
-        if (!method_exists(ValidatorBuilder::class, 'addLoader')) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
-        }
-
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
             ->addXmlMappings([__DIR__.'/../Resources/validator/BaseUser.xml'])
@@ -178,7 +173,7 @@ class DoctrineLoaderTest extends TestCase
      */
     public function testClassValidator(bool $expected, string $classValidatorRegexp = null)
     {
-        $doctrineLoader = new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), $classValidatorRegexp);
+        $doctrineLoader = new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), $classValidatorRegexp, false);
 
         $classMetadata = new ClassMetadata(DoctrineLoaderEntity::class);
         $this->assertSame($expected, $doctrineLoader->loadClassMetadata($classMetadata));
@@ -187,7 +182,8 @@ class DoctrineLoaderTest extends TestCase
     public function regexpProvider()
     {
         return [
-            [true, null],
+            [false, null],
+            [true, '{.*}'],
             [true, '{^'.preg_quote(DoctrineLoaderEntity::class).'$|^'.preg_quote(Entity::class).'$}'],
             [false, '{^'.preg_quote(Entity::class).'$}'],
         ];
@@ -195,13 +191,9 @@ class DoctrineLoaderTest extends TestCase
 
     public function testClassNoAutoMapping()
     {
-        if (!method_exists(ValidatorBuilder::class, 'addLoader')) {
-            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
-        }
-
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
-            ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager()))
+            ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{.*}'))
             ->getValidator();
 
         $classMetadata = $validator->getMetadataFor(new DoctrineLoaderNoAutoMappingEntity());

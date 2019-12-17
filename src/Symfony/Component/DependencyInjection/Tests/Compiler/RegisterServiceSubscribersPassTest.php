@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterServiceSubscribersPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -233,6 +234,34 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'some_service' => new ServiceClosureArgument(new TypedReference('stdClass $some_service', 'stdClass')),
             'another_service' => new ServiceClosureArgument(new TypedReference('stdClass $anotherService', 'stdClass')),
         ];
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    public function testBinding()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', TestServiceSubscriber::class)
+            ->addMethodCall('setServiceProvider')
+            ->addTag('container.service_subscriber')
+        ;
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveBindingsPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
+
+        $this->assertFalse($locator->isPublic());
+        $this->assertSame(ServiceLocator::class, $locator->getClass());
+
+        $expected = [
+            TestServiceSubscriber::class => new ServiceClosureArgument(new TypedReference(TestServiceSubscriber::class, TestServiceSubscriber::class)),
+            CustomDefinition::class => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            'bar' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'bar')),
+            'baz' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'baz')),
+        ];
+
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 }

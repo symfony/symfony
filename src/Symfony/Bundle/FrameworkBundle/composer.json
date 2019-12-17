@@ -20,7 +20,7 @@
         "ext-xml": "*",
         "symfony/cache": "^4.4|^5.0",
         "symfony/config": "^5.0",
-        "symfony/dependency-injection": "^5.0.1",
+        "symfony/dependency-injection": "^5.1",
         "symfony/error-handler": "^4.4.1|^5.0.1",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^5.0",

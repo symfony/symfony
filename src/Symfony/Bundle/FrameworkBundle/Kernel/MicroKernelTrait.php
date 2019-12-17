@@ -13,9 +13,13 @@ namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as ContainerPhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
@@ -93,6 +97,8 @@ trait MicroKernelTrait
 
             if (!$container->hasDefinition('kernel')) {
                 $container->register('kernel', static::class)
+                    ->addTag('controller.service_arguments')
+                    ->setAutoconfigured(true)
                     ->setSynthetic(true)
                     ->setPublic(true)
                 ;
@@ -101,12 +107,9 @@ trait MicroKernelTrait
             $kernelDefinition = $container->getDefinition('kernel');
             $kernelDefinition->addTag('routing.route_loader');
 
-            if ($this instanceof EventSubscriberInterface) {
-                $kernelDefinition->addTag('kernel.event_subscriber');
-            }
-
             $container->addObjectResource($this);
             $container->fileExists($this->getProjectDir().'/config/bundles.php');
+            $container->setParameter('kernel.secret', '%env(APP_SECRET)%');
 
             try {
                 $this->configureContainer($container, $loader);
@@ -120,16 +123,27 @@ trait MicroKernelTrait
                 }
             }
 
+            // the user has opted into using the ContainerConfigurator
+            $defaultDefinition = (new Definition())->setAutowired(true)->setAutoconfigured(true);
+            /* @var ContainerPhpFileLoader $kernelLoader */
             $kernelLoader = $loader->getResolver()->resolve($file);
             $kernelLoader->setCurrentDir(\dirname($file));
             $instanceof = &\Closure::bind(function &() { return $this->instanceof; }, $kernelLoader, $kernelLoader)();
 
+            $valuePreProcessor = AbstractConfigurator::$valuePreProcessor;
+            AbstractConfigurator::$valuePreProcessor = function ($value) {
+                return $this === $value ? new Reference('kernel') : $value;
+            };
+
             try {
-                $this->configureContainer(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file), $loader);
+                $this->configureContainer(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file, $defaultDefinition), $loader);
             } finally {
                 $instanceof = [];
                 $kernelLoader->registerAliasesForSinglyImplementedInterfaces();
+                AbstractConfigurator::$valuePreProcessor = $valuePreProcessor;
             }
+
+            $container->setAlias(static::class, 'kernel');
         });
     }
 
@@ -139,12 +153,21 @@ trait MicroKernelTrait
     public function loadRoutes(LoaderInterface $loader)
     {
         $file = (new \ReflectionObject($this))->getFileName();
+        /* @var RoutingPhpFileLoader $kernelLoader */
         $kernelLoader = $loader->getResolver()->resolve($file);
         $kernelLoader->setCurrentDir(\dirname($file));
         $collection = new RouteCollection();
 
         try {
             $this->configureRoutes(new RoutingConfigurator($collection, $kernelLoader, $file, $file));
+
+            foreach ($collection as $route) {
+                $controller = $route->getDefault('_controller');
+
+                if (\is_array($controller) && [0, 1] === array_keys($controller) && $this === $controller[0]) {
+                    $route->setDefault('_controller', ['kernel', $controller[1]]);
+                }
+            }
 
             return $collection;
         } catch (\TypeError $e) {

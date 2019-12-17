@@ -158,8 +158,17 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             CURLOPT_CERTINFO => $options['capture_peer_cert_chain'],
         ];
 
+        if (1.0 === (float) $options['http_version']) {
+            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_0;
+        } elseif (1.1 === (float) $options['http_version'] || 'https:' !== $scheme) {
+            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
+        } elseif (\defined('CURL_VERSION_HTTP2') && CURL_VERSION_HTTP2 & self::$curlVersion['features']) {
+            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_2_0;
+        }
+
         if (isset($options['auth_ntlm'])) {
             $curlopts[CURLOPT_HTTPAUTH] = CURLAUTH_NTLM;
+            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
 
             if (\is_array($options['auth_ntlm'])) {
                 $count = \count($options['auth_ntlm']);
@@ -210,14 +219,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
 
             $curlopts[CURLOPT_RESOLVE] = $resolve;
-        }
-
-        if (1.0 === (float) $options['http_version']) {
-            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_0;
-        } elseif (1.1 === (float) $options['http_version'] || 'https:' !== $scheme) {
-            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
-        } elseif (\defined('CURL_VERSION_HTTP2') && CURL_VERSION_HTTP2 & self::$curlVersion['features']) {
-            $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_2_0;
         }
 
         if ('POST' === $method) {

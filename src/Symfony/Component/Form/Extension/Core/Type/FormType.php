@@ -183,7 +183,7 @@ class FormType extends BaseType
             // section 4.2., empty URIs are considered same-document references
             'action' => '',
             'attr' => [],
-            'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
+            'post_max_size_message' => 'The combination of submitted content and uploaded files was too large. Please try to reduce the size of the submitted content or upload smaller files.',
             'upload_max_size_message' => $uploadMaxSizeMessage, // internal
             'allow_file_upload' => false,
             'help' => null,

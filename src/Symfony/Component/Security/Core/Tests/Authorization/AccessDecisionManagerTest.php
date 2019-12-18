@@ -66,6 +66,31 @@ class AccessDecisionManagerTest extends TestCase
 
             [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), false, true, false],
             [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), true, true, true],
+
+            // priority
+            [AccessDecisionManager::STRATEGY_PRIORITY, [
+                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+                $this->getVoter(VoterInterface::ACCESS_GRANTED),
+                $this->getVoter(VoterInterface::ACCESS_DENIED),
+                $this->getVoter(VoterInterface::ACCESS_DENIED),
+            ], true, true, true],
+
+            [AccessDecisionManager::STRATEGY_PRIORITY, [
+                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+                $this->getVoter(VoterInterface::ACCESS_DENIED),
+                $this->getVoter(VoterInterface::ACCESS_GRANTED),
+                $this->getVoter(VoterInterface::ACCESS_GRANTED),
+            ], true, true, false],
+
+            [AccessDecisionManager::STRATEGY_PRIORITY, [
+                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+            ], false, true, false],
+
+            [AccessDecisionManager::STRATEGY_PRIORITY, [
+                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
+            ], true, true, true],
         ];
     }
 

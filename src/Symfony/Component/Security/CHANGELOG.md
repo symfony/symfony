@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added access decision strategy to override access decisions by voter service priority
+
 5.0.0
 -----
 

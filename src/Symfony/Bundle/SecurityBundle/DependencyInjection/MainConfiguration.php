@@ -76,7 +76,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->enumNode('strategy')
-                            ->values([AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS])
+                            ->values($this->getAccessDecisionStrategies())
                         ->end()
                         ->scalarNode('service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
@@ -391,5 +391,20 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    private function getAccessDecisionStrategies()
+    {
+        $strategies = [
+            AccessDecisionManager::STRATEGY_AFFIRMATIVE,
+            AccessDecisionManager::STRATEGY_CONSENSUS,
+            AccessDecisionManager::STRATEGY_UNANIMOUS,
+        ];
+
+        if (\defined(AccessDecisionManager::class.'::STRATEGY_PRIORITY')) {
+            $strategies[] = AccessDecisionManager::STRATEGY_PRIORITY;
+        }
+
+        return $strategies;
     }
 }

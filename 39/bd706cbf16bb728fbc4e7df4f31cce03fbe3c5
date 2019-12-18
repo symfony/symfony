@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by aschempp at 2019-12-15T21:10:01Z
+
+regarding if/elseif, I just implemented it the same way the other strategies are implemented 🤷‍♂😊 let me know if I should change it.
+
+Sorry I don't understand what you're referring to with the `composer.json` and security-core?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-15T21:13:04Z
+
+> Sorry I don't understand what you're referring to with the composer.json and security-core?
+
+have a look at deps=low failures ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-15T21:15:20Z
+
+> I just implemented it the same way the other strategies are implemented
+
+only AccessDecisionManager does it this way, and honeslty the switch looks less readable than some early return statements to me...
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-12-15T21:16:44Z
+
+> only AccessDecisionManager does it this way, and honeslty the switch looks less readable than some early return statements to me...
+
+Should I change the other statements too then?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-15T21:20:15Z
+
+> Should I change the other statements too then?
+
+On branch 3.4 then, as all CS changes (to reduce future merge conflicts).
+And only if you're up to (not doing it is fine too :) )
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-12-15T21:27:17Z
+
+now that I see it, it really looks much better 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-15T23:57:16Z
+
+@aschempp Can you add an entry to security and security-bundle CHANGELOG files?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-12-16T11:08:29Z
+
+Updated in 0c782393471c06556f7c2afd524a2a10a720de87. Let me know if that makes sense, I never did CHANGELOG files before 🙃

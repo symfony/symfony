@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-12-18T09:22:25Z
+
+I think we need more tests covering the fallback usage, especially given we don't run our testsuite on Alpine
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-18T09:46:22Z
+
+@stof can you please hint me about which kind of tests are missing to you?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-12-18T09:59:20Z
+
+Well, exercising it with a bunch of different globs, including cases which are unsupported by the fallback, to be sure they get properly detected as needing Finder rather than trying to be handled by the fallback implementation.
+
+I was hoping that we could get inspiration from the test cases of the zend-stdlib implementation, but they seem to test only 1 case in their provider.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-18T10:41:05Z
+
+> including cases which are unsupported by the fallback
+
+I've made the fallback support nested braces instead :)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-12-18T11:03:16Z
+
+> I've made the fallback support nested braces instead :)
+
+you still don't have tests which include nested braces actually needing expansion.
+
+and you are also missing tests covering what happens when feeding it with invalid braces for the glob.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-18T12:00:43Z
+
+Here you are.

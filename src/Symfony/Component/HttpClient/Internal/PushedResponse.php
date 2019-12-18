@@ -29,10 +29,13 @@ final class PushedResponse
 
     public $parentOptions = [];
 
-    public function __construct(CurlResponse $response, array $requestHeaders, array $parentOptions)
+    public $handle;
+
+    public function __construct(CurlResponse $response, array $requestHeaders, array $parentOptions, $handle)
     {
         $this->response = $response;
         $this->requestHeaders = $requestHeaders;
         $this->parentOptions = $parentOptions;
+        $this->handle = $handle;
     }
 }

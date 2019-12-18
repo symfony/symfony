@@ -165,4 +165,33 @@ class GlobResourceTest extends TestCase
         touch($dir.'/Resource/TmpGlob');
         $this->assertFalse($resource->isFresh(0));
     }
+
+    public function testBraceFallback()
+    {
+        $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
+        $resource = new GlobResource($dir, '/*{/*/*.txt,.x{m,n}l}', true);
+
+        $p = new \ReflectionProperty($resource, 'globBrace');
+        $p->setAccessible(true);
+        $p->setValue($resource, 0);
+
+        $expected = [
+            $dir.'/Exclude/ExcludeToo/AnotheExcludedFile.txt',
+            $dir.'/foo.xml',
+        ];
+
+        $this->assertSame($expected, array_keys(iterator_to_array($resource)));
+    }
+
+    public function testUnbalancedBraceFallback()
+    {
+        $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
+        $resource = new GlobResource($dir, '/*{/*/*.txt,.x{m,nl}', true);
+
+        $p = new \ReflectionProperty($resource, 'globBrace');
+        $p->setAccessible(true);
+        $p->setValue($resource, 0);
+
+        $this->assertSame([], array_keys(iterator_to_array($resource)));
+    }
 }

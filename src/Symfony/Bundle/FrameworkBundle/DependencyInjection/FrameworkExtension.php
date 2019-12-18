@@ -1360,7 +1360,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($config['decryption_env_var']) {
-            if (!preg_match('/^(?:\w*+:)*+\w++$/', $config['decryption_env_var'])) {
+            if (!preg_match('/^(?:[-.\w]*+:)*+\w++$/', $config['decryption_env_var'])) {
                 throw new InvalidArgumentException(sprintf('Invalid value "%s" set as "decryption_env_var": only "word" characters are allowed.', $config['decryption_env_var']));
             }
 

@@ -187,4 +187,11 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->resolve();
         $this->assertNotNull($bag->get('env(default::BAR)'));
     }
+
+    public function testExtraCharsInProcessor()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $bag->resolve();
+        $this->assertStringMatchesFormat('env_%s_key_a_b_c_FOO_%s', $bag->get('env(key:a.b-c:FOO)'));
+    }
 }

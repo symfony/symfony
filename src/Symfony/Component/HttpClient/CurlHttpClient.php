@@ -119,23 +119,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $options['normalized_headers']['user-agent'][] = $options['headers'][] = 'User-Agent: Symfony HttpClient/Curl';
         }
 
-        if ($pushedResponse = $this->multi->pushedResponses[$url] ?? null) {
-            unset($this->multi->pushedResponses[$url]);
-
-            if (self::acceptPushForRequest($method, $options, $pushedResponse)) {
-                $this->logger && $this->logger->debug(sprintf('Accepting pushed response: "%s %s"', $method, $url));
-
-                // Reinitialize the pushed response with request's options
-                $pushedResponse->response->__construct($this->multi, $url, $options, $this->logger);
-
-                return $pushedResponse->response;
-            }
-
-            $this->logger && $this->logger->debug(sprintf('Rejecting pushed response: "%s".', $url));
-        }
-
-        $this->logger && $this->logger->info(sprintf('Request: "%s %s"', $method, $url));
-
         $curlopts = [
             CURLOPT_URL => $url,
             CURLOPT_TCP_NODELAY => true,
@@ -294,7 +277,26 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[CURLOPT_TIMEOUT_MS] = 1000 * $options['max_duration'];
         }
 
-        $ch = curl_init();
+        if ($pushedResponse = $this->multi->pushedResponses[$url] ?? null) {
+            unset($this->multi->pushedResponses[$url]);
+
+            if (self::acceptPushForRequest($method, $options, $pushedResponse)) {
+                $this->logger && $this->logger->debug(sprintf('Accepting pushed response: "%s %s"', $method, $url));
+
+                // Reinitialize the pushed response with request's options
+                $ch = $pushedResponse->handle;
+                $pushedResponse = $pushedResponse->response;
+                $pushedResponse->__construct($this->multi, $url, $options, $this->logger);
+            } else {
+                $this->logger && $this->logger->debug(sprintf('Rejecting pushed response: "%s".', $url));
+                $pushedResponse = null;
+            }
+        }
+
+        if (!$pushedResponse) {
+            $ch = curl_init();
+            $this->logger && $this->logger->info(sprintf('Request: "%s %s"', $method, $url));
+        }
 
         foreach ($curlopts as $opt => $value) {
             if (null !== $value && !curl_setopt($ch, $opt, $value) && CURLOPT_CERTINFO !== $opt) {
@@ -306,7 +308,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host));
+        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host));
     }
 
     /**
@@ -396,7 +398,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         $url .= $headers[':path'][0];
         $logger && $logger->debug(sprintf('Queueing pushed response: "%s"', $url));
 
-        $multi->pushedResponses[$url] = new PushedResponse(new CurlResponse($multi, $pushed), $headers, $multi->openHandles[(int) $parent][1] ?? []);
+        $multi->pushedResponses[$url] = new PushedResponse(new CurlResponse($multi, $pushed), $headers, $multi->openHandles[(int) $parent][1] ?? [], $pushed);
 
         return CURL_PUSH_OK;
     }

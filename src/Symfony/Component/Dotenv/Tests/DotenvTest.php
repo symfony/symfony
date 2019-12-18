@@ -314,4 +314,15 @@ class DotenvTest extends TestCase
             $this->assertSame('foo2_prod', $values['TEST2']);
         }
     }
+
+    public function testGetVariablesValueFromGetenv()
+    {
+        putenv('Foo=Bar');
+
+        $dotenv = new Dotenv(true);
+        $values = $dotenv->parse('Foo=${Foo}');
+        $this->assertSame('Bar', $values['Foo']);
+
+        putenv('Foo');
+    }
 }

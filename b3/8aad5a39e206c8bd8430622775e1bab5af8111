@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by mccullagh at 2019-12-18T15:26:16Z
+
+> Did you actually encounter the issue?
+
+yes, on Apache. Command line and Unit tests work.
+> If yes, what's your variables_order setting like?
+
+variables_order => GPCS => GPCS
+> Do you know why `$_SERVER` doesn't contain the env vars on your setup?
+
+Yes, on the Apache vHost I would need to set the missing  env vars with `PassEnv Foo` to use them.

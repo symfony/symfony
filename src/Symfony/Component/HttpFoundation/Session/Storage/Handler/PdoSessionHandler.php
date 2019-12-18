@@ -871,10 +871,10 @@ class PdoSessionHandler extends AbstractSessionHandler
             $mergeStmt->bindParam(2, $sessionId, \PDO::PARAM_STR);
             $mergeStmt->bindParam(3, $data, \PDO::PARAM_LOB);
             $mergeStmt->bindValue(4, time() + $maxlifetime, \PDO::PARAM_INT);
-            $mergeStmt->bindValue(4, time(), \PDO::PARAM_INT);
-            $mergeStmt->bindParam(5, $data, \PDO::PARAM_LOB);
-            $mergeStmt->bindValue(6, time() + $maxlifetime, \PDO::PARAM_INT);
-            $mergeStmt->bindValue(6, time(), \PDO::PARAM_INT);
+            $mergeStmt->bindValue(5, time(), \PDO::PARAM_INT);
+            $mergeStmt->bindParam(6, $data, \PDO::PARAM_LOB);
+            $mergeStmt->bindValue(7, time() + $maxlifetime, \PDO::PARAM_INT);
+            $mergeStmt->bindValue(8, time(), \PDO::PARAM_INT);
         } else {
             $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
             $mergeStmt->bindParam(':data', $data, \PDO::PARAM_LOB);

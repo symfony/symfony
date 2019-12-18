@@ -31,7 +31,10 @@ final class SecurityExtension extends AbstractExtension
         $this->securityChecker = $securityChecker;
     }
 
-    public function isGranted($role, object $object = null, string $field = null): bool
+    /**
+     * @param mixed $object
+     */
+    public function isGranted($role, $object = null, string $field = null): bool
     {
         if (null === $this->securityChecker) {
             return false;

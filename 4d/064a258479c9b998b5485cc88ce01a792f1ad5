@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-12-18T15:23:40Z
+
+Or we can `if (true)`? As you want.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-12-18T15:55:58Z
+
+Another solution could be to move these internal classes to separate files, to let the autoloader load them (which should prevent the issue, as each file will not declare other things that what the autoloader expects to be there)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-12-18T15:57:02Z
+
+Moving the trait works but I think Nicolas did this to keep everything inside one file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-18T15:57:49Z
+
+Yes, I don't want each adapter to spread many files around.

@@ -16,7 +16,9 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -87,33 +89,43 @@ class SesApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
-        if ($email->getAttachments()) {
-            return [
-                'Action' => 'SendRawEmail',
-                'RawMessage.Data' => base64_encode($email->toString()),
-            ];
-        }
-
         $payload = [
-            'Action' => 'SendEmail',
-            'Destination.ToAddresses.member' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
-            'Message.Subject.Data' => $email->getSubject(),
+            'Action' => 'SendRawEmail',
+            'RawMessage.Data' => base64_encode($email->toString()),
             'Source' => $envelope->getSender()->toString(),
         ];
 
-        if ($emails = $email->getCc()) {
-            $payload['Destination.CcAddresses.member'] = $this->stringifyAddresses($emails);
-        }
-        if ($emails = $email->getBcc()) {
-            $payload['Destination.BccAddresses.member'] = $this->stringifyAddresses($emails);
-        }
-        if ($email->getTextBody()) {
-            $payload['Message.Body.Text.Data'] = $email->getTextBody();
-        }
-        if ($email->getHtmlBody()) {
-            $payload['Message.Body.Html.Data'] = $email->getHtmlBody();
+        $headerRecipients = $this->getRecipientAddressesFromHeaders($email);
+        $envelopeRecipients = array_map(static function (Address $recipient) {
+            return $recipient->getAddress();
+        }, $envelope->getRecipients());
+        $requiresDestinations = count(array_diff($headerRecipients, $envelopeRecipients)) > 0;
+
+        if ($requiresDestinations) {
+            $payload['Destinations.member'] = $this->stringifyAddresses($envelope->getRecipients());
         }
 
+        dd($email->toString(), $payload);
         return $payload;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getRecipientAddressesFromHeaders(Email $email): array
+    {
+        $headers = $email->getHeaders();
+
+        $recipients = [];
+        foreach (['to', 'cc', 'bcc'] as $name) {
+            foreach ($headers->all($name) as $header) {
+                /* @var MailboxListHeader $header */
+                foreach ($header->getAddresses() as $address) {
+                    $recipients[] = $address->getAddress();
+                }
+            }
+        }
+
+        return $recipients;
     }
 }

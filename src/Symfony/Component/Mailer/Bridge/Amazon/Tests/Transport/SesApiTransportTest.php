@@ -18,8 +18,6 @@ use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use function GuzzleHttp\Psr7\parse_query;
 
 class SesApiTransportTest extends TestCase
 {

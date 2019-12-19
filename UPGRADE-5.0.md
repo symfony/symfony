@@ -60,6 +60,7 @@ Debug
 -----
 
  * Removed the component in favor of the `ErrorHandler` component
+ * Replace uses of `Symfony\Component\Debug\Debug` by `Symfony\Component\ErrorHandler\Debug`
 
 DependencyInjection
 -------------------

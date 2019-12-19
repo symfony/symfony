@@ -14,6 +14,8 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -79,6 +81,18 @@ class PostmarkApiTransport extends AbstractApiTransport
         $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to'];
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
+                continue;
+            }
+
+            if ($header instanceof TagHeader) {
+                $payload['Tag'] = $header->getValue();
+
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                $payload['Metadata'][$header->getKey()] = $header->getValue();
+
                 continue;
             }
 

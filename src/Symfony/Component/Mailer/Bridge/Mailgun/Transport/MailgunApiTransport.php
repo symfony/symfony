@@ -14,6 +14,8 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -111,6 +113,18 @@ class MailgunApiTransport extends AbstractApiTransport
         $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'];
         foreach ($headers->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
+                continue;
+            }
+
+            if ($header instanceof TagHeader) {
+                $payload['o:tag'] = $header->getValue();
+
+                continue;
+            }
+
+            if ($header instanceof MetadataHeader) {
+                $payload['v:'.$header->getKey()] = $header->getValue();
+
                 continue;
             }
 

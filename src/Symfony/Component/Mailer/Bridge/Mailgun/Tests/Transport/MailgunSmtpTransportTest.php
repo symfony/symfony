@@ -12,43 +12,16 @@
 namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunHttpTransport;
+use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunSmtpTransport;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 
-class MailgunHttpTransportTest extends TestCase
+/**
+ * @author Kevin Bond <kevinbond@gmail.com>
+ */
+class MailgunSmtpTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
-    public function testToString(MailgunHttpTransport $transport, string $expected)
-    {
-        $this->assertSame($expected, (string) $transport);
-    }
-
-    public function getTransportData()
-    {
-        return [
-            [
-                new MailgunHttpTransport('ACCESS_KEY', 'DOMAIN'),
-                'mailgun+https://api.mailgun.net?domain=DOMAIN',
-            ],
-            [
-                new MailgunHttpTransport('ACCESS_KEY', 'DOMAIN', 'us-east-1'),
-                'mailgun+https://api.us-east-1.mailgun.net?domain=DOMAIN',
-            ],
-            [
-                (new MailgunHttpTransport('ACCESS_KEY', 'DOMAIN'))->setHost('example.com'),
-                'mailgun+https://example.com?domain=DOMAIN',
-            ],
-            [
-                (new MailgunHttpTransport('ACCESS_KEY', 'DOMAIN'))->setHost('example.com')->setPort(99),
-                'mailgun+https://example.com:99?domain=DOMAIN',
-            ],
-        ];
-    }
-
     public function testTagAndMetadataHeaders()
     {
         $email = new Email();
@@ -57,8 +30,8 @@ class MailgunHttpTransportTest extends TestCase
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
 
-        $transport = new MailgunHttpTransport('key', 'domain');
-        $method = new \ReflectionMethod(MailgunHttpTransport::class, 'addMailgunHeaders');
+        $transport = new MailgunSmtpTransport('user', 'password');
+        $method = new \ReflectionMethod(MailgunSmtpTransport::class, 'addMailgunHeaders');
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 

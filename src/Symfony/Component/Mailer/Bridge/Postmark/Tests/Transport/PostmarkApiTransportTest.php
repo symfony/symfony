@@ -14,6 +14,8 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkApiTransport;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
@@ -60,5 +62,26 @@ class PostmarkApiTransportTest extends TestCase
         $this->assertCount(1, $payload['Headers']);
 
         $this->assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
+    }
+
+    public function testTagAndMetadataHeaders()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TagHeader('password-reset'));
+        $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
+        $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new PostmarkApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayNotHasKey('Headers', $payload);
+        $this->assertArrayHasKey('Tag', $payload);
+        $this->assertArrayHasKey('Metadata', $payload);
+
+        $this->assertSame('password-reset', $payload['Tag']);
+        $this->assertSame(['Color' => 'blue', 'Client-ID' => '12345'], $payload['Metadata']);
     }
 }

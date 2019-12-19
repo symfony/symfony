@@ -64,7 +64,7 @@ class PostmarkApiTransportTest extends TestCase
         $response
             ->expects($this->once())
             ->method('toArray')
-            ->willReturn(["ErrorCode" => 0, "Message" => "OK", "MessageID" => "123", "To" => "bar@example.com"]);
+            ->willReturn(['ErrorCode' => 0, 'Message' => 'OK', 'MessageID' => '123', 'To' => 'bar@example.com']);
 
         $httpClient = $this->createMock(HttpClientInterface::class);
 

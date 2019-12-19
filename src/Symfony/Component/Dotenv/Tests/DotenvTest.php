@@ -431,6 +431,17 @@ class DotenvTest extends TestCase
         }
     }
 
+    public function testGetVariablesValueFromGetenv()
+    {
+        putenv('Foo=Bar');
+
+        $dotenv = new Dotenv(true);
+        $values = $dotenv->parse('Foo=${Foo}');
+        $this->assertSame('Bar', $values['Foo']);
+
+        putenv('Foo');
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation The default value of "$usePutenv" argument of "%s" will be changed from "true" to "false" in Symfony 5.0. You should define its value explicitly.

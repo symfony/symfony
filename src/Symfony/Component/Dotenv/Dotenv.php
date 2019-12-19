@@ -458,7 +458,7 @@ final class Dotenv
             } elseif (isset($this->values[$name])) {
                 $value = $this->values[$name];
             } else {
-                $value = '';
+                $value = (string) getenv($name);
             }
 
             if (!$matches['opening_brace'] && isset($matches['closing_brace'])) {

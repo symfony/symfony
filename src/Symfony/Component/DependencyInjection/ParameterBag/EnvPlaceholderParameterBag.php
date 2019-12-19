@@ -44,7 +44,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                     return $placeholder; // return first result
                 }
             }
-            if (!preg_match('/^(?:\w*+:)*+\w++$/', $env)) {
+            if (!preg_match('/^(?:[-.\w]*+:)*+\w++$/', $env)) {
                 throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
             }
             if ($this->has($name) && null !== ($defaultValue = parent::get($name)) && !\is_string($defaultValue)) {
@@ -52,7 +52,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
             }
 
             $uniqueName = md5($name.'_'.self::$counter++);
-            $placeholder = sprintf('%s_%s_%s', $this->getEnvPlaceholderUniquePrefix(), str_replace(':', '_', $env), $uniqueName);
+            $placeholder = sprintf('%s_%s_%s', $this->getEnvPlaceholderUniquePrefix(), strtr($env, ':-.', '___'), $uniqueName);
             $this->envPlaceholders[$env][$placeholder] = $placeholder;
 
             return $placeholder;

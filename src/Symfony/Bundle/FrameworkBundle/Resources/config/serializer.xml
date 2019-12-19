@@ -109,10 +109,22 @@
             <tag name="kernel.cache_warmer" />
         </service>
 
-        <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">
+        <service id="serializer.mapping.cache.symfony.file" class="Psr\Cache\CacheItemPoolInterface">
             <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
             <argument>%serializer.mapping.cache.file%</argument>
             <argument type="service" id="cache.serializer" />
+        </service>
+
+        <service id="serializer.mapping.cache.symfony" class="Symfony\Component\Cache\Adapter\ChainAdapter">
+            <argument type="collection">
+                <argument type="service">
+                    <service class="Symfony\Component\Cache\Adapter\ArrayAdapter">
+                        <argument>0</argument>
+                        <argument>false</argument>
+                    </service>
+                </argument>
+                <argument type="service" id="serializer.mapping.cache.symfony.file" />
+            </argument>
         </service>
 
         <service id="serializer.mapping.cache_class_metadata_factory" decorates="serializer.mapping.class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory">

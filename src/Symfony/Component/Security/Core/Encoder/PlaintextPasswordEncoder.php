@@ -47,7 +47,7 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
-        if ($this->isPasswordTooLong($raw)) {
+        if (null === $encoded || $this->isPasswordTooLong($raw)) {
             return false;
         }
 

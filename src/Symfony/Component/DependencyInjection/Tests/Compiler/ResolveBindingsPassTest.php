@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DefinitionErrorExceptionPass;
@@ -35,6 +36,7 @@ class ResolveBindingsPassTest extends TestCase
 
         $bindings = [
             CaseSensitiveClass::class => new BoundArgument(new Reference('foo')),
+            'Psr\Container\ContainerInterface $container' => new BoundArgument(new ServiceLocatorArgument([]), true, BoundArgument::INSTANCEOF_BINDING),
             'iterable $objects' => new BoundArgument(new TaggedIteratorArgument('tag.name'), true, BoundArgument::INSTANCEOF_BINDING),
         ];
 
@@ -49,7 +51,13 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $this->assertEquals([0 => new Reference('foo'), 1 => '123', 4 => new TaggedIteratorArgument('tag.name')], $definition->getArguments());
+        $expected = [
+            0 => new Reference('foo'),
+            1 => '123',
+            3 => new ServiceLocatorArgument([]),
+            4 => new TaggedIteratorArgument('tag.name'),
+        ];
+        $this->assertEquals($expected, $definition->getArguments());
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 

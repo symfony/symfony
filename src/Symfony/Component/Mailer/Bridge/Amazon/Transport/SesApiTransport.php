@@ -99,13 +99,12 @@ class SesApiTransport extends AbstractApiTransport
         $envelopeRecipients = array_map(static function (Address $recipient) {
             return $recipient->getAddress();
         }, $envelope->getRecipients());
-        $requiresDestinations = count(array_diff($headerRecipients, $envelopeRecipients)) > 0;
+        $requiresDestinations = \count(array_diff($headerRecipients, $envelopeRecipients)) > 0;
 
         if ($requiresDestinations) {
             $payload['Destinations.member'] = $this->stringifyAddresses($envelope->getRecipients());
         }
 
-        dd($email->toString(), $payload);
         return $payload;
     }
 

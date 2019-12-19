@@ -57,7 +57,7 @@ class SesApiTransportTest extends TestCase
     {
         $awsApiCallback = function ($method, $url, $options) {
             $requestParts = [];
-            \parse_str($options['body'], $requestParts);
+            parse_str($options['body'], $requestParts);
 
             $this->assertEquals('POST', $method);
             $this->assertEquals('https://email.eu-west-1.amazonaws.com/', $url);
@@ -87,7 +87,7 @@ class SesApiTransportTest extends TestCase
     {
         $awsApiCallback = function ($method, $url, $options) {
             $requestParts = [];
-            \parse_str($options['body'], $requestParts);
+            parse_str($options['body'], $requestParts);
 
             $this->assertEquals('POST', $method);
             $this->assertEquals('https://email.eu-west-1.amazonaws.com/', $url);
@@ -96,7 +96,7 @@ class SesApiTransportTest extends TestCase
             $this->assertArrayHasKey('Destinations_member', $requestParts);
             $this->assertEquals($requestParts['Destinations_member'], [
                 'envelope-recipient-1@example.tld',
-                'envelope-recipient-2@example.tld'
+                'envelope-recipient-2@example.tld',
             ]);
 
             return new MockResponse($this->createMockAwsSendRawEmailResponse());
@@ -116,7 +116,7 @@ class SesApiTransportTest extends TestCase
 
         $envelope = new Envelope(Address::create('envelope-sender@example.tld'), [
             Address::create('envelope-recipient-1@example.tld'),
-            Address::create('envelope-recipient-2@example.tld')
+            Address::create('envelope-recipient-2@example.tld'),
         ]);
 
         $transport->send($email, $envelope);

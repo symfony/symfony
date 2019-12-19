@@ -443,6 +443,17 @@ class DotenvTest extends TestCase
         }
     }
 
+    public function testGetVariablesValueFromGetenv()
+    {
+        putenv('Foo=Bar');
+
+        $dotenv = new Dotenv(true);
+        $values = $dotenv->parse('Foo=${Foo}');
+        $this->assertSame('Bar', $values['Foo']);
+
+        putenv('Foo');
+    }
+
     public function testNoDeprecationWarning()
     {
         $dotenv = new Dotenv(true);

@@ -72,8 +72,6 @@ class SesApiTransportTest extends TestCase
         $email = (new Email())
             ->from('sender@example.tld')
             ->to('recipient-to@example.tld')
-            ->cc('recipient-cc@example.tld')
-            ->bcc('recipient-bcc@example.tld')
             ->subject('Test Mail')
             ->text('Text content of the test mail')
             ->html('<p>HTML content of the test mail</p>');
@@ -106,8 +104,6 @@ class SesApiTransportTest extends TestCase
         $email = (new Email())
             ->from('sender@example.tld')
             ->to('recipient-to@example.tld')
-            ->cc('recipient-cc@example.tld')
-            ->bcc('recipient-bcc@example.tld')
             ->subject('Test Mail')
             ->text('Text content of the test mail')
             ->html('<p>HTML content of the test mail</p>');

@@ -463,7 +463,7 @@ final class Dotenv
             } elseif (isset($this->values[$name])) {
                 $value = $this->values[$name];
             } else {
-                $value = '';
+                $value = (string) getenv($name);
             }
 
             if ('' === $value && isset($matches['default_value']) && '' !== $matches['default_value']) {

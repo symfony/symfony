@@ -119,14 +119,14 @@ class SesApiTransportTest extends TestCase
     private function createMockAwsSendRawEmailResponse(): string
     {
         return <<<XML
-        <SendRawEmailResponse xmlns="http://ses.amazonaws.com/doc/2010-12-01/">
-          <SendRawEmailResult>
-            <MessageId>0102016f1eb7661b-4294e7da-5d64-45c2-8998-e8ade5468d95-000000</MessageId>
-          </SendRawEmailResult>
-          <ResponseMetadata>
-            <RequestId>dc4fb17f-0320-428b-8c03-62f9ec9b98ba</RequestId>
-          </ResponseMetadata>
-        </SendRawEmailResponse>
-        XML;
+<SendRawEmailResponse xmlns="http://ses.amazonaws.com/doc/2010-12-01/">
+  <SendRawEmailResult>
+    <MessageId>0102016f1eb7661b-4294e7da-5d64-45c2-8998-e8ade5468d95-000000</MessageId>
+  </SendRawEmailResult>
+  <ResponseMetadata>
+    <RequestId>dc4fb17f-0320-428b-8c03-62f9ec9b98ba</RequestId>
+  </ResponseMetadata>
+</SendRawEmailResponse>
+XML;
     }
 }

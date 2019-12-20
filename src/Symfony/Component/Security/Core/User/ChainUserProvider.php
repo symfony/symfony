@@ -73,6 +73,10 @@ class ChainUserProvider implements UserProviderInterface
 
         foreach ($this->providers as $provider) {
             try {
+                if (!$provider->supportsClass(\get_class($user))) {
+                    continue;
+                }
+
                 return $provider->refreshUser($user);
             } catch (UnsupportedUserException $e) {
                 // try next one

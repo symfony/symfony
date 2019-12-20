@@ -15,7 +15,7 @@ namespace Symfony\Component\CssSelector\Parser\Tokenizer;
  * CSS selector tokenizer escaping applier.
  *
  * This component is a port of the Python cssselect library,
- * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ * which is copyright Ian Bicking, @see https://github.com/scrapy/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  *

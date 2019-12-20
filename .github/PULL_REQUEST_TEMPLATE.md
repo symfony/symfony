@@ -11,7 +11,7 @@
 Replace this notice by a short README for your feature/bugfix. This will help people
 understand your PR and can be used as a start for the documentation.
 
-Additionally (see https://symfony.com/roadmap):
+Additionally (see https://symfony.com/releases):
  - Always add tests and ensure they pass.
  - Never break backward compatibility (see https://symfony.com/bc).
  - Bug fixes must be submitted against the lowest maintained branch where they apply

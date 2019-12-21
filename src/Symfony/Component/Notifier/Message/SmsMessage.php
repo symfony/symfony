@@ -58,7 +58,7 @@ final class SmsMessage implements MessageInterface
         return $this->phone;
     }
 
-    public function getRecipientId(): ?string
+    public function getRecipientId(): string
     {
         return $this->phone;
     }

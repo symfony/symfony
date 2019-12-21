@@ -23,6 +23,9 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class NexmoTransportFactory extends AbstractTransportFactory
 {
+    /**
+     * @return NexmoTransport
+     */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();

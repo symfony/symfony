@@ -260,6 +260,7 @@
 
   <xsd:simpleType name="argument_type">
     <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="abstract" />
       <xsd:enumeration value="collection" />
       <xsd:enumeration value="service" />
       <xsd:enumeration value="expression" />

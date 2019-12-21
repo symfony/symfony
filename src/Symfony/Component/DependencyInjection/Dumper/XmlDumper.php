@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -311,6 +312,14 @@ class XmlDumper extends Dumper
             } elseif (\is_string($value) && !preg_match('/^[^\x00-\x08\x0B\x0E-\x1A\x1C-\x1F\x7F]*+$/u', $value)) {
                 $element->setAttribute('type', 'binary');
                 $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
+                $element->appendChild($text);
+            } elseif ($value instanceof AbstractArgument) {
+                $argKey = $value->getArgumentKey();
+                if (!is_numeric($argKey)) {
+                    $element->setAttribute('key', $argKey);
+                }
+                $element->setAttribute('type', 'abstract');
+                $text = $this->document->createTextNode(self::phpToXml($value->getText()));
                 $element->appendChild($text);
             } else {
                 if (\in_array($value, ['null', 'true', 'false'], true)) {

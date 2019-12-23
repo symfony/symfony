@@ -470,6 +470,11 @@ abstract class AbstractString implements \JsonSerializable
     /**
      * @return static
      */
+    abstract public function reverse(): self;
+
+    /**
+     * @return static
+     */
     abstract public function slice(int $start = 0, int $length = null): self;
 
     /**

@@ -303,6 +303,17 @@ class ByteString extends AbstractString
         return $str;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function reverse(): parent
+    {
+        $str = clone $this;
+        $str->string = strrev($str->string);
+
+        return $str;
+    }
+
     public function slice(int $start = 0, int $length = null): parent
     {
         $str = clone $this;

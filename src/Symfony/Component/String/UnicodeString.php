@@ -71,7 +71,7 @@ class UnicodeString extends AbstractUnicodeString
             $rx .= '\X{65535}';
             $length -= 65535;
         }
-        $rx .= '\X{'.$length.'})/us';
+        $rx .= '\X{'.$length.'})/u';
 
         $str = clone $this;
         $chunks = [];

@@ -568,6 +568,9 @@ class ApplicationTest extends TestCase
         $fooCommand->setAliases(['foo2']);
 
         $application = new Application();
+        $application->setCommandLoader(new FactoryCommandLoader([
+            'foo3' => static function () use ($fooCommand) { return $fooCommand; },
+        ]));
         $application->add($fooCommand);
 
         $result = $application->find('foo');

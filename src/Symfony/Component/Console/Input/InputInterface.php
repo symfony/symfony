@@ -62,6 +62,8 @@ interface InputInterface
     /**
      * Binds the current Input instance with the given arguments and options.
      *
+     * @param InputDefinition $definition
+     *
      * @throws RuntimeException
      */
     public function bind(InputDefinition $definition);
@@ -83,7 +85,7 @@ interface InputInterface
     /**
      * Returns the argument value for a given argument name.
      *
-     * @return string|string[]|null The argument value
+     * @return string $name The argument name
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
@@ -92,6 +94,7 @@ interface InputInterface
     /**
      * Sets an argument value by name.
      *
+     * @param string               $name  The argument name
      * @param string|string[]|null $value The argument value
      *
      * @throws InvalidArgumentException When argument given doesn't exist
@@ -117,7 +120,7 @@ interface InputInterface
     /**
      * Returns the option value for a given option name.
      *
-     * @return string|string[]|bool|null The option value
+     * @return string $name The option name
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
@@ -126,6 +129,7 @@ interface InputInterface
     /**
      * Sets an option value by name.
      *
+     * @param string                    $name  The option name
      * @param string|string[]|bool|null $value The option value
      *
      * @throws InvalidArgumentException When option given doesn't exist
@@ -134,6 +138,8 @@ interface InputInterface
 
     /**
      * Returns true if an InputOption object exists by name.
+     *
+     * @param string $name The option name
      *
      * @return bool true if the InputOption object exists, false otherwise
      */
@@ -148,6 +154,8 @@ interface InputInterface
 
     /**
      * Sets the input interactivity.
+     * 
+     * @param bool $interactive The interactive flag
      */
     public function setInteractive(bool $interactive);
 }

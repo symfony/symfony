@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-07T16:16:18Z
+
+Thank you for the PR @tienvx
+This should target master, as we don't consider perf improvements as bug fixes (unless they are catastrophic, but that's not the case here)
+
+---------------------------------------------------------------------------
+
+by tienvx at 2019-12-08T02:09:27Z
+
+Thanks! I updated.
+
+One question: will this code be ported to 5.0?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-12-09T23:03:48Z
+
+> One question: will this code be ported to 5.0?
+
+No because master = 5.1.
+
+---------------------------------------------------------------------------
+
+by tienvx at 2019-12-21T03:51:14Z
+
+I updated @nicolas-grekas

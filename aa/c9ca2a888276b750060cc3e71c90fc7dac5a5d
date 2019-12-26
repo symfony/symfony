@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-26T08:57:18Z
+
+I'd suggest opening a bug report on bugs.php.net
+`method_exists('Closure', '__invoke')` should return `true` to me, since we can call the method
+https://3v4l.org/NEK2T

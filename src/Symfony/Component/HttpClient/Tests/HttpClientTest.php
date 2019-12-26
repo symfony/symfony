@@ -20,7 +20,7 @@ class HttpClientTest extends TestCase
 {
     public function testCreateClient()
     {
-        if (\extension_loaded('curl')) {
+        if (\extension_loaded('curl') && ('\\' !== \DIRECTORY_SEPARATOR || ini_get('curl.cainfo') || ini_get('openssl.cafile') || ini_get('openssl.capath'))) {
             $this->assertInstanceOf(CurlHttpClient::class, HttpClient::create());
         } else {
             $this->assertInstanceOf(NativeHttpClient::class, HttpClient::create());

@@ -99,6 +99,8 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
+        "amphp/http-client": "^4.2",
+        "amphp/http-tunnel": "^1.0",
         "cache/integration-tests": "dev-master",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.6",

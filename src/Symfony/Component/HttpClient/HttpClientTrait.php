@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient;
 
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 
 /**
  * Provides the common logic from writing HttpClientInterface implementations.
@@ -552,6 +553,48 @@ trait HttpClientTrait
         }
 
         return implode('&', $replace ? array_replace($query, $queryArray) : ($query + $queryArray));
+    }
+
+    /**
+     * Loads proxy configuration from the same environment variables as curl when no proxy is explicitly set.
+     */
+    private static function getProxy(?string $proxy, array $url, ?string $noProxy): ?array
+    {
+        if (null === $proxy) {
+            // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
+            $proxy = $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
+
+            if ('https:' === $url['scheme']) {
+                $proxy = $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? $proxy;
+            }
+        }
+
+        if (null === $proxy) {
+            return null;
+        }
+
+        $proxy = (parse_url($proxy) ?: []) + ['scheme' => 'http'];
+
+        if (!isset($proxy['host'])) {
+            throw new TransportException('Invalid HTTP proxy: host is missing.');
+        }
+
+        if ('http' === $proxy['scheme']) {
+            $proxyUrl = 'tcp://'.$proxy['host'].':'.($proxy['port'] ?? '80');
+        } elseif ('https' === $proxy['scheme']) {
+            $proxyUrl = 'ssl://'.$proxy['host'].':'.($proxy['port'] ?? '443');
+        } else {
+            throw new TransportException(sprintf('Unsupported proxy scheme "%s": "http" or "https" expected.', $proxy['scheme']));
+        }
+
+        $noProxy = $noProxy ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '';
+        $noProxy = $noProxy ? preg_split('/[\s,]+/', $noProxy) : [];
+
+        return [
+            'url' => $proxyUrl,
+            'auth' => isset($proxy['user']) ? 'Basic '.base64_encode(rawurldecode($proxy['user']).':'.rawurldecode($proxy['pass'] ?? '')) : null,
+            'no_proxy' => $noProxy,
+        ];
     }
 
     private static function shouldBuffer(array $headers): bool

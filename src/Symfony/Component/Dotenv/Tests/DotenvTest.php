@@ -320,9 +320,12 @@ class DotenvTest extends TestCase
         putenv('Foo=Bar');
 
         $dotenv = new Dotenv(true);
-        $values = $dotenv->parse('Foo=${Foo}');
-        $this->assertSame('Bar', $values['Foo']);
 
-        putenv('Foo');
+        try {
+            $values = $dotenv->parse('Foo=${Foo}');
+            $this->assertSame('Bar', $values['Foo']);
+        } finally {
+            putenv('Foo');
+        }
     }
 }

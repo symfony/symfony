@@ -342,6 +342,17 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function reverse(): parent
+    {
+        $str = clone $this;
+        $str->string = implode('', array_reverse(preg_split('/(\X)/u', $str->string, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY)));
+
+        return $str;
+    }
+
     public function snake(): parent
     {
         $str = $this->camel()->title();

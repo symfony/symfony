@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-12-03T08:25:11Z
+
+it's considerable to use the new Console dumper (#28898) for env  var values, that would improve display as well.
+
+The CliDumper has `setMaxStringWidth`, so if we can pass such a value (as calculated here) we can depend on existing building blocks :)
+
+something like
+
+```diff
+diff --git a/Command/AboutCommand.php b/Command/AboutCommand.php
+index b9fbe67..feee4e6 100644
+--- a/Command/AboutCommand.php
++++ b/Command/AboutCommand.php
+@@ -12,6 +12,7 @@
+ namespace Symfony\Bundle\FrameworkBundle\Command;
+
+ use Symfony\Component\Console\Command\Command;
++use Symfony\Component\Console\Helper\Dumper;
+ use Symfony\Component\Console\Helper\Helper;
+ use Symfony\Component\Console\Helper\TableSeparator;
+ use Symfony\Component\Console\Input\InputInterface;
+@@ -90,12 +91,13 @@ EOT
+         ];
+
+         if ($dotenv = self::getDotenvVars()) {
++            $dumper = new Dumper($io);
+             $rows = array_merge($rows, [
+                 new TableSeparator(),
+                 ['<info>Environment (.env)</>'],
+                 new TableSeparator(),
+-            ], array_map(function ($value, $name) {
+-                return [$name, $value];
++            ], array_map(function ($value, $name) use ($dumper) {
++                return [$name, $dumper($value, $maxLength)];
+             }, $dotenv, array_keys($dotenv)));
+         }
+```
+
+---------------------------------------------------------------------------
+
+by tuqqu at 2019-12-03T12:42:22Z
+
+@ro0NL I'm not sure. `Dumper::__invoke()` does not allow to pass string's max length as the second parameter. Or are you suggesting to tweak its behaviour in this pr?
+
+If so, `dump`'s output is standing out with it's bright colours and double quotes from all the rest. Do we really want this?
+
+If so, I could take a look into this.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-12-03T13:16:44Z
+
+>  Or are you suggesting to tweak its behaviour in this pr?
+
+yep :)
+
+> If so, dump's output is standing out with it's bright colours and double quotes from all the rest. Do we really want this?
+
+IMHO yes, but perhaps post a screenshot to see what others think. Maybe it's too much indeed ... i was mostly triggered for being able to reuse `CliDumper::setMaxStringWidth` :)
+
+---------------------------------------------------------------------------
+
+by tuqqu at 2019-12-03T20:36:26Z
+
+@ro0NL I decided against using `Dumper` since we would rely on `CliDumper::setMaxStringWidth()` and it is part of `VarDumper` which is mostly a require-dev package, plus it adds a new dependency (on symfony/console).
+
+So I rewrote it a bit and it looks quite nice. I added a pic
+<img width="614" alt="Screenshot 2019-12-03 at 23 33 12" src="https://user-images.githubusercontent.com/47274443/70087417-568e7880-1625-11ea-857a-69b7e24c2bf1.png">
+
+Could you please review my code?
+
+---------------------------------------------------------------------------
+
+by tuqqu at 2019-12-04T16:57:23Z
+
+@ro0NL fixed all
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-15T11:04:02Z
+
+Not sure about this: while it improves the display, what if I *do* want to get the full value, eg to copy/paste it somewhere else?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-12-15T11:20:10Z
+
+from experience, i agree `about` can be over-cluttered with output. Typically access tokens & co completely break the table
+
+![image](https://user-images.githubusercontent.com/1047696/70861873-6d41a300-1f34-11ea-92d8-56b605bba678.png)
+
+the original intend was always "debugging"; give a hint about the actual values being used. Truncating does not defeat this purpose IMHO.
+
+> what if I do want to get the full value
+
+`bin/console debug:container --env-var APP_SECRET` :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-15T11:26:46Z
+
+Wouldn't it make more sense to just remove this table with env vars?
+There is already `bin/console debug:container --env-vars` if one wants to display them.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-12-15T11:32:01Z
+
+hmpf... yes. There's a subtle difference.. (envs managed by .env vs envs used in DI), but i agree it's not really significant.
+
+Alternatively, what about displaying `SYMFONY_DOTENV_VARS` comma separated in `about`, to not loose this feature (it's also shown in the webprofiler e.g.)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-12-16T21:20:10Z
+
+i tend to agree we should remove the Environment table in `about`. Actually the web profiler shows the server parameters used for that request (and highlights which are from .env)... this concept doesnt exists for the console.
+
+The current table was a solution, prior to the later added `debug:container --env-vars`.
+
+Also we imply this are the actual values in .env, which is false :) the feature replacement is looking at .env really :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by tuqqu at 2019-12-18T18:33:26Z
+
+@ro0NL @nicolas-grekas ok, I see. I pushed a new commit which removes env var table completely.

@@ -89,16 +89,6 @@ EOT
             ['Xdebug', \extension_loaded('xdebug') ? 'true' : 'false'],
         ];
 
-        if ($dotenv = self::getDotenvVars()) {
-            $rows = array_merge($rows, [
-                new TableSeparator(),
-                ['<info>Environment (.env)</>'],
-                new TableSeparator(),
-            ], array_map(function ($value, $name) {
-                return [$name, $value];
-            }, $dotenv, array_keys($dotenv)));
-        }
-
         $io->table([], $rows);
 
         return 0;
@@ -128,17 +118,5 @@ EOT
         $date = \DateTime::createFromFormat('d/m/Y', '01/'.$date);
 
         return false !== $date && new \DateTime() > $date->modify('last day of this month 23:59:59');
-    }
-
-    private static function getDotenvVars(): array
-    {
-        $vars = [];
-        foreach (explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? '') as $name) {
-            if ('' !== $name && isset($_ENV[$name])) {
-                $vars[$name] = $_ENV[$name];
-            }
-        }
-
-        return $vars;
     }
 }

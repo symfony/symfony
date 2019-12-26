@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fre5h at 2019-12-15T19:36:25Z
+
+CI is failed because it is failed in master branch too. Tests for From component have passed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-26T09:04:01Z
+
+Could you please add a line about it in the changelog of the component?
+
+---------------------------------------------------------------------------
+
+by fre5h at 2019-12-26T09:22:49Z
+
+@nicolas-grekas Added

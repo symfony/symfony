@@ -40,6 +40,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class MessengerPassTest extends TestCase
 {
@@ -602,6 +603,21 @@ class MessengerPassTest extends TestCase
         ], $container->getDefinition('console.command.messenger_debug')->getArgument(0));
     }
 
+    public function testAutomaticallyRouteMessagesWhenFromTransportTagIsSet()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container
+            ->register(DummyHandler::class, DummyHandler::class)
+            ->addTag('messenger.message_handler', ['from_transport' => 'async'])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $messageToSendersMapping = $container->getDefinition('messenger.senders_locator')->getArgument(0);
+        $this->assertCount(1, $messageToSendersMapping);
+        $this->assertSame([DummyMessage::class => ['async']], $messageToSendersMapping);
+    }
+
     private function getContainerBuilder(string $busId = 'message_bus'): ContainerBuilder
     {
         $container = new ContainerBuilder();
@@ -614,6 +630,10 @@ class MessengerPassTest extends TestCase
 
         $container->register('messenger.receiver_locator', ServiceLocator::class)
             ->addArgument(new Reference('service_container'))
+        ;
+
+        $container->register('messenger.senders_locator', SendersLocator::class)
+            ->addArgument([])
         ;
 
         return $container;

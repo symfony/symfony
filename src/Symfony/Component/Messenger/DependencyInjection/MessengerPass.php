@@ -165,6 +165,12 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
+        $messageToSendersMapping = [];
+        if ($container->hasDefinition('messenger.receiver_locator')) {
+            $messageToSendersMapping = $container->getDefinition('messenger.senders_locator')
+                ->getArgument(0);
+        }
+
         $handlersLocatorMappingByBus = [];
         foreach ($handlersByBusAndMessage as $bus => $handlersByMessage) {
             foreach ($handlersByMessage as $message => $handlers) {
@@ -172,12 +178,28 @@ class MessengerPass implements CompilerPassInterface
                 foreach ($handlers as $handler) {
                     $definitions[$definitionId = '.messenger.handler_descriptor.'.ContainerBuilder::hash($bus.':'.$message.':'.$handler[0])] = (new Definition(HandlerDescriptor::class))->setArguments([new Reference($handler[0]), $handler[1]]);
                     $handlerDescriptors[] = new Reference($definitionId);
+
+                    if (isset($handler[1]['from_transport'])) {
+                        if (!isset($messageToSendersMapping[$message])) {
+                            $messageToSendersMapping[$message] = [];
+                        }
+
+                        if (!\in_array($handler[1]['from_transport'], $messageToSendersMapping[$message])) {
+                            $messageToSendersMapping[$message][] = $handler[1]['from_transport'];
+                        }
+                    }
                 }
 
                 $handlersLocatorMappingByBus[$bus][$message] = new IteratorArgument($handlerDescriptors);
             }
         }
         $container->addDefinitions($definitions);
+
+        if ($container->hasDefinition('messenger.receiver_locator')) {
+            $container->getDefinition('messenger.senders_locator')
+                ->replaceArgument(0, $messageToSendersMapping)
+            ;
+        }
 
         foreach ($busIds as $bus) {
             $container->register($locatorId = $bus.'.messenger.handlers_locator', HandlersLocator::class)

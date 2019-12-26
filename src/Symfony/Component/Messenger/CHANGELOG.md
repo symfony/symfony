@@ -5,7 +5,8 @@ CHANGELOG
 -----
 
  * The `LoggingMiddleware` class has been removed, pass a logger to `SendMessageMiddleware` instead.
- * made `SendersLocator` require a `ContainerInterface` as 2nd argument
+ * Made `SendersLocator` require a `ContainerInterface` as 2nd argument
+ * Automatically add routing for message when `from_transport` tag is set on handler.
 
 4.4.0
 -----

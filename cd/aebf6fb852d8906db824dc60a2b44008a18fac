@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by bastnic at 2019-12-21T21:31:14Z
+
+ab -n 100
+
+```
+# local cache, warmup:
+
+  50%     63
+  66%     64
+  75%     66
+  80%     68
+  90%     72
+  95%     75
+  98%     80
+  99%     82
+ 100%     82 (longest request)
+
+# di cache, warmup
+
+  50%     65
+  66%     66
+  75%     66
+  80%     67
+  90%     72
+  95%     76
+  98%     78
+  99%     82
+ 100%     82 (longest request)
+
+# warmup
+
+  50%     75
+  66%     77
+  75%     79
+  80%     81
+  90%     83
+  95%     88
+  98%     93
+  99%    110
+ 100%    110 (longest request)
+
+# no warmup
+
+  50%    208
+  66%    223
+  75%    233
+  80%    237
+  90%    260
+  95%    280
+  98%    290
+  99%    301
+ 100%    301 (longest request)
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-12-23T07:18:49Z
+
+Should we implement the `ResettableInterface` to avoid memory leaks on long running processes?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-23T10:55:25Z
+
+> Should we implement the ResettableInterface to avoid memory leaks on long running processes?
+
+I'm not sure this would qualify as a leak: the memory requirement is asymptotic, ie it won't grow once all classes used by the app have been loaded. This is the same for eg opcache.
+No need to reset to me.

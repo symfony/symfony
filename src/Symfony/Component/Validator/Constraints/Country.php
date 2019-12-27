@@ -30,6 +30,7 @@ class Country extends Constraint
     ];
 
     public $message = 'This value is not a valid country.';
+    public $alpha3 = false;
 
     public function __construct($options = null)
     {

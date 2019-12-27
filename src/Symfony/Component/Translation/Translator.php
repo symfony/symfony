@@ -412,8 +412,19 @@ EOF
             $locales[] = $fallback;
         }
 
-        if (false !== strrchr($locale, '_')) {
+        if (\function_exists('locale_parse')) {
+            $localeSubTags = locale_parse($locale);
+            if (1 < \count($localeSubTags)) {
+                array_pop($localeSubTags);
+                $fallback = locale_compose($localeSubTags);
+                if (false !== $fallback) {
+                    array_unshift($locales, $fallback);
+                }
+            }
+        } elseif (false !== strrchr($locale, '_')) {
             array_unshift($locales, substr($locale, 0, -\strlen(strrchr($locale, '_'))));
+        } elseif (false !== strrchr($locale, '-')) {
+            array_unshift($locales, substr($locale, 0, -\strlen(strrchr($locale, '-'))));
         }
 
         return array_unique($locales);

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-16T00:26:23Z
+
+Probably worth a changelog entry for monolog-bridge. Fabbot's suggested patch looks good btw
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-12-16T10:01:51Z
+
+@chalasr Fixed.

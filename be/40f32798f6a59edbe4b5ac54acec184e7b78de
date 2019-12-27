@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-12-17T21:21:07Z
+
+I don't see anything wrong in the current naming.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-12-17T21:51:02Z
+
+https://github.com/symfony/symfony/blob/76c98fda989a812a5265d9d3c97f855430821e29/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php#L15 :grin:
+
+if we consider "database" a more sophisticated system evolving around data, id say the implementation indeed relies on a storage system, not a database system.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2019-12-17T22:21:22Z
+
+@fabpot just to name thing as they are :)
+edit: personal account
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-12-20T16:35:39Z
+
+I agree that "database" looks wrong because we don't have a database here ... but what about removing any details about the storage?
+
+Original:
+
+```
+No profiles found in the database.
+Token ~ token|default('') ~ was not found in the database.
+```
+
+This PR:
+
+```
+No profiles found in the storage.
+Token ~ token|default('') ~ was not found in the storage.
+```
+
+Proposal:
+
+```
+No profiles found.
+Token ~ token|default('') ~ was not found.
+```
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2019-12-20T16:53:03Z
+
+We can yes 👍🏻
+
+The main idea behind was to dissociate with the database word, as a newcomer may search for nothing the profiler table data inside its database, for example like the messenger table, but for nothing :)

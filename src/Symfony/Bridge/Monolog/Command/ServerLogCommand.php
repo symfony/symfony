@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\WebServerBundle\Command;
+namespace Symfony\Bridge\Monolog\Command;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
@@ -25,8 +25,6 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
- *
- * @deprecated since Symfony 4.4, to be removed in 5.0; use ServerLogCommand from symfony/monolog-bridge instead
  */
 class ServerLogCommand extends Command
 {
@@ -80,8 +78,6 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        @trigger_error('Using the WebserverBundle is deprecated since Symfony 4.4. Use the DebugBundle combined with MonologBridge instead.', E_USER_DEPRECATED);
-
         $filter = $input->getOption('filter');
         if ($filter) {
             if (!class_exists(ExpressionLanguage::class)) {

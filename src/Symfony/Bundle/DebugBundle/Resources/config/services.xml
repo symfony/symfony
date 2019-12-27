@@ -107,5 +107,9 @@
             </argument>
             <tag name="console.command" command="server:dump" />
         </service>
+
+        <service id="monolog.command.server_log" class="Symfony\Bridge\Monolog\Command\ServerLogCommand">
+            <tag name="console.command" command="server:log" />
+        </service>
     </services>
 </container>

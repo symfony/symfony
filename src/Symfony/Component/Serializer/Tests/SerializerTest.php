@@ -34,6 +34,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Normalizer\ScalarDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
@@ -475,6 +476,38 @@ class SerializerTest extends TestCase
         $this->expectExceptionMessage('An unexpected value could not be normalized: stream resource');
 
         (new Serializer())->normalize(tmpfile());
+    }
+
+    public function testDeserializeScalar()
+    {
+        $serializer = new Serializer([new ScalarDenormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->assertEquals(42, $serializer->deserialize('42', 'int', 'json'));
+        $this->assertEquals(42, $serializer->deserialize('42', 'integer', 'json'));
+
+        $this->assertTrue($serializer->deserialize('true', 'bool', 'json'));
+        $this->assertFalse($serializer->deserialize('false', 'boolean', 'json'));
+
+        $this->assertEquals(3.14, $serializer->deserialize('3.14', 'float', 'json'));
+        $this->assertEquals(3.14, $serializer->deserialize('31.4e-1', 'float', 'json'));
+
+        $this->assertEquals('  spaces  ', $serializer->deserialize('"  spaces  "', 'string', 'json'));
+        $this->assertEquals('@Ca$e%', $serializer->deserialize('"@Ca$e%"', 'string', 'json'));
+    }
+
+    public function testDeserializeScalarArray()
+    {
+        $serializer = new Serializer([new ScalarDenormalizer(), new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->assertEquals([42], $serializer->deserialize('[42]', 'int[]', 'json'));
+        $this->assertEquals([42], $serializer->deserialize('[42]', 'integer[]', 'json'));
+
+        $this->assertEquals([true, false], $serializer->deserialize('[true, false]', 'bool[]', 'json'));
+        $this->assertEquals([false, true], $serializer->deserialize('[false, true]', 'boolean[]', 'json'));
+
+        $this->assertEquals([3.14, 3.14], $serializer->deserialize('[3.14, 31.4e-1]', 'float[]', 'json'));
+
+        $this->assertEquals(['  spaces  ', '@Ca$e%'], $serializer->deserialize('["  spaces  ", "@Ca$e%"]', 'string[]', 'json'));
     }
 
     private function serializerWithClassDiscriminator()

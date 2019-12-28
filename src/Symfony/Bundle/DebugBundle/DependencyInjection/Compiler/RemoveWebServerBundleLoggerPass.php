@@ -16,8 +16,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
+ *
+ * @internal
  */
-class RemoveWebServerBundleLoggerPass implements CompilerPassInterface
+final class RemoveWebServerBundleLoggerPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}

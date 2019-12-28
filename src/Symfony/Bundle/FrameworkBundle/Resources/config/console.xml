@@ -91,6 +91,7 @@
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="collection" /> <!-- Receiver names -->
+            <argument type="service" id="lock.default.factory" />
 
             <tag name="console.command" command="messenger:consume" />
             <tag name="monolog.logger" channel="messenger" />

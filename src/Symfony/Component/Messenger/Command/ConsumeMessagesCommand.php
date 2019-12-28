@@ -23,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
@@ -41,14 +42,16 @@ class ConsumeMessagesCommand extends Command
     private $logger;
     private $receiverNames;
     private $eventDispatcher;
+    private $lockFactory;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], LockFactory $lockFactory = null)
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
         $this->eventDispatcher = $eventDispatcher;
+        $this->lockFactory = $lockFactory;
 
         parent::__construct();
     }
@@ -68,6 +71,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
+                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'Consumer name for prevent overlapping'),
             ])
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
@@ -132,6 +136,20 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
+
+        if ($consumerName = $input->getOption('name')) {
+            if (null === $this->lockFactory) {
+                $io->error('--name option can not be used because lock factory is not set');
+                return 1;
+            }
+            $lock = $this->lockFactory->createLock('messenger-consumer-'.$consumerName);
+            if (!$lock->acquire()) {
+                $io->error(sprintf('Messenger consumer "%s" already running', $consumerName));
+                return 1;
+            }
+        }
+
         $receivers = [];
         foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
@@ -164,7 +182,6 @@ EOF
 
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
-        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
         $io->success(sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 0 ? 's' : '', implode(', ', $receiverNames)));
 
         if ($stopsWhen) {

@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
@@ -48,6 +49,9 @@ class SupervisorCommand extends Command
     {
         $this
             ->setDescription('Run and watch messenger:consume commands with parameters from config')
+            ->setDefinition([
+                new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep after messenger:consume is started', 1),
+            ])
         ;
     }
 
@@ -74,13 +78,13 @@ class SupervisorCommand extends Command
         $stoping = false;
         $consumers = [];
         $php = (new PhpExecutableFinder())->find();
-        $appHash = substr(sha1(__DIR__), 0, 10);
+        $appHash = substr(sha1(__DIR__), 0, 8);
 
         foreach ($this->config as $name => $params) {
-            $cmd = array_merge([$php, $_SERVER['argv'][0], 'messenger:consume'], $params['receivers']);
+            $cmd = array_merge([$php, $_SERVER['PHP_SELF'], 'messenger:consume'], $params['receivers']);
             unset($params['receivers']);
             foreach ($params as $k => $v) {
-                $cmd[] = sprintf('--%s=%s', $k, $v);
+                $cmd[] = sprintf('--%s=%s', str_replace('_', '-', $k), $v);
             }
             $consumerName = sprintf('supervisor-%s-%s', $name, $appHash);
             $cmd[] = sprintf('--name=%s', $consumerName);
@@ -97,6 +101,8 @@ class SupervisorCommand extends Command
             $running = false;
         });
 
+        $sleep = $input->getOption('sleep');
+
         $this->logger->info('Messenger supervisor started');
 
         while ($running) {
@@ -105,10 +111,11 @@ class SupervisorCommand extends Command
                     $lock = $c['lock'];
                     if ($lock->acquire()) {
                         $process = $c['process'];
-                        $process->stop();
+                        $process->stop(0);
                         $lock->release();
                         $this->logger->warning(sprintf('Starting "%s" messenger consumer: %s', $name, $process->getCommandLine()));
-                        $process->run();
+                        $process->start();
+                        sleep($sleep);
                     }
                 }
                 pcntl_signal_dispatch();

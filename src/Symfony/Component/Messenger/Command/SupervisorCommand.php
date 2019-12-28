@@ -116,7 +116,7 @@ class SupervisorCommand extends Command
                 }
             }
             pcntl_signal_dispatch();
-            usleep(1000);
+            sleep(1);
         }
         foreach ($consumers as $c) {
             $c['process']->wait();

@@ -75,7 +75,6 @@ class SupervisorCommand extends Command
         }
 
         $running = true;
-        $stoping = false;
         $consumers = [];
         $php = (new PhpExecutableFinder())->find();
         $appHash = substr(sha1(__DIR__), 0, 8);
@@ -93,8 +92,7 @@ class SupervisorCommand extends Command
             $consumers[$name]['process'] = new Process($cmd);
         }
 
-        pcntl_signal(SIGTERM, function () use (&$running, &$stoping, $consumers) {
-            $stoping = true;
+        pcntl_signal(SIGTERM, function () use (&$running, $consumers) {
             foreach ($consumers as $consumer) {
                 $consumer['process']->signal(SIGTERM);
             }
@@ -106,10 +104,6 @@ class SupervisorCommand extends Command
         $this->logger->info('Messenger supervisor started');
 
         while ($running) {
-            usleep(1000);
-            if ($stoping) {
-                continue;
-            }
             foreach ($consumers as $name => $c) {
                 $lock = $c['lock'];
                 if ($lock->acquire()) {
@@ -122,6 +116,7 @@ class SupervisorCommand extends Command
                 }
             }
             pcntl_signal_dispatch();
+            usleep(1000);
         }
         foreach ($consumers as $c) {
             $c['process']->wait();

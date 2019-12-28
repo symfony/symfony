@@ -681,4 +681,20 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $this->addToAssertionCount(1);
     }
+
+    public function testProcessHandleClosureForCallable()
+    {
+        $closureDefinition = new Definition(\Closure::class);
+        $closureDefinition->setFactory([\Closure::class, 'fromCallable']);
+        $closureDefinition->setArguments(['strlen']);
+
+        $container = new ContainerBuilder();
+        $container
+            ->register('foobar', BarMethodCall::class)
+            ->addMethodCall('setCallable', [$closureDefinition]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
 }

@@ -306,7 +306,7 @@ TwigBundle
    The new default exception controller will also change the error response content according to
    https://tools.ietf.org/html/rfc7807 for `json`, `xml`, `atom` and `txt` formats:
 
-   Before:
+   Before (HTTP status code `200`):
    ```json
    {
        "error": {
@@ -316,7 +316,7 @@ TwigBundle
    }
    ```
 
-   After:
+   After (HTTP status code `404`):
    ```json
    {
        "title": "Not Found",

@@ -212,6 +212,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return $this->docBlockFactory->create($reflectionProperty, $this->contextFactory->createFromReflector($reflectionProperty->getDeclaringClass()));
         } catch (\InvalidArgumentException $e) {
             return null;
+        } catch (\RuntimeException $e) {
+            return null;
         }
     }
 
@@ -256,6 +258,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         try {
             return [$this->docBlockFactory->create($reflectionMethod, $this->contextFactory->createFromReflector($reflectionMethod)), $prefix];
         } catch (\InvalidArgumentException $e) {
+            return null;
+        } catch (\RuntimeException $e) {
             return null;
         }
     }

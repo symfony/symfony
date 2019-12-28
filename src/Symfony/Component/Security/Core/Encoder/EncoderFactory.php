@@ -144,10 +144,10 @@ class EncoderFactory implements EncoderFactoryInterface
                 return [
                     'class' => Pbkdf2PasswordEncoder::class,
                     'arguments' => [
-                        $config['hash_algorithm'],
-                        $config['encode_as_base64'],
-                        $config['iterations'],
-                        $config['key_length'],
+                        $config['hash_algorithm'] ?? 'sha512',
+                        $config['encode_as_base64'] ?? true,
+                        $config['iterations'] ?? 1000,
+                        $config['key_length'] ?? 40,
                     ],
                 ];
 
@@ -205,8 +205,8 @@ class EncoderFactory implements EncoderFactoryInterface
             'class' => MessageDigestPasswordEncoder::class,
             'arguments' => [
                 $config['algorithm'],
-                $config['encode_as_base64'],
-                $config['iterations'],
+                $config['encode_as_base64'] ?? true,
+                $config['iterations'] ?? 5000,
             ],
         ];
     }

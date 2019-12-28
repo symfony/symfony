@@ -106,21 +106,25 @@ class SupervisorCommand extends Command
         $this->logger->info('Messenger supervisor started');
 
         while ($running) {
-            if (!$stoping) {
-                foreach ($consumers as $name => $c) {
-                    $lock = $c['lock'];
-                    if ($lock->acquire()) {
-                        $process = $c['process'];
-                        $process->stop(0);
-                        $lock->release();
-                        $this->logger->warning(sprintf('Starting "%s" messenger consumer: %s', $name, $process->getCommandLine()));
-                        $process->start();
-                        sleep($sleep);
-                    }
-                }
-                pcntl_signal_dispatch();
-            }
             usleep(1000);
+            if ($stoping) {
+                continue;
+            }
+            foreach ($consumers as $name => $c) {
+                $lock = $c['lock'];
+                if ($lock->acquire()) {
+                    $process = $c['process'];
+                    $process->stop(0);
+                    $lock->release();
+                    $this->logger->warning(sprintf('Starting "%s" messenger consumer: %s', $name, $process->getCommandLine()));
+                    $process->start();
+                    sleep($sleep);
+                }
+            }
+            pcntl_signal_dispatch();
+        }
+        foreach ($consumers as $c) {
+            $c['process']->wait();
         }
 
         return 0;

@@ -74,8 +74,7 @@ class SupervisorCommand extends Command
         $stoping = false;
         $consumers = [];
         $php = (new PhpExecutableFinder())->find();
-
-        $appHash = substr(sha1(__DIR__), 0 ,10);
+        $appHash = substr(sha1(__DIR__), 0, 10);
 
         foreach ($this->config as $name => $params) {
             $cmd = array_merge([$php, $_SERVER['argv'][0], 'messenger:consume'], $params['receivers']);

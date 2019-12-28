@@ -20,7 +20,6 @@ class TypedReference extends Reference
 {
     private $type;
     private $name;
-    private $requiringClass;
 
     /**
      * @param string $id              The service identifier

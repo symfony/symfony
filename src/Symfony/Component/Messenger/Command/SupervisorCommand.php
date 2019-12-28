@@ -93,10 +93,10 @@ class SupervisorCommand extends Command
         }
 
         pcntl_signal(SIGTERM, function () use (&$running, $consumers) {
+            $running = false;
             foreach ($consumers as $consumer) {
                 $consumer['process']->signal(SIGTERM);
             }
-            $running = false;
         });
 
         $sleep = $input->getOption('sleep');

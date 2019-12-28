@@ -18,7 +18,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -61,11 +60,13 @@ class SupervisorCommand extends Command
 
         if (!\extension_loaded('pcntl')) {
             $io->error('pcntl extension must be installed and enabled to run this command');
+
             return 1;
         }
 
         if (empty($this->config)) {
             $io->warning('No consumers is defined in config. Exiting.');
+
             return 1;
         }
 
@@ -73,6 +74,7 @@ class SupervisorCommand extends Command
         $stoping = false;
         $consumers = [];
         $php = (new PhpExecutableFinder())->find();
+
         $appHash = substr(sha1(__DIR__), 0 ,10);
 
         foreach ($this->config as $name => $params) {

@@ -141,11 +141,13 @@ EOF
         if ($consumerName = $input->getOption('name')) {
             if (null === $this->lockFactory) {
                 $io->error('--name option can not be used because lock factory is not set');
+
                 return 1;
             }
             $lock = $this->lockFactory->createLock('messenger-consumer-'.$consumerName);
             if (!$lock->acquire()) {
                 $io->error(sprintf('Messenger consumer "%s" already running', $consumerName));
+
                 return 1;
             }
         }

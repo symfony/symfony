@@ -35,6 +35,8 @@ use Symfony\Component\Messenger\Worker;
  */
 class ConsumeMessagesCommand extends Command
 {
+    const LOCK_PREFIX = 'messenger-consumer';
+
     protected static $defaultName = 'messenger:consume';
 
     private $routableBus;
@@ -144,7 +146,8 @@ EOF
 
                 return 1;
             }
-            $lock = $this->lockFactory->createLock('messenger-consumer-'.$consumerName);
+            $lockName = sprintf('%s-%s', static::LOCK_PREFIX, $consumerName);
+            $lock = $this->lockFactory->createLock($lockName);
             if (!$lock->acquire()) {
                 $io->error(sprintf('Messenger consumer "%s" already running', $consumerName));
 

@@ -14,11 +14,11 @@ namespace Symfony\Component\Messenger\Command;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -64,7 +64,7 @@ class SupervisorCommand extends Command
             return 1;
         }
 
-        if(empty($this->config)) {
+        if (empty($this->config)) {
             $io->warning('No consumers is defined in config. Exiting.');
             return 1;
         }
@@ -73,6 +73,7 @@ class SupervisorCommand extends Command
         $stoping = false;
         $consumers = [];
         $php = (new PhpExecutableFinder())->find();
+        $appHash = substr(sha1(__DIR__), 0 ,10);
 
         foreach ($this->config as $name => $params) {
             $cmd = array_merge([$php, $_SERVER['argv'][0], 'messenger:consume'], $params['receivers']);
@@ -80,30 +81,33 @@ class SupervisorCommand extends Command
             foreach ($params as $k => $v) {
                 $cmd[] = sprintf('--%s=%s', $k, $v);
             }
-            $consumers[$name] = new Process($cmd);
+            $consumerName = sprintf('supervisor-%s-%s', $name, $appHash);
+            $cmd[] = sprintf('--name=%s', $consumerName);
+            $lockName = sprintf('%s-%s', ConsumeMessagesCommand::LOCK_PREFIX, $consumerName);
+            $consumers[$name]['lock'] = $this->lockFactory->createLock($lockName);
+            $consumers[$name]['process'] = new Process($cmd);
         }
 
         pcntl_signal(SIGTERM, function () use ($running, $stoping, $consumers) {
             $stoping = true;
             foreach ($consumers as $consumer) {
-                $consumer->signal(SIGTERM);
+                $consumer['process']->signal(SIGTERM);
             }
             $running = false;
         });
 
         $this->logger->info('Messenger supervisor started');
-        $appHash = sha1(__DIR__);
 
         while ($running) {
             if (!$stoping) {
-                foreach ($consumers as $name => $p) {
-                    $lockName = sprintf('supervisor-%s-%s', $name, $appHash);
-                    $lock = $this->lockFactory->createLock($lockName);
+                foreach ($consumers as $name => $c) {
+                    $lock = $c['lock'];
                     if ($lock->acquire()) {
-                        $p->stop();
+                        $process = $c['process'];
+                        $process->stop();
                         $lock->release();
-                        $this->logger->info(sprintf('Starting "%s" messenger consumer: %s', $name, $p->getCommandLine()));
-                        $p->start();
+                        $this->logger->warning(sprintf('Starting "%s" messenger consumer: %s', $name, $process->getCommandLine()));
+                        $process->run();
                     }
                 }
                 pcntl_signal_dispatch();

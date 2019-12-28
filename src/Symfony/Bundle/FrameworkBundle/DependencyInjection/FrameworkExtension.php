@@ -1566,6 +1566,8 @@ class FrameworkExtension extends Extension
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
         }
 
+        $container->setParameter('messenger.supervisor', $config['supervisor']);
+
         $loader->load('messenger.xml');
 
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {

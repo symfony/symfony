@@ -93,7 +93,7 @@ class SupervisorCommand extends Command
             $consumers[$name]['process'] = new Process($cmd);
         }
 
-        pcntl_signal(SIGTERM, function () use ($running, $stoping, $consumers) {
+        pcntl_signal(SIGTERM, function () use (&$running, &$stoping, $consumers) {
             $stoping = true;
             foreach ($consumers as $consumer) {
                 $consumer['process']->signal(SIGTERM);

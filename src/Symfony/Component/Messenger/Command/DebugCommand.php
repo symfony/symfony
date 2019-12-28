@@ -108,9 +108,9 @@ EOF
 
         $optionsMapping = [];
         foreach ($options as $key => $value) {
-            $optionsMapping[] = ' '.$key.'='.$value;
+            $optionsMapping[] = $key.'='.$value;
         }
 
-        return ' (when'.implode(', ', $optionsMapping).')';
+        return ' (when '.implode(', ', $optionsMapping).')';
     }
 }

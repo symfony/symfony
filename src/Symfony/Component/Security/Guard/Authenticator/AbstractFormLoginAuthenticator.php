@@ -39,6 +39,9 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     /**
      * Override to change what happens after a bad username/password is submitted.
      *
+     * @param Request $request
+     * @param AuthenticationException $exception
+     *
      * @return RedirectResponse
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
@@ -55,9 +58,13 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     /**
      * Override to change what happens after successful authentication.
      *
+     * @param Request $request
+     * @param TokenInterface $token
      * @param string $providerKey
      *
      * @return RedirectResponse
+     * 
+     * @throws \Exception
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {

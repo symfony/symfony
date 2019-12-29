@@ -1117,6 +1117,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->scalarNode('memory_limit')->end()
                                     ->integerNode('time_limit')->end()
+                                    ->integerNode('limit')->end()
                                     ->integerNode('sleep')->end()
                                     ->scalarNode('bus')->end()
                                 ->end()

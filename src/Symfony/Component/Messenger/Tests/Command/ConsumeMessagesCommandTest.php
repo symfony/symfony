@@ -18,6 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -98,5 +101,52 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $this->assertSame(0, $tester->getStatusCode());
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+    }
+
+    public function testRunWithNameOption()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->expects($this->once())->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->once())->method('has')->with('dummy-receiver')->willReturn(true);
+        $receiverLocator->expects($this->once())->method('get')->with('dummy-receiver')->willReturn($receiver);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch');
+
+        $busLocator = $this->createMock(ContainerInterface::class);
+        $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
+        $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
+
+        $store = $this->createMock(PersistingStoreInterface::class);
+        $store->expects($this->exactly(2))->method('save');
+        $store->method('exists')->willReturn(false);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher(), null, [], new LockFactory($store));
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+            '--name' => 'test',
+        ]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
+
+        $store->method('save')->willThrowException(new LockConflictedException());
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+            '--name' => 'test',
+        ]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString('[ERROR] Messenger consumer "test" already running', $tester->getDisplay());
     }
 }

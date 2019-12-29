@@ -47,13 +47,16 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $userProviders, string $secret, string $providerKey, array $options = [], LoggerInterface $logger = null)
+    public function __construct(iterable $userProviders, string $secret, string $providerKey, array $options = [], LoggerInterface $logger = null)
     {
         if (empty($secret)) {
             throw new \InvalidArgumentException('$secret must not be empty.');
         }
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
+        }
+        if (!\is_array($userProviders) && !$userProviders instanceof \Countable) {
+            $userProviders = iterator_to_array($userProviders, false);
         }
         if (0 === \count($userProviders)) {
             throw new \InvalidArgumentException('You must provide at least one user provider.');

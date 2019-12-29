@@ -12,6 +12,7 @@
             <bind key="$foo" type="collection">
                 <bind>null</bind>
             </bind>
+            <bind key="iterable $baz" type="tagged_iterator" tag="bar"/>
         </service>
 
         <service id="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar">

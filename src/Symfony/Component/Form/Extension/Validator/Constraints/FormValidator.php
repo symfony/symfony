@@ -30,7 +30,7 @@ class FormValidator extends ConstraintValidator
     public function validate($form, Constraint $formConstraint)
     {
         if (!$formConstraint instanceof Form) {
-            throw new UnexpectedTypeException($formConstraint, __NAMESPACE__.'\Form');
+            throw new UnexpectedTypeException($formConstraint, Form::class);
         }
 
         if (!$form instanceof FormInterface) {

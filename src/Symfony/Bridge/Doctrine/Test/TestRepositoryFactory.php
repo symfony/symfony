@@ -11,10 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Test;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Repository\RepositoryFactory;
+use Doctrine\Persistence\ObjectRepository;
 
 /**
  * @author Andreas Braun <alcaeus@alcaeus.org>
@@ -28,8 +28,10 @@ final class TestRepositoryFactory implements RepositoryFactory
 
     /**
      * {@inheritdoc}
+     *
+     * @return ObjectRepository
      */
-    public function getRepository(EntityManagerInterface $entityManager, $entityName): ObjectRepository
+    public function getRepository(EntityManagerInterface $entityManager, $entityName)
     {
         $repositoryHash = $this->getRepositoryHash($entityManager, $entityName);
 

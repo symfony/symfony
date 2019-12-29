@@ -13,7 +13,14 @@ namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as ContainerPhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
@@ -25,31 +32,55 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
 trait MicroKernelTrait
 {
     /**
-     * Add or import routes into your application.
+     * Adds or imports routes into your application.
      *
-     *     $routes->import('config/routing.yml');
-     *     $routes->add('/admin', 'App\Controller\AdminController::dashboard', 'admin_dashboard');
+     *     $routes->import($this->getProjectDir().'/config/*.{yaml,php}');
+     *     $routes
+     *         ->add('admin_dashboard', '/admin')
+     *         ->controller('App\Controller\AdminController::dashboard')
+     *     ;
      */
-    abstract protected function configureRoutes(RouteCollectionBuilder $routes);
+    abstract protected function configureRoutes(RoutingConfigurator $routes);
 
     /**
      * Configures the container.
      *
      * You can register extensions:
      *
-     *     $c->loadFromExtension('framework', [
+     *     $c->extension('framework', [
      *         'secret' => '%secret%'
      *     ]);
      *
      * Or services:
      *
-     *     $c->register('halloween', 'FooBundle\HalloweenProvider');
+     *     $c->services()->set('halloween', 'FooBundle\HalloweenProvider');
      *
      * Or parameters:
      *
-     *     $c->setParameter('halloween', 'lot of fun');
+     *     $c->parameters()->set('halloween', 'lot of fun');
      */
-    abstract protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader);
+    abstract protected function configureContainer(ContainerConfigurator $c);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProjectDir(): string
+    {
+        return \dirname((new \ReflectionObject($this))->getFileName(), 2);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function registerBundles(): iterable
+    {
+        $contents = require $this->getProjectDir().'/config/bundles.php';
+        foreach ($contents as $class => $envs) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+                yield new $class();
+            }
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -66,6 +97,8 @@ trait MicroKernelTrait
 
             if (!$container->hasDefinition('kernel')) {
                 $container->register('kernel', static::class)
+                    ->addTag('controller.service_arguments')
+                    ->setAutoconfigured(true)
                     ->setSynthetic(true)
                     ->setPublic(true)
                 ;
@@ -74,13 +107,43 @@ trait MicroKernelTrait
             $kernelDefinition = $container->getDefinition('kernel');
             $kernelDefinition->addTag('routing.route_loader');
 
-            if ($this instanceof EventSubscriberInterface) {
-                $kernelDefinition->addTag('kernel.event_subscriber');
+            $container->addObjectResource($this);
+            $container->fileExists($this->getProjectDir().'/config/bundles.php');
+            $container->setParameter('kernel.secret', '%env(APP_SECRET)%');
+
+            try {
+                $this->configureContainer($container, $loader);
+
+                return;
+            } catch (\TypeError $e) {
+                $file = $e->getFile();
+
+                if (0 !== strpos($e->getMessage(), sprintf('Argument 1 passed to %s::configureContainer() must be an instance of %s,', static::class, ContainerConfigurator::class))) {
+                    throw $e;
+                }
             }
 
-            $this->configureContainer($container, $loader);
+            // the user has opted into using the ContainerConfigurator
+            $defaultDefinition = (new Definition())->setAutowired(true)->setAutoconfigured(true);
+            /* @var ContainerPhpFileLoader $kernelLoader */
+            $kernelLoader = $loader->getResolver()->resolve($file);
+            $kernelLoader->setCurrentDir(\dirname($file));
+            $instanceof = &\Closure::bind(function &() { return $this->instanceof; }, $kernelLoader, $kernelLoader)();
 
-            $container->addObjectResource($this);
+            $valuePreProcessor = AbstractConfigurator::$valuePreProcessor;
+            AbstractConfigurator::$valuePreProcessor = function ($value) {
+                return $this === $value ? new Reference('kernel') : $value;
+            };
+
+            try {
+                $this->configureContainer(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file, $defaultDefinition), $loader);
+            } finally {
+                $instanceof = [];
+                $kernelLoader->registerAliasesForSinglyImplementedInterfaces();
+                AbstractConfigurator::$valuePreProcessor = $valuePreProcessor;
+            }
+
+            $container->setAlias(static::class, 'kernel');
         });
     }
 
@@ -89,6 +152,32 @@ trait MicroKernelTrait
      */
     public function loadRoutes(LoaderInterface $loader)
     {
+        $file = (new \ReflectionObject($this))->getFileName();
+        /* @var RoutingPhpFileLoader $kernelLoader */
+        $kernelLoader = $loader->getResolver()->resolve($file);
+        $kernelLoader->setCurrentDir(\dirname($file));
+        $collection = new RouteCollection();
+
+        try {
+            $this->configureRoutes(new RoutingConfigurator($collection, $kernelLoader, $file, $file));
+
+            foreach ($collection as $route) {
+                $controller = $route->getDefault('_controller');
+
+                if (\is_array($controller) && [0, 1] === array_keys($controller) && $this === $controller[0]) {
+                    $route->setDefault('_controller', ['kernel', $controller[1]]);
+                }
+            }
+
+            return $collection;
+        } catch (\TypeError $e) {
+            if (0 !== strpos($e->getMessage(), sprintf('Argument 1 passed to %s::configureRoutes() must be an instance of %s,', static::class, RouteCollectionBuilder::class))) {
+                throw $e;
+            }
+        }
+
+        @trigger_error(sprintf('Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated since Symfony 5.1, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class), E_USER_DEPRECATED);
+
         $routes = new RouteCollectionBuilder($loader);
         $this->configureRoutes($routes);
 

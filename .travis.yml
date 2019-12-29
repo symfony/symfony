@@ -26,10 +26,10 @@ env:
 matrix:
     include:
         - php: 7.2
-          env: php_extra="7.4snapshot"
+          env: php_extra="7.4"
         - php: 7.3
           env: deps=high
-        - php: 7.4snapshot
+        - php: 7.4
           env: deps=low
     fast_finish: true
 
@@ -140,6 +140,12 @@ before_install:
           wget http://php.net/get/php-$MIN_PHP.tar.bz2/from/this/mirror -O - | tar -xj &&
           (cd php-$MIN_PHP && ./configure --enable-sigchild --enable-pcntl && make -j2)
       fi
+
+    - |
+      # Install vulcain
+      wget https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz
+      sudo mv vulcain /usr/local/bin
+      docker pull php:7.3-alpine
 
     - |
       # php.ini configuration
@@ -260,6 +266,11 @@ install:
       run_tests () {
           set -e
           export PHP=$1
+
+          if [[ !$deps && $PHP = 7.2 ]]; then
+              tfold src/Symfony/Component/HttpClient.h2push "$COMPOSER_UP symfony/contracts && docker run -it --rm -v $(pwd):/app -v $(phpenv which composer):/usr/local/bin/composer -v /usr/local/bin/vulcain:/usr/local/bin/vulcain -w /app php:7.3-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push"
+          fi
+
           if [[ $PHP != 7.4* && $PHP != $TRAVIS_PHP_VERSION && $TRAVIS_PULL_REQUEST != false ]]; then
               echo -e "\\n\\e[33;1mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"
               return
@@ -307,7 +318,10 @@ install:
               fi
 
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
-              tfold src/Symfony/Component/Console.tty $PHPUNIT --group tty
+
+              tfold src/Symfony/Component/Console.tty $PHPUNIT src/Symfony/Component/Console --group tty
+              tfold src/Symfony/Bridge/Twig.tty $PHPUNIT src/Symfony/Bridge/Twig --group tty
+
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
                   export PHP=$MIN_PHP
                   tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/

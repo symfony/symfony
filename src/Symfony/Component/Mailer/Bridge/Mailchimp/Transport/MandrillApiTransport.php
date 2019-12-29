@@ -57,7 +57,8 @@ class MandrillApiTransport extends AbstractApiTransport
             throw new HttpTransportException(sprintf('Unable to send an email (code %s).', $result['code']), $response);
         }
 
-        $sentMessage->setMessageId($result['_id']);
+        $firstRecipient = reset($result);
+        $sentMessage->setMessageId($firstRecipient['_id']);
 
         return $response;
     }

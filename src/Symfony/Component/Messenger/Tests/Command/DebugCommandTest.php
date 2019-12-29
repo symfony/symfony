@@ -40,7 +40,7 @@ class DebugCommandTest extends TestCase
     {
         $command = new DebugCommand([
             'command_bus' => [
-                DummyCommand::class => [[DummyCommandHandler::class, []]],
+                DummyCommand::class => [[DummyCommandHandler::class, ['option1' => '1', 'option2' => '2']]],
                 MultipleBusesMessage::class => [[MultipleBusesMessageHandler::class, []]],
             ],
             'query_bus' => [
@@ -62,12 +62,12 @@ command_bus
 
  The following messages can be dispatched:
 
- --------------------------------------------------------------------------------------- 
-  Symfony\Component\Messenger\Tests\Fixtures\DummyCommand                                
-      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler          
-  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                        
-      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler  
- --------------------------------------------------------------------------------------- 
+ ----------------------------------------------------------------------------------------------------------- 
+  Symfony\Component\Messenger\Tests\Fixtures\DummyCommand                                                    
+      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler (when option1=1, option2=2)  
+  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                                            
+      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler                      
+ ----------------------------------------------------------------------------------------------------------- 
 
 query_bus
 ---------

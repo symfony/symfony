@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added context to `TransitionException` and its child classes whenever they are thrown in `Workflow::apply()`
+ * Added `Registry::has()` to check if a workflow exists
+
 5.0.0
 -----
 

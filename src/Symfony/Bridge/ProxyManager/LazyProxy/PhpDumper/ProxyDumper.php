@@ -81,6 +81,7 @@ EOF;
     public function getProxyCode(Definition $definition): string
     {
         $code = $this->classGenerator->generate($this->generateProxyClass($definition));
+        $code = preg_replace('/^(class [^ ]++ extends )([^\\\\])/', '$1\\\\$2', $code);
 
         if (version_compare(self::getProxyManagerVersion(), '2.2', '<')) {
             $code = preg_replace(

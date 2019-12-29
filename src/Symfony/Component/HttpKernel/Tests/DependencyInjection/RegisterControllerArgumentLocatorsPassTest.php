@@ -197,7 +197,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
     public function testExceptionOnNonExistentTypeHint()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException('RuntimeException');
         $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClass". Did you forget to add a use statement?');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
@@ -207,11 +207,17 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
+
+        $error = $container->getDefinition('argument_resolver.service')->getArgument(0);
+        $error = $container->getDefinition($error)->getArgument(0)['foo::fooAction']->getValues()[0];
+        $error = $container->getDefinition($error)->getArgument(0)['nonExistent']->getValues()[0];
+
+        $container->get($error);
     }
 
     public function testExceptionOnNonExistentTypeHintDifferentNamespace()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException('RuntimeException');
         $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassDifferentNamespaceController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Acme\NonExistentClass".');
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
@@ -221,6 +227,12 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
+
+        $error = $container->getDefinition('argument_resolver.service')->getArgument(0);
+        $error = $container->getDefinition($error)->getArgument(0)['foo::fooAction']->getValues()[0];
+        $error = $container->getDefinition($error)->getArgument(0)['nonExistent']->getValues()[0];
+
+        $container->get($error);
     }
 
     public function testNoExceptionOnNonExistentTypeHintOptionalArg()

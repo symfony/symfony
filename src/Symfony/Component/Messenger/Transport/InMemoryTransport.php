@@ -55,7 +55,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function ack(Envelope $envelope): void
     {
         $this->acknowledged[] = $envelope;
-        $id = spl_object_hash($envelope);
+        $id = spl_object_hash($envelope->getMessage());
         unset($this->queue[$id]);
     }
 
@@ -65,7 +65,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function reject(Envelope $envelope): void
     {
         $this->rejected[] = $envelope;
-        $id = spl_object_hash($envelope);
+        $id = spl_object_hash($envelope->getMessage());
         unset($this->queue[$id]);
     }
 
@@ -75,7 +75,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
     public function send(Envelope $envelope): Envelope
     {
         $this->sent[] = $envelope;
-        $id = spl_object_hash($envelope);
+        $id = spl_object_hash($envelope->getMessage());
         $this->queue[$id] = $envelope;
 
         return $envelope;

@@ -55,7 +55,7 @@ class CachePoolPass implements CompilerPassInterface
         }
         $seed .= '.'.$container->getParameter('kernel.container_class');
 
-        $pools = [];
+        $allPools = [];
         $clearers = [];
         $attributes = [
             'provider',
@@ -163,7 +163,7 @@ class CachePoolPass implements CompilerPassInterface
                 $clearers[$clearer][$name] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
             }
 
-            $pools[$name] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
+            $allPools[$name] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
         }
 
         $notAliasedCacheClearerId = $this->cacheClearerId;
@@ -171,7 +171,7 @@ class CachePoolPass implements CompilerPassInterface
             $this->cacheClearerId = (string) $container->getAlias($this->cacheClearerId);
         }
         if ($container->hasDefinition($this->cacheClearerId)) {
-            $clearers[$notAliasedCacheClearerId] = $pools;
+            $clearers[$notAliasedCacheClearerId] = $allPools;
         }
 
         foreach ($clearers as $id => $pools) {
@@ -189,7 +189,7 @@ class CachePoolPass implements CompilerPassInterface
         }
 
         if ($container->hasDefinition('console.command.cache_pool_list')) {
-            $container->getDefinition('console.command.cache_pool_list')->replaceArgument(0, array_keys($pools));
+            $container->getDefinition('console.command.cache_pool_list')->replaceArgument(0, array_keys($allPools));
         }
     }
 

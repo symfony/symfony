@@ -60,6 +60,7 @@ Debug
 -----
 
  * Removed the component in favor of the `ErrorHandler` component
+ * Replace uses of `Symfony\Component\Debug\Debug` by `Symfony\Component\ErrorHandler\Debug`
 
 DependencyInjection
 -------------------
@@ -271,6 +272,9 @@ HttpFoundation
  * `ApacheRequest` has been removed, use the `Request` class instead.
  * The third argument of the `HeaderBag::get()` method has been removed, use method `all()` instead.
  * Getting the container from a non-booted kernel is not possible anymore.
+ * [BC BREAK] `PdoSessionHandler` with MySQL changed the type of the lifetime column,
+   make sure to run `ALTER TABLE sessions MODIFY sess_lifetime INTEGER UNSIGNED NOT NULL` to
+   update your database.
 
 HttpKernel
 ----------
@@ -410,7 +414,7 @@ Security
 
    **After**
    ```php
-   if ($this->authorizationChecker->isGranted(new Expression("has_role('ROLE_USER') or has_role('ROLE_ADMIN')"))) {}
+   if ($this->authorizationChecker->isGranted(new Expression("is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"))) {}
 
    // or:
    if ($this->authorizationChecker->isGranted('ROLE_USER')
@@ -434,7 +438,7 @@ Security
  * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
    `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
    `SimplePreAuthenticationListener` have been removed. Use Guard instead.
- * The `ListenerInterface` has been removed, turn your listeners into callables instead.
+ * The `ListenerInterface` has been removed, extend `AbstractListener` instead.
  * The `Firewall::handleRequest()` method has been removed, use `Firewall::callListeners()` instead.
  * `\Serializable` interface has been removed from `AbstractToken` and `AuthenticationException`,
    thus `serialize()` and `unserialize()` aren't available.
@@ -473,6 +477,7 @@ Security
  * Classes implementing the `TokenInterface` must implement the two new methods
    `__serialize` and `__unserialize`
  * Implementations of `Guard\AuthenticatorInterface::checkCredentials()` must return a boolean value now. Please explicitly return `false` to indicate invalid credentials.
+ * Removed the `has_role()` function from security expressions, use `is_granted()` instead.
 
 SecurityBundle
 --------------

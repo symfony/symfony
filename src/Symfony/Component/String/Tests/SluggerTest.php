@@ -36,6 +36,7 @@ class SluggerTest extends TestCase
             ['Αυτή η τιμή πρέπει να είναι ψευδής', 'el', 'Avti-i-timi-prepi-na-inai-psevdhis'],
             ['该变量的值应为', 'zh', 'gai-bian-liang-de-zhi-ying-wei'],
             ['該變數的值應為', 'zh_TW', 'gai-bian-shu-de-zhi-ying-wei'],
+            ['Wôrķšƥáçè ~~sèťtïñğš~~', 'C', 'Workspace-settings'],
         ];
     }
 

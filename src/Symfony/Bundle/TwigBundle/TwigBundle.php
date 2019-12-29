@@ -31,7 +31,8 @@ class TwigBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ExtensionPass());
+        // ExtensionPass must be run before the FragmentRendererPass as it adds tags that are processed later
+        $container->addCompilerPass(new ExtensionPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
         $container->addCompilerPass(new TwigEnvironmentPass());
         $container->addCompilerPass(new TwigLoaderPass());
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);

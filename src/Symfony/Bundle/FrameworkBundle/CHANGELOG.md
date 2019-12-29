@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Made `MicroKernelTrait::configureContainer()` compatible with `ContainerConfigurator`
+ * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
+ * Added flex-compatible default implementations for `MicroKernelTrait::registerBundles()` and `getProjectDir()`
+ * Deprecated passing a `RouteCollectionBuiler` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
+
 5.0.0
 -----
 
@@ -39,7 +47,7 @@ CHANGELOG
  * Added new `error_controller` configuration to handle system exceptions
  * Added sort option for `translation:update` command.
  * [BC Break] The `framework.messenger.routing.senders` config key is not deeply merged anymore.
- * Added `secrets:*` commands and `%env(secret:...)%` processor to deal with secrets seamlessly.
+ * Added `secrets:*` commands to deal with secrets seamlessly.
  * Made `framework.session.handler_id` accept a DSN
  * Marked the `RouterDataCollector` class as `@final`.
  * [BC Break] The `framework.messenger.buses.<name>.middleware` config key is not deeply merged anymore.

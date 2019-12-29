@@ -170,11 +170,14 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                             $message .= ' Did you forget to add a use statement?';
                         }
 
-                        throw new InvalidArgumentException($message);
-                    }
+                        $container->register($erroredId = '.errored.'.$container->hash($message), $type)
+                            ->addError($message);
 
-                    $target = ltrim($target, '\\');
-                    $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, $p->name) : new Reference($target, $invalidBehavior);
+                        $args[$p->name] = new Reference($erroredId, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE);
+                    } else {
+                        $target = ltrim($target, '\\');
+                        $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, $p->name) : new Reference($target, $invalidBehavior);
+                    }
                 }
                 // register the maps as a per-method service-locators
                 if ($args) {

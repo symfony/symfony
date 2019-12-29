@@ -1367,6 +1367,21 @@ abstract class FrameworkExtensionTest extends TestCase
         $l = $container->getDefinition('mailer.envelope_listener');
         $this->assertSame('sender@example.org', $l->getArgument(0));
         $this->assertSame(['redirected@example.org', 'redirected1@example.org'], $l->getArgument(1));
+        $this->assertEquals(new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.mailer')->getArgument(1));
+    }
+
+    public function testMailerWithDisabledMessageBus(): void
+    {
+        $container = $this->createContainerFromFile('mailer_with_disabled_message_bus');
+
+        $this->assertNull($container->getDefinition('mailer.mailer')->getArgument(1));
+    }
+
+    public function testMailerWithSpecificMessageBus(): void
+    {
+        $container = $this->createContainerFromFile('mailer_with_specific_message_bus');
+
+        $this->assertEquals(new Reference('app.another_bus'), $container->getDefinition('mailer.mailer')->getArgument(1));
     }
 
     protected function createContainer(array $data = [])

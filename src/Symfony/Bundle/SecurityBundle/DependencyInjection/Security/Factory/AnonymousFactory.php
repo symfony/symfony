@@ -24,19 +24,19 @@ class AnonymousFactory implements SecurityFactoryInterface
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         if (null === $config['secret']) {
-            $firewall['anonymous']['secret'] = new Parameter('container.build_hash');
+            $config['secret'] = new Parameter('container.build_hash');
         }
 
         $listenerId = 'security.authentication.listener.anonymous.'.$id;
         $container
             ->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.anonymous'))
-            ->replaceArgument(1, $firewall['anonymous']['secret'])
+            ->replaceArgument(1, $config['secret'])
         ;
 
         $providerId = 'security.authentication.provider.anonymous.'.$id;
         $container
             ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.anonymous'))
-            ->replaceArgument(0, $firewall['anonymous']['secret'])
+            ->replaceArgument(0, $config['secret'])
         ;
 
         return [$providerId, $listenerId, $defaultEntryPoint];

@@ -113,11 +113,18 @@ final class NativeResponse implements ResponseInterface
 
     private function open(): void
     {
-        set_error_handler(function ($type, $msg) { throw new TransportException($msg); });
+        $url = $this->url;
+
+        set_error_handler(function ($type, $msg) use (&$url) {
+            if (E_NOTICE !== $type || 'fopen(): Content-type not specified assuming application/x-www-form-urlencoded' !== $msg) {
+                throw new TransportException($msg);
+            }
+
+            $this->logger && $this->logger->info(sprintf('%s for "%s".', $msg, $url ?? $this->url));
+        });
 
         try {
             $this->info['start_time'] = microtime(true);
-            $url = $this->url;
 
             while (true) {
                 $context = stream_context_get_options($this->context);
@@ -223,11 +230,7 @@ final class NativeResponse implements ResponseInterface
             $runningResponses[$i] = [$response->multi, []];
         }
 
-        if (null === $response->remaining) {
-            $response->multi->pendingResponses[] = $response;
-        } else {
-            $runningResponses[$i][1][$response->id] = $response;
-        }
+        $runningResponses[$i][1][$response->id] = $response;
 
         if (null === $response->buffer) {
             // Response already completed
@@ -329,25 +332,30 @@ final class NativeResponse implements ResponseInterface
             return;
         }
 
-        if ($multi->pendingResponses && \count($multi->handles) < $multi->maxHostConnections) {
-            // Open the next pending request - this is a blocking operation so we do only one of them
-            /** @var self $response */
-            $response = array_shift($multi->pendingResponses);
-            $response->open();
-            $responses[$response->id] = $response;
-            $multi->sleep = false;
-            self::perform($response->multi);
-
-            if (null !== $response->handle) {
-                $multi->handles[] = $response->handle;
+        // Create empty activity lists to tell ResponseTrait::stream() we still have pending requests
+        foreach ($responses as $i => $response) {
+            if (null === $response->remaining && null !== $response->buffer) {
+                $multi->handlesActivity[$i] = [];
             }
         }
 
-        if ($multi->pendingResponses) {
-            // Create empty activity list to tell ResponseTrait::stream() we still have pending requests
-            $response = $multi->pendingResponses[0];
-            $responses[$response->id] = $response;
-            $multi->handlesActivity[$response->id] = [];
+        if (\count($multi->handles) >= $multi->maxHostConnections) {
+            return;
+        }
+
+        // Open the next pending request - this is a blocking operation so we do only one of them
+        foreach ($responses as $i => $response) {
+            if (null === $response->remaining && null !== $response->buffer) {
+                $response->open();
+                $multi->sleep = false;
+                self::perform($multi);
+
+                if (null !== $response->handle) {
+                    $multi->handles[] = $response->handle;
+                }
+
+                break;
+            }
         }
     }
 

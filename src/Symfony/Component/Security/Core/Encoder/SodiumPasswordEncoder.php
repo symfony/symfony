@@ -80,9 +80,9 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
             return false;
         }
 
-        if (72 >= \strlen($raw) && 0 === strpos($encoded, '$2')) {
-            // Accept validating BCrypt passwords for seamless migrations
-            return password_verify($raw, $encoded);
+        if (0 !== strpos($encoded, '$argon')) {
+            // Accept validating non-argon passwords for seamless migrations
+            return (72 >= \strlen($raw) || 0 !== strpos($encoded, '$2')) && password_verify($raw, $encoded);
         }
 
         if (\function_exists('sodium_crypto_pwhash_str_verify')) {

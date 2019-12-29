@@ -27,6 +27,17 @@ class Registry
         $this->workflows[] = [$workflow, $supportStrategy];
     }
 
+    public function has(object $subject, string $workflowName = null): bool
+    {
+        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+            if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @return Workflow
      */

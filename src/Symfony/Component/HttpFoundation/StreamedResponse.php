@@ -47,9 +47,13 @@ class StreamedResponse extends Response
      * @param callable|null $callback A valid PHP callback or null to set it later
      *
      * @return static
+     *
+     * @deprecated since Symfony 5.1, use __construct() instead.
      */
     public static function create($callback = null, int $status = 200, array $headers = [])
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 5.1; use __construct() instead.', __METHOD__), E_USER_DEPRECATED);
+
         return new static($callback, $status, $headers);
     }
 

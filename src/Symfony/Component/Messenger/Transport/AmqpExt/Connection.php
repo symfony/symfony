@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\LogicException;
 
 /**
  * An AMQP connection.
@@ -58,6 +59,10 @@ class Connection
 
     public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, AmqpFactory $amqpFactory = null)
     {
+        if (!\extension_loaded('amqp')) {
+            throw new LogicException(sprintf('You cannot use the "%s" as the "amqp" extension is not installed.', __CLASS__));
+        }
+
         $this->connectionOptions = array_replace_recursive([
             'delay' => [
                 'exchange_name' => 'delays',
@@ -225,6 +230,7 @@ class Connection
     {
         $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
         $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);
+        $attributes['delivery_mode'] = $attributes['delivery_mode'] ?? 2;
 
         $exchange->publish(
             $body,
@@ -317,7 +323,7 @@ class Connection
             }
         } catch (\AMQPQueueException $e) {
             if (404 === $e->getCode() && $this->shouldSetup()) {
-                // If we get a 404 for the queue, it means we need to setup the exchange & queue.
+                // If we get a 404 for the queue, it means we need to set up the exchange & queue.
                 $this->setupExchangeAndQueues();
 
                 return $this->get();

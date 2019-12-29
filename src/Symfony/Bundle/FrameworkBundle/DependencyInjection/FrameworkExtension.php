@@ -302,7 +302,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
-            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer'], $config['validation']);
+            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['validation']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
             $container->removeDefinition('console.command.messenger_debug');
@@ -1187,7 +1187,7 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('validator.auto_mapping', $config['auto_mapping']);
-        if (!$propertyInfoEnabled || !$config['auto_mapping'] || !class_exists(PropertyInfoLoader::class)) {
+        if (!$propertyInfoEnabled || !class_exists(PropertyInfoLoader::class)) {
             $container->removeDefinition('validator.property_info_loader');
         }
 
@@ -1353,12 +1353,14 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('secrets.vault')->replaceArgument(0, $config['vault_directory']);
 
-        if (!$config['local_dotenv_file']) {
+        if ($config['local_dotenv_file']) {
+            $container->getDefinition('secrets.local_vault')->replaceArgument(0, $config['local_dotenv_file']);
+        } else {
             $container->removeDefinition('secrets.local_vault');
         }
 
         if ($config['decryption_env_var']) {
-            if (!preg_match('/^(?:\w*+:)*+\w++$/', $config['decryption_env_var'])) {
+            if (!preg_match('/^(?:[-.\w]*+:)*+\w++$/', $config['decryption_env_var'])) {
                 throw new InvalidArgumentException(sprintf('Invalid value "%s" set as "decryption_env_var": only "word" characters are allowed.', $config['decryption_env_var']));
             }
 
@@ -1510,7 +1512,7 @@ class FrameworkExtension extends Extension
             $storeDefinitions = [];
             foreach ($resourceStores as $storeDsn) {
                 $storeDsn = $container->resolveEnvPlaceholders($storeDsn, null, $usedEnvs);
-                $storeDefinition = new Definition(PersistingStoreInterface::class);
+                $storeDefinition = new Definition(interface_exists(StoreInterface::class) ? StoreInterface::class : PersistingStoreInterface::class);
                 $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
                 $storeDefinition->setArguments([$storeDsn]);
 
@@ -1558,7 +1560,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $serializerConfig, array $validationConfig)
+    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $validationConfig)
     {
         if (!interface_exists(MessageBusInterface::class)) {
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
@@ -1884,6 +1886,13 @@ class FrameworkExtension extends Extension
         $container->getDefinition('mailer.transports')->setArgument(0, $transports);
         $container->getDefinition('mailer.default_transport')->setArgument(0, current($transports));
 
+        $mailer = $container->getDefinition('mailer.mailer');
+        if (false === $messageBus = $config['message_bus']) {
+            $mailer->replaceArgument(1, null);
+        } else {
+            $mailer->replaceArgument(1, $messageBus ? new Reference($messageBus) : new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        }
+
         $classToServices = [
             SesTransportFactory::class => 'mailer.transport_factory.amazon',
             GmailTransportFactory::class => 'mailer.transport_factory.gmail',
@@ -1941,7 +1950,9 @@ class FrameworkExtension extends Extension
 
             // as we have a bus, the channels don't need the transports
             $container->getDefinition('notifier.channel.chat')->setArgument(0, null);
-            $container->getDefinition('notifier.channel.email')->setArgument(0, null);
+            if ($container->hasDefinition('notifier.channel.email')) {
+                $container->getDefinition('notifier.channel.email')->setArgument(0, null);
+            }
             $container->getDefinition('notifier.channel.sms')->setArgument(0, null);
         }
 

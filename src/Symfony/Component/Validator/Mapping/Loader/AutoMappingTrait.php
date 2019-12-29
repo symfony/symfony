@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
-use Symfony\Component\Validator\Constraints\DisableAutoMapping;
-use Symfony\Component\Validator\Constraints\EnableAutoMapping;
+use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -25,17 +24,11 @@ trait AutoMappingTrait
     private function isAutoMappingEnabledForClass(ClassMetadata $metadata, string $classValidatorRegexp = null): bool
     {
         // Check if AutoMapping constraint is set first
-        foreach ($metadata->getConstraints() as $constraint) {
-            if ($constraint instanceof DisableAutoMapping) {
-                return false;
-            }
-
-            if ($constraint instanceof EnableAutoMapping) {
-                return true;
-            }
+        if (AutoMappingStrategy::NONE !== $strategy = $metadata->getAutoMappingStrategy()) {
+            return AutoMappingStrategy::ENABLED === $strategy;
         }
 
         // Fallback on the config
-        return null === $classValidatorRegexp || preg_match($classValidatorRegexp, $metadata->getClassName());
+        return null !== $classValidatorRegexp && preg_match($classValidatorRegexp, $metadata->getClassName());
     }
 }

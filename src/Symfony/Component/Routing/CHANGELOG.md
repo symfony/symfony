@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
+
 5.0.0
 -----
 

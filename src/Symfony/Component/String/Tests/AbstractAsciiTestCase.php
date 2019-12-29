@@ -1377,4 +1377,23 @@ abstract class AbstractAsciiTestCase extends TestCase
 
         self::assertSame('foobar', $instance->toString());
     }
+
+    /**
+     * @dataProvider provideReverse
+     */
+    public function testReverse(string $expected, string $origin)
+    {
+        $instance = static::createFromString($origin)->reverse();
+
+        $this->assertEquals(static::createFromString($expected), $instance);
+    }
+
+    public static function provideReverse()
+    {
+        return [
+            ['', ''],
+            ['oof', 'foo'],
+            ["\n!!!\tTAERG SI     ynofmyS    ", "    Symfony     IS GREAT\t!!!\n"],
+        ];
+    }
 }

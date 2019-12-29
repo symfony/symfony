@@ -30,7 +30,7 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  *
  * @final
  */
-class LogoutListener
+class LogoutListener extends AbstractListener
 {
     private $tokenStorage;
     private $options;
@@ -62,6 +62,14 @@ class LogoutListener
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        return $this->requiresLogout($request);
+    }
+
+    /**
      * Performs the logout if requested.
      *
      * If a CsrfTokenManagerInterface instance is available, it will be used to
@@ -70,13 +78,9 @@ class LogoutListener
      * @throws LogoutException   if the CSRF token is invalid
      * @throws \RuntimeException if the LogoutSuccessHandlerInterface instance does not return a response
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();
-
-        if (!$this->requiresLogout($request)) {
-            return;
-        }
 
         if (null !== $this->csrfTokenManager) {
             $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);

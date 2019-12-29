@@ -162,6 +162,11 @@ class EncoderFactoryTest extends TestCase
             (new EncoderFactory([SomeUser::class => ['class' => NativePasswordEncoder::class, 'arguments' => []]]))->getEncoder(SomeUser::class)
         );
 
+        $this->assertInstanceOf(
+            MigratingPasswordEncoder::class,
+            (new EncoderFactory([SomeUser::class => ['algorithm' => 'bcrypt', 'cost' => 11]]))->getEncoder(SomeUser::class)
+        );
+
         if (!SodiumPasswordEncoder::isSupported()) {
             return;
         }

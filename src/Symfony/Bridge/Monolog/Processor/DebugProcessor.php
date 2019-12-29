@@ -33,7 +33,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface
         $hash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
 
         $this->records[$hash][] = [
-            'timestamp' => $record['datetime']->getTimestamp(),
+            'timestamp' => $record['datetime'] instanceof \DateTimeInterface ? $record['datetime']->getTimestamp() : strtotime($record['datetime']),
             'message' => $record['message'],
             'priority' => $record['level'],
             'priorityName' => $record['level_name'],

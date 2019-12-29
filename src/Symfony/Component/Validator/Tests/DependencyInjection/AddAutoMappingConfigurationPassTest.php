@@ -81,6 +81,6 @@ class AddAutoMappingConfigurationPassTest extends TestCase
 
         (new AddAutoMappingConfigurationPass())->process($container);
 
-        $this->assertFalse($container->hasDefinition('loader'));
+        $this->assertNull($container->getDefinition('loader')->getArguments()['$classValidatorRegexp'] ?? null);
     }
 }

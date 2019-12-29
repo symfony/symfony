@@ -57,7 +57,7 @@ class RouterDebugCommand extends Command
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
-                new InputOption('sort', null, InputOption::VALUE_REQUIRED, 'The sorting field (name, path)'),
+                new InputOption('sort', null, InputOption::VALUE_REQUIRED, 'The sorting field (priority, name, or path)', 'priority'),
             ])
             ->setDescription('Displays current routes for an application')
             ->setHelp(<<<'EOF'
@@ -130,13 +130,19 @@ EOF
 
     private function sortRoutes(RouteCollection $routes, string $propertyName): RouteCollection
     {
+        $validOptions = ['priority', 'name', 'path'];
         $sortedRoutes = $routes->all();
         if ('name' === $propertyName) {
             ksort($sortedRoutes);
         } elseif ('path' === $propertyName) {
-            uasort($sortedRoutes, static function (Route $a, Route $b): int {
-                return $a->getPath() <=> $b->getPath();
-            });
+            uasort(
+                $sortedRoutes,
+                static function (Route $a, Route $b): int {
+                    return $a->getPath() <=> $b->getPath();
+                }
+            );
+        } elseif (!in_array($propertyName, $validOptions)) {
+            throw new InvalidArgumentException(sprintf('The option "%s" is not valid.', $propertyName));
         }
         $routeCollection = new RouteCollection();
         foreach ($sortedRoutes as $routeName => $route) {

@@ -38,6 +38,29 @@ class RouterDebugCommandTest extends TestCase
         );
     }
 
+    public function testWithSortByPriorityParameter()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['--sort' => 'priority'], ['decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertRegExp(
+            '/(charlie.*?)(.\s)*(alpha.*?)(.\s)*(bravo.*?).*/mi',
+            $tester->getDisplay()
+        );
+        $this->assertRegExp(
+            '/(\/first.*?)(.)*\s(.)*(\/second.*?)(.)*\s(.)*(\/second.*?)(.)*\s(.)*/mi',
+            $tester->getDisplay()
+        );
+    }
+
+    public function testThrowsExceptionOnInvalidParameter()
+    {
+        $tester = $this->createCommandTester();
+        $this->expectException(\InvalidArgumentException::class);
+        $tester->execute(['--sort' => 'foobar'], ['decorated' => false]);
+    }
+
     public function testWithSortByNameParameter()
     {
         $tester = $this->createCommandTester();

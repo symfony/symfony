@@ -141,7 +141,7 @@ EOF
                     return $a->getPath() <=> $b->getPath();
                 }
             );
-        } elseif (!in_array($propertyName, $validOptions)) {
+        } elseif (!\in_array($propertyName, $validOptions)) {
             throw new InvalidArgumentException(sprintf('The option "%s" is not valid.', $propertyName));
         }
         $routeCollection = new RouteCollection();

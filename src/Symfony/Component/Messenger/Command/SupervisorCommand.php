@@ -52,6 +52,23 @@ class SupervisorCommand extends Command
             ->setDefinition([
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep after messenger:consume is started', 1),
             ])
+            ->setHelp(<<<'EOF'
+Config example:
+
+<comment>framework:
+    messenger:
+        supervisor:
+            queue-1:
+                receivers:</> [in_memory, redis]
+                <comment>limit:</> 1000
+                <comment>time-limit:</> 3600
+                <comment>memory-limit:</> 128M
+                <comment>bus:</> mybus
+            <comment>queue-2:</> ~
+            <comment>queue-3:</> ~
+
+EOF
+            )
         ;
     }
 

@@ -1576,7 +1576,7 @@ class FrameworkExtension extends Extension
                     throw new InvalidConfigurationException(sprintf('Invalid receiver "%s" in "%s" messenger consumer. Available transports are "%s"', $receiver, $name, implode('", "', $transports)));
                 }
             }
-            if (!\in_array($consumer['bus'], $buses)) {
+            if (isset($consumer['bus']) && !\in_array($consumer['bus'], $buses)) {
                 throw new InvalidConfigurationException(sprintf('Invalid bus "%s" in "%s" messenger consumer. Available buses are "%s"', $consumer['bus'], $name, implode('", "', $buses)));
             }
         }

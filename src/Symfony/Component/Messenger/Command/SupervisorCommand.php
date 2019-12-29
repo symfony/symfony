@@ -83,7 +83,7 @@ class SupervisorCommand extends Command
             $cmd = array_merge([$php, $_SERVER['PHP_SELF'], 'messenger:consume'], $params['receivers']);
             unset($params['receivers']);
             foreach ($params as $k => $v) {
-                $cmd[] = sprintf('--%s=%s', str_replace('_', '-', $k), $v);
+                $cmd[] = sprintf('--%s=%s', $k, $v);
             }
             $consumerName = sprintf('supervisor-%s-%s', $name, $appHash);
             $cmd[] = sprintf('--name=%s', $consumerName);

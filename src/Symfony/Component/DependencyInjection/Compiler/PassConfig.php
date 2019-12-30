@@ -53,7 +53,7 @@ class PassConfig
             new ServiceLocatorTagPass(),
             new RegisterServiceSubscribersPass(),
             new DecoratorServicePass(),
-            new ResolveParameterPlaceHoldersPass(false),
+            new ResolveParameterPlaceHoldersPass(false, false),
             new ResolveFactoryClassPass(),
             new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),

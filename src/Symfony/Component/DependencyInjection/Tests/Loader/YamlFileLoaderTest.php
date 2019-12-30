@@ -374,9 +374,6 @@ class YamlFileLoaderTest extends TestCase
         $lazyDefinition = $container->getDefinition('lazy_context');
 
         $this->assertEquals([new IteratorArgument(['k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')]), new IteratorArgument([])], $lazyDefinition->getArguments(), '->load() parses lazy arguments');
-
-        $message = 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.';
-        $this->assertSame($message, $container->getDefinition('deprecated_service')->getDeprecationMessage('deprecated_service'));
     }
 
     public function testAutowire()
@@ -769,14 +766,12 @@ class YamlFileLoaderTest extends TestCase
             '$foo' => [null],
             '$quz' => 'quz',
             '$factory' => 'factory',
-            'iterable $baz' => new TaggedIteratorArgument('bar'),
         ], array_map(function (BoundArgument $v) { return $v->getValues()[0]; }, $definition->getBindings()));
         $this->assertEquals([
             'quz',
             null,
             new Reference(Bar::class),
             [null],
-            new TaggedIteratorArgument('bar'),
         ], $definition->getArguments());
 
         $definition = $container->getDefinition(Bar::class);

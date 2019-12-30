@@ -315,11 +315,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listeners[] = new Reference('security.channel_listener');
 
         $contextKey = null;
-        $contextListenerId = null;
         // Context serializer listener
         if (false === $firewall['stateless']) {
             $contextKey = $firewall['context'] ?? $id;
-            $listeners[] = new Reference($contextListenerId = $this->createContextListener($container, $contextKey));
+            $listeners[] = new Reference($this->createContextListener($container, $contextKey));
             $sessionStrategyId = 'security.authentication.session_strategy';
         } else {
             $this->statelessFirewallKeys[] = $id;
@@ -392,7 +391,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $configuredEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
 
         // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint, $contextListenerId);
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint);
 
         $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);
 
@@ -405,7 +404,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         // Access listener
-        $listeners[] = new Reference('security.access_listener');
+        if ($firewall['stateless'] || empty($firewall['anonymous']['lazy'])) {
+            $listeners[] = new Reference('security.access_listener');
+        }
 
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
@@ -443,7 +444,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners(ContainerBuilder $container, string $id, array $firewall, array &$authenticationProviders, ?string $defaultProvider, array $providerIds, ?string $defaultEntryPoint, string $contextListenerId = null)
+    private function createAuthenticationListeners(ContainerBuilder $container, string $id, array $firewall, array &$authenticationProviders, ?string $defaultProvider, array $providerIds, ?string $defaultEntryPoint)
     {
         $listeners = [];
         $hasListeners = false;
@@ -458,13 +459,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                             throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$key]['provider']));
                         }
                         $userProvider = $providerIds[$normalizedName];
-                    } elseif ('remember_me' === $key || 'anonymous' === $key) {
-                        // RememberMeFactory will use the firewall secret when created, AnonymousAuthenticationListener does not load users.
+                    } elseif ('remember_me' === $key) {
+                        // RememberMeFactory will use the firewall secret when created
                         $userProvider = null;
-
-                        if ('remember_me' === $key && $contextListenerId) {
-                            $container->getDefinition($contextListenerId)->addTag('security.remember_me_aware', ['id' => $id, 'provider' => 'none']);
-                        }
                     } elseif ($defaultProvider) {
                         $userProvider = $defaultProvider;
                     } elseif (empty($providerIds)) {
@@ -676,7 +673,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $exceptionListenerId;
     }
 
-    private function createSwitchUserListener(ContainerBuilder $container, string $id, array $config, ?string $defaultProvider, bool $stateless): string
+    private function createSwitchUserListener(ContainerBuilder $container, string $id, array $config, string $defaultProvider, bool $stateless): string
     {
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
 

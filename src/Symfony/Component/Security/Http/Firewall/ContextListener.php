@@ -12,9 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -31,7 +29,6 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -42,7 +39,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final
  */
-class ContextListener extends AbstractListener
+class ContextListener
 {
     private $tokenStorage;
     private $sessionKey;
@@ -51,7 +48,6 @@ class ContextListener extends AbstractListener
     private $dispatcher;
     private $registered;
     private $trustResolver;
-    private $rememberMeServices;
     private $sessionTrackerEnabler;
 
     /**
@@ -67,24 +63,15 @@ class ContextListener extends AbstractListener
         $this->userProviders = $userProviders;
         $this->sessionKey = '_security_'.$contextKey;
         $this->logger = $logger;
-        $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
-
+        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
         $this->sessionTrackerEnabler = $sessionTrackerEnabler;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function supports(Request $request): ?bool
-    {
-        return null; // always run authenticate() lazily with lazy firewalls
-    }
-
-    /**
      * Reads the Security Token from the session.
      */
-    public function authenticate(RequestEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         if (!$this->registered && null !== $this->dispatcher && $event->isMasterRequest()) {
             $this->dispatcher->addListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
@@ -125,10 +112,6 @@ class ContextListener extends AbstractListener
 
         if ($token instanceof TokenInterface) {
             $token = $this->refreshUser($token);
-
-            if (!$token && $this->rememberMeServices) {
-                $this->rememberMeServices->loginFail($request);
-            }
         } elseif (null !== $token) {
             if (null !== $this->logger) {
                 $this->logger->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);
@@ -298,10 +281,5 @@ class ContextListener extends AbstractListener
     public static function handleUnserializeCallback($class)
     {
         throw new \ErrorException('Class not found: '.$class, 0x37313bc);
-    }
-
-    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
-    {
-        $this->rememberMeServices = $rememberMeServices;
     }
 }

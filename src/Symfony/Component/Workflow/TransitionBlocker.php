@@ -66,20 +66,12 @@ final class TransitionBlocker
     /**
      * Creates a blocker that says the transition cannot be made because of an
      * unknown reason.
+     *
+     * This blocker code is chiefly for preserving backwards compatibility.
      */
-    public static function createUnknown(string $message = null, int $backtraceFrame = 2): self
+    public static function createUnknown(): self
     {
-        if (null !== $message) {
-            return new static($message, self::UNKNOWN);
-        }
-
-        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $backtraceFrame + 1)[$backtraceFrame]['class'] ?? null;
-
-        if (null !== $caller) {
-            return new static("The transition has been blocked by a guard ($caller).", self::UNKNOWN);
-        }
-
-        return new static('The transition has been blocked by a guard.', self::UNKNOWN);
+        return new static('Unknown reason.', self::UNKNOWN);
     }
 
     public function getMessage(): string

@@ -21,15 +21,15 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderNoAutoMappingEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderParentEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\DoctrineLoader;
+use Symfony\Component\Validator\Constraints\DisableAutoMapping;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AutoMappingTrait;
-use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -140,16 +140,19 @@ class DoctrineLoaderTest extends TestCase
         $this->assertInstanceOf(Length::class, $textFieldConstraints[0]);
         $this->assertSame(1000, $textFieldConstraints[0]->max);
 
-        /** @var PropertyMetadata[] $noAutoMappingMetadata */
         $noAutoMappingMetadata = $classMetadata->getPropertyMetadata('noAutoMapping');
         $this->assertCount(1, $noAutoMappingMetadata);
         $noAutoMappingConstraints = $noAutoMappingMetadata[0]->getConstraints();
-        $this->assertCount(0, $noAutoMappingConstraints);
-        $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
+        $this->assertCount(1, $noAutoMappingConstraints);
+        $this->assertInstanceOf(DisableAutoMapping::class, $noAutoMappingConstraints[0]);
     }
 
     public function testFieldMappingsConfiguration()
     {
+        if (!method_exists(ValidatorBuilder::class, 'addLoader')) {
+            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
+        }
+
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
             ->addXmlMappings([__DIR__.'/../Resources/validator/BaseUser.xml'])
@@ -173,7 +176,7 @@ class DoctrineLoaderTest extends TestCase
      */
     public function testClassValidator(bool $expected, string $classValidatorRegexp = null)
     {
-        $doctrineLoader = new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), $classValidatorRegexp, false);
+        $doctrineLoader = new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), $classValidatorRegexp);
 
         $classMetadata = new ClassMetadata(DoctrineLoaderEntity::class);
         $this->assertSame($expected, $doctrineLoader->loadClassMetadata($classMetadata));
@@ -182,8 +185,7 @@ class DoctrineLoaderTest extends TestCase
     public function regexpProvider()
     {
         return [
-            [false, null],
-            [true, '{.*}'],
+            [true, null],
             [true, '{^'.preg_quote(DoctrineLoaderEntity::class).'$|^'.preg_quote(Entity::class).'$}'],
             [false, '{^'.preg_quote(Entity::class).'$}'],
         ];
@@ -191,23 +193,25 @@ class DoctrineLoaderTest extends TestCase
 
     public function testClassNoAutoMapping()
     {
+        if (!method_exists(ValidatorBuilder::class, 'addLoader')) {
+            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
+        }
+
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
-            ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{.*}'))
+            ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager()))
             ->getValidator();
 
         $classMetadata = $validator->getMetadataFor(new DoctrineLoaderNoAutoMappingEntity());
 
         $classConstraints = $classMetadata->getConstraints();
-        $this->assertCount(0, $classConstraints);
-        $this->assertSame(AutoMappingStrategy::DISABLED, $classMetadata->getAutoMappingStrategy());
+        $this->assertCount(1, $classConstraints);
+        $this->assertInstanceOf(DisableAutoMapping::class, $classConstraints[0]);
 
         $maxLengthMetadata = $classMetadata->getPropertyMetadata('maxLength');
         $this->assertEmpty($maxLengthMetadata);
 
-        /** @var PropertyMetadata[] $autoMappingExplicitlyEnabledMetadata */
         $autoMappingExplicitlyEnabledMetadata = $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled');
-        $this->assertCount(1, $autoMappingExplicitlyEnabledMetadata[0]->constraints);
-        $this->assertSame(AutoMappingStrategy::ENABLED, $autoMappingExplicitlyEnabledMetadata[0]->getAutoMappingStrategy());
+        $this->assertCount(2, $autoMappingExplicitlyEnabledMetadata[0]->constraints);
     }
 }

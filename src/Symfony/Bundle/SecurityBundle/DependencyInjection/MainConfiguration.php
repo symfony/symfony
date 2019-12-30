@@ -76,7 +76,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->enumNode('strategy')
-                            ->values($this->getAccessDecisionStrategies())
+                            ->values([AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS])
                         ->end()
                         ->scalarNode('service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
@@ -362,13 +362,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->performNoDeepMerging()
                         ->beforeNormalization()->ifString()->then(function ($v) { return ['algorithm' => $v]; })->end()
                         ->children()
-                            ->scalarNode('algorithm')
-                                ->cannotBeEmpty()
-                                ->validate()
-                                    ->ifTrue(function ($v) { return !\is_string($v); })
-                                    ->thenInvalid('You must provide a string value.')
-                                ->end()
-                            ->end()
+                            ->scalarNode('algorithm')->cannotBeEmpty()->end()
                             ->arrayNode('migrate_from')
                                 ->prototype('scalar')->end()
                                 ->beforeNormalization()->castToArray()->end()
@@ -391,20 +385,5 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
-    }
-
-    private function getAccessDecisionStrategies()
-    {
-        $strategies = [
-            AccessDecisionManager::STRATEGY_AFFIRMATIVE,
-            AccessDecisionManager::STRATEGY_CONSENSUS,
-            AccessDecisionManager::STRATEGY_UNANIMOUS,
-        ];
-
-        if (\defined(AccessDecisionManager::class.'::STRATEGY_PRIORITY')) {
-            $strategies[] = AccessDecisionManager::STRATEGY_PRIORITY;
-        }
-
-        return $strategies;
     }
 }

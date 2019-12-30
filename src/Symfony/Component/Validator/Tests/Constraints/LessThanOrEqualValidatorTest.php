@@ -82,11 +82,4 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
             ['c', '"c"', 'b', '"b"', 'string'],
         ];
     }
-
-    public function provideComparisonsToNullValueAtPropertyPath()
-    {
-        return [
-            [5, '5', true],
-        ];
-    }
 }

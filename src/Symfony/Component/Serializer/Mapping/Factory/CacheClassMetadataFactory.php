@@ -32,8 +32,6 @@ class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     private $cacheItemPool;
 
-    private $loadedClasses = [];
-
     public function __construct(ClassMetadataFactoryInterface $decorated, CacheItemPoolInterface $cacheItemPool)
     {
         $this->decorated = $decorated;
@@ -46,23 +44,18 @@ class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
     public function getMetadataFor($value)
     {
         $class = $this->getClass($value);
-
-        if (isset($this->loadedClasses[$class])) {
-            return $this->loadedClasses[$class];
-        }
-
         // Key cannot contain backslashes according to PSR-6
         $key = strtr($class, '\\', '_');
 
         $item = $this->cacheItemPool->getItem($key);
         if ($item->isHit()) {
-            return $this->loadedClasses[$class] = $item->get();
+            return $item->get();
         }
 
         $metadata = $this->decorated->getMetadataFor($value);
         $this->cacheItemPool->save($item->set($metadata));
 
-        return $this->loadedClasses[$class] = $metadata;
+        return $metadata;
     }
 
     /**

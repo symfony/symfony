@@ -89,7 +89,7 @@ class TimezoneType extends AbstractType
      */
     public function getParent()
     {
-        return ChoiceType::class;
+        return __NAMESPACE__.'\ChoiceType';
     }
 
     /**

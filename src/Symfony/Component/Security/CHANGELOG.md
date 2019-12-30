@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-5.1.0
------
-
- * Added access decision strategy to override access decisions by voter service priority
-
 5.0.0
 -----
 
@@ -20,7 +15,7 @@ CHANGELOG
 
    **After**
    ```php
-   if ($this->authorizationChecker->isGranted(new Expression("is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"))) {}
+   if ($this->authorizationChecker->isGranted(new Expression("has_role('ROLE_USER') or has_role('ROLE_ADMIN')"))) {}
    // or:
    if ($this->authorizationChecker->isGranted('ROLE_USER')
       || $this->authorizationChecker->isGranted('ROLE_ADMIN')
@@ -67,7 +62,6 @@ CHANGELOG
  * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`.
  * Deprecated passing more than one attribute to `AccessDecisionManager::decide()` and `AuthorizationChecker::isGranted()`
  * Added new `argon2id` encoder, undeprecated the `bcrypt` and `argon2i` ones (using `auto` is still recommended by default.)
- * Added `AbstractListener` which replaces the deprecated `ListenerInterface`
 
 4.3.0
 -----

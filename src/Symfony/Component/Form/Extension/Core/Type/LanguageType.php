@@ -13,8 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
-use Symfony\Component\Form\Exception\LogicException;
-use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Languages;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,43 +27,19 @@ class LanguageType extends AbstractType
         $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
                 $choiceTranslationLocale = $options['choice_translation_locale'];
-                $useAlpha3Codes = $options['alpha3'];
-                $choiceSelfTranslation = $options['choice_self_translation'];
+                $alpha3 = $options['alpha3'];
 
-                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale, $useAlpha3Codes, $choiceSelfTranslation) {
-                    if (true === $choiceSelfTranslation) {
-                        foreach (Languages::getLanguageCodes() as $alpha2Code) {
-                            try {
-                                $languageCode = $useAlpha3Codes ? Languages::getAlpha3Code($alpha2Code) : $alpha2Code;
-                                $languagesList[$languageCode] = Languages::getName($alpha2Code, $alpha2Code);
-                            } catch (MissingResourceException $e) {
-                                // ignore errors like "Couldn't read the indices for the locale 'meta'"
-                            }
-                        }
-                    } else {
-                        $languagesList = $useAlpha3Codes ? Languages::getAlpha3Names($choiceTranslationLocale) : Languages::getNames($choiceTranslationLocale);
-                    }
-
-                    return array_flip($languagesList);
+                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale, $alpha3) {
+                    return array_flip($alpha3 ? Languages::getAlpha3Names($choiceTranslationLocale) : Languages::getNames($choiceTranslationLocale));
                 });
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'alpha3' => false,
-            'choice_self_translation' => false,
         ]);
 
-        $resolver->setAllowedTypes('choice_self_translation', ['bool']);
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
         $resolver->setAllowedTypes('alpha3', 'bool');
-
-        $resolver->setNormalizer('choice_self_translation', function (Options $options, $value) {
-            if (true === $value && $options['choice_translation_locale']) {
-                throw new LogicException('Cannot use the "choice_self_translation" and "choice_translation_locale" options at the same time. Remove one of them.');
-            }
-
-            return $value;
-        });
     }
 
     /**
@@ -73,7 +47,7 @@ class LanguageType extends AbstractType
      */
     public function getParent()
     {
-        return ChoiceType::class;
+        return __NAMESPACE__.'\ChoiceType';
     }
 
     /**

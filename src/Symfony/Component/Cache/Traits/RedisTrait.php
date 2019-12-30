@@ -308,13 +308,7 @@ trait RedisTrait
                 }
             });
         } else {
-            $values = $this->redis->mget($ids);
-
-            if (!\is_array($values) || \count($values) !== \count($ids)) {
-                return [];
-            }
-
-            $values = array_combine($ids, $values);
+            $values = array_combine($ids, $this->redis->mget($ids));
         }
 
         foreach ($values as $id => $v) {

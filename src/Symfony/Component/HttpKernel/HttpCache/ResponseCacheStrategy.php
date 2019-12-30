@@ -110,6 +110,8 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
         $response->headers->set('Age', $this->age);
 
         if ($this->isNotCacheableResponseEmbedded) {
+            $response->setExpires($response->getDate());
+
             if ($this->flagDirectives['no-store']) {
                 $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
             } else {

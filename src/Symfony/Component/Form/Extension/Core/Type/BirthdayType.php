@@ -31,7 +31,7 @@ class BirthdayType extends AbstractType
      */
     public function getParent()
     {
-        return DateType::class;
+        return __NAMESPACE__.'\DateType';
     }
 
     /**

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -351,7 +351,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return UserInterface|object|null
+     * @return mixed
      *
      * @throws \LogicException If SecurityBundle is not available
      *

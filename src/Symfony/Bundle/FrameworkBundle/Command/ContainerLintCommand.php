@@ -14,17 +14,12 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
-use Symfony\Component\HttpKernel\Kernel;
 
 final class ContainerLintCommand extends Command
 {
@@ -51,18 +46,13 @@ final class ContainerLintCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $errorIo = $io->getErrorStyle();
+        $container = $this->getContainerBuilder();
 
-        try {
-            $container = $this->getContainerBuilder();
-        } catch (RuntimeException $e) {
-            $errorIo->error($e->getMessage());
-
-            return 2;
-        }
-
+        $container->setParameter('container.build_hash', 'lint_container');
         $container->setParameter('container.build_time', time());
+        $container->setParameter('container.build_id', 'lint_container');
+
+        $container->addCompilerPass(new CheckTypeDeclarationsPass(true), PassConfig::TYPE_AFTER_REMOVING, -100);
 
         $container->compile();
 
@@ -76,43 +66,14 @@ final class ContainerLintCommand extends Command
         }
 
         $kernel = $this->getApplication()->getKernel();
-        $kernelContainer = $kernel->getContainer();
 
-        if (!$kernel->isDebug() || !(new ConfigCache($kernelContainer->getParameter('debug.container.dump'), true))->isFresh()) {
-            if (!$kernel instanceof Kernel) {
-                throw new RuntimeException(sprintf('This command does not support the application kernel: "%s" does not extend "%s".', \get_class($kernel), Kernel::class));
-            }
-
-            $buildContainer = \Closure::bind(function (): ContainerBuilder {
-                $this->initializeBundles();
-
-                return $this->buildContainer();
-            }, $kernel, \get_class($kernel));
+        if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
+            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
             $container = $buildContainer();
-
-            $skippedIds = [];
+            $container->getCompilerPassConfig()->setRemovingPasses([]);
         } else {
-            if (!$kernelContainer instanceof Container) {
-                throw new RuntimeException(sprintf('This command does not support the application container: "%s" does not extend "%s".', \get_class($kernelContainer), Container::class));
-            }
-
-            (new XmlFileLoader($container = new ContainerBuilder($parameterBag = new EnvPlaceholderParameterBag()), new FileLocator()))->load($kernelContainer->getParameter('debug.container.dump'));
-
-            $refl = new \ReflectionProperty($parameterBag, 'resolved');
-            $refl->setAccessible(true);
-            $refl->setValue($parameterBag, true);
-
-            $passConfig = $container->getCompilerPassConfig();
-            $passConfig->setRemovingPasses([]);
-            $passConfig->setAfterRemovingPasses([]);
-
-            $skippedIds = $kernelContainer->getRemovedIds();
+            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
         }
-
-        $container->setParameter('container.build_hash', 'lint_container');
-        $container->setParameter('container.build_id', 'lint_container');
-
-        $container->addCompilerPass(new CheckTypeDeclarationsPass(true, $skippedIds), PassConfig::TYPE_AFTER_REMOVING, -100);
 
         return $this->containerBuilder = $container;
     }

@@ -59,8 +59,13 @@ class AddAutoMappingConfigurationPass implements CompilerPassInterface
         $validatorBuilder = $container->getDefinition($this->validatorBuilderService);
         foreach ($container->findTaggedServiceIds($this->tag) as $id => $tags) {
             $regexp = $this->getRegexp(array_merge($globalNamespaces, $servicesToNamespaces[$id] ?? []));
-            $validatorBuilder->addMethodCall('addLoader', [new Reference($id)]);
+            if (null === $regexp) {
+                $container->removeDefinition($id);
+                continue;
+            }
+
             $container->getDefinition($id)->setArgument('$classValidatorRegexp', $regexp);
+            $validatorBuilder->addMethodCall('addLoader', [new Reference($id)]);
         }
 
         $container->getParameterBag()->remove('validator.auto_mapping');

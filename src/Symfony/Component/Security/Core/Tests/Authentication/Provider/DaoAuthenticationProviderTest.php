@@ -147,11 +147,7 @@ class DaoAuthenticationProviderTest extends TestCase
             ->willReturn('0')
         ;
 
-        $method->invoke(
-            $provider,
-            new User('username', 'password'),
-            $token
-        );
+        $method->invoke($provider, new TestUser(), $token);
     }
 
     public function testCheckAuthenticationWhenCredentialsAreNotValid()
@@ -173,7 +169,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, new User('username', 'password'), $token);
+        $method->invoke($provider, new TestUser(), $token);
     }
 
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
@@ -245,7 +241,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, new User('username', 'password'), $token);
+        $method->invoke($provider, new TestUser(), $token);
     }
 
     public function testPasswordUpgrades()

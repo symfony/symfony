@@ -32,7 +32,7 @@ class ChoiceValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Choice) {
-            throw new UnexpectedTypeException($constraint, Choice::class);
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Choice');
         }
 
         if (!\is_array($constraint->choices) && !$constraint->callback) {

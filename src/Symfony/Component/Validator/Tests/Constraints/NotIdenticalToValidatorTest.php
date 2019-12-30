@@ -94,11 +94,4 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 
         return $comparisons;
     }
-
-    public function provideComparisonsToNullValueAtPropertyPath()
-    {
-        return [
-            [5, '5', true],
-        ];
-    }
 }

@@ -17,6 +17,6 @@ class FooSubType extends AbstractType
 {
     public function getParent(): ?string
     {
-        return FooType::class;
+        return __NAMESPACE__.'\FooType';
     }
 }

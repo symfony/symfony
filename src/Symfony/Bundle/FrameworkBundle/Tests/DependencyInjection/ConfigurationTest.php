@@ -314,27 +314,6 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function testItErrorsWhenDefaultBusDoesNotExist()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The specified default bus "foo" is not configured. Available buses are "bar", "baz".');
-
-        $processor->processConfiguration($configuration, [
-            [
-                'messenger' => [
-                    'default_bus' => 'foo',
-                    'buses' => [
-                        'bar' => null,
-                        'baz' => null,
-                    ],
-                ],
-            ],
-        ]);
-    }
-
     protected static function getBundleDefaultConfig()
     {
         return [
@@ -490,7 +469,6 @@ class ConfigurationTest extends TestCase
                 'dsn' => null,
                 'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
-                'message_bus' => null,
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),
@@ -504,7 +482,7 @@ class ConfigurationTest extends TestCase
             'secrets' => [
                 'enabled' => true,
                 'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
-                'local_dotenv_file' => '%kernel.project_dir%/.env.%kernel.environment%.local',
+                'local_dotenv_file' => '%kernel.project_dir%/.env.local',
                 'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
             ],
         ];

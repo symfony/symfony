@@ -1,12 +1,6 @@
 CHANGELOG
 =========
 
-5.1.0
------
-
- * added support to autowire public typed properties in php 7.4
- * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`
-
 5.0.0
 -----
 

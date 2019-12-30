@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Transport;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -19,6 +18,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @experimental in 5.0
@@ -30,7 +30,7 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
 
     public function __construct(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null)
     {
-        $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
+        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
         $this->client = $client;
     }
 
@@ -39,9 +39,6 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
         return \in_array($dsn->getScheme(), $this->getSupportedSchemes());
     }
 
-    /**
-     * @return string[]
-     */
     abstract protected function getSupportedSchemes(): array;
 
     protected function getUser(Dsn $dsn): string

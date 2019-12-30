@@ -18,17 +18,16 @@ trait CallTrait
     /**
      * Adds a method to call after service initialization.
      *
-     * @param string $method       The method name to call
-     * @param array  $arguments    An array of arguments to pass to the method call
-     * @param bool   $returnsClone Whether the call returns the service instance or not
+     * @param string $method    The method name to call
+     * @param array  $arguments An array of arguments to pass to the method call
      *
      * @return $this
      *
      * @throws InvalidArgumentException on empty $method param
      */
-    final public function call(string $method, array $arguments = [], bool $returnsClone = false): self
+    final public function call(string $method, array $arguments = []): self
     {
-        $this->definition->addMethodCall($method, static::processValue($arguments, true), $returnsClone);
+        $this->definition->addMethodCall($method, static::processValue($arguments, true));
 
         return $this;
     }

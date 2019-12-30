@@ -26,7 +26,7 @@ class ResetType extends AbstractType implements ButtonTypeInterface
      */
     public function getParent()
     {
-        return ButtonType::class;
+        return __NAMESPACE__.'\ButtonType';
     }
 
     /**

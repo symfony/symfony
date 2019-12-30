@@ -19,30 +19,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DebugProcessorTest extends TestCase
 {
-    /**
-     * @dataProvider providerDatetimeFormatTests
-     */
-    public function testDatetimeFormat(array $record, $expectedTimestamp)
-    {
-        $processor = new DebugProcessor();
-        $processor($record);
-
-        $records = $processor->getLogs();
-        self::assertCount(1, $records);
-        self::assertSame($expectedTimestamp, $records[0]['timestamp']);
-    }
-
-    public function providerDatetimeFormatTests(): array
-    {
-        $record = $this->getRecord();
-
-        return [
-            [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), 1546300860],
-            [array_merge($record, ['datetime' => '2019-01-01T00:01:00+00:00']), 1546300860],
-            [array_merge($record, ['datetime' => 'foo']), false],
-        ];
-    }
-
     public function testDebugProcessor()
     {
         $processor = new DebugProcessor();
@@ -99,7 +75,7 @@ class DebugProcessorTest extends TestCase
         $this->assertEquals(0, $debugProcessorChild->countErrors());
     }
 
-    private function getRecord($level = Logger::WARNING, $message = 'test'): array
+    private function getRecord($level = Logger::WARNING, $message = 'test')
     {
         return [
             'message' => $message,

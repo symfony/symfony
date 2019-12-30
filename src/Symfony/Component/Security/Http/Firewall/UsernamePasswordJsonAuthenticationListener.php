@@ -43,7 +43,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final
  */
-class UsernamePasswordJsonAuthenticationListener extends AbstractListener
+class UsernamePasswordJsonAuthenticationListener
 {
     private $tokenStorage;
     private $authenticationManager;
@@ -71,27 +71,19 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    public function supports(Request $request): ?bool
+    public function __invoke(RequestEvent $event)
     {
+        $request = $event->getRequest();
         if (false === strpos($request->getRequestFormat(), 'json')
             && false === strpos($request->getContentType(), 'json')
         ) {
-            return false;
+            return;
         }
 
         if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
-            return false;
+            return;
         }
 
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function authenticate(RequestEvent $event)
-    {
-        $request = $event->getRequest();
         $data = json_decode($request->getContent());
 
         try {

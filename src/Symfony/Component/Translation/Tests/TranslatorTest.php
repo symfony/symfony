@@ -263,36 +263,13 @@ class TranslatorTest extends TestCase
         $this->assertSame('bar', $translator->trans('bar'));
     }
 
-    /**
-     * @dataProvider getFallbackLocales
-     */
-    public function testTransWithFallbackLocaleBis($expectedLocale, $locale)
+    public function testTransWithFallbackLocaleBis()
     {
-        $translator = new Translator($locale);
+        $translator = new Translator('en_US');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', ['foo' => 'foofoo'], $locale);
-        $translator->addResource('array', ['bar' => 'foobar'], $expectedLocale);
+        $translator->addResource('array', ['foo' => 'foofoo'], 'en_US');
+        $translator->addResource('array', ['bar' => 'foobar'], 'en');
         $this->assertEquals('foobar', $translator->trans('bar'));
-    }
-
-    public function getFallbackLocales()
-    {
-        $locales = [
-            ['en', 'en_US'],
-            ['en', 'en-US'],
-            ['sl_Latn_IT', 'sl_Latn_IT_nedis'],
-            ['sl_Latn', 'sl_Latn_IT'],
-        ];
-
-        if (\function_exists('locale_parse')) {
-            $locales[] = ['sl_Latn_IT', 'sl-Latn-IT-nedis'];
-            $locales[] = ['sl_Latn', 'sl-Latn-IT'];
-        } else {
-            $locales[] = ['sl-Latn-IT', 'sl-Latn-IT-nedis'];
-            $locales[] = ['sl-Latn', 'sl-Latn-IT'];
-        }
-
-        return $locales;
     }
 
     public function testTransWithFallbackLocaleTer()

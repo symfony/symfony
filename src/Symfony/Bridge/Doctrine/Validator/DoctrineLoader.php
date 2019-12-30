@@ -11,14 +11,15 @@
 
 namespace Symfony\Bridge\Doctrine\Validator;
 
+use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
-use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints\DisableAutoMapping;
+use Symfony\Component\Validator\Constraints\EnableAutoMapping;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AutoMappingTrait;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
@@ -75,16 +76,13 @@ final class DoctrineLoader implements LoaderInterface
             $enabledForProperty = $enabledForClass;
             $lengthConstraint = null;
             foreach ($metadata->getPropertyMetadata($mapping['fieldName']) as $propertyMetadata) {
-                // Enabling or disabling auto-mapping explicitly always takes precedence
-                if (AutoMappingStrategy::DISABLED === $propertyMetadata->getAutoMappingStrategy()) {
-                    continue 2;
-                }
-                if (AutoMappingStrategy::ENABLED === $propertyMetadata->getAutoMappingStrategy()) {
-                    $enabledForProperty = true;
-                }
-
                 foreach ($propertyMetadata->getConstraints() as $constraint) {
-                    if ($constraint instanceof Length) {
+                    // Enabling or disabling auto-mapping explicitly always takes precedence
+                    if ($constraint instanceof DisableAutoMapping) {
+                        continue 3;
+                    } elseif ($constraint instanceof EnableAutoMapping) {
+                        $enabledForProperty = true;
+                    } elseif ($constraint instanceof Length) {
                         $lengthConstraint = $constraint;
                     }
                 }

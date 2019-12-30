@@ -10,7 +10,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ClearableService;
-use Symfony\Component\HttpKernel\Tests\Fixtures\MultiResettableService;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class ResettableServicePassTest extends TestCase
@@ -24,10 +23,6 @@ class ResettableServicePassTest extends TestCase
         $container->register('two', ClearableService::class)
             ->setPublic(true)
             ->addTag('kernel.reset', ['method' => 'clear']);
-        $container->register('three', MultiResettableService::class)
-            ->setPublic(true)
-            ->addTag('kernel.reset', ['method' => 'resetFirst'])
-            ->addTag('kernel.reset', ['method' => 'resetSecond']);
 
         $container->register('services_resetter', ServicesResetter::class)
             ->setPublic(true)
@@ -43,12 +38,10 @@ class ResettableServicePassTest extends TestCase
                 new IteratorArgument([
                     'one' => new Reference('one', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
                     'two' => new Reference('two', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
-                    'three' => new Reference('three', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
                 ]),
                 [
-                    'one' => ['reset'],
-                    'two' => ['clear'],
-                    'three' => ['resetFirst', 'resetSecond'],
+                    'one' => 'reset',
+                    'two' => 'clear',
                 ],
             ],
             $definition->getArguments()
@@ -58,7 +51,7 @@ class ResettableServicePassTest extends TestCase
     public function testMissingMethod()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set.');
+        $this->expectExceptionMessage('Tag kernel.reset requires the "method" attribute to be set.');
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
             ->addTag('kernel.reset');

@@ -61,15 +61,14 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         $this->adapterCount = \count($this->adapters);
 
         $this->syncItem = \Closure::bind(
-            static function ($sourceItem, $item, $sourceMetadata = null) use ($defaultLifetime) {
-                $sourceItem->isTaggable = false;
-                $sourceMetadata = $sourceMetadata ?? $sourceItem->metadata;
-                unset($sourceMetadata[CacheItem::METADATA_TAGS]);
-
+            static function ($sourceItem, $item) use ($defaultLifetime) {
                 $item->value = $sourceItem->value;
-                $item->expiry = $sourceMetadata[CacheItem::METADATA_EXPIRY] ?? $sourceItem->expiry;
+                $item->expiry = $sourceItem->expiry;
                 $item->isHit = $sourceItem->isHit;
-                $item->metadata = $item->newMetadata = $sourceItem->metadata = $sourceMetadata;
+                $item->metadata = $sourceItem->metadata;
+
+                $sourceItem->isTaggable = false;
+                unset($sourceItem->metadata[CacheItem::METADATA_TAGS]);
 
                 if (0 < $sourceItem->defaultLifetime && $sourceItem->defaultLifetime < $defaultLifetime) {
                     $defaultLifetime = $sourceItem->defaultLifetime;
@@ -104,7 +103,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $value = $this->doGet($adapter, $key, $callback, $beta, $metadata);
             }
             if (null !== $item) {
-                ($this->syncItem)($lastItem = $lastItem ?? $item, $item, $metadata);
+                ($this->syncItem)($lastItem = $lastItem ?? $item, $item);
             }
 
             return $value;

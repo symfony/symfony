@@ -44,7 +44,7 @@ class PasswordType extends AbstractType
      */
     public function getParent()
     {
-        return TextType::class;
+        return __NAMESPACE__.'\TextType';
     }
 
     /**

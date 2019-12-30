@@ -15,12 +15,11 @@ use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
  */
-final class HttpClientDataCollector extends DataCollector implements LateDataCollectorInterface
+final class HttpClientDataCollector extends DataCollector
 {
     /**
      * @var TraceableHttpClient[]
@@ -37,7 +36,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $this->reset();
+        $this->initData();
 
         foreach ($this->clients as $name => $client) {
             [$errorCount, $traces] = $this->collectOnClient($client);
@@ -49,13 +48,6 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
             $this->data['request_count'] += \count($traces);
             $this->data['error_count'] += $errorCount;
-        }
-    }
-
-    public function lateCollect()
-    {
-        foreach ($this->clients as $client) {
-            $client->reset();
         }
     }
 
@@ -77,12 +69,23 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
     /**
      * {@inheritdoc}
      */
+    public function reset()
+    {
+        $this->initData();
+        foreach ($this->clients as $client) {
+            $client->reset();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName(): string
     {
         return 'http_client';
     }
 
-    public function reset()
+    private function initData()
     {
         $this->data = [
             'clients' => [],

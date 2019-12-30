@@ -172,7 +172,6 @@ class DotenvTest extends TestCase
             ["FOO=BAR\nBAR=\${NOTDEFINED:=TEST}", ['FOO' => 'BAR', 'NOTDEFINED' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\${FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST']],
             ["FOO=\nBAR=\$FOO:=TEST}", ['FOO' => 'TEST', 'BAR' => 'TEST}']],
-            ["FOO=foo\nFOOBAR=\${FOO}\${BAR}", ['FOO' => 'foo', 'FOOBAR' => 'foo']],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {
@@ -440,20 +439,6 @@ class DotenvTest extends TestCase
             $test = "APP_ENV=dev\nTEST2=foo2_\$(php -r 'echo \$_SERVER[\"APP_ENV\"];')";
             $values = $dotenv->parse($test);
             $this->assertSame('foo2_prod', $values['TEST2']);
-        }
-    }
-
-    public function testGetVariablesValueFromGetenv()
-    {
-        putenv('Foo=Bar');
-
-        $dotenv = new Dotenv(true);
-
-        try {
-            $values = $dotenv->parse('Foo=${Foo}');
-            $this->assertSame('Bar', $values['Foo']);
-        } finally {
-            putenv('Foo');
         }
     }
 

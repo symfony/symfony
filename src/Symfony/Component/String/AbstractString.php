@@ -470,11 +470,6 @@ abstract class AbstractString implements \JsonSerializable
     /**
      * @return static
      */
-    abstract public function reverse(): self;
-
-    /**
-     * @return static
-     */
     abstract public function slice(int $start = 0, int $length = null): self;
 
     /**
@@ -695,11 +690,6 @@ abstract class AbstractString implements \JsonSerializable
         $str->string = $string.implode('', $chars);
 
         return $str;
-    }
-
-    public function __sleep(): array
-    {
-        return ['string'];
     }
 
     public function __clone()

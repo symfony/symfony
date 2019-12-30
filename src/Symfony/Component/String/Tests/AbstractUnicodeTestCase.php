@@ -568,16 +568,4 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
             ]
         );
     }
-
-    public static function provideReverse()
-    {
-        return array_merge(
-            parent::provideReverse(),
-            [
-                ['äuß⭐erst', 'tsre⭐ßuä'],
-                ['漢字ーユニコードéèΣσς', 'ςσΣèéドーコニユー字漢'],
-                ['नमस्ते', 'तेस्मन'],
-            ]
-        );
-    }
 }

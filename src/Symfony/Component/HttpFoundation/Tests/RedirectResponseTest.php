@@ -59,9 +59,6 @@ class RedirectResponseTest extends TestCase
         $this->assertEquals('baz.beep', $response->getTargetUrl());
     }
 
-    /**
-     * @group legacy
-     */
     public function testCreate()
     {
         $response = RedirectResponse::create('foo', 301);

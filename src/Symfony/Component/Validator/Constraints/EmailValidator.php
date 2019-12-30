@@ -48,7 +48,7 @@ class EmailValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Email) {
-            throw new UnexpectedTypeException($constraint, Email::class);
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Email');
         }
 
         if (null === $value || '' === $value) {

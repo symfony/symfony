@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-5.1.0
------
-
- * The `LegacyEventDispatcherProxy` class has been deprecated.
-
 5.0.0
 -----
 

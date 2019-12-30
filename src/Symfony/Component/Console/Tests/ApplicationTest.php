@@ -616,7 +616,7 @@ class ApplicationTest extends TestCase
             $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
             $this->assertRegExp('/afoobar1/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternative : "afoobar1"');
             $this->assertRegExp('/foo:bar1/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternative : "foo:bar1"');
-            $this->assertNotRegExp('/foo:bar(?!1)/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, without "foo:bar" alternative');
+            $this->assertNotRegExp('/foo:bar(?>!1)/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, without "foo:bar" alternative');
         }
     }
 
@@ -626,9 +626,6 @@ class ApplicationTest extends TestCase
         $fooCommand->setAliases(['foo2']);
 
         $application = new Application();
-        $application->setCommandLoader(new FactoryCommandLoader([
-            'foo3' => static function () use ($fooCommand) { return $fooCommand; },
-        ]));
         $application->add($fooCommand);
 
         $result = $application->find('foo');

@@ -376,12 +376,12 @@ class ResolvedFormTypeTest extends TestCase
     public function provideTypeClassBlockPrefixTuples()
     {
         return [
-            [Fixtures\FooType::class, 'foo'],
-            [Fixtures\Foo::class, 'foo'],
-            [Fixtures\Type::class, 'type'],
-            [Fixtures\FooBarHTMLType::class, 'foo_bar_html'],
+            [__NAMESPACE__.'\Fixtures\FooType', 'foo'],
+            [__NAMESPACE__.'\Fixtures\Foo', 'foo'],
+            [__NAMESPACE__.'\Fixtures\Type', 'type'],
+            [__NAMESPACE__.'\Fixtures\FooBarHTMLType', 'foo_bar_html'],
             [__NAMESPACE__.'\Fixtures\Foo1Bar2Type', 'foo1_bar2'],
-            [Fixtures\FBooType::class, 'f_boo'],
+            [__NAMESPACE__.'\Fixtures\FBooType', 'f_boo'],
         ];
     }
 

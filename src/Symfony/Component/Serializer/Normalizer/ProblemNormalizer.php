@@ -41,15 +41,14 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
     public function normalize($exception, string $format = null, array $context = [])
     {
         $context += $this->defaultContext;
-        $debug = $this->debug && ($context['debug'] ?? true);
 
         $data = [
             'type' => $context['type'],
             'title' => $context['title'],
             'status' => $context['status'] ?? $exception->getStatusCode(),
-            'detail' => $debug ? $exception->getMessage() : $exception->getStatusText(),
+            'detail' => $this->debug ? $exception->getMessage() : $exception->getStatusText(),
         ];
-        if ($debug) {
+        if ($this->debug) {
             $data['class'] = $exception->getClass();
             $data['trace'] = $exception->getTrace();
         }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\DebugBundle\DependencyInjection;
 
-use Symfony\Bridge\Monolog\Command\ServerLogCommand;
 use Symfony\Bundle\DebugBundle\Command\ServerDumpPlaceholderCommand;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -90,10 +89,6 @@ class DebugExtension extends Extension
                     'fileLinkFormat' => new Reference('debug.file_link_formatter', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE),
                 ]])
             ;
-        }
-
-        if (!class_exists(ServerLogCommand::class)) {
-            $container->removeDefinition('monolog.command.server_log');
         }
     }
 

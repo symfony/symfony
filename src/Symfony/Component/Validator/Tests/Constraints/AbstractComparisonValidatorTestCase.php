@@ -53,7 +53,10 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
             foreach ($comparison as $i => $value) {
                 if ($value instanceof \DateTime) {
-                    $comparison[$i] = new \DateTimeImmutable($value->format('Y-m-d H:i:s.u e'));
+                    $comparison[$i] = new \DateTimeImmutable(
+                        $value->format('Y-m-d H:i:s.u e'),
+                        $value->getTimezone()
+                    );
                     $add = true;
                 } elseif ('DateTime' === $value) {
                     $comparison[$i] = 'DateTimeImmutable';
@@ -247,32 +250,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         ];
     }
 
-    /**
-     * @dataProvider provideComparisonsToNullValueAtPropertyPath
-     */
-    public function testCompareWithNullValueAtPropertyAt($dirtyValue, $dirtyValueAsString, $isValid)
-    {
-        $constraint = $this->createConstraint(['propertyPath' => 'value']);
-        $constraint->message = 'Constraint Message';
-
-        $object = new ComparisonTest_Class(null);
-        $this->setObject($object);
-
-        $this->validator->validate($dirtyValue, $constraint);
-
-        if ($isValid) {
-            $this->assertNoViolation();
-        } else {
-            $this->buildViolation('Constraint Message')
-                ->setParameter('{{ value }}', $dirtyValueAsString)
-                ->setParameter('{{ compared_value }}', 'null')
-                ->setParameter('{{ compared_value_type }}', 'NULL')
-                ->setParameter('{{ compared_value_path }}', 'value')
-                ->setCode($this->getErrorCode())
-                ->assertRaised();
-        }
-    }
-
     public function provideAllInvalidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
@@ -287,8 +264,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     }
 
     abstract public function provideInvalidComparisons(): array;
-
-    abstract public function provideComparisonsToNullValueAtPropertyPath();
 
     /**
      * @param array|null $options Options for the constraint

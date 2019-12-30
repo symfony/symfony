@@ -40,7 +40,7 @@ final class GuardEvent extends Event
         return !$this->transitionBlockerList->isEmpty();
     }
 
-    public function setBlocked(bool $blocked, string $message = null): void
+    public function setBlocked(bool $blocked): void
     {
         if (!$blocked) {
             $this->transitionBlockerList->clear();
@@ -48,7 +48,7 @@ final class GuardEvent extends Event
             return;
         }
 
-        $this->transitionBlockerList->add(TransitionBlocker::createUnknown($message));
+        $this->transitionBlockerList->add(TransitionBlocker::createUnknown());
     }
 
     public function getTransitionBlockerList(): TransitionBlockerList

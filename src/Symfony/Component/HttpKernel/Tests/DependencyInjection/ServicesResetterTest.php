@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ClearableService;
-use Symfony\Component\HttpKernel\Tests\Fixtures\MultiResettableService;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class ServicesResetterTest extends TestCase
@@ -23,8 +22,6 @@ class ServicesResetterTest extends TestCase
     {
         ResettableService::$counter = 0;
         ClearableService::$counter = 0;
-        MultiResettableService::$resetFirstCounter = 0;
-        MultiResettableService::$resetSecondCounter = 0;
     }
 
     public function testResetServices()
@@ -32,18 +29,14 @@ class ServicesResetterTest extends TestCase
         $resetter = new ServicesResetter(new \ArrayIterator([
             'id1' => new ResettableService(),
             'id2' => new ClearableService(),
-            'id3' => new MultiResettableService(),
         ]), [
-            'id1' => ['reset'],
-            'id2' => ['clear'],
-            'id3' => ['resetFirst', 'resetSecond'],
+            'id1' => 'reset',
+            'id2' => 'clear',
         ]);
 
         $resetter->reset();
 
-        $this->assertSame(1, ResettableService::$counter);
-        $this->assertSame(1, ClearableService::$counter);
-        $this->assertSame(1, MultiResettableService::$resetFirstCounter);
-        $this->assertSame(1, MultiResettableService::$resetSecondCounter);
+        $this->assertEquals(1, ResettableService::$counter);
+        $this->assertEquals(1, ClearableService::$counter);
     }
 }

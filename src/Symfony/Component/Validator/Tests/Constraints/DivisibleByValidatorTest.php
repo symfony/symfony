@@ -98,9 +98,4 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
             [\ArrayIterator::class, new \ArrayIterator(), 12],
         ];
     }
-
-    public function provideComparisonsToNullValueAtPropertyPath()
-    {
-        $this->markTestSkipped('DivisibleByValidator rejects null values.');
-    }
 }

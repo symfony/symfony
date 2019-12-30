@@ -190,7 +190,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
 /**
  * @internal
  */
-class Psr18NetworkException extends \RuntimeException implements NetworkExceptionInterface
+trait Psr18ExceptionTrait
 {
     private $request;
 
@@ -209,18 +209,15 @@ class Psr18NetworkException extends \RuntimeException implements NetworkExceptio
 /**
  * @internal
  */
+class Psr18NetworkException extends \RuntimeException implements NetworkExceptionInterface
+{
+    use Psr18ExceptionTrait;
+}
+
+/**
+ * @internal
+ */
 class Psr18RequestException extends \InvalidArgumentException implements RequestExceptionInterface
 {
-    private $request;
-
-    public function __construct(TransportExceptionInterface $e, RequestInterface $request)
-    {
-        parent::__construct($e->getMessage(), 0, $e);
-        $this->request = $request;
-    }
-
-    public function getRequest(): RequestInterface
-    {
-        return $this->request;
-    }
+    use Psr18ExceptionTrait;
 }

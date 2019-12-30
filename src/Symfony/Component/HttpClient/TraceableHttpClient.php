@@ -14,12 +14,11 @@ namespace Symfony\Component\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
  */
-final class TraceableHttpClient implements HttpClientInterface, ResetInterface
+final class TraceableHttpClient implements HttpClientInterface
 {
     private $client;
     private $tracedRequests = [];
@@ -69,10 +68,6 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface
 
     public function reset()
     {
-        if ($this->client instanceof ResetInterface) {
-            $this->client->reset();
-        }
-
         $this->tracedRequests = [];
     }
 }

@@ -15,14 +15,13 @@ use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Auto-configure the default options based on the requested URL.
  *
  * @author Anthony Martin <anthony.martin@sensiolabs.com>
  */
-class ScopingHttpClient implements HttpClientInterface, ResetInterface
+class ScopingHttpClient implements HttpClientInterface
 {
     use HttpClientTrait;
 
@@ -90,12 +89,5 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
         return $this->client->stream($responses, $timeout);
-    }
-
-    public function reset()
-    {
-        if ($this->client instanceof ResetInterface) {
-            $this->client->reset();
-        }
     }
 }

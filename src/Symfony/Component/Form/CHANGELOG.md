@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-5.1.0
------
-
- * Added default `inputmode` attribute to Search, Email and Tel form types.
-
 5.0.0
 -----
 

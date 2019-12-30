@@ -40,9 +40,6 @@ class UnsupportedSchemeException extends LogicException
         ],
     ];
 
-    /**
-     * @param string[] $supported
-     */
     public function __construct(Dsn $dsn, string $name = null, array $supported = [])
     {
         $provider = $dsn->getScheme();

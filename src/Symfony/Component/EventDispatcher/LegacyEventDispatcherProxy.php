@@ -13,14 +13,12 @@ namespace Symfony\Component\EventDispatcher;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-@trigger_error(sprintf('%s is deprecated since Symfony 5.1, use the event dispatcher without the proxy.', LegacyEventDispatcherProxy::class), E_USER_DEPRECATED);
-
 /**
  * A helper class to provide BC/FC with the legacy signature of EventDispatcherInterface::dispatch().
  *
- * @author Nicolas Grekas <p@tchwork.com>
+ * This class should be deprecated in Symfony 5.1
  *
- * @deprecated since Symfony 5.1.
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 final class LegacyEventDispatcherProxy
 {

@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
@@ -27,7 +26,7 @@ class AccessListenerTest extends TestCase
     public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
     {
         $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
-        $request = new Request();
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
 
         $accessMap = $this->getMockBuilder('Symfony\Component\Security\Http\AccessMapInterface')->getMock();
         $accessMap
@@ -66,12 +65,19 @@ class AccessListenerTest extends TestCase
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock()
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
+        $event
+            ->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request)
+        ;
+
+        $listener($event);
     }
 
     public function testHandleWhenTheTokenIsNotAuthenticated()
     {
-        $request = new Request();
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
 
         $accessMap = $this->getMockBuilder('Symfony\Component\Security\Http\AccessMapInterface')->getMock();
         $accessMap
@@ -130,12 +136,19 @@ class AccessListenerTest extends TestCase
             $authManager
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
+        $event
+            ->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request)
+        ;
+
+        $listener($event);
     }
 
     public function testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest()
     {
-        $request = new Request();
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
 
         $accessMap = $this->getMockBuilder('Symfony\Component\Security\Http\AccessMapInterface')->getMock();
         $accessMap
@@ -165,12 +178,19 @@ class AccessListenerTest extends TestCase
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock()
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
+        $event
+            ->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request)
+        ;
+
+        $listener($event);
     }
 
     public function testHandleWhenAccessMapReturnsEmptyAttributes()
     {
-        $request = new Request();
+        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->disableOriginalClone()->getMock();
 
         $accessMap = $this->getMockBuilder(AccessMapInterface::class)->getMock();
         $accessMap
@@ -193,7 +213,12 @@ class AccessListenerTest extends TestCase
             $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock()
         );
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
+        $event
+            ->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request)
+        ;
 
         $listener(new LazyResponseEvent($event));
     }
@@ -208,7 +233,7 @@ class AccessListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $request = new Request();
+        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->disableOriginalClone()->getMock();
 
         $accessMap = $this->getMockBuilder(AccessMapInterface::class)->getMock();
         $accessMap
@@ -225,6 +250,13 @@ class AccessListenerTest extends TestCase
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock()
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
+        $event
+            ->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request)
+        ;
+
+        $listener($event);
     }
 }

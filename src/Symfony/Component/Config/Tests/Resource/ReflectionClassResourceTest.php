@@ -64,12 +64,8 @@ class ReflectionClassResourceTest extends TestCase
     /**
      * @dataProvider provideHashedSignature
      */
-    public function testHashedSignature($changeExpected, $changedLine, $changedCode, $setContext = null)
+    public function testHashedSignature($changeExpected, $changedLine, $changedCode)
     {
-        if ($setContext) {
-            $setContext();
-        }
-
         $code = <<<'EOPHP'
 /* 0*/
 /* 1*/  class %s extends ErrorException
@@ -87,9 +83,7 @@ class ReflectionClassResourceTest extends TestCase
 /*13*/      protected function prot($a = []) {}
 /*14*/
 /*15*/      private function priv() {}
-/*16*/
-/*17*/      public function ccc($bar = A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC) {}
-/*18*/  }
+/*16*/  }
 EOPHP;
 
         static $expectedSignature, $generateSignature;
@@ -104,9 +98,7 @@ EOPHP;
         }
 
         $code = explode("\n", $code);
-        if (null !== $changedCode) {
-            $code[$changedLine] = $changedCode;
-        }
+        $code[$changedLine] = $changedCode;
         eval(sprintf(implode("\n", $code), $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
         $signature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
 
@@ -150,10 +142,6 @@ EOPHP;
             yield [0, 7, 'protected int $prot;'];
             yield [0, 9, 'private string $priv;'];
         }
-
-        yield [1, 17, 'public function ccc($bar = 187) {}'];
-        yield [1, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
-        yield [1, 17, null, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
     }
 
     public function testEventSubscriber()

@@ -21,7 +21,6 @@ class TaggedIteratorArgument extends IteratorArgument
     private $tag;
     private $indexAttribute;
     private $defaultIndexMethod;
-    private $defaultPriorityMethod;
     private $needsIndexes = false;
 
     /**

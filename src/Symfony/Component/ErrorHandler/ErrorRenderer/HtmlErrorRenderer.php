@@ -36,28 +36,16 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     private $charset;
     private $fileLinkFormat;
     private $projectDir;
-    private $outputBuffer;
+    private $requestStack;
     private $logger;
 
-    /**
-     * @param bool|callable $debug        The debugging mode as a boolean or a callable that should return it
-     * @param bool|callable $outputBuffer The output buffer as a string or a callable that should return it
-     */
-    public function __construct($debug = false, string $charset = null, $fileLinkFormat = null, string $projectDir = null, $outputBuffer = '', LoggerInterface $logger = null)
+    public function __construct(bool $debug = false, string $charset = null, $fileLinkFormat = null, string $projectDir = null, RequestStack $requestStack = null, LoggerInterface $logger = null)
     {
-        if (!\is_bool($debug) && !\is_callable($debug)) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be a boolean or a callable, %s given.', __METHOD__, \is_object($debug) ? \get_class($debug) : \gettype($debug)));
-        }
-
-        if (!\is_string($outputBuffer) && !\is_callable($outputBuffer)) {
-            throw new \TypeError(sprintf('Argument 5 passed to %s() must be a string or a callable, %s given.', __METHOD__, \is_object($outputBuffer) ? \get_class($outputBuffer) : \gettype($outputBuffer)));
-        }
-
         $this->debug = $debug;
         $this->charset = $charset ?: (ini_get('default_charset') ?: 'UTF-8');
         $this->fileLinkFormat = $fileLinkFormat ?: (ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format'));
         $this->projectDir = $projectDir;
-        $this->outputBuffer = $outputBuffer;
+        $this->requestStack = $requestStack;
         $this->logger = $logger;
     }
 
@@ -69,7 +57,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         $exception = FlattenException::createFromThrowable($exception, null, [
             'Content-Type' => 'text/html; charset='.$this->charset,
         ]);
-
+        
         return $exception->setAsString($this->renderException($exception));
     }
 
@@ -93,43 +81,12 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         return $this->include('assets/css/exception.css');
     }
 
-    public static function isDebug(RequestStack $requestStack, bool $debug): \Closure
-    {
-        return static function () use ($requestStack, $debug): bool {
-            if (!$request = $requestStack->getCurrentRequest()) {
-                return $debug;
-            }
-
-            return $debug && $request->attributes->getBoolean('showException', true);
-        };
-    }
-
-    public static function getAndCleanOutputBuffer(RequestStack $requestStack): \Closure
-    {
-        return static function () use ($requestStack): string {
-            if (!$request = $requestStack->getCurrentRequest()) {
-                return '';
-            }
-
-            $startObLevel = $request->headers->get('X-Php-Ob-Level', -1);
-
-            if (ob_get_level() <= $startObLevel) {
-                return '';
-            }
-
-            Response::closeOutputBuffers($startObLevel + 1, true);
-
-            return ob_get_clean();
-        };
-    }
-
     private function renderException(FlattenException $exception, string $debugTemplate = 'views/exception_full.html.php'): string
     {
-        $debug = \is_bool($this->debug) ? $this->debug : ($this->debug)($exception);
         $statusText = $this->escape($exception->getStatusText());
         $statusCode = $this->escape($exception->getStatusCode());
 
-        if (!$debug) {
+        if (!$this->debug) {
             return $this->include('views/error.html.php', [
                 'statusText' => $statusText,
                 'statusCode' => $statusCode,
@@ -137,6 +94,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         }
 
         $exceptionMessage = $this->escape($exception->getMessage());
+        $request = $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
 
         return $this->include($debugTemplate, [
             'exception' => $exception,
@@ -144,8 +102,19 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             'statusText' => $statusText,
             'statusCode' => $statusCode,
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-            'currentContent' => \is_string($this->outputBuffer) ? $this->outputBuffer : ($this->outputBuffer)(),
+            'currentContent' => $request ? $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1)) : '',
         ]);
+    }
+
+    private function getAndCleanOutputBuffering(int $startObLevel): string
+    {
+        if (ob_get_level() <= $startObLevel) {
+            return '';
+        }
+
+        Response::closeOutputBuffers($startObLevel + 1, true);
+
+        return ob_get_clean();
     }
 
     /**
@@ -343,7 +312,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     {
         extract($context, EXTR_SKIP);
         ob_start();
-        include __DIR__.'/../Resources/'.$name;
+        include __DIR__ . '/../Resources/' .$name;
 
         return trim(ob_get_clean());
     }

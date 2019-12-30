@@ -27,7 +27,7 @@ class DateTimeValidator extends DateValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof DateTime) {
-            throw new UnexpectedTypeException($constraint, DateTime::class);
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\DateTime');
         }
 
         if (null === $value || '' === $value) {

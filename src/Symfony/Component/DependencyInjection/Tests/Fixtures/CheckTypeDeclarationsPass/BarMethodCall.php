@@ -36,8 +36,4 @@ class BarMethodCall
     public function setIterable(iterable $iterable)
     {
     }
-
-    public function setCallable(callable $callable): void
-    {
-    }
 }

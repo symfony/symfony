@@ -19,7 +19,6 @@ Debug
 -----
 
  * Deprecated the component in favor of the `ErrorHandler` component
- * Replace uses of `Symfony\Component\Debug\Debug` by `Symfony\Component\ErrorHandler\Debug`
 
 Config
 ------
@@ -105,9 +104,6 @@ HttpFoundation
 
  * `ApacheRequest` is deprecated, use `Request` class instead.
  * Passing a third argument to `HeaderBag::get()` is deprecated since Symfony 4.4, use method `all()` instead
- * [BC BREAK] `PdoSessionHandler` with MySQL changed the type of the lifetime column,
-   make sure to run `ALTER TABLE sessions MODIFY sess_lifetime INTEGER UNSIGNED NOT NULL` to
-   update your database.
  * `PdoSessionHandler` now precalculates the expiry timestamp in the lifetime column,
     make sure to run `CREATE INDEX EXPIRY ON sessions (sess_lifetime)` to update your database
     to speed up garbage collection of expired sessions.
@@ -165,8 +161,8 @@ Lock
  * Deprecated `Symfony\Component\Lock\StoreInterface` in favor of `Symfony\Component\Lock\BlockingStoreInterface` and
    `Symfony\Component\Lock\PersistingStoreInterface`.
  * `Factory` is deprecated, use `LockFactory` instead
- * Deprecated services `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract`,
-   use `StoreFactory::createStore` instead.
+ * Deprecated services `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract`, 
+   use `StoreFactory::createStore` instead. 
 
 Mailer
 ------
@@ -223,7 +219,6 @@ Security
  * The `LdapUserProvider` class has been deprecated, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead.
  * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` should add a new `needsRehash()` method
  * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`. Please explicitly return `false` to indicate invalid credentials.
- * The `ListenerInterface` is deprecated, extend `AbstractListener` instead.
  * Deprecated passing more than one attribute to `AccessDecisionManager::decide()` and `AuthorizationChecker::isGranted()` (and indirectly the `is_granted()` Twig and ExpressionLanguage function)
 
    **Before**
@@ -235,7 +230,7 @@ Security
 
    **After**
    ```php
-   if ($this->authorizationChecker->isGranted(new Expression("is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"))) {}
+   if ($this->authorizationChecker->isGranted(new Expression("has_role('ROLE_USER') or has_role('ROLE_ADMIN')"))) {}
 
    // or:
    if ($this->authorizationChecker->isGranted('ROLE_USER')
@@ -276,17 +271,7 @@ TwigBridge
 TwigBundle
 ----------
 
- * Deprecated `twig.exception_controller` configuration option.
-
-   If you were not using this option previously, set it to `null`:
-
-   After:
-   ```yaml
-   twig:
-       exception_controller: null
-   ```
-
-   If you were using this option previously, set it to `null` and use `framework.error_controller` instead:
+ * Deprecated `twig.exception_controller` configuration option, set it to "null" and use `framework.error_controller` instead:
 
    Before:
    ```yaml
@@ -306,7 +291,7 @@ TwigBundle
    The new default exception controller will also change the error response content according to
    https://tools.ietf.org/html/rfc7807 for `json`, `xml`, `atom` and `txt` formats:
 
-   Before (HTTP status code `200`):
+   Before:
    ```json
    {
        "error": {
@@ -316,7 +301,7 @@ TwigBundle
    }
    ```
 
-   After (HTTP status code `404`):
+   After:
    ```json
    {
        "title": "Not Found",
@@ -361,7 +346,6 @@ TwigBundle
 Validator
 ---------
 
- * [BC BREAK] Using null as `$classValidatorRegexp` value in `DoctrineLoader::__construct` or `PropertyInfoLoader::__construct` will not enable auto-mapping for all classes anymore, use `'{.*}'` instead.
  * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`.
  * Deprecated using anything else than a `string` as the code of a `ConstraintViolation`, a `string` type-hint will
    be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`

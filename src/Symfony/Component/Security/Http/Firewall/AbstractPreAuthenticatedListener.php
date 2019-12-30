@@ -34,7 +34,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @internal
  */
-abstract class AbstractPreAuthenticatedListener extends AbstractListener
+abstract class AbstractPreAuthenticatedListener
 {
     protected $logger;
     private $tokenStorage;
@@ -53,30 +53,19 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function supports(Request $request): ?bool
-    {
-        try {
-            $request->attributes->set('_pre_authenticated_data', $this->getPreAuthenticatedData($request));
-        } catch (BadCredentialsException $e) {
-            $this->clearToken($e);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Handles pre-authentication.
      */
-    public function authenticate(RequestEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
 
-        [$user, $credentials] = $request->attributes->get('_pre_authenticated_data');
-        $request->attributes->remove('_pre_authenticated_data');
+        try {
+            list($user, $credentials) = $this->getPreAuthenticatedData($request);
+        } catch (BadCredentialsException $e) {
+            $this->clearToken($e);
+
+            return;
+        }
 
         if (null !== $this->logger) {
             $this->logger->debug('Checking current security token.', ['token' => (string) $this->tokenStorage->getToken()]);

@@ -15,7 +15,7 @@ class Bar implements BarInterface
 {
     public $quz;
 
-    public function __construct($quz = null, \NonExistent $nonExistent = null, BarInterface $decorated = null, array $foo = [], iterable $baz = [])
+    public function __construct($quz = null, \NonExistent $nonExistent = null, BarInterface $decorated = null, array $foo = [])
     {
         $this->quz = $quz;
     }

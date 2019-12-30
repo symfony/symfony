@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form;
 
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractExtension;
 

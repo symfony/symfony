@@ -20,9 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseTest extends ResponseTestCase
 {
-    /**
-     * @group legacy
-     */
     public function testCreate()
     {
         $response = Response::create('foo', 301, ['Foo' => 'bar']);

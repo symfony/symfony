@@ -11,14 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -108,14 +105,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
         }
 
-        $locatorRef = ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId);
-
-        $value->addTag('container.service_subscriber.locator', ['id' => (string) $locatorRef]);
-
-        $value->setBindings([
-            PsrContainerInterface::class => new BoundArgument($locatorRef, false),
-            ServiceProviderInterface::class => new BoundArgument($locatorRef, false),
-        ] + $value->getBindings());
+        $value->addTag('container.service_subscriber.locator', ['id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId)]);
 
         return parent::processValue($value);
     }

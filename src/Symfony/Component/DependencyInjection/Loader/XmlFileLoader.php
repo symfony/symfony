@@ -36,8 +36,6 @@ class XmlFileLoader extends FileLoader
 {
     const NS = 'http://symfony.com/schema/dic/services';
 
-    protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
-
     /**
      * {@inheritdoc}
      */

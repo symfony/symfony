@@ -32,7 +32,7 @@ class IssnValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Issn) {
-            throw new UnexpectedTypeException($constraint, Issn::class);
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Issn');
         }
 
         if (null === $value || '' === $value) {

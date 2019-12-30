@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 
-require_once __DIR__.'/flex-style/src/FlexStyleMicroKernel.php';
-
 class MicroKernelTraitTest extends TestCase
 {
     public function test()
@@ -57,16 +55,5 @@ class MicroKernelTraitTest extends TestCase
         $kernel = new ConcreteMicroKernel('test', false);
         $kernel->registerContainerConfiguration(new ClosureLoader($container));
         $this->assertTrue($container->getDefinition('kernel')->hasTag('routing.route_loader'));
-    }
-
-    public function testFlexStyle()
-    {
-        $kernel = new FlexStyleMicroKernel('test', false);
-        $kernel->boot();
-
-        $request = Request::create('/');
-        $response = $kernel->handle($request);
-
-        $this->assertEquals('Have a great day!', $response->getContent());
     }
 }

@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Translation\DataCollectorTranslator;
-use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>

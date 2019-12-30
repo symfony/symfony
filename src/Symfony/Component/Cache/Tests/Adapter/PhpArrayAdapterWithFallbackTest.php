@@ -38,8 +38,6 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
 
     protected function tearDown(): void
     {
-        $this->createCachePool()->clear();
-
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
         }

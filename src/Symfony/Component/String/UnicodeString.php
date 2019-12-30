@@ -71,7 +71,7 @@ class UnicodeString extends AbstractUnicodeString
             $rx .= '\X{65535}';
             $length -= 65535;
         }
-        $rx .= '\X{'.$length.'})/u';
+        $rx .= '\X{'.$length.'})/us';
 
         $str = clone $this;
         $chunks = [];
@@ -345,11 +345,6 @@ class UnicodeString extends AbstractUnicodeString
         }
 
         return $prefix === grapheme_extract($this->string, \strlen($prefix), GRAPHEME_EXTR_MAXBYTES);
-    }
-
-    public function __wakeup()
-    {
-        normalizer_is_normalized($this->string) ?: $this->string = normalizer_normalize($this->string);
     }
 
     public function __clone()

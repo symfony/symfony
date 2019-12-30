@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
@@ -87,7 +87,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         $optimize = $this->idReader && (null === $value || \is_array($value) && $value[0] === $this->idReader);
 
         // Attention: This optimization does not check choices for existence
-        if ($optimize && !$this->choiceList) {
+        if ($optimize && !$this->choiceList && $this->idReader->isSingleId()) {
             $values = [];
 
             // Maintain order and indices of the given objects
@@ -123,7 +123,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         // a single-field identifier
         $optimize = $this->idReader && (null === $value || \is_array($value) && $this->idReader === $value[0]);
 
-        if ($optimize && !$this->choiceList && $this->objectLoader) {
+        if ($optimize && !$this->choiceList && $this->objectLoader && $this->idReader->isSingleId()) {
             $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values);
             $objectsById = [];
             $objects = [];

@@ -37,9 +37,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     public function __construct(string $resource, bool $exists = null)
     {
         $this->resource = $resource;
-        if (null !== $exists) {
-            $this->exists = [(bool) $exists, null];
-        }
+        $this->exists = $exists;
     }
 
     /**
@@ -67,33 +65,26 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     {
         $loaded = class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
 
-        if (null !== $exists = &self::$existsCache[$this->resource]) {
-            if ($loaded) {
-                $exists = [true, null];
-            } elseif (0 >= $timestamp && !$exists[0] && null !== $exists[1]) {
-                throw new \ReflectionException($exists[1]);
-            }
-        } elseif ([false, null] === $exists = [$loaded, null]) {
+        if (null !== $exists = &self::$existsCache[(int) (0 >= $timestamp)][$this->resource]) {
+            $exists = $exists || $loaded;
+        } elseif (!$exists = $loaded) {
             if (!self::$autoloadLevel++) {
                 spl_autoload_register(__CLASS__.'::throwOnRequiredClass');
             }
             $autoloadedClass = self::$autoloadedClass;
-            self::$autoloadedClass = ltrim($this->resource, '\\');
+            self::$autoloadedClass = $this->resource;
 
             try {
-                $exists[0] = class_exists($this->resource) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
+                $exists = class_exists($this->resource) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
             } catch (\Exception $e) {
-                $exists[1] = $e->getMessage();
-
                 try {
                     self::throwOnRequiredClass($this->resource, $e);
                 } catch (\ReflectionException $e) {
                     if (0 >= $timestamp) {
+                        unset(self::$existsCache[1][$this->resource]);
                         throw $e;
                     }
                 }
-            } catch (\Throwable $e) {
-                $exists[1] = $e->getMessage();
             } finally {
                 self::$autoloadedClass = $autoloadedClass;
                 if (!--self::$autoloadLevel) {
@@ -106,7 +97,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             $this->exists = $exists;
         }
 
-        return $this->exists[0] xor !$exists[0];
+        return $this->exists xor !$exists;
     }
 
     /**
@@ -119,16 +110,6 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
         }
 
         return ['resource', 'exists'];
-    }
-
-    /**
-     * @internal
-     */
-    public function __wakeup()
-    {
-        if (\is_bool($this->exists)) {
-            $this->exists = [$this->exists, null];
-        }
     }
 
     /**
@@ -166,23 +147,13 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             throw $previous;
         }
 
-        $message = sprintf('Class "%s" not found.', $class);
-
-        if (self::$autoloadedClass !== $class) {
-            $message = substr_replace($message, sprintf(' while loading "%s"', self::$autoloadedClass), -1, 0);
-        }
-
-        if (null !== $previous) {
-            $message = $previous->getMessage();
-        }
-
-        $e = new \ReflectionException($message, 0, $previous);
+        $e = new \ReflectionException(sprintf('Class "%s" not found while loading "%s".', $class, self::$autoloadedClass), 0, $previous);
 
         if (null !== $previous) {
             throw $e;
         }
 
-        $trace = debug_backtrace();
+        $trace = $e->getTrace();
         $autoloadFrame = [
             'function' => 'spl_autoload_call',
             'args' => [$class],
@@ -212,17 +183,15 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             }
 
             $props = [
-                'file' => isset($trace[$i]['file']) ? $trace[$i]['file'] : null,
-                'line' => isset($trace[$i]['line']) ? $trace[$i]['line'] : null,
+                'file' => $trace[$i]['file'],
+                'line' => $trace[$i]['line'],
                 'trace' => \array_slice($trace, 1 + $i),
             ];
 
             foreach ($props as $p => $v) {
-                if (null !== $v) {
-                    $r = new \ReflectionProperty('Exception', $p);
-                    $r->setAccessible(true);
-                    $r->setValue($e, $v);
-                }
+                $r = new \ReflectionProperty('Exception', $p);
+                $r->setAccessible(true);
+                $r->setValue($e, $v);
             }
         }
 

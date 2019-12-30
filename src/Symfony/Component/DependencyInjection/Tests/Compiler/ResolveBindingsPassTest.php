@@ -13,13 +13,13 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DefinitionErrorExceptionPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
@@ -36,7 +36,6 @@ class ResolveBindingsPassTest extends TestCase
 
         $bindings = [
             CaseSensitiveClass::class => new BoundArgument(new Reference('foo')),
-            'Psr\Container\ContainerInterface $container' => new BoundArgument(new ServiceLocatorArgument([]), true, BoundArgument::INSTANCEOF_BINDING),
             'iterable $objects' => new BoundArgument(new TaggedIteratorArgument('tag.name'), true, BoundArgument::INSTANCEOF_BINDING),
         ];
 
@@ -51,13 +50,7 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $expected = [
-            0 => new Reference('foo'),
-            1 => '123',
-            3 => new ServiceLocatorArgument([]),
-            4 => new TaggedIteratorArgument('tag.name'),
-        ];
-        $this->assertEquals($expected, $definition->getArguments());
+        $this->assertEquals([0 => new Reference('foo'), 1 => '123', 4 => new TaggedIteratorArgument('tag.name')], $definition->getArguments());
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
@@ -92,10 +85,7 @@ class ResolveBindingsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $bindings = [
-            CaseSensitiveClass::class => new BoundArgument(new Reference('foo')),
-            CaseSensitiveClass::class.' $c' => new BoundArgument(new Reference('bar')),
-        ];
+        $bindings = [CaseSensitiveClass::class => new BoundArgument(new Reference('foo'))];
 
         // Explicit service id
         $definition1 = $container->register('def1', NamedArgumentsDummy::class);
@@ -106,16 +96,11 @@ class ResolveBindingsPassTest extends TestCase
         $definition2->addArgument(new TypedReference(CaseSensitiveClass::class, CaseSensitiveClass::class));
         $definition2->setBindings($bindings);
 
-        $definition3 = $container->register('def3', NamedArgumentsDummy::class);
-        $definition3->addArgument(new TypedReference(CaseSensitiveClass::class, CaseSensitiveClass::class, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, 'c'));
-        $definition3->setBindings($bindings);
-
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
         $this->assertEquals([$typedRef], $container->getDefinition('def1')->getArguments());
         $this->assertEquals([new Reference('foo')], $container->getDefinition('def2')->getArguments());
-        $this->assertEquals([new Reference('bar')], $container->getDefinition('def3')->getArguments());
     }
 
     public function testScalarSetter()

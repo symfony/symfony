@@ -27,7 +27,7 @@ trait ClassResolverTrait
      *
      * @param object|string $value
      *
-     * @throws InvalidArgumentException If the class does not exist
+     * @throws InvalidArgumentException If the class does not exists
      */
     private function getClass($value): string
     {

@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class KernelTest extends TestCase
 {
-    protected function tearDown(): void
+    public static function tearDownAfterClass(): void
     {
         $fs = new Filesystem();
         $fs->remove(__DIR__.'/Fixtures/var');

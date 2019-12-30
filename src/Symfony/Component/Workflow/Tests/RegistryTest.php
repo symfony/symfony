@@ -28,16 +28,6 @@ class RegistryTest extends TestCase
         $this->registry = null;
     }
 
-    public function testHasWithMatch()
-    {
-        $this->assertTrue($this->registry->has(new Subject1()));
-    }
-
-    public function testHasWithoutMatch()
-    {
-        $this->assertFalse($this->registry->has(new Subject1(), 'nope'));
-    }
-
     public function testGetWithSuccess()
     {
         $workflow = $this->registry->get(new Subject1());

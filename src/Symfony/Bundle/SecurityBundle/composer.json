@@ -27,7 +27,7 @@
         "symfony/security-http": "^4.4.1|^5.0.1"
     },
     "require-dev": {
-        "doctrine/doctrine-bundle": "^1.5|^2.0",
+        "doctrine/doctrine-bundle": "^2.0",
         "symfony/asset": "^4.4|^5.0",
         "symfony/browser-kit": "^4.4|^5.0",
         "symfony/console": "^4.4|^5.0",

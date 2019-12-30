@@ -8,6 +8,10 @@
         <default key="_controller">web_profiler.controller.profiler::homeAction</default>
     </route>
 
+    <route id="_profiler_purge" path="/purge">
+        <default key="_controller">web_profiler.controller.profiler::purgeAction</default>
+    </route>
+
     <route id="_profiler_search" path="/search">
         <default key="_controller">web_profiler.controller.profiler::searchAction</default>
     </route>

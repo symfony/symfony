@@ -64,6 +64,25 @@ class ProfilerController
     }
 
     /**
+     * Purges all data from the storage.
+     *
+     * @return RedirectResponse A RedirectResponse instance
+     *
+     * @throws NotFoundHttpException
+     */
+    public function purgeAction()
+    {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
+        $this->profiler->disable();
+        $this->profiler->purge();
+
+        return new RedirectResponse($this->generator->generate('_profiler_search_results', ['token' => 'empty', 'limit' => 10]), 302, ['Content-Type' => 'text/html']);
+    }
+
+    /**
      * Renders a profiler panel for the given token.
      *
      * @return Response A Response instance

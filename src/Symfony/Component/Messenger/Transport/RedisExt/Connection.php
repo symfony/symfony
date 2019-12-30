@@ -185,9 +185,16 @@ class Connection
         }
 
         try {
-            $added = $this->connection->xadd($this->stream, '*', ['message' => json_encode(
-                ['body' => $body, 'headers' => $headers]
-            )]);
+            $message = json_encode([
+                'body' => $body,
+                'headers' => $headers,
+            ]);
+
+            if (false === $message) {
+                throw new TransportException(json_last_error_msg());
+            }
+
+            $added = $this->connection->xadd($this->stream, '*', ['message' => $message]);
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }

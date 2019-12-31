@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-28T13:42:48Z
+
+Can you try replacing the call to array_replace() by a foreach over $messages (and keeping set() as-is).
+What's the perf?
+
+---------------------------------------------------------------------------
+
+by ArtemBrovko at 2019-12-28T14:41:36Z
+
+Did that, that leads to same performance impovement. foreach over $messages is as good as what i did in terms of speed. Should I update pull request?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-28T14:50:25Z
+
+Yes please, because that would improve the performance of add() too, and would make the patch shorter.
+
+---------------------------------------------------------------------------
+
+by ArtemBrovko at 2019-12-28T15:03:51Z
+
+Done

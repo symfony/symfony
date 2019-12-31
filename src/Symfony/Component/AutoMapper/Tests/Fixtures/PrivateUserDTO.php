@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\AutoMapper\Tests\Fixtures;
 
-
 class PrivateUserDTO
 {
     /** @var int */

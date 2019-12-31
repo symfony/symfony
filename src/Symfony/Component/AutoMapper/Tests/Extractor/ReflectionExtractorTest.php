@@ -22,12 +22,12 @@ class ReflectionExtractorTest extends TestCase
     /** @var ReflectionExtractor */
     private $reflectionExtractor;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->reflectionExtractor = new ReflectionExtractor(true);
     }
 
-    public function testReadAccessorGetter()
+    public function testReadAccessorGetter(): void
     {
         $accessor = $this->reflectionExtractor->getReadAccessor(ReflectionExtractorTestFixture::class, 'foo');
 
@@ -37,7 +37,7 @@ class ReflectionExtractorTest extends TestCase
         self::assertFalse($accessor->isPrivate());
     }
 
-    public function testReadAccessorGetterSetter()
+    public function testReadAccessorGetterSetter(): void
     {
         $accessor = $this->reflectionExtractor->getReadAccessor(ReflectionExtractorTestFixture::class, 'bar');
 
@@ -47,7 +47,7 @@ class ReflectionExtractorTest extends TestCase
         self::assertFalse($accessor->isPrivate());
     }
 
-    public function testReadAccessorIsser()
+    public function testReadAccessorIsser(): void
     {
         $accessor = $this->reflectionExtractor->getReadAccessor(ReflectionExtractorTestFixture::class, 'baz');
 
@@ -57,7 +57,7 @@ class ReflectionExtractorTest extends TestCase
         self::assertFalse($accessor->isPrivate());
     }
 
-    public function testReadAccessorHasser()
+    public function testReadAccessorHasser(): void
     {
         $accessor = $this->reflectionExtractor->getReadAccessor(ReflectionExtractorTestFixture::class, 'foz');
 
@@ -67,7 +67,7 @@ class ReflectionExtractorTest extends TestCase
         self::assertFalse($accessor->isPrivate());
     }
 
-    public function testReadAccessorMagicGet()
+    public function testReadAccessorMagicGet(): void
     {
         $accessor = $this->reflectionExtractor->getReadAccessor(ReflectionExtractorTestFixture::class, 'magicGet');
 
@@ -77,7 +77,7 @@ class ReflectionExtractorTest extends TestCase
         self::assertFalse($accessor->isPrivate());
     }
 
-    public function testWriteMutatorSetter()
+    public function testWriteMutatorSetter(): void
     {
         $mutator = $this->reflectionExtractor->getWriteMutator(ReflectionExtractorTestFixture::class, 'foo');
 
@@ -87,7 +87,7 @@ class ReflectionExtractorTest extends TestCase
         self::assertFalse($mutator->isPrivate());
     }
 
-    public function testWriteMutatorGetterSetter()
+    public function testWriteMutatorGetterSetter(): void
     {
         $mutator = $this->reflectionExtractor->getWriteMutator(ReflectionExtractorTestFixture::class, 'bar');
 
@@ -97,7 +97,7 @@ class ReflectionExtractorTest extends TestCase
         self::assertFalse($mutator->isPrivate());
     }
 
-    public function testWriteMutatorMagicSet()
+    public function testWriteMutatorMagicSet(): void
     {
         $mutator = $this->reflectionExtractor->getWriteMutator(ReflectionExtractorTestFixture::class, 'magicSet');
 
@@ -107,7 +107,7 @@ class ReflectionExtractorTest extends TestCase
         self::assertFalse($mutator->isPrivate());
     }
 
-    public function testWriteMutatorConstructor()
+    public function testWriteMutatorConstructor(): void
     {
         $mutator = $this->reflectionExtractor->getWriteMutator(ReflectionExtractorTestFixture::class, 'propertyConstruct');
 

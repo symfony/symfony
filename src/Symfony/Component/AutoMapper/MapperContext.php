@@ -172,7 +172,7 @@ class MapperContext
     {
         $context[self::CIRCULAR_REFERENCE_REGISTRY][$reference] = &$object;
         $context[self::CIRCULAR_COUNT_REFERENCE_REGISTRY][$reference] = $context[self::CIRCULAR_COUNT_REFERENCE_REGISTRY][$reference] ?? 0;
-        $context[self::CIRCULAR_COUNT_REFERENCE_REGISTRY][$reference]++;
+        ++$context[self::CIRCULAR_COUNT_REFERENCE_REGISTRY][$reference];
 
         return $context;
     }
@@ -199,7 +199,7 @@ class MapperContext
     public static function withIncrementedDepth(array $context): array
     {
         $context[self::DEPTH] = $context[self::DEPTH] ?? 0;
-        $context[self::DEPTH]++;
+        ++$context[self::DEPTH];
 
         return $context;
     }

@@ -15,9 +15,9 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 class FooMaxDepth
 {
-   /**
-    * @var int
-    */
+    /**
+     * @var int
+     */
     private $id;
 
     /**

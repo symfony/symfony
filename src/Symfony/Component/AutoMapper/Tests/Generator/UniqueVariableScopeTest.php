@@ -16,7 +16,7 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 
 class UniqueVariableScopeTest extends TestCase
 {
-    public function testVariableNameNotEquals()
+    public function testVariableNameNotEquals(): void
     {
         $uniqueVariable = new UniqueVariableScope();
         $var1 = $uniqueVariable->getUniqueName('value');

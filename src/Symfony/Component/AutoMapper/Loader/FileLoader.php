@@ -16,7 +16,7 @@ use Symfony\Component\AutoMapper\Generator\Generator;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 
 /**
- * Use file system to load mapper, and persist them using a registry
+ * Use file system to load mapper, and persist them using a registry.
  *
  * @expiremental in 4.3
  *

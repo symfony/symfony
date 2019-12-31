@@ -18,7 +18,7 @@ class Foo
     /**
      * @var int
      *
-     * @Groups({"group1", "group2"})
+     * @Groups({"group1", "group2", "group3"})
      */
     private $id = 0;
 

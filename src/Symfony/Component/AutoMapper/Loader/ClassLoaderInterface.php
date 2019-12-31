@@ -18,8 +18,5 @@ use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
  */
 interface ClassLoaderInterface
 {
-    /**
-     * @param MapperGeneratorMetadataInterface $mapperMetadata
-     */
     public function loadClass(MapperGeneratorMetadataInterface $mapperMetadata): void;
 }

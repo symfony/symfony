@@ -41,8 +41,6 @@ interface TransformerInterface
 
     /**
      * Should the resulting output be assigned by ref.
-     *
-     * @return bool
      */
     public function assignByRef(): bool;
 }

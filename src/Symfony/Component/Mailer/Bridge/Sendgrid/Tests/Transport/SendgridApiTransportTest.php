@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -148,5 +149,21 @@ class SendgridApiTransportTest extends TestCase
         $mailer = new SendgridApiTransport('foo', $httpClient);
 
         $mailer->send($email);
+    }
+
+    public function testCustomHeader()
+    {
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('foo', 'bar');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('headers', $payload);
+        $this->assertArrayHasKey('foo', $payload['headers']);
+        $this->assertEquals('bar', $payload['headers']['foo']);
     }
 }

@@ -75,17 +75,17 @@ class TemplateController implements ContainerAwareInterface
             throw new \LogicException('You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.');
         }
 
-        if ($maxAge) {
+        if (null !== $maxAge) {
             $response->setMaxAge($maxAge);
         }
 
-        if ($sharedAge) {
+        if (null !== $sharedAge) {
             $response->setSharedMaxAge($sharedAge);
         }
 
         if ($private) {
             $response->setPrivate();
-        } elseif (false === $private || (null === $private && ($maxAge || $sharedAge))) {
+        } elseif (false === $private || (null === $private && (null !== $maxAge || null !== $sharedAge))) {
             $response->setPublic();
         }
 

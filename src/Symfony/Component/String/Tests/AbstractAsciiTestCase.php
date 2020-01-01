@@ -1451,4 +1451,35 @@ abstract class AbstractAsciiTestCase extends TestCase
             ["\n!!!\tTAERG SI     ynofmyS    ", "    Symfony     IS GREAT\t!!!\n"],
         ];
     }
+
+    /**
+     * @dataProvider provideWidth
+     */
+    public function testWidth(int $expected, string $origin, bool $ignoreAnsiDecoration = true)
+    {
+        $this->assertSame($expected, static::createFromString($origin)->width($ignoreAnsiDecoration));
+    }
+
+    public static function provideWidth(): array
+    {
+        return [
+            [0, ''],
+            [1, 'c'],
+            [3, 'foo'],
+            [2, '⭐'],
+            [8, 'f⭐o⭐⭐'],
+            [19, 'コンニチハ, セカイ!'],
+            [6, "foo\u{0000}bar"],
+            [6, "foo\u{001b}[0mbar"],
+            [6, "foo\u{0001}bar"],
+            [6, "foo\u{0001}bar", false],
+            [4, '--ֿ--'],
+            [4, 'café'],
+            [1, 'А҈'],
+            [4, 'ᬓᬨᬮ᭄'],
+            [1, "\u{00AD}"],
+            [14, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1"], // foobarcccïfcy1
+            [17, "\u{007f}\u{007f}f\u{001b}[0moo\u{0001}bar\u{007f}cccïf\u{008e}cy\u{0005}1", false], // f[0moobarcccïfcy1
+        ];
+    }
 }

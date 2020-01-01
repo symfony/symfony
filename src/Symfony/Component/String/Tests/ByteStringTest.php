@@ -43,4 +43,15 @@ class ByteStringTest extends AbstractAsciiTestCase
             ]
         );
     }
+
+    public static function provideWidth(): array
+    {
+        return array_merge(
+            parent::provideWidth(),
+            [
+                [10, "f\u{001b}[0moo\x80bar\xfe\xfe1"], // foo?bar??1
+                [13, "f\u{001b}[0moo\x80bar\xfe\xfe1", false], // f[0moo?bar??1
+            ]
+        );
+    }
 }

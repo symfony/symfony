@@ -75,10 +75,7 @@ class SendgridApiTransport extends AbstractApiTransport
 
         $payload = [
             'personalizations' => [],
-            'from' => [
-                'email' => $envelope->getSender()->getAddress(),
-                'name' => $envelope->getSender()->getName(),
-            ],
+            'from' => $addressStringifier($envelope->getSender()),
             'content' => $this->getContent($email),
         ];
 

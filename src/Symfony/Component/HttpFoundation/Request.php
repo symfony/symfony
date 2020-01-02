@@ -930,6 +930,16 @@ class Request
     }
 
     /**
+     * Returns the port being used on the user's machine to communicate with the web server
+     *
+     * @return string
+     */
+    public function getRemotePort()
+    {
+        return $this->server->get('REMOTE_PORT');
+    }
+
+    /**
      * Returns the user.
      *
      * @return string|null

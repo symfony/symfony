@@ -22,8 +22,7 @@
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^4.4 || ^5.0",
-        "nyholm/psr7": "^1.1",
-        "zendframework/zend-diactoros": "^1.4.1 || ^2.0"
+        "nyholm/psr7": "^1.1"
     },
     "suggest": {
         "nyholm/psr7": "For a super lightweight PSR-7/17 implementation"
@@ -36,7 +35,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.3-dev"
+            "dev-master": "2.0-dev"
         }
     }
 }

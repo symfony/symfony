@@ -76,7 +76,7 @@ class SendgridApiTransportTest extends TestCase
                         [
                             'to' => [[
                                 'email' => 'bar@example.com',
-                                'name' => 'Mr. Recipient'
+                                'name' => 'Mr. Recipient',
                             ]],
                             'subject' => null,
                             'bcc' => [['email' => 'baz@example.com']],
@@ -84,7 +84,7 @@ class SendgridApiTransportTest extends TestCase
                     ],
                     'from' => [
                         'email' => 'foo@example.com',
-                        'name' => 'Ms. Foo Bar'
+                        'name' => 'Ms. Foo Bar',
                     ],
                     'content' => [
                         ['type' => 'text/plain', 'value' => 'content'],

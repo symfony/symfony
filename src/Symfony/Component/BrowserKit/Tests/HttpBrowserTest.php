@@ -14,6 +14,7 @@ namespace Symfony\Component\BrowserKit\Tests;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\HttpBrowser;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -80,5 +81,31 @@ class HttpBrowserTest extends AbstractBrowserTest
         $path = tempnam(sys_get_temp_dir(), 'http');
         file_put_contents($path, 'my_file');
         $browser->request('POST', 'http://example.com/', [], ['file' => ['tmp_name' => $path, 'name' => 'foo']]);
+    }
+
+    /**
+     * @dataProvider provideScopingHttpClientRequests
+     */
+    public function testWithScopingHttpClient(string $baseUri, string $method, string $path, string $expectedUri): void
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $client
+            ->expects($this->once())
+            ->method('request')
+            ->with($method, $expectedUri)
+            ->willReturn($this->createMock(ResponseInterface::class));
+
+        $browser = new HttpBrowser(ScopingHttpClient::forBaseUri($client, $baseUri));
+        $browser->request($method, $path);
+    }
+
+    public function provideScopingHttpClientRequests(): iterable
+    {
+        yield ['http://example.com/', 'GET', '/foo', 'http://example.com/foo'];
+        yield ['https://example.com/', 'POST', '/foo', 'https://example.com/foo'];
+        yield ['http://example.com/foo', 'GET', '/bar', 'http://example.com/bar'];
+        yield ['https://example.com/foo', 'GET', 'bar', 'https://example.com/bar'];
+        yield ['http://example.com/foo/', 'GET', '/bar', 'http://example.com/bar'];
+        yield ['https://example.com/foo/', 'GET', 'bar', 'https://example.com/foo/bar'];
     }
 }

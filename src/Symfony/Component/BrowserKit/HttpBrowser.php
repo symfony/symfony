@@ -12,6 +12,7 @@
 namespace Symfony\Component\BrowserKit;
 
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -51,6 +52,18 @@ class HttpBrowser extends AbstractBrowser
         ]);
 
         return new Response($response->getContent(false), $response->getStatusCode(), $response->getHeaders(false));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAbsoluteUri($uri)
+    {
+        if ($this->client instanceof ScopingHttpClient) {
+            return $uri;
+        }
+
+        return parent::getAbsoluteUri($uri);
     }
 
     /**

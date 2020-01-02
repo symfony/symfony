@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Symfony\Component\VarDumper\Caster\ImgStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
@@ -186,5 +187,27 @@ EOTXT
             [['dummy' => new ImgStub('dummy', 'img/png', '100em')], '<img src="data:img/png;base64,ZHVtbXk=" />'],
             ['foo', '<span class=sf-dump-str title="3 characters">foo</span>'],
         ];
+    }
+
+    public function testDumpWithMaxLength()
+    {
+        $dumper = new HtmlDumper();
+        $cloner = new VarCloner();
+
+        $leafObject = new stdClass();
+        $leafObject->foo = 'bar';
+
+        $deepObject = new stdClass();
+        $deepObject->firstDepthProperty = $leafObject;
+
+        ob_start();
+        $dumper->dump($cloner->cloneVar($deepObject), null, ['maxDepth' => 1]);
+        $out = ob_get_clean();
+
+        $needle = '<span class=sf-dump-public title="Runtime added dynamic property">firstDepthProperty</span>';
+        $this->assertStringContainsString($needle, $out);
+
+        $needle = '<span class=sf-dump-str title="3 characters">bar</span>';
+        $this->assertStringNotContainsString($needle, $out);
     }
 }

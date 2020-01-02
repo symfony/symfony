@@ -142,6 +142,11 @@ class HtmlDumper extends CliDumper
     public function dump(Data $data, $output = null, array $extraDisplayOptions = [])
     {
         $this->extraDisplayOptions = $extraDisplayOptions;
+
+        if (isset($this->extraDisplayOptions['maxDepth']) && is_numeric($this->extraDisplayOptions['maxDepth'])) {
+            $data = $data->withMaxDepth($this->extraDisplayOptions['maxDepth']);
+        }
+
         $result = parent::dump($data, $output);
         $this->dumpId = 'sf-dump-'.mt_rand();
 

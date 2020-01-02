@@ -102,6 +102,12 @@
 
         <service id="Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface" alias="serializer.mapping.class_metadata_factory" />
 
+        <!-- Validate config -->
+        <service id="serializer.mapping.checker" class="Symfony\Bundle\FrameworkBundle\Command\SerializerMappingCheckerCommand">
+            <argument type="collection" /><!-- Loaders injected by the extension -->
+            <tag name="console.command" command="serializer:mapping:checker" />
+        </service>
+
         <!-- Cache -->
         <service id="serializer.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer">
             <argument type="collection" /><!-- Loaders injected by the extension -->

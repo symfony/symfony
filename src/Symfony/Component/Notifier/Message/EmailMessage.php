@@ -35,7 +35,7 @@ final class EmailMessage implements MessageInterface
         $this->envelope = $envelope;
     }
 
-    public static function fromNotification(Notification $notification, Recipient $recipient, string $transport = null): self
+    public static function fromNotification(Notification $notification, Recipient $recipient): self
     {
         if (!class_exists(NotificationEmail::class)) {
             $email = (new Email())

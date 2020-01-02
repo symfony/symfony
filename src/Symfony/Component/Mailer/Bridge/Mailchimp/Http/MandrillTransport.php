@@ -42,7 +42,7 @@ class MandrillTransport extends AbstractHttpTransport
             'json' => [
                 'key' => $this->key,
                 'to' => $this->stringifyAddresses($envelope->getRecipients()),
-                'from_email' => $envelope->getSender()->toString(),
+                'from_email' => $envelope->getSender()->getAddress(),
                 'raw_message' => $message->toString(),
             ],
         ]);

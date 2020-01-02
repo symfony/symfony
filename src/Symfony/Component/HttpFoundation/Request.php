@@ -930,7 +930,7 @@ class Request
     }
 
     /**
-     * Returns the port being used on the user's machine to communicate with the web server
+     * Returns the port being used on the user's machine to communicate with the web server.
      *
      * @return string
      */

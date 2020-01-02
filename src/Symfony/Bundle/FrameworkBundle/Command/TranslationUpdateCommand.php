@@ -200,12 +200,12 @@ EOF
             }
         }
 
-        $errorIo->title('Translation Messages Extractor and Dumper');
-        $errorIo->comment(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
+        $io->title('Translation Messages Extractor and Dumper');
+        $io->comment(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
         // load any messages from templates
         $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
-        $errorIo->comment('Parsing templates...');
+        $io->comment('Parsing templates...');
         $prefix = $input->getOption('prefix');
         // @deprecated since version 3.4, to be removed in 4.0 along with the --no-prefix option
         if ($input->getOption('no-prefix')) {
@@ -221,7 +221,7 @@ EOF
 
         // load any existing messages from the translation files
         $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
-        $errorIo->comment('Loading translation files...');
+        $io->comment('Loading translation files...');
         foreach ($transPaths as $path) {
             if (is_dir($path)) {
                 $this->reader->read($path, $currentCatalogue);
@@ -274,7 +274,7 @@ EOF
             }
 
             if ('xlf' == $input->getOption('output-format')) {
-                $errorIo->comment('Xliff output version is <info>1.2</info>');
+                $io->comment('Xliff output version is <info>1.2</info>');
             }
 
             $resultMessage = sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
@@ -286,7 +286,7 @@ EOF
 
         // save the files
         if (true === $input->getOption('force')) {
-            $errorIo->comment('Writing files...');
+            $io->comment('Writing files...');
 
             $bundleTransPath = false;
             foreach ($transPaths as $path) {
@@ -306,7 +306,7 @@ EOF
             }
         }
 
-        $errorIo->success($resultMessage.'.');
+        $io->success($resultMessage.'.');
 
         return null;
     }

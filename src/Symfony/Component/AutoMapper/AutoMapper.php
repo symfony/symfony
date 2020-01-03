@@ -204,7 +204,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             [$reflectionExtractor]
         );
 
-        $accessorExtractor = new \Symfony\Component\AutoMapper\Extractor\ReflectionExtractor($private);
+        $accessorExtractor = new Extractor\ReflectionExtractor($private);
         $transformerFactory = new ChainTransformerFactory();
         $sourceTargetMappingExtractor = new SourceTargetMappingExtractor(
             $propertyInfoExtractor,

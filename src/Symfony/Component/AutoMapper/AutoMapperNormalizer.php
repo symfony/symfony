@@ -47,7 +47,7 @@ class AutoMapperNormalizer implements NormalizerInterface, DenormalizerInterface
 
     public function supportsNormalization($data, $format = null)
     {
-        if (!\is_object($data)) {
+        if (!\is_object($data) || $data instanceof \stdClass) {
             return false;
         }
 
@@ -75,7 +75,7 @@ class AutoMapperNormalizer implements NormalizerInterface, DenormalizerInterface
             MapperContext::CIRCULAR_REFERENCE_HANDLER => $serializerContext[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER] ?? null,
         ];
 
-        if ($serializerContext[AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS]) {
+        if (\array_key_exists(AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS, $serializerContext) && is_iterable($serializerContext[AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS])) {
             foreach ($serializerContext[AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS] as $class => $keyArgs) {
                 foreach ($keyArgs as $key => $value) {
                     $context[MapperContext::CONSTRUCTOR_ARGUMENTS][$class][$key] = $value;

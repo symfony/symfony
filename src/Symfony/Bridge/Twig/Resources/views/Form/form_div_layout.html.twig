@@ -222,13 +222,11 @@
                 '%name%': name,
                 '%id%': id,
             }) %}
-        {%- elseif label is same as(false) -%}
-            {% set translation_domain = false %}
-        {%- else -%}
+        {%- elseif label is not same as(false) -%}
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) or label is same as(false) ? label : label|trans({}, translation_domain) }}</button>
 {%- endblock button_widget -%}
 
 {%- block submit_widget -%}

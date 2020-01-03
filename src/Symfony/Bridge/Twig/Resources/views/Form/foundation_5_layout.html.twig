@@ -160,12 +160,14 @@
         {%- endif %}
         {%- if preferred_choices|length > 0 -%}
             {% set options = preferred_choices %}
+            {% set render_preferred_choices = true %}
             {{- block('choice_widget_options') -}}
             {% if choices|length > 0 and separator is not none -%}
                 <option disabled="disabled">{{ separator }}</option>
             {%- endif %}
         {%- endif -%}
         {% set options = choices -%}
+        {%- set render_preferred_choices = false -%}
         {{- block('choice_widget_options') -}}
     </select>
 {%- endblock choice_widget_collapsed %}

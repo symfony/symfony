@@ -128,7 +128,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             CURLOPT_MAXREDIRS => 0 < $options['max_redirects'] ? $options['max_redirects'] : 0,
             CURLOPT_COOKIEFILE => '', // Keep track of cookies during redirects
             CURLOPT_TIMEOUT => 0,
-            CURLOPT_PROXY => $options['proxy'],
+            CURLOPT_PROXY => self::getProxy($options['proxy'], $url),
             CURLOPT_NOPROXY => $options['no_proxy'] ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '',
             CURLOPT_SSL_VERIFYPEER => $options['verify_peer'],
             CURLOPT_SSL_VERIFYHOST => $options['verify_host'] ? 2 : 0,
@@ -309,6 +309,31 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host));
+    }
+
+   /**
+     * Loads proxy configuration from the same environment variables as native when no proxy is explicitly set.
+     */
+    private static function getProxy(?string $proxy, string $url): ?string
+    {
+        if (null === $proxy) {
+            // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
+            $proxy = $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
+
+            if ('https' === parse_url($url)['scheme']) {
+                $proxy = $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? $proxy;
+            }
+        }
+
+        if (null === $proxy) {
+            return null;
+        }
+
+        if (!isset(parse_url($proxy)['host'])) {
+            throw new TransportException('Invalid HTTP proxy: host is missing.');
+        }
+
+        return $proxy;
     }
 
     /**

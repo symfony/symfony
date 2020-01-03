@@ -288,7 +288,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 $pushedResponse = $pushedResponse->response;
                 $pushedResponse->__construct($this->multi, $url, $options, $this->logger);
             } else {
-                $this->logger && $this->logger->debug(sprintf('Rejecting pushed response: "%s".', $url));
+                $this->logger && $this->logger->debug(sprintf('Rejecting pushed response: "%s"', $url));
                 $pushedResponse = null;
             }
         }
@@ -412,7 +412,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             return false;
         }
 
-        foreach (['proxy', 'no_proxy', 'bindto'] as $k) {
+        foreach (['proxy', 'no_proxy', 'bindto', 'local_cert', 'local_pk'] as $k) {
             if ($options[$k] !== $pushedResponse->parentOptions[$k]) {
                 return false;
             }

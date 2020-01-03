@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -48,8 +49,8 @@ class SendgridApiTransportTest extends TestCase
     public function testSend()
     {
         $email = new Email();
-        $email->from('foo@example.com')
-            ->to('bar@example.com')
+        $email->from(new Address('foo@example.com', 'Ms. Foo Bar'))
+            ->to(new Address('bar@example.com', 'Mr. Recipient'))
             ->bcc('baz@example.com')
             ->text('content');
 
@@ -73,12 +74,18 @@ class SendgridApiTransportTest extends TestCase
                 'json' => [
                     'personalizations' => [
                         [
-                            'to' => [['email' => 'bar@example.com']],
+                            'to' => [[
+                                'email' => 'bar@example.com',
+                                'name' => 'Mr. Recipient',
+                            ]],
                             'subject' => null,
                             'bcc' => [['email' => 'baz@example.com']],
                         ],
                     ],
-                    'from' => ['email' => 'foo@example.com'],
+                    'from' => [
+                        'email' => 'foo@example.com',
+                        'name' => 'Ms. Foo Bar',
+                    ],
                     'content' => [
                         ['type' => 'text/plain', 'value' => 'content'],
                     ],

@@ -797,4 +797,29 @@ class InlineTest extends TestCase
             'negative octal number' => [-28, '-034'],
         ];
     }
+
+    public function testParseScalarDoesNotFailWithAnEmptyString()
+    {
+        $this->assertSame('', Inline::parseScalar(''));
+    }
+
+    /**
+     * @dataProvider phpConstTagInAMappingKeyThrowsProvider
+     */
+    public function testPhpConstTagInAMappingKeyThrows($extra)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The !php/const tag is not supported in a mapping key at line 1 (near "!php/const").');
+
+        Inline::parse(sprintf('{!php/const%s: foo}', $extra), Yaml::PARSE_CONSTANT);
+    }
+
+    public function phpConstTagInAMappingKeyThrowsProvider()
+    {
+        return [
+            [''],
+            [' '],
+            [' MyConst'],
+        ];
+    }
 }

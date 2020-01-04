@@ -320,7 +320,11 @@ class Inline
      */
     public static function parseScalar($scalar, $flags = 0, $delimiters = null, &$i = 0, $evaluate = true, $references = [], $legacyOmittedKeySupport = false)
     {
-        if (\in_array($scalar[$i], ['"', "'"])) {
+        if ('' === $scalar = (string) $scalar) {
+            return '';
+        }
+
+        if (isset($scalar[$i]) && \in_array($scalar[$i], ['"', "'"])) {
             // quoted scalar
             $output = self::parseQuotedScalar($scalar, $i);
 
@@ -513,7 +517,7 @@ class Inline
             }
 
             if (!$isKeyQuoted) {
-                $evaluatedKey = self::evaluateScalar($key, $flags, $references);
+                $evaluatedKey = self::evaluateScalar($key, $flags, $references, true);
 
                 if ('' !== $key && $evaluatedKey !== $key && !\is_string($evaluatedKey) && !\is_int($evaluatedKey)) {
                     @trigger_error(self::getDeprecationMessage('Implicit casting of incompatible mapping keys to strings is deprecated since Symfony 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.'), E_USER_DEPRECATED);
@@ -611,12 +615,13 @@ class Inline
      * @param string $scalar
      * @param int    $flags
      * @param array  $references
+     * @param bool   $isMappingKey
      *
      * @return mixed The evaluated YAML string
      *
      * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */
-    private static function evaluateScalar($scalar, $flags, $references = [])
+    private static function evaluateScalar($scalar, $flags, $references = [], $isMappingKey = false)
     {
         $scalar = trim($scalar);
         $scalarLower = strtolower($scalar);
@@ -712,6 +717,10 @@ class Inline
                         return null;
                     case 0 === strpos($scalar, '!php/const'):
                         if (self::$constantSupport) {
+                            if ($isMappingKey) {
+                                throw new ParseException('The !php/const tag is not supported in a mapping key.', self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+                            }
+
                             $i = 0;
                             if (\defined($const = self::parseScalar(substr($scalar, 11), 0, null, $i, false))) {
                                 return \constant($const);

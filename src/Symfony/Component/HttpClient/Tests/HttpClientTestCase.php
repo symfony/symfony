@@ -75,4 +75,20 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057/404');
         $stream = $response->toStream();
     }
+
+    public function testNonBlockingStream()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-body');
+        $stream = $response->toStream();
+
+        $this->assertTrue(stream_set_blocking($stream, false));
+        $this->assertSame('<1>', fread($stream, 8192));
+        $this->assertFalse(feof($stream));
+
+        $this->assertTrue(stream_set_blocking($stream, true));
+        $this->assertSame('<2>', fread($stream, 8192));
+        $this->assertSame('', fread($stream, 8192));
+        $this->assertTrue(feof($stream));
+    }
 }

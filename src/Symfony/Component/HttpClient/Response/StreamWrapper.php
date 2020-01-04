@@ -37,6 +37,8 @@ class StreamWrapper
     /** @var resource|null */
     private $handle;
 
+    private $blocking = true;
+    private $timeout;
     private $eof = false;
     private $offset = 0;
 
@@ -150,7 +152,7 @@ class StreamWrapper
             return $data;
         }
 
-        foreach ($this->client->stream([$this->response]) as $chunk) {
+        foreach ($this->client->stream([$this->response], $this->blocking ? $this->timeout : 0) as $chunk) {
             try {
                 $this->eof = true;
                 $this->eof = !$chunk->isTimeout();
@@ -179,6 +181,19 @@ class StreamWrapper
         }
 
         return '';
+    }
+
+    public function stream_set_option(int $option, int $arg1, ?int $arg2): bool
+    {
+        if (STREAM_OPTION_BLOCKING === $option) {
+            $this->blocking = (bool) $arg1;
+        } elseif (STREAM_OPTION_READ_TIMEOUT === $option) {
+            $this->timeout = $arg1 + $arg2 / 1e6;
+        } else {
+            return false;
+        }
+
+        return true;
     }
 
     public function stream_tell(): int

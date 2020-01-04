@@ -236,6 +236,29 @@ class UrlGeneratorTest extends TestCase
         );
     }
 
+    public function testDumpWithLocalizedRoutesPreserveTheGoodLocaleInTheUrl()
+    {
+        $routeCollection = new RouteCollection();
+
+        $routeCollection->add('foo.en', (new Route('/{_locale}/foo'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo'));
+        $routeCollection->add('foo.fr', (new Route('/{_locale}/foo'))->setDefault('_locale', 'fr')->setDefault('_canonical_route', 'foo'));
+        $routeCollection->add('fun.en', (new Route('/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'fun'));
+        $routeCollection->add('fun.fr', (new Route('/amusant'))->setDefault('_locale', 'fr')->setDefault('_canonical_route', 'fun'));
+
+        $urlGenerator = $this->getGenerator($routeCollection);
+        $urlGenerator->getContext()->setParameter('_locale', 'fr');
+
+        $this->assertSame('/app.php/fr/foo', $urlGenerator->generate('foo'));
+        $this->assertSame('/app.php/en/foo', $urlGenerator->generate('foo.en'));
+        $this->assertSame('/app.php/en/foo', $urlGenerator->generate('foo', ['_locale' => 'en']));
+        $this->assertSame('/app.php/en/foo', $urlGenerator->generate('foo.fr', ['_locale' => 'en']));
+
+        $this->assertSame('/app.php/amusant', $urlGenerator->generate('fun'));
+        $this->assertSame('/app.php/fun', $urlGenerator->generate('fun.en'));
+        $this->assertSame('/app.php/fun', $urlGenerator->generate('fun', ['_locale' => 'en']));
+        $this->assertSame('/app.php/amusant', $urlGenerator->generate('fun.fr', ['_locale' => 'en']));
+    }
+
     public function testGenerateWithoutRoutes()
     {
         $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');

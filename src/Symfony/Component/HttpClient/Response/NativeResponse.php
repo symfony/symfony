@@ -162,12 +162,12 @@ final class NativeResponse implements ResponseInterface
             restore_error_handler();
         }
 
-        stream_set_blocking($h, false);
-        $this->context = $this->resolveRedirect = null;
-
-        if (isset($context['ssl']['peer_certificate_chain'])) {
+        if (isset($context['ssl']['capture_peer_cert_chain']) && isset(($context = stream_context_get_options($this->context))['ssl']['peer_certificate_chain'])) {
             $this->info['peer_certificate_chain'] = $context['ssl']['peer_certificate_chain'];
         }
+
+        stream_set_blocking($h, false);
+        $this->context = $this->resolveRedirect = null;
 
         // Create dechunk and inflate buffers
         if (isset($this->headers['content-length'])) {

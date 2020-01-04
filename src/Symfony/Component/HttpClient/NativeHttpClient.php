@@ -357,7 +357,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             });
 
             if (isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {
-                $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
+                $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static function ($h) {
                     return 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:');
                 });
             }

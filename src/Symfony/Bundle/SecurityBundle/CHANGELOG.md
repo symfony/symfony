@@ -20,6 +20,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * Added `anonymous: lazy` mode to firewalls to make them (not) start the session as late as possible
  * Added `migrate_from` option to encoders configuration.
  * Added new `argon2id` encoder, undeprecated the `bcrypt` and `argon2i` ones (using `auto` is still recommended by default.)
  * Deprecated the usage of "query_string" without a "search_dn" and a "search_password" config key in Ldap factories.
@@ -28,7 +29,6 @@ CHANGELOG
 4.3.0
 -----
 
- * Added `anonymous: lazy` mode to firewalls to make them (not) start the session as late as possible
  * Added new encoder types: `auto` (recommended), `native` and `sodium`
  * The normalization of the cookie names configured in the `logout.delete_cookies`
    option is deprecated and will be disabled in Symfony 5.0. This affects to cookies

@@ -40,7 +40,6 @@ class SymfonyTestsListenerTrait
     private $expectedDeprecations = array();
     private $gatheredDeprecations = array();
     private $previousErrorHandler;
-    private $testsWithWarnings;
     private $reportUselessTests;
     private $error;
     private $runsInSeparateProcess = false;
@@ -112,7 +111,6 @@ class SymfonyTestsListenerTrait
     public function startTestSuite($suite)
     {
         $suiteName = $suite->getName();
-        $this->testsWithWarnings = array();
 
         foreach ($suite->tests() as $test) {
             if (!($test instanceof \PHPUnit\Framework\TestCase || $test instanceof TestCase)) {
@@ -233,13 +231,6 @@ class SymfonyTestsListenerTrait
                 $this->expectedDeprecations = $annotations['method']['expectedDeprecation'];
                 $this->previousErrorHandler = set_error_handler(array($this, 'handleError'));
             }
-        }
-    }
-
-    public function addWarning($test, $e, $time)
-    {
-        if ($test instanceof \PHPUnit\Framework\TestCase || $test instanceof TestCase) {
-            $this->testsWithWarnings[$test->getName()] = true;
         }
     }
 

@@ -311,6 +311,7 @@
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="large-12 columns{% if not valid %} error{% endif %}">
             {{ form_widget(form) }}
+            {{- form_help(form) -}}
             {{ form_errors(form) }}
         </div>
     </div>
@@ -320,6 +321,7 @@
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="large-12 columns{% if not valid %} error{% endif %}">
             {{ form_widget(form) }}
+            {{- form_help(form) -}}
             {{ form_errors(form) }}
         </div>
     </div>

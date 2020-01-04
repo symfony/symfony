@@ -94,10 +94,14 @@ class MandrillApiTransport extends AbstractApiTransport
                 'type' => $headers->get('Content-Type')->getBody(),
             ];
 
+            if ($name = $headers->getHeaderParameter('Content-Disposition', 'name')) {
+                $att['name'] = $name;
+            }
+
             if ('inline' === $disposition) {
-                $payload['images'][] = $att;
+                $payload['message']['images'][] = $att;
             } else {
-                $payload['attachments'][] = $att;
+                $payload['message']['attachments'][] = $att;
             }
         }
 
@@ -107,7 +111,7 @@ class MandrillApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['message']['headers'][] = $name.': '.$header->toString();
+            $payload['message']['headers'][] = $name.': '.$header->getBodyAsString();
         }
 
         return $payload;

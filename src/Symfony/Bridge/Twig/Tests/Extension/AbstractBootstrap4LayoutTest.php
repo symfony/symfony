@@ -422,6 +422,21 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
+    public function testCheckboxRowWithHelp()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
+        $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="form-group"]
+    [
+        ./small[text() = "[trans]really helpful text[/trans]"]
+    ]
+'
+        );
+    }
+
     public function testSingleChoiceExpanded()
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
@@ -1022,6 +1037,21 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         /following-sibling::label
             [@class="form-check-label required"]
             [@for="my&id"]
+    ]
+'
+        );
+    }
+
+    public function testRadioRowWithHelp()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', false);
+        $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
+
+        $this->assertMatchesXpath($html,
+'/div
+    [@class="form-group"]
+    [
+        ./small[text() = "[trans]really helpful text[/trans]"]
     ]
 '
         );

@@ -13,6 +13,9 @@ namespace Symfony\Component\Mailer\Bridge\Mailchimp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillApiTransport;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 
 class MandrillApiTransportTest extends TestCase
 {
@@ -40,5 +43,22 @@ class MandrillApiTransportTest extends TestCase
                 'mandrill+api://example.com:99',
             ],
         ];
+    }
+
+    public function testCustomHeader()
+    {
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('foo', 'bar');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new MandrillApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('message', $payload);
+        $this->assertArrayHasKey('headers', $payload['message']);
+        $this->assertCount(1, $payload['message']['headers']);
+        $this->assertEquals('foo: bar', $payload['message']['headers'][0]);
     }
 }

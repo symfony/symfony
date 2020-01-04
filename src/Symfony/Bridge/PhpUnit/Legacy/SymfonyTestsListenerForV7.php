@@ -55,11 +55,6 @@ class SymfonyTestsListenerForV7 implements TestListener
         $this->trait->startTest($test);
     }
 
-    public function addWarning(Test $test, Warning $e, float $time): void
-    {
-        $this->trait->addWarning($test, $e, $time);
-    }
-
     public function endTest(Test $test, float $time): void
     {
         $this->trait->endTest($test, $time);

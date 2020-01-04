@@ -13,6 +13,9 @@ namespace Symfony\Component\Mailer\Bridge\Postmark\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkApiTransport;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 
 class PostmarkApiTransportTest extends TestCase
 {
@@ -40,5 +43,22 @@ class PostmarkApiTransportTest extends TestCase
                 'postmark+api://example.com:99',
             ],
         ];
+    }
+
+    public function testCustomHeader()
+    {
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('foo', 'bar');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new PostmarkApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('Headers', $payload);
+        $this->assertCount(1, $payload['Headers']);
+
+        $this->assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
     }
 }

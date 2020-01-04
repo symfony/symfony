@@ -95,6 +95,12 @@ class Transport
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {
+                    if (isset($query['encryption']) && strtolower($query['encryption']) == 'starttls') {
+                        return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger, 'tls', 587);
+                    }
+                    if (isset($parsedDsn['port']) && intval($parsedDsn['port']) == 587) {
+                        return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger, 'tls', 587);
+                    }
                     return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger);
                 }
 

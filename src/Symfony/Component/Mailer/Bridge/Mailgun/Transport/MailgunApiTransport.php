@@ -114,7 +114,7 @@ class MailgunApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['h:'.$name] = $header->toString();
+            $payload['h:'.$name] = $header->getBodyAsString();
         }
 
         return $payload;

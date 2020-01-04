@@ -84,7 +84,7 @@ class PostmarkApiTransport extends AbstractApiTransport
 
             $payload['Headers'][] = [
                 'Name' => $name,
-                'Value' => $header->toString(),
+                'Value' => $header->getBodyAsString(),
             ];
         }
 

@@ -101,6 +101,7 @@ class Transport
                     if (isset($parsedDsn['port']) && 587 == (int) ($parsedDsn['port'])) {
                         return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger, 'tls', 587);
                     }
+
                     return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger);
                 }
 

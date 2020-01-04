@@ -859,6 +859,15 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('model_timezone'));
     }
 
+    public function testViewTimezoneDefaultsToModelTimezoneIfProvided()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'Europe/Berlin',
+        ]);
+
+        $this->assertSame('Europe/Berlin', $form->getConfig()->getOption('view_timezone'));
+    }
+
     public function testPassDefaultChoiceTranslationDomain()
     {
         $form = $this->factory->create(static::TESTED_TYPE);

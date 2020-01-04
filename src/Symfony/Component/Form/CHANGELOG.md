@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * The `view_timezone` option defaults to the `model_timezone` if no `reference_date` is configured.
  * Added default `inputmode` attribute to Search, Email and Tel form types.
 
 5.0.0

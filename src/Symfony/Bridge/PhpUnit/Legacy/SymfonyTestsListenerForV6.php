@@ -52,11 +52,6 @@ class SymfonyTestsListenerForV6 extends BaseTestListener
         $this->trait->startTest($test);
     }
 
-    public function addWarning(Test $test, Warning $e, $time)
-    {
-        $this->trait->addWarning($test, $e, $time);
-    }
-
     public function endTest(Test $test, $time)
     {
         $this->trait->endTest($test, $time);

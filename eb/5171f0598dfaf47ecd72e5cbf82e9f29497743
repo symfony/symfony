@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-09-24T11:10:04Z
+
+Maybe the actual issue is the usage of `bodyToString` on the DataPart, relying on the base64 encoding built for SMTP while this is sent to an HTTP API.
+
+Btw, this may also impact other API providers.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-09-24T15:11:50Z
+
+@stof is right. We had the same kind of issue with `SmtpEnvelope` which was optimized for SMTP. We fixed that in 4.4 by renaming it to `Envelope` but more importantly moved the SMTP logic to the SMTP classes. Maybe something we need to do here as well. I haven't looked at the code to have an idea on how to do it properly though.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-09-24T18:27:21Z
+
+The SendGrid HTTP API requires attachments to be base64 encoded though (but with "strict" base64 i.e. no line-break). But API transports could indeed bypass the encoding system and use `base64_encode()` directly if needed, that's what I propose in #32645 for the very same bug.

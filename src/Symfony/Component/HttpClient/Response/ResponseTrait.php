@@ -204,7 +204,11 @@ trait ResponseTrait
             $this->getHeaders($throw);
         }
 
-        return StreamWrapper::createResource($this, null, $this->content, $this->handle && 'stream' === get_resource_type($this->handle) ? $this->handle : null);
+        $stream = StreamWrapper::createResource($this);
+        stream_get_meta_data($stream)['wrapper_data']
+            ->bindHandles($this->handle, $this->content);
+
+        return $stream;
     }
 
     /**

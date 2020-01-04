@@ -169,7 +169,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $this->multi->dnsCache = $options['resolve'] + $this->multi->dnsCache;
         }
 
-        $this->logger && $this->logger->info(sprintf('Request: %s %s', $method, implode('', $url)));
+        $this->logger && $this->logger->info(sprintf('Request: "%s %s"', $method, implode('', $url)));
 
         [$host, $port, $url['authority']] = self::dnsResolve($url, $this->multi, $info, $onProgress);
 

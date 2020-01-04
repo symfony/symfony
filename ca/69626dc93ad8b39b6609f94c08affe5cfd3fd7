@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-02T09:49:39Z
+
+@Nyholm The fix seems indeed correct to me. The other providers are affected as well (see #35095 for instance on the same topic). If you can fix it for all providers in this PR, that would be great! Thank you.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-02T10:13:33Z
+
+Sure, I will.
+
+Thank you for a quick reply
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-04T11:55:23Z
+
+I fixed other providers and rebased the PRs.
+
+@fbourigault Could you review please?

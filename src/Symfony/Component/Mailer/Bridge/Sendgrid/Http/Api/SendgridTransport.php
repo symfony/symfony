@@ -115,7 +115,7 @@ class SendgridTransport extends AbstractApiTransport
             $disposition = $headers->getHeaderBody('Content-Disposition');
 
             $att = [
-                'content' => $attachment->bodyToString(),
+                'content' => str_replace("\r\n", '', $attachment->bodyToString()),
                 'type' => $headers->get('Content-Type')->getBody(),
                 'filename' => $filename,
                 'disposition' => $disposition,

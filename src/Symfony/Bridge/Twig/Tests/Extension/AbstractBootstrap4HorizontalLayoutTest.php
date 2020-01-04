@@ -234,4 +234,23 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
 '
         );
     }
+
+    public function testRadioRowWithHelp()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', false);
+        $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
+
+        $this->assertMatchesXpath($html,
+'/div
+    [@class="form-group row"]
+    [
+        ./div[@class="col-sm-2" or @class="col-sm-10"]
+        /following-sibling::div[@class="col-sm-2" or @class="col-sm-10"]
+        [
+            ./small[text() = "[trans]really helpful text[/trans]"]
+        ]
+    ]
+'
+        );
+    }
 }

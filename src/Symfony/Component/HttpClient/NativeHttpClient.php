@@ -187,7 +187,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         $context = [
             'http' => [
-                'protocol_version' => $options['http_version'] ?: '1.1',
+                'protocol_version' => min($options['http_version'] ?: '1.1', '1.1'),
                 'method' => $method,
                 'content' => $options['body'],
                 'ignore_errors' => true,

@@ -171,6 +171,10 @@ class MockHttpClientTest extends HttpClientTestCase
 
                 return $client;
 
+            case 'testNonBlockingStream':
+                $responses[] = new MockResponse((function () { yield '<1>'; yield ''; yield '<2>'; })(), ['response_headers' => $headers]);
+                break;
+
             case 'testMaxDuration':
                 $mock = $this->getMockBuilder(ResponseInterface::class)->getMock();
                 $mock->expects($this->any())

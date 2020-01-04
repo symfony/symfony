@@ -48,12 +48,12 @@ class FormatterHelper extends Helper
         foreach ($messages as $message) {
             $message = OutputFormatter::escape($message);
             $lines[] = sprintf($large ? '  %s  ' : ' %s ', $message);
-            $len = max($this->strlen($message) + ($large ? 4 : 2), $len);
+            $len = max(self::strlen($message) + ($large ? 4 : 2), $len);
         }
 
         $messages = $large ? [str_repeat(' ', $len)] : [];
         for ($i = 0; isset($lines[$i]); ++$i) {
-            $messages[] = $lines[$i].str_repeat(' ', $len - $this->strlen($lines[$i]));
+            $messages[] = $lines[$i].str_repeat(' ', $len - self::strlen($lines[$i]));
         }
         if ($large) {
             $messages[] = str_repeat(' ', $len);
@@ -73,17 +73,13 @@ class FormatterHelper extends Helper
      */
     public function truncate(string $message, int $length, string $suffix = '...')
     {
-        $computedLength = $length - $this->strlen($suffix);
+        $computedLength = $length - self::strlen($suffix);
 
-        if ($computedLength > $this->strlen($message)) {
+        if ($computedLength > self::strlen($message)) {
             return $message;
         }
 
-        if (false === $encoding = mb_detect_encoding($message, null, true)) {
-            return substr($message, 0, $length).$suffix;
-        }
-
-        return mb_substr($message, 0, $length, $encoding).$suffix;
+        return self::substr($message, 0, $length).$suffix;
     }
 
     /**

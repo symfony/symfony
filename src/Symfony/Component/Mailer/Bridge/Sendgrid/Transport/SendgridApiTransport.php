@@ -63,11 +63,19 @@ class SendgridApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
-        $addressStringifier = function (Address $address) {return ['email' => $address->toString()]; };
+        $addressStringifier = function (Address $address) {
+            $stringified = ['email' => $address->getAddress()];
+
+            if ($address->getName()) {
+                $stringified['name'] = $address->getName();
+            }
+
+            return $stringified;
+        };
 
         $payload = [
             'personalizations' => [],
-            'from' => ['email' => $envelope->getSender()->toString()],
+            'from' => $addressStringifier($envelope->getSender()),
             'content' => $this->getContent($email),
         ];
 
@@ -96,7 +104,7 @@ class SendgridApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            $payload['headers'][$name] = $header->toString();
+            $payload['headers'][$name] = $header->getBodyAsString();
         }
 
         return $payload;
@@ -124,7 +132,7 @@ class SendgridApiTransport extends AbstractApiTransport
             $disposition = $headers->getHeaderBody('Content-Disposition');
 
             $att = [
-                'content' => $attachment->bodyToString(),
+                'content' => str_replace("\r\n", '', $attachment->bodyToString()),
                 'type' => $headers->get('Content-Type')->getBody(),
                 'filename' => $filename,
                 'disposition' => $disposition,

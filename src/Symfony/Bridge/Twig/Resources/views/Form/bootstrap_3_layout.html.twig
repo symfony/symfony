@@ -148,6 +148,7 @@
 {% block checkbox_row -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group' ~ (not valid ? ' has-error'))|trim})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_widget(form) -}}
+        {{- form_help(form) -}}
         {{- form_errors(form) -}}
     </div>
 {%- endblock checkbox_row %}
@@ -155,6 +156,7 @@
 {% block radio_row -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group' ~ (not valid ? ' has-error'))|trim})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_widget(form) -}}
+        {{- form_help(form) -}}
         {{- form_errors(form) -}}
     </div>
 {%- endblock radio_row %}

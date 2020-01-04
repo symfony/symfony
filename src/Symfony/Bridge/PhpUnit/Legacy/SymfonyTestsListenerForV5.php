@@ -47,11 +47,6 @@ class SymfonyTestsListenerForV5 extends \PHPUnit_Framework_BaseTestListener
         $this->trait->startTest($test);
     }
 
-    public function addWarning(\PHPUnit_Framework_Test $test, \PHPUnit_Framework_Warning $e, $time)
-    {
-        $this->trait->addWarning($test, $e, $time);
-    }
-
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
         $this->trait->endTest($test, $time);

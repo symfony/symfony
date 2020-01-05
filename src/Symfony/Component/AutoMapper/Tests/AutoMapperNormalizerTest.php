@@ -24,7 +24,7 @@ class AutoMapperNormalizerTest extends AutoMapperBaseTest
         $this->normalizer = new AutoMapperNormalizer($this->autoMapper);
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $object = new Fixtures\User(1, 'Jack', 37);
         $expected = ['id' => 1, 'name' => 'Jack', 'age' => 37];
@@ -36,7 +36,7 @@ class AutoMapperNormalizerTest extends AutoMapperBaseTest
         self::assertEquals($expected['age'], $normalized['age']);
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $source = ['id' => 1, 'name' => 'Jack', 'age' => 37];
 
@@ -48,7 +48,7 @@ class AutoMapperNormalizerTest extends AutoMapperBaseTest
         self::assertEquals($source['age'], $denormalized->age);
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         self::assertFalse($this->normalizer->supportsNormalization(['foo']));
         self::assertFalse($this->normalizer->supportsNormalization('{"foo":1}'));
@@ -63,7 +63,7 @@ class AutoMapperNormalizerTest extends AutoMapperBaseTest
         self::assertFalse($this->normalizer->supportsNormalization($stdClass));
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         self::assertTrue($this->normalizer->supportsDenormalization(['foo' => 1], 'array'));
         self::assertTrue($this->normalizer->supportsDenormalization(['foo' => 1], 'json'));

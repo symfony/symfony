@@ -94,7 +94,7 @@ class MapperGeneratorMetadataFactoryTest extends AutoMapperBaseTest
         $transformerFactory->addTransformerFactory(new ObjectTransformerFactory($this->autoMapper));
     }
 
-    public function testCreateObjectToArray()
+    public function testCreateObjectToArray(): void
     {
         $userReflection = new \ReflectionClass(Fixtures\User::class);
 
@@ -110,7 +110,7 @@ class MapperGeneratorMetadataFactoryTest extends AutoMapperBaseTest
         self::assertInstanceOf(PropertyMapping::class, $metadata->getPropertyMapping('email'));
     }
 
-    public function testCreateArrayToObject()
+    public function testCreateArrayToObject(): void
     {
         $userReflection = new \ReflectionClass(Fixtures\User::class);
 
@@ -126,7 +126,7 @@ class MapperGeneratorMetadataFactoryTest extends AutoMapperBaseTest
         self::assertInstanceOf(PropertyMapping::class, $metadata->getPropertyMapping('email'));
     }
 
-    public function testCreateWithBothObjects()
+    public function testCreateWithBothObjects(): void
     {
         $userConstructorDTOReflection = new \ReflectionClass(Fixtures\UserConstructorDTO::class);
 

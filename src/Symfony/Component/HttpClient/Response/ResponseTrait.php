@@ -43,11 +43,6 @@ trait ResponseTrait
      */
     private $initializer;
 
-    /**
-     * @var resource A php://temp stream typically
-     */
-    private $content;
-
     private $info = [
         'response_headers' => [],
         'http_code' => 0,
@@ -59,6 +54,9 @@ trait ResponseTrait
     private $handle;
     private $id;
     private $timeout = 0;
+    private $inflate;
+    private $shouldBuffer;
+    private $content;
     private $finalInfo;
     private $offset = 0;
     private $jsonData;
@@ -69,8 +67,7 @@ trait ResponseTrait
     public function getStatusCode(): int
     {
         if ($this->initializer) {
-            ($this->initializer)($this);
-            $this->initializer = null;
+            self::initialize($this);
         }
 
         return $this->info['http_code'];
@@ -82,8 +79,7 @@ trait ResponseTrait
     public function getHeaders(bool $throw = true): array
     {
         if ($this->initializer) {
-            ($this->initializer)($this);
-            $this->initializer = null;
+            self::initialize($this);
         }
 
         if ($throw) {
@@ -99,8 +95,7 @@ trait ResponseTrait
     public function getContent(bool $throw = true): string
     {
         if ($this->initializer) {
-            ($this->initializer)($this);
-            $this->initializer = null;
+            self::initialize($this);
         }
 
         if ($throw) {
@@ -231,6 +226,30 @@ trait ResponseTrait
      */
     abstract protected static function select(ClientState $multi, float $timeout): int;
 
+    private static function initialize(self $response): void
+    {
+        if (null !== $response->info['error']) {
+            throw new TransportException($response->info['error']);
+        }
+
+        try {
+            if (($response->initializer)($response)) {
+                foreach (self::stream([$response]) as $chunk) {
+                    if ($chunk->isFirst()) {
+                        break;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Persist timeouts thrown during initialization
+            $response->info['error'] = $e->getMessage();
+            $response->close();
+            throw $e;
+        }
+
+        $response->initializer = null;
+    }
+
     private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers, string &$debug = ''): void
     {
         foreach ($responseHeaders as $h) {
@@ -276,8 +295,7 @@ trait ResponseTrait
     private function doDestruct()
     {
         if ($this->initializer && null === $this->info['error']) {
-            ($this->initializer)($this);
-            $this->initializer = null;
+            self::initialize($this);
             $this->checkStatusCode();
         }
     }
@@ -329,6 +347,16 @@ trait ResponseTrait
                         $isTimeout = false;
 
                         if (\is_string($chunk = array_shift($multi->handlesActivity[$j]))) {
+                            if (null !== $response->inflate && false === $chunk = @inflate_add($response->inflate, $chunk)) {
+                                $multi->handlesActivity[$j] = [null, new TransportException('Error while processing content unencoding.')];
+                                continue;
+                            }
+
+                            if ('' !== $chunk && null !== $response->content && \strlen($chunk) !== fwrite($response->content, $chunk)) {
+                                $multi->handlesActivity[$j] = [null, new TransportException('Failed writing %d bytes to the response buffer.', \strlen($chunk))];
+                                continue;
+                            }
+
                             $response->offset += \strlen($chunk);
                             $chunk = new DataChunk($response->offset, $chunk);
                         } elseif (null === $chunk) {
@@ -355,6 +383,28 @@ trait ResponseTrait
                                 $info = $response->getInfo();
                                 $response->logger->info(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
                             }
+
+                            $response->inflate = \extension_loaded('zlib') && $response->inflate && 'gzip' === ($response->headers['content-encoding'][0] ?? null) ? inflate_init(ZLIB_ENCODING_GZIP) : null;
+
+                            if ($response->shouldBuffer instanceof \Closure) {
+                                try {
+                                    $response->shouldBuffer = ($response->shouldBuffer)($response->headers);
+
+                                    if (null !== $response->info['error']) {
+                                        throw new TransportException($response->info['error']);
+                                    }
+                                } catch (\Throwable $e) {
+                                    $response->close();
+                                    $multi->handlesActivity[$j] = [null, $e];
+                                }
+                            }
+
+                            if (true === $response->shouldBuffer) {
+                                $response->content = fopen('php://temp', 'w+');
+                            } elseif (\is_resource($response->shouldBuffer)) {
+                                $response->content = $response->shouldBuffer;
+                            }
+                            $response->shouldBuffer = null;
 
                             yield $response => $chunk;
 

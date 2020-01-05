@@ -97,6 +97,7 @@ class Transport
                 if ('smtp' === $parsedDsn['scheme']) {
                     $encryption = isset($query['encryption']) ? $query['encryption'] : 'ssl';
                     $port = isset($parsedDsn['port']) ? $parsedDsn['port'] : 465;
+
                     return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger, $encryption, $port);
                 }
 

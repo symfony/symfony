@@ -95,14 +95,9 @@ class Transport
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {
-                    if (isset($query['encryption']) && 'starttls' == strtolower($query['encryption'])) {
-                        return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger, 'tls', 587);
-                    }
-                    if (isset($parsedDsn['port']) && 587 == (int) ($parsedDsn['port'])) {
-                        return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger, 'tls', 587);
-                    }
-
-                    return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger);
+                    $encryption = isset($query['encryption']) ? $query['encryption'] : 'ssl';
+                    $port = isset($parsedDsn['port']) ? $parsedDsn['port'] : 465;
+                    return new Google\Smtp\GmailTransport($user, $pass, $dispatcher, $logger, $encryption, $port);
                 }
 
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));

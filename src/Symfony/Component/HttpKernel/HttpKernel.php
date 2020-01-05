@@ -131,7 +131,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $event = new ControllerEvent($this, $controller, $request, $type);
         $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER);
-        $controller = $event->getController();
 
         // controller arguments
         $arguments = $this->argumentResolver->getArguments($request, $controller);

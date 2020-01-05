@@ -46,7 +46,7 @@ final class FromTargetMappingExtractor extends MappingExtractor
      */
     public function getPropertiesMapping(MapperMetadataInterface $mapperMetadata): array
     {
-        $targetProperties = array_unique($this->propertyInfoExtractor->getProperties($mapperMetadata->getTarget()));
+        $targetProperties = array_unique($this->propertyInfoExtractor->getProperties($mapperMetadata->getTarget()) ?? []);
 
         if (!\in_array($mapperMetadata->getSource(), self::ALLOWED_SOURCES, true)) {
             throw new InvalidMappingException('Only array or stdClass are accepted as a source');

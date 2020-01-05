@@ -22,6 +22,9 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
+/**
+ * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ */
 abstract class AutoMapperBaseTest extends TestCase
 {
     /** @var AutoMapper */

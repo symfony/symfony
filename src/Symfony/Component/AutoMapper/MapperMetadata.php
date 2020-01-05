@@ -48,6 +48,8 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
 
     private $attributeChecking;
 
+    private $targetReflectionClass = null;
+
     public function __construct(MapperGeneratorMetadataRegistryInterface $metadataRegistry, MappingExtractorInterface $mappingExtractor, string $source, string $target, string $classPrefix = 'Mapper_')
     {
         $this->mappingExtractor = $mappingExtractor;
@@ -58,6 +60,15 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
         $this->dateTimeFormat = \DateTime::RFC3339;
         $this->classPrefix = $classPrefix;
         $this->attributeChecking = true;
+    }
+
+    private function getCachedTargetReflectionClass(): \ReflectionClass
+    {
+        if (null === $this->targetReflectionClass) {
+            $this->targetReflectionClass = new \ReflectionClass($this->getTarget());
+        }
+
+        return $this->targetReflectionClass;
     }
 
     /**
@@ -97,7 +108,7 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
             return false;
         }
 
-        $reflection = new \ReflectionClass($this->getTarget());
+        $reflection = $this->getCachedTargetReflectionClass();
         $constructor = $reflection->getConstructor();
 
         if (null === $constructor) {
@@ -133,9 +144,14 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
      */
     public function isTargetCloneable(): bool
     {
-        $reflection = new \ReflectionClass($this->getTarget());
+        try {
+            $reflection = $this->getCachedTargetReflectionClass();
 
-        return $reflection->isCloneable() && !$reflection->hasMethod('__clone');
+            return $reflection->isCloneable() && !$reflection->hasMethod('__clone');
+        } catch (\ReflectionException $e) {
+            // if we have a \ReflectionException, then we can't clone target
+            return false;
+        }
     }
 
     /**
@@ -173,7 +189,7 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
         }
 
         if (!\in_array($this->target, ['array', \stdClass::class], true)) {
-            $reflection = new \ReflectionClass($this->target);
+            $reflection = $this->getCachedTargetReflectionClass();
             $hash .= filemtime($reflection->getFileName());
         }
 

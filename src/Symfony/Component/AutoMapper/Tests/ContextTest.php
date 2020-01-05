@@ -16,6 +16,9 @@ use Symfony\Component\AutoMapper\Context;
 use Symfony\Component\AutoMapper\Exception\CircularReferenceException;
 use Symfony\Component\AutoMapper\Exception\NoConstructorArgumentFoundException;
 
+/**
+ * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ */
 class ContextTest extends TestCase
 {
     public function testIsAllowedAttribute(): void

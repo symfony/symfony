@@ -13,6 +13,9 @@ namespace Symfony\Component\AutoMapper\Tests;
 
 use Symfony\Component\AutoMapper\AutoMapperNormalizer;
 
+/**
+ * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ */
 class AutoMapperNormalizerTest extends AutoMapperBaseTest
 {
     /** @var AutoMapperNormalizer */

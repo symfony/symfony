@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -692,6 +693,30 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $container
             ->register('foobar', BarMethodCall::class)
             ->addMethodCall('setCallable', [$closureDefinition]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenPassingServiceClosureArgumentToCallable()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', BarMethodCall::class)
+            ->addMethodCall('setCallable', [new ServiceClosureArgument(new Reference('foo'))]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenPassingServiceClosureArgumentToClosure()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', BarMethodCall::class)
+            ->addMethodCall('setClosure', [new ServiceClosureArgument(new Reference('foo'))]);
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

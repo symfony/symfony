@@ -40,4 +40,8 @@ class BarMethodCall
     public function setCallable(callable $callable): void
     {
     }
+
+    public function setClosure(\Closure $closure): void
+    {
+    }
 }

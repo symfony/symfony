@@ -55,6 +55,13 @@ abstract class AbstractAsciiTestCase extends TestCase
         ];
     }
 
+    public function testUnwrap(Type $var = null)
+    {
+        $expected = ['hello', 'world'];
+        $actual = UnicodeString::unwrap([new UnicodeString('hello'), new UnicodeString('world')]);
+        $this->assertEquals($expected, $actual);
+    }
+
     /**
      * @dataProvider provideWrap
      */

@@ -32,7 +32,6 @@ final class NativeResponse implements ResponseInterface
     private $onProgress;
     private $remaining;
     private $buffer;
-    private $inflate;
     private $multi;
     private $debugBuffer;
     private $shouldBuffer;
@@ -40,7 +39,7 @@ final class NativeResponse implements ResponseInterface
     /**
      * @internal
      */
-    public function __construct(NativeClientState $multi, $context, string $url, $options, bool $gzipEnabled, array &$info, callable $resolveRedirect, ?callable $onProgress, ?LoggerInterface $logger)
+    public function __construct(NativeClientState $multi, $context, string $url, array $options, array &$info, callable $resolveRedirect, ?callable $onProgress, ?LoggerInterface $logger)
     {
         $this->multi = $multi;
         $this->id = (int) $context;
@@ -51,28 +50,17 @@ final class NativeResponse implements ResponseInterface
         $this->info = &$info;
         $this->resolveRedirect = $resolveRedirect;
         $this->onProgress = $onProgress;
-        $this->content = true === $options['buffer'] ? fopen('php://temp', 'w+') : (\is_resource($options['buffer']) ? $options['buffer'] : null);
-        $this->shouldBuffer = $options['buffer'] instanceof \Closure ? $options['buffer'] : null;
+        $this->inflate = !isset($options['normalized_headers']['accept-encoding']);
+        $this->shouldBuffer = $options['buffer'] ?? true;
 
-        // Temporary resources to dechunk/inflate the response stream
+        // Temporary resource to dechunk the response stream
         $this->buffer = fopen('php://temp', 'w+');
-        $this->inflate = $gzipEnabled ? inflate_init(ZLIB_ENCODING_GZIP) : null;
 
         $info['user_data'] = $options['user_data'];
         ++$multi->responseCount;
 
         $this->initializer = static function (self $response) {
-            if (null !== $response->info['error']) {
-                throw new TransportException($response->info['error']);
-            }
-
-            if (null === $response->remaining) {
-                foreach (self::stream([$response]) as $chunk) {
-                    if ($chunk->isFirst()) {
-                        break;
-                    }
-                }
-            }
+            return null === $response->remaining;
         };
     }
 
@@ -169,7 +157,7 @@ final class NativeResponse implements ResponseInterface
         stream_set_blocking($h, false);
         $this->context = $this->resolveRedirect = null;
 
-        // Create dechunk and inflate buffers
+        // Create dechunk buffers
         if (isset($this->headers['content-length'])) {
             $this->remaining = (int) $this->headers['content-length'][0];
         } elseif ('chunked' === ($this->headers['transfer-encoding'][0] ?? null)) {
@@ -177,27 +165,6 @@ final class NativeResponse implements ResponseInterface
             $this->remaining = -1;
         } else {
             $this->remaining = -2;
-        }
-
-        if ($this->inflate && 'gzip' !== ($this->headers['content-encoding'][0] ?? null)) {
-            $this->inflate = null;
-        }
-
-        try {
-            if (null !== $this->shouldBuffer && null === $this->content && $this->content = ($this->shouldBuffer)($this->headers) ?: null) {
-                $this->content = \is_resource($this->content) ? $this->content : fopen('php://temp', 'w+');
-            }
-
-            if (null !== $this->info['error']) {
-                throw new TransportException($this->info['error']);
-            }
-        } catch (\Throwable $e) {
-            $this->close();
-            $this->multi->handlesActivity[$this->id] = [new FirstChunk()];
-            $this->multi->handlesActivity[$this->id][] = null;
-            $this->multi->handlesActivity[$this->id][] = $e;
-
-            return;
         }
 
         $this->multi->handlesActivity[$this->id] = [new FirstChunk()];
@@ -209,7 +176,7 @@ final class NativeResponse implements ResponseInterface
             return;
         }
 
-        $this->multi->openHandles[$this->id] = [$h, $this->buffer, $this->inflate, $this->content, $this->onProgress, &$this->remaining, &$this->info];
+        $this->multi->openHandles[$this->id] = [$h, $this->buffer, $this->onProgress, &$this->remaining, &$this->info];
     }
 
     /**
@@ -249,15 +216,15 @@ final class NativeResponse implements ResponseInterface
             $multi->handles = [];
         }
 
-        foreach ($multi->openHandles as $i => [$h, $buffer, $inflate, $content, $onProgress]) {
+        foreach ($multi->openHandles as $i => [$h, $buffer, $onProgress]) {
             $hasActivity = false;
-            $remaining = &$multi->openHandles[$i][5];
-            $info = &$multi->openHandles[$i][6];
+            $remaining = &$multi->openHandles[$i][3];
+            $info = &$multi->openHandles[$i][4];
             $e = null;
 
             // Read incoming buffer and write it to the dechunk one
             try {
-                while ($remaining && '' !== $data = (string) fread($h, 0 > $remaining ? 16372 : $remaining)) {
+                if ($remaining && '' !== $data = (string) fread($h, 0 > $remaining ? 16372 : $remaining)) {
                     fwrite($buffer, $data);
                     $hasActivity = true;
                     $multi->sleep = false;
@@ -285,16 +252,8 @@ final class NativeResponse implements ResponseInterface
                 rewind($buffer);
                 ftruncate($buffer, 0);
 
-                if (null !== $inflate && false === $data = @inflate_add($inflate, $data)) {
-                    $e = new TransportException('Error while processing content unencoding.');
-                }
-
-                if ('' !== $data && null === $e) {
+                if (null === $e) {
                     $multi->handlesActivity[$i][] = $data;
-
-                    if (null !== $content && \strlen($data) !== fwrite($content, $data)) {
-                        $e = new TransportException(sprintf('Failed writing %d bytes to the response buffer.', \strlen($data)));
-                    }
                 }
             }
 

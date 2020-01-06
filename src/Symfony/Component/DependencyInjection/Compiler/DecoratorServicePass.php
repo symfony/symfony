@@ -64,8 +64,18 @@ class DecoratorServicePass implements CompilerPassInterface
 
             if (isset($decoratingDefinitions[$inner])) {
                 $decoratingDefinition = $decoratingDefinitions[$inner];
-                $definition->setTags(array_merge($decoratingDefinition->getTags(), $definition->getTags()));
-                $decoratingDefinition->setTags([]);
+
+                $decoratingTags = $decoratingDefinition->getTags();
+                $resetTags = [];
+
+                if (isset($decoratingTags['container.service_locator'])) {
+                    // container.service_locator has special logic and it must not be transferred out to decorators
+                    $resetTags = ['container.service_locator' => $decoratingTags['container.service_locator']];
+                    unset($decoratingTags['container.service_locator']);
+                }
+
+                $definition->setTags(array_merge($decoratingTags, $definition->getTags()));
+                $decoratingDefinition->setTags($resetTags);
                 $decoratingDefinitions[$inner] = $definition;
             }
 

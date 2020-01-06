@@ -455,7 +455,7 @@ trait HttpClientTrait
     {
         $result = '';
 
-        while (!\in_array($path, ['', '.', '..'], true)) {
+        while (!\in_array($path, [false, '', '.', '..'], true)) {
             if ('.' === $path[0] && (0 === strpos($path, $p = '../') || 0 === strpos($path, $p = './'))) {
                 $path = substr($path, \strlen($p));
             } elseif ('/.' === $path || 0 === strpos($path, '/./')) {

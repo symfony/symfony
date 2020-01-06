@@ -116,7 +116,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         $url = implode('', $url);
 
         if (!isset($options['normalized_headers']['user-agent'])) {
-            $options['normalized_headers']['user-agent'][] = $options['headers'][] = 'User-Agent: Symfony HttpClient/Curl';
+            $options['headers'][] = 'User-Agent: Symfony HttpClient/Curl';
         }
 
         $curlopts = [
@@ -217,8 +217,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[CURLOPT_NOSIGNAL] = true;
         }
 
-        if (!isset($options['normalized_headers']['accept-encoding']) && CURL_VERSION_LIBZ & self::$curlVersion['features']) {
-            $curlopts[CURLOPT_ENCODING] = 'gzip'; // Expose only one encoding, some servers mess up when more are provided
+        if (\extension_loaded('zlib') && !isset($options['normalized_headers']['accept-encoding'])) {
+            $options['headers'][] = 'Accept-Encoding: gzip'; // Expose only one encoding, some servers mess up when more are provided
         }
 
         foreach ($options['headers'] as $header) {

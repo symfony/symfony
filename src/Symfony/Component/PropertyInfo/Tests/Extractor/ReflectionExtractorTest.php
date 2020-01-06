@@ -378,9 +378,9 @@ class ReflectionExtractorTest extends TestCase
         $bazMutator = $this->extractor->getWriteInfo(Dummy::class, 'baz');
 
         $this->assertNull($barAcessor);
-        $this->assertNull($barMutator);
+        $this->assertEquals(PropertyWriteInfo::TYPE_NONE, $barMutator->getType());
         $this->assertNull($bazAcessor);
-        $this->assertNull($bazMutator);
+        $this->assertEquals(PropertyWriteInfo::TYPE_NONE, $bazMutator->getType());
     }
 
     /**
@@ -439,7 +439,7 @@ class ReflectionExtractorTest extends TestCase
         ]);
 
         if (!$found) {
-            $this->assertNull($writeMutator);
+            $this->assertEquals(PropertyWriteInfo::TYPE_NONE, $writeMutator->getType());
 
             return;
         }

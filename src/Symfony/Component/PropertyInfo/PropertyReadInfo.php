@@ -37,8 +37,13 @@ final class PropertyReadInfo
 
     private $byRef;
 
-    private function __construct()
+    public function __construct(string $type, string $name, string $visibility, bool $static, bool $byRef)
     {
+        $this->type = $type;
+        $this->name = $name;
+        $this->visibility = $visibility;
+        $this->static = $static;
+        $this->byRef = $byRef;
     }
 
     /**
@@ -73,29 +78,5 @@ final class PropertyReadInfo
     public function canBeReference(): bool
     {
         return $this->byRef;
-    }
-
-    public static function forProperty(string $propertyName, string $visibility, bool $static, bool $byRef): self
-    {
-        $accessor = new self();
-        $accessor->type = self::TYPE_PROPERTY;
-        $accessor->name = $propertyName;
-        $accessor->visibility = $visibility;
-        $accessor->static = $static;
-        $accessor->byRef = $byRef;
-
-        return $accessor;
-    }
-
-    public static function forMethod(string $methodName, string $visibility, bool $static): self
-    {
-        $accessor = new self();
-        $accessor->type = self::TYPE_METHOD;
-        $accessor->name = $methodName;
-        $accessor->visibility = $visibility;
-        $accessor->static = $static;
-        $accessor->byRef = false;
-
-        return $accessor;
     }
 }

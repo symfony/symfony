@@ -15,15 +15,11 @@ namespace Symfony\Component\PropertyInfo;
  * Extract read information for the property of a class.
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
- *
- * @internal
  */
 interface PropertyReadInfoExtractorInterface
 {
     /**
      * Get read information object for a given property of a class.
-     *
-     * @internal
      */
     public function getReadInfo(string $class, string $property, array $context = []): ?PropertyReadInfo;
 }

@@ -760,7 +760,7 @@ class PropertyAccessorTest extends TestCase
     public function testAdderAndRemoveNeedsTheExactParametersDefined()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
-        $this->expectExceptionMessageRegExp('/.*The method "addFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 0 arguments, but should accept only 1\. The method "removeFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1\./');
+        $this->expectExceptionMessageRegExp('/.*The method "addFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 0 arguments, but should accept only 1\./');
         $object = new TestAdderRemoverInvalidArgumentLength();
         $this->propertyAccessor->setValue($object, 'foo', [1, 2]);
     }

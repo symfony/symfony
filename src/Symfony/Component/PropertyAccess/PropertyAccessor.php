@@ -76,19 +76,14 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      */
-    public function __construct(bool $magicCall = false, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true)
+    public function __construct(bool $magicCall = false, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
     {
         $this->magicCall = $magicCall;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
         $this->ignoreInvalidProperty = !$throwExceptionOnInvalidPropertyPath;
-        $this->readInfoExtractor = $this->writeInfoExtractor = new ReflectionExtractor(
-            ['set'],
-            ['get', 'is', 'has', 'can'],
-            ['add', 'remove'],
-            false,
-            ReflectionExtractor::ALLOW_PUBLIC
-        );
+        $this->readInfoExtractor = $readInfoExtractor ?? new ReflectionExtractor([], null, null, false);
+        $this->writeInfoExtractor = $writeInfoExtractor ?? new ReflectionExtractor(['set'], null, null, false);
     }
 
     /**
@@ -391,34 +386,25 @@ class PropertyAccessor implements PropertyAccessorInterface
         $access = $this->getReadInfo($class, $property);
 
         if (null !== $access) {
-            if (PropertyReadInfo::TYPE_METHOD === $access->getType()) {
-                $result[self::VALUE] = $object->{$access->getName()}();
-            }
+            $name = $access->getName();
+            $type = $access->getType();
 
-            if (PropertyReadInfo::TYPE_PROPERTY === $access->getType()) {
-                $result[self::VALUE] = $object->{$access->getName()};
+            if (PropertyReadInfo::TYPE_METHOD === $type) {
+                $result[self::VALUE] = $object->$name();
+            } elseif (PropertyReadInfo::TYPE_PROPERTY === $type) {
+                $result[self::VALUE] = $object->$name;
 
                 if (isset($zval[self::REF]) && $access->canBeReference()) {
-                    $result[self::REF] = &$object->{$access->getName()};
+                    $result[self::REF] = &$object->$name;
                 }
             }
         } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
-            // Needed to support \stdClass instances. We need to explicitly
-            // exclude $access[self::ACCESS_HAS_PROPERTY], otherwise if
-            // a *protected* property was found on the class, property_exists()
-            // returns true, consequently the following line will result in a
-            // fatal error.
-
             $result[self::VALUE] = $object->$property;
             if (isset($zval[self::REF])) {
                 $result[self::REF] = &$object->$property;
             }
         } elseif (!$ignoreInvalidProperty) {
-            throw new NoSuchPropertyException(sprintf(
-                'Can get a way to read the property "%s" in class "%s".',
-                $property,
-                $class
-            ));
+            throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $class));
         }
 
         // Objects are always passed around by reference
@@ -494,45 +480,38 @@ class PropertyAccessor implements PropertyAccessorInterface
         $class = \get_class($object);
         $mutator = $this->getWriteInfo($class, $property, $value);
 
-        if (null !== $mutator) {
-            if (PropertyWriteInfo::TYPE_METHOD === $mutator->getType()) {
+        if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType()) {
+            $type = $mutator->getType();
+
+            if (PropertyWriteInfo::TYPE_METHOD === $type) {
                 $object->{$mutator->getName()}($value);
-            }
-
-            if (PropertyWriteInfo::TYPE_PROPERTY === $mutator->getType()) {
+            } elseif (PropertyWriteInfo::TYPE_PROPERTY === $type) {
                 $object->{$mutator->getName()} = $value;
-            }
-
-            if (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $mutator->getType()) {
+            } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
                 $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
             }
         } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
-            // Needed to support \stdClass instances. We need to explicitly
-            // exclude $access[self::ACCESS_HAS_PROPERTY], otherwise if
-            // a *protected* property was found on the class, property_exists()
-            // returns true, consequently the following line will result in a
-            // fatal error.
-
             $object->$property = $value;
-        } else {
+        } elseif (!$this->ignoreInvalidProperty) {
+            if ($mutator->hasErrors()) {
+                throw new NoSuchPropertyException(implode('. ', $mutator->getErrors()).'.');
+            }
+
             throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, \get_class($object)));
         }
     }
 
     /**
      * Adjusts a collection-valued property by calling add*() and remove*() methods.
-     *
-     * @param array             $zval         The array containing the object to write to
-     * @param string            $property     The property to write
-     * @param iterable          $collection   The collection to write
-     * @param PropertyWriteInfo $addMethod    The add*() method
-     * @param PropertyWriteInfo $removeMethod The remove*() method
      */
     private function writeCollection(array $zval, string $property, iterable $collection, PropertyWriteInfo $addMethod, PropertyWriteInfo $removeMethod)
     {
         // At this point the add and remove methods have been found
         $previousValue = $this->readProperty($zval, $property);
         $previousValue = $previousValue[self::VALUE];
+
+        $removeMethodName = $removeMethod->getName();
+        $addMethodName = $addMethod->getName();
 
         if ($previousValue instanceof \Traversable) {
             $previousValue = iterator_to_array($previousValue);
@@ -544,7 +523,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             foreach ($previousValue as $key => $item) {
                 if (!\in_array($item, $collection, true)) {
                     unset($previousValue[$key]);
-                    $zval[self::VALUE]->{$removeMethod->getName()}($item);
+                    $zval[self::VALUE]->$removeMethodName($item);
                 }
             }
         } else {
@@ -553,12 +532,12 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         foreach ($collection as $item) {
             if (!$previousValue || !\in_array($item, $previousValue, true)) {
-                $zval[self::VALUE]->{$addMethod->getName()}($item);
+                $zval[self::VALUE]->$addMethodName($item);
             }
         }
     }
 
-    private function getWriteInfo(string $class, string $property, $value): ?PropertyWriteInfo
+    private function getWriteInfo(string $class, string $property, $value): PropertyWriteInfo
     {
         $useAdderAndRemover = \is_array($value) || $value instanceof \Traversable;
         $key = str_replace('\\', '.', $class).'..'.$property.'..'.(int) $useAdderAndRemover;
@@ -601,13 +580,13 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $mutatorForArray = $this->getWriteInfo(\get_class($object), $property, []);
 
-        if (null !== $mutatorForArray || ($object instanceof \stdClass && property_exists($object, $property))) {
+        if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType() || ($object instanceof \stdClass && property_exists($object, $property))) {
             return true;
         }
 
         $mutator = $this->getWriteInfo(\get_class($object), $property, '');
 
-        return null !== $mutator || ($object instanceof \stdClass && property_exists($object, $property));
+        return PropertyWriteInfo::TYPE_NONE !== $mutator->getType() || ($object instanceof \stdClass && property_exists($object, $property));
     }
 
     /**

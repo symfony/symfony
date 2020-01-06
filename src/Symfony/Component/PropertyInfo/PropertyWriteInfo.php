@@ -20,6 +20,7 @@ namespace Symfony\Component\PropertyInfo;
  */
 final class PropertyWriteInfo
 {
+    public const TYPE_NONE = 'none';
     public const TYPE_METHOD = 'method';
     public const TYPE_PROPERTY = 'property';
     public const TYPE_ADDER_AND_REMOVER = 'adder_and_remover';
@@ -35,9 +36,14 @@ final class PropertyWriteInfo
     private $static;
     private $adderInfo;
     private $removerInfo;
+    private $errors = [];
 
-    private function __construct()
+    public function __construct(string $type = self::TYPE_NONE, string $name = null, string $visibility = null, bool $static = null)
     {
+        $this->type = $type;
+        $this->name = $name;
+        $this->visibility = $visibility;
+        $this->static = $static;
     }
 
     public function getType(): string
@@ -54,6 +60,11 @@ final class PropertyWriteInfo
         return $this->name;
     }
 
+    public function setAdderInfo(self $adderInfo): void
+    {
+        $this->adderInfo = $adderInfo;
+    }
+
     public function getAdderInfo(): self
     {
         if (null === $this->adderInfo) {
@@ -61,6 +72,11 @@ final class PropertyWriteInfo
         }
 
         return $this->adderInfo;
+    }
+
+    public function setRemoverInfo(self $removerInfo): void
+    {
+        $this->removerInfo = $removerInfo;
     }
 
     public function getRemoverInfo(): self
@@ -90,44 +106,18 @@ final class PropertyWriteInfo
         return $this->static;
     }
 
-    public static function forMethod(string $methodName, string $visibility, bool $static): self
+    public function setErrors(array $errors): void
     {
-        $mutator = new self();
-        $mutator->type = self::TYPE_METHOD;
-        $mutator->name = $methodName;
-        $mutator->visibility = $visibility;
-        $mutator->static = $static;
-
-        return $mutator;
+        $this->errors = $errors;
     }
 
-    public static function forProperty(string $propertyName, string $visibility, bool $static): self
+    public function getErrors(): array
     {
-        $mutator = new self();
-        $mutator->type = self::TYPE_PROPERTY;
-        $mutator->name = $propertyName;
-        $mutator->visibility = $visibility;
-        $mutator->static = $static;
-
-        return $mutator;
+        return $this->errors;
     }
 
-    public static function forAdderAndRemover(self $adder, self $remover): self
+    public function hasErrors(): bool
     {
-        $mutator = new self();
-        $mutator->type = self::TYPE_ADDER_AND_REMOVER;
-        $mutator->adderInfo = $adder;
-        $mutator->removerInfo = $remover;
-
-        return $mutator;
-    }
-
-    public static function forConstructor(string $propertyName): self
-    {
-        $mutator = new self();
-        $mutator->type = self::TYPE_CONSTRUCTOR;
-        $mutator->name = $propertyName;
-
-        return $mutator;
+        return (bool) \count($this->errors);
     }
 }

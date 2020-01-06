@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -34,7 +35,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
-use Symfony\Component\Serializer\Normalizer\ScalarDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
@@ -480,7 +480,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeScalar()
     {
-        $serializer = new Serializer([new ScalarDenormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
 
         $this->assertEquals(42, $serializer->deserialize('42', 'int', 'json'));
         $this->assertEquals(42, $serializer->deserialize('42', 'integer', 'json'));
@@ -493,11 +493,14 @@ class SerializerTest extends TestCase
 
         $this->assertEquals('  spaces  ', $serializer->deserialize('"  spaces  "', 'string', 'json'));
         $this->assertEquals('@Ca$e%', $serializer->deserialize('"@Ca$e%"', 'string', 'json'));
+
+        $this->expectException(LogicException::class);
+        $serializer->deserialize('"something"', Foo::class, 'json');
     }
 
     public function testDeserializeScalarArray()
     {
-        $serializer = new Serializer([new ScalarDenormalizer(), new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
 
         $this->assertEquals([42], $serializer->deserialize('[42]', 'int[]', 'json'));
         $this->assertEquals([42], $serializer->deserialize('[42]', 'integer[]', 'json'));

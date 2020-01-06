@@ -183,6 +183,14 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
+        if ($this->scalarDenormalization($type)) {
+            if (false === @settype($data, $type)) {
+                throw new LogicException(sprintf('"%s" cannot be denormalized to %s', (string) $data, $type));
+            }
+
+            return $data;
+        }
+
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
@@ -207,7 +215,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        return null !== $this->getDenormalizer($data, $type, $format, $context);
+        return $this->scalarDenormalization($type)
+            || null !== $this->getDenormalizer($data, $type, $format, $context);
     }
 
     /**
@@ -295,6 +304,11 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
 
         return null;
+    }
+
+    final public function scalarDenormalization($type)
+    {
+        return \in_array($type, ['int', 'integer', 'bool', 'boolean', 'float', 'string'], true);
     }
 
     /**

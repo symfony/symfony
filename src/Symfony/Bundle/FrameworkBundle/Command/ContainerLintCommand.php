@@ -102,11 +102,12 @@ final class ContainerLintCommand extends Command
             $refl->setAccessible(true);
             $refl->setValue($parameterBag, true);
 
-            $passConfig = $container->getCompilerPassConfig();
-            $passConfig->setRemovingPasses([]);
-            $passConfig->setAfterRemovingPasses([]);
-
-            $skippedIds = $kernelContainer->getRemovedIds();
+            $skippedIds = [];
+            foreach ($container->getServiceIds() as $serviceId) {
+                if (0 === strpos($serviceId, '.errored.')) {
+                    $skippedIds[$serviceId] = true;
+                }
+            }
         }
 
         $container->setParameter('container.build_hash', 'lint_container');

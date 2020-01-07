@@ -323,7 +323,7 @@ trait ResponseTrait
                             }
 
                             if ('' !== $chunk && null !== $response->content && \strlen($chunk) !== fwrite($response->content, $chunk)) {
-                                $multi->handlesActivity[$j] = [null, new TransportException('Failed writing %d bytes to the response buffer.', \strlen($chunk))];
+                                $multi->handlesActivity[$j] = [null, new TransportException(sprintf('Failed writing %d bytes to the response buffer.', \strlen($chunk)))];
                                 continue;
                             }
 

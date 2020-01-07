@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
+use Symfony\Component\Security\Http\Firewall\LegacyListenerTrait;
+
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
  *
@@ -18,6 +20,8 @@ namespace Symfony\Bundle\SecurityBundle\Debug;
  */
 trait TraceableListenerTrait
 {
+    use LegacyListenerTrait;
+
     private $response;
     private $listener;
     private $time;

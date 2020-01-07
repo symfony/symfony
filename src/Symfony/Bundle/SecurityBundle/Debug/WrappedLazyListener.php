@@ -24,7 +24,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  *
  * @internal
  */
-final class WrappedLazyListener extends AbstractListener
+final class WrappedLazyListener extends AbstractListener implements ListenerInterface
 {
     use TraceableListenerTrait;
 

@@ -103,7 +103,12 @@ class CachePoolPass implements CompilerPassInterface
             if (ChainAdapter::class === $class) {
                 $adapters = [];
                 foreach ($adapter->getArgument(0) as $provider => $adapter) {
-                    $chainedPool = $adapter = new ChildDefinition($adapter);
+                    if ($adapter instanceof ChildDefinition) {
+                        $chainedPool = $adapter;
+                    } else {
+                        $chainedPool = $adapter = new ChildDefinition($adapter);
+                    }
+
                     $chainedTags = [\is_int($provider) ? [] : ['provider' => $provider]];
                     $chainedClass = '';
 

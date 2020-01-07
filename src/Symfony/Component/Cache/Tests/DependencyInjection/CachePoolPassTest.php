@@ -12,7 +12,9 @@
 namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -173,5 +175,43 @@ class CachePoolPassTest extends TestCase
         $container->setDefinition('app.cache_pool', $cachePool);
 
         $this->cachePoolPass->process($container);
+    }
+
+    public function testChainAdapterPool()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
+
+        $container->register('cache.adapter.array', ArrayAdapter::class)
+            ->addTag('cache.pool');
+        $container->register('cache.adapter.apcu', ApcuAdapter::class)
+            ->setArguments([null, 0, null])
+            ->addTag('cache.pool');
+        $container->register('cache.chain', ChainAdapter::class)
+            ->addArgument(['cache.adapter.array', 'cache.adapter.apcu'])
+            ->addTag('cache.pool');
+        $container->setDefinition('cache.app', new ChildDefinition('cache.chain'))
+            ->addTag('cache.pool');
+        $container->setDefinition('doctrine.result_cache_pool', new ChildDefinition('cache.app'))
+            ->addTag('cache.pool');
+
+        $this->cachePoolPass->process($container);
+
+        $appCachePool = $container->getDefinition('cache.app');
+        $this->assertInstanceOf(ChildDefinition::class, $appCachePool);
+        $this->assertSame('cache.chain', $appCachePool->getParent());
+
+        $chainCachePool = $container->getDefinition('cache.chain');
+        $this->assertNotInstanceOf(ChildDefinition::class, $chainCachePool);
+        $this->assertCount(2, $chainCachePool->getArgument(0));
+        $this->assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[0]);
+        $this->assertSame('cache.adapter.array', $chainCachePool->getArgument(0)[0]->getParent());
+        $this->assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[1]);
+        $this->assertSame('cache.adapter.apcu', $chainCachePool->getArgument(0)[1]->getParent());
+
+        $doctrineCachePool = $container->getDefinition('doctrine.result_cache_pool');
+        $this->assertInstanceOf(ChildDefinition::class, $doctrineCachePool);
+        $this->assertSame('cache.app', $doctrineCachePool->getParent());
     }
 }

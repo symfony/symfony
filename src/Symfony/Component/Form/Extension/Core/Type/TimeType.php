@@ -280,6 +280,18 @@ class TimeType extends AbstractType
             return null;
         };
 
+        $viewTimezone = static function (Options $options, $value): ?string {
+            if (null !== $value) {
+                return $value;
+            }
+
+            if (null !== $options['model_timezone'] && null === $options['reference_date']) {
+                return $options['model_timezone'];
+            }
+
+            return null;
+        };
+
         $resolver->setDefaults([
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
@@ -290,7 +302,7 @@ class TimeType extends AbstractType
             'with_minutes' => true,
             'with_seconds' => false,
             'model_timezone' => $modelTimezone,
-            'view_timezone' => null,
+            'view_timezone' => $viewTimezone,
             'reference_date' => null,
             'placeholder' => $placeholderDefault,
             'html5' => true,
@@ -310,12 +322,12 @@ class TimeType extends AbstractType
             'choice_translation_domain' => false,
         ]);
 
-        $resolver->setNormalizer('model_timezone', function (Options $options, $modelTimezone): ?string {
-            if (null !== $modelTimezone && $options['view_timezone'] !== $modelTimezone && null === $options['reference_date']) {
+        $resolver->setNormalizer('view_timezone', function (Options $options, $viewTimezone): ?string {
+            if (null !== $options['model_timezone'] && $viewTimezone !== $options['model_timezone'] && null === $options['reference_date']) {
                 throw new LogicException(sprintf('Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is not supported.'));
             }
 
-            return $modelTimezone;
+            return $viewTimezone;
         });
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);

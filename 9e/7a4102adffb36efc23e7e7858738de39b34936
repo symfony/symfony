@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-07T13:12:46Z
+
+Hum, actually the message says `No PSR-17 response factory found. Install a package from this list: https://packagist.org/providers/psr/http-factory-implementation.`
+The one about `No HTTPlug clients found.` is from another dep that calls `Http\Discovery\HttpClientDiscovery::find()`.
+
+This is a mess, sorry :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-07T13:56:52Z
+
+Reopening, the message is still better.

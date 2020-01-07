@@ -30,27 +30,6 @@ final class KernelEvents
     const REQUEST = 'kernel.request';
 
     /**
-     * The EXCEPTION event occurs when an uncaught exception appears.
-     *
-     * This event allows you to create a response for a thrown exception or
-     * to modify the thrown exception.
-     *
-     * @Event("Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent")
-     */
-    const EXCEPTION = 'kernel.exception';
-
-    /**
-     * The VIEW event occurs when the return value of a controller
-     * is not a Response instance.
-     *
-     * This event allows you to create a response for the return value of the
-     * controller.
-     *
-     * @Event("Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent")
-     */
-    const VIEW = 'kernel.view';
-
-    /**
      * The CONTROLLER event occurs once a controller was found for
      * handling a request.
      *
@@ -70,6 +49,17 @@ final class KernelEvents
      * @Event("Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent")
      */
     const CONTROLLER_ARGUMENTS = 'kernel.controller_arguments';
+
+    /**
+     * The VIEW event occurs when the return value of a controller
+     * is not a Response instance.
+     *
+     * This event allows you to create a response for the return value of the
+     * controller.
+     *
+     * @Event("Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent")
+     */
+    const VIEW = 'kernel.view';
 
     /**
      * The RESPONSE event occurs once a response was created for
@@ -100,4 +90,14 @@ final class KernelEvents
      * @Event("Symfony\Component\HttpKernel\Event\FinishRequestEvent")
      */
     const FINISH_REQUEST = 'kernel.finish_request';
+
+    /**
+     * The EXCEPTION event occurs when an uncaught exception appears.
+     *
+     * This event allows you to create a response for a thrown exception or
+     * to modify the thrown exception.
+     *
+     * @Event("Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent")
+     */
+    const EXCEPTION = 'kernel.exception';
 }

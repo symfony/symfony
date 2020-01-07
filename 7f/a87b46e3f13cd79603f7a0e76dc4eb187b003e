@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-02T11:42:15Z
+
+Maybe not relevant for this specific command, but outputting informational messages on stderr is often quite legit: when the command produces technically useful output (compared to info messages which are useful only for human readers), then these should be split to stdout/stderr.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-01-05T13:00:31Z
+
+> Why this PR?
+
+Because all other commands output this kind of things on stdout which seems better to me. Let's be consistent.

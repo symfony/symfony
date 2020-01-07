@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-05T20:47:24Z
+
+What do you think of https://github.com/symfony/symfony/pull/35166#issuecomment-570778609?
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2020-01-05T21:02:54Z
+
+@nicolas-grekas while `phpenv which composer` will work for detecting `phpenv-composer` proxy, it's still a bash script and I think that it's still possible that developers may wrap composer executable with custom wrapper.
+
+About COMPOSER_BIN from https://github.com/symfony/symfony/pull/35166
+IMO it's better to add detection instead of env. variable.

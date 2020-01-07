@@ -1457,10 +1457,6 @@ class FrameworkExtension extends Extension
         $chainLoader->replaceArgument(0, $serializerLoaders);
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
-        if ($container->getParameter('kernel.debug')) {
-            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
-        }
-
         if (isset($config['name_converter']) && $config['name_converter']) {
             $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument(1, new Reference($config['name_converter']));
         }

@@ -11,5 +11,15 @@
         <service id="data_collector.cache" class="Symfony\Component\Cache\DataCollector\CacheDataCollector" public="true">
             <tag name="data_collector" template="@WebProfiler/Collector/cache.html.twig" id="cache" priority="275" />
         </service>
+
+        <!-- CacheWarmer used in dev to clear cache pool -->
+        <service id="cache_pool_clearer.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\CachePoolClearerCacheWarmer" public="false">
+            <argument type="service" id="cache.system_clearer" />
+            <argument type="collection">
+                <argument>cache.validator</argument>
+                <argument>cache.serializer</argument>
+            </argument>
+            <tag name="kernel.cache_warmer" priority="64" />
+        </service>
     </services>
 </container>

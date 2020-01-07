@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by toooni at 2019-12-30T18:24:34Z
+
+@nicolas-grekas 👍https://github.com/symfony/symfony/pull/35150 is targeted to 4.3
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-31T13:30:51Z
+
+Should we do the same for decoding?
+
+---------------------------------------------------------------------------
+
+by toooni at 2020-01-04T13:04:09Z
+
+@chalasr I am not sure. I don't think there is much to gain when doing the same for decoding.

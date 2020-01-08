@@ -21,6 +21,7 @@ CHANGELOG
  * Service route loaders must be tagged with `routing.route_loader`. 
  * Added `slugger` service and `SluggerInterface` alias
  * Removed the `lock.store.flock`, `lock.store.semaphore`, `lock.store.memcached.abstract` and `lock.store.redis.abstract` services.
+ * Removed the `router.cache_class_prefix` parameter.
 
 4.4.0
 -----

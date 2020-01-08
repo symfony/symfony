@@ -33,7 +33,7 @@ class ClearRememberMeTest extends AbstractWebTestCase
         $this->assertNotNull($cookieJar->get('REMEMBERME'));
 
         $client->request('GET', '/foo');
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertRedirect($client->getResponse(), '/login');
         $this->assertNull($cookieJar->get('REMEMBERME'));
     }
 }

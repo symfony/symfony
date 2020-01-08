@@ -94,7 +94,7 @@ class EventDispatcher implements EventDispatcherInterface
     public function getListenerPriority(string $eventName, $listener)
     {
         if (empty($this->listeners[$eventName])) {
-            return null;
+            return 0;
         }
 
         if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
@@ -114,7 +114,7 @@ class EventDispatcher implements EventDispatcherInterface
             }
         }
 
-        return null;
+        return 0;
     }
 
     /**

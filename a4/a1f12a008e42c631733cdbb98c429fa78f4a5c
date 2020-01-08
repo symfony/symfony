@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-10T09:42:18Z
+
+I'm not sure about the patch: if I revert the change but keep the test, the test fails with an undefined offset error.
+This error is fixed by this patch:
+```diff
+--- a/src/Symfony/Component/Dotenv/Dotenv.php
++++ b/src/Symfony/Component/Dotenv/Dotenv.php
+@@ -203,7 +203,10 @@ final class Dotenv
+                 $this->cursor += 1 + $len;
+             } elseif ('"' === $this->data[$this->cursor]) {
+                 $value = '';
+-                ++$this->cursor;
++
++                if (++$this->cursor === $this->end) {
++                    throw $this->createFormatException('Missing quote to end the value');
++                }
+
+                 while ('"' !== $this->data[$this->cursor] || ('\\' === $this->data[$this->cursor - 1] && '\\' !== $this->data[$this->cursor - 2])) {
+                     $value .= $this->data[$this->cursor];
+```
+
+Which means we need another test case to trigger the infinite loop and fix it I think.
+
+---------------------------------------------------------------------------
+
+by naitsirch at 2019-12-10T13:59:39Z
+
+> I'm not sure about the patch: if I revert the change but keep the test, the test fails with an undefined offset error.
+
+@nicolas-grekas Yes, this is because of the ErrorHandler of phpunit. The access of the uninitialized string offset triggers a notice which invokes the error handler and throws an exception. To trigger the infinite loop in the unit test you have to disable phpunit's `convertNoticesToExceptions` setting.
+
+Or if you want to see the infinite loop you can try the code block that I have attached to #34642.
+
+> This error is fixed by this patch:
+
+Your patch fixes the error, but with a wrong offset in the error hint.
+Try this script with your fix:
+```php
+require __DIR__.'/vendor/autoload.php';
+
+$testString = 'FOO="x"
+DOO="y
+VOO="z"';
+
+$dotenv = new \Symfony\Component\Dotenv\Dotenv();
+
+$dotenv->parse($testString);
+```
+the output will look like:
+```
+$ php test.php
+PHP Fatal error:  Uncaught Symfony\Component\Dotenv\Exception\FormatException: Missing quote to end the value in ".env" at line 2.
+...O="x"\nDOO="y\nVOO="z"...
+                        ^ line 2 offset 22 in /var/www/test-dotenv/vendor/symfony/symfony/src/Symfony/Component/Dotenv/Dotenv.php:426
+```
+This makes it harder to find the broken line, because the hint in the output points to the last character of the whole env file.
+This is why I have introduced the `$prevLf` variable.
+
+My patch will output
+```
+$ php test.php
+PHP Fatal error:  Uncaught Symfony\Component\Dotenv\Exception\FormatException: Missing quote to end the value in ".env" at line 2.
+...FOO="x"\nDOO="y\nVOO="z"...
+                 ^ line 2 offset 14 in /var/www/test-dotenv/vendor/symfony/symfony/src/Symfony/Component/Dotenv/Dotenv.php:426
+```
+I think this makes it easier to spot the issue.
+
+---------------------------------------------------------------------------
+
+by naitsirch at 2019-12-10T14:03:55Z
+
+Even better would be if the output sayd `line 2 offset 6` but for this to work I'd have to use another way to throw the exception.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-15T11:09:33Z
+
+> Your patch fixes the error, but with a wrong offset in the error hint.
+
+The error looks correct to me. Multi-line quoted strings are possible, we cannot assume anything about their content.
+
+---------------------------------------------------------------------------
+
+by naitsirch at 2019-12-20T14:03:07Z
+
+Okay, how should be proceed with this PR? Should I revert my fix and only provide the unit test, or should I change my fix to the version suggested by you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-20T14:07:48Z
+
+I'd be in favor of adopting my patch if you don't mind too much, and adapt tests accordingly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-04T12:13:57Z
+
+ping @naitsirch
+
+---------------------------------------------------------------------------
+
+by naitsirch at 2020-01-04T21:23:37Z
+
+Okay, I'll try to update my PR and will contact you in the next few days.
+
+---------------------------------------------------------------------------
+
+by naitsirch at 2020-01-07T20:35:59Z
+
+@nicolas-grekas I have updated the patch following your suggestion and adjusted the unit test.

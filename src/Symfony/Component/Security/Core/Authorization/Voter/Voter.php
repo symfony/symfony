@@ -19,15 +19,17 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-abstract class Voter implements VoterInterface
+abstract class Voter implements VoterInterface, ExplainedVoterInterface
 {
+    use ExplainedVoterTrait;
+
     /**
      * {@inheritdoc}
      */
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
         // abstain vote by default in case none of the attributes are supported
-        $vote = self::ACCESS_ABSTAIN;
+        $vote = $this->abstain();
 
         foreach ($attributes as $attribute) {
             if (!$this->supports($attribute, $subject)) {
@@ -35,11 +37,13 @@ abstract class Voter implements VoterInterface
             }
 
             // as soon as at least one attribute is supported, default is to deny access
-            $vote = self::ACCESS_DENIED;
+            $vote = $this->deny();
 
-            if ($this->voteOnAttribute($attribute, $subject, $token)) {
+            if (($v = $this->voteOnAttribute($attribute, $subject, $token))->isGranted()) {
                 // grant access as soon as at least one attribute returns a positive response
-                return self::ACCESS_GRANTED;
+                return $v;
+            } else {
+                $vote->merge($v);
             }
         }
 
@@ -62,7 +66,7 @@ abstract class Voter implements VoterInterface
      *
      * @param mixed $subject
      *
-     * @return bool
+     * @return bool|Vote
      */
     abstract protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token);
 }

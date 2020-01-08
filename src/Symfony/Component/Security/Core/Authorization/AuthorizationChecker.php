@@ -29,6 +29,8 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     private $accessDecisionManager;
     private $authenticationManager;
     private $alwaysAuthenticate;
+    /** @var AccessDecision */
+    private $lastAccessDecision;
 
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false)
     {
@@ -53,6 +55,11 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
         }
 
-        return $this->accessDecisionManager->decide($token, [$attribute], $subject);
+        return ($this->lastAccessDecision = $this->accessDecisionManager->decide($token, [$attribute], $subject))->isGranted();
+    }
+
+    public function getLastAccessDecision(): AccessDecision
+    {
+        return $this->lastAccessDecision;
     }
 }

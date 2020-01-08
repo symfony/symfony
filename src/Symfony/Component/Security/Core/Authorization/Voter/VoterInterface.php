@@ -33,7 +33,7 @@ interface VoterInterface
      * @param mixed $subject    The subject to secure
      * @param array $attributes An array of attributes associated with the method being invoked
      *
-     * @return int either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
+     * @return int|Vote either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
      */
     public function vote(TokenInterface $token, $subject, array $attributes);
 }

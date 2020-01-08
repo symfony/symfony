@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -48,7 +49,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function decide(TokenInterface $token, array $attributes, $object = null): bool
+    public function decide(TokenInterface $token, array $attributes, $object = null)
     {
         $currentDecisionLog = [
             'attributes' => $attributes,
@@ -71,9 +72,9 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      * Adds voter vote and class to the voter details.
      *
      * @param array $attributes attributes used for the vote
-     * @param int   $vote       vote of the voter
+     * @param Vote  $vote       vote of the voter
      */
-    public function addVoterVote(VoterInterface $voter, array $attributes, int $vote)
+    public function addVoterVote(VoterInterface $voter, array $attributes, Vote $vote)
     {
         $currentLogIndex = \count($this->currentLog) - 1;
         $this->currentLog[$currentLogIndex]['voterDetails'][] = [

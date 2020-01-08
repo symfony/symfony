@@ -23,6 +23,9 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class SlackTransportFactory extends AbstractTransportFactory
 {
+    /**
+     * @return SlackTransport
+     */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();

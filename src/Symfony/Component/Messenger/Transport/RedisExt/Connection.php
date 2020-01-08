@@ -248,6 +248,10 @@ class Connection
                     'uniqid' => uniqid('', true),
                 ]);
 
+                if (false === $message) {
+                    throw new TransportException(json_last_error_msg());
+                }
+
                 $score = (int) ($this->getCurrentTimeInMilliseconds() + $delayInMs);
                 $added = $this->connection->zadd($this->queue, ['NX'], $score, $message);
             } else {
@@ -255,6 +259,10 @@ class Connection
                     'body' => $body,
                     'headers' => $headers,
                 ]);
+
+                if (false === $message) {
+                    throw new TransportException(json_last_error_msg());
+                }
 
                 if ($this->maxEntries) {
                     $added = $this->connection->xadd($this->stream, '*', ['message' => $message], $this->maxEntries, true);

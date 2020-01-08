@@ -186,6 +186,18 @@ class ConnectionTest extends TestCase
         $redis->del('messenger-getnonblocking');
     }
 
+    public function testJsonError()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/json-error', [], $redis);
+        try {
+            $connection->add("\xB1\x31", []);
+        } catch (TransportException $e) {
+        }
+
+        $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getMessage());
+    }
+
     public function testMaxEntries()
     {
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();

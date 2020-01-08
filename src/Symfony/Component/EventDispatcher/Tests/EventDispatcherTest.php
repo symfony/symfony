@@ -123,8 +123,8 @@ class EventDispatcherTest extends TestCase
 
         $this->assertSame(-10, $this->dispatcher->getListenerPriority('pre.foo', $listener1));
         $this->assertSame(0, $this->dispatcher->getListenerPriority('pre.foo', $listener2));
-        $this->assertNull($this->dispatcher->getListenerPriority('pre.bar', $listener2));
-        $this->assertNull($this->dispatcher->getListenerPriority('pre.foo', function () {}));
+        $this->assertEquals($this->dispatcher->getListenerPriority('pre.bar', $listener2), 0);
+        $this->assertEquals($this->dispatcher->getListenerPriority('pre.foo', function () {}), 0);
     }
 
     public function testDispatch()

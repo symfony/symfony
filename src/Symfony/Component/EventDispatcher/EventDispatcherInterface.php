@@ -62,7 +62,7 @@ interface EventDispatcherInterface extends ContractsEventDispatcherInterface
      *
      * @param callable $listener The listener
      *
-     * @return int|null The event listener priority
+     * @return int The event listener priority, defaults to 0
      */
     public function getListenerPriority(string $eventName, $listener);
 

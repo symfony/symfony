@@ -199,6 +199,10 @@ class FlattenExceptionTest extends TestCase
 
     public function testArguments()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            $this->markTestSkipped('PHP 7.4 removes arguments from exception traces.');
+        }
+
         $dh = opendir(__DIR__);
         $fh = tmpfile();
 
@@ -261,6 +265,10 @@ class FlattenExceptionTest extends TestCase
 
     public function testRecursionInArguments()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            $this->markTestSkipped('PHP 7.4 removes arguments from exception traces.');
+        }
+
         $a = null;
         $a = ['foo', [2, &$a]];
         $exception = $this->createException($a);
@@ -272,6 +280,10 @@ class FlattenExceptionTest extends TestCase
 
     public function testTooBigArray()
     {
+        if (\PHP_VERSION_ID >= 70400) {
+            $this->markTestSkipped('PHP 7.4 removes arguments from exception traces.');
+        }
+
         $a = [];
         for ($i = 0; $i < 20; ++$i) {
             for ($j = 0; $j < 50; ++$j) {

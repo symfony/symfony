@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by bastnic at 2020-01-07T22:31:50Z
+
+FYI, it depends of the number of property in the response, so could be way more than 5% (I got 8 in a previous one).
+
+---------------------------------------------------------------------------
+
+by natebrunette at 2020-01-08T05:14:12Z
+
+@bastnic Is this behavior documented somewhere? These results are impressive, I'm curious where you learned that `array_key_exists` is faster, as all the benchmarks I've seen show the opposite.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-08T07:01:35Z
+
+@natebrunette IIRC it’s not about the benchmark of these functions but about checking issue on null even if the key exists. Not the key is checked instead of the value which only forces a recalculate if really needed. The perf boost comes from correct usage not one function over the other. Am I right @bastnic?
+
+---------------------------------------------------------------------------
+
+by bastnic at 2020-01-08T07:06:04Z
+
+> @natebrunette IIRC it’s not about the benchmark of these functions but about checking issue on null even if the key exists. Not the key is checked instead of the value which only forces a recalculate if really needed. The perf boost comes from correct usage not one function over the other. Am I right @bastnic?
+
+I couldn't say it better. Thanks @OskarStark.

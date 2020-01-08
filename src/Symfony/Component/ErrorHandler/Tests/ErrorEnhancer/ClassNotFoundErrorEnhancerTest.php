@@ -32,6 +32,10 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
                 $function = $function[0]->getClassLoader();
             }
 
+            if (!\is_array($function)) {
+                dump($function);
+            }
+
             if ($function[0] instanceof ComposerClassLoader) {
                 $function[0]->add('Symfony_Component_ErrorHandler_Tests_Fixtures', \dirname(__DIR__, 5));
                 break;

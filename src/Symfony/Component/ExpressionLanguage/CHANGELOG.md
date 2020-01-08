@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Added support for callable properties
+
 4.0.0
 -----
 

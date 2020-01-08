@@ -220,7 +220,7 @@ class ExpressionLanguageTest extends TestCase
     public function testCallBadCallable()
     {
         $this->expectException('RuntimeException');
-        $this->expectExceptionMessageRegExp('/Unable to call method "\w+" of object "\w+"./');
+        $this->expectExceptionMessageRegExp('/Unable to call method or callable property "\w+" on object "\w+"./');
         $el = new ExpressionLanguage();
         $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
     }
@@ -256,4 +256,25 @@ class ExpressionLanguageTest extends TestCase
             ],
         ];
     }
+
+    public function testCallableProperties()
+    {
+        $el = new ExpressionLanguage();
+        $obj = new ObjectWithCallableProperty();
+        $obj->prop = static function ($value) {
+            return $value * 2;
+        };
+
+        $this->assertEquals(4, $el->evaluate(
+            'obj.prop(2)',
+            [
+                'obj' => $obj,
+            ]
+        ));
+    }
+}
+
+class ObjectWithCallableProperty
+{
+    public $prop;
 }

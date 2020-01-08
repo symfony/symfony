@@ -24,6 +24,9 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class TelegramTransportFactory extends AbstractTransportFactory
 {
+    /**
+     * @return TelegramTransport
+     */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();

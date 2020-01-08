@@ -23,6 +23,9 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class TwilioTransportFactory extends AbstractTransportFactory
 {
+    /**
+     * @return TwilioTransport
+     */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();

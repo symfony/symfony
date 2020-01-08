@@ -272,7 +272,10 @@ final class Dotenv
                 $this->cursor += 1 + $len;
             } elseif ('"' === $this->data[$this->cursor]) {
                 $value = '';
-                ++$this->cursor;
+
+                if (++$this->cursor === $this->end) {
+                    throw $this->createFormatException('Missing quote to end the value');
+                }
 
                 while ('"' !== $this->data[$this->cursor] || ('\\' === $this->data[$this->cursor - 1] && '\\' !== $this->data[$this->cursor - 2])) {
                     $value .= $this->data[$this->cursor];

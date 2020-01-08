@@ -192,15 +192,15 @@ HttpKernel
 
  * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been deprecated
  * The `KernelInterface::getName()` and the `kernel.name` parameter have been deprecated
- * Deprecated the first and second constructor argument of `ConfigDataCollector` 
- * Deprecated `ConfigDataCollector::getApplicationName()` 
+ * Deprecated the first and second constructor argument of `ConfigDataCollector`
+ * Deprecated `ConfigDataCollector::getApplicationName()`
  * Deprecated `ConfigDataCollector::getApplicationVersion()`
 
 Messenger
 ---------
 
  * The `MiddlewareInterface::handle()` and `SenderInterface::send()` methods must now return an `Envelope` instance.
- * The return value of handlers isn't forwarded anymore by middleware and buses. 
+ * The return value of handlers isn't forwarded anymore by middleware and buses.
    If you used to return a value, e.g in query bus handlers, you can either:
     - get the result from the `HandledStamp` in the envelope returned by the bus.
     - use the `HandleTrait` to leverage a message bus, expecting a single, synchronous message handling and returning its result.
@@ -214,15 +214,15 @@ Messenger
       $query->setResult($yourResult);
       ```
  * The `EnvelopeAwareInterface` was removed and the `MiddlewareInterface::handle()` method now requires an `Envelope` object
-   as first argument. When using built-in middleware with the provided `MessageBus`, you will not have to do anything.  
-   If you use your own `MessageBusInterface` implementation, you must wrap the message in an `Envelope` before passing it to middleware.  
+   as first argument. When using built-in middleware with the provided `MessageBus`, you will not have to do anything.
+   If you use your own `MessageBusInterface` implementation, you must wrap the message in an `Envelope` before passing it to middleware.
    If you created your own middleware, you must change the signature to always expect an `Envelope`.
  * The `MiddlewareInterface::handle()` second argument (`callable $next`) has changed in favor of a `StackInterface` instance.
-   When using built-in middleware with the provided `MessageBus`, you will not have to do anything.  
-   If you use your own `MessageBusInterface` implementation, you can use the `StackMiddleware` implementation.  
+   When using built-in middleware with the provided `MessageBus`, you will not have to do anything.
+   If you use your own `MessageBusInterface` implementation, you can use the `StackMiddleware` implementation.
    If you created your own middleware, you must change the signature to always expect an `StackInterface` instance
    and call `$stack->next()->handle($envelope, $stack)` instead of `$next` to call the next middleware:
-   
+
    Before:
    ```php
    public function handle($message, callable $next): Envelope
@@ -230,7 +230,7 @@ Messenger
        // do something before
        $message = $next($message);
        // do something after
-    
+
        return $message;
    }
    ```
@@ -242,7 +242,7 @@ Messenger
        // do something before
        $envelope = $stack->next()->handle($envelope, $stack);
        // do something after
-    
+
        return $envelope;
    }
    ```
@@ -251,7 +251,7 @@ Messenger
     respectively `ReceivedStamp`, `ValidationStamp`, `SerializerStamp` and moved to the `Stamp` namespace.
  * `AllowNoHandlerMiddleware` has been removed in favor of a new constructor argument on `HandleMessageMiddleware`
  * The `ConsumeMessagesCommand` class now takes an instance of `Psr\Container\ContainerInterface`
-    as first constructor argument, i.e a message bus locator. The CLI command now expects a mandatory 
+    as first constructor argument, i.e a message bus locator. The CLI command now expects a mandatory
     `--bus` option value if there is more than one bus in the locator.
  * `MessageSubscriberInterface::getHandledMessages()` return value has changed. The value of an array item
    needs to be an associative array or the method name.

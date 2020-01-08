@@ -475,7 +475,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                             }
                         }
 
-                        public function __destruct()
+                        public function release()
                         {
                             flock($this->lock, LOCK_UN);
                             fclose($this->lock);
@@ -553,7 +553,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-        unset($cache);
+        $cache->release();
         $this->container = require $cachePath;
         $this->container->set('kernel', $this);
 

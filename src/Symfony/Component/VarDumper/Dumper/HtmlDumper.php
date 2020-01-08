@@ -164,8 +164,8 @@ class HtmlDumper extends CliDumper
 Sfdump = window.Sfdump || (function (doc) {
 
 var refStyle = doc.createElement('style'),
-    rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
-    idRx = /\bsf-dump-\d+-ref[012]\w+\b/,
+    rxEsc = '/([.*+?^${}()|\[\]\/\\])/g',
+    idRx = '/\bsf-dump-\d+-ref[012]\w+\b/',
     keyHint = 0 <= navigator.platform.toUpperCase().indexOf('MAC') ? 'Cmd' : 'Ctrl',
     addEventListener = function (e, n, cb) {
         e.addEventListener(n, cb, false);
@@ -600,7 +600,7 @@ return function (root, x) {
                     */
                     return;
                 }
-    
+
                 e.preventDefault();
                 search.className = search.className.replace(/\bsf-dump-search-hidden\b/, '');
                 searchInput.focus();

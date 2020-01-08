@@ -27,13 +27,15 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
                 continue;
             }
 
+            $function = $function[0];
+
             // get class loaders wrapped by DebugClassLoader
-            if ($function[0] instanceof DebugClassLoader) {
-                $function = $function[0]->getClassLoader();
+            if ($function instanceof DebugClassLoader) {
+                $function = $function->getClassLoader();
             }
 
-            if ($function[0] instanceof ComposerClassLoader) {
-                $function[0]->add('Symfony_Component_ErrorHandler_Tests_Fixtures', \dirname(__DIR__, 5));
+            if ($function instanceof ComposerClassLoader) {
+                $function->add('Symfony_Component_ErrorHandler_Tests_Fixtures', \dirname(__DIR__, 5));
                 break;
             }
         }

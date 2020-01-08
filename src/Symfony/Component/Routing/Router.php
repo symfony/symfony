@@ -285,7 +285,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->matcher;
         }
 
-        $compiled = is_a($this->options['matcher_class'], CompiledUrlMatcher::class, true) && (UrlMatcher::class === $this->options['matcher_base_class'] || RedirectableUrlMatcher::class === $this->options['matcher_base_class']);
+        $compiled = is_a($this->options['matcher_class'], CompiledUrlMatcher::class, true) && (UrlMatcher::class === $this->options['matcher_base_class'] || RedirectableUrlMatcher::class === $this->options['matcher_base_class']) && is_a($this->options['matcher_dumper_class'], CompiledUrlMatcherDumper::class, true);
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
             $routes = $this->getRouteCollection();
@@ -342,7 +342,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->generator;
         }
 
-        $compiled = is_a($this->options['generator_class'], CompiledUrlGenerator::class, true) && UrlGenerator::class === $this->options['generator_base_class'];
+        $compiled = is_a($this->options['generator_class'], CompiledUrlGenerator::class, true) && UrlGenerator::class === $this->options['generator_base_class'] && is_a($this->options['generator_dumper_class'], CompiledUrlGeneratorDumper::class, true);
 
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
             $routes = $this->getRouteCollection();
@@ -392,8 +392,8 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     protected function getGeneratorDumperInstance()
     {
-        // For BC, fallback to PhpGeneratorDumper if the UrlGenerator and UrlGeneratorDumper are not consistent with each other
-        if (is_a($this->options['generator_class'], CompiledUrlGenerator::class, true) !== is_a($this->options['generator_dumper_class'], CompiledUrlGeneratorDumper::class, true)) {
+        // For BC, fallback to PhpGeneratorDumper (which is the old default value) if the old UrlGenerator is used with the new default CompiledUrlGeneratorDumper
+        if (!is_a($this->options['generator_class'], CompiledUrlGenerator::class, true) && is_a($this->options['generator_dumper_class'], CompiledUrlGeneratorDumper::class, true)) {
             return new PhpGeneratorDumper($this->getRouteCollection());
         }
 
@@ -405,8 +405,8 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     protected function getMatcherDumperInstance()
     {
-        // For BC, fallback to PhpMatcherDumper if the UrlMatcher and UrlMatcherDumper are not consistent with each other
-        if (is_a($this->options['matcher_class'], CompiledUrlMatcher::class, true) !== is_a($this->options['matcher_dumper_class'], CompiledUrlMatcherDumper::class, true)) {
+        // For BC, fallback to PhpMatcherDumper (which is the old default value) if the old UrlMatcher is used with the new default CompiledUrlMatcherDumper
+        if (!is_a($this->options['matcher_class'], CompiledUrlMatcher::class, true) && is_a($this->options['matcher_dumper_class'], CompiledUrlMatcherDumper::class, true)) {
             return new PhpMatcherDumper($this->getRouteCollection());
         }
 

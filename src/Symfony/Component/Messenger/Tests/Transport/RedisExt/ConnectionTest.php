@@ -189,9 +189,7 @@ class ConnectionTest extends TestCase
     public function testJsonError()
     {
         $redis = new \Redis();
-
         $connection = Connection::fromDsn('redis://localhost/json-error', [], $redis);
-
         try {
             $connection->add("\xB1\x31", []);
         } catch (TransportException $e) {

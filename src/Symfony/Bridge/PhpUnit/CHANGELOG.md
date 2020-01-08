@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * ignore verbosity settings when the build fails because of deprecations
+ * added per-group verbosity
+
 5.0.0
 -----
 

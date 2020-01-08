@@ -29,6 +29,10 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
             // get class loaders wrapped by DebugClassLoader
             if ($function[0] instanceof DebugClassLoader) {
                 $function = $function[0]->getClassLoader();
+
+                if (!\is_array($function)) {
+                    continue;
+                }
             }
 
             if ($function[0] instanceof ComposerClassLoader) {

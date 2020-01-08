@@ -6,6 +6,7 @@ use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
+use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class EsmtpTransportFactoryTest extends TransportFactoryTestCase
@@ -65,6 +66,19 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
 
         yield [
             new Dsn('smtps', 'example.com', '', '', 465),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 465, true, $eventDispatcher, $logger);
+        /** @var SocketStream $stream */
+        $stream = $transport->getStream();
+        $streamOptions = $stream->getStreamOptions();
+        $streamOptions['ssl']['verify_peer'] = false;
+        $streamOptions['ssl']['verify_peer_name'] = false;
+        $stream->setStreamOptions($streamOptions);
+
+        yield [
+            new Dsn('smtps', 'example.com', '', '', 465, ['verify_peer' => false]),
             $transport,
         ];
     }

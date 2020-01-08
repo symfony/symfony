@@ -36,6 +36,7 @@ CHANGELOG
  * Added `Symfony\Component\Mailer\Test\TransportFactoryTestCase` to ease testing custom transport factories.
  * Added `SentMessage::getDebug()` and `TransportExceptionInterface::getDebug` to help debugging
  * Made `MessageEvent` final
+ * add DSN parameter `verify_peer` to disable TLS peer verification for SMTP transport
 
 4.3.0
 -----

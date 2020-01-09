@@ -1,0 +1,173 @@
+---------------------------------------------------------------------------
+
+by rybakit at 2019-12-05T09:40:39Z
+
+Imho, it's not obvious just from looking at the PR example that `MyCommand()` will be executed on the object destruction. Moreover, this new behavior is different from the behavior of other commands, which might be confusing:
+
+```php
+$cmd1 = new HelpCommand(); // noop
+$cmd2 = new MyCommand();
+$cmd3 = clone $cmd2;
+// $cmd2 and $cmd3 get executed
+```
+
+What about removing this implicit magic and trigger the execution explicitly? Something like:
+
+```php
+class SingleCommandApplication extends Command
+{
+    ...
+
+    public function run(callable $code): int
+    {
+        $new = clone $this;
+        $new->setCode($code);
+        ...
+        return $application->run();
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-05T09:48:37Z
+
+The `run()` method is already defined and I can not modify it. More over, with your API, it's a shame to add a new way to add the "code" when there is already a way to add one.
+
+The goal here is to write a single command application. So it does not make sensee to write
+```php
+$cmd1 = new HelpCommand(); // noop
+$cmd2 = new MyCommand();
+$cmd3 = clone $cmd2;
+```
+
+**But**, to re reduce confusion, I might add a `start()` method for those who want to be explicit and does not rely on `__desctruct()`. Basically, I will rename `__desctruct()` to `start()` and call it from the desctructor. Not sure it worth it according to the very good feedback I got here and on twitter
+
+---------------------------------------------------------------------------
+
+by rybakit at 2019-12-05T23:17:59Z
+
+> The run() method is already defined and I can not modify it. More over, with your API, it's a shame to add a new way to add the "code" when there is already a way to add one.
+
+I agree, maybe it was not the best example. But my point was not about how to name the method or whether it should accept the `$code` argument or not. My main concern is about non-intuitive API that you're introducing by this PR (maybe it's only me, but if I would see this piece of code in a real project I would think that there is a bug).
+
+> Not sure it worth it according to the very good feedback I got here and on twitter
+
+That's what surprised me, tbh :) Maybe I'm missing something obvious here, I really tried but couldn't think of a single reason why relying on implicit object destruction is better than an explicit method call. Sorry, but it feels like you are abusing destructor for things it's not intended to be used for. I'm sure you know how easy it is to write a script in PHP (accidentally or not) that will prevent `__destruct()` from being called. Heck, even `__invoke()` would be better than `__destruct()`. And no, calling `start()` from the destructor will not make the API any better.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-06T09:57:37Z
+
+I did not not add a start method to reduce de boilerplate code. That's all :)
+You need to remember this PR target RAD :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-06T19:57:19Z
+
+Making the code runs without doing any call just hides the intent for no benefit to me.
+Could we at least make it invokable?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-11T10:51:50Z
+
+> Could we at least make it invokable?
+
+The file will look like this:
+```php
+(new SingleCommandApplication())
+    ->setName('My Super Command') // Optional
+    ->setVersion('1.0.0') // Optional
+    ->setProcessTitle('my_proc_title') // Optional
+    ->addArgument('who', InputArgument::OPTIONAL, 'Who', 'World')  // Optional
+    ->setCode(function(InputInterface $input, OutputInterface $output) {
+        $output->writeln(sprintf('Hello %s!', $input->getArgument('who')));
+    })
+();
+```
+
+A start method looks better to me, WDYT?
+
+```php
+(new SingleCommandApplication())
+    ->setName('My Super Command') // Optional
+    ->setVersion('1.0.0') // Optional
+    ->setProcessTitle('my_proc_title') // Optional
+    ->addArgument('who', InputArgument::OPTIONAL, 'Who', 'World')  // Optional
+    ->setCode(function(InputInterface $input, OutputInterface $output) {
+        $output->writeln(sprintf('Hello %s!', $input->getArgument('who')));
+    })
+    ->start()
+;
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-11T10:53:40Z
+
+An explicit named method looks better to me also.
+start() or run() :) (run() is the name if the method on Application. It'd be consistent to use the same to me)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-12-11T10:55:06Z
+
+I would use `run()` as well.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-11T18:03:04Z
+
+👍 for `run()`
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-11T23:31:38Z
+
+But run is already used. I think I can not use it
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-12T04:29:45Z
+
+Adding some state should do the trick:
+```php
+private $running = false;
+public function run(InputInterface $input = null, OutputInterface $output = null): int {
+    if ($this->running) {
+        return parent::run($input, $output);
+    }
+    // ...
+    $this->running = true;
+    $ret = $app->run($input, $output);
+    $this->running = false;
+
+    return $ret;
+}
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-12T08:37:03Z
+
+I really wanted to avoid this. This is ugly... But... It's better for consistency
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-12-12T15:12:09Z
+
+OK, I updated the PR to add the `run()` command. Hope you like it!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-12-13T19:17:34Z
+
+These two failures are related https://ci.appveyor.com/project/fabpot/symfony/builds/29497553#L1101 :angel:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-01-08T10:38:41Z
+
+Failures on appveyor & travis are not related

@@ -56,6 +56,50 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     /**
+     * @dataProvider wordwrapProvider
+     */
+    public function testWordwrap($expected, $actual, $length, $break, $cut = false)
+    {
+        $instance = static::createFromString($actual);
+        $actual = $instance->wordwrap($length, $break, $cut);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function wordwrapProvider()
+    {
+        return [
+            [
+                'Lo-re-m-Ip-su-m',
+                'Lorem Ipsum',
+                2,
+                '-',
+                true,
+            ],
+            [
+                'Lorem-Ipsum',
+                'Lorem Ipsum',
+                2,
+                '-',
+            ],
+            [
+                'Lor-em-Ips-um',
+                'Lorem Ipsum',
+                3,
+                '-',
+                true,
+            ],
+            [
+                'L-o-r-e-m-I-p-s-u-m',
+                'Lorem Ipsum',
+                1,
+                '-',
+                true,
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider provideWrap
      */
     public function testWrap(array $expected, array $values)

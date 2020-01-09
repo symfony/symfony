@@ -141,9 +141,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         $passthruOrFail("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
 
-    if (PHP_VERSION_ID >= 70000) {
-        $passthruOrFail("$COMPOSER config --unset platform");
-    }
+    $passthruOrFail("$COMPOSER config --unset platform.php");
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
         $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
         $passthruOrFail("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', DIRECTORY_SEPARATOR, $path)));

@@ -17,21 +17,22 @@
     ],
     "require": {
         "php": "^5.5.9|>=7.0.8",
+        "symfony/config": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4.25|^4.2.6",
         "symfony/polyfill-php70": "~1.0",
-        "symfony/routing": "~2.8|~3.0|~4.0",
-        "symfony/twig-bundle": "~2.8|~3.0|~4.0",
+        "symfony/routing": "~3.4.7|~4.0",
+        "symfony/twig-bundle": "~3.4|~4.0",
         "symfony/var-dumper": "~3.3|~4.0",
         "twig/twig": "~1.34|~2.4"
     },
     "require-dev": {
-        "symfony/config": "~3.4|~4.0",
-        "symfony/console": "~2.8|~3.0|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
-        "symfony/stopwatch": "~2.8|~3.0|~4.0"
+        "symfony/browser-kit": "~3.4|~4.0",
+        "symfony/console": "~3.4|~4.0",
+        "symfony/css-selector": "~3.4|~4.0",
+        "symfony/framework-bundle": "~3.4|~4.0",
+        "symfony/stopwatch": "~3.4|~4.0"
     },
     "conflict": {
-        "symfony/config": "<3.4",
         "symfony/dependency-injection": "<3.4",
         "symfony/event-dispatcher": "<3.3.1",
         "symfony/var-dumper": "<3.3"

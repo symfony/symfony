@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-18T16:07:41Z
+
+@javiereguiluz Can you have a look at the tests, they seem broken.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-03T16:42:21Z
+
+@javiereguiluz Can you have a look at this PR? We cannot merge it as the tests are broken.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-18T07:27:58Z
+
+Can you please rebase, squash, fix tests?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-18T09:28:03Z
+
+I've rebased and squashed ... but I need help solving a failing test: https://travis-ci.org/symfony/symfony/jobs/560385179#L2602  Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-09-26T21:00:16Z
+
+Can you please rebase so that we can see fresh tests?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-09-27T08:27:35Z
+
+I've rebased and fixed everything I could, but now I see this error:
+
+> 1) Symfony\Bundle\WebProfilerBundle\Tests\Controller\ProfilerControllerTest::testPanelActionWithWrongPanel
+TypeError: Argument 2 passed to Symfony\Bundle\TwigBundle\Controller\ExceptionController::showAction() must be an instance of Symfony\Component\Debug\Exception\FlattenException, instance of Symfony\Component\ErrorRenderer\Exception\FlattenException given, called in /home/travis/build/symfony/symfony/src/Symfony/Bundle/WebProfilerBundle/vendor/symfony/http-kernel/HttpKernel.php on line 146
+
+https://travis-ci.org/symfony/symfony/jobs/590304523#L3318

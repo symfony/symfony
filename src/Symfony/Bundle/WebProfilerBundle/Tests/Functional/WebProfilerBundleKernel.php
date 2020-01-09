@@ -10,7 +10,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class WebProfilerBundleKernel extends Kernel
 {
@@ -30,11 +30,11 @@ class WebProfilerBundleKernel extends Kernel
         ];
     }
 
-    protected function configureRoutes(RouteCollectionBuilder $routes)
+    protected function configureRoutes(RoutingConfigurator $routes)
     {
-        $routes->import(__DIR__.'/../../Resources/config/routing/profiler.xml', '/_profiler');
-        $routes->import(__DIR__.'/../../Resources/config/routing/wdt.xml', '/_wdt');
-        $routes->add('/', 'kernel:homepageController');
+        $routes->import(__DIR__.'/../../Resources/config/routing/profiler.xml')->prefix('/_profiler');
+        $routes->import(__DIR__.'/../../Resources/config/routing/wdt.xml')->prefix('/_wdt');
+        $routes->add('_', '/')->controller('kernel:homepageController');
     }
 
     protected function configureContainer(ContainerBuilder $containerBuilder, LoaderInterface $loader)

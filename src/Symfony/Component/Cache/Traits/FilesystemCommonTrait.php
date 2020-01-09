@@ -35,6 +35,8 @@ trait FilesystemCommonTrait
                 throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
             }
             $directory .= \DIRECTORY_SEPARATOR.$namespace;
+        } else {
+            $directory .= \DIRECTORY_SEPARATOR.'@';
         }
         if (!file_exists($directory)) {
             @mkdir($directory, 0777, true);

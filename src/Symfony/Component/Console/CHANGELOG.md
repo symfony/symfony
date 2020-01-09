@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * Add `SingleCommandApplication`
+
 5.0.0
 -----
 

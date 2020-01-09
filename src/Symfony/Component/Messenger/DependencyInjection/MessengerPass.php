@@ -114,6 +114,10 @@ class MessengerPass implements CompilerPassInterface
                         $options['from_transport'] = $tag['from_transport'];
                     }
 
+                    if (!isset($options['auto_route']) && isset($tag['auto_route'])) {
+                        $options['auto_route'] = $tag['auto_route'];
+                    }
+
                     $priority = $tag['priority'] ?? $options['priority'] ?? 0;
                     $method = $options['method'] ?? '__invoke';
 
@@ -179,7 +183,7 @@ class MessengerPass implements CompilerPassInterface
                     $definitions[$definitionId = '.messenger.handler_descriptor.'.ContainerBuilder::hash($bus.':'.$message.':'.$handler[0])] = (new Definition(HandlerDescriptor::class))->setArguments([new Reference($handler[0]), $handler[1]]);
                     $handlerDescriptors[] = new Reference($definitionId);
 
-                    if (isset($handler[1]['from_transport'])) {
+                    if (isset($handler[1]['auto_route']) && $handler[1]['auto_route'] && isset($handler[1]['from_transport'])) {
                         if (!isset($messageToSendersMapping[$message])) {
                             $messageToSendersMapping[$message] = [];
                         }

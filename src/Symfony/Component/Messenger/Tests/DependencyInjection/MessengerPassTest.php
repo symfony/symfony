@@ -608,10 +608,40 @@ class MessengerPassTest extends TestCase
         $container = $this->getContainerBuilder($busId = 'message_bus');
         $container
             ->register(DummyHandler::class, DummyHandler::class)
-            ->addTag('messenger.message_handler', ['from_transport' => 'async'])
+            ->addTag('messenger.message_handler', ['from_transport' => 'async', 'auto_route' => true])
+        ;
+        $container
+            ->register(SecondDummyHandler::class, DummyHandler::class)
+            ->addTag('messenger.message_handler', ['from_transport' => 'sync'])
         ;
 
         (new MessengerPass())->process($container);
+
+        $messageToSendersMapping = $container->getDefinition('messenger.senders_locator')->getArgument(0);
+        $this->assertCount(1, $messageToSendersMapping);
+        $this->assertSame([DummyMessage::class => ['async']], $messageToSendersMapping);
+    }
+
+    public function testAutomaticallyRouteMessagesWhenFromTransportOptionIsSet()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+        $container->register('command_bus', MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, []);
+
+        $container
+            ->register(HandlerFromTransportWithAutoRoute::class, HandlerFromTransportWithAutoRoute::class)
+            ->addTag('messenger.message_handler');
+
+        (new MessengerPass())->process($container);
+
+        $mapping = $container->getDefinition('message_bus.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertHandlerDescriptor(
+            $container,
+            $mapping,
+            DummyMessage::class,
+            [[HandlerFromTransportWithAutoRoute::class, 'exec']],
+            [['from_transport' => 'async', 'auto_route' => true]]
+        );
 
         $messageToSendersMapping = $container->getDefinition('messenger.senders_locator')->getArgument(0);
         $this->assertCount(1, $messageToSendersMapping);
@@ -671,6 +701,13 @@ class MessengerPassTest extends TestCase
 }
 
 class DummyHandler
+{
+    public function __invoke(DummyMessage $message): void
+    {
+    }
+}
+
+class SecondDummyHandler
 {
     public function __invoke(DummyMessage $message): void
     {
@@ -865,5 +902,17 @@ class UselessMiddleware implements MiddlewareInterface
     public function handle(Envelope $message, StackInterface $stack): Envelope
     {
         return $stack->next()->handle($message, $stack);
+    }
+}
+
+class HandlerFromTransportWithAutoRoute implements MessageSubscriberInterface
+{
+    public static function getHandledMessages(): iterable
+    {
+        yield DummyMessage::class => ['method' => 'exec', 'from_transport' => 'async', 'auto_route' => true];
+    }
+
+    public function exec(DummyMessage $message)
+    {
     }
 }

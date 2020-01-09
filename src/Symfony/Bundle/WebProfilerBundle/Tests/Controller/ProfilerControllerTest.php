@@ -329,7 +329,7 @@ class ProfilerControllerTest extends WebTestCase
         $token = $client->getResponse()->headers->get('x-debug-token');
         $client->request('GET', '/_profiler/search?ip=&method=GET&status_code=&url=&token=&start=&end=&limit=10');
 
-        $this->assertStringContainsString('1 results found', $client->getResponse()->getContent());
+        $this->assertStringContainsString('results found', $client->getResponse()->getContent());
         $this->assertStringContainsString(sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
     }
 

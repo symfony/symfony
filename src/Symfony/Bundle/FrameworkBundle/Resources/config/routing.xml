@@ -79,10 +79,10 @@
         <service id="Symfony\Component\Routing\RequestContextAwareInterface" alias="router" />
 
         <service id="router.request_context" class="Symfony\Component\Routing\RequestContext">
-            <argument>%router.request_context.base_url%</argument>
+            <argument></argument> <!-- base_url -->
             <argument>GET</argument>
-            <argument>%router.request_context.host%</argument>
-            <argument>%router.request_context.scheme%</argument>
+            <argument></argument> <!-- host -->
+            <argument></argument> <!-- scheme -->
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
         </service>

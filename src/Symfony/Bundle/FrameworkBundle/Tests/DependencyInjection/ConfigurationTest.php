@@ -413,6 +413,11 @@ class ConfigurationTest extends TestCase
                 'https_port' => 443,
                 'strict_requirements' => true,
                 'utf8' => false,
+                'context' => [
+                    'host' => '%router.request_context.host%',
+                    'scheme' => '%router.request_context.scheme%',
+                    'base_url' => '%router.request_context.base_url%',
+                ],
             ],
             'session' => [
                 'enabled' => false,

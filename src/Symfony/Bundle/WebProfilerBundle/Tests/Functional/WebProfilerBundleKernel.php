@@ -21,18 +21,6 @@ class WebProfilerBundleKernel extends Kernel
         parent::__construct('test', false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        if (null === $this->name) {
-            $this->name = parent::getName().substr(md5(__CLASS__), -16);
-        }
-
-        return $this->name;
-    }
-
     public function registerBundles()
     {
         return [
@@ -60,6 +48,11 @@ class WebProfilerBundleKernel extends Kernel
         $containerBuilder->loadFromExtension('web_profiler', [
             'toolbar' => true,
             'intercept_redirects' => false,
+        ]);
+
+        $containerBuilder->loadFromExtension('twig', [
+            'strict_variables' => true,
+            'exception_controller' => null,
         ]);
     }
 

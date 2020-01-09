@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+ * Added `PunycodeAddressEncoder`, supports UTF8 address
+
 4.4.0
 -----
 

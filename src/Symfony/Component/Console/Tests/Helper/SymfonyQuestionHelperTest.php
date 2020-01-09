@@ -145,13 +145,13 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         );
 
         $this->assertOutputContains(<<<EOT
-qqq:
+ qqq:
   [foo   ] foo
   [żółw  ] bar
   [łabądź] baz
  > 
 EOT
-        , $output);
+        , $output, true);
     }
 
     public function testChoiceQuestionCustomPrompt()
@@ -168,9 +168,9 @@ EOT
         $this->assertOutputContains(<<<EOT
  qqq:
   [0] foo
- >ccc>
+ >ccc> 
 EOT
-        , $output);
+        , $output, true);
     }
 
     protected function getInputStream($input)
@@ -200,10 +200,15 @@ EOT
         return $mock;
     }
 
-    private function assertOutputContains($expected, StreamOutput $output)
+    private function assertOutputContains($expected, StreamOutput $output, $normalize = false)
     {
         rewind($output->getStream());
         $stream = stream_get_contents($output->getStream());
+
+        if ($normalize) {
+            $stream = str_replace(PHP_EOL, "\n", $stream);
+        }
+
         $this->assertStringContainsString($expected, $stream);
     }
 }

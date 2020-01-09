@@ -73,6 +73,10 @@ class Connection
 
     public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
     {
+        if (0 === strpos($dsn, 'redis:')) {
+            $dsn = str_replace('redis:', 'file:', $dsn);
+        }
+
         if (false === $parsedUrl = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
         }
@@ -83,11 +87,18 @@ class Connection
         $group = $pathParts[2] ?? $redisOptions['group'] ?? null;
         $consumer = $pathParts[3] ?? $redisOptions['consumer'] ?? null;
 
-        $connectionCredentials = [
-            'host' => $parsedUrl['host'] ?? '127.0.0.1',
-            'port' => $parsedUrl['port'] ?? 6379,
-            'auth' => $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
-        ];
+        if (isset($parsedUrl['host'])) {
+            $connectionCredentials = [
+                'host' => $parsedUrl['host'] ?? '127.0.0.1',
+                'port' => $parsedUrl['port'] ?? 6379,
+                'auth' => $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
+            ];
+        } else {
+            $connectionCredentials = [
+                'host' => $parsedUrl['path'],
+                'port' => 0,
+            ];
+        }
 
         if (isset($parsedUrl['query'])) {
             parse_str($parsedUrl['query'], $redisOptions);

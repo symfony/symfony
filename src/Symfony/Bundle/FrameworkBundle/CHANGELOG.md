@@ -8,6 +8,7 @@ CHANGELOG
  * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
  * Added flex-compatible default implementations for `MicroKernelTrait::registerBundles()` and `getProjectDir()`
  * Deprecated passing a `RouteCollectionBuiler` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
+ * The `TemplateController` now accepts context argument
 
 5.0.0
 -----

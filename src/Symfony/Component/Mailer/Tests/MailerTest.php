@@ -17,7 +17,6 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class MailerTest extends TestCase
 {
@@ -25,7 +24,7 @@ class MailerTest extends TestCase
     {
         $this->expectException(LogicException::class);
 
-        $transport = new Mailer($this->createMock(TransportInterface::class), $this->createMock(MessageBusInterface::class), $this->createMock(EventDispatcherInterface::class));
+        $transport = new Mailer($this->createMock(TransportInterface::class), $this->createMock(MessageBusInterface::class));
         $transport->send(new RawMessage('Some raw email message'));
     }
 }

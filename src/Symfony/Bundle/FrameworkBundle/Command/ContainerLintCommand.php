@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\HttpKernel\Kernel;
@@ -64,7 +65,15 @@ final class ContainerLintCommand extends Command
 
         $container->setParameter('container.build_time', time());
 
-        $container->compile();
+        try {
+            $container->compile();
+        } catch (InvalidArgumentException $e) {
+            $errorIo->error($e->getMessage());
+
+            return 1;
+        }
+
+        $io->success('The container was lint successfully: all services are injected with values that are compatible with their type declarations.');
 
         return 0;
     }

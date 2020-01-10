@@ -1627,7 +1627,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.redis.factory');
             $container->removeDefinition('messenger.transport.semaphore.factory');
         } else {
-            if (true === \extension_loaded('sysvmsg')) {
+            if (false === \extension_loaded('sysvmsg')) {
                 $container->removeDefinition('messenger.transport.semaphore.factory');
             }
 

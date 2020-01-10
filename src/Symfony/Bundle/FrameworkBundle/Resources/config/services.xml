@@ -89,6 +89,7 @@
         <service id="uri_signer" class="Symfony\Component\HttpKernel\UriSigner">
             <argument>%kernel.secret%</argument>
         </service>
+        <service id="Symfony\Component\HttpKernel\UriSigner" alias="uri_signer" />
 
         <service id="config_cache_factory" class="Symfony\Component\Config\ResourceCheckerConfigCacheFactory">
             <argument type="tagged_iterator" tag="config_cache.resource_checker" />

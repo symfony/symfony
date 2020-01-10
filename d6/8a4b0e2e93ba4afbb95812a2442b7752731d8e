@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-07T14:15:22Z
+
+I think this breaks laziness of the listeners: `LazyFirewallContext` won't see `$listener instanceof AbstractListener` anymore, isn't it?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-07T22:06:51Z
+
+@nicolas-grekas ofc you're right. Should be better now

@@ -1211,7 +1211,7 @@ class Response
     }
 
     /**
-     * Mark a response as safe according to RFC8674.
+     * Marks a response as safe according to RFC8674.
      *
      * @see https://tools.ietf.org/html/rfc8674
      */

@@ -380,7 +380,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #32446 [Lock] rename and deprecate Factory into LockFactory (Simperfit)
  * feature #31975 Dynamic bundle assets (garak)
  * feature #32429 [VarDumper] Let browsers trigger their own search on double CMD/CTRL + F (ogizanagi)
- * feature #32198 [Lock] Split "StoreInterface" into multiple interfaces with less responsability (Simperfit)
+ * feature #32198 [Lock] Split "StoreInterface" into multiple interfaces with less responsibility (Simperfit)
  * feature #31511 [Validator] Allow to use property paths to get limits in range constraint (Lctrs)
  * feature #32424 [Console] don't redraw progress bar more than every 100ms by default (nicolas-grekas)
  * feature #27905 [MonologBridge] Monolog 2 compatibility (derrabus)

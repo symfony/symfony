@@ -393,7 +393,7 @@ Routing
 -------
 
  * The `generator_base_class`, `generator_cache_class`, `matcher_base_class`, and `matcher_cache_class` router
-   options have been removed.
+   options have been removed. If you are using multiple Router instances and need separate caches for them, set a unique `cache_dir` per Router instance instead.
  * `Serializable` implementing methods for `Route` and `CompiledRoute` are final.
    Instead of overwriting them, use `__serialize` and `__unserialize` as extension points which are forward compatible
    with the new serialization methods in PHP 7.4.

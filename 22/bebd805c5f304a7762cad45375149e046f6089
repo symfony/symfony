@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by Rebolon at 2020-01-08T14:56:48Z
+
+@yceruto thx for help.
+Not sure to get time for the Functional Test. I understand the goal, but not sure how to achieve it throught this project in short time (i'm looking for it).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-08T15:03:19Z
+
+> Not sure to get time for the Functional Test. I understand the goal, but not sure how to achieve it throught this project in short time (i'm looking for it).
+
+Don't worry about it, I can add it at the end, just let me know when the other comments have been fixed. Thanks!
+
+---------------------------------------------------------------------------
+
+by Rebolon at 2020-01-08T17:06:15Z
+
+@yceruto it should be ok right now
+I added an Integration Test as i needed Twig. If you consider you need a Functional Test, it's up to you, or just give me tips on the wished usage (WebTestCase or Panther, anything else)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-08T17:16:25Z
+
+Wow! you were fast :zap: :)
+
+An unit test is enough for me, but can you confirm that this is the new route config for this feature?
+```yaml
+# config/routes.yaml
+acme_privacy:
+    path:          /privacy
+    controller:    Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template:  'static/privacy.html.twig'
+        maxAge:    86400
+        sharedAge: 86400
+
+        # optionally you can define some arguments passed to the template
+        context:
+            site_name: 'ACME'
+            theme: 'dark'
+```
+
+---------------------------------------------------------------------------
+
+by Rebolon at 2020-01-09T08:01:30Z
+
+@yceruto That's it for the yaml config.
+I pushed the last changes following your review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-10T09:23:18Z
+
+(please fix fabbot's report)

@@ -11,43 +11,54 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
- * Wraps a security listener for calls record.
+ * Wraps a lazy security listener.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  *
- * @internal since Symfony 4.3
+ * @internal
  */
-final class WrappedListener implements ListenerInterface
+final class WrappedLazyListener extends AbstractListener implements ListenerInterface
 {
     use TraceableListenerTrait;
 
-    /**
-     * @param callable $listener
-     */
-    public function __construct($listener)
+    public function __construct(AbstractListener $listener)
     {
         $this->listener = $listener;
+    }
+
+    public function supports(Request $request): ?bool
+    {
+        return $this->listener->supports($request);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $startTime = microtime(true);
-        if (\is_callable($this->listener)) {
-            ($this->listener)($event);
-        } else {
-            @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, extend "%s" instead.', \get_class($this->listener), AbstractListener::class), E_USER_DEPRECATED);
-            $this->listener->handle($event);
+
+        try {
+            $ret = $this->listener->authenticate($event);
+        } catch (LazyResponseException $e) {
+            $this->response = $e->getResponse();
+
+            throw $e;
+        } finally {
+            $this->time = microtime(true) - $startTime;
         }
-        $this->time = microtime(true) - $startTime;
+
         $this->response = $event->getResponse();
+
+        return $ret;
     }
 
     public function getInfo(): array

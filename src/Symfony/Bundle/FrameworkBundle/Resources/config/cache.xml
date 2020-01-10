@@ -18,6 +18,7 @@
 
         <service id="cache.app.taggable" class="Symfony\Component\Cache\Adapter\TagAwareAdapter">
             <argument type="service" id="cache.app" />
+            <tag name="cache.pool" />
         </service>
 
         <service id="cache.system" parent="cache.adapter.system" public="true">

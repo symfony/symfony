@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
 use Symfony\Component\Security\Http\Firewall\LegacyListenerTrait;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
@@ -38,5 +39,14 @@ trait TraceableListenerTrait
     public function getWrappedListener()
     {
         return $this->listener;
+    }
+
+    public function getInfo(): array
+    {
+        return [
+            'response' => $this->response,
+            'time' => $this->time,
+            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener),
+        ];
     }
 }

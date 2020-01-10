@@ -13,7 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Debug;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
-use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * Wraps a security listener for calls record.
@@ -48,14 +47,5 @@ final class WrappedListener implements ListenerInterface
         }
         $this->time = microtime(true) - $startTime;
         $this->response = $event->getResponse();
-    }
-
-    public function getInfo(): array
-    {
-        return [
-            'response' => $this->response,
-            'time' => $this->time,
-            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener),
-        ];
     }
 }

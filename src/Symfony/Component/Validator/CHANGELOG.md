@@ -3,6 +3,7 @@ CHANGELOG
 
 5.1.0
 -----
+
  * added the `Hostname` constraint and validator
 
 5.0.0

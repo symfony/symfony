@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-03T11:35:30Z
+
+@karser thanks for this contribution! I like this a lot ... except for the `tld` option, which is confusing to me.
+
+Here's a proposal:
+
+* Rename `tld` to `require_tld`
+* Set it as `true` by default
+* If `true`, domains like `localhost` are not valid. Set it to `false` to allow them.
+
+---------------------------------------------------------------------------
+
+by karser at 2019-07-03T19:30:51Z
+
+@javiereguiluz thanks for the feedback. I implemented your proposal (see the test cases). wdyt?
+```
+App\Entity\Acme:
+    properties:
+        domain:
+            - Domain: ~
+        non_tld_domain:
+            - Domain: { requireTld: false }
+```
+The option `requireTld` is `true` by default and disallows domains like localhost and etc.
+
+---------------------------------------------------------------------------
+
+by karser at 2019-07-15T12:43:59Z
+
+Regarding [having underscore in the hostname](https://github.com/symfony/symfony/issues/32506) - we can add option `requireRfc` which will be adding `FILTER_FLAG_HOSTNAME` option in `filter_var`.
+
+FILTER_FLAG_HOSTNAME adds [RFC1035](https://www.ietf.org/rfc/rfc1035.txt) validation: `They must
+start with a letter, end with a letter or digit, and have as interior
+characters only letters, digits, and hyphen`
+```
+filter_var('goog_le.com', FILTER_VALIDATE_DOMAIN); // goog_le.com
+filter_var('goog_le.com', FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME); // false
+filter_var('qq--.com', FILTER_VALIDATE_DOMAIN); // qq--.com
+filter_var('qq--.com', FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME); //false
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-07-16T16:40:45Z
+
+im :+1: for a pure Hostname validator, not sure any "domain name" is the actual requirement :/ but @elnur  may clarify on this.
+
+---------------------------------------------------------------------------
+
+by karser at 2019-09-20T15:04:48Z
+
+>Symfony 4.4/5.0 "feature freeze" :snowflake: starts in 10 days!
+
+Is there a chance this PR will be merged into 4.4?
+
+---------------------------------------------------------------------------
+
+by cybernet at 2019-11-21T15:00:39Z
+
+really looking forward for this 👍

@@ -7,6 +7,8 @@ CHANGELOG
  * Deprecate `Response::create()`, `JsonResponse::create()`,
    `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
    `__construct()` instead)
+ * added `Request::preferSafeContent()` and `Response::setContentSafe()` to handle "safe" HTTP preference
+   according to [RFC 8674](https://tools.ietf.org/html/rfc8674)
 
 5.0.0
 -----

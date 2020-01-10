@@ -1211,6 +1211,22 @@ class Response
     }
 
     /**
+     * Mark a response as safe according to RFC8674.
+     *
+     * @see https://tools.ietf.org/html/rfc8674
+     */
+    public function setContentSafe(bool $safe = true): void
+    {
+        if ($safe) {
+            $this->headers->set('Preference-Applied', 'safe');
+        } elseif ('safe' === $this->headers->get('Preference-Applied')) {
+            $this->headers->remove('Preference-Applied');
+        }
+
+        $this->setVary('Prefer', false);
+    }
+
+    /**
      * Checks if we need to remove Cache-Control for SSL encrypted downloads when using IE < 9.
      *
      * @see http://support.microsoft.com/kb/323308

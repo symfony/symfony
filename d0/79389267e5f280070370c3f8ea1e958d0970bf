@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-10T07:06:46Z
+
+But initial_places was also a thing and should not be removed from the README, shouldn’t it?
+
+Even this line was not introduced in your referenced PR #30890 🤔
+
+Or do you mean to skip 2 iterations which were both introduced in 4.3 go straight to initial_marking?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-10T09:22:03Z
+
+friendly ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by phansys at 2020-01-10T11:00:21Z
+
+In the last release from 4.2 branch (v4.2.12), the configuration node is called "initial_place":
+https://github.com/symfony/symfony/blob/7b0ca3ab5678232f876a95991b66778f4aaa33e3/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Configuration.php#L230
+In the first release from 4.3 branch (v4.3.0), the configuration node is called "initial_marking":
+https://github.com/symfony/symfony/blob/0bf8d128ef3c492436ab5f1b7c7b130f9e96aad2/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Configuration.php#L236
+
+So, answering your question, I think yes:
+>Or do you mean to skip 2 iterations which were both introduced in 4.3 go straight to initial_marking?
+
+The related commit is 1af1bf29ef5f1306dfcaf15970df46146a6dbdc4.

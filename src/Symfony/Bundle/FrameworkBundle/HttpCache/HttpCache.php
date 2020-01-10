@@ -37,7 +37,14 @@ abstract class HttpCache extends BaseHttpCache
         $this->kernel = $kernel;
         $this->cacheDir = $cacheDir;
 
-        parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge(['debug' => $kernel->isDebug()], $this->getOptions()));
+        $isDebug = $kernel->isDebug();
+        $options = ['debug' => $isDebug];
+
+        if ($isDebug) {
+            $options['stale_if_error'] = 0;
+        }
+
+        parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge($options, $this->getOptions()));
     }
 
     /**

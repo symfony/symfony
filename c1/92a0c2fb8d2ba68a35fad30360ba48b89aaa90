@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-09T20:52:03Z
+
+Making `assertOutputContains()` able to normalize the output string could make sense, as `ApplicationTester` and `CommandTester` do.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-01-10T07:55:03Z
+
+I repushed with @chalasr's suggestion.

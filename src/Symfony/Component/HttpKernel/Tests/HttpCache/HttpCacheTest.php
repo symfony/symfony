@@ -1523,6 +1523,168 @@ class HttpCacheTest extends HttpCacheTestCase
         // Surrogate request
         $cache->handle($request, HttpKernelInterface::SUB_REQUEST);
     }
+
+    public function testStaleIfErrorMustNotResetLifetime()
+    {
+        // Make sure we don't accidentally treat the response as fresh (revalidated) again
+        // when stale-if-error handling kicks in.
+
+        $responses = [
+            [
+                'status' => 200,
+                'body' => 'OK',
+                // This is cacheable and can be used in stale-if-error cases:
+                'headers' => ['Cache-Control' => 'public, max-age=10', 'ETag' => 'some-etag'],
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+        ];
+
+        $this->setNextResponses($responses);
+        $this->cacheConfig['stale_if_error'] = 10;
+
+        $this->request('GET', '/'); // warm cache
+
+        sleep(15); // now the entry is stale, but still within the grace period (10s max-age + 10s stale-if-error)
+
+        $this->request('GET', '/'); // hit backend error
+        $this->assertEquals(200, $this->response->getStatusCode()); // stale-if-error saved the day
+        $this->assertEquals(15, $this->response->getAge());
+
+        sleep(10); // now we're outside the grace period
+
+        $this->request('GET', '/'); // hit backend error
+        $this->assertEquals(500, $this->response->getStatusCode()); // fail
+    }
+
+    /**
+     * @dataProvider getResponseDataThatMayBeServedStaleIfError
+     */
+    public function testResponsesThatMayBeUsedStaleIfError($responseHeaders, $sleepBetweenRequests = null)
+    {
+        $responses = [
+            [
+                'status' => 200,
+                'body' => 'OK',
+                'headers' => $responseHeaders,
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+        ];
+
+        $this->setNextResponses($responses);
+        $this->cacheConfig['stale_if_error'] = 10; // after stale, may be served for 10s
+
+        $this->request('GET', '/'); // warm cache
+
+        if ($sleepBetweenRequests) {
+            sleep($sleepBetweenRequests);
+        }
+
+        $this->request('GET', '/'); // hit backend error
+
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertEquals('OK', $this->response->getContent());
+        $this->assertTraceContains('stale-if-error');
+    }
+
+    public function getResponseDataThatMayBeServedStaleIfError()
+    {
+        // All data sets assume that a 10s stale-if-error grace period has been configured
+        yield 'public, max-age expired' => [['Cache-Control' => 'public, max-age=60'], 65];
+        yield 'public, validateable with ETag, no TTL' => [['Cache-Control' => 'public', 'ETag' => 'some-etag'], 5];
+        yield 'public, validateable with Last-Modified, no TTL' => [['Cache-Control' => 'public', 'Last-Modified' => 'yesterday'], 5];
+        yield 'public, s-maxage will be served stale-if-error, even if the RFC mandates otherwise' => [['Cache-Control' => 'public, s-maxage=20'], 25];
+    }
+
+    /**
+     * @dataProvider getResponseDataThatMustNotBeServedStaleIfError
+     */
+    public function testResponsesThatMustNotBeUsedStaleIfError($responseHeaders, $sleepBetweenRequests = null)
+    {
+        $responses = [
+            [
+                'status' => 200,
+                'body' => 'OK',
+                'headers' => $responseHeaders,
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+        ];
+
+        $this->setNextResponses($responses);
+        $this->cacheConfig['stale_if_error'] = 10; // after stale, may be served for 10s
+        $this->cacheConfig['strict_smaxage'] = true; // full RFC compliance for this feature
+
+        $this->request('GET', '/'); // warm cache
+
+        if ($sleepBetweenRequests) {
+            sleep($sleepBetweenRequests);
+        }
+
+        $this->request('GET', '/'); // hit backend error
+
+        $this->assertEquals(500, $this->response->getStatusCode());
+    }
+
+    public function getResponseDataThatMustNotBeServedStaleIfError()
+    {
+        // All data sets assume that a 10s stale-if-error grace period has been configured
+        yield 'public, no TTL but beyond grace period' => [['Cache-Control' => 'public'], 15];
+        yield 'public, validateable with ETag, no TTL but beyond grace period' => [['Cache-Control' => 'public', 'ETag' => 'some-etag'], 15];
+        yield 'public, validateable with Last-Modified, no TTL but beyond grace period' => [['Cache-Control' => 'public', 'Last-Modified' => 'yesterday'], 15];
+        yield 'public, stale beyond grace period' => [['Cache-Control' => 'public, max-age=10'], 30];
+
+        // Cache-control values that prohibit serving stale responses or responses without positive validation -
+        // see https://tools.ietf.org/html/rfc7234#section-4.2.4 and
+        // https://tools.ietf.org/html/rfc7234#section-5.2.2
+        yield 'no-cache requires positive validation' => [['Cache-Control' => 'public, no-cache', 'ETag' => 'some-etag']];
+        yield 'no-cache requires positive validation, even if fresh' => [['Cache-Control' => 'public, no-cache, max-age=10']];
+        yield 'must-revalidate requires positive validation once stale' => [['Cache-Control' => 'public, max-age=10, must-revalidate'], 15];
+        yield 'proxy-revalidate requires positive validation once stale' => [['Cache-Control' => 'public, max-age=10, proxy-revalidate'], 15];
+    }
+
+    public function testStaleIfErrorWhenStrictSmaxageDisabled()
+    {
+        $responses = [
+            [
+                'status' => 200,
+                'body' => 'OK',
+                'headers' => ['Cache-Control' => 'public, s-maxage=20'],
+            ],
+            [
+                'status' => 500,
+                'body' => 'FAIL',
+                'headers' => [],
+            ],
+        ];
+
+        $this->setNextResponses($responses);
+        $this->cacheConfig['stale_if_error'] = 10;
+        $this->cacheConfig['strict_smaxage'] = false;
+
+        $this->request('GET', '/'); // warm cache
+        sleep(25);
+        $this->request('GET', '/'); // hit backend error
+
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertEquals('OK', $this->response->getContent());
+        $this->assertTraceContains('stale-if-error');
+    }
 }
 
 class TestKernel implements HttpKernelInterface

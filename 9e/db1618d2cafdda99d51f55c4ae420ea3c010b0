@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-09T09:15:15Z
+
+But one should be able to configure the decorated client before decorating it. I think not having this method encourages better instantiation steps. I get this can be helpful, but maybe here we'd prefer favoring better design?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2020-01-09T10:29:02Z
+
+> But one should be able to configure the decorated client before decorating it
+
+This doesn't work when injecting a scoped client from the framework configuration, as you are then stuck with the default logger and can't change it at runtime (E.G injecting a `ConsoleLogger` when running in CLI)

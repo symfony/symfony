@@ -443,6 +443,22 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTrue($this->response->headers->has('Age'));
     }
 
+    public function testRevalidatesResponsesWithNoCacheDirectiveEvenIfFresh()
+    {
+        $this->setNextResponse(200, ['Cache-Control' => 'public, no-cache, max-age=10', 'ETag' => 'some-etag'], 'OK');
+        $this->request('GET', '/'); // warm the cache
+
+        sleep(5);
+
+        $this->setNextResponse(304, ['Cache-Control' => 'public, no-cache, max-age=10', 'ETag' => 'some-etag']);
+        $this->request('GET', '/');
+
+        $this->assertHttpKernelIsCalled(); // no-cache -> MUST have revalidated at origin
+        $this->assertTraceContains('valid');
+        $this->assertEquals('OK', $this->response->getContent());
+        $this->assertEquals(0, $this->response->getAge());
+    }
+
     public function testCachesResponsesWithAnExpirationHeader()
     {
         $time = \DateTime::createFromFormat('U', time() + 5);

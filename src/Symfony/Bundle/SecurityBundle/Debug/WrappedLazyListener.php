@@ -11,31 +11,53 @@
 
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Core\Exception\LazyResponseException;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
- * Wraps a security listener for calls record.
+ * Wraps a lazy security listener.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  *
  * @internal
  */
-final class WrappedListener
+final class WrappedLazyListener extends AbstractListener
 {
     use TraceableListenerTrait;
 
-    public function __construct(callable $listener)
+    public function __construct(AbstractListener $listener)
     {
         $this->listener = $listener;
     }
 
-    public function __invoke(RequestEvent $event)
+    public function supports(Request $request): ?bool
+    {
+        return $this->listener->supports($request);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function authenticate(RequestEvent $event)
     {
         $startTime = microtime(true);
-        ($this->listener)($event);
-        $this->time = microtime(true) - $startTime;
+
+        try {
+            $ret = $this->listener->authenticate($event);
+        } catch (LazyResponseException $e) {
+            $this->response = $e->getResponse();
+
+            throw $e;
+        } finally {
+            $this->time = microtime(true) - $startTime;
+        }
+
         $this->response = $event->getResponse();
+
+        return $ret;
     }
 
     public function getInfo(): array

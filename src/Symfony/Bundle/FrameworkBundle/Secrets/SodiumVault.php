@@ -47,7 +47,9 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $this->lastMessage = null;
 
         if (null === $this->encryptionKey && '' !== $this->decryptionKey = (string) $this->decryptionKey) {
-            throw new \LogicException('Cannot generate keys when a decryption key has been provided while instantiating the vault.');
+            $this->lastMessage = 'Cannot generate keys when a decryption key has been provided while instantiating the vault.';
+
+            return false;
         }
 
         try {

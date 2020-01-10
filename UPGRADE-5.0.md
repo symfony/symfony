@@ -416,7 +416,7 @@ Workflow
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
  * `WorkflowInterface::apply()` has a third argument: `array $context = []`.
  * `MarkingStoreInterface::setMarking()` has a third argument: `array $context = []`.
- * Removed support of `initial_place`. Use `initial_places` instead.
+ * Removed support of `initial_place`. Use `initial_marking` instead.
  * `MultipleStateMarkingStore` has been removed. Use `MethodMarkingStore` instead.
  * `DefinitionBuilder::setInitialPlace()` has been removed, use `DefinitionBuilder::setInitialPlaces()` instead.
 

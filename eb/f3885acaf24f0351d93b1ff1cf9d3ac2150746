@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by cjunge at 2019-12-06T23:08:30Z
+
+Is a default value of `false` the same as not specifying "safe"?
+
+---------------------------------------------------------------------------
+
+by pyrech at 2019-12-07T07:48:00Z
+
+@cjunge I'm not sure to understand where this default value would be. Do you mean in the request or in the response?
+
+Anyway, from what I understand from the RFC:
+- either the client requests for safe content if possible or it requests a normal response
+- either the server send a response with safe preference applied or it send a normal response.
+
+There is no such thing as "prefering a not safe content" or sending a response with "preference not applied".
+
+---------------------------------------------------------------------------
+
+by pyrech at 2019-12-16T16:34:48Z
+
+Comments fixed and PR rebased :wink:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-16T17:18:35Z
+
+Oups, wait, tests fail.
+
+---------------------------------------------------------------------------
+
+by pyrech at 2019-12-23T14:55:53Z
+
+Oups, sorry, tests should be green now

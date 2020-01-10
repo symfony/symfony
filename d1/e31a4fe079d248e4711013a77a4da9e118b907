@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-07T19:26:19Z
+
+@Islam93 Can you rebase on 3.4 and change the target of this PR accordingly?
+
+---------------------------------------------------------------------------
+
+by Islam93 at 2020-01-08T12:04:02Z
+
+@fabpot, should travis-ci and appveyor builds be restarted?

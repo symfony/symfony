@@ -34,6 +34,9 @@
             "/Tests/"
         ]
     },
+    "bin": [
+        "Resources/bin/yaml-lint"
+    ],
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

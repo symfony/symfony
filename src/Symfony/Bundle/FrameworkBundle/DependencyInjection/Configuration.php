@@ -483,7 +483,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->booleanNode('utf8')->defaultFalse()->end()
                         ->arrayNode('context')
-                            ->info('router request context')
+                            ->info('The request context used to generate URLs in a non-HTTP context')
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('host')->defaultValue('%router.request_context.host%')->end()

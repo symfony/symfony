@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added the `framework.router.context` configuration node to configure the `RequestContext`
  * Made `MicroKernelTrait::configureContainer()` compatible with `ContainerConfigurator`
  * Added a new `mailer.message_bus` option to configure or disable the message bus to use to send mails.
  * Added flex-compatible default implementations for `MicroKernelTrait::registerBundles()` and `getProjectDir()`

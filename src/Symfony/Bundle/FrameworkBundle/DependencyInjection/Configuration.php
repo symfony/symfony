@@ -481,7 +481,7 @@ class Configuration implements ConfigurationInterface
                             )
                             ->defaultTrue()
                         ->end()
-                        ->booleanNode('utf8')->defaultFalse()->end()
+                        ->booleanNode('utf8')->defaultNull()->end()
                         ->arrayNode('context')
                             ->info('router request context')
                             ->addDefaultsIfNotSet()

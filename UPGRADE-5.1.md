@@ -10,6 +10,7 @@ FrameworkBundle
 ---------------
 
  * Deprecated passing a `RouteCollectionBuiler` to `MicroKernelTrait::configureRoutes()`, type-hint `RoutingConfigurator` instead
+ * Deprecated *not* setting the "framework.router.utf8" configuration option as it will default to `true` in Symfony 6.0
 
 HttpFoundation
 --------------

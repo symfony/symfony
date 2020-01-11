@@ -838,6 +838,10 @@ class FrameworkExtension extends Extension
 
         $loader->load('routing.xml');
 
+        if (null === $config['utf8']) {
+            @trigger_error('Not setting the "framework.router.utf8" configuration option is deprecated since Symfony 5.1, it will default to "true" in Symfony 6.0.', E_USER_DEPRECATED);
+        }
+
         if ($config['utf8']) {
             $container->getDefinition('routing.loader')->replaceArgument(1, ['utf8' => true]);
         }

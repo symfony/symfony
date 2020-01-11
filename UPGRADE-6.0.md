@@ -10,6 +10,7 @@ FrameworkBundle
 ---------------
 
  * `MicroKernelTrait::configureRoutes()` is now always called with a `RoutingConfigurator`
+ * The "framework.router.utf8" configuration option defaults to `true`
 
 HttpFoundation
 --------------

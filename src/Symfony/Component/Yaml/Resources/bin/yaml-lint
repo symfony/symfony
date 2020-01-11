@@ -16,11 +16,7 @@
  * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
  */
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Yaml\Command\LintCommand;
 
 function includeIfExists(string $file): bool

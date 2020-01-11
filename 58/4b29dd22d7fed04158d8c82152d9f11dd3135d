@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-11-29T17:53:40Z
+
+Hi @xabbuh, ready to be merged, I guess? :-)
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-01-07T21:13:03Z
+
+Looks like the failing tests are not related. So this PR is ready to be merged imho.

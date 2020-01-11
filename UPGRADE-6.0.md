@@ -6,6 +6,11 @@ Console
 
  * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter
 
+Dotenv
+------
+
+ * Removed argument `$usePutenv` from Dotenv's constructor, use `Dotenv::usePutenv()` instead.
+
 EventDispatcher
 ---------------
 

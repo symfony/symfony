@@ -323,6 +323,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             return $this->validate($request, $entry, $catch);
         }
 
+        if ($entry->headers->hasCacheControlDirective('no-cache')) {
+            return $this->validate($request, $entry, $catch);
+        }
+
         $this->record($request, 'fresh');
 
         $entry->headers->set('Age', $entry->getAge());

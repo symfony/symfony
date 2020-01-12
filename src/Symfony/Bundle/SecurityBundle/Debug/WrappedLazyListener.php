@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
-use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * Wraps a lazy security listener.
@@ -59,14 +58,5 @@ final class WrappedLazyListener extends AbstractListener implements ListenerInte
         $this->response = $event->getResponse();
 
         return $ret;
-    }
-
-    public function getInfo(): array
-    {
-        return [
-            'response' => $this->response,
-            'time' => $this->time,
-            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener),
-        ];
     }
 }

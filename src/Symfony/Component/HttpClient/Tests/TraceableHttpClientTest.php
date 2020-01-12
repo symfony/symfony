@@ -36,7 +36,7 @@ class TraceableHttpClientTest extends TestCase
                     return true;
                 })
             )
-            ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse()))
+            ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('{"foo": "bar"}')))
         ;
         $sut = new TraceableHttpClient($httpClient);
         $sut->request('GET', '/foo/bar', ['options1' => 'foo']);
@@ -47,6 +47,7 @@ class TraceableHttpClientTest extends TestCase
             'url' => '/foo/bar',
             'options' => ['options1' => 'foo'],
             'info' => [],
+            'response_content' => ['foo' => 'bar']
         ], $actualTracedRequest);
     }
 
@@ -58,6 +59,7 @@ class TraceableHttpClientTest extends TestCase
         $actualTracedRequest = $tracedRequests[0];
         $this->assertSame('GET', $actualTracedRequest['info']['http_method']);
         $this->assertSame('http://localhost:8057/', $actualTracedRequest['info']['url']);
+        $this->assertNull($actualTracedRequest['response_content']);
     }
 
     public function testItExecutesOnProgressOption()

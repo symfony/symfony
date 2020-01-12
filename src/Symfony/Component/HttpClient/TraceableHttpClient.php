@@ -35,11 +35,13 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $traceInfo = [];
+        $responseContent = null;
         $this->tracedRequests[] = [
             'method' => $method,
             'url' => $url,
             'options' => $options,
             'info' => &$traceInfo,
+            'response_content' => &$responseContent
         ];
         $onProgress = $options['on_progress'] ?? null;
 
@@ -51,7 +53,15 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface
             }
         };
 
-        return $this->client->request($method, $url, $options);
+        $response = $this->client->request($method, $url, $options);
+
+        // Try to convert response to array if possible
+        try {
+            $responseContent = $response->toArray(false);
+        } catch (\Throwable $e) {
+        }
+
+        return $response;
     }
 
     /**

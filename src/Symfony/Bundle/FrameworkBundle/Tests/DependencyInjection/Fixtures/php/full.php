@@ -23,6 +23,7 @@ $container->loadFromExtension('framework', [
     'router' => [
         'resource' => '%kernel.project_dir%/config/routing.xml',
         'type' => 'xml',
+        'utf8' => true,
     ],
     'session' => [
         'storage_id' => 'session.storage.native',

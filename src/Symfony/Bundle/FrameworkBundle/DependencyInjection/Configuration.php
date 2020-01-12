@@ -481,7 +481,7 @@ class Configuration implements ConfigurationInterface
                             )
                             ->defaultTrue()
                         ->end()
-                        ->booleanNode('utf8')->defaultFalse()->end()
+                        ->booleanNode('utf8')->defaultNull()->end()
                         ->arrayNode('context')
                             ->info('The request context used to generate URLs in a non-HTTP context')
                             ->addDefaultsIfNotSet()

@@ -81,5 +81,7 @@ class FlexStyleMicroKernel extends Kernel
             ->set('stdClass', 'stdClass')
                 ->factory([$this, 'createHalloween'])
                 ->arg('$halloween', '%halloween%');
+
+        $c->extension('framework', ['router' => ['utf8' => true]]);
     }
 }

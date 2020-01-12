@@ -140,7 +140,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         ];
 
         $ext = new FrameworkExtension();
-        $ext->load(['framework' => ['csrf_protection' => false, 'router' => ['resource' => 'dummy']]], $container);
+        $ext->load(['framework' => ['csrf_protection' => false, 'router' => ['resource' => 'dummy', 'utf8' => true]]], $container);
 
         $ext = new SecurityExtension();
         $ext->load($config, $container);

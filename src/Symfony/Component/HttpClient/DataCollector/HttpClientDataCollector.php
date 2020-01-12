@@ -131,7 +131,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             }
 
             $debugInfo = array_diff_key($info, $baseInfo);
-            $responseContent = $trace['response_content'] ?? null;
+            $responseContent = isset($trace['response_content']) ? $trace['response_content'] : null;
             $info = array_diff_key($info, $debugInfo) + ['response_content' => $responseContent, 'debug_info' => $debugInfo];
             unset($traces[$i]['info'], $traces[$i]['response_content']); // break PHP reference used by TraceableHttpClient
             $traces[$i]['info'] = $this->cloneVar($info);

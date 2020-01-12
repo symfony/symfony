@@ -42,15 +42,6 @@ class LanguageBundle extends LanguageDataProvider implements LanguageBundleInter
      */
     public function getLanguageName($language, $region = null, $displayLocale = null)
     {
-        // Some languages are translated together with their region,
-        // i.e. "en_GB" is translated as "British English"
-        if (null !== $region) {
-            try {
-                return $this->getName($language.'_'.$region, $displayLocale);
-            } catch (MissingResourceException $e) {
-            }
-        }
-
         try {
             return $this->getName($language, $displayLocale);
         } catch (MissingResourceException $e) {

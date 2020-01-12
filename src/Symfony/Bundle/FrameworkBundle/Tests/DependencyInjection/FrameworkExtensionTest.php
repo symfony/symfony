@@ -170,6 +170,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->createContainerFromFile('template_and_fragments');
     }
 
+    public function testFragmentsAndHinclude()
+    {
+        $container = $this->createContainerFromFile('fragments_and_hinclude');
+        $this->assertTrue($container->hasParameter('fragment.renderer.hinclude.global_template'));
+        $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'));
+    }
+
     public function testSsi()
     {
         $container = $this->createContainerFromFile('full');

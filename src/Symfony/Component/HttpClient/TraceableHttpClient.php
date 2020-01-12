@@ -41,7 +41,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface
             'url' => $url,
             'options' => $options,
             'info' => &$traceInfo,
-            'response_content' => &$responseContent
+            'response_content' => &$responseContent,
         ];
         $onProgress = $options['on_progress'] ?? null;
 

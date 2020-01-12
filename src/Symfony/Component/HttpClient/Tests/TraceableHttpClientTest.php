@@ -47,7 +47,7 @@ class TraceableHttpClientTest extends TestCase
             'url' => '/foo/bar',
             'options' => ['options1' => 'foo'],
             'info' => [],
-            'response_content' => ['foo' => 'bar']
+            'response_content' => ['foo' => 'bar'],
         ], $actualTracedRequest);
     }
 

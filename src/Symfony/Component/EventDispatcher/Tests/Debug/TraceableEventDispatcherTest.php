@@ -308,6 +308,39 @@ class TraceableEventDispatcherTest extends TestCase
         $events = $tdispatcher->getOrphanedEvents();
         $this->assertCount(0, $events);
     }
+
+    /** @group legacy */
+    public function testLegacySupportsContract()
+    {
+        $calls = 0;
+
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', function () use (&$calls) {
+            ++$calls;
+        });
+
+        $tdispatcher->dispatch('foo', new Event());
+
+        $this->assertSame(1, $calls);
+    }
+
+    /** @group legacy */
+    public function testLegacyDoesntSupportNotEvent()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+
+        try {
+            $tdispatcher->dispatch('foo', new \stdClass());
+        } catch (\TypeError $e) {
+            $message = sprintf('Argument 1 passed to "%s::dispatch()" must be an instance of either %s or %s, %s given.', EventDispatcherInterface::class, Event::class, ContractsEvent::class, \stdClass::class);
+
+            $this->assertSame($message, $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('A TypeError should have been thrown');
+    }
 }
 
 class EventSubscriber implements EventSubscriberInterface

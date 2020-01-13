@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-13T16:40:34Z
+
+I'm not sure about `\s`. Does your server use a tab? Or does it only miss the trailing space?
+Not that HTTP mandates the trailing space, but I get we can accept ending with the code.

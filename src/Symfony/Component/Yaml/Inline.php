@@ -504,6 +504,11 @@ class Inline
             $isKeyQuoted = \in_array($mapping[$i], ['"', "'"], true);
             $key = self::parseScalar($mapping, $flags, [':', ' '], $i, false, [], true);
 
+            if ('!php/const' === $key) {
+                $key .= self::parseScalar($mapping, $flags, [':', ' '], $i, false, [], true);
+                $key = self::evaluateScalar($key, $flags);
+            }
+
             if (':' !== $key && false === $i = strpos($mapping, ':', $i)) {
                 break;
             }

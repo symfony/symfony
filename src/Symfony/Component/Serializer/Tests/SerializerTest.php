@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -486,6 +487,86 @@ class SerializerTest extends TestCase
         $this->expectExceptionMessage('An unexpected value could not be normalized: stream resource');
 
         (new Serializer())->normalize(tmpfile());
+    }
+
+    public function testNormalizeScalar()
+    {
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->assertSame('42', $serializer->serialize(42, 'json'));
+        $this->assertSame('true', $serializer->serialize(true, 'json'));
+        $this->assertSame('false', $serializer->serialize(false, 'json'));
+        $this->assertSame('3.14', $serializer->serialize(3.14, 'json'));
+        $this->assertSame('3.14', $serializer->serialize(31.4e-1, 'json'));
+        $this->assertSame('"  spaces  "', $serializer->serialize('  spaces  ', 'json'));
+        $this->assertSame('"@Ca$e%"', $serializer->serialize('@Ca$e%', 'json'));
+    }
+
+    public function testNormalizeScalarArray()
+    {
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->assertSame('[42]', $serializer->serialize([42], 'json'));
+        $this->assertSame('[true,false]', $serializer->serialize([true, false], 'json'));
+        $this->assertSame('[3.14,3.24]', $serializer->serialize([3.14, 32.4e-1], 'json'));
+        $this->assertSame('["  spaces  ","@Ca$e%"]', $serializer->serialize(['  spaces  ', '@Ca$e%'], 'json'));
+    }
+
+    public function testDeserializeScalar()
+    {
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+
+        $this->assertSame(42, $serializer->deserialize('42', 'int', 'json'));
+        $this->assertTrue($serializer->deserialize('true', 'bool', 'json'));
+        $this->assertSame(3.14, $serializer->deserialize('3.14', 'float', 'json'));
+        $this->assertSame(3.14, $serializer->deserialize('31.4e-1', 'float', 'json'));
+        $this->assertSame('  spaces  ', $serializer->deserialize('"  spaces  "', 'string', 'json'));
+        $this->assertSame('@Ca$e%', $serializer->deserialize('"@Ca$e%"', 'string', 'json'));
+    }
+
+    public function testDeserializeLegacyScalarType()
+    {
+        $this->expectException(LogicException::class);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+        $serializer->deserialize('42', 'integer', 'json');
+    }
+
+    public function testDeserializeScalarTypeToCustomType()
+    {
+        $this->expectException(LogicException::class);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+        $serializer->deserialize('"something"', Foo::class, 'json');
+    }
+
+    public function testDeserializeNonscalarTypeToScalar()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+        $serializer->deserialize('{"foo":true}', 'string', 'json');
+    }
+
+    public function testDeserializeInconsistentScalarType()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $serializer = new Serializer([], ['json' => new JsonEncoder()]);
+        $serializer->deserialize('"42"', 'int', 'json');
+    }
+
+    public function testDeserializeScalarArray()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->assertSame([42], $serializer->deserialize('[42]', 'int[]', 'json'));
+        $this->assertSame([true, false], $serializer->deserialize('[true,false]', 'bool[]', 'json'));
+        $this->assertSame([3.14, 3.24], $serializer->deserialize('[3.14,32.4e-1]', 'float[]', 'json'));
+        $this->assertSame(['  spaces  ', '@Ca$e%'], $serializer->deserialize('["  spaces  ","@Ca$e%"]', 'string[]', 'json'));
+    }
+
+    public function testDeserializeInconsistentScalarArray()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $serializer = new Serializer([new ArrayDenormalizer()], ['json' => new JsonEncoder()]);
+        $serializer->deserialize('["42"]', 'int[]', 'json');
     }
 
     private function serializerWithClassDiscriminator()

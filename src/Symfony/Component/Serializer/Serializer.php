@@ -46,6 +46,13 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {
+    private const SCALAR_TYPES = [
+        'int' => true,
+        'bool' => true,
+        'float' => true,
+        'string' => true,
+    ];
+
     /**
      * @var Encoder\ChainEncoder
      */
@@ -177,6 +184,14 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
+        if (isset(self::SCALAR_TYPES[$type])) {
+            if (!('is_'.$type)($data)) {
+                throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given)', $type, \is_object($data) ? \get_class($data) : \gettype($data)));
+            }
+
+            return $data;
+        }
+
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
@@ -201,7 +216,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     public function supportsDenormalization($data, string $type, string $format = null, array $context = [])
     {
-        return null !== $this->getDenormalizer($data, $type, $format, $context);
+        return isset(self::SCALAR_TYPES[$type]) || null !== $this->getDenormalizer($data, $type, $format, $context);
     }
 
     /**

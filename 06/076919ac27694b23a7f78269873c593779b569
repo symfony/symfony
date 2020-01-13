@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-13T13:38:36Z
+
+For the generated ids, I think this is OK, but for the static names, isn't this a BC break?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-01-13T13:39:49Z
+
+> For the generated ids, I think this is OK, but for the static names, isn't this a BC break?
+
+I don't know. You tell me :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-01-13T13:48:25Z
+
+> For the generated ids, I think this is OK, but for the static names, isn't this a BC break?
+
+reverted

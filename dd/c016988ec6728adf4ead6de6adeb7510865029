@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-01-07T16:31:38Z
+
+Just asking: does it really make sense for the Serializer and is it consistent to blindly cast the values?
+AFAIK, the object normalizer:
+- returns the value if it matches `is_*` functions: https://github.com/symfony/symfony/blob/b1bee601197e2a07ef3fd3274e46231b26e28824/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L436-L438
+- throws on non-matching types: https://github.com/symfony/symfony/blob/b1bee601197e2a07ef3fd3274e46231b26e28824/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L445
+- unless the `DISABLE_TYPE_ENFORCEMENT` flag is set: https://github.com/symfony/symfony/blob/b1bee601197e2a07ef3fd3274e46231b26e28824/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L441-L443 then, it returns the original data and let the validation occur after deserialization.
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-07T17:52:33Z
+
+@ogizanagi object normalizer doesn't work with scalar values. Data that passed into `denormalize` method should be an object.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-01-07T18:35:01Z
+
+It does, for scalar values of the object properties. The point is it'll do it inconsistently between objects (no cast, exception if type enforcement is not disabled) and raw arrays of scalars and scalars (implicit cast).
+
+Such assertions would pass with current code:
+
+```php
+$this->assertSame([42], $serializer->deserialize('["42"]', 'int[]', 'json'));
+$this->assertSame([0, 2], $serializer->deserialize('["test", "2test"]', 'int[]', 'json'));
+$this->assertSame([true, false], $serializer->deserialize('["test", ""]', 'bool[]', 'json'));
+```
+
+which wouldn't in case of denormalizing object properties with the object normalizer, and would either throw or won't transform the original value depending of the type enforcement flag.
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-07T18:51:03Z
+
+@ogizanagi maybe I'm misunderstanding you, but what class of Normalizers should I use to get assertations passed (or how should I instantiate `$serializer` from your code snippet)?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-01-07T18:53:31Z
+
+I meant adding these lines in your `SerializerTest::testDeserializeScalarArray` test case would pass with this PR.
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-07T19:15:34Z
+
+@ogizanagi now I'm understood you, thanks for explanation!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-09T09:25:32Z
+
+@ogizanagi I'll let you do the final review + merge if you don't mind.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-01-09T09:35:24Z
+
+Just to double-check: do you really think this qualifies as a bug fix? Looks like only an unsupported usage of the Serializer 'til now.
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-09T09:59:32Z
+
+I think @xabbuh can answer this question, because I qualified this as a bug fix according to related issue [#33784](https://github.com/symfony/symfony/issues/33784).
+
+---------------------------------------------------------------------------
+
+by a-menshchikov at 2020-01-10T22:57:41Z
+
+We briefly discussed with @xabbuh this question and he expressed his point of view that this is rather a feature than a bug.
+But I have a bit different view. To explain it I added test for normalizing scalar values. As you can see, historically normalizing of scalars was worked and return strings are valid json values. But if we have trying to deserialize this value (in current 3.4) it leads to error. And I find here a serializer interface inconsistence, because in my mind any result of serialization should be able to be deserialized into origin value. From this point of view it seems like a bug.
+
+@ogizanagi if you insist I'm ready to rebase PR to 5.0 as a new feature implementation.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-01-10T23:52:26Z
+
+>  As you can see, historically normalizing of scalars was worked and return strings are valid json values.
+
+But scalar "normalization" in such case is simply "encoding". If you simply need decoding a scalar value, perhaps you should use `decode` instead?
+
+Actually I'm not certain where we're going here: if the aim is to get a bijective behavior between serialize & deserialize, then we also need to handle `null` and arbitrary arrays, so such assertions would pass:
+
+```php
+$this->assertSame([2, 'foo'], $serializer->deserialize('[2, "foo"]', 'array', 'json'));
+$this->assertSame(null, $serializer->deserialize('null', 'null', 'json'));
+```
+
+right? (but that wouldn't even be enough to make it truly bijective)
+
+In any case, I'd still argue this is a new usage of the Serializer, hence a feature for 5.1.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-11T07:34:20Z
+
+By our standards, this is a new feature.

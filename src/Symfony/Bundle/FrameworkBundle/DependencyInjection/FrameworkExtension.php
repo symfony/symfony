@@ -632,7 +632,7 @@ class FrameworkExtension extends Extension
                 if ('workflow' === $type) {
                     $transitionDefinition = new Definition(Workflow\Transition::class, [$transition['name'], $transition['from'], $transition['to']]);
                     $transitionDefinition->setPublic(false);
-                    $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
+                    $transitionId = sprintf('.%s.transition.%s', $workflowId, $transitionCounter++);
                     $container->setDefinition($transitionId, $transitionDefinition);
                     $transitions[] = new Reference($transitionId);
                     if (isset($transition['guard'])) {
@@ -654,7 +654,7 @@ class FrameworkExtension extends Extension
                         foreach ($transition['to'] as $to) {
                             $transitionDefinition = new Definition(Workflow\Transition::class, [$transition['name'], $from, $to]);
                             $transitionDefinition->setPublic(false);
-                            $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
+                            $transitionId = sprintf('.%s.transition.%s', $workflowId, $transitionCounter++);
                             $container->setDefinition($transitionId, $transitionDefinition);
                             $transitions[] = new Reference($transitionId);
                             if (isset($transition['guard'])) {
@@ -750,7 +750,7 @@ class FrameworkExtension extends Extension
                 $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.transition', $name), 'method' => 'onTransition']);
                 $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.enter', $name), 'method' => 'onEnter']);
                 $listener->addArgument(new Reference('logger'));
-                $container->setDefinition(sprintf('%s.listener.audit_trail', $workflowId), $listener);
+                $container->setDefinition(sprintf('.%s.listener.audit_trail', $workflowId), $listener);
             }
 
             // Add Guard Listener
@@ -779,7 +779,7 @@ class FrameworkExtension extends Extension
                     $guard->addTag('kernel.event_listener', ['event' => $eventName, 'method' => 'onTransition']);
                 }
 
-                $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);
+                $container->setDefinition(sprintf('.%s.listener.guard', $workflowId), $guard);
                 $container->setParameter('workflow.has_guard_listeners', true);
             }
         }

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Added context to `TransitionException` and its child classes whenever they are thrown in `Workflow::apply()`
  * Added `Registry::has()` to check if a workflow exists
+ * Added support for `$context[Workflow::DISABLE_ANNOUNCE_EVENT] = true` when calling `workflow->apply()` to not fire the announce event
 
 5.0.0
 -----

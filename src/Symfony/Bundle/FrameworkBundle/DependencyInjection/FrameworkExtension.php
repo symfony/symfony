@@ -325,7 +325,6 @@ class FrameworkExtension extends Extension
 
         $this->addAnnotatedClassesToCompile([
             '**\\Controller\\',
-            '**\\Entity\\',
 
             // Added explicitly so that we don't rely on the class map being dumped to make it work
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController',

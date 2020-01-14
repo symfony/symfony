@@ -172,7 +172,17 @@ abstract class AbstractUnicodeString extends AbstractString
     {
         $str = $this->slice($offset, 1);
 
-        return '' === $str->string ? [] : array_map('mb_ord', preg_split('//u', $str->string, -1, PREG_SPLIT_NO_EMPTY));
+        if ('' === $str->string) {
+            return [];
+        }
+
+        $codePoints = [];
+
+        foreach (preg_split('//u', $str->string, -1, PREG_SPLIT_NO_EMPTY) as $c) {
+            $codePoints[] = mb_ord($c, 'UTF-8');
+        }
+
+        return $codePoints;
     }
 
     public function folded(bool $compat = true): parent

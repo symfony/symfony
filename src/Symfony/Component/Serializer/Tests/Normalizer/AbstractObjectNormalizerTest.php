@@ -136,7 +136,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 null
             ));
 
-        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
+        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, [], $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
         $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
         $arrayDenormalizer->setSerializer($serializer);
@@ -183,7 +183,7 @@ class AbstractObjectNormalizerTest extends TestCase
                 null
             ));
 
-        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
+        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, [], $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
         $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
         $arrayDenormalizer->setSerializer($serializer);
@@ -219,7 +219,7 @@ class AbstractObjectNormalizerTest extends TestCase
         };
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
-        $normalizer = new AbstractObjectNormalizerDummy($factory, null, new PhpDocExtractor(), $discriminatorResolver);
+        $normalizer = new AbstractObjectNormalizerDummy($factory, [], new PhpDocExtractor(), $discriminatorResolver);
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
         $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'baz' => 'baz', 'quux' => ['value' => 'quux'], 'type' => 'second'], AbstractDummy::class);

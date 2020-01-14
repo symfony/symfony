@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added support for scalar values denormalization
+ * changed the name converter constructor argument in normalizers to an array of name converters
+ * added `AbstractNormalizer::NAME_CONVERTER` constant to set the name converter to use in context
 
 5.0.0
 -----

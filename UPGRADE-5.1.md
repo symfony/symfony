@@ -23,3 +23,8 @@ Routing
 -------
 
  * Deprecated `RouteCollectionBuilder` in favor of `RoutingConfigurator`.
+
+Serializer
+----------
+
+ * Deprecated passing a name converter directly to the second argument of the constructor of `AbstractNormalizer`, pass an array of name converters instead.

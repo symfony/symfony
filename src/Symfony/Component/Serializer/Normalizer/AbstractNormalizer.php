@@ -112,6 +112,15 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const IGNORED_ATTRIBUTES = 'ignored_attributes';
 
     /**
+     * The name converter to use when (de)normalizing a property.
+     *
+     * It has to correspond of a class of the given name converters.
+     *
+     * If not specified or if it does not exist, the first name converter will be used if available.
+     */
+    public const NAME_CONVERTER = 'name_converter';
+
+    /**
      * @internal
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
@@ -130,16 +139,30 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * @var NameConverterInterface|null
+     *
+     * @deprecated since Symfony 5.1, use $nameConverters instead.
      */
     protected $nameConverter;
 
     /**
+     * @var array<string, NameConverterInterface>
+     */
+    protected $nameConverters = [];
+
+    /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, /* array */ $nameConverter/*s*/ = [], array $defaultContext = [])
     {
         $this->classMetadataFactory = $classMetadataFactory;
-        $this->nameConverter = $nameConverter;
+        if (!\is_array($nameConverter)) {
+            @trigger_error(sprintf('The 2nd constructor argument of the class "%s" should be an array of name converters, using a name converter directly or null is deprecated since Symfony 5.1.', __CLASS__), E_USER_DEPRECATED);
+            $this->nameConverter = $nameConverter;
+        } else {
+            foreach ($nameConverter as $nameConverterInstance) {
+                $this->nameConverters[\get_class($nameConverterInstance)] = $nameConverterInstance;
+            }
+        }
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
         if (isset($this->defaultContext[self::CALLBACKS])) {
@@ -347,7 +370,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             $params = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
-                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
+                $key = $paramName;
+                if (\count($this->nameConverters) > 0) {
+                    $nameConverter = $this->nameConverters[$context[static::NAME_CONVERTER] ?? null] ?? reset($this->nameConverters);
+                    $key = $nameConverter->normalize($paramName, $class, $format, $context);
+                } elseif ($this->nameConverter) {
+                    @trigger_error(sprintf('Using the "nameConverter" property of the class "%s" is deprecated since Symfony 5.1, use the "nameConverters" property instead.', __CLASS__), E_USER_DEPRECATED);
+                    $key = $this->nameConverter->normalize($paramName, $class, $format, $context);
+                }
 
                 $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);

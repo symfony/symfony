@@ -24,7 +24,6 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Base class for a normalizer dealing with objects.
@@ -101,7 +100,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected $classDiscriminatorResolver;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, /* array */ $nameConverter/*s*/ = [], PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
         parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
 
@@ -309,7 +308,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
         foreach ($normalizedData as $attribute => $value) {
-            if ($this->nameConverter) {
+            if (\count($this->nameConverters) > 0) {
+                $nameConverter = $this->nameConverters[$context[static::NAME_CONVERTER] ?? null] ?? reset($this->nameConverters);
+                $attribute = $nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
+            } elseif ($this->nameConverter) {
+                @trigger_error(sprintf('Using the "nameConverter" property of the class "%s" is deprecated since Symfony 5.1, use the "nameConverters" property instead.', __CLASS__), E_USER_DEPRECATED);
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
             }
 
@@ -505,7 +508,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $data;
         }
 
-        if ($this->nameConverter) {
+        if (\count($this->nameConverters) > 0) {
+            $nameConverter = $this->nameConverters[$context[static::NAME_CONVERTER] ?? null] ?? reset($this->nameConverters);
+            $attribute = $nameConverter->normalize($attribute, $class, $format, $context);
+        } elseif ($this->nameConverter) {
+            @trigger_error(sprintf('Using the "nameConverter" property of the class "%s" is deprecated since Symfony 5.1, use the "nameConverters" property instead.', __CLASS__), E_USER_DEPRECATED);
             $attribute = $this->nameConverter->normalize($attribute, $class, $format, $context);
         }
 

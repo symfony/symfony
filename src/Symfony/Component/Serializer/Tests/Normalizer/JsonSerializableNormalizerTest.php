@@ -41,7 +41,7 @@ class JsonSerializableNormalizerTest extends TestCase
     private function createNormalizer(array $defaultContext = [])
     {
         $this->serializer = $this->getMockBuilder(JsonSerializerNormalizer::class)->getMock();
-        $this->normalizer = new JsonSerializableNormalizer(null, null, $defaultContext);
+        $this->normalizer = new JsonSerializableNormalizer(null, [], $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
 

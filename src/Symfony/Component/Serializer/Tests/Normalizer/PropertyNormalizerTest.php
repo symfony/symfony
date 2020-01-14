@@ -69,7 +69,7 @@ class PropertyNormalizerTest extends TestCase
     private function createNormalizer(array $defaultContext = [])
     {
         $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')->getMock();
-        $this->normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
+        $this->normalizer = new PropertyNormalizer(null, [], null, null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -194,7 +194,7 @@ class PropertyNormalizerTest extends TestCase
     protected function getDenormalizerForConstructArguments(): PropertyNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $denormalizer = new PropertyNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $denormalizer = new PropertyNormalizer($classMetadataFactory, [new MetadataAwareNameConverter($classMetadataFactory)]);
         $serializer = new Serializer([$denormalizer]);
         $denormalizer->setSerializer($serializer);
 
@@ -215,7 +215,11 @@ class PropertyNormalizerTest extends TestCase
         return new PropertyNormalizer($classMetadataFactory);
     }
 
-    public function testGroupsNormalizeWithNameConverter()
+    /**
+     * @group legacy
+     * @expectedDeprecation Using the "nameConverter" property of the class "Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer" is deprecated since Symfony 5.1, use the "nameConverters" property instead.
+     */
+    public function testGroupsNormalizeWithDirectNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
@@ -236,10 +240,52 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
+    public function testGroupsNormalizeWithNameConverter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new PropertyNormalizer($classMetadataFactory, [new CamelCaseToSnakeCaseNameConverter()]);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFooBar('@dunglas');
+        $obj->setSymfony('@coopTilleuls');
+        $obj->setCoopTilleuls('les-tilleuls.coop');
+
+        $this->assertEquals(
+            [
+                'bar' => null,
+                'foo_bar' => '@dunglas',
+                'symfony' => '@coopTilleuls',
+            ],
+            $this->normalizer->normalize($obj, null, [PropertyNormalizer::GROUPS => ['name_converter']])
+        );
+    }
+
+    public function testGroupsNormalizeWithNameConverters()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new PropertyNormalizer($classMetadataFactory, [new MetadataAwareNameConverter($classMetadataFactory), new CamelCaseToSnakeCaseNameConverter()]);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFooBar('@dunglas');
+        $obj->setSymfony('@coopTilleuls');
+        $obj->setCoopTilleuls('les-tilleuls.coop');
+
+        $this->assertEquals(
+            [
+                'bar' => null,
+                'foo_bar' => '@dunglas',
+                'symfony' => '@coopTilleuls',
+            ],
+            $this->normalizer->normalize($obj, null, [PropertyNormalizer::GROUPS => ['name_converter'], PropertyNormalizer::NAME_CONVERTER => CamelCaseToSnakeCaseNameConverter::class])
+        );
+    }
+
     public function testGroupsDenormalizeWithNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $this->normalizer = new PropertyNormalizer($classMetadataFactory, [new CamelCaseToSnakeCaseNameConverter()]);
         $this->normalizer->setSerializer($this->serializer);
 
         $obj = new GroupDummy();
@@ -254,6 +300,27 @@ class PropertyNormalizerTest extends TestCase
                 'symfony' => '@coopTilleuls',
                 'coop_tilleuls' => 'les-tilleuls.coop',
             ], 'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy', null, [PropertyNormalizer::GROUPS => ['name_converter']])
+        );
+    }
+
+    public function testGroupsDenormalizeWithNameConverters()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new PropertyNormalizer($classMetadataFactory, [new MetadataAwareNameConverter($classMetadataFactory), new CamelCaseToSnakeCaseNameConverter()]);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFooBar('@dunglas');
+        $obj->setSymfony('@coopTilleuls');
+
+        $this->assertEquals(
+            $obj,
+            $this->normalizer->denormalize([
+                'bar' => null,
+                'foo_bar' => '@dunglas',
+                'symfony' => '@coopTilleuls',
+                'coop_tilleuls' => 'les-tilleuls.coop',
+            ], 'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy', null, [PropertyNormalizer::GROUPS => ['name_converter'], PropertyNormalizer::NAME_CONVERTER => CamelCaseToSnakeCaseNameConverter::class])
         );
     }
 
@@ -293,7 +360,7 @@ class PropertyNormalizerTest extends TestCase
     protected function getDenormalizerForObjectToPopulate(): PropertyNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new PropertyNormalizer($classMetadataFactory, null, new PhpDocExtractor());
+        $normalizer = new PropertyNormalizer($classMetadataFactory, [], new PhpDocExtractor());
         new Serializer([$normalizer]);
 
         return $normalizer;
@@ -302,7 +369,7 @@ class PropertyNormalizerTest extends TestCase
     protected function getDenormalizerForTypeEnforcement(): DenormalizerInterface
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
-        $normalizer = new PropertyNormalizer(null, null, $extractor);
+        $normalizer = new PropertyNormalizer(null, [], $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), $normalizer]);
         $normalizer->setSerializer($serializer);
 

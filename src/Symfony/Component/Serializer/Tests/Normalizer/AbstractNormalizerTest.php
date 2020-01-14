@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
@@ -133,5 +134,14 @@ class AbstractNormalizerTest extends TestCase
         foreach ($dummy->getFoo() as $foo) {
             $this->assertInstanceOf(Dummy::class, $foo);
         }
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The 2nd constructor argument of the class "Symfony\Component\Serializer\Normalizer\AbstractNormalizer" should be an array of name converters, using a name converter directly or null is deprecated since Symfony 5.1.
+     */
+    public function testConstructNameConverter()
+    {
+        new AbstractNormalizerDummy($this->classMetadata, new CamelCaseToSnakeCaseNameConverter());
     }
 }

@@ -44,7 +44,7 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
 }
 EOF;
         $serializer = new Serializer([
-            new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+            new ObjectNormalizer(null, [], null, new PhpDocExtractor()),
             new ArrayDenormalizer(),
         ], ['json' => new JsonEncoder()]);
         //WHEN

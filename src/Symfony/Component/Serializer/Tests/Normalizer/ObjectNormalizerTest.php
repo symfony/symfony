@@ -78,7 +78,7 @@ class ObjectNormalizerTest extends TestCase
     private function createNormalizer(array $defaultContext = [], ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
         $this->serializer = $this->getMockBuilder(ObjectSerializerNormalizer::class)->getMock();
-        $this->normalizer = new ObjectNormalizer($classMetadataFactory, null, null, null, null, null, $defaultContext);
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, [], null, null, null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -275,7 +275,7 @@ class ObjectNormalizerTest extends TestCase
     protected function getDenormalizerForAttributes(): ObjectNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor());
+        $normalizer = new ObjectNormalizer($classMetadataFactory, [], null, new ReflectionExtractor());
         new Serializer([$normalizer]);
 
         return $normalizer;
@@ -283,7 +283,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testAttributesContextDenormalizeConstructor()
     {
-        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $normalizer = new ObjectNormalizer(null, [], null, new ReflectionExtractor());
         $serializer = new Serializer([$normalizer]);
 
         $objectInner = new ObjectInner();
@@ -371,7 +371,7 @@ class ObjectNormalizerTest extends TestCase
     protected function getDenormalizerForConstructArguments(): ObjectNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $denormalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $denormalizer = new ObjectNormalizer($classMetadataFactory, [new MetadataAwareNameConverter($classMetadataFactory)]);
         $serializer = new Serializer([$denormalizer]);
         $denormalizer->setSerializer($serializer);
 
@@ -397,7 +397,11 @@ class ObjectNormalizerTest extends TestCase
         return new ObjectNormalizer($classMetadataFactory);
     }
 
-    public function testGroupsNormalizeWithNameConverter()
+    /**
+     * @group legacy
+     * @expectedDeprecation Using the "nameConverter" property of the class "Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer" is deprecated since Symfony 5.1, use the "nameConverters" property instead.
+     */
+    public function testGroupsNormalizeWithDirectNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
@@ -418,10 +422,52 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testGroupsNormalizeWithNameConverter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, [new CamelCaseToSnakeCaseNameConverter()]);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFooBar('@dunglas');
+        $obj->setSymfony('@coopTilleuls');
+        $obj->setCoopTilleuls('les-tilleuls.coop');
+
+        $this->assertEquals(
+            [
+                'bar' => null,
+                'foo_bar' => '@dunglas',
+                'symfony' => '@coopTilleuls',
+            ],
+            $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['name_converter']])
+        );
+    }
+
+    public function testGroupsNormalizeWithNameConverters()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, [new MetadataAwareNameConverter($classMetadataFactory), new CamelCaseToSnakeCaseNameConverter()]);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFooBar('@dunglas');
+        $obj->setSymfony('@coopTilleuls');
+        $obj->setCoopTilleuls('les-tilleuls.coop');
+
+        $this->assertEquals(
+            [
+                'bar' => null,
+                'foo_bar' => '@dunglas',
+                'symfony' => '@coopTilleuls',
+            ],
+            $this->normalizer->normalize($obj, null, [ObjectNormalizer::GROUPS => ['name_converter'], ObjectNormalizer::NAME_CONVERTER => CamelCaseToSnakeCaseNameConverter::class])
+        );
+    }
+
     public function testGroupsDenormalizeWithNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $this->normalizer = new ObjectNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, [new CamelCaseToSnakeCaseNameConverter()]);
         $this->normalizer->setSerializer($this->serializer);
 
         $obj = new GroupDummy();
@@ -439,10 +485,31 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testGroupsDenormalizeWithNameConverters()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, [new MetadataAwareNameConverter($classMetadataFactory), new CamelCaseToSnakeCaseNameConverter()]);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFooBar('@dunglas');
+        $obj->setSymfony('@coopTilleuls');
+
+        $this->assertEquals(
+            $obj,
+            $this->normalizer->denormalize([
+                'bar' => null,
+                'foo_bar' => '@dunglas',
+                'symfony' => '@coopTilleuls',
+                'coop_tilleuls' => 'les-tilleuls.coop',
+            ], 'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy', null, [ObjectNormalizer::GROUPS => ['name_converter'], ObjectNormalizer::NAME_CONVERTER => CamelCaseToSnakeCaseNameConverter::class])
+        );
+    }
+
     public function testGroupsDenormalizeWithMetaDataNameConverter()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, [new MetadataAwareNameConverter($classMetadataFactory)]);
         $this->normalizer->setSerializer($this->serializer);
 
         $obj = new OtherSerializedNameDummy();
@@ -470,7 +537,7 @@ class ObjectNormalizerTest extends TestCase
     protected function getDenormalizerForIgnoredAttributes(): ObjectNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor());
+        $normalizer = new ObjectNormalizer($classMetadataFactory, [], null, new ReflectionExtractor());
         new Serializer([$normalizer]);
 
         return $normalizer;
@@ -493,7 +560,7 @@ class ObjectNormalizerTest extends TestCase
     protected function getDenormalizerForObjectToPopulate(): ObjectNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
+        $normalizer = new ObjectNormalizer($classMetadataFactory, [], null, new PhpDocExtractor());
         new Serializer([$normalizer]);
 
         return $normalizer;
@@ -511,7 +578,7 @@ class ObjectNormalizerTest extends TestCase
     protected function getDenormalizerForTypeEnforcement(): ObjectNormalizer
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
-        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $normalizer = new ObjectNormalizer(null, [], null, $extractor);
         new Serializer([new ArrayDenormalizer(), $normalizer]);
 
         return $normalizer;
@@ -579,7 +646,7 @@ class ObjectNormalizerTest extends TestCase
     public function testDenomalizeRecursive()
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
-        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $normalizer = new ObjectNormalizer(null, [], null, $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
         $obj = $serializer->denormalize([
@@ -598,7 +665,7 @@ class ObjectNormalizerTest extends TestCase
     public function testAcceptJsonNumber()
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
-        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $normalizer = new ObjectNormalizer(null, [], null, $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
         $this->assertSame(10.0, $serializer->denormalize(['number' => 10], JsonNumber::class, 'json')->number);
@@ -641,7 +708,7 @@ class ObjectNormalizerTest extends TestCase
             }
         };
 
-        $normalizer = new ObjectNormalizer(null, $nameConverter);
+        $normalizer = new ObjectNormalizer(null, [$nameConverter]);
         $this->assertArrayHasKey('foo-Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy-json-bar', $normalizer->normalize(new ObjectDummy(), 'json', ['foo' => 'bar']));
     }
 
@@ -675,7 +742,7 @@ class ObjectNormalizerTest extends TestCase
             return ObjectDummy::class;
         };
 
-        $normalizer = new ObjectNormalizer(null, null, null, null, null, $classResolver);
+        $normalizer = new ObjectNormalizer(null, [], null, null, null, $classResolver);
 
         $obj = new ProxyObjectDummy();
         $obj->setFoo('foo');

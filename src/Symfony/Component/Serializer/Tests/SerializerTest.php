@@ -406,7 +406,7 @@ class SerializerTest extends TestCase
         };
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PhpDocExtractor(), $discriminatorResolver)], ['json' => new JsonEncoder()]);
+        $serializer = new Serializer([new ObjectNormalizer(null, [], null, new PhpDocExtractor(), $discriminatorResolver)], ['json' => new JsonEncoder()]);
 
         $jsonData = '{"type":"first","quux":{"value":"quux"},"bar":"bar-value","foo":"foo-value"}';
 
@@ -573,7 +573,7 @@ class SerializerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        return new Serializer([new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))], ['json' => new JsonEncoder()]);
+        return new Serializer([new ObjectNormalizer($classMetadataFactory, [], null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))], ['json' => new JsonEncoder()]);
     }
 }
 

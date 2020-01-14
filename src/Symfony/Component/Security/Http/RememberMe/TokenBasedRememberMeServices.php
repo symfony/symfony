@@ -89,10 +89,10 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * Generates the cookie value.
      *
-     * @param string $class
-     * @param string $username The username
-     * @param int    $expires  The Unix timestamp when the cookie expires
-     * @param string $password The encoded password
+     * @param string      $class
+     * @param string      $username The username
+     * @param int         $expires  The Unix timestamp when the cookie expires
+     * @param string|null $password The encoded password
      *
      * @return string
      */
@@ -111,10 +111,10 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * Generates a hash for the cookie to ensure it is not being tampered with.
      *
-     * @param string $class
-     * @param string $username The username
-     * @param int    $expires  The Unix timestamp when the cookie expires
-     * @param string $password The encoded password
+     * @param string      $class
+     * @param string      $username The username
+     * @param int         $expires  The Unix timestamp when the cookie expires
+     * @param string|null $password The encoded password
      *
      * @return string
      */

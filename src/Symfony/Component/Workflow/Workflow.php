@@ -33,6 +33,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class Workflow implements WorkflowInterface
 {
+    public const DISABLE_ANNOUNCE_EVENT = 'workflow_disable_announce_event';
+
     private $definition;
     private $markingStore;
     private $dispatcher;
@@ -207,7 +209,9 @@ class Workflow implements WorkflowInterface
 
             $this->completed($subject, $transition, $marking);
 
-            $this->announce($subject, $transition, $marking);
+            if (!($context[self::DISABLE_ANNOUNCE_EVENT] ?? false)) {
+                $this->announce($subject, $transition, $marking);
+            }
         }
 
         return $marking;

@@ -292,6 +292,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');
             $container->removeDefinition('console.command.messenger_failed_messages_remove');
+            $container->removeDefinition('cache.messenger.restart_workers_signal');
         }
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);

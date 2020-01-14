@@ -22,10 +22,12 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper\Fixtures\Issue;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -1589,5 +1591,151 @@ class ViolationMapperTest extends TestCase
         $this->assertEquals([$this->getFormError($violation1, $grandChild1)], iterator_to_array($grandChild1->getErrors()), $grandChild1->getName().' should have an error, but has none');
         $this->assertEquals([$this->getFormError($violation2, $grandChild2)], iterator_to_array($grandChild2->getErrors()), $grandChild2->getName().' should have an error, but has none');
         $this->assertEquals([$this->getFormError($violation3, $grandChild3)], iterator_to_array($grandChild3->getErrors()), $grandChild3->getName().' should have an error, but has none');
+    }
+
+    public function testMessageWithLabel1()
+    {
+        $renderer = $this->getMockBuilder(FormRenderer::class)
+            ->setMethods(null)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator->expects($this->any())->method('trans')->willReturnMap([
+            ['Name', [], null, null, 'Custom Name'],
+        ]);
+        $this->mapper = new ViolationMapper($renderer, $translator);
+
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('name', 'name');
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message {{ label }}', null, [], null, 'data.name', null);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(1, $child->getErrors(), $child->getName().' should have an error, but has none');
+
+        $errors = iterator_to_array($child->getErrors());
+        if (isset($errors[0])) {
+            /** @var FormError $error */
+            $error = $errors[0];
+            $this->assertSame('Message Custom Name', $error->getMessage());
+        }
+    }
+
+    public function testMessageWithLabel2()
+    {
+        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator->expects($this->any())->method('trans')->willReturnMap([
+            ['options_label', [], null, null, 'Translated Label'],
+        ]);
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $parent = $this->getForm('parent');
+
+        $config = new FormConfigBuilder('name', null, $this->dispatcher, [
+            'error_mapping' => [],
+            'label' => 'options_label',
+        ]);
+        $config->setMapped(true);
+        $config->setInheritData(false);
+        $config->setPropertyPath('name');
+        $config->setCompound(true);
+        $config->setDataMapper(new PropertyPathMapper());
+
+        $child = new Form($config);
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message {{ label }}', null, [], null, 'data.name', null);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(1, $child->getErrors(), $child->getName().' should have an error, but has none');
+
+        $errors = iterator_to_array($child->getErrors());
+        if (isset($errors[0])) {
+            /** @var FormError $error */
+            $error = $errors[0];
+            $this->assertSame('Message Translated Label', $error->getMessage());
+        }
+    }
+
+    public function testMessageWithLabelFormat1()
+    {
+        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator->expects($this->any())->method('trans')->willReturnMap([
+            ['form.custom', [], null, null, 'Translated 1st Custom Label'],
+        ]);
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $parent = $this->getForm('parent');
+
+        $config = new FormConfigBuilder('custom', null, $this->dispatcher, [
+            'error_mapping' => [],
+            'label_format' => 'form.%name%',
+        ]);
+        $config->setMapped(true);
+        $config->setInheritData(false);
+        $config->setPropertyPath('custom');
+        $config->setCompound(true);
+        $config->setDataMapper(new PropertyPathMapper());
+
+        $child = new Form($config);
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message {{ label }}', null, [], null, 'data.custom', null);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(1, $child->getErrors(), $child->getName().' should have an error, but has none');
+
+        $errors = iterator_to_array($child->getErrors());
+        if (isset($errors[0])) {
+            /** @var FormError $error */
+            $error = $errors[0];
+            $this->assertSame('Message Translated 1st Custom Label', $error->getMessage());
+        }
+    }
+
+    public function testMessageWithLabelFormat2()
+    {
+        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator->expects($this->any())->method('trans')->willReturnMap([
+            ['form_custom-id', [], null, null, 'Translated 2nd Custom Label'],
+        ]);
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $parent = $this->getForm('parent');
+
+        $config = new FormConfigBuilder('custom-id', null, $this->dispatcher, [
+            'error_mapping' => [],
+            'label_format' => 'form_%id%',
+        ]);
+        $config->setMapped(true);
+        $config->setInheritData(false);
+        $config->setPropertyPath('custom-id');
+        $config->setCompound(true);
+        $config->setDataMapper(new PropertyPathMapper());
+
+        $child = new Form($config);
+        $parent->add($child);
+
+        $parent->submit([]);
+
+        $violation = new ConstraintViolation('Message {{ label }}', null, [], null, 'data.custom-id', null);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(1, $child->getErrors(), $child->getName().' should have an error, but has none');
+
+        $errors = iterator_to_array($child->getErrors());
+        if (isset($errors[0])) {
+            /** @var FormError $error */
+            $error = $errors[0];
+            $this->assertSame('Message Translated 2nd Custom Label', $error->getMessage());
+        }
     }
 }

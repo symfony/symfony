@@ -15,9 +15,11 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -28,10 +30,10 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     private $violationMapper;
     private $legacyErrorMessages;
 
-    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true)
+    public function __construct(ValidatorInterface $validator, bool $legacyErrorMessages = true, FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
     {
         $this->validator = $validator;
-        $this->violationMapper = new ViolationMapper();
+        $this->violationMapper = new ViolationMapper($formRenderer, $translator);
         $this->legacyErrorMessages = $legacyErrorMessages;
     }
 

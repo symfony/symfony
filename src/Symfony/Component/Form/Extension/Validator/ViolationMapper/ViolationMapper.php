@@ -13,21 +13,28 @@ namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ViolationMapper implements ViolationMapperInterface
 {
-    /**
-     * @var bool
-     */
-    private $allowNonSynchronized;
+    private $formRenderer;
+    private $translator;
+    private $allowNonSynchronized = false;
+
+    public function __construct(FormRendererInterface $formRenderer = null, TranslatorInterface $translator = null)
+    {
+        $this->formRenderer = $formRenderer;
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -124,9 +131,49 @@ class ViolationMapper implements ViolationMapperInterface
 
         // Only add the error if the form is synchronized
         if ($this->acceptsErrors($scope)) {
+            $labelFormat = $scope->getConfig()->getOption('label_format');
+
+            if (null !== $labelFormat) {
+                $label = str_replace(
+                    [
+                        '%name%',
+                        '%id%',
+                    ],
+                    [
+                        $scope->getName(),
+                        (string) $scope->getPropertyPath(),
+                    ],
+                    $labelFormat
+                );
+            } else {
+                $label = $scope->getConfig()->getOption('label');
+            }
+
+            if (null === $label && null !== $this->formRenderer) {
+                $label = $this->formRenderer->humanize($scope->getName());
+            } elseif (null === $label) {
+                $label = $scope->getName();
+            }
+
+            if (false !== $label && null !== $this->translator) {
+                $label = $this->translator->trans(
+                    $label,
+                    $scope->getConfig()->getOption('label_translation_parameters', []),
+                    $scope->getConfig()->getOption('translation_domain')
+                );
+            }
+
+            $message = $violation->getMessage();
+            $messageTemplate = $violation->getMessageTemplate();
+
+            if (false !== $label) {
+                $message = str_replace('{{ label }}', $label, $message);
+                $messageTemplate = str_replace('{{ label }}', $label, $messageTemplate);
+            }
+
             $scope->addError(new FormError(
-                $violation->getMessage(),
-                $violation->getMessageTemplate(),
+                $message,
+                $messageTemplate,
                 $violation->getParameters(),
                 $violation->getPlural(),
                 $violation

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by gudfar at 2019-11-05T16:02:19Z
+
+@nicolas-grekas
+
+> Here is a code review, but before fixing it: this will break configurations that target different arguments when the type is here or not. To them, the exception will be a false positive.
+
+I guess it shouldn't break, because exception will trigger only if we have different argument type in binding and in constructor. But I also don’t like throwing an exception in this place I can suggest to add error message. It will look like this http://joxi.net/YmEyjBYtw5O7Bm
+WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-11-05T16:32:44Z
+
+Let's give it a try :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-12-22T20:19:33Z
+
+Thank you Nicolas I am able to test this in January but from the code pov it looks good👍🏻
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-08T17:22:59Z
+
+friendly ping @OskarStark

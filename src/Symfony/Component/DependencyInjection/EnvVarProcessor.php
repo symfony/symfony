@@ -30,8 +30,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
     public function __construct(ContainerInterface $container, \Traversable $loaders = null)
     {
         $this->container = $container;
-        $this->loaders = new \IteratorIterator($loaders ?? new \ArrayIterator());
-        $this->loaders = $this->loaders->getInnerIterator();
+        $this->loaders = $loaders ?? new \ArrayIterator();
     }
 
     /**
@@ -141,20 +140,32 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 }
             }
 
-            $loaders = $this->loaders;
-            $this->loaders = new \ArrayIterator();
+            if (false === $env || null === $env) {
+                $loaders = $this->loaders;
+                $this->loaders = new \ArrayIterator();
 
-            try {
-                while ((false === $env || null === $env) && $loaders->valid()) {
-                    $loader = $loaders->current();
-                    $loaders->next();
-                    $this->loadedVars[] = $vars = $loader->loadEnvVars();
-                    $env = $vars[$name] ?? false;
+                try {
+                    $i = 0;
+                    $ended = true;
+                    $count = $loaders instanceof \Countable ? $loaders->count() : 0;
+                    foreach ($loaders as $loader) {
+                        if (\count($this->loadedVars) > $i++) {
+                            continue;
+                        }
+                        $this->loadedVars[] = $vars = $loader->loadEnvVars();
+                        if (false !== $env = $vars[$name] ?? false) {
+                            $ended = false;
+                            break;
+                        }
+                    }
+                    if ($ended || $count === $i) {
+                        $loaders = $this->loaders;
+                    }
+                } catch (ParameterCircularReferenceException $e) {
+                    // skip loaders that need an env var that is not defined
+                } finally {
+                    $this->loaders = $loaders;
                 }
-            } catch (ParameterCircularReferenceException $e) {
-                // skip loaders that need an env var that is not defined
-            } finally {
-                $this->loaders = $loaders;
             }
 
             if (false === $env || null === $env) {

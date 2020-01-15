@@ -33,6 +33,28 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testNullIsValidIfAllowNullTrue()
+    {
+        $constraint = new Type(['type' => 'integer', 'allowNull' => true]);
+
+        $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testNullIsNotValidIfAllowNullFalse()
+    {
+        $constraint = new Type(['type' => 'integer', 'allowNull' => false]);
+
+        $this->validator->validate(null, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ value }}', 'null')
+            ->setParameter('{{ type }}', 'integer')
+            ->setCode(Type::INVALID_TYPE_ERROR)
+            ->assertRaised();
+    }
+
     public function testEmptyIsValidIfString()
     {
         $constraint = new Type(['type' => 'string']);

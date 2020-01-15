@@ -29,6 +29,7 @@ class Type extends Constraint
 
     public $message = 'This value should be of type {{ type }}.';
     public $type;
+    public $allowNull = true;
 
     /**
      * {@inheritdoc}

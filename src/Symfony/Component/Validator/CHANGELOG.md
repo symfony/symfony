@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added the `Hostname` constraint and validator
+ * added option `allowNull` to Type constraint
 
 5.0.0
 -----

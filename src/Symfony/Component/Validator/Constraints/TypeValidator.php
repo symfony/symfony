@@ -29,11 +29,19 @@ class TypeValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Type::class);
         }
 
+        $types = (array) $constraint->type;
+
         if (null === $value) {
+            if (!$constraint->allowNull) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', 'null')
+                    ->setParameter('{{ type }}', implode('|', $types))
+                    ->setCode(Type::INVALID_TYPE_ERROR)
+                    ->addViolation();
+            }
+
             return;
         }
-
-        $types = (array) $constraint->type;
 
         foreach ($types as $type) {
             $type = strtolower($type);

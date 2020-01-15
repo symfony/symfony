@@ -63,6 +63,20 @@ before_install:
       export REDIS_CLUSTER_HOSTS='localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
 
     - |
+      # Start Kafka and install an up-to-date librdkafka
+      docker network create kafka_network
+      docker pull wurstmeister/zookeeper:3.4.6
+      docker run -d --network kafka_network --name zookeeper wurstmeister/zookeeper:3.4.6
+      docker pull wurstmeister/kafka:2.12-2.3.1
+      docker run -d -p 9092:9092 --network kafka_network -e "KAFKA_AUTO_CREATE_TOPICS_ENABLE=false" -e "KAFKA_CREATE_TOPICS=test-topic:1:1:compact" -e "KAFKA_ADVERTISED_HOST_NAME=kafka" -e "KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181" -e "KAFKA_ADVERTISED_PORT=9092" --name kafka wurstmeister/kafka:2.12-2.3.1
+      export KAFKA_BROKER=kafka:9092
+      sudo sh -c 'echo "\n127.0.0.1  kafka\n" >> /etc/hosts'
+
+      mkdir /tmp/librdkafka
+      curl https://codeload.github.com/edenhill/librdkafka/tar.gz/v0.11.6 | tar xzf - -C /tmp/librdkafka
+      (cd  /tmp/librdkafka/librdkafka-0.11.6 && ./configure && make && sudo make install)
+
+    - |
       # General configuration
       set -e
       stty cols 120
@@ -175,6 +189,7 @@ before_install:
           tfold ext.igbinary tpecl igbinary-3.1.2 igbinary.so $INI
           tfold ext.zookeeper tpecl zookeeper-0.7.1 zookeeper.so $INI
           tfold ext.amqp tpecl amqp-1.9.4 amqp.so $INI
+          tfold ext.rdkafka tpecl rdkafka-4.0.2 rdkafka.so $INI
           tfold ext.redis tpecl redis-4.3.0 redis.so $INI "no"
       done
     - |

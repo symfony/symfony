@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+ * added max-items + LRU + max-lifetime capabilities to `ArrayCache`
+
 5.0.0
 -----
 

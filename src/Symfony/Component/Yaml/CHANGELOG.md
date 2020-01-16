@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added `yaml-lint` binary.
+ * Deprecated using the `!php/object` and `!php/const` tags without a value.
 
 5.0.0
 -----

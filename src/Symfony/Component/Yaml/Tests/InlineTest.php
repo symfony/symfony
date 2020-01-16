@@ -740,6 +740,10 @@ class InlineTest extends TestCase
 
     /**
      * @dataProvider phpObjectTagWithEmptyValueProvider
+     *
+     * @group legacy
+     *
+     * @expectedDeprecation Using the !php/object tag without a value is deprecated since Symfony 5.1.
      */
     public function testPhpObjectWithEmptyValue($expected, $value)
     {
@@ -760,6 +764,10 @@ class InlineTest extends TestCase
 
     /**
      * @dataProvider phpConstTagWithEmptyValueProvider
+     *
+     * @group legacy
+     *
+     * @expectedDeprecation Using the !php/const tag without a value is deprecated since Symfony 5.1.
      */
     public function testPhpConstTagWithEmptyValue($expected, $value)
     {

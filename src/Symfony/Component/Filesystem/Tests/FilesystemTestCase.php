@@ -105,21 +105,32 @@ class FilesystemTestCase extends TestCase
         );
     }
 
+    protected function getFileOwnerId($filepath)
+    {
+        $infos = stat($filepath);
+
+        return $infos['uid'];
+    }
+
     protected function getFileOwner($filepath)
     {
         $this->markAsSkippedIfPosixIsMissing();
 
+        return ($datas = posix_getpwuid($this->getFileOwnerId($filepath))) ? $datas['name'] : null;
+    }
+
+    protected function getFileGroupId($filepath)
+    {
         $infos = stat($filepath);
 
-        return ($datas = posix_getpwuid($infos['uid'])) ? $datas['name'] : null;
+        return $infos['gid'];
     }
 
     protected function getFileGroup($filepath)
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        $infos = stat($filepath);
-        if ($datas = posix_getgrgid($infos['gid'])) {
+        if ($datas = posix_getgrgid($this->getFileGroupId($filepath))) {
             return $datas['name'];
         }
 

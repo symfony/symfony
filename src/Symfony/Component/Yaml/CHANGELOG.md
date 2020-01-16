@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added `yaml-lint` binary.
+ * Added support for binary int notation.
 
 5.0.0
 -----

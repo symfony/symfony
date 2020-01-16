@@ -634,9 +634,18 @@ class Inline
                         return '0' == $scalar[1] ? -octdec(substr($scalar, 1)) : (($raw === (string) $cast) ? $cast : $raw);
                     case is_numeric($scalar):
                     case Parser::preg_match(self::getHexRegex(), $scalar):
+                    case Parser::preg_match(self::getBinRegex(), $scalar):
                         $scalar = str_replace('_', '', $scalar);
 
-                        return '0x' === $scalar[0].$scalar[1] ? hexdec($scalar) : (float) $scalar;
+                        if ('0x' === $scalar[0].$scalar[1]) {
+                            return hexdec($scalar);
+                        }
+
+                        if ('0b' === $scalar[0].$scalar[1]) {
+                            return bindec($scalar);
+                        }
+
+                        return (float) $scalar;
                     case '.inf' === $scalarLower:
                     case '.nan' === $scalarLower:
                         return -log(0);
@@ -749,5 +758,13 @@ EOF;
     private static function getHexRegex(): string
     {
         return '~^0x[0-9a-f_]++$~i';
+    }
+
+    /**
+     * Gets a regex that matches a YAML number in binary notation.
+     */
+    private static function getBinRegex(): string
+    {
+        return '~^0b[01]++$~i';
     }
 }

@@ -736,4 +736,9 @@ class InlineTest extends TestCase
             'negative octal number' => [-28, '-034'],
         ];
     }
+
+    public function testParseBinaryInt()
+    {
+        self::assertSame(0b010, Inline::parse('0b010'));
+    }
 }

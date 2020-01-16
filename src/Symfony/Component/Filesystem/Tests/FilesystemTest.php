@@ -521,7 +521,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(753, $subdirectory);
     }
 
-    public function testChown()
+    public function testChownByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -534,7 +534,20 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame($owner, $this->getFileOwner($dir));
     }
 
-    public function testChownRecursive()
+    public function testChownById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $ownerId = $this->getFileOwnerId($dir);
+        $this->filesystem->chown($dir, $ownerId);
+
+        $this->assertSame($ownerId, $this->getFileOwnerId($dir));
+    }
+
+    public function testChownRecursiveByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -547,6 +560,21 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chown($dir, $owner, true);
 
         $this->assertSame($owner, $this->getFileOwner($file));
+    }
+
+    public function testChownRecursiveById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+        $file = $dir.\DIRECTORY_SEPARATOR.'file';
+        touch($file);
+
+        $ownerId = $this->getFileOwnerId($dir);
+        $this->filesystem->chown($dir, $ownerId, true);
+
+        $this->assertSame($ownerId, $this->getFileOwnerId($file));
     }
 
     public function testChownSymlink()
@@ -624,7 +652,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chown($dir, 'user'.time().mt_rand(1000, 9999));
     }
 
-    public function testChgrp()
+    public function testChgrpByName()
     {
         $this->markAsSkippedIfPosixIsMissing();
 
@@ -635,6 +663,19 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chgrp($dir, $group);
 
         $this->assertSame($group, $this->getFileGroup($dir));
+    }
+
+    public function testChgrpById()
+    {
+        $this->markAsSkippedIfPosixIsMissing();
+
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
+        mkdir($dir);
+
+        $groupId = $this->getFileGroupId($dir);
+        $this->filesystem->chgrp($dir, $groupId);
+
+        $this->assertSame($groupId, $this->getFileGroupId($dir));
     }
 
     public function testChgrpRecursive()
@@ -652,7 +693,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame($group, $this->getFileGroup($file));
     }
 
-    public function testChgrpSymlink()
+    public function testChgrpSymlinkByName()
     {
         $this->markAsSkippedIfSymlinkIsMissing();
 
@@ -667,6 +708,23 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chgrp($link, $group);
 
         $this->assertSame($group, $this->getFileGroup($link));
+    }
+
+    public function testChgrpSymlinkById()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.\DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->symlink($file, $link);
+
+        $groupId = $this->getFileGroupId($link);
+        $this->filesystem->chgrp($link, $groupId);
+
+        $this->assertSame($groupId, $this->getFileGroupId($link));
     }
 
     public function testChgrpLink()

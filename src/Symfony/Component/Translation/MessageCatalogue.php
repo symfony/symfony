@@ -153,15 +153,12 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function add(array $messages, string $domain = 'messages')
     {
+        if (!isset($this->messages[$domain])) {
+            $this->messages[$domain] = [];
+        }
         $intlDomain = $domain;
         if (false === mb_strpos($intlDomain, self::INTL_DOMAIN_SUFFIX)) {
             $intlDomain .= self::INTL_DOMAIN_SUFFIX;
-        }
-        if (!isset($this->messages[$intlDomain])) {
-            $this->messages[$intlDomain] = [];
-        }
-        if (!isset($this->messages[$domain])) {
-            $this->messages[$domain] = [];
         }
         foreach ($messages as $id => $message) {
             if (isset($this->messages[$intlDomain][$id])) {

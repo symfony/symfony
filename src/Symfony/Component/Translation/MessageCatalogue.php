@@ -164,10 +164,10 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
             $this->messages[$domain] = [];
         }
         foreach ($messages as $id => $message) {
-            if (isset($this->messages[$domain][$id])) {
-                $this->messages[$domain][$id] = $message;
-            } else {
+            if (isset($this->messages[$intlDomain][$id])) {
                 $this->messages[$intlDomain][$id] = $message;
+            } else {
+                $this->messages[$domain][$id] = $message;
             }
         }
     }

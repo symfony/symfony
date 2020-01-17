@@ -314,4 +314,12 @@ class XliffFileLoaderTest extends TestCase
             $catalogue->getMetadata('test', 'domain1')
         );
     }
+
+    public function testLoadVersion2WithName()
+    {
+        $loader = new XliffFileLoader();
+        $catalogue = $loader->load(__DIR__.'/../fixtures/resources-2.0-name.xlf', 'en', 'domain1');
+
+        $this->assertEquals(['foo' => 'bar', 'bar' => 'baz', 'baz' => 'foo', 'qux' => 'qux source'], $catalogue->all('domain1'));
+    }
 }

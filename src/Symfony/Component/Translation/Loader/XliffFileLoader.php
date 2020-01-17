@@ -135,11 +135,12 @@ class XliffFileLoader implements LoaderInterface
 
         foreach ($xml->xpath('//xliff:unit') as $unit) {
             foreach ($unit->segment as $segment) {
-                $source = $segment->source;
+                $attributes = $unit->attributes();
+                $source = $attributes['name'] ?? $segment->source;
 
                 // If the xlf file has another encoding specified, try to convert it because
                 // simple_xml will always return utf-8 encoded values
-                $target = $this->utf8ToCharset((string) (isset($segment->target) ? $segment->target : $source), $encoding);
+                $target = $this->utf8ToCharset((string) ($segment->target ?? $segment->source), $encoding);
 
                 $catalogue->set((string) $source, $target, $domain);
 

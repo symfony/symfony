@@ -155,6 +155,10 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     {
         if (!isset($this->messages[$domain])) {
             $this->messages[$domain] = $messages;
+        } elseif (isset($this->messages[$domain.self::INTL_DOMAIN_SUFFIX])) {
+            foreach ($messages as $id => $message) {
+                $this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id] = $message;
+            }
         } else {
             foreach ($messages as $id => $message) {
                 $this->messages[$domain][$id] = $message;

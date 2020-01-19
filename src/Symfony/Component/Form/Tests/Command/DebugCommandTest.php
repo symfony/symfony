@@ -152,6 +152,8 @@ Symfony\Component\Form\Tests\Command\FooType (foo)
 ==================================================
 
  ---------------- -----------%s
+  Info             "Info"    %s
+ ---------------- -----------%s
   Required         true      %s
  ---------------- -----------%s
   Default          -         %s
@@ -209,5 +211,6 @@ class FooType extends AbstractType
         $resolver->setNormalizer('foo', function (Options $options, $value) {
             return (string) $value;
         });
+        $resolver->setInfo('foo', 'Info');
     }
 }

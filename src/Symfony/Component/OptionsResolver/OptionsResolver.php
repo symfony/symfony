@@ -72,6 +72,11 @@ class OptionsResolver implements Options
     private $allowedTypes = [];
 
     /**
+     * A list of info messages for each option.
+     */
+    private $info = [];
+
+    /**
      * A list of closures for evaluating lazy options.
      */
     private $lazy = [];
@@ -716,6 +721,41 @@ class OptionsResolver implements Options
     }
 
     /**
+     * Sets an info message for an option.
+     *
+     * @return $this
+     *
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     */
+    public function setInfo(string $option, string $info): self
+    {
+        if ($this->locked) {
+            throw new AccessException('The Info message cannot be set from a lazy option or normalizer.');
+        }
+
+        if (!isset($this->defined[$option])) {
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $this->formatOptions([$option]), implode('", "', array_keys($this->defined))));
+        }
+
+        $this->info[$option] = $info;
+
+        return $this;
+    }
+
+    /**
+     * Gets the info message for an option.
+     */
+    public function getInfo(string $option): ?string
+    {
+        if (!isset($this->defined[$option])) {
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $this->formatOptions([$option]), implode('", "', array_keys($this->defined))));
+        }
+
+        return $this->info[$option] ?? null;
+    }
+
+    /**
      * Removes the option with the given name.
      *
      * Undefined options are ignored.
@@ -734,7 +774,7 @@ class OptionsResolver implements Options
 
         foreach ((array) $optionNames as $option) {
             unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option]);
-            unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option]);
+            unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option], $this->info[$option]);
         }
 
         return $this;
@@ -763,6 +803,7 @@ class OptionsResolver implements Options
         $this->allowedTypes = [];
         $this->allowedValues = [];
         $this->deprecated = [];
+        $this->info = [];
 
         return $this;
     }
@@ -994,6 +1035,10 @@ class OptionsResolver implements Options
                         ' Accepted values are: %s.',
                         $this->formatValues($printableAllowedValues)
                     );
+                }
+
+                if (isset($this->info[$option])) {
+                    $message .= sprintf(' Info: %s.', $this->info[$option]);
                 }
 
                 throw new InvalidOptionsException($message);

@@ -124,4 +124,18 @@ final class OptionConfigurator
 
         return $this;
     }
+
+    /**
+     * Sets an info message for an option.
+     *
+     * @return $this
+     *
+     * @throws AccessException If called from a lazy option or normalizer
+     */
+    public function info(string $info): self
+    {
+        $this->resolver->setInfo($this->name, $info);
+
+        return $this;
+    }
 }

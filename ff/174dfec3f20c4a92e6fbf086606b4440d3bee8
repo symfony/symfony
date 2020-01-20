@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-04T11:24:49Z
+
+> Let's assume that when a test expect a deprecation, it can have 0 assertions
+
+what does that mean? We do have tests that expect deprecations, and have many other assertions in the body of the test case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-04T11:26:49Z
+
+> Let's assume that when a test expect a deprecation, it can have 0 assertions
+
+does this mean that a test that makes no assertion won't be reported as risky as soon as it also expects deprecations?
+What's the current behavior, and why change it?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-01-05T12:54:50Z
+
+> what does that mean? We do have tests that expect deprecations, and have many other assertions in the body of the test case.
+
+Yes and that is fine. Removing this code does not change anything about that. The only thing that is changed is that we don't reset the original "beStrictAboutTestsThatDoNotTestAnything" flag value to true (when it was true) at the end of each test anymore.
+
+> does this mean that a test that makes no assertion won't be reported as risky as soon as it also expects deprecations?
+>  What's the current behavior, and why change it?
+
+Yes and that is the current behavior. When a test expects a deprecation we always set the "beStrictAboutTestsThatDoNotTestAnything" flag to false (that overrides it if it was true). So a test that expects an annotation can never be considered as risky if it makes no assertion. The current behavior is not changed.
+
+I would like to have @xabbuh input about this.

@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-14T16:11:04Z
+
+Does this cause any issue? We're not using string mode, so it shouldn't, isn't it? Beside this, IF there is an issue, the same code exists on 3.4 :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-01-14T16:37:23Z
+
+Yes it triggers:
+```
+TypeError: Argument 4 passed to
+Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices::generateCookieHash()
+must be of the type string, null given
+```
+It's not an issue before 5.0 because method `generateCookieHash` were not typehinted with `string`.
+Another way to fix it is to replace typehint by `?string`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-14T16:40:45Z
+
+Oh, ok. Then we need to change the docblock on 3.4+, and make this nullable on 5.0. That's the most sensible option to me, from an historical perspective, don't you think?

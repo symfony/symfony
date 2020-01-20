@@ -23,6 +23,7 @@ use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
@@ -253,6 +254,24 @@ EOF
         }
 
         $resultMessage = 'Translation files were successfully updated';
+
+        // move new messages to intl domain when possible
+        if (class_exists(\MessageFormatter::class)) {
+            foreach ($operation->getDomains() as $domain) {
+                $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+                $newMessages = $operation->getNewMessages($domain);
+
+                if ([] === $newMessages || ([] === $currentCatalogue->all($intlDomain) && [] !== $currentCatalogue->all($domain))) {
+                    continue;
+                }
+
+                $result = $operation->getResult();
+                $allIntlMessages = $result->all($intlDomain);
+                $currentMessages = array_diff_key($newMessages, $result->all($domain));
+                $result->replace($currentMessages, $domain);
+                $result->replace($allIntlMessages + $newMessages, $intlDomain);
+            }
+        }
 
         // show compiled list of messages
         if (true === $input->getOption('dump-messages')) {

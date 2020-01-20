@@ -36,10 +36,10 @@ class TraceableHttpClientTest extends TestCase
                     return true;
                 })
             )
-            ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse()))
+            ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('hello')))
         ;
         $sut = new TraceableHttpClient($httpClient);
-        $sut->request('GET', '/foo/bar', ['options1' => 'foo']);
+        $sut->request('GET', '/foo/bar', ['options1' => 'foo'])->getContent();
         $this->assertCount(1, $tracedRequests = $sut->getTracedRequests());
         $actualTracedRequest = $tracedRequests[0];
         $this->assertEquals([
@@ -47,6 +47,7 @@ class TraceableHttpClientTest extends TestCase
             'url' => '/foo/bar',
             'options' => ['options1' => 'foo'],
             'info' => [],
+            'content' => 'hello',
         ], $actualTracedRequest);
     }
 

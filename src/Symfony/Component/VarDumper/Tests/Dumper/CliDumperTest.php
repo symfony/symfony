@@ -62,7 +62,7 @@ array:24 [
   6 => {$intMax}
   "str" => "déjà\\n"
   7 => b"""
-    é\\x00test\\t\\n
+    é\\x01test\\t\\n
     ing
     """
   "[]" => []

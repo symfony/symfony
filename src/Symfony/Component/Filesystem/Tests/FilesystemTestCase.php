@@ -122,7 +122,7 @@ class FilesystemTestCase extends TestCase
     protected function getFileGroupId($filepath)
     {
         $infos = stat($filepath);
-
+var_dump($infos);
         return $infos['gid'];
     }
 
@@ -150,7 +150,6 @@ class FilesystemTestCase extends TestCase
 
     protected function markAsSkippedIfSymlinkIsMissing($relative = false)
     {
-        var_dump(['\\' === \DIRECTORY_SEPARATOR, false === self::$symlinkOnWindows]);
         if ('\\' === \DIRECTORY_SEPARATOR && false === self::$symlinkOnWindows) {
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
         }

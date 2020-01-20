@@ -18,6 +18,7 @@ class FilesystemTest extends FilesystemTestCase
 {
     public function testChgrpSymlinkByName()
     {
+        var_dump(__METHOD__);
         $this->markAsSkippedIfSymlinkIsMissing();
 
         $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';
@@ -36,6 +37,7 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testChgrpSymlinkById()
     {
+        var_dump(__METHOD__);
         $this->markAsSkippedIfSymlinkIsMissing();
 
         $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';

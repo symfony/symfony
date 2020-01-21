@@ -253,7 +253,7 @@ class ContextListenerTest extends TestCase
     public function testIfTokenIsDeauthenticated()
     {
         $refreshedUser = new User('foobar', 'baz');
-        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)]);
+        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)]);
 
         $this->assertNull($tokenStorage->getToken());
     }
@@ -275,7 +275,7 @@ class ContextListenerTest extends TestCase
         $rememberMeServices = $this->createMock(RememberMeServicesInterface::class);
         $rememberMeServices->expects($this->once())->method('loginFail');
 
-        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)], null, $rememberMeServices);
+        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], null, $rememberMeServices);
 
         $this->assertNull($tokenStorage->getToken());
     }
@@ -283,7 +283,7 @@ class ContextListenerTest extends TestCase
     public function testTryAllUserProvidersUntilASupportingUserProviderIsFound()
     {
         $refreshedUser = new User('foobar', 'baz');
-        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)], $refreshedUser);
+        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], $refreshedUser);
 
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
     }
@@ -291,14 +291,14 @@ class ContextListenerTest extends TestCase
     public function testNextSupportingUserProviderIsTriedIfPreviousSupportingUserProviderDidNotLoadTheUser()
     {
         $refreshedUser = new User('foobar', 'baz');
-        $tokenStorage = $this->handleEventWithPreviousSession([new SupportingUserProvider(), new SupportingUserProvider($refreshedUser)], $refreshedUser);
+        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], $refreshedUser);
 
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
     }
 
     public function testTokenIsSetToNullIfNoUserWasLoadedByTheRegisteredUserProviders()
     {
-        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(), new SupportingUserProvider()]);
+        $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider()]);
 
         $this->assertNull($tokenStorage->getToken());
     }
@@ -306,13 +306,13 @@ class ContextListenerTest extends TestCase
     public function testRuntimeExceptionIsThrownIfNoSupportingUserProviderWasRegistered()
     {
         $this->expectException('RuntimeException');
-        $this->handleEventWithPreviousSession([new NotSupportingUserProvider(), new NotSupportingUserProvider()]);
+        $this->handleEventWithPreviousSession([new NotSupportingUserProvider(false), new NotSupportingUserProvider(true)]);
     }
 
     public function testAcceptsProvidersAsTraversable()
     {
         $refreshedUser = new User('foobar', 'baz');
-        $tokenStorage = $this->handleEventWithPreviousSession(new \ArrayObject([new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)]), $refreshedUser);
+        $tokenStorage = $this->handleEventWithPreviousSession(new \ArrayObject([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)]), $refreshedUser);
 
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
     }
@@ -338,7 +338,7 @@ class ContextListenerTest extends TestCase
             $this->assertNotEquals($event->getRefreshedToken()->getUser(), $user);
         });
 
-        $listener = new ContextListener($tokenStorage, [new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)], 'context_key', null, $eventDispatcher);
+        $listener = new ContextListener($tokenStorage, [new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], 'context_key', null, $eventDispatcher);
         $listener(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
 
         $this->assertNull($tokenStorage->getToken());
@@ -422,6 +422,14 @@ class ContextListenerTest extends TestCase
 
 class NotSupportingUserProvider implements UserProviderInterface
 {
+    /** @var bool */
+    private $throwsUnsupportedException;
+
+    public function __construct($throwsUnsupportedException)
+    {
+        $this->throwsUnsupportedException = $throwsUnsupportedException;
+    }
+
     public function loadUserByUsername($username): UserInterface
     {
         throw new UsernameNotFoundException();
@@ -429,7 +437,11 @@ class NotSupportingUserProvider implements UserProviderInterface
 
     public function refreshUser(UserInterface $user): UserInterface
     {
-        throw new UnsupportedUserException();
+        if ($this->throwsUnsupportedException) {
+            throw new UnsupportedUserException();
+        }
+
+        return $user;
     }
 
     public function supportsClass($class): bool

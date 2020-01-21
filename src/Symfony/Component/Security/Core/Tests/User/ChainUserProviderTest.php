@@ -70,18 +70,37 @@ class ChainUserProviderTest extends TestCase
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
-            ->method('refreshUser')
-            ->willThrowException(new UnsupportedUserException('unsupported'))
+            ->method('supportsClass')
+            ->willReturn(false)
         ;
 
         $provider2 = $this->getProvider();
         $provider2
             ->expects($this->once())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
+        $provider2
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->willThrowException(new UnsupportedUserException('unsupported'))
+        ;
+
+        $provider3 = $this->getProvider();
+        $provider3
+            ->expects($this->once())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
+        $provider3
+            ->expects($this->once())
             ->method('refreshUser')
             ->willReturn($account = $this->getAccount())
         ;
 
-        $provider = new ChainUserProvider([$provider1, $provider2]);
+        $provider = new ChainUserProvider([$provider1, $provider2, $provider3]);
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
@@ -90,11 +109,23 @@ class ChainUserProviderTest extends TestCase
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
+        $provider1
+            ->expects($this->once())
             ->method('refreshUser')
             ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
         $provider2 = $this->getProvider();
+        $provider2
+            ->expects($this->once())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
@@ -111,11 +142,23 @@ class ChainUserProviderTest extends TestCase
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
+        $provider1
+            ->expects($this->once())
             ->method('refreshUser')
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
         $provider2 = $this->getProvider();
+        $provider2
+            ->expects($this->once())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
@@ -175,11 +218,23 @@ class ChainUserProviderTest extends TestCase
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
+        $provider1
+            ->expects($this->once())
             ->method('refreshUser')
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
         $provider2 = $this->getProvider();
+        $provider2
+            ->expects($this->once())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
         $provider2
             ->expects($this->once())
             ->method('refreshUser')

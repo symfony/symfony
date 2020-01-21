@@ -29,28 +29,10 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->symlink($file, $link);
 
         $group = $this->getFileGroup($link);
-        var_dump($group);
-        $this->filesystem->chgrp($link, $group);
-
-        $this->assertSame($group, $this->getFileGroup($link));
-    }
-
-    public function testChgrpSymlinkById()
-    {
-        var_dump(__METHOD__);
-        $this->markAsSkippedIfSymlinkIsMissing();
-
-        $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';
-        $link = $this->workspace.\DIRECTORY_SEPARATOR.'link';
-
-        touch($file);
-
-        $this->filesystem->symlink($file, $link);
-
         $groupId = $this->getFileGroupId($link);
-        var_dump($groupId);
-        $this->filesystem->chgrp($link, $groupId);
+        var_dump(chgrp($link, $group));
+        var_dump(chgrp($link, $groupId));
+        $this->assertFalse(true);
 
-        $this->assertSame($groupId, $this->getFileGroupId($link));
     }
 }

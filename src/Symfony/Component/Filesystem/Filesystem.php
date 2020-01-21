@@ -206,8 +206,9 @@ class Filesystem
     /**
      * Change the owner of an array of files or directories.
      *
-     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to change owner
-     * @param string|int      $user  A user name or number
+     * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change owner
+     * @param string|int      $user      A user name or number
+     * @param bool            $recursive Whether change the owner recursively or not
      *
      * @throws IOException When the change fails
      */
@@ -232,8 +233,9 @@ class Filesystem
     /**
      * Change the group of an array of files or directories.
      *
-     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to change group
-     * @param string|int      $group A group name or number
+     * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change group
+     * @param string|int      $group     A group name or number
+     * @param bool            $recursive Whether change the group recursively or not
      *
      * @throws IOException When the change fails
      */

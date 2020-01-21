@@ -37,13 +37,4 @@ final class WrappedListener
         $this->time = microtime(true) - $startTime;
         $this->response = $event->getResponse();
     }
-
-    public function getInfo(): array
-    {
-        return [
-            'response' => $this->response,
-            'time' => $this->time,
-            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener),
-        ];
-    }
 }

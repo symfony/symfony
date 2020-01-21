@@ -59,13 +59,4 @@ final class WrappedLazyListener extends AbstractListener
 
         return $ret;
     }
-
-    public function getInfo(): array
-    {
-        return [
-            'response' => $this->response,
-            'time' => $this->time,
-            'stub' => $this->stub ?? $this->stub = ClassStub::wrapCallable($this->listener),
-        ];
-    }
 }

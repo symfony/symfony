@@ -159,6 +159,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('esi'));
     }
 
+    public function testFragmentsAndHinclude()
+    {
+        $container = $this->createContainerFromFile('fragments_and_hinclude');
+        $this->assertTrue($container->hasParameter('fragment.renderer.hinclude.global_template'));
+        $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'));
+    }
+
     public function testSsi()
     {
         $container = $this->createContainerFromFile('full');
@@ -565,9 +572,23 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('web_link.add_link_header_listener'));
     }
 
+    public function testMessengerServicesRemovedWhenDisabled()
+    {
+        $container = $this->createContainerFromFile('messenger_disabled');
+        $this->assertFalse($container->hasDefinition('console.command.messenger_consume_messages'));
+        $this->assertFalse($container->hasDefinition('console.command.messenger_debug'));
+        $this->assertFalse($container->hasDefinition('console.command.messenger_stop_workers'));
+        $this->assertFalse($container->hasDefinition('console.command.messenger_setup_transports'));
+        $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_retry'));
+        $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_show'));
+        $this->assertFalse($container->hasDefinition('console.command.messenger_failed_messages_remove'));
+        $this->assertFalse($container->hasDefinition('cache.messenger.restart_workers_signal'));
+    }
+
     public function testMessenger()
     {
         $container = $this->createContainerFromFile('messenger');
+        $this->assertTrue($container->hasDefinition('console.command.messenger_consume_messages'));
         $this->assertTrue($container->hasAlias('messenger.default_bus'));
         $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
         $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));

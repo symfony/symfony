@@ -101,7 +101,7 @@ EOF
         (new SymfonyStyle($input, $output))
             ->table(['Secret', 'Value'] + (null !== $localSecrets ? [2 => 'Local Value'] : []), $rows);
 
-        $io->comment("Local values override secret values.\nUse <info>secrets:set --local</info> to defined them.");
+        $io->comment("Local values override secret values.\nUse <info>secrets:set --local</info> to define them.");
 
         return 0;
     }

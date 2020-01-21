@@ -634,7 +634,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-        $cache->release();
+        if (method_exists($cache, 'release')) {
+            $cache->release();
+        }
+
         $this->container = require $cachePath;
         $this->container->set('kernel', $this);
 

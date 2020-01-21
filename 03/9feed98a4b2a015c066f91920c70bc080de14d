@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2020-01-15T13:46:11Z
+
+Can we somehow add a test to make sure we don't end up in the same situation once this revert is reverted again? Imho dumping a file should not flip it to `+intl-icu`. Only when you manually specify so.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-15T13:52:55Z
+
+@ruudk I'm not sure that a test can guarantee that you will end up with a percentage placeholder in a '+intl-icu' translation file.
+
+> Imho dumping a file should not flip it to +intl-icu
+
+It's not the case anymore (after reverting it).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-15T16:13:08Z
+
+Which PR does it revert?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-15T16:55:30Z
+
+> Which PR does it revert?
+
+Title and description updated with the PR number that has being reverted.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-15T17:00:31Z
+
+So, it means that you are re-introducing the bug I've reported in #34713, right?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-15T17:25:40Z
+
+> So, it means that you are re-introducing the bug I've reported in #34713, right?
+
+Yes, we need to re-think another way to fix it (the current one is breaking BC).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-15T17:35:56Z
+
+And it's very likely that the new way will be completely different from this one that is being reverted. That's why I'm reverting rather than fixing it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-15T17:47:47Z
+
+I also can't provide "the another way" in the near future, sorry :(
+any help on this is welcome
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-20T00:47:10Z
+
+@fabpot now https://github.com/symfony/symfony/issues/34713 is being fixed here too. Only new translations are taken into account because https://github.com/symfony/symfony/issues/35328.
+
+---------------------------------------------------------------------------
+
+by XWB at 2020-01-20T18:36:59Z
+
+We installed `php-intl` to use the Twig intl extension because we want to format numbers according to the current locale. This works fine.
+
+As a side effect, I noticed that our translation files are now named `messages+intl-icu.nl.xlf` instead of `messages.nl.xlf`. We use https://github.com/php-translation/symfony-bundle to download translations from an external API. File names are created automatically.
+
+That means our translation files are broken because the message formatter does not recognize the %% parameters in the `*intl-icu*` translation files.
+
+This happens because of `$hasMessageFormatter = class_exists(\MessageFormatter::class)` in FileDumper. MessageFormatter becomes available as soon as `php-intl` is installed.
+
+We now have to update hundreds of translation keys, while we just want to use intl for the Twig number formatter. Please consider a fix.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-01-20T19:21:13Z
+
+@XWB this PR is the fix ;)

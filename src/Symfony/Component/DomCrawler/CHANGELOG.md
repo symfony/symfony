@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+* Added an internal cache layer on top of the CssSelectorConverter
+
 5.0.0
 -----
 

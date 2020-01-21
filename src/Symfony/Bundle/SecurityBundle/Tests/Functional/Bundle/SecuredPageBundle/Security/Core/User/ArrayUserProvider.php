@@ -2,8 +2,10 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User;
 
+use Symfony\Bundle\SecurityBundle\Tests\Functional\UserWithoutEquatable;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -52,6 +54,6 @@ class ArrayUserProvider implements UserProviderInterface
 
     public function supportsClass($class)
     {
-        return 'Symfony\Component\Security\Core\User\User' === $class;
+        return User::class === $class || UserWithoutEquatable::class === $class;
     }
 }

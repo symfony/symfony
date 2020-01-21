@@ -88,6 +88,7 @@ class RoundRobinTransport implements TransportInterface
             $transport = $this->transports[$cursor];
 
             if (!$transport->supports($message)) {
+                $cursor = $this->moveCursor($cursor);
                 continue;
             }
 

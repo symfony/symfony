@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-01-16T14:36:39Z
+
+Note that there are some values that currently works but that will throw now (and they should throw). For example:
+
+- Empty `!` in an array --> `[!]` currently gives `['']`
+- Empty `!` in an object --> `{foo: !}` currently gives a `TaggedValue` with empty tag and value
+- `!` followed by (`]` or `}` or `,`) --> `!}` currently gives `}`

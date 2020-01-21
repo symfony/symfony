@@ -114,7 +114,7 @@ class FilesystemTestCase extends TestCase
 
     protected function getFileOwner($filepath)
     {
-        $this->markAsSkippedIfPosixIsMissing();
+        // $this->markAsSkippedIfPosixIsMissing();
 
         return ($datas = posix_getpwuid($this->getFileOwnerId($filepath))) ? $datas['name'] : null;
     }
@@ -128,7 +128,7 @@ var_dump($infos);
 
     protected function getFileGroup($filepath)
     {
-        $this->markAsSkippedIfPosixIsMissing();
+        // $this->markAsSkippedIfPosixIsMissing();
 
         if ($datas = posix_getgrgid($this->getFileGroupId($filepath))) {
             return $datas['name'];

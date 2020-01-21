@@ -43,6 +43,7 @@ abstract class KernelTestCase extends TestCase
     {
         static::ensureKernelShutdown();
         static::$kernel = null;
+        static::$booted = false;
     }
 
     /**

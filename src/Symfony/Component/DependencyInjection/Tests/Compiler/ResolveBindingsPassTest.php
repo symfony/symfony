@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\DefinitionErrorExceptionPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
@@ -168,5 +169,20 @@ class ResolveBindingsPassTest extends TestCase
         (new DefinitionErrorExceptionPass())->process($container);
 
         $this->assertSame([1 => 'bar'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+    }
+
+    public function testEmptyBindingTypehint()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Did you forget to add the type "string" to argument "$apiKey" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy::__construct()"?');
+
+        $container = new ContainerBuilder();
+        $bindings = [
+            'string $apiKey' => new BoundArgument('foo'),
+        ];
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setBindings($bindings);
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
     }
 }

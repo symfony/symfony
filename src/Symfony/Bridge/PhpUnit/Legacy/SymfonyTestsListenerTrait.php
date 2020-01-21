@@ -40,7 +40,6 @@ class SymfonyTestsListenerTrait
     private $expectedDeprecations = array();
     private $gatheredDeprecations = array();
     private $previousErrorHandler;
-    private $reportUselessTests;
     private $error;
     private $runsInSeparateProcess = false;
 
@@ -194,10 +193,6 @@ class SymfonyTestsListenerTrait
     public function startTest($test)
     {
         if (-2 < $this->state && ($test instanceof \PHPUnit\Framework\TestCase || $test instanceof TestCase)) {
-            if (null !== $test->getTestResultObject()) {
-                $this->reportUselessTests = $test->getTestResultObject()->isStrictAboutTestsThatDoNotTestAnything();
-            }
-
             // This event is triggered before the test is re-run in isolation
             if ($this->willBeIsolated($test)) {
                 $this->runsInSeparateProcess = tempnam(sys_get_temp_dir(), 'deprec');
@@ -242,11 +237,6 @@ class SymfonyTestsListenerTrait
 
         $className = \get_class($test);
         $groups = Test::getGroups($className, $test->getName(false));
-
-        if (null !== $this->reportUselessTests) {
-            $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything($this->reportUselessTests);
-            $this->reportUselessTests = null;
-        }
 
         if ($errored = null !== $this->error) {
             $test->getTestResultObject()->addError($test, $this->error, 0);

@@ -253,7 +253,7 @@ trait ResponseTrait
     private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers, string &$debug = ''): void
     {
         foreach ($responseHeaders as $h) {
-            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([12345]\d\d) .*#', $h, $m)) {
+            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([12345]\d\d)(?: |$)#', $h, $m)) {
                 if ($headers) {
                     $debug .= "< \r\n";
                     $headers = [];

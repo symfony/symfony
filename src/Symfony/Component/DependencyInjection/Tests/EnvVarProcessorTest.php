@@ -3,10 +3,12 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
+use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 
 class EnvVarProcessorTest extends TestCase
 {
@@ -552,5 +554,45 @@ CSV;
 
         $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
         $this->assertSame('123', $result); // check twice
+    }
+
+    public function testCircularEnvLoader()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FOO_CONTAINER)', 'foo');
+        $container->compile();
+
+        $index = 0;
+        $loaders = function () use (&$index) {
+            if (0 === $index++) {
+                throw new ParameterCircularReferenceException(['FOO_CONTAINER']);
+            }
+
+            yield new class() implements EnvVarLoaderInterface {
+                public function loadEnvVars(): array
+                {
+                    return [
+                        'FOO_ENV_LOADER' => '123',
+                    ];
+                }
+            };
+        };
+
+        $processor = new EnvVarProcessor($container, new RewindableGenerator($loaders, 1));
+
+        $result = $processor->getEnv('string', 'FOO_CONTAINER', function () {});
+        $this->assertSame('foo', $result);
+
+        $result = $processor->getEnv('string', 'FOO_ENV_LOADER', function () {});
+        $this->assertSame('123', $result);
+
+        $result = $processor->getEnv('default', ':BAR_CONTAINER', function ($name) use ($processor) {
+            $this->assertSame('BAR_CONTAINER', $name);
+
+            return $processor->getEnv('string', $name, function () {});
+        });
+        $this->assertNull($result);
+
+        $this->assertSame(2, $index);
     }
 }

@@ -412,6 +412,7 @@
             <xsd:element name="bus" type="messenger_bus" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="default-bus" type="xsd:string" />
+        <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">

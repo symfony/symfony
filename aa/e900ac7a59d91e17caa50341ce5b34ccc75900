@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by Slamdunk at 2020-01-16T09:53:49Z
+
+The are two fails: the Travis' one seems unrelated
+
+![immagine](https://user-images.githubusercontent.com/152236/72514112-5bfaf780-384e-11ea-8613-230ad96af142.png)
+
+The AppVeyor one I don't really know how to fix it:
+
+![immagine](https://user-images.githubusercontent.com/152236/72514158-746b1200-384e-11ea-9865-ddc9318ee770.png)
+
+Any help?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-17T08:26:10Z
+
+Why is this better than providing the integer as a string? I think `string` is good as a type hint.
+
+---------------------------------------------------------------------------
+
+by Slamdunk at 2020-01-17T08:31:21Z
+
+Because it doesn't work:
+
+```
+# date > file.txt
+
+# ll
+-rw-r--r-- 1 root root 31 gen 17 09:29 file.txt
+
+# php -r 'var_dump(chown("file.txt", "1000"));'
+PHP Warning:  chown(): Unable to find uid for 1000 in Command line code on line 1
+bool(false)
+
+# ll
+-rw-r--r-- 1 root root 31 gen 17 09:29 file.txt
+
+# php -r 'var_dump(chown("file.txt", 1000));'
+bool(true)
+
+# ll
+-rw-r--r-- 1 tessarotto root 31 gen 17 09:29 file.txt
+
+# php -v
+PHP 7.3.13-1+ubuntu19.10.1+deb.sury.org+1 (cli) (built: Dec 18 2019 14:49:29) ( NTS )
+```
+
+---------------------------------------------------------------------------
+
+by Slamdunk at 2020-01-17T08:37:29Z
+
+I've push the first commit with only the tests, so you can see them failing the first time: https://travis-ci.org/symfony/symfony/jobs/637855585#L3952
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-17T08:39:05Z
+
+OK, thanks! Can you send a PR to 3.4 to update the docblock please?
+
+---------------------------------------------------------------------------
+
+by Slamdunk at 2020-01-17T08:53:18Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-01-17T09:58:20Z
+
+Tests on AppVeyor are failing now. Can you please check how to fix them?
+
+---------------------------------------------------------------------------
+
+by Slamdunk at 2020-01-17T10:05:26Z
+
+Honestly I don't get why `FilesystemTest::testChgrpSymlinkById` is run in the first place.
+The method before, `FilesystemTest::testChgrpSymlinkByName`, gets correctly skipped.
+
+How can I debug this without a Windows machine? Shrinking `.appveyor.yml` scope it's not so trivial for me :\

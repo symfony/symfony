@@ -78,7 +78,7 @@ class Transport
 
         switch ($parsedDsn['host']) {
             case 'null':
-                if ('smtp' === $parsedDsn['scheme']) {
+                if ('null' === $parsedDsn['scheme']) {
                     return new Transport\NullTransport($dispatcher, $logger);
                 }
 

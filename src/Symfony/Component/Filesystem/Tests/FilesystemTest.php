@@ -20,19 +20,28 @@ class FilesystemTest extends FilesystemTestCase
     {
         var_dump(__METHOD__);
         $this->markAsSkippedIfSymlinkIsMissing();
+        var_dump(__LINE__);
 
         $file = $this->workspace.\DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.\DIRECTORY_SEPARATOR.'link';
+        var_dump(__LINE__);
 
         touch($file);
+        var_dump(__LINE__);
 
         $this->filesystem->symlink($file, $link);
+        var_dump(__LINE__);
 
         $group = $this->getFileGroup($link);
+        var_dump(__LINE__);
         $groupId = $this->getFileGroupId($link);
+        var_dump(__LINE__);
         var_dump(chgrp($link, $group));
+        var_dump(__LINE__);
         var_dump(chgrp($link, $groupId));
+        var_dump(__LINE__);
         $this->assertFalse(true);
+        var_dump(__LINE__);
 
     }
 }

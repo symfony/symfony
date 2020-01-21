@@ -11,47 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
-use Doctrine\Persistence\ConnectionRegistry;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
-use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
-use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory as BridgeDoctrineTransportFactory;
 
-/**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
- */
-class DoctrineTransportFactory implements TransportFactoryInterface
-{
-    private $registry;
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 5.1, use "%s" instead. The Doctrine transport has been moved to package "symfony/doctrine-messenger" and will not be included by default in 6.0. Run "composer require symfony/doctrine-messenger".', DoctrineTransportFactory::class, BridgeDoctrineTransportFactory::class), E_USER_DEPRECATED);
 
-    public function __construct($registry)
+class_exists(BridgeDoctrineTransportFactory::class);
+
+if (false) {
+    /**
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/doctrine-messenger instead.
+     */
+    class DoctrineTransportFactory
     {
-        if (!$registry instanceof RegistryInterface && !$registry instanceof ConnectionRegistry) {
-            throw new \TypeError(sprintf('Expected an instance of %s or %s, but got %s.', RegistryInterface::class, ConnectionRegistry::class, \is_object($registry) ? \get_class($registry) : \gettype($registry)));
-        }
-
-        $this->registry = $registry;
-    }
-
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
-    {
-        unset($options['transport_name']);
-        $configuration = Connection::buildConfiguration($dsn, $options);
-
-        try {
-            $driverConnection = $this->registry->getConnection($configuration['connection']);
-        } catch (\InvalidArgumentException $e) {
-            throw new TransportException(sprintf('Could not find Doctrine connection from Messenger DSN "%s".', $dsn), 0, $e);
-        }
-
-        $connection = new Connection($configuration, $driverConnection);
-
-        return new DoctrineTransport($connection, $serializer);
-    }
-
-    public function supports(string $dsn, array $options): bool
-    {
-        return 0 === strpos($dsn, 'doctrine://');
     }
 }

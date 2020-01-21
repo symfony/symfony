@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by linaori at 2019-12-20T15:29:22Z
+
+One additional solution for 3.4 and higher in case we want to add the BC version, would be to log it as error regardless so that people can fix it without introducing a new feature:
+```php
+try {
+    $refreshedUser = $provider->refreshUser($user);
+    $newToken = clone $token;
+    $newToken->setUser($refreshedUser);
+
+    if (!$provider->supportsClass($userClass)) {
+        $this->logger->error('...');
+    }
+```
+
+Both failures are unrelated to this PR as far as I can see.
+```
+1) Symfony\Component\Config\Tests\Resource\DirectoryResourceTest::testIsFreshDeleteFile
+
+->isFresh() returns false if an existing file is removed
+
+Failed asserting that true is false.
+
+/home/travis/build/symfony/symfony/src/Symfony/Component/Config/Tests/Resource/DirectoryResourceTest.php:115
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-12-20T15:52:12Z
+
+I would consider the new error log a feature :) I think we can just fix the non called `supportsClass()` "silently" here, and discuss about triggering on master
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-12-20T18:05:26Z
+
+So if I understand it correctly, the PR as-is is okay? I'm not sure what the best approach would be for 5.1 and 6.0. Ideally I'd see either `supportsClass()` or `UnsupportedUserException` disappear to reduce it to a single way of determining support, with my preference being the exception.
+
+What about a `supportsUser(UserInterface $user)` instead?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-01-20T17:47:28Z
+
+> What about a supportsUser(UserInterface $user) instead?
+
+`supportsClass` is needed to avoid extra `loadUserByUsername()` calls, see e.g. RememberMeServices

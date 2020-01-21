@@ -108,9 +108,9 @@
                                     <div class="metric">
                                         <span class="value">
                                             {% if key == 'time' %}
-                                                {{ '%0.2f'|format(1000 * value.value) }} <span class="unit">ms</span>
+                                                {{ '%0.2f'|format(1000 * value) }} <span class="unit">ms</span>
                                             {% elseif key == 'hit_read_ratio' %}
-                                                {{ value.value ?? 0 }} <span class="unit">%</span>
+                                                {{ value ?? 0 }} <span class="unit">%</span>
                                             {% else %}
                                                 {{ value }}
                                             {% endif %}

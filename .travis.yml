@@ -172,7 +172,7 @@ before_install:
 
           tfold ext.apcu tpecl apcu-5.1.17 apcu.so $INI
           tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
-          tfold ext.igbinary tpecl igbinary-2.0.8 igbinary.so $INI
+          tfold ext.igbinary tpecl igbinary-3.1.2 igbinary.so $INI
           tfold ext.zookeeper tpecl zookeeper-0.7.1 zookeeper.so $INI
           tfold ext.amqp tpecl amqp-1.9.4 amqp.so $INI
           tfold ext.redis tpecl redis-4.3.0 redis.so $INI "no"

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Neirda24 at 2020-01-20T10:26:57Z
+
+Nice 👍 . Thanks for implementing it. I was wondering though. This solutions works only if the profiler token is on the same url. Why not pointing out to the link provided by the header ? (in a new tab maybe ?)
+
+---------------------------------------------------------------------------
+
+by cristagu at 2020-01-20T11:32:01Z
+
+Yeah, good idea, I will update the implementation and use the x-debug-token-link header instead.
+
+---------------------------------------------------------------------------
+
+by cristagu at 2020-01-20T13:07:39Z
+
+Thank you for the feedback @Neirda24 and @nicolas-grekas. I have made the changes.

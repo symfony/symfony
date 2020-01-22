@@ -63,7 +63,13 @@ class MessengerPass implements CompilerPassInterface
         if ($container->hasDefinition('messenger.receiver_locator')) {
             $this->registerReceivers($container, $busIds);
         }
-        $this->registerHandlers($container, $busIds, $container->getParameter('messenger.auto_routing'));
+
+        $autoRouting = false;
+        if ($container->hasParameter('messenger.auto_routing')) {
+            $autoRouting = $container->getParameter('messenger.auto_routing');
+        }
+
+        $this->registerHandlers($container, $busIds, $autoRouting);
     }
 
     private function registerHandlers(ContainerBuilder $container, array $busIds, bool $autoRouting)

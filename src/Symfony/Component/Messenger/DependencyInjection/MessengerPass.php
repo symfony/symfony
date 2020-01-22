@@ -63,10 +63,10 @@ class MessengerPass implements CompilerPassInterface
         if ($container->hasDefinition('messenger.receiver_locator')) {
             $this->registerReceivers($container, $busIds);
         }
-        $this->registerHandlers($container, $busIds);
+        $this->registerHandlers($container, $busIds, $container->getParameter('messenger.auto_routing'));
     }
 
-    private function registerHandlers(ContainerBuilder $container, array $busIds)
+    private function registerHandlers(ContainerBuilder $container, array $busIds, bool $autoRouting)
     {
         $definitions = [];
         $handlersByBusAndMessage = [];
@@ -112,10 +112,6 @@ class MessengerPass implements CompilerPassInterface
 
                     if (!isset($options['from_transport']) && isset($tag['from_transport'])) {
                         $options['from_transport'] = $tag['from_transport'];
-                    }
-
-                    if (!isset($options['auto_route']) && isset($tag['auto_route'])) {
-                        $options['auto_route'] = $tag['auto_route'];
                     }
 
                     $priority = $tag['priority'] ?? $options['priority'] ?? 0;
@@ -183,7 +179,7 @@ class MessengerPass implements CompilerPassInterface
                     $definitions[$definitionId = '.messenger.handler_descriptor.'.ContainerBuilder::hash($bus.':'.$message.':'.$handler[0])] = (new Definition(HandlerDescriptor::class))->setArguments([new Reference($handler[0]), $handler[1]]);
                     $handlerDescriptors[] = new Reference($definitionId);
 
-                    if (isset($handler[1]['auto_route']) && $handler[1]['auto_route'] && isset($handler[1]['from_transport'])) {
+                    if ($autoRouting && isset($handler[1]['from_transport'])) {
                         if (!isset($messageToSendersMapping[$message])) {
                             $messageToSendersMapping[$message] = [];
                         }

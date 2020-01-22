@@ -606,9 +606,10 @@ class MessengerPassTest extends TestCase
     public function testAutomaticallyRouteMessagesWhenFromTransportTagIsSet()
     {
         $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->setParameter('messenger.auto_routing', true);
         $container
             ->register(DummyHandler::class, DummyHandler::class)
-            ->addTag('messenger.message_handler', ['from_transport' => 'async', 'auto_route' => true])
+            ->addTag('messenger.message_handler', ['from_transport' => 'async'])
         ;
         $container
             ->register(SecondDummyHandler::class, DummyHandler::class)
@@ -619,12 +620,13 @@ class MessengerPassTest extends TestCase
 
         $messageToSendersMapping = $container->getDefinition('messenger.senders_locator')->getArgument(0);
         $this->assertCount(1, $messageToSendersMapping);
-        $this->assertSame([DummyMessage::class => ['async']], $messageToSendersMapping);
+        $this->assertSame([DummyMessage::class => ['async', 'sync']], $messageToSendersMapping);
     }
 
     public function testAutomaticallyRouteMessagesWhenFromTransportOptionIsSet()
     {
         $container = $this->getContainerBuilder('message_bus');
+        $container->setParameter('messenger.auto_routing', true);
         $container->register('command_bus', MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, []);
 
         $container
@@ -640,7 +642,7 @@ class MessengerPassTest extends TestCase
             $mapping,
             DummyMessage::class,
             [[HandlerFromTransportWithAutoRoute::class, 'exec']],
-            [['from_transport' => 'async', 'auto_route' => true]]
+            [['from_transport' => 'async']]
         );
 
         $messageToSendersMapping = $container->getDefinition('messenger.senders_locator')->getArgument(0);
@@ -652,6 +654,7 @@ class MessengerPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
+        $container->setParameter('messenger.auto_routing', false);
 
         $container->register($busId, MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, []);
         if ('message_bus' !== $busId) {
@@ -909,7 +912,7 @@ class HandlerFromTransportWithAutoRoute implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {
-        yield DummyMessage::class => ['method' => 'exec', 'from_transport' => 'async', 'auto_route' => true];
+        yield DummyMessage::class => ['method' => 'exec', 'from_transport' => 'async'];
     }
 
     public function exec(DummyMessage $message)

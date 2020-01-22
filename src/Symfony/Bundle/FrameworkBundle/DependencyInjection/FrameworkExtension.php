@@ -1568,6 +1568,8 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.xml');
 
+        $container->setParameter('messenger.auto_routing', $config['auto_routing']);
+
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);
         }

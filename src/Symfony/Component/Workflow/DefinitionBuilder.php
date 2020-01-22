@@ -40,7 +40,7 @@ class DefinitionBuilder
     /**
      * @return Definition
      */
-    public function build()
+    public function build(): Definition
     {
         return new Definition($this->places, $this->transitions, $this->initialPlaces, $this->metadataStore);
     }
@@ -50,7 +50,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function clear()
+    public function clear(): self
     {
         $this->places = [];
         $this->transitions = [];
@@ -65,7 +65,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function setInitialPlaces($initialPlaces)
+    public function setInitialPlaces($initialPlaces): self
     {
         $this->initialPlaces = $initialPlaces;
 
@@ -75,7 +75,7 @@ class DefinitionBuilder
     /**
      * @return $this
      */
-    public function addPlace(string $place)
+    public function addPlace(string $place): self
     {
         if (!$this->places) {
             $this->initialPlaces = $place;
@@ -91,7 +91,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function addPlaces(array $places)
+    public function addPlaces(array $places): self
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -105,7 +105,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function addTransitions(array $transitions)
+    public function addTransitions(array $transitions): self
     {
         foreach ($transitions as $transition) {
             $this->addTransition($transition);
@@ -117,7 +117,7 @@ class DefinitionBuilder
     /**
      * @return $this
      */
-    public function addTransition(Transition $transition)
+    public function addTransition(Transition $transition): self
     {
         $this->transitions[] = $transition;
 
@@ -127,7 +127,7 @@ class DefinitionBuilder
     /**
      * @return $this
      */
-    public function setMetadataStore(MetadataStoreInterface $metadataStore)
+    public function setMetadataStore(MetadataStoreInterface $metadataStore): self
     {
         $this->metadataStore = $metadataStore;
 

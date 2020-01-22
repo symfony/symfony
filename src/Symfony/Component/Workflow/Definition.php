@@ -76,7 +76,7 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlaces($places = null)
+    private function setInitialPlaces($places = null): void
     {
         if (!$places) {
             return;
@@ -93,7 +93,7 @@ final class Definition
         $this->initialPlaces = $places;
     }
 
-    private function addPlace(string $place)
+    private function addPlace(string $place): void
     {
         if (!\count($this->places)) {
             $this->initialPlaces = [$place];
@@ -102,7 +102,7 @@ final class Definition
         $this->places[$place] = $place;
     }
 
-    private function addTransition(Transition $transition)
+    private function addTransition(Transition $transition): void
     {
         $name = $transition->getName();
 

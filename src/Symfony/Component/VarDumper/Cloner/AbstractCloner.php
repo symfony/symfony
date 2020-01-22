@@ -286,7 +286,7 @@ abstract class AbstractCloner implements ClonerInterface
         $class = $stub->class;
 
         if (isset($class[15]) && "\0" === $class[15] && 0 === strpos($class, "class@anonymous\x00")) {
-            $stub->class = get_parent_class($class).'@anonymous';
+            $stub->class = (get_parent_class($class) ?: key(class_implements($class))).'@anonymous';
         }
         if (isset($this->classInfo[$class])) {
             list($i, $parents, $hasDebugInfo, $fileInfo) = $this->classInfo[$class];

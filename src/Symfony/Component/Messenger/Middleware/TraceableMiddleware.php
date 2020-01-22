@@ -79,7 +79,7 @@ class TraceableStack implements StackInterface
             $this->currentEvent = 'Tail';
         } else {
             $class = \get_class($nextMiddleware);
-            $this->currentEvent = sprintf('"%s"', 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).'@anonymous' : $class);
+            $this->currentEvent = sprintf('"%s"', 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class))).'@anonymous' : $class);
         }
         $this->currentEvent .= sprintf(' on "%s"', $this->busName);
 

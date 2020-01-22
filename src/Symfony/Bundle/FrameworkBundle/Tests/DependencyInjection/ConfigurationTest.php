@@ -480,6 +480,7 @@ class ConfigurationTest extends TestCase
                 ],
                 'default_bus' => null,
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
+                'auto_routing' => false,
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [

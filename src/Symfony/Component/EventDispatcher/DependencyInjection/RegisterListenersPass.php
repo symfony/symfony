@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\Event as LegacyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\DefaultPriorityInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -66,7 +67,12 @@ class RegisterListenersPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($this->listenerTag, true) as $id => $events) {
             foreach ($events as $event) {
-                $priority = isset($event['priority']) ? $event['priority'] : 0;
+                $priority = 0;
+                if (isset($event['priority'])) {
+                    $priority = $event['priority'];
+                } elseif (null !== ($class = $container->getDefinition($id)->getClass()) && \is_subclass_of($class, DefaultPriorityInterface::class)) {
+                    $priority = \call_user_func([$class, 'getDefaultPriority']);
+                }
 
                 if (!isset($event['event'])) {
                     if ($container->getDefinition($id)->hasTag($this->subscriberTag)) {

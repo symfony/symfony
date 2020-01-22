@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\DefaultPriorityInterface;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -355,6 +356,38 @@ class RegisterListenersPassTest extends TestCase
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
+
+    public function testEventListenerWithDefaultPriority(): void
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', InvokableListenerWithDefaultPriorityService::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
+        $container->register('baz', InvokableListenerWithDefaultPriorityService::class)->addTag('kernel.event_listener', ['event' => 'foo.baz', 'priority' => 99]);
+        $container->register('event_dispatcher');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    'foo.bar',
+                    [new ServiceClosureArgument(new Reference('bar')), '__invoke'],
+                    100,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'foo.baz',
+                    [new ServiceClosureArgument(new Reference('baz')), '__invoke'],
+                    99,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
 }
 
 class SubscriberService implements EventSubscriberInterface
@@ -375,6 +408,18 @@ class InvokableListenerService
 
     public function onEvent()
     {
+    }
+}
+
+class InvokableListenerWithDefaultPriorityService implements DefaultPriorityInterface
+{
+    public function __invoke()
+    {
+    }
+
+    public static function getDefaultPriority(): int
+    {
+        return 100;
     }
 }
 

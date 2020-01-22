@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Add `DefaultPriorityInterface` to allow setting priority for autowired listener, without a need to register it as a service.
  * The `LegacyEventDispatcherProxy` class has been deprecated.
 
 5.0.0

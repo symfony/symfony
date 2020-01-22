@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\VarDumper\Caster\ImgStub;
 
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
@@ -128,8 +129,29 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
                 }
             }
 
+            if (\is_string($content = $trace['content'])) {
+                $contentType = 'application/octet-stream';
+
+                foreach ($info['response_headers'] ?? [] as $h) {
+                    if (0 === stripos($h, 'content-type: ')) {
+                        $contentType = substr($h, \strlen('content-type: '));
+                        break;
+                    }
+                }
+
+                if (0 === strpos($contentType, 'image/') && class_exists(ImgStub::class)) {
+                    $content = new ImgStub($content, $contentType, '');
+                } else {
+                    $content = [$content];
+                }
+
+                $k = 'response_content';
+            } else {
+                $k = 'response_json';
+            }
+
             $debugInfo = array_diff_key($info, $baseInfo);
-            $info = array_diff_key($info, $debugInfo) + ['debug_info' => $debugInfo];
+            $info = ['info' => $debugInfo] + array_diff_key($info, $debugInfo) + [$k => $content];
             unset($traces[$i]['info']); // break PHP reference used by TraceableHttpClient
             $traces[$i]['info'] = $this->cloneVar($info);
             $traces[$i]['options'] = $this->cloneVar($trace['options']);

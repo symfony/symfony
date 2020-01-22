@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Response\TraceableResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -36,12 +37,14 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $content = '';
         $traceInfo = [];
         $this->tracedRequests[] = [
             'method' => $method,
             'url' => $url,
             'options' => $options,
             'info' => &$traceInfo,
+            'content' => &$content,
         ];
         $onProgress = $options['on_progress'] ?? null;
 
@@ -53,7 +56,7 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
             }
         };
 
-        return $this->client->request($method, $url, $options);
+        return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $content);
     }
 
     /**
@@ -61,7 +64,21 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
      */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
-        return $this->client->stream($responses, $timeout);
+        if ($responses instanceof TraceableResponse) {
+            $responses = [$responses];
+        } elseif (!is_iterable($responses)) {
+            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of TraceableResponse objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
+        }
+
+        return $this->client->stream(\Closure::bind(static function () use ($responses) {
+            foreach ($responses as $k => $r) {
+                if (!$r instanceof TraceableResponse) {
+                    throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of TraceableResponse objects, %s given.', __METHOD__, \is_object($r) ? \get_class($r) : \gettype($r)));
+                }
+
+                yield $k => $r->response;
+            }
+        }, null, TraceableResponse::class), $timeout);
     }
 
     public function getTracedRequests(): array

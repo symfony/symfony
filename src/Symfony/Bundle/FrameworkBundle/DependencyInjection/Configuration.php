@@ -1047,7 +1047,7 @@ class Configuration implements ConfigurationInterface
                         ->then(static function (array $v): void { throw new InvalidConfigurationException(sprintf('The specified default bus "%s" is not configured. Available buses are "%s".', $v['default_bus'], implode('", "', array_keys($v['buses'])))); })
                     ->end()
                     ->booleanNode('auto_routing')
-                        ->info('Automatically create routing for handlers that specify `from_transport` via tag attribute or MessageSubscriberInterface.')
+                        ->info('Automatically create routing for handlers that specify "from_transport" via tag attribute or MessageSubscriberInterface.')
                         ->defaultFalse()
                     ->end()
                     ->children()

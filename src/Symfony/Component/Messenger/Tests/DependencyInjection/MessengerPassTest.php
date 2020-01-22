@@ -612,7 +612,7 @@ class MessengerPassTest extends TestCase
             ->addTag('messenger.message_handler', ['from_transport' => 'async'])
         ;
         $container
-            ->register(SecondDummyHandler::class, DummyHandler::class)
+            ->register(SecondDummyHandler::class, SecondDummyHandler::class)
             ->addTag('messenger.message_handler', ['from_transport' => 'sync'])
         ;
 

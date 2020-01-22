@@ -179,7 +179,7 @@ before_install:
       done
     - |
       # List all php extensions with versions
-    - php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+      php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
 
     - |
       # Load fixtures

@@ -73,6 +73,10 @@ To get specific information about a service, specify its name:
 
   <info>php %command.full_name% validator</info>
 
+To get specific information about a service including all its arguments, use the <info>--show-arguments</info> flag:
+
+  <info>php %command.full_name% validator --show-arguments</info>
+
 To see available types that can be used for autowiring, use the <info>--types</info> flag:
 
   <info>php %command.full_name% --types</info>

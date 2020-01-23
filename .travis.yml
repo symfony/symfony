@@ -171,15 +171,15 @@ before_install:
           fi
 
           tfold ext.apcu tpecl apcu-5.1.17 apcu.so $INI
-          tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
-          tfold ext.igbinary tpecl igbinary-2.0.8 igbinary.so $INI
+          tfold ext.mongodb tpecl mongodb-1.6.0 mongodb.so $INI
+          tfold ext.igbinary tpecl igbinary-3.1.2 igbinary.so $INI
           tfold ext.zookeeper tpecl zookeeper-0.7.1 zookeeper.so $INI
           tfold ext.amqp tpecl amqp-1.9.4 amqp.so $INI
           tfold ext.redis tpecl redis-4.3.0 redis.so $INI "no"
       done
     - |
       # List all php extensions with versions
-    - php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+      php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
 
     - |
       # Load fixtures
@@ -276,7 +276,7 @@ install:
               return
           fi
           phpenv global $PHP
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb ~1.5.0)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then

@@ -115,7 +115,11 @@ class ConnectionTest extends TestCase
 
     public function testDbIndex()
     {
-        $redis = new \Redis();
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('password')
+            ->willReturn(true);
 
         Connection::fromDsn('redis://password@localhost/queue?dbindex=2', [], $redis);
 

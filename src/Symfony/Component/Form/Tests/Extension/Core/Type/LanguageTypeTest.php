@@ -150,4 +150,21 @@ class LanguageTypeTest extends BaseTypeTest
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }
+
+    public function testWhitelist()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'whitelist' => [
+                    'fr',
+                    'de',
+                ],
+            ])
+            ->createView()->vars['choices'];
+
+        $this->assertContainsEquals(new ChoiceView('fr', 'fr', 'French'), $choices);
+        $this->assertContainsEquals(new ChoiceView('de', 'de', 'German'), $choices);
+        $this->assertNotContainsEquals(new ChoiceView('en', 'en', 'English'), $choices);
+        $this->assertNotContainsEquals(new ChoiceView('es', 'es', 'Spanish'), $choices);
+    }
 }

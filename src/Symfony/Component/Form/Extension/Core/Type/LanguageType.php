@@ -30,20 +30,25 @@ class LanguageType extends AbstractType
             'choice_loader' => function (Options $options) {
                 $choiceTranslationLocale = $options['choice_translation_locale'];
                 $useAlpha3Codes = $options['alpha3'];
-                $choiceSelfTranslation = $options['choice_self_translation'];
+                $useChoiceSelfTranslation = true === $options['choice_self_translation'];
+                $whitelist = $options['whitelist'];
 
-                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale, $useAlpha3Codes, $choiceSelfTranslation) {
-                    if (true === $choiceSelfTranslation) {
-                        foreach (Languages::getLanguageCodes() as $alpha2Code) {
-                            try {
-                                $languageCode = $useAlpha3Codes ? Languages::getAlpha3Code($alpha2Code) : $alpha2Code;
-                                $languagesList[$languageCode] = Languages::getName($alpha2Code, $alpha2Code);
-                            } catch (MissingResourceException $e) {
-                                // ignore errors like "Couldn't read the indices for the locale 'meta'"
+                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale, $useAlpha3Codes, $useChoiceSelfTranslation, $whitelist) {
+                    if ($whitelist) {
+                        $whitelist = array_flip($whitelist);
+                    }
+
+                    foreach (Languages::getLanguageCodes() as $alpha2Code) {
+                        try {
+                            $languageCode = $useAlpha3Codes ? Languages::getAlpha3Code($alpha2Code) : $alpha2Code;
+                            if ($whitelist && !isset($whitelist[$languageCode])) {
+                                continue;
                             }
+
+                            $languagesList[$languageCode] = Languages::getName($alpha2Code, $useChoiceSelfTranslation ? $alpha2Code : $choiceTranslationLocale);
+                        } catch (MissingResourceException $e) {
+                            // ignore errors like "Couldn't read the indices for the locale 'meta'"
                         }
-                    } else {
-                        $languagesList = $useAlpha3Codes ? Languages::getAlpha3Names($choiceTranslationLocale) : Languages::getNames($choiceTranslationLocale);
                     }
 
                     return array_flip($languagesList);
@@ -53,11 +58,13 @@ class LanguageType extends AbstractType
             'choice_translation_locale' => null,
             'alpha3' => false,
             'choice_self_translation' => false,
+            'whitelist' => null,
         ]);
 
         $resolver->setAllowedTypes('choice_self_translation', ['bool']);
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
         $resolver->setAllowedTypes('alpha3', 'bool');
+        $resolver->setAllowedTypes('whitelist', ['null', 'array']);
 
         $resolver->setNormalizer('choice_self_translation', function (Options $options, $value) {
             if (true === $value && $options['choice_translation_locale']) {

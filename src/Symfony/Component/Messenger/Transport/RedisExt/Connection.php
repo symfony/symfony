@@ -34,6 +34,7 @@ class Connection
         'group' => 'symfony',
         'consumer' => 'consumer',
         'auto_setup' => true,
+        'dbindex' => 0,
     ];
 
     private $connection;
@@ -54,6 +55,10 @@ class Connection
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 
         if (isset($connectionCredentials['auth']) && !$this->connection->auth($connectionCredentials['auth'])) {
+            throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
+        }
+
+        if (($dbIndex = $configuration['dbindex'] ?? self::DEFAULT_OPTIONS['dbindex']) && !$this->connection->select($dbIndex)) {
             throw new InvalidArgumentException(sprintf('Redis connection failed: %s', $redis->getLastError()));
         }
 
@@ -92,6 +97,20 @@ class Connection
         }
 
         return new self(['stream' => $stream, 'group' => $group, 'consumer' => $consumer, 'auto_setup' => $autoSetup], $connectionCredentials, $redisOptions, $redis);
+
+        $dbIndex = null;
+        if (\array_key_exists('dbindex', $redisOptions)) {
+            $dbIndex = filter_var($redisOptions['dbindex'], FILTER_VALIDATE_INT);
+            unset($redisOptions['dbindex']);
+        }
+
+        return new self([
+            'stream' => $stream,
+            'group' => $group,
+            'consumer' => $consumer,
+            'auto_setup' => $autoSetup,
+            'dbindex' => $dbIndex,
+        ], $connectionCredentials, $redisOptions, $redis);
     }
 
     public function get(): ?array

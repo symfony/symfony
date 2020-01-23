@@ -182,7 +182,7 @@ before_install:
               echo extension = $ext_cache >> $INI
           elif [[ $PHP = 7.* ]]; then
               tfold ext.apcu tpecl apcu-5.1.17 apcu.so $INI
-              tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
+              tfold ext.mongodb tpecl mongodb-1.6.0 mongodb.so $INI
           fi
       done
 
@@ -279,7 +279,7 @@ install:
           fi
           phpenv global ${PHP/hhvm*/hhvm}
           if [[ $PHP = 7.* ]]; then
-              ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb)
+              ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb ~1.5.0)
           fi
           tfold 'composer update' $COMPOSER_UP
           if [[ $TRAVIS_PHP_VERSION = 5.* || $TRAVIS_PHP_VERSION = hhvm* ]]; then

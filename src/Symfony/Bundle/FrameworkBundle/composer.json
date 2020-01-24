@@ -27,7 +27,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
-        "symfony/routing": "^5.0"
+        "symfony/routing": "^5.1"
     },
     "require-dev": {
         "doctrine/annotations": "~1.7",

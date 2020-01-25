@@ -56,7 +56,7 @@ class ClassStub extends ConstStub
             }
 
             if (false !== strpos($identifier, "class@anonymous\0")) {
-                $this->value = $identifier = preg_replace_callback('/class@anonymous\x00.*?\.php(?:0x?|:)[0-9a-fA-F]++/', function ($m) {
+                $this->value = $identifier = preg_replace_callback('/class@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', function ($m) {
                     return class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
                 }, $identifier);
             }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\EntryPointFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
@@ -515,6 +516,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                             }
                         } else {
                             $authenticationProviders[$id.'_'.$key] = $authenticators;
+                        }
+
+                        if ($factory instanceof EntryPointFactoryInterface) {
+                            $defaultEntryPoint = $factory->createEntryPoint($container, $id, $firewall[$key], $defaultEntryPoint);
                         }
                     } else {
                         list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);

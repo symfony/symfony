@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Core\Authentication\Authenticator;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -7,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Core\Security;
@@ -15,7 +23,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
@@ -25,16 +32,17 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  */
 class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
 {
-    use TargetPathTrait, UsernamePasswordTrait, UserProviderTrait {
+    use TargetPathTrait, UsernamePasswordTrait {
         UsernamePasswordTrait::checkCredentials as checkPassword;
     }
 
     private $options;
     private $httpUtils;
     private $csrfTokenManager;
+    private $userProvider;
     private $encoderFactory;
 
-    public function __construct(HttpUtils $httpUtils, ?CsrfTokenManagerInterface $csrfTokenManager, EncoderFactoryInterface $encoderFactory, array $options)
+    public function __construct(HttpUtils $httpUtils, ?CsrfTokenManagerInterface $csrfTokenManager, UserProviderInterface $userProvider, EncoderFactoryInterface $encoderFactory, array $options)
     {
         $this->httpUtils = $httpUtils;
         $this->csrfTokenManager = $csrfTokenManager;
@@ -52,6 +60,7 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
             'target_path_parameter' => '_target_path',
             'use_referer' => false,
         ], $options);
+        $this->userProvider = $userProvider;
     }
 
     protected function getLoginUrl(): string
@@ -91,9 +100,14 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
             throw new BadCredentialsException('Invalid username.');
         }
 
-        $request->getSession()->set(Security::LAST_USERNAME, $username);
+        $request->getSession()->set(Security::LAST_USERNAME, $credentials['username']);
 
         return $credentials;
+    }
+
+    public function getUser($credentials): ?UserInterface
+    {
+        return $this->userProvider->loadUserByUsername($credentials['username']);
     }
 
     public function checkCredentials($credentials, UserInterface $user): bool
@@ -107,7 +121,7 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
         return $this->checkPassword($credentials, $user);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): Response
     {
         return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request, $providerKey));
     }

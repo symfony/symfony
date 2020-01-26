@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Security\Guard\Provider;
 
+use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface as CoreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
 /**
@@ -28,10 +29,22 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
  */
 trait GuardAuthenticationProviderTrait
 {
-    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token, string $providerKey): TokenInterface
+    /**
+     * @param CoreAuthenticatorInterface|AuthenticatorInterface $guardAuthenticator
+     */
+    private function authenticateViaGuard($guardAuthenticator, PreAuthenticationGuardToken $token, string $providerKey): TokenInterface
     {
         // get the user from the GuardAuthenticator
-        $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
+        if ($guardAuthenticator instanceof AuthenticatorInterface) {
+            if (!isset($this->userProvider)) {
+                throw new LogicException(sprintf('%s only supports authenticators implementing "%s", update "%s" or use the legacy guard integration instead.', __CLASS__, CoreAuthenticatorInterface::class, \get_class($guardAuthenticator)));
+            }
+            $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
+        } elseif ($guardAuthenticator instanceof CoreAuthenticatorInterface) {
+            $user = $guardAuthenticator->getUser($token->getCredentials());
+        } else {
+            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+        }
 
         if (null === $user) {
             throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($guardAuthenticator)));
@@ -63,7 +76,10 @@ trait GuardAuthenticationProviderTrait
         return $authenticatedToken;
     }
 
-    private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token): ?AuthenticatorInterface
+    /**
+     * @return CoreAuthenticatorInterface|\Symfony\Component\Security\Guard\AuthenticatorInterface|null
+     */
+    private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token)
     {
         // find the *one* GuardAuthenticator that this token originated from
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {

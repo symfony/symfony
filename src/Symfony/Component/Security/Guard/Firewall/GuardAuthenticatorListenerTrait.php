@@ -1,10 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Guard\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface as CoreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
@@ -37,7 +47,7 @@ trait GuardAuthenticatorListenerTrait
     }
 
     /**
-     * @param AuthenticatorInterface[] $guardAuthenticators
+     * @param (CoreAuthenticatorInterface|AuthenticatorInterface)[] $guardAuthenticators
      */
     protected function executeGuardAuthenticators(array $guardAuthenticators, RequestEvent $event): void
     {
@@ -56,8 +66,15 @@ trait GuardAuthenticatorListenerTrait
         }
     }
 
-    private function executeGuardAuthenticator(string $uniqueGuardKey, AuthenticatorInterface $guardAuthenticator, RequestEvent $event)
+    /**
+     * @param CoreAuthenticatorInterface|AuthenticatorInterface $guardAuthenticator
+     */
+    private function executeGuardAuthenticator(string $uniqueGuardKey, $guardAuthenticator, RequestEvent $event)
     {
+        if (!$guardAuthenticator instanceof AuthenticatorInterface && !$guardAuthenticator instanceof CoreAuthenticatorInterface) {
+            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+        }
+
         $request = $event->getRequest();
         try {
             if (null !== $this->logger) {
@@ -124,9 +141,15 @@ trait GuardAuthenticatorListenerTrait
     /**
      * Checks to see if remember me is supported in the authenticator and
      * on the firewall. If it is, the RememberMeServicesInterface is notified.
+     *
+     * @param CoreAuthenticatorInterface|AuthenticatorInterface $guardAuthenticator
      */
-    private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
+    private function triggerRememberMe($guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
     {
+        if (!$guardAuthenticator instanceof AuthenticatorInterface && !$guardAuthenticator instanceof CoreAuthenticatorInterface) {
+            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+        }
+
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {
                 $this->logger->debug('Remember me skipped: it is not configured for the firewall.', ['authenticator' => \get_class($guardAuthenticator)]);

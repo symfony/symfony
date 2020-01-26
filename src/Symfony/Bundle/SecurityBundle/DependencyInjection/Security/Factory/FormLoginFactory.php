@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class FormLoginFactory extends AbstractFactory implements GuardFactoryInterface
+class FormLoginFactory extends AbstractFactory implements GuardFactoryInterface, EntryPointFactoryInterface
 {
     public function __construct()
     {
@@ -84,7 +84,7 @@ class FormLoginFactory extends AbstractFactory implements GuardFactoryInterface
         return $listenerId;
     }
 
-    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPoint)
+    public function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPoint): string
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container
@@ -105,7 +105,8 @@ class FormLoginFactory extends AbstractFactory implements GuardFactoryInterface
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
             ->replaceArgument(1, isset($config['csrf_token_generator']) ? new Reference($config['csrf_token_generator']) : null)
-            ->replaceArgument(3, $options);
+            ->replaceArgument(2, new Reference($userProviderId))
+            ->replaceArgument(4, $options);
 
         return $authenticatorId;
     }

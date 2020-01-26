@@ -12,14 +12,13 @@
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 
 /**
  * UsernamePasswordToken implements a username and password token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class UsernamePasswordToken extends AbstractToken implements GuardTokenInterface
+class UsernamePasswordToken extends AbstractToken
 {
     private $credentials;
     private $providerKey;

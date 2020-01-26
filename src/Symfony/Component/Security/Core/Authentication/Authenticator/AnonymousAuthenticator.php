@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Core\Authentication\Authenticator;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -9,9 +18,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -25,11 +31,6 @@ class AnonymousAuthenticator implements AuthenticatorInterface
         $this->secret = $secret;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
-        return new Response(null, Response::HTTP_UNAUTHORIZED);
-    }
-
     public function supports(Request $request): ?bool
     {
         return true;
@@ -40,27 +41,29 @@ class AnonymousAuthenticator implements AuthenticatorInterface
         return [];
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($credentials): ?UserInterface
     {
         return new User('anon.', null);
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $user): bool
     {
         return true;
     }
 
-    public function createAuthenticatedToken(UserInterface $user, string $providerKey)
+    public function createAuthenticatedToken(UserInterface $user, string $providerKey): TokenInterface
     {
         return new AnonymousToken($this->secret, 'anon.', []);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
+        return null;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
     {
+        return null;
     }
 
     public function supportsRememberMe(): bool

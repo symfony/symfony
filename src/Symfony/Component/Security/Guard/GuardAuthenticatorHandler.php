@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Guard;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface as CoreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -65,9 +66,15 @@ class GuardAuthenticatorHandler
 
     /**
      * Returns the "on success" response for the given GuardAuthenticator.
+     *
+     * @param CoreAuthenticatorInterface|AuthenticatorInterface $guardAuthenticator
      */
-    public function handleAuthenticationSuccess(TokenInterface $token, Request $request, AuthenticatorInterface $guardAuthenticator, string $providerKey): ?Response
+    public function handleAuthenticationSuccess(TokenInterface $token, Request $request, $guardAuthenticator, string $providerKey): ?Response
     {
+        if (!$guardAuthenticator instanceof AuthenticatorInterface && !$guardAuthenticator instanceof CoreAuthenticatorInterface) {
+            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+        }
+
         $response = $guardAuthenticator->onAuthenticationSuccess($request, $token, $providerKey);
 
         // check that it's a Response or null
@@ -81,9 +88,15 @@ class GuardAuthenticatorHandler
     /**
      * Convenience method for authenticating the user and returning the
      * Response *if any* for success.
+     *
+     * @param CoreAuthenticatorInterface|AuthenticatorInterface $authenticator
      */
-    public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, AuthenticatorInterface $authenticator, string $providerKey): ?Response
+    public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, $authenticator, string $providerKey): ?Response
     {
+        if (!$authenticator instanceof AuthenticatorInterface && !$authenticator instanceof CoreAuthenticatorInterface) {
+            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+        }
+
         // create an authenticated token for the User
         $token = $authenticator->createAuthenticatedToken($user, $providerKey);
         // authenticate this in the system
@@ -96,9 +109,15 @@ class GuardAuthenticatorHandler
     /**
      * Handles an authentication failure and returns the Response for the
      * GuardAuthenticator.
+     *
+     * @param CoreAuthenticatorInterface|AuthenticatorInterface $guardAuthenticator
      */
-    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $guardAuthenticator, string $providerKey): ?Response
+    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, $guardAuthenticator, string $providerKey): ?Response
     {
+        if (!$guardAuthenticator instanceof AuthenticatorInterface && !$guardAuthenticator instanceof CoreAuthenticatorInterface) {
+            throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
+        }
+
         $response = $guardAuthenticator->onAuthenticationFailure($request, $authenticationException);
         if ($response instanceof Response || null === $response) {
             // returning null is ok, it means they want the request to continue

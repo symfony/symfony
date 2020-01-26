@@ -19,16 +19,14 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class HttpBasicAuthenticator implements AuthenticatorInterface
+class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {
-    use UserProviderTrait, UsernamePasswordTrait {
-        UserProviderTrait::getUser as getUserTrait;
-    }
+    use UsernamePasswordTrait;
 
     private $realmName;
     private $userProvider;
@@ -52,14 +50,9 @@ class HttpBasicAuthenticator implements AuthenticatorInterface
         return $response;
     }
 
-    public function supports(Request $request): bool
+    public function supports(Request $request): ?bool
     {
         return $request->headers->has('PHP_AUTH_USER');
-    }
-
-    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
-    {
-        return $this->getUserTrait($credentials, $this->userProvider);
     }
 
     public function getCredentials(Request $request)
@@ -68,6 +61,11 @@ class HttpBasicAuthenticator implements AuthenticatorInterface
             'username' => $request->headers->get('PHP_AUTH_USER'),
             'password' => $request->headers->get('PHP_AUTH_PW', ''),
         ];
+    }
+
+    public function getUser($credentials): ?UserInterface
+    {
+        return $this->userProvider->loadUserByUsername($credentials['username']);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response

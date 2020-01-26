@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Authenticator;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -41,7 +41,7 @@ trait UsernamePasswordTrait
         return true;
     }
 
-    public function createAuthenticatedToken(UserInterface $user, $providerKey): GuardTokenInterface
+    public function createAuthenticatedToken(UserInterface $user, $providerKey): TokenInterface
     {
         return new UsernamePasswordToken($user, null, $providerKey, $user->getRoles());
     }

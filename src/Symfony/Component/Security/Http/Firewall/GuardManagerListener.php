@@ -12,10 +12,9 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticatorListenerTrait;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 

@@ -72,7 +72,7 @@ trait GuardAuthenticatorListenerTrait
             }
 
             // create a token with the unique key, so that the provider knows which authenticator to use
-            $token = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey);
+            $token = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey, $this->providerKey);
 
             if (null !== $this->logger) {
                 $this->logger->debug('Passing guard token information to the GuardAuthenticationProvider', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);

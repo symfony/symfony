@@ -81,7 +81,7 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
         }
 
         try {
-            $result = $this->authenticateViaGuard($guard, $token);
+            $result = $this->authenticateViaGuard($guard, $token, $token->getProviderKey());
         } catch (AuthenticationException $exception) {
             $this->handleFailure($exception, $token);
         }

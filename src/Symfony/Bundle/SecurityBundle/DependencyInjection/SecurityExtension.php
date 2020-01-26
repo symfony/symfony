@@ -269,19 +269,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if ($this->guardAuthenticationManagerEnabled) {
             $authenticationManagerId = 'security.authentication.manager.guard';
             $container->setAlias('security.authentication.manager', new Alias($authenticationManagerId));
-
-            // guard authentication manager listener
-            $container
-                ->setDefinition('security.firewall.guard.'.$name.'locator', new ChildDefinition('security.firewall.guard.locator'))
-                ->setArguments([$authenticationProviders])
-                ->addTag('container.service_locator')
-            ;
-            $container
-                ->setDefinition('security.firewall.guard.'.$name, new ChildDefinition('security.firewall.guard'))
-                ->replaceArgument(2, new Reference('security.firewall.guard.'.$name.'locator'))
-                ->replaceArgument(3, $name)
-                ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
-            ;
         }
         $container
             ->getDefinition($authenticationManagerId)
@@ -431,7 +418,29 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $configuredEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
 
         // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint, $contextListenerId);
+        $firewallAuthenticationProviders = [];
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $firewallAuthenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint, $contextListenerId);
+
+        $authenticationProviders = array_merge($authenticationProviders, $firewallAuthenticationProviders);
+
+        if ($this->guardAuthenticationManagerEnabled) {
+            // guard authentication manager listener
+            $container
+                ->setDefinition('security.firewall.guard.'.$id.'.locator', new ChildDefinition('security.firewall.guard.locator'))
+                ->setArguments([array_map(function ($id) {
+                    return new Reference($id);
+                }, $firewallAuthenticationProviders)])
+                ->addTag('container.service_locator')
+            ;
+            $container
+                ->setDefinition('security.firewall.guard.'.$id, new ChildDefinition('security.firewall.guard'))
+                ->replaceArgument(2, new Reference('security.firewall.guard.'.$id.'.locator'))
+                ->replaceArgument(3, $id)
+                ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
+            ;
+
+            $listeners[] = new Reference('security.firewall.guard.'.$id);
+        }
 
         $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);
 

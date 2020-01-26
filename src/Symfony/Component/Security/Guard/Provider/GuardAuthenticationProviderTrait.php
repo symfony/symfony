@@ -28,7 +28,7 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
  */
 trait GuardAuthenticationProviderTrait
 {
-    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token): GuardTokenInterface
+    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token, string $providerKey): TokenInterface
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
@@ -55,7 +55,7 @@ trait GuardAuthenticationProviderTrait
         $this->userChecker->checkPostAuth($user);
 
         // turn the UserInterface into a TokenInterface
-        $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $this->providerKey);
+        $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $providerKey);
         if (!$authenticatedToken instanceof TokenInterface) {
             throw new \UnexpectedValueException(sprintf('The "%s::createAuthenticatedToken()" method must return a TokenInterface. You returned "%s".', get_debug_type($guardAuthenticator), get_debug_type($authenticatedToken)));
         }

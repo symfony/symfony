@@ -93,7 +93,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
             throw new AuthenticationException(sprintf('Token with provider key "%s" did not originate from any of the guard authenticators of provider "%s".', $token->getGuardProviderKey(), $this->providerKey));
         }
 
-        return $this->authenticateViaGuard($guardAuthenticator, $token);
+        return $this->authenticateViaGuard($guardAuthenticator, $token, $this->providerKey);
     }
 
     public function supports(TokenInterface $token)

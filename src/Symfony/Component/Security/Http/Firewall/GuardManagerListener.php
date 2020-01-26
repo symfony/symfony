@@ -57,7 +57,7 @@ class GuardManagerListener
 
     protected function getGuardKey(string $key): string
     {
-        // Guard authenticators in the GuardAuthenticationManager are already indexed
+        // Guard authenticators in the GuardManagerListener are already indexed
         // by an unique key
         return $key;
     }

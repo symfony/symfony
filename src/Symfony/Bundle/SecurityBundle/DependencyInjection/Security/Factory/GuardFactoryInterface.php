@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @experimental in 5.1
  */
 interface GuardFactoryInterface
 {

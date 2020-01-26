@@ -21,6 +21,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @property EncoderFactoryInterface $encoderFactory
+ *
+ * @experimental in 5.1
  */
 trait UsernamePasswordTrait
 {

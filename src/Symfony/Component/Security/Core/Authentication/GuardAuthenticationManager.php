@@ -25,6 +25,12 @@ use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @experimental in 5.1
+ */
 class GuardAuthenticationManager implements AuthenticationManagerInterface
 {
     use GuardAuthenticationProviderTrait;

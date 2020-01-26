@@ -20,6 +20,8 @@ use Symfony\Component\Security\Http\Firewall\GuardManagerListener;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @experimental in 5.1
  */
 class LazyGuardManagerListener extends GuardManagerListener
 {

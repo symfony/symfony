@@ -23,6 +23,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @author Ryan Weaver <ryan@knpuniversity.com>
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @experimental in 5.1
  */
 interface AuthenticatorInterface
 {

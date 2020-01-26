@@ -29,6 +29,10 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
+ * @experimental in 5.1
  */
 class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
 {

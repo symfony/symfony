@@ -20,6 +20,10 @@ use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Ryan Weaver <ryan@knpuniversity.com>
+ * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
+ *
+ * @experimental in 5.1
  */
 class GuardManagerListener
 {

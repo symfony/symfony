@@ -22,6 +22,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final
+ * @experimental in 5.1
  */
 class AnonymousAuthenticator implements AuthenticatorInterface
 {

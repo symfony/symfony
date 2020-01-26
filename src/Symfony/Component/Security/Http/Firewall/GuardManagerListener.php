@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticatorListenerTrait;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -34,6 +35,7 @@ class GuardManagerListener
     private $guardAuthenticators;
     protected $providerKey;
     protected $logger;
+    private $rememberMeServices;
 
     /**
      * @param AuthenticatorInterface[] $guardAuthenticators
@@ -56,6 +58,11 @@ class GuardManagerListener
         }
 
         $this->executeGuardAuthenticators($guardAuthenticators, $requestEvent);
+    }
+
+    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
+    {
+        $this->rememberMeServices = $rememberMeServices;
     }
 
     protected function getGuardKey(string $key): string

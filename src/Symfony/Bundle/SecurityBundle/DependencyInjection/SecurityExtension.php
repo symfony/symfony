@@ -418,6 +418,19 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Determine default entry point
         $configuredEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
 
+        if ($this->guardAuthenticationManagerEnabled) {
+            // guard authentication manager listener (must be before calling createAuthenticationListeners() to inject remember me services)
+            $container
+                ->setDefinition('security.firewall.guard.'.$id, new ChildDefinition('security.firewall.guard'))
+                ->replaceArgument(2, new Reference('security.firewall.guard.'.$id.'.locator'))
+                ->replaceArgument(3, $id)
+                ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
+                ->addTag('security.remember_me_aware', ['id' => $id, 'provider' => 'none'])
+            ;
+
+            $listeners[] = new Reference('security.firewall.guard.'.$id);
+        }
+
         // Authentication listeners
         $firewallAuthenticationProviders = [];
         list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $firewallAuthenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint, $contextListenerId);
@@ -425,7 +438,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $authenticationProviders = array_merge($authenticationProviders, $firewallAuthenticationProviders);
 
         if ($this->guardAuthenticationManagerEnabled) {
-            // guard authentication manager listener
+            // add authentication providers for this firewall to the GuardManagerListener (if guard is enabled)
             $container
                 ->setDefinition('security.firewall.guard.'.$id.'.locator', new ChildDefinition('security.firewall.guard.locator'))
                 ->setArguments([array_map(function ($id) {
@@ -434,13 +447,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->addTag('container.service_locator')
             ;
             $container
-                ->setDefinition('security.firewall.guard.'.$id, new ChildDefinition('security.firewall.guard'))
+                ->getDefinition('security.firewall.guard.'.$id)
                 ->replaceArgument(2, new Reference('security.firewall.guard.'.$id.'.locator'))
-                ->replaceArgument(3, $id)
-                ->addTag('kernel.event_listener', ['event' => KernelEvents::REQUEST])
             ;
-
-            $listeners[] = new Reference('security.firewall.guard.'.$id);
         }
 
         $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);

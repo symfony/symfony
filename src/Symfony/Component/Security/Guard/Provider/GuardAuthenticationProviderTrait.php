@@ -62,8 +62,20 @@ trait GuardAuthenticationProviderTrait
 
             throw new BadCredentialsException(sprintf('Authentication failed because "%s::checkCredentials()" did not return true.', get_debug_type($guardAuthenticator)));
         }
-        if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordEncoder && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && method_exists($this->passwordEncoder, 'needsRehash') && $this->passwordEncoder->needsRehash($user)) {
-            $this->userProvider->upgradePassword($user, $this->passwordEncoder->encodePassword($user, $password));
+
+        if ($guardAuthenticator instanceof PasswordAuthenticatedInterface
+            && null !== $password = $guardAuthenticator->getPassword($token->getCredentials())
+            && null !== $passwordEncoder = $this->passwordEncoder ?? (method_exists($guardAuthenticator, 'getPasswordEncoder') ? $guardAuthenticator->getPasswordEncoder() : null)
+        ) {
+            if (method_exists($passwordEncoder, 'needsRehash') && $passwordEncoder->needsRehash($user)) {
+                if (!isset($this->userProvider)) {
+                    if ($guardAuthenticator instanceof PasswordUpgraderInterface) {
+                        $guardAuthenticator->upgradePassword($user, $guardAuthenticator->getPasswordEncoder()->encodePassword($user, $password));
+                    }
+                } elseif ($this->userProvider instanceof PasswordUpgraderInterface) {
+                    $this->userProvider->upgradePassword($user, $passwordEncoder->encodePassword($user, $password));
+                }
+            }
         }
         $this->userChecker->checkPostAuth($user);
 

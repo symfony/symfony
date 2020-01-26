@@ -5,7 +5,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Authenticator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authentication\Authenticator\HttpBasicAuthenticator;
+use Symfony\Component\Security\Http\Authentication\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;

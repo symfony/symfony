@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Guard\Provider;
+namespace Symfony\Component\Security\Http\Authentication;
 
-use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface as CoreAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface as CoreAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LogicException;
@@ -20,14 +21,13 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
 /**
  * @author Ryan Weaver <ryan@knpuniversity.com>
  *
  * @internal
  */
-trait GuardAuthenticationProviderTrait
+trait GuardAuthenticationManagerTrait
 {
     /**
      * @param CoreAuthenticatorInterface|AuthenticatorInterface $guardAuthenticator

@@ -20,7 +20,7 @@
         </service>
 
         <service id="security.authenticator.http_basic"
-                 class="Symfony\Component\Security\Core\Authentication\Authenticator\HttpBasicAuthenticator"
+                 class="Symfony\Component\Security\Http\Authentication\Authenticator\HttpBasicAuthenticator"
                  abstract="true">
             <argument type="abstract">realm name</argument>
             <argument type="abstract">user provider</argument>
@@ -29,7 +29,7 @@
         </service>
 
         <service id="security.authenticator.form_login"
-                 class="Symfony\Component\Security\Core\Authentication\Authenticator\FormLoginAuthenticator"
+                 class="Symfony\Component\Security\Http\Authentication\Authenticator\FormLoginAuthenticator"
                  abstract="true">
             <argument type="service" id="security.http_utils" />
             <argument /> <!-- csrf token generator -->
@@ -39,7 +39,7 @@
         </service>
 
         <service id="security.authenticator.anonymous"
-                 class="Symfony\Component\Security\Core\Authentication\Authenticator\AnonymousAuthenticator"
+                 class="Symfony\Component\Security\Http\Authentication\Authenticator\AnonymousAuthenticator"
                  abstract="true">
             <argument /> <!-- secret -->
             <argument type="service" id="security.token_storage" />

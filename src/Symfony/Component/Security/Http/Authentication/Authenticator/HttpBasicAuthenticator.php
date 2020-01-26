@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Core\Authentication\Authenticator;
+namespace Symfony\Component\Security\Http\Authentication\Authenticator;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;

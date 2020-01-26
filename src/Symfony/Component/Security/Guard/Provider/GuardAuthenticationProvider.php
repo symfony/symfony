@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Guard\Provider;
 
+use Symfony\Component\Security\Http\Authentication\GuardAuthenticationManagerTrait;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -30,7 +31,7 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
  */
 class GuardAuthenticationProvider implements AuthenticationProviderInterface
 {
-    use GuardAuthenticationProviderTrait;
+    use GuardAuthenticationManagerTrait;
 
     /**
      * @var AuthenticatorInterface[]

@@ -15,9 +15,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken as GuardPreAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
+use Symfony\Component\Security\Http\Firewall\GuardManagerListenerTrait;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
@@ -30,7 +33,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class GuardAuthenticationListener extends AbstractListener
 {
-    use GuardAuthenticatorListenerTrait;
+    use GuardManagerListenerTrait;
 
     private $guardHandler;
     private $authenticationManager;
@@ -99,6 +102,11 @@ class GuardAuthenticationListener extends AbstractListener
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
         $this->rememberMeServices = $rememberMeServices;
+    }
+
+    protected function createPreAuthenticatedToken($credentials, string $uniqueGuardKey, string $providerKey): PreAuthenticationGuardToken
+    {
+        return new GuardPreAuthenticationGuardToken($credentials, $uniqueGuardKey, $providerKey);
     }
 
     protected function getGuardKey(string $key): string

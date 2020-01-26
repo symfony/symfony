@@ -9,9 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Core\Authentication;
+namespace Symfony\Component\Security\Http\Authentication;
 
-use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
@@ -20,9 +22,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Guard\Provider\GuardAuthenticationProviderTrait;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -33,7 +32,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class GuardAuthenticationManager implements AuthenticationManagerInterface
 {
-    use GuardAuthenticationProviderTrait;
+    use GuardAuthenticationManagerTrait;
 
     private $guardAuthenticators;
     private $userChecker;
@@ -58,10 +57,6 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
 
     public function authenticate(TokenInterface $token)
     {
-        if (!$token instanceof GuardTokenInterface) {
-            throw new \InvalidArgumentException('GuardAuthenticationManager only supports GuardTokenInterface.');
-        }
-
         if (!$token instanceof PreAuthenticationGuardToken) {
             /*
              * The listener *only* passes PreAuthenticationGuardToken instances.

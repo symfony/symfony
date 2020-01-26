@@ -14,8 +14,8 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Guard\Firewall\GuardAuthenticatorListenerTrait;
+use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class GuardManagerListener
 {
-    use GuardAuthenticatorListenerTrait;
+    use GuardManagerListenerTrait;
 
     private $authenticationManager;
     private $guardHandler;
@@ -63,6 +63,11 @@ class GuardManagerListener
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
         $this->rememberMeServices = $rememberMeServices;
+    }
+
+    protected function createPreAuthenticatedToken($credentials, string $uniqueGuardKey, string $providerKey): PreAuthenticationGuardToken
+    {
+        return new PreAuthenticationGuardToken($credentials, $uniqueGuardKey, $providerKey);
     }
 
     protected function getGuardKey(string $key): string

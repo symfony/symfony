@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Guard\Firewall;
+namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Security\Core\Authentication\Authenticator\AuthenticatorInterface as CoreAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authentication\Authenticator\AuthenticatorInterface as CoreAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
-use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
 /**
  * @author Ryan Weaver <ryan@knpuniversity.com>
@@ -26,7 +26,7 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
  *
  * @internal
  */
-trait GuardAuthenticatorListenerTrait
+trait GuardManagerListenerTrait
 {
     protected function getSupportingGuardAuthenticators(Request $request): array
     {
@@ -89,7 +89,7 @@ trait GuardAuthenticatorListenerTrait
             }
 
             // create a token with the unique key, so that the provider knows which authenticator to use
-            $token = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey, $this->providerKey);
+            $token = $this->createPreAuthenticatedToken($credentials, $uniqueGuardKey, $this->providerKey);
 
             if (null !== $this->logger) {
                 $this->logger->debug('Passing guard token information to the GuardAuthenticationProvider', ['firewall_key' => $this->providerKey, 'authenticator' => \get_class($guardAuthenticator)]);
@@ -174,4 +174,6 @@ trait GuardAuthenticatorListenerTrait
     }
 
     abstract protected function getGuardKey(string $key): string;
+
+    abstract protected function createPreAuthenticatedToken($credentials, string $uniqueGuardKey, string $providerKey): PreAuthenticationGuardToken;
 }

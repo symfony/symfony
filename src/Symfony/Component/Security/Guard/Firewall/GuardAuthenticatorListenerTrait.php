@@ -150,6 +150,11 @@ trait GuardAuthenticatorListenerTrait
             throw new \UnexpectedValueException('Invalid guard authenticator passed to '.__METHOD__.'. Expected AuthenticatorInterface of either Security Core or Security Guard.');
         }
 
+        // @todo implement remember me functionality
+        if (!isset($this->rememberMeServices)) {
+            return;
+        }
+
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {
                 $this->logger->debug('Remember me skipped: it is not configured for the firewall.', ['authenticator' => \get_class($guardAuthenticator)]);

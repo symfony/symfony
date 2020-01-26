@@ -86,12 +86,14 @@ class GuardAuthenticationManager implements AuthenticationManagerInterface
             $this->handleFailure($exception, $token);
         }
 
-        if (true === $this->eraseCredentials) {
-            $result->eraseCredentials();
-        }
+        if (null !== $result) {
+            if (true === $this->eraseCredentials) {
+                $result->eraseCredentials();
+            }
 
-        if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($result), AuthenticationEvents::AUTHENTICATION_SUCCESS);
+            if (null !== $this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($result), AuthenticationEvents::AUTHENTICATION_SUCCESS);
+            }
         }
 
         return $result;

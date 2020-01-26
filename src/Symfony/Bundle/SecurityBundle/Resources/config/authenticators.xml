@@ -42,6 +42,7 @@
                  class="Symfony\Component\Security\Core\Authentication\Authenticator\AnonymousAuthenticator"
                  abstract="true">
             <argument /> <!-- secret -->
+            <argument type="service" id="security.token_storage" />
         </service>
     </services>
 </container>

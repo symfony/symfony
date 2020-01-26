@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Authentication\Authenticator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\User;
@@ -25,15 +26,18 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class AnonymousAuthenticator implements AuthenticatorInterface
 {
     private $secret;
+    private $tokenStorage;
 
-    public function __construct(string $secret)
+    public function __construct(string $secret, TokenStorageInterface $tokenStorage)
     {
         $this->secret = $secret;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function supports(Request $request): ?bool
     {
-        return true;
+        // do not overwrite already stored tokens (i.e. from the session)
+        return null === $this->tokenStorage->getToken();
     }
 
     public function getCredentials(Request $request)

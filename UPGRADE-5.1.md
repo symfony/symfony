@@ -1,6 +1,11 @@
 UPGRADE FROM 5.0 to 5.1
 =======================
 
+Console
+-------
+
+ * `Command::setHidden()` is final since Symfony 5.1
+
 EventDispatcher
 ---------------
 

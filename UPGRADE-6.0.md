@@ -1,6 +1,11 @@
 UPGRADE FROM 5.x to 6.0
 =======================
 
+Console
+-------
+
+ * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter
+
 EventDispatcher
 ---------------
 

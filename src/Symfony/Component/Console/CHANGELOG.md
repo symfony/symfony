@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * `Command::setHidden()` is final since Symfony 5.1
  * Add `SingleCommandApplication`
 
 5.0.0

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-01-22T11:08:26Z
+
+should we use 2 static properties for the cache, or an instance property ?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-01-22T11:09:49Z
+
+Also, the code may be simpler if we define an instance-level `cache` property, being a reference to either `self::$xmlCache` or `self::$htmlCache`. This way, only the constructor needs to know about the 2 separate caches.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-01-22T12:03:20Z
+
+A New crawler is instanced on each method call (for the results). Then each time you call filter() a new css selector converter is instansiated. That's why the cache is static
+
+I will implement your last idea 👍

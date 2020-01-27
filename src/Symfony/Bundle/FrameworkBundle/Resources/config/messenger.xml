@@ -56,6 +56,13 @@
             <argument type="service" id="debug.stopwatch" />
         </service>
 
+        <service id="messenger.middleware.stop_worker_on_exceptions" class="Symfony\Component\Messenger\Middleware\StopWorkerOnExceptionMiddleware" abstract="true" public="false">
+            <argument type="collection" />
+            <call method="setRestartSignalCachePool">
+                <argument type="service" id="cache.messenger.restart_workers_signal" />
+            </call>
+        </service>
+
         <!-- Discovery -->
         <service id="messenger.receiver_locator">
             <tag name="container.service_locator" />

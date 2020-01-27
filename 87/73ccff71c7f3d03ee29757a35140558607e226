@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-22T08:38:38Z
+
+Can you provide a reproducer for the issue? Maybe a test case?
+There is already such a check when $value is a Definition.
+Which triggers this: what's the type/class of $value in your case and more importantly how does it get there?
+
+---------------------------------------------------------------------------
+
+by pfazzi at 2020-01-22T08:41:26Z
+
+Yes i can. Let me anticipate you that error happens when `$value` is not a `Definition` but instance of `Symfony\Component\ExpressionLanguage\Expression`
+
+---------------------------------------------------------------------------
+
+by pfazzi at 2020-01-22T15:20:52Z
+
+@nicolas-grekas I have just integrated a test case

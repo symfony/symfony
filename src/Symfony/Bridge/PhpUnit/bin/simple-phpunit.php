@@ -28,6 +28,15 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
         $phpunitConfigFilename = null;
         if (INF !== $opt && isset($opts[$opt - 1])) {
             $phpunitConfigFilename = $opts[$opt - 1];
+            if (is_dir($phpunitConfigFilename)) {
+                if (file_exists($phpunitConfigFilename.'/phpunit.xml')) {
+                    $phpunitConfigFilename .= '/phpunit.xml';
+                } elseif (file_exists($phpunitConfigFilename.'/phpunit.xml.dist')) {
+                    $phpunitConfigFilename .= '/phpunit.xml.dist';
+                } else {
+                    $phpunitConfigFilename = null;
+                }
+            }
         } elseif (file_exists('phpunit.xml')) {
             $phpunitConfigFilename = 'phpunit.xml';
         } elseif (file_exists('phpunit.xml.dist')) {

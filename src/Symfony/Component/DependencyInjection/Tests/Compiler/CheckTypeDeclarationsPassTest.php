@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgumentNotNull;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Wobble;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
@@ -596,6 +598,21 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $container
             ->register('foobar', BarMethodCall::class)
             ->addMethodCall('setArray', [new Expression("parameter('ccc')")]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenExpressionReturnsObject()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('waldo', Waldo::class);
+
+        $container
+            ->register('wobble', Wobble::class)
+            ->setArguments([new Expression("service('waldo')")]);
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

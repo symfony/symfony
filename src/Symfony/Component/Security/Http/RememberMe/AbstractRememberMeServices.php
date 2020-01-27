@@ -239,7 +239,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             }
         }
 
-        throw new UnsupportedUserException(sprintf('There is no user provider that supports class "%s".', $class));
+        throw new UnsupportedUserException(sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', $class));
     }
 
     /**

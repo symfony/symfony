@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-20T18:55:50Z
+
+Would be nice, but that's a BC break... :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-20T18:56:48Z
+
+Could be made `@final since Symfony 5.1` to unlock the change for 6.0 (requires proper notes in the changelog+upgrade files of course)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-01-21T14:06:06Z
+
+OK, Fixed

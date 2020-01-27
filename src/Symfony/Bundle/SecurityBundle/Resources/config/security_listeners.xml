@@ -195,10 +195,10 @@
             <argument /> <!-- UserChecker -->
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- LDAP -->
-            <argument /> <!-- search dn -->
-            <argument /> <!-- search password -->
             <argument /> <!-- Base DN -->
             <argument>%security.authentication.hide_user_not_found%</argument>
+            <argument /> <!-- search dn -->
+            <argument /> <!-- search password -->
         </service>
 
         <service id="security.authentication.provider.simple" class="Symfony\Component\Security\Core\Authentication\Provider\SimpleAuthenticationProvider" abstract="true">

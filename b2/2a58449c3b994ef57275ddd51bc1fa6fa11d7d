@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by andrerom at 2020-01-21T08:57:08Z
+
+Added some suggestions, looks good 👍
+
+Suggestion of LFU over LRU was because LFU in theory can have higher cache hits as the most frequently loaded items are kept in memory until they expire. However I'm unaware of a way to do that without involving array functions in some way so I think this is good approach for now and might be faster in some cases as there is less computation going on. So a CPU vs IO trade-off basically.

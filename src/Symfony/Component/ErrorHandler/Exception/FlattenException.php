@@ -142,7 +142,7 @@ class FlattenException
      */
     public function setClass($class): self
     {
-        $this->class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).'@anonymous' : $class;
+        $this->class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? (get_parent_class($class) ?: key(class_implements($class))).'@anonymous' : $class;
 
         return $this;
     }
@@ -201,7 +201,7 @@ class FlattenException
     {
         if (false !== strpos($message, "class@anonymous\0")) {
             $message = preg_replace_callback('/class@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)[0-9a-fA-F]++/', function ($m) {
-                return class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
+                return class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0]))).'@anonymous' : $m[0];
             }, $message);
         }
 

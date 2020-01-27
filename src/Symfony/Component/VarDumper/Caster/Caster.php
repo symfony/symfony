@@ -77,7 +77,7 @@ class Caster
                         $prefixedKeys[$i] = self::PREFIX_DYNAMIC.$k;
                     }
                 } elseif (isset($k[16]) && "\0" === $k[16] && 0 === strpos($k, "\0class@anonymous\0")) {
-                    $prefixedKeys[$i] = "\0".get_parent_class($class).'@anonymous'.strrchr($k, "\0");
+                    $prefixedKeys[$i] = "\0".(get_parent_class($class) ?: key(class_implements($class))).'@anonymous'.strrchr($k, "\0");
                 }
                 ++$i;
             }

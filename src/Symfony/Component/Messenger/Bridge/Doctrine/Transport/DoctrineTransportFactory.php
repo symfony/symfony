@@ -36,8 +36,10 @@ class DoctrineTransportFactory implements TransportFactoryInterface
 
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
-        unset($options['transport_name']);
-        $configuration = Connection::buildConfiguration($dsn, $options);
+        $useNotify = ($options['use_notify'] ?? true);
+        unset($options['transport_name'], $options['use_notify']);
+        // Always allow PostgreSQL-specific keys, to be able to transparently fallback to the native driver when LISTEN/NOTIFY isn't available
+        $configuration = PostgreSqlConnection::buildConfiguration($dsn, $options);
 
         try {
             $driverConnection = $this->registry->getConnection($configuration['connection']);
@@ -45,7 +47,11 @@ class DoctrineTransportFactory implements TransportFactoryInterface
             throw new TransportException(sprintf('Could not find Doctrine connection from Messenger DSN "%s".', $dsn), 0, $e);
         }
 
-        $connection = new Connection($configuration, $driverConnection);
+        if ($useNotify && method_exists($driverConnection->getWrappedConnection(), 'pgsqlGetNotify')) {
+            $connection = new PostgreSqlConnection($configuration, $driverConnection);
+        } else {
+            $connection = new Connection($configuration, $driverConnection);
+        }
 
         return new DoctrineTransport($connection, $serializer);
     }

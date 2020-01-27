@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class DoctrineTransportFactoryTest extends TestCase
@@ -49,7 +50,7 @@ class DoctrineTransportFactoryTest extends TestCase
         $serializer = $this->createMock(SerializerInterface::class);
 
         $this->assertEquals(
-            new DoctrineTransport(new Connection(Connection::buildConfiguration('doctrine://default'), $driverConnection), $serializer),
+            new DoctrineTransport(new Connection(PostgreSqlConnection::buildConfiguration('doctrine://default'), $driverConnection), $serializer),
             $factory->createTransport('doctrine://default', [], $serializer)
         );
     }

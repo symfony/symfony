@@ -22,15 +22,17 @@ use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
+ * @internal since Symfony 5.1
  *
- * @final
+ * @author Vincent Touzet <vincent.touzet@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Connection
+class Connection implements ResetInterface
 {
-    private const DEFAULT_OPTIONS = [
+    protected const DEFAULT_OPTIONS = [
         'table_name' => 'messenger_messages',
         'queue_name' => 'default',
         'redeliver_timeout' => 3600,
@@ -45,20 +47,26 @@ class Connection
      * * table_name: name of the table
      * * connection: name of the Doctrine's entity manager
      * * queue_name: name of the queue
-     * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default 3600
-     * * auto_setup: Whether the table should be created automatically during send / get. Default : true
+     * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default: 3600
+     * * auto_setup: Whether the table should be created automatically during send / get. Default: true
      */
-    private $configuration = [];
-    private $driverConnection;
+    protected $configuration = [];
+    protected $driverConnection;
+    protected $queueEmptiedAt;
     private $schemaSynchronizer;
     private $autoSetup;
 
     public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
-        $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
+        $this->configuration = array_replace_recursive(static::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
         $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
         $this->autoSetup = $this->configuration['auto_setup'];
+    }
+
+    public function reset()
+    {
+        $this->queueEmptiedAt = null;
     }
 
     public function getConfiguration(): array
@@ -78,20 +86,20 @@ class Connection
         }
 
         $configuration = ['connection' => $components['host']];
-        $configuration += $options + $query + self::DEFAULT_OPTIONS;
+        $configuration += $options + $query + static::DEFAULT_OPTIONS;
 
         $configuration['auto_setup'] = filter_var($configuration['auto_setup'], FILTER_VALIDATE_BOOLEAN);
 
         // check for extra keys in options
-        $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
+        $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found : [%s]. Allowed options are [%s]', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(sprintf('Unknown option found : [%s]. Allowed options are [%s]', implode(', ', $optionsExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         // check for extra keys in options
-        $queryExtraKeys = array_diff(array_keys($query), array_keys(self::DEFAULT_OPTIONS));
+        $queryExtraKeys = array_diff(array_keys($query), array_keys(static::DEFAULT_OPTIONS));
         if (0 < \count($queryExtraKeys)) {
-            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s]', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
+            throw new InvalidArgumentException(sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s]', implode(', ', $queryExtraKeys), implode(', ', array_keys(static::DEFAULT_OPTIONS))));
         }
 
         return $configuration;
@@ -154,9 +162,13 @@ class Connection
 
             if (false === $doctrineEnvelope) {
                 $this->driverConnection->commit();
+                $this->queueEmptiedAt = microtime(true) * 1000;
 
                 return null;
             }
+            // Postgres can "group" notifications having the same channel and payload
+            // We need to be sure to empty the queue before blocking again
+            $this->queueEmptiedAt = null;
 
             $doctrineEnvelope = $this->decodeEnvelopeHeaders($doctrineEnvelope);
 

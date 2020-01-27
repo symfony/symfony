@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-20T12:00:41Z
+
+OR, we shouldn't use named parameters. Can you consider this option?
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2020-01-20T12:03:03Z
+
+Yep that would be my preference. How would you like to approach regression tests?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-23T10:54:18Z
+
+> How would you like to approach regression tests?
+
+maybe just a comment inline telling why we don't use named params?
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2020-01-23T14:01:07Z
+
+Seems like a dangerous approach to regression testing but as that's your preference I've pushed up a version that replaces named parameters with positional ones and removes the exception I previously added
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-23T14:05:58Z
+
+I didn't say that's my preference :)
+If you're up to adding a mysql server + mysqli client + functional test cases, that would be my preference. But I get that's a huge task for the change here...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-25T12:43:17Z
+
+Side question: why are you using mysqli instead of PDO?
+We have more code in core that could benefit from similar changes, but is it worth it, vs telling ppl mysqli is not supported?
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2020-01-25T12:47:06Z
+
+We had some legacy code in an application that was using `mysqli`, so instead of installing the `pdo_mysql` extension we just configured Doctrine to use `mysqli` too.
+
+We're switching it to `pdo_mysql` now, I don't personally have a desire for `mysqli` support in locks. I'm happy to help out either way with this PR though and either set up a full mysqli test case or just add the exception to warn future devs about using `mysqli` with locks :man_shrugging:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-25T12:50:01Z
+
+Thanks for the feedback. Since myslqi doesn't work already, let's throw an exception when someone tries to use it with Lock, but also with Cache or HttpFoundation's Session.
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2020-01-25T12:53:24Z
+
+Ok I'll take a look at adding those exceptions now...
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2020-01-25T13:09:46Z
+
+I've reverted this to the exception version now, and opened #35473 for cache, I couldn't see anywhere the session handler supports `mysqli`, but if you can point me towards it I'll gladly open a PR for that too
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-25T13:15:33Z
+
+I'm thinking of ./src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2020-01-25T13:17:12Z
+
+Sorry I wasn't clear, that's the file I've looked in, it only codes for `mysql` and `mysql2`, no mention of `mysqli` (in the 4.3 branch I'm working against)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-25T13:23:04Z
+
+OK, got it, you're right, nothing to change there.

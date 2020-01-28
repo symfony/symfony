@@ -11,46 +11,17 @@
 
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
-use Doctrine\DBAL\DBALException;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineSender as BridgeDoctrineSender;
 
-/**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
- */
-class DoctrineSender implements SenderInterface
-{
-    private $connection;
-    private $serializer;
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 5.1, use "%s" instead. The Doctrine transport has been moved to package "symfony/doctrine-messenger" and will not be included by default in 6.0. Run "composer require symfony/doctrine-messenger".', DoctrineSender::class, BridgeDoctrineSender::class), E_USER_DEPRECATED);
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
-    {
-        $this->connection = $connection;
-        $this->serializer = $serializer ?? new PhpSerializer();
-    }
+class_exists(BridgeDoctrineSender::class);
 
+if (false) {
     /**
-     * {@inheritdoc}
+     * @deprecated since Symfony 5.1, to be removed in 6.0. Use symfony/doctrine-messenger instead.
      */
-    public function send(Envelope $envelope): Envelope
+    class DoctrineSender
     {
-        $encodedMessage = $this->serializer->encode($envelope);
-
-        /** @var DelayStamp|null $delayStamp */
-        $delayStamp = $envelope->last(DelayStamp::class);
-        $delay = null !== $delayStamp ? $delayStamp->getDelay() : 0;
-
-        try {
-            $id = $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay);
-        } catch (DBALException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
-
-        return $envelope->with(new TransportMessageIdStamp($id));
     }
 }

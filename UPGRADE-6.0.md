@@ -24,6 +24,13 @@ HttpFoundation
    `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
    `__construct()` instead)
 
+Messenger
+---------
+
+ * Removed AmqpExt transport. Run `composer require symfony/amqp-messenger` to keep the transport in your application.
+ * Removed Doctrine transport. Run `composer require symfony/doctrine-messenger` to keep the transport in your application.
+ * Removed RedisExt transport. Run `composer require symfony/redis-messenger` to keep the transport in your application.
+
 Routing
 -------
 

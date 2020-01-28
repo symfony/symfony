@@ -24,6 +24,13 @@ HttpFoundation
    `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
    `__construct()` instead)
 
+Messenger
+---------
+
+ * Deprecated AmqpExt transport. It has moved to a separate package. Run `composer require symfony/amqp-messenger` to use the new classes.
+ * Deprecated Doctrine transport. It has moved to a separate package. Run `composer require symfony/doctrine-messenger` to use the new classes.
+ * Deprecated RedisExt transport. It has moved to a separate package. Run `composer require symfony/redis-messenger` to use the new classes.
+
 Routing
 -------
 

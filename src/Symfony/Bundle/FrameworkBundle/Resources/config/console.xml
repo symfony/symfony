@@ -97,15 +97,6 @@
             <tag name="monolog.logger" channel="messenger" />
         </service>
 
-        <service id="console.command.messenger_supervisor" class="Symfony\Component\Messenger\Command\SupervisorCommand">
-            <argument type="service" id="lock.default.factory" />
-            <argument type="service" id="parameter_bag" />
-            <argument type="service" id="logger" on-invalid="null" />
-
-            <tag name="console.command" command="messenger:supervisor" />
-            <tag name="monolog.logger" channel="messenger" />
-        </service>
-
         <service id="console.command.messenger_setup_transports" class="Symfony\Component\Messenger\Command\SetupTransportsCommand">
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="collection" /> <!-- Receiver names -->

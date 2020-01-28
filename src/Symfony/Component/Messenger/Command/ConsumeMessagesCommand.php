@@ -146,7 +146,7 @@ EOF
 
                 return 1;
             }
-            $lockName = sprintf('%s-%s', static::LOCK_PREFIX, $consumerName);
+            $lockName = sprintf('%s-%s', self::LOCK_PREFIX, $consumerName);
             $lock = $this->lockFactory->createLock($lockName);
             if (!$lock->acquire()) {
                 $io->error(sprintf('Messenger consumer "%s" already running', $consumerName));

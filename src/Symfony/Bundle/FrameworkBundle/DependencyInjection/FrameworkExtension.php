@@ -35,7 +35,6 @@ use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\ResettableInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -306,7 +305,6 @@ class FrameworkExtension extends Extension
             $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['validation']);
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
-            $container->removeDefinition('console.command.messenger_supervisor');
             $container->removeDefinition('console.command.messenger_debug');
             $container->removeDefinition('console.command.messenger_stop_workers');
             $container->removeDefinition('console.command.messenger_setup_transports');
@@ -1567,20 +1565,6 @@ class FrameworkExtension extends Extension
         if (!interface_exists(MessageBusInterface::class)) {
             throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed. Try running "composer require symfony/messenger".');
         }
-
-        $transports = array_keys($config['transports']);
-        $buses = array_keys($config['buses']);
-        foreach ($config['supervisor'] as $name => $consumer) {
-            foreach ($consumer['receivers'] as $receiver) {
-                if (!\in_array($receiver, $transports)) {
-                    throw new InvalidConfigurationException(sprintf('Invalid receiver "%s" in "%s" messenger consumer. Available transports are "%s"', $receiver, $name, implode('", "', $transports)));
-                }
-            }
-            if (isset($consumer['bus']) && !\in_array($consumer['bus'], $buses)) {
-                throw new InvalidConfigurationException(sprintf('Invalid bus "%s" in "%s" messenger consumer. Available buses are "%s"', $consumer['bus'], $name, implode('", "', $buses)));
-            }
-        }
-        $container->setParameter('messenger.supervisor', $config['supervisor']);
 
         $loader->load('messenger.xml');
 

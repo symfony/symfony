@@ -1,0 +1,132 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-22T07:11:37Z
+
+I would do it the same way as with the Mailer and Notifier in terms of namespaces. That would mean creating aliases between the old and the new namespaces, but I think it's worth.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-22T09:41:25Z
+
+I've updated the PR:
+
+* I moved the 3 transports to `Symfony\Component\Messenger\Bridge`.
+* I added class aliases
+* I added deprecation notices
+
+Tests passes on all 4 packages. I've been careful and I think I've done everything correct.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-22T09:45:39Z
+
+Oh, no.. The big diff looks awful. It might be easier to review this PR commit by commit.
+
+* Added meta files: 9f56b5a41adae2762864e97da9b8daf567ea1580
+* Moved all the transports: cd335b1fae8a9909928acccd8b8c1784f3f10d20
+* Added class aliases: e96e55e4986e1e3e0af41673b77f0c1e5abfb7a7
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-24T16:18:43Z
+
+I moved `class_alias` to the new class after discussions with Nicolas.
+
+The following does not work:
+
+```php
+// FILE: old.php
+namespace Old;
+class_alias(\New\Foo::class, \Old\Foo::class);
+
+if (false) {
+    class Foo{}
+}
+
+// FILE: new.php
+namespace New;
+class Foo{}
+
+// FILE: index.php
+function foo(\Old\Foo $old) {};
+
+// This will break.
+foo(new \New\Foo());
+```
+
+We need to move the `class_alias` to the new.php.
+
+```php
+// FILE: old.php
+namespace Old;
+// Load the new class
+class_exists(\New\Foo::class);
+
+if (false) {
+    class Foo{}
+}
+
+// FILE: new.php
+namespace New;
+class Foo{}
+class_alias(Foo::class, Old\Foo::class);
+
+// FILE: index.php
+function foo(\Old\Foo $old) {};
+
+// This will work
+foo(new {New\Foo());
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-24T20:33:27Z
+
+Thank you for all the reviews and carefully thinking out the BC layer.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-26T20:57:29Z
+
+Thank you @Tobion for your review.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-01-26T21:45:24Z
+
+The transports are currently inside the bridge folder of the symfony/messenger package. But for 6.0 we don't want to include the transports automatically. But I don't see how that is going to work without moving the files again? Shouldn't we create new packages outside the symfony/messenger for this to be equipped for 6.0? Otherwise symfony/messenger is a meta-package like symfony/security used to be, which is not what we want.
+We still require the transports for BC from symfony/messenger, but the files should not be located there.
+
+So ideally some structure like
+- Symfony/Component/Messenger/
+   - Core/
+   - Bridge/AmqpExt
+   - Bridge/RedisExt
+
+The problem is only that Core is not part of the messenger namespace and would require some autoloading adaptions for symfony/symfony. Another alternative would be to move the transports to `Symfony/Bridge/...` namespace like `Symfony/Bridge/MessengerAmqpExt`
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-27T08:15:11Z
+
+For what I understand, we can configure subtreesplit so it works as expected. Just like with the Notifier and Mailer component.
+
+So we dont need to move the files again.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-01-27T12:49:04Z
+
+I see. If it works like in mailer that's fine for me. I just think it's not an ideal setup because people will not realize that the Bridges are not part of symfony/messenger from reading the source of symfony/symfony on Github. I also didn't expect that subtree splits delete files.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-28T08:21:23Z
+
+Sure. I'll rename it. If we want to support the amqp-lib in a separate transport, it could be named `AmqpLib`.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-01-28T08:52:31Z
+
+The namespace is renamed, and the tests are green.

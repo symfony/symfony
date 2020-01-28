@@ -117,46 +117,4 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
 
         return $attributes;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
-    {
-        $ucfirsted = ucfirst($attribute);
-
-        $getter = 'get'.$ucfirsted;
-        if (\is_callable([$object, $getter])) {
-            return $object->$getter();
-        }
-
-        $isser = 'is'.$ucfirsted;
-        if (\is_callable([$object, $isser])) {
-            return $object->$isser();
-        }
-
-        $haser = 'has'.$ucfirsted;
-        if (\is_callable([$object, $haser])) {
-            return $object->$haser();
-        }
-
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
-    {
-        $setter = 'set'.ucfirst($attribute);
-        $key = \get_class($object).':'.$setter;
-
-        if (!isset(self::$setterAccessibleCache[$key])) {
-            self::$setterAccessibleCache[$key] = \is_callable([$object, $setter]) && !(new \ReflectionMethod($object, $setter))->isStatic();
-        }
-
-        if (self::$setterAccessibleCache[$key]) {
-            $object->$setter($value);
-        }
-    }
 }

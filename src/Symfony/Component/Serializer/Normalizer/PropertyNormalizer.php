@@ -127,48 +127,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
-    {
-        try {
-            $reflectionProperty = $this->getReflectionProperty($object, $attribute);
-        } catch (\ReflectionException $reflectionException) {
-            return null;
-        }
-
-        // Override visibility
-        if (!$reflectionProperty->isPublic()) {
-            $reflectionProperty->setAccessible(true);
-        }
-
-        return $reflectionProperty->getValue($object);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
-    {
-        try {
-            $reflectionProperty = $this->getReflectionProperty($object, $attribute);
-        } catch (\ReflectionException $reflectionException) {
-            return;
-        }
-
-        if ($reflectionProperty->isStatic()) {
-            return;
-        }
-
-        // Override visibility
-        if (!$reflectionProperty->isPublic()) {
-            $reflectionProperty->setAccessible(true);
-        }
-
-        $reflectionProperty->setValue($object, $value);
-    }
-
-    /**
      * @param string|object $classOrObject
      *
      * @throws \ReflectionException

@@ -21,6 +21,7 @@ use Psr\Cache\CacheItemPoolInterface;
 class PropertyAccessorBuilder
 {
     private $magicCall = false;
+    private $staticCall = true;
     private $throwExceptionOnInvalidIndex = false;
     private $throwExceptionOnInvalidPropertyPath = true;
 
@@ -59,6 +60,20 @@ class PropertyAccessorBuilder
     public function isMagicCallEnabled()
     {
         return $this->magicCall;
+    }
+
+    public function enableStaticCall(): self
+    {
+        $this->staticCall = true;
+
+        return $this;
+    }
+
+    public function disableStaticCall(): self
+    {
+        $this->staticCall = false;
+
+        return $this;
     }
 
     /**
@@ -164,6 +179,6 @@ class PropertyAccessorBuilder
      */
     public function getPropertyAccessor()
     {
-        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool, $this->throwExceptionOnInvalidPropertyPath);
+        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool, $this->throwExceptionOnInvalidPropertyPath, null, null, $this->staticCall);
     }
 }

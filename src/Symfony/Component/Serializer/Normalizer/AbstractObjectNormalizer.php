@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -93,15 +95,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private $propertyTypeExtractor;
     private $typesCache = [];
     private $attributesCache = [];
+    private $discriminatorCache = [];
 
     private $objectClassResolver;
+    private $propertyAccessor;
 
     /**
      * @var ClassDiscriminatorResolverInterface|null
      */
     protected $classDiscriminatorResolver;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [], PropertyAccessorInterface $propertyAccessor = null)
     {
         parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
 
@@ -118,6 +122,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
         $this->classDiscriminatorResolver = $classDiscriminatorResolver;
         $this->objectClassResolver = $objectClassResolver;
+
+        $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessorBuilder()
+                ->disableExceptionOnInvalidPropertyPath()
+                ->disableStaticCall()
+                ->getPropertyAccessor();
     }
 
     /**
@@ -208,6 +217,25 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return $data;
     }
 
+    protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = [])
+    {
+        $cacheKey = \get_class($object);
+        if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {
+            $this->discriminatorCache[$cacheKey] = null;
+            if (null !== $this->classDiscriminatorResolver) {
+                $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object);
+                $this->discriminatorCache[$cacheKey] = null === $mapping ? null : $mapping->getTypeProperty();
+            }
+        }
+
+        return $attribute === $this->discriminatorCache[$cacheKey] ? $this->classDiscriminatorResolver->getTypeForMappedObject($object) : $this->propertyAccessor->getValue($object, $attribute);
+    }
+
+    protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+    {
+        $this->propertyAccessor->setValue($object, $attribute, $value);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -277,13 +305,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     abstract protected function extractAttributes(object $object, string $format = null, array $context = []);
 
     /**
-     * Gets the attribute value.
-     *
-     * @return mixed
-     */
-    abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
-
-    /**
      * {@inheritdoc}
      */
     public function supportsDenormalization($data, string $type, string $format = null)
@@ -342,11 +363,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         return $object;
     }
-
-    /**
-     * Sets attribute value.
-     */
-    abstract protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = []);
 
     /**
      * Validates the submitted data and denormalizes it.

@@ -48,6 +48,10 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @var bool
      */
     private $magicCall;
+    /**
+     * @var bool
+     */
+    private $staticCall;
     private $ignoreInvalidIndices;
     private $ignoreInvalidProperty;
 
@@ -76,9 +80,10 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      */
-    public function __construct(bool $magicCall = false, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
+    public function __construct(bool $magicCall = false, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null, bool $staticCall = true)
     {
         $this->magicCall = $magicCall;
+        $this->staticCall = $staticCall;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
         $this->ignoreInvalidProperty = !$throwExceptionOnInvalidPropertyPath;
@@ -385,7 +390,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $class = \get_class($object);
         $access = $this->getReadInfo($class, $property);
 
-        if (null !== $access) {
+        if (null !== $access && (!$access->isStatic() || $this->staticCall)) {
             $name = $access->getName();
             $type = $access->getType();
 
@@ -480,7 +485,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $class = \get_class($object);
         $mutator = $this->getWriteInfo($class, $property, $value);
 
-        if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType()) {
+        if (PropertyWriteInfo::TYPE_NONE !== $mutator->getType() && (!$mutator->isStatic() || $this->staticCall)) {
             $type = $mutator->getType();
 
             if (PropertyWriteInfo::TYPE_METHOD === $type) {

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by Chi-teck at 2020-01-26T16:33:14Z
+
+Can we use these constants in console's own code?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-27T16:18:41Z
+
+What about just `Command::SUCCESS` and `Command::FAILURE`?
+I would not use these constants in Symfony's code.

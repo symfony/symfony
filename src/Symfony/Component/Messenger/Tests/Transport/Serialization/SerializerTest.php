@@ -207,7 +207,40 @@ class SerializerTest extends TestCase
         $encoded = $serializer->encode($envelope);
         $this->assertStringNotContainsString('DummySymfonySerializerNonSendableStamp', print_r($encoded['headers'], true));
     }
+
+    public function testDecodingFailedConstructorDeserialization()
+    {
+        $serializer = new Serializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+
+        $serializer->decode([
+            'body' => '{}',
+            'headers' => ['type' => DummySymfonySerializerInvalidConstructor::class],
+        ]);
+    }
+
+    public function testDecodingStampFailedDeserialization()
+    {
+        $serializer = new Serializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+
+        $serializer->decode([
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.SerializerStamp::class => '[{}]',
+            ],
+        ]);
+    }
 }
 class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterface
 {
+}
+class DummySymfonySerializerInvalidConstructor
+{
+    public function __construct(string $missingArgument)
+    {
+    }
 }

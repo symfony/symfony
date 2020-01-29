@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-01-08T16:25:02Z
+
+Do we actually want to allow that ? Disabling peer verification means that your TLS connection is insecure (anyone can do a MitM attack without any issue).
+
+---------------------------------------------------------------------------
+
+by stof at 2020-01-08T16:25:38Z
+
+What is the use case to add such feature ?
+
+---------------------------------------------------------------------------
+
+by Livda at 2020-01-09T07:55:04Z
+
+In case of internal enterprise SMTP with self signed certificate, it's currently impossible to send mail without this. I'm aware that's an insecure way to do things, but there is no way to force no use of TLS connection to work around this issue. I think it's a good compromise in term of security between no encryption at all and fully authenticated TLS connection.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-01-14T11:09:33Z
+
+> internal enterprise SMTP with self signed certificate
+
+The way to go here would be to trust your internal CA that signed your certificate. TLS without certificate verification is a big red flag.
+
+---------------------------------------------------------------------------
+
+by Livda at 2020-01-14T12:04:50Z
+
+> The way to go here would be to trust your internal CA that signed your certificate. TLS without certificate verification is a big red flag.
+
+The issue here is I cannot trust any CA because it's a self signed certificate. By design there is no CA on a self signed certificate. I do know it's a bad way to do things, but I have no control over the SMTP server which use this certificate.
+Currently I'm using Switfmailer without any encryption at all because I can't use this lib. There is no way to not use TLS with this lib, if the server respond with `STARTTLS` capability, so I've made this PR in order to use this mailer in such case. But I can add a flag to prevent TLS even if the server said it support TLS after the EHLO request.
+
+---------------------------------------------------------------------------
+
+by xfifix at 2020-01-22T10:44:16Z
+
+i have the same problem !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-28T09:59:26Z
+
+(please add a line in the changelog of the component)

@@ -29,6 +29,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Command
 {
+    public const SUCCESS = 0;
+    public const FAILURE = 1;
+
     /**
      * @var string|null The default command name
      */

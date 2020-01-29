@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Transport\Smtp;
 
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
@@ -27,6 +28,17 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
         $host = $dsn->getHost();
 
         $transport = new EsmtpTransport($host, $port, $tls, $this->dispatcher, $this->logger);
+
+        if (!$dsn->getOption('verify_peer', true)) {
+            /** @var SocketStream $stream */
+            $stream = $transport->getStream();
+            $streamOptions = $stream->getStreamOptions();
+
+            $streamOptions['ssl']['verify_peer'] = false;
+            $streamOptions['ssl']['verify_peer_name'] = false;
+
+            $stream->setStreamOptions($streamOptions);
+        }
 
         if ($user = $dsn->getUser()) {
             $transport->setUsername($user);

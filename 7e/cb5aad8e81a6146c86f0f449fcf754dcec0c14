@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-20T21:55:55Z
+
+I added per-group verbosity, the usage is `verbose[direct]=0|1`, but maybe I should use `verbose[]=direct`, tell me what you think.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-01-20T22:43:50Z
+
+> usage is verbose[direct]=0|1, but maybe I should use verbose[]=direct, tell me what you think.
+
+[key]=int is more consistent with what we have now
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-26T11:50:56Z
+
+I just pushed a version with a test case that makes more sense. Also, I added a commit to remove the "remaining" prefix
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-27T21:45:10Z
+
+> Can you please also update to the description of the PR so that it documents what this is about? I had to review in details to get it, the ppl that will write the doc and/or the blog post about this need help too.
+
+Sorry for not doing that sooner, now that I wrote it guess the usage is a bit confusing, maybe the behavior should be changed, and it people should rather say which groups should be made quiet with `verbose[indirect]=0`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-27T21:50:21Z
+
+`quiet=foo,bar,baz`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-27T21:50:55Z
+
+or `quiet[]=foo&quiet[]=bar`, as you prefer :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-27T21:53:00Z
+
+ouch, I'm going again in the other alternative not suggested by @ostrolucky, sorry...
+I feel like [key]=int might create confusion: "what does 2 mean?", that's why I proposed these.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-27T21:55:55Z
+
+Yeah, also, only one of `1` like right now or `0` (if we default to verbose groups) would ever be actually used. The syntax you proposed leaves less room for errors and confusion I think.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-27T22:10:51Z
+
+@nicolas-grekas what should happen if we have `verbose=0&quiet[]=indirect`? throw an exception telling the user not to use both options together?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-27T22:14:30Z
+
+Nothing special to me.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-27T22:49:58Z
+
+@nicolas-grekas implemented :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-28T12:16:46Z
+
+>  reducing merge conflicts is my priority,
+
+@nicolas-grekas should I contribute the first commit to a lower branch first? It's a refactoring (and a big one).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-28T12:20:58Z
+
+> should I contribute the first commit to a lower branch first? It's a refactoring
+
+nope, refacto are always for master: reducing the risk of introducing regressions has an even higher priority.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-28T12:23:30Z
+
+Ok, I just dropped the last commit (about "remaining")
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-01-28T18:15:11Z
+
+> Some minor comments and good to me (I didn't run the PR so I'm counting on you to fix any issues we missed during review ;) )
+
+I just tested on SonataAdminBundle, and I couldn't find any issues :stuck_out_tongue:

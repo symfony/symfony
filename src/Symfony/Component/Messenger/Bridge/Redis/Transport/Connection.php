@@ -104,6 +104,12 @@ class Connection
             unset($redisOptions['dbindex']);
         }
 
+        $tls = false;
+        if (\array_key_exists('tls', $redisOptions)) {
+            $tls = filter_var($redisOptions['tls'], FILTER_VALIDATE_BOOLEAN);
+            unset($redisOptions['tls']);
+        }
+
         $configuration = [
             'stream' => $redisOptions['stream'] ?? null,
             'group' => $redisOptions['group'] ?? null,
@@ -125,6 +131,9 @@ class Connection
             $configuration['stream'] = $pathParts[1] ?? $configuration['stream'];
             $configuration['group'] = $pathParts[2] ?? $configuration['group'];
             $configuration['consumer'] = $pathParts[3] ?? $configuration['consumer'];
+            if ($tls) {
+                $connectionCredentials['host'] = 'tls://'.$connectionCredentials['host'];
+            }
         } else {
             $connectionCredentials = [
                 'host' => $parsedUrl['path'],

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
+use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
  * @requires extension redis >= 4.3.0
@@ -71,6 +71,28 @@ class ConnectionTest extends TestCase
             Connection::fromDsn('redis://localhost', ['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'serializer' => 2]),
             Connection::fromDsn('redis://localhost/queue/group1/consumer1?serializer=2&auto_setup=0')
         );
+    }
+
+    public function testFromDsnWithTls()
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->once())
+            ->method('connect')
+            ->with('tls://127.0.0.1', 6379)
+            ->willReturn(null);
+
+        Connection::fromDsn('redis://127.0.0.1?tls=1', [], $redis);
+    }
+
+    public function testFromDsnWithTlsOption()
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->once())
+            ->method('connect')
+            ->with('tls://127.0.0.1', 6379)
+            ->willReturn(null);
+
+        Connection::fromDsn('redis://127.0.0.1', ['tls' => true], $redis);
     }
 
     public function testFromDsnWithQueryOptions()

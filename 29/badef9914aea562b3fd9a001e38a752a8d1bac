@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-04T13:02:04Z
+
+Thanks. deps=low tests fail apparently, can you please have a look?
+Can you please also double check that the fixtures match realworld payload from the providers?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-08T17:31:26Z
+
+(please check fabbot)

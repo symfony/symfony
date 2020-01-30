@@ -79,6 +79,7 @@ class FlexStyleMicroKernel extends Kernel
         $c->services()
             ->set('logger', NullLogger::class)
             ->set('stdClass', 'stdClass')
+                ->autowire()
                 ->factory([$this, 'createHalloween'])
                 ->arg('$halloween', '%halloween%');
 

@@ -124,7 +124,6 @@ trait MicroKernelTrait
             }
 
             // the user has opted into using the ContainerConfigurator
-            $defaultDefinition = (new Definition())->setAutowired(true)->setAutoconfigured(true);
             /* @var ContainerPhpFileLoader $kernelLoader */
             $kernelLoader = $loader->getResolver()->resolve($file);
             $kernelLoader->setCurrentDir(\dirname($file));
@@ -136,7 +135,7 @@ trait MicroKernelTrait
             };
 
             try {
-                $this->configureContainer(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file, $defaultDefinition), $loader);
+                $this->configureContainer(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file), $loader);
             } finally {
                 $instanceof = [];
                 $kernelLoader->registerAliasesForSinglyImplementedInterfaces();

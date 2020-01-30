@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2020-01-04T22:30:41Z
+
+I'm kinda against having a fluent interface as it doesn't really make sense to have a fluent here (it's not a builder...)
+
+Adding a mutable state why not, and maybe keep it immutable (returning a new instance with the property set correctly) would be even better IMO.
+
+(Hence my 😕 / 👎 reaction)
+
+---------------------------------------------------------------------------
+
+by ns3777k at 2020-01-04T22:37:05Z
+
+@Taluu  Maybe `fluent interface` is not correct term here, I meant a bunch of setters by it just to mutate the state (that's exactly what's been done.).
+
+Sorry for my bad english but what's the difference between this PR and `Adding a mutable state why not`?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2020-01-04T23:30:07Z
+
+You made it fluent (returning `$this`) is the key difference here. :)
+
+---------------------------------------------------------------------------
+
+by ns3777k at 2020-01-04T23:57:10Z
+
+Oh, I got you :-) I don't mind changing the PR so setters would become something like:
+
+```php
+public function setName(string $name): self
+{
+    // ...validating $name...
+    $clone = clone $this;
+    $clone->name = $name;
+
+    return $clone;
+}
+```
+
+But I personally prefer `$this` :-)
+Anyway, let's wait on other opinions.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2020-01-05T00:40:17Z
+
+Even better : make withers (`withName`...).
+
+Or remove the return and make it mutable.
+
+---------------------------------------------------------------------------
+
+by ns3777k at 2020-01-05T19:18:23Z
+
+@Taluu
+
+I updated the PR with withers keeping the Cookie immutable. Appreciate it if you take a look.
+
+---------------------------------------------------------------------------
+
+by florianajir at 2020-01-07T13:51:50Z
+
+I need this ! but sad to have to wait for 5.2.0 release to get mutable cookie :/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-12T21:53:23Z
+
+Thanks for your explanations @ns3777k, I missed that some attributes should remain nullable.
+I pushed a third commit on your fork with additional changes.
+As a last step, I think we should group all wither methods at the beginning of the class, before the getters.
+
+---------------------------------------------------------------------------
+
+by ns3777k at 2020-01-12T22:01:33Z
+
+Thanks for clarification! @nicolas-grekas  I'm gonna move the withers up.

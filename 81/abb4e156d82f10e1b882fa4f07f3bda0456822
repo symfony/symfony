@@ -1,0 +1,166 @@
+---------------------------------------------------------------------------
+
+by kbond at 2019-12-19T15:39:20Z
+
+Replying to https://github.com/symfony/symfony/issues/35047#issuecomment-567526041:
+
+My experience is only with Postmark but I was able to find a similar concept for these 3rd party providers:
+
+**Postmark**
+Tag: single value
+Metadata: key/value pair
+
+**Mailgun**
+Tag: single value
+Metadata: key/value pair, referred to as "variables"
+
+**SendGrid**
+Tag: multiple values, referred to as "categories"
+Metadata: key/value pair, referred to as "custom_args"
+
+**Amazon**
+Looks like tags/metadata is combined as "Tags"
+
+---------------------------------------------------------------------------
+
+by AndreiIgna at 2019-12-20T11:32:49Z
+
+This is great and much better implementation than https://github.com/symfony/symfony/pull/34766 I was focusing on Postmark (using this atm) and that code targets only that transport.
+
+PostmarkApiTransport doesn't have a `sendEmail` test, maybe you can add the one from my PR https://github.com/symfony/symfony/pull/34766/files#diff-e50347a040c466692646cd1e6b7fe257
+
+---------------------------------------------------------------------------
+
+by kbond at 2019-12-20T15:06:07Z
+
+I have thought of some alternate solutions to account for the provider differences. Both would require knowledge of the transport when creating the email (which doesn't seem unreasonable).
+
+1. A single `MetadataHeader` that takes a free form array. Providers would have knowledge of how to parse this array. This would be added as a json encoded `X-Metadata` header for providers that don't support this. This is the most generic solution but complex from a usage perspective.
+
+    ```php
+    $email->getHeaders()->addMetadata([
+        'tag' => 'password-reset',
+        'metadata' => [
+            'Color' => 'blue',
+            'Client-Id' => '12345',
+        ],
+    ]);
+    ```
+
+2. Each provider can define it's own header(s) (that would live in the bridge): `PostmarkHeader`, `MailgunHeader`, etc.
+
+    ```php
+    $email->getHeaders()->add((new PostmarkHeader())
+        ->tag('password-reset')
+        ->metadata([
+            'Color' => 'blue',
+            'Client-Id' => '12345',
+        ])
+    );
+    ```
+
+    Or multiple headers:
+
+    ```php
+    $email->getHeaders()->add(new PostmarkTag('password-reset'));
+    $email->getHeaders()->add(new PostmarkMetadata([
+        'Color' => 'blue',
+        'Client-Id' => '12345',
+    ]));
+    ```
+
+    This would allow us to utilize all the different features of each provider in a way that is easy for the user to use.
+
+My vote would be for *option 2*.
+
+---------------------------------------------------------------------------
+
+by AndreiIgna at 2019-12-20T15:19:48Z
+
+Hmm I think option 2 adds much more complexity.
+I think option 1 or current implementation in PR would work better, because it doesn't require custom code for providers in app's code.
+
+For example, with option 2 emails are created and sent by adding specific tags "PostmarkTag/PostmarkHeader". If email transport is changed later for a project, instead of changing the project's config now it requires code changes too.
+At the moment I use Postmark for a project, but may change this to Sendgrid later. I'm using Mailer exactly for this reason, to change only the config once, and don't worry about how emails are created.
+
+More generic `Headers` like Tag or Metadata are better in this case, and each transport uses this as it sees fit.
+
+---------------------------------------------------------------------------
+
+by kbond at 2019-12-20T15:32:59Z
+
+It looks like SendGrid has more options than just tags and metadata, they have personalizations and substitutions. The current PR implementation would not be able to provide these options. Option 1 would but if you switched providers, it would likely silently break in a way that isn't obvious. Option 2 would also break but in a more obvious way (there would be an exception because the header class would be missing).
+
+Maybe the best course is to stick with the current PR implementation since multiple providers can support it and possibly add custom provider headers later?
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-01-10T14:34:05Z
+
+I have moved the new Header classes to the Mailer component per @fabpot's request. I updated the PR description.
+
+I have confirmed this works on Postmark but I don't use Mailgun. I'd appreciate someone with a Mailgun account to test.
+
+If this is acceptable, I will add tests.
+
+---------------------------------------------------------------------------
+
+by acasademont at 2020-01-10T17:16:19Z
+
+Sendgrid user here, I'll take a look at this asap, it might fix #34700
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-01-30T14:11:25Z
+
+I made the changes and added tests. The tests are failing on travis (deps=low). Can I get some direction on how to fix?
+
+Again, I don't feel confident in the Mailgun implementation as I can't do a live test but Postmark works as expected.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-01-30T14:20:16Z
+
+Mandrill (Mailchimp) also support these features (multiple values are supported for tags). Here are their doc:
+
+- https://mandrillapp.com/api/docs/messages.JSON.html#method=send for the endpoint used by our ApiTransport
+- https://mandrill.zendesk.com/hc/en-us/articles/205582117-How-to-Use-SMTP-Headers-to-Customize-Your-Messages#tag-your-messages for the SMTP doc about tags
+- https://mandrill.zendesk.com/hc/en-us/articles/205582117-How-to-Use-SMTP-Headers-to-Customize-Your-Messages#use-custom-metadata for the SMTP doc about metadata
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-30T14:21:56Z
+
+To fix the tests, you need to require at Mailer 5.1 for the bridges so that the new headers exist.
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-01-30T14:34:52Z
+
+Ok, travis has been fixed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-30T14:57:35Z
+
+@kbond Can you try to do the same for Mandrill with the docs suggested by @stof? It not, happy to merge as is and let someone else take over for the other transport providers.
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-01-30T15:36:55Z
+
+Ok, I added Mandrill support for this feature. Again, I have not "live" tested this.
+
+Mailgun and Mandrill both have an `HttpTransport` - this PR does not add tag/metadata support to these. Since these transports send the raw headers, it should work if using the proper header names for each service. *edit: it should be possibly to add support to these using the same logic as the SmtpTransports, let me know if you'd like me to add before merging.*
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-30T15:46:07Z
+
+@kbond I think having support in HttpTransport classes as you describe would be good for consistency. Last thing to do before merge :)
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-01-30T15:58:05Z
+
+Ok, added support for Mandrill/Mailgun Http Transports. I added 2 traits to reduce duplication.

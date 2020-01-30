@@ -12,39 +12,13 @@
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillHttpTransport;
+use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillSmtpTransport;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 
-class MandrillHttpTransportTest extends TestCase
+class MandrillSmtpTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
-    public function testToString(MandrillHttpTransport $transport, string $expected)
-    {
-        $this->assertSame($expected, (string) $transport);
-    }
-
-    public function getTransportData()
-    {
-        return [
-            [
-                new MandrillHttpTransport('KEY'),
-                'mandrill+https://mandrillapp.com',
-            ],
-            [
-                (new MandrillHttpTransport('KEY'))->setHost('example.com'),
-                'mandrill+https://example.com',
-            ],
-            [
-                (new MandrillHttpTransport('KEY'))->setHost('example.com')->setPort(99),
-                'mandrill+https://example.com:99',
-            ],
-        ];
-    }
-
     public function testTagAndMetadataHeaders()
     {
         $email = new Email();
@@ -53,8 +27,8 @@ class MandrillHttpTransportTest extends TestCase
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
 
-        $transport = new MandrillHttpTransport('key');
-        $method = new \ReflectionMethod(MandrillHttpTransport::class, 'addMandrillHeaders');
+        $transport = new MandrillSmtpTransport('user', 'password');
+        $method = new \ReflectionMethod(MandrillSmtpTransport::class, 'addMandrillHeaders');
         $method->setAccessible(true);
         $method->invoke($transport, $email);
 

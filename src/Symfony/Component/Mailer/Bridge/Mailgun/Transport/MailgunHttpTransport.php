@@ -26,6 +26,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MailgunHttpTransport extends AbstractHttpTransport
 {
+    use MailgunHeadersTrait;
+
     private const HOST = 'api.%region_dot%mailgun.net';
 
     private $key;

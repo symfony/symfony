@@ -24,6 +24,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MandrillHttpTransport extends AbstractHttpTransport
 {
+    use MandrillHeadersTrait;
+
     private const HOST = 'mandrillapp.com';
     private $key;
 

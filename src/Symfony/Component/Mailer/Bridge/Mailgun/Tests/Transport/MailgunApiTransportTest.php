@@ -14,6 +14,8 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunApiTransport;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
@@ -63,5 +65,30 @@ class MailgunApiTransportTest extends TestCase
 
         $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
         $this->assertEquals($json, $payload['h:x-mailgun-variables']);
+    }
+
+    public function testTagAndMetadataHeaders()
+    {
+        $json = json_encode(['foo' => 'bar']);
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('X-Mailgun-Variables', $json);
+        $email->getHeaders()->add(new TagHeader('password-reset'));
+        $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
+        $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
+        $method->setAccessible(true);
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
+        $this->assertEquals($json, $payload['h:x-mailgun-variables']);
+        $this->assertArrayHasKey('o:tag', $payload);
+        $this->assertSame('password-reset', $payload['o:tag']);
+        $this->assertArrayHasKey('v:Color', $payload);
+        $this->assertSame('blue', $payload['v:Color']);
+        $this->assertArrayHasKey('v:Client-ID', $payload);
+        $this->assertSame('12345', $payload['v:Client-ID']);
     }
 }

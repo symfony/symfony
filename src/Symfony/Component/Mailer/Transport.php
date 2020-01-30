@@ -149,7 +149,7 @@ class Transport
         throw new UnsupportedSchemeException($dsn);
     }
 
-    private static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): iterable
+    public static function getDefaultFactories(EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): iterable
     {
         foreach (self::FACTORY_CLASSES as $factoryClass) {
             if (class_exists($factoryClass)) {

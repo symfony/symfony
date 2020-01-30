@@ -6,6 +6,11 @@ Console
 
  * `Command::setHidden()` is final since Symfony 5.1
 
+Dotenv
+------
+
+ * Deprecated passing `$usePutenv` argument to Dotenv's constructor, use `Dotenv::usePutenv()` instead.
+
 EventDispatcher
 ---------------
 

@@ -303,9 +303,6 @@ class ByteString extends AbstractString
         return $str;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverse(): parent
     {
         $str = clone $this;
@@ -460,29 +457,8 @@ class ByteString extends AbstractString
 
     public function width(bool $ignoreAnsiDecoration = true): int
     {
-        $width = 0;
-        $s = str_replace(["\x00", "\x05", "\x07"], '', $this->string);
+        $string = preg_match('//u', $this->string) ? $this->string : preg_replace('/[\x80-\xFF]/', '?', $this->string);
 
-        if (false !== strpos($s, "\r")) {
-            $s = str_replace(["\r\n", "\r"], "\n", $s);
-        }
-
-        foreach (explode("\n", $s) as $s) {
-            if ($ignoreAnsiDecoration) {
-                $s = preg_replace('/\x1B(?:
-                    \[ [\x30-\x3F]*+ [\x20-\x2F]*+ [0x40-\x7E]
-                    | [P\]X^_] .*? \x1B\\\\
-                    | [\x41-\x7E]
-                )/x', '', $s);
-            }
-
-            $w = substr_count($s, "\xAD") - substr_count($s, "\x08");
-
-            if ($width < $w += \strlen($s)) {
-                $width = $w;
-            }
-        }
-
-        return $width;
+        return (new CodePointString($string))->width($ignoreAnsiDecoration);
     }
 }

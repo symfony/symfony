@@ -22,6 +22,10 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/translation-contracts": "^1.1|^2"
     },
+    "require-dev": {
+        "symfony/http-client": "^4.4|^5.0",
+        "symfony/var-exporter": "^4.4|^5.0"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\String\\": "" },
         "files": [ "Resources/functions.php" ],

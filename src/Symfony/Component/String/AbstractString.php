@@ -646,6 +646,9 @@ abstract class AbstractString implements \JsonSerializable
      */
     abstract public function upper(): self;
 
+    /**
+     * Returns the printable length on a terminal.
+     */
     abstract public function width(bool $ignoreAnsiDecoration = true): int;
 
     /**

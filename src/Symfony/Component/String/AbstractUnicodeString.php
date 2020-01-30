@@ -352,9 +352,6 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverse(): parent
     {
         $str = clone $this;
@@ -444,22 +441,21 @@ abstract class AbstractUnicodeString extends AbstractString
             $s = str_replace(["\r\n", "\r"], "\n", $s);
         }
 
+        if (!$ignoreAnsiDecoration) {
+            $s = preg_replace('/[\p{Cc}\x7F]++/u', '', $s);
+        }
+
         foreach (explode("\n", $s) as $s) {
             if ($ignoreAnsiDecoration) {
-                $s = preg_replace('/\x1B(?:
+                $s = preg_replace('/(?:\x1B(?:
                     \[ [\x30-\x3F]*+ [\x20-\x2F]*+ [0x40-\x7E]
                     | [P\]X^_] .*? \x1B\\\\
                     | [\x41-\x7E]
-                )/x', '', $s);
+                )|[\p{Cc}\x7F]++)/xu', '', $s);
             }
 
-            $w = substr_count($s, "\xAD") - substr_count($s, "\x08");
-            $s = preg_replace('/[\x00\x05\x07\p{Mn}\p{Me}\p{Cf}\x{1160}-\x{11FF}\x{200B}]+/u', '', $s);
-            $s = preg_replace('/[\x{1100}-\x{115F}\x{2329}\x{232A}\x{2E80}-\x{303E}\x{3040}-\x{A4CF}\x{AC00}-\x{D7A3}\x{F900}-\x{FAFF}\x{FE10}-\x{FE19}\x{FE30}-\x{FE6F}\x{FF00}-\x{FF60}\x{FFE0}-\x{FFE6}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}]/u', '', $s, -1, $wide);
-
-            if ($width < $w += mb_strlen($s, 'UTF-8') + ($wide << 1)) {
-                $width = $w;
-            }
+            // Non printable characters have been dropped, so wcswidth cannot logically return -1.
+            $width += $this->wcswidth($s);
         }
 
         return $width;
@@ -502,5 +498,81 @@ abstract class AbstractUnicodeString extends AbstractString
             default:
                 throw new InvalidArgumentException('Invalid padding type.');
         }
+    }
+
+    /**
+     * Based on https://github.com/jquast/wcwidth, a Python implementation of https://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c.
+     */
+    private function wcswidth(string $string): int
+    {
+        $width = 0;
+
+        foreach (preg_split('//u', $string, -1, PREG_SPLIT_NO_EMPTY) as $c) {
+            $codePoint = mb_ord($c, 'UTF-8');
+
+            if (0 === $codePoint // NULL
+                || 0x034F === $codePoint // COMBINING GRAPHEME JOINER
+                || (0x200B <= $codePoint && 0x200F >= $codePoint) // ZERO WIDTH SPACE to RIGHT-TO-LEFT MARK
+                || 0x2028 === $codePoint // LINE SEPARATOR
+                || 0x2029 === $codePoint // PARAGRAPH SEPARATOR
+                || (0x202A <= $codePoint && 0x202E >= $codePoint) // LEFT-TO-RIGHT EMBEDDING to RIGHT-TO-LEFT OVERRIDE
+                || (0x2060 <= $codePoint && 0x2063 >= $codePoint) // WORD JOINER to INVISIBLE SEPARATOR
+            ) {
+                continue;
+            }
+
+            // Non printable characters
+            if (32 > $codePoint // C0 control characters
+                || (0x07F <= $codePoint && 0x0A0 > $codePoint) // C1 control characters and DEL
+            ) {
+                return -1;
+            }
+
+            static $tableZero;
+            if (null === $tableZero) {
+                $tableZero = require __DIR__.'/Resources/data/wcswidth_table_zero.php';
+            }
+
+            if ($codePoint >= $tableZero[0][0] && $codePoint <= $tableZero[$ubound = \count($tableZero) - 1][1]) {
+                $lbound = 0;
+                while ($ubound >= $lbound) {
+                    $mid = floor(($lbound + $ubound) / 2);
+
+                    if ($codePoint > $tableZero[$mid][1]) {
+                        $lbound = $mid + 1;
+                    } elseif ($codePoint < $tableZero[$mid][0]) {
+                        $ubound = $mid - 1;
+                    } else {
+                        continue 2;
+                    }
+                }
+            }
+
+            static $tableWide;
+            if (null === $tableWide) {
+                $tableWide = require __DIR__.'/Resources/data/wcswidth_table_wide.php';
+            }
+
+            if ($codePoint >= $tableWide[0][0] && $codePoint <= $tableWide[$ubound = \count($tableWide) - 1][1]) {
+                $lbound = 0;
+                while ($ubound >= $lbound) {
+                    $mid = floor(($lbound + $ubound) / 2);
+
+                    if ($codePoint > $tableWide[$mid][1]) {
+                        $lbound = $mid + 1;
+                    } elseif ($codePoint < $tableWide[$mid][0]) {
+                        $ubound = $mid - 1;
+                    } else {
+                        $width += 2;
+
+                        continue 2;
+                    }
+                }
+            }
+
+            ++$width;
+        }
+
+        return $width;
     }
 }

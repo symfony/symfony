@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added the `AbstractString::reverse()` method.
+ * Made `AbstractString::width()` follow POSIX.1-2001.
 
 5.0.0
 -----

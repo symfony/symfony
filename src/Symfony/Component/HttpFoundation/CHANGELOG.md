@@ -4,6 +4,9 @@ CHANGELOG
 5.1.0
 -----
 
+ * added `Cookie::withValue`, `Cookie::withDomain`, `Cookie::withExpires`,
+   `Cookie::withPath`, `Cookie::withSecure`, `Cookie::withHttpOnly`,
+   `Cookie::withRaw`, `Cookie::withSameSite`
  * Deprecate `Response::create()`, `JsonResponse::create()`,
    `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
    `__construct()` instead)

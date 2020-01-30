@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-21T07:48:29Z
+
+Thanks for the PR. Can you rebase to get rid of the merge commit and add a test?

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-12-04T18:21:59Z
+
+/cc @ro0NL maybe?
+
+~@biozshock, please mind the CI failures.~
+actually not!! this file uses a specific code style, you can ignore fabbot :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-12-04T18:27:29Z
+
+> After fixing #34300 the PhpUnitBridge stopped recognizing short -c option.
+
+how did it regognize `-c` before then? AFAIK #34300 / #34305 was exactly about supporting that. Though maybe im missing it.. as i only considered the usecase from PhpStorm's perspectivice which invokes using `--configuration /project/phpunit.xml.dist` (the path i configured).
+
+> Also original PHPUnit allows to pass a directory as configuration parameter and read from either phpunit.xml or phpunit.xml.dist
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by biozshock at 2019-12-04T19:33:57Z
+
+> how did it regognize `-c` before then? AFAIK #34300 / #34305 was exactly about supporting that. Though maybe im missing it.. as i only considered the usecase from PhpStorm's perspectivice which invokes using `--configuration /project/phpunit.xml.dist` (the path i configured).
+
+It was recognizing `-c path/phpunit.xml` which not supported by PHPUnit, because notation is not GetOpt compatible.
+
+---------------------------------------------------------------------------
+
+by biozshock at 2019-12-20T15:39:59Z
+
+is it good to be merged, or i need to fix something here?
+/cc @ro0NL @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by biozshock at 2020-01-15T08:02:09Z
+
+@nicolas-grekas is there anything else need to be done before merging this into next release?

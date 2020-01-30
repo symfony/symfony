@@ -1,0 +1,150 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2020-01-11T10:36:48Z
+
+@fabpot I made strict `s-maxage` compliance a config switch, defaulting to turning it off (BC). WDYT?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-11T15:54:51Z
+
+Not sure about the switch. In general, I tend to avoid making something configurable when it's not needed. I've one additional question: how does Varnish work? I think doing the same as Varnish is the way to go. WDYT?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2020-01-11T17:21:14Z
+
+Personally, I have never used Varnish because the `HttpCache` does such a great job. But I will give their Docker image with the default configuration a try and report back.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2020-01-13T08:57:46Z
+
+TL;DR:
+
+I may be doing something wrong or misinterpreting the results, but it seems Varnish does not do `stale-if-error`, at least not with the default config and/or triggered by the `stale-if-error` response header.
+
+It always does _background_ validation, so errors show up on the second-next request only.
+
+My tests were with `public, max-age=2, stale-if-error=60`, because that – in theory – should allow for serving stale responses.
+
+<hr>
+
+Here is the setup to reproduce and/or test it, in case someone wants to tinker with it. You can try arbitrary `Cache-Control` settings from the `curl` command.
+
+<pre>
+<b>$ cd $(mktemp -d)</b>
+<b>$ docker run --rm varnish -V</b>
+varnishd (varnish-6.3.1 revision 6e96ff048692235e64565211a38c41432a26c055)
+Copyright (c) 2006 Verdens Gang AS
+Copyright (c) 2006-2019 Varnish Software AS
+<b>$ cat &lt;&lt;'EOF' > index.php</b>
+&lt;?php
+
+if (file_exists($_REQUEST['id'])) {
+    header('HTTP/1.1 500 Internal server error');
+    exit;
+}
+
+touch($_REQUEST['id']);
+unset($_REQUEST['id']);
+
+$cacheControl = 'Cache-Control: public';
+
+foreach ($_REQUEST as $key => $value) {
+    $cacheControl .= ", $key";
+    if ($value) {
+        $cacheControl .= "=$value";
+    }
+}
+
+header('HTTP/1.1 200 OK');
+header($cacheControl);
+EOF
+<b>$ php -S 0.0.0.0:8000 index.php &</b>
+[1] 8299
+PHP 7.2.24-0ubuntu0.18.04.1 Development Server started at Mon Jan 13 07:28:37 2020
+Listening on http://0.0.0.0:8000
+Document root is /tmp/tmp.PxbY0DOltD
+Press Ctrl-C to quit.
+<b>$ cat <<'EOF' > default.vcl</b>
+vcl 4.0;
+
+backend default {
+  .host = "localhost:8000";
+}
+EOF
+<b>$ docker run -d --rm -v $(pwd)/default.vcl:/etc/varnish/default.vcl:ro --tmpfs /usr/local/var/varnish:exec -p 8001:80  varnish</b>
+d62ec6ff328d332afb23674bc49bbf29c0a407863c0639cae5f7f18f5389af86
+<b>$ export ID=$(date +'%s') # use this to run a fresh set of tests // bust Varnish cache</b>
+<b>$ curl -IX GET "http://localhost:8001/?id=${ID}&max-age=2&stale-if-error=60"  # first hit</b>
+HTTP/1.1 200 OK
+Host: localhost:8001
+Date: Mon, 13 Jan 2020 07:30:51 GMT
+Cache-Control: public, max-age=2, stale-if-error=60
+Content-type: text/html; charset=UTF-8
+X-Varnish: 5
+Age: 0
+Via: 1.1 varnish (Varnish/6.3)
+Accept-Ranges: bytes
+Content-Length: 0
+Connection: keep-alive
+
+<b>$ curl -IX GET "http://localhost:8001/?id=${ID}&max-age=2&stale-if-error=60"  # Varnish seems to always deliver the cached response and do background validation</b>
+HTTP/1.1 200 OK
+Host: localhost:8001
+Date: Mon, 13 Jan 2020 07:30:51 GMT
+Cache-Control: public, max-age=2, stale-if-error=60
+Content-type: text/html; charset=UTF-8
+X-Varnish: 8 6
+Age: 11
+Via: 1.1 varnish (Varnish/6.3)
+Accept-Ranges: bytes
+Content-Length: 0
+Connection: keep-alive
+
+<b>$ curl -IX GET "http://localhost:8001/?id=${ID}&max-age=2&stale-if-error=60"  # Now we see the error</b>
+HTTP/1.1 500 Internal server error
+Host: localhost:8001
+Date: Mon, 13 Jan 2020 07:31:07 GMT
+Content-type: text/html; charset=UTF-8
+X-Varnish: 32770
+Age: 0
+Via: 1.1 varnish (Varnish/6.3)
+Connection: keep-alive
+Transfer-Encoding: chunked
+
+</pre>
+
+---------------------------------------------------------------------------
+
+by mpdude at 2020-01-20T21:13:02Z
+
+@jderusse I’ve seen in Twitter that you’re doing non-trivial use cases with Varnish, so maybe you could kindly answer a few Varnish questions here?
+
+First, can you confirm that Varnish does not serve `stale-on-error` by default? So, if a response with `public, max-age=2, stale-if-error=60` becomes stale and the backend then gives status code 500, Varnish does not use the stale cache entry?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-01-20T21:56:42Z
+
+@mpdude I never played with staled content in varnish.
+
+But, from the [documentation](http://book.varnish-software.com/4.0/chapters/Saving_a_Request.html?highlight=grace#saint-mode) varnish [handle](https://github.com/varnishcache/varnish-cache/blob/master/bin/varnishtest/tests/b00043.vtc) `stale-while-revalidate`, but does not deal with `stale-if-error`. They recommend using a custom VCL script.
+This is confirmed in the [wiki of the respository](https://github.com/fgsch/vcl-snippets/wiki/Stale-If-Error) referenced by varnish.
+
+This custom VCL returns a stale response when [status > 400](https://github.com/fgsch/vcl-snippets/blob/master/v4/stale-if-error.vcl#L20) and use the delay stored in [stale-while-revalidate](https://github.com/fgsch/vcl-snippets/blob/master/v4/stale-if-error.vcl#L2)
+
+I don't think that's a good model
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-30T15:38:52Z
+
+@mpdude Let's move on. I would still remove the switch and be non compliant here.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2020-01-30T15:57:55Z
+
+@fabpot done: Switch removed, but left some comments in case someone reviews this in the future.

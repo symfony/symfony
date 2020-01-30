@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-22T17:04:01Z
+
+Maybe mention the sorting in the class phpdoc?
+
+---------------------------------------------------------------------------
+
+by hermann8u at 2020-01-24T08:34:13Z
+
+Could you be more precise please?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-01-24T08:59:24Z
+
+> Could you be more precise please?
+
+Sure. What I mean is to adjust the class description like this:
+
+```diff
+- Contains all events thrown in the HttpKernel component.
++ Contains all events (sorted by their lifecycle) thrown in the HttpKernel component.
+```
+
+sth like this...

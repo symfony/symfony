@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-01-16T08:27:48Z
+
+@nicolas-grekas Could we however somehow have a public accessible pure implementation of wcswidth in the String component? With moving the wcswidth() method logic somewhere else for example. Symfony wcswidth implementation could become the most robust tested PHP implementation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-01-20T12:43:43Z
+
+> Could we however somehow have a public accessible pure implementation of wcswidth in the String component?
+
+Honestly, I'm not sure until someone gives us a real-world use case... width() looks more useful to me...

@@ -48,6 +48,14 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpSortWithoutValueAndClean()
+    {
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort']);
+        $this->assertRegExp("/\*bar\*foo\*test/", preg_replace('/\s+/', '', $tester->getDisplay()));
+        $this->assertRegExp('/3 messages were successfully extracted/', $tester->getDisplay());
+    }
+
     public function testDumpWrongSortAndClean()
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);

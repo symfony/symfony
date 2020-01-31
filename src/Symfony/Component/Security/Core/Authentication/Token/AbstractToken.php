@@ -276,7 +276,7 @@ abstract class AbstractToken implements TokenInterface
             $userRoles[] = 'ROLE_PREVIOUS_ADMIN';
         }
 
-        if (\count($userRoles) !== \count($this->getRoleNames()) || \count($userRoles) !== \count(array_intersect($userRoles, $this->getRoleNames()))) {
+        if (\count($userRoles) !== \count($this->getRoleNames()) && \count($this->getRoleNames()) !== \count(array_intersect($this->getRoleNames(), $userRoles))) {
             return true;
         }
 

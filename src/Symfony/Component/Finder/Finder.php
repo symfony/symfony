@@ -636,6 +636,8 @@ class Finder implements \IteratorAggregate, \Countable
             $iterator->append($it);
         }
 
+        $iterator->rewind();
+
         return $iterator;
     }
 
@@ -786,6 +788,8 @@ class Finder implements \IteratorAggregate, \Countable
             $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort, $this->reverseSorting);
             $iterator = $iteratorAggregate->getIterator();
         }
+
+        $iterator->rewind();
 
         return $iterator;
     }

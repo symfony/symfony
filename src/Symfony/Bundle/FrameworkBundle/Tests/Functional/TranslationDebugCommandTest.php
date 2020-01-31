@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -32,7 +33,11 @@ class TranslationDebugCommandTest extends AbstractWebTestCase
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['locale' => 'en']);
 
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertSame(
+            TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED,
+            $ret,
+            'Returns appropriate exit code in the event of error'
+        );
         $this->assertStringContainsString('missing    messages     hello_from_construct_arg_service', $tester->getDisplay());
         $this->assertStringContainsString('missing    messages     hello_from_subscriber_service', $tester->getDisplay());
         $this->assertStringContainsString('missing    messages     hello_from_property_service', $tester->getDisplay());

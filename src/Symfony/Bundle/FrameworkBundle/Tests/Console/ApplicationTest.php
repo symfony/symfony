@@ -208,7 +208,7 @@ class ApplicationTest extends TestCase
 
     public function testSuggestingPackagesWithExactMatch()
     {
-        $result = $this->createEventForSuggestingPackages('server:dump', []);
+        $result = $this->createEventForSuggestingPackages('doctrine:fixtures', []);
         $this->assertRegExp('/You may be looking for a command provided by/', $result);
     }
 

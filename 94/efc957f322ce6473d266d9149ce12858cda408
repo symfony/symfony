@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by DAcodedBEAT at 2018-11-13T14:27:47Z
+
+Hi everyone! First time symfony contributor here. It’d be super swell to get this merged in. What do I need to do to get some code review for this?
+
+---------------------------------------------------------------------------
+
+by DAcodedBEAT at 2018-11-20T22:07:00Z
+
+@nicolas-grekas @fabpot what should I do to expedite the process of merging this in?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-20T23:19:21Z
+
+We're in feature freeze finalizing version 4.2. we'll start merging new features again in two to three weeks (after/during SymfonyCon Lisbon I'd say.)
+Thanks for your patience.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T07:21:14Z
+
+Not a big fan of adding a new flag for that. I think not returning a non-zero exit code was a mistake and should be done without a flag.
+
+---------------------------------------------------------------------------
+
+by DAcodedBEAT at 2019-03-06T13:35:11Z
+
+Hello @fabpot and @nicolas-grekas!  Apologies for the delay.  Originally I thought it was silly to not return a non-zero exit code by default as well, but then I realized that this command could be used for fallback messages.  Because of this, knowing when to return a non-zero status code could be difficult (e.g. should the command return a non-zero exit code due to missing a localized translation or should it return a successful zero exit code because a fallback could be used instead).
+
+When initially writing the this PR, I pulled inspiration from composer's outdated command and the ability to increase verbosity levels in numerous commands (`-v` vs `-vvv`), but I could definitely be convinced to pivot to an alternative. 🙂
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-08T09:48:26Z
+
+I still think that this should not be configurable via an option. The return code could be different based on the kind of errors though.
+
+---------------------------------------------------------------------------
+
+by DAcodedBEAT at 2019-07-11T11:35:05Z
+
+@fabpot I have changed this PR to return a non-zero exit code on failure.  Can you please re-review this?
+@nicolas-grekas Given these turn of events, would you still want these `--fail-on-*` options added to this PR?
+
+Thank you both for your feedback 🙂
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-10T10:00:37Z
+
+@DAcodedBEAT Still interested in finishing this PR?
+
+---------------------------------------------------------------------------
+
+by DAcodedBEAT at 2020-01-30T18:29:40Z
+
+Hello @fabpot! Sorry for the delay. Yes, I am still interested in finishing this Pull Request! I have pushed up the changes requested. Thank you for the reminder! 🙂

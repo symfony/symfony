@@ -1,0 +1,160 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-26T12:42:24Z
+
+#30706 add the private property concept, if this gets merged will update this PR to handle the flags options when extracting mutator / accessor
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-27T06:42:42Z
+
+@joelwurtz #30706 has just been merged :)
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-27T10:08:14Z
+
+Thanks @fabpot just updated the PR to reflect the change and extracting accessor / mutator with access flags.
+
+I also begin to add consistency to the extraction, but not sure this is wanted, here is a list of different behavior between `ReflectionExtractor` and `PropertyAccessor` class where have i a question about what do to:
+
+ * `ReflectionExtractor` use a configurable list of accessor and mutator prefixes to know if the property exist and can be read / write where `PropertyAccessor` has a hard coded list: I don't think it's a problem as default list is the same as the hard coded list of `PropertyAccessor`: Should we use the `ReflectionExtractor` list and not the hard coded one ?
+
+ * If using this list: `PropertyAccessor` allows to get / set on methods having the same name (jQuery style `public function foo(string $foo = null): string)`), where `ReflectionExtractor` does not allow it, and adding an empty prefix to the list breaks some tests, Should we add support for this or change the code to allow empty prefix ?
+
+ * `PropertyAccessor` limit add / remove mutator only when type of the property is a traversable / array and only when **both** methods are available, where `ReflectionExtractor` does the reverse, it suppose that type is array if the method is present, and made the property writable if **one** of the `add` or `remove` method if available: Should we add support for restricting those mutators like `PropertyAccessor` do ?
+
+ * `PropertyAccessor` has support for magic call where `ReflectionExtractor` does not have it by default (private property + __get or __set = not writable or readable): Should we add support for magic set / get in `ReflectionExtractor` ?
+
+Support for each of this behavior can be done in constructor arguments or context, would prefer to avoid context and, in the future, use different `ReflectionExtractor` service for each use case, as most of the time those behavior are domain specific (for a set of class, not for one only).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T08:09:36Z
+
+/cc @dunglas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-31T10:23:54Z
+
+I fully agree with this move. I also think we should make `PropertyInfo` a hard dependency of `PropertyAccess` (and `PropertyAccess` a hard dependency of `Serializer`) to prevent code duplication. It's ok for Symfony components to depend of other lower level Symfony components.
+
+> Should we use the ReflectionExtractor list and not the hard coded one ?
+
+I think so.
+
+> Should we add support for this or change the code to allow empty prefix.
+
+I'm not sure that the jQuery-style is still very used. jQuery itself is not used anymore in modern JS projects. It's why I not implemented it (and AFAIK nobody complained since the creation of this library). As a an alternative, we couldn't just deprecate support for this notation. WDYT?
+
+> Should we add support for restricting those mutators like PropertyAccessor do ?
+
+It looks reasonable.
+
+> Should we add support for magic set / get?
+
+Yes, it could be nice as long as it's optional. I'm not sure that this feature is used a lot, but it could be useful for advanced use cases.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T10:25:20Z
+
+I agree with @dunglas, that having hard dependencies between such components make sense (especially as they are low-level building blocks).
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-05T13:54:12Z
+
+Thanks @dbu for the review
+
+> i guess a serializer would use these as one element along with other things like the target name (serializer) resp source name (deserialize)?
+
+With the global vision, serializer will never use this :)
+
+It intents to work as the following schema:
+
+ * Serializer use the PropertyAccess component to read / write a value for a data
+ * PropertyAccess use this extractor to know how to read / write a value for an object
+
+This will mask the complexity of accessing / setting value on the serializer component and also ensure that we can also read / write to / from an array or other dynamic object that does not have metadatas.
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-04-05T14:06:52Z
+
+> With the global vision, serializer will never use this
+
+thanks for the clarifications. and i think that makes sense. the only concern i have is with performance. large object graphs with many fields can mean A LOT of method calls. if there are several 10k of single fields to handle, method calls for each property start to add up. this is what prompted us to write https://github.com/liip/serializer/ .
+i agree that for the normal case, a bit of overhead is worth it when it avoids a lot of duplication in the codebase. but i'd love to check how we can make code generation possible so that it can cleanly replace the slower implementation keeping the exact same behaviour.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-05T15:20:40Z
+
+> but i'd love to check how we can make code generation possible so that it can cleanly replace the slower implementation keeping the exact same behaviour.
+
+This is clearly something that i want to make it possible with new organisation / extension point. As we could do a specific PropertyAccess implementation that generate code given accessor / mutator (see the automapper pull request https://github.com/symfony/symfony/pull/30248 that have something like this), which will boost serializer by a large factor.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-06T16:30:56Z
+
+Ready for review
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-06T17:28:40Z
+
+ping @Simperfit
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-04-06T17:31:39Z
+
+for the most difficult question about naming things: i don't like the name "extractor" because that is mainly suiting for reflection. however, in a serializer, the mutator and reader information could be determined from annotations or external metadata like yaml or xml.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2019-04-07T08:26:25Z
+
+Another thought: One limitation of PropertyAccess, which I don't particularly like, is that it can only write properties one by one. As soon as you want to change multiple properties through one method, or pass multiple properties to the constructor, you can't.
+
+Is this really an architecture we want to build the Serializer on?
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-07T12:41:48Z
+
+Thanks @webmozart for the review
+
+I add `@internal` on those interface / value object, as we don't provide actually extension point for this and like we discuss it would be better ATM to use that only as an implementation detail to ease code between components.
+
+We could remove `@internal` in another PR (if someone wants to use virtual setter / getter in its project by example), and at this moment we could have a longer discussion about exposed API and value object. Let's keep it simple for this PR.
+
+> Is this really an architecture we want to build the Serializer on?
+
+Like we discuss, this is already the architecture of Normalizer, so we need to keep that in order to not break too many behaviours.
+
+Another architecture process is done by the #30248 PR which is better IMO, and maybe we would be able to provide a migrate path for the future, but this is clearly not in the scope of this PR.
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2020-01-07T22:42:59Z
+
+It's finally ready, ping @dunglas
+Last failed test is same as `master` and not related.
+
+---------------------------------------------------------------------------
+
+by Korbeil at 2020-01-23T17:37:15Z
+
+@lyrixx @dunglas ping, fixed all comments.
+
+About errors, I had to update `PropertyWriteInfo` DTO to store errors and use theses in `PropertyAccessor` class :wink:
+
+---------------------------------------------------------------------------
+
+by bastnic at 2020-01-27T13:13:05Z
+
+This is huge, thanks @Korbeil!

@@ -27,7 +27,7 @@ class RoundRobinTransport implements TransportInterface
     private $deadTransports;
     private $transports = [];
     private $retryPeriod;
-    private $cursor = 0;
+    private $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports
@@ -66,6 +66,12 @@ class RoundRobinTransport implements TransportInterface
      */
     protected function getNextTransport(): ?TransportInterface
     {
+        if (-1 === $this->cursor) {
+            // the cursor initial value is randomized so that
+            // when are not in a daemon, we are still rotating the transports
+            $this->cursor = mt_rand(0, \count($this->transports) - 1);
+        }
+
         $cursor = $this->cursor;
         while (true) {
             $transport = $this->transports[$cursor];

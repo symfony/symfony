@@ -35,6 +35,10 @@ class Php71Dummy
     public function addBaz(string $baz)
     {
     }
+
+    public function removeBaz(string $baz)
+    {
+    }
 }
 
 class Php71DummyExtended extends Php71Dummy

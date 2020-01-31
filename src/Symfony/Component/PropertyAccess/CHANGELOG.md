@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.1.0
+-----
+
+* Linking to PropertyInfo extractor to remove a lot of duplicate code
+
 4.4.0
 -----
 

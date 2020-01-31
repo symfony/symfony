@@ -7,6 +7,24 @@ in 5.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.0.0...v5.0.1
 
+* 5.0.4 (2020-01-31)
+
+ * bug #35530 [HttpClient] Fix regex bearer (noniagriconomie)
+ * bug #35532 [Validator] fix access to uninitialized property when getting value (greedyivan)
+ * bug #35486 [Translator] Default value for 'sort' option in translation:update should be 'asc' (versgui)
+ * bug #35305 [HttpKernel] Fix stale-if-error behavior, add tests (mpdude)
+ * bug #34808 [PhpUnitBridge] Properly handle phpunit arguments for configuration file (biozshock)
+ * bug #35517 [Intl] Provide more locale translations (ro0NL)
+ * bug #35518 [Mailer] Fix STARTTLS support for Postmark and Mandrill (fabpot)
+ * bug #35480 [Messenger] Check for all serialization exceptions during message dec… (Patrick Berenschot)
+ * bug #35502 [Messenger] Fix bug when using single route with XML config (Nyholm)
+ * bug #35438 [SecurityBundle] fix ldap_bind service arguments (Ioni14)
+ * bug #35429 [DI]  CheckTypeDeclarationsPass now checks if value is type of parameter type  (pfazzi)
+ * bug #35464 [ErrorHandler] Add debug argument to decide whether debug page is shown or not (yceruto)
+ * bug #35423 Fixes a runtime error when accessing the cache panel (DamienHarper)
+ * bug #35428 [Cache] fix checking for igbinary availability (nicolas-grekas)
+ * bug #35424 [HttpKernel] Check if lock can be released (sjadema)
+
 * 5.0.3 (2020-01-21)
 
  * bug #35364 [Yaml] Throw on unquoted exclamation mark (fancyweb)

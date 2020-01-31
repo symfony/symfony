@@ -140,7 +140,7 @@ class MapperContext
      *
      * @return mixed
      */
-    public static function &handleCircularReference(array $context, string $reference, $object, ?int $circularReferenceLimit = null, callable $callback = null)
+    public static function &handleCircularReference(array &$context, string $reference, $object, ?int $circularReferenceLimit = null, callable $callback = null)
     {
         if (null === $callback) {
             $callback = $context[self::CIRCULAR_REFERENCE_HANDLER] ?? null;
@@ -157,8 +157,12 @@ class MapperContext
             $circularReferenceLimit = $context[self::CIRCULAR_REFERENCE_LIMIT] ?? null;
         }
 
-        if (null !== $circularReferenceLimit && $circularReferenceLimit <= ($context[self::CIRCULAR_COUNT_REFERENCE_REGISTRY][$reference] ?? 0)) {
-            throw new CircularReferenceException(sprintf('A circular reference has been detected when mapping the object of type "%s" (configured limit: %d)', \is_object($object) ? \get_class($object) : 'array', $circularReferenceLimit));
+        if (null !== $circularReferenceLimit) {
+            if ($circularReferenceLimit <= ($context[self::CIRCULAR_COUNT_REFERENCE_REGISTRY][$reference] ?? 0)) {
+                throw new CircularReferenceException(sprintf('A circular reference has been detected when mapping the object of type "%s" (configured limit: %d)', \is_object($object) ? \get_class($object) : 'array', $circularReferenceLimit));
+            }
+
+            ++$context[self::CIRCULAR_COUNT_REFERENCE_REGISTRY][$reference];
         }
 
         // When no limit defined return the object referenced

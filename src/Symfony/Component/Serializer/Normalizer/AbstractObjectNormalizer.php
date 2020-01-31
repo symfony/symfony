@@ -15,13 +15,16 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Context\ObjectChildContextTrait;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Instantiator\Instantiator;
+use Symfony\Component\Serializer\Instantiator\InstantiatorInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -35,6 +38,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {
+    use ObjectChildContextTrait;
+
     /**
      * Set to true to respect the max depth metadata on fields.
      */
@@ -103,9 +108,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected $classDiscriminatorResolver;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [], InstantiatorInterface $instantiator = null)
     {
-        parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
+        if (null === $classDiscriminatorResolver && null !== $classMetadataFactory) {
+            $classDiscriminatorResolver = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        }
+        $this->classDiscriminatorResolver = $classDiscriminatorResolver;
+        $this->objectClassResolver = $objectClassResolver;
+
+        parent::__construct($classMetadataFactory, $nameConverter, $defaultContext, $instantiator, $propertyTypeExtractor, $classDiscriminatorResolver);
 
         if (isset($this->defaultContext[self::MAX_DEPTH_HANDLER]) && !\is_callable($this->defaultContext[self::MAX_DEPTH_HANDLER])) {
             throw new InvalidArgumentException(sprintf('The "%s" given in the default context is not callable.', self::MAX_DEPTH_HANDLER));
@@ -114,12 +125,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = array_merge($this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] ?? [], [self::CIRCULAR_REFERENCE_LIMIT_COUNTERS]);
 
         $this->propertyTypeExtractor = $propertyTypeExtractor;
-
-        if (null === $classDiscriminatorResolver && null !== $classMetadataFactory) {
-            $classDiscriminatorResolver = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
-        }
-        $this->classDiscriminatorResolver = $classDiscriminatorResolver;
-        $this->objectClassResolver = $objectClassResolver;
     }
 
     /**
@@ -211,29 +216,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
-    {
-        if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
-            if (!isset($data[$mapping->getTypeProperty()])) {
-                throw new RuntimeException(sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class));
-            }
-
-            $type = $data[$mapping->getTypeProperty()];
-            if (null === ($mappedClass = $mapping->getClassForType($type))) {
-                throw new RuntimeException(sprintf('The type "%s" has no mapped class for the abstract object "%s".', $type, $class));
-            }
-
-            if ($mappedClass !== $class) {
-                return $this->instantiateObject($data, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
-            }
-        }
-
-        return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);
-    }
-
-    /**
      * Gets and caches attributes for the given object, format and context.
      *
      * @param object $object
@@ -299,16 +281,25 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        if (!isset($context['cache_key'])) {
+        if (!\array_key_exists('cache_key', $context)) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
+        }
+        if (!\array_key_exists(Instantiator::INSTANTIATOR_CONSTRUCTOR, $context)) {
+            $context[Instantiator::INSTANTIATOR_CONSTRUCTOR] = \Closure::fromCallable([$this, 'getConstructor']);
         }
 
         $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = [];
 
-        $reflectionClass = new \ReflectionClass($type);
-        $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
+        $instantiatorResult = $this->instantiator->instantiate($type, $normalizedData, $context, $format);
+        if ($instantiatorResult->hasFailed()) {
+            throw new MissingConstructorArgumentsException($instantiatorResult->getError());
+        }
+        $object = $instantiatorResult->getObject();
+        $normalizedData = $instantiatorResult->getUnusedData();
+        $context = $instantiatorResult->getUnusedContext();
+
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
         foreach ($normalizedData as $attribute => $value) {
@@ -593,23 +584,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         ++$context[$key];
 
         return false;
-    }
-
-    /**
-     * Overwritten to update the cache key for the child.
-     *
-     * We must not mix up the attribute cache between parent and children.
-     *
-     * {@inheritdoc}
-     *
-     * @internal
-     */
-    protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
-    {
-        $context = parent::createChildContext($parentContext, $attribute, $format);
-        $context['cache_key'] = $this->getCacheKey($format, $context);
-
-        return $context;
     }
 
     /**

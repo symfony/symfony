@@ -11,12 +11,17 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Context\ChildContextTrait;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Instantiator\Instantiator;
+use Symfony\Component\Serializer\Instantiator\InstantiatorInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -27,10 +32,12 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
+abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface, DenormalizerAwareInterface
 {
     use ObjectToPopulateTrait;
     use SerializerAwareTrait;
+    use DenormalizerAwareTrait;
+    use ChildContextTrait;
 
     /* constants to configure the context */
 
@@ -134,9 +141,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected $nameConverter;
 
     /**
+     * @var Instantiator|null
+     */
+    protected $instantiator;
+
+    /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [], InstantiatorInterface $instantiator = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
@@ -157,6 +169,27 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         if (isset($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER]) && !\is_callable($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
             throw new InvalidArgumentException(sprintf('Invalid callback found in the "%s" default context option.', self::CIRCULAR_REFERENCE_HANDLER));
         }
+
+        if (null === $instantiator) {
+            $instantiator = new Instantiator($classMetadataFactory, $classDiscriminatorResolver, $propertyTypeExtractor, null, $nameConverter, null);
+
+            if ($this->denormalizer instanceof DenormalizerInterface) {
+                $instantiator->setDenormalizer($this->denormalizer);
+            }
+        }
+        $this->instantiator = $instantiator;
+    }
+
+    /**
+     * @internal
+     */
+    public function setDenormalizer(DenormalizerInterface $denormalizer)
+    {
+        $this->denormalizer = $denormalizer;
+
+        // Because we need a denormalizer in the Instantiator and we create it in the construct method, it won't get it.
+        // So we are obliged to overwrite this method in order to give the denormalizer to the Instantiator.
+        $this->instantiator->setDenormalizer($denormalizer);
     }
 
     /**
@@ -312,9 +345,13 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @param array|bool $allowedAttributes
      *
      * @return \ReflectionMethod|null
+     *
+     * @deprecated since Symfony 5.3, use "instantiator_constructor" field in context array instead.
      */
     protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
     {
+        trigger_deprecation('symfony/serializer', '5.3', 'The "%s()" method is deprecated. Use "%s" field in context array instead.', __METHOD__, Instantiator::INSTANTIATOR_CONSTRUCTOR);
+
         return $reflectionClass->getConstructor();
     }
 
@@ -332,77 +369,20 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws RuntimeException
      * @throws MissingConstructorArgumentsException
+     *
+     * @deprecated since Symfony 5.3, Use "Symfony\Component\Serializer\Instantiator\Instantiator::instantiate()" instead.
      */
     protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
-        if (null !== $object = $this->extractObjectToPopulate($class, $context, self::OBJECT_TO_POPULATE)) {
-            unset($context[self::OBJECT_TO_POPULATE]);
+        trigger_deprecation('symfony/serializer', '5.3', 'The "%s()" method is deprecated. Use "%s::instantiate()" instead.', __METHOD__, Instantiator::class);
 
-            return $object;
-        }
-        // clean up even if no match
-        unset($context[static::OBJECT_TO_POPULATE]);
-
-        $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
-        if ($constructor) {
-            if (true !== $constructor->isPublic()) {
-                return $reflectionClass->newInstanceWithoutConstructor();
-            }
-
-            $constructorParameters = $constructor->getParameters();
-
-            $params = [];
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = $constructorParameter->name;
-                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
-
-                $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
-                $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
-                if ($constructorParameter->isVariadic()) {
-                    if ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
-                        if (!\is_array($data[$paramName])) {
-                            throw new RuntimeException(sprintf('Cannot create an instance of "%s" from serialized data because the variadic parameter "%s" can only accept an array.', $class, $constructorParameter->name));
-                        }
-
-                        $variadicParameters = [];
-                        foreach ($data[$paramName] as $parameterData) {
-                            $variadicParameters[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
-                        }
-
-                        $params = array_merge($params, $variadicParameters);
-                        unset($data[$key]);
-                    }
-                } elseif ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
-                    $parameterData = $data[$key];
-                    if (null === $parameterData && $constructorParameter->allowsNull()) {
-                        $params[] = null;
-                        // Don't run set for a parameter passed to the constructor
-                        unset($data[$key]);
-                        continue;
-                    }
-
-                    // Don't run set for a parameter passed to the constructor
-                    $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
-                    unset($data[$key]);
-                } elseif (\array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
-                    $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
-                } elseif (\array_key_exists($key, $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
-                    $params[] = $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
-                } elseif ($constructorParameter->isDefaultValueAvailable()) {
-                    $params[] = $constructorParameter->getDefaultValue();
-                } else {
-                    throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
-                }
-            }
-
-            if ($constructor->isConstructor()) {
-                return $reflectionClass->newInstanceArgs($params);
-            } else {
-                return $constructor->invokeArgs(null, $params);
-            }
+        if (!\array_key_exists(Instantiator::INSTANTIATOR_CONSTRUCTOR, $context)) {
+            $context[Instantiator::INSTANTIATOR_CONSTRUCTOR] = \Closure::fromCallable([$this, 'getConstructor']);
         }
 
-        return new $class();
+        $result = $this->instantiator->instantiate($class, $data, $context, $format);
+
+        return $result->getObject();
     }
 
     /**
@@ -432,19 +412,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         return $parameterData;
-    }
-
-    /**
-     * @internal
-     */
-    protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
-    {
-        if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
-            $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
-        } else {
-            unset($parentContext[self::ATTRIBUTES]);
-        }
-
-        return $parentContext;
     }
 }

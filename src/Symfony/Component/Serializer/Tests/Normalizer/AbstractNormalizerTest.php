@@ -6,6 +6,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Instantiator\Instantiator;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -14,8 +15,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
@@ -116,6 +117,26 @@ class AbstractNormalizerTest extends TestCase
     {
         $normalizer = new StaticConstructorNormalizer();
         $dummy = $normalizer->denormalize(['foo' => 'baz'], StaticConstructorDummy::class);
+
+        $this->assertInstanceOf(StaticConstructorDummy::class, $dummy);
+        $this->assertEquals('baz', $dummy->quz);
+        $this->assertNull($dummy->foo);
+    }
+
+    public function testObjectWithStaticConstructorFromContext()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, [], null, new Instantiator());
+        $dummy = $normalizer->denormalize(['foo' => 'baz'], StaticConstructorDummy::class, null, [
+            Instantiator::INSTANTIATOR_CONSTRUCTOR => function (array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes): ?\ReflectionMethod {
+                $class = $reflectionClass->getName();
+
+                if (is_a($class, StaticConstructorDummy::class, true)) {
+                    return new \ReflectionMethod($class, 'create');
+                }
+
+                return $reflectionClass->getConstructor();
+            },
+        ]);
 
         $this->assertInstanceOf(StaticConstructorDummy::class, $dummy);
         $this->assertEquals('baz', $dummy->quz);

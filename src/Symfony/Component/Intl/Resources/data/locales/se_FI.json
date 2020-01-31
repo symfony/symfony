@@ -1,5 +1,6 @@
 {
     "Names": {
+        "ar_001": "arábagiella (Máilbmi)",
         "ar_SD": "arábagiella (Sudan)",
         "ar_TD": "arábagiella (Chad)",
         "be": "vilgesruoššagiella",
@@ -10,7 +11,9 @@
         "bs_BA": "bosniagiella (Bosnia ja Hercegovina)",
         "bs_Cyrl_BA": "bosniagiella (kyrillalaš, Bosnia ja Hercegovina)",
         "bs_Latn_BA": "bosniagiella (láhtenaš, Bosnia ja Hercegovina)",
+        "en_001": "eaŋgalsgiella (Máilbmi)",
         "en_SD": "eaŋgalsgiella (Sudan)",
+        "es_419": "spánskkagiella (Latiinnalaš Amerihká)",
         "fr_TD": "fránskkagiella (Chad)",
         "hr_BA": "kroátiagiella (Bosnia ja Hercegovina)",
         "hy": "armenagiella",

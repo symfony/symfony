@@ -307,6 +307,7 @@ class PdoStore implements PersistingStoreInterface
         } else {
             switch ($this->driver = $con->getDriver()->getName()) {
                 case 'mysqli':
+                    throw new NotSupportedException(sprintf('The store "%s" does not support the mysqli driver, use pdo_mysql instead.', \get_class($this)));
                 case 'pdo_mysql':
                 case 'drizzle_pdo_mysql':
                     $this->driver = 'mysql';

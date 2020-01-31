@@ -24,7 +24,7 @@ class MandrillSmtpTransport extends EsmtpTransport
 
     public function __construct(string $username, string $password, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        parent::__construct('smtp.mandrillapp.com', 587, true, $dispatcher, $logger);
+        parent::__construct('smtp.mandrillapp.com', 587, false, $dispatcher, $logger);
 
         $this->setUsername($username);
         $this->setPassword($password);

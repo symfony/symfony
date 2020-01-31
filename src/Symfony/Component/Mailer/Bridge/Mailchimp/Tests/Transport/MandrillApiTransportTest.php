@@ -12,12 +12,16 @@
 namespace Symfony\Component\Mailer\Bridge\Mailchimp\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillApiTransport;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MandrillApiTransportTest extends TestCase
 {
@@ -62,6 +66,61 @@ class MandrillApiTransportTest extends TestCase
         $this->assertArrayHasKey('headers', $payload['message']);
         $this->assertCount(1, $payload['message']['headers']);
         $this->assertEquals('foo: bar', $payload['message']['headers'][0]);
+    }
+
+    public function testSend()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://mandrillapp.com/api/1.0/messages/send.json', $url);
+
+            $body = json_decode($options['body'], true);
+            $message = $body['message'];
+            $this->assertSame('KEY', $body['key']);
+            $this->assertSame('Fabien', $message['from_name']);
+            $this->assertSame('fabpot@symfony.com', $message['from_email']);
+            $this->assertSame('Saif Eddin', $message['to'][0]['name']);
+            $this->assertSame('saif.gmati@symfony.com', $message['to'][0]['email']);
+            $this->assertSame('Hello!', $message['subject']);
+            $this->assertSame('Hello There!', $message['text']);
+
+            return new MockResponse(json_encode([['_id' => 'foobar']]), [
+                'http_code' => 200,
+            ]);
+        });
+
+        $transport = new MandrillApiTransport('KEY', $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testSendThrowsForErrorResponse()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            return new MockResponse(json_encode(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418]), [
+                'http_code' => 418,
+            ]);
+        });
+
+        $transport = new MandrillApiTransport('KEY', $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $this->expectException(HttpTransportException::class);
+        $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
+        $transport->send($mail);
     }
 
     public function testTagAndMetadataHeaders()

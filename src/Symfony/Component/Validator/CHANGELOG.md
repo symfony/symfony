@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added the `Hostname` constraint and validator
+ * added option `alpha3` to `Country` constraint
 
 5.0.0
 -----

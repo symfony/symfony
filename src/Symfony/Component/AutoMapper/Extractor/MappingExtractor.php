@@ -65,7 +65,7 @@ abstract class MappingExtractor implements MappingExtractorInterface
         return new ReadAccessor(
             $type,
             $readInfo->getName(),
-            $readInfo->getVisibility() !== PropertyReadInfo::VISIBILITY_PUBLIC
+            PropertyReadInfo::VISIBILITY_PUBLIC !== $readInfo->getVisibility()
         );
     }
 
@@ -99,7 +99,7 @@ abstract class MappingExtractor implements MappingExtractorInterface
         return new WriteMutator(
             $type,
             $writeInfo->getName(),
-            $writeInfo->getVisibility() !== PropertyReadInfo::VISIBILITY_PUBLIC
+            PropertyReadInfo::VISIBILITY_PUBLIC !== $writeInfo->getVisibility()
         );
     }
 

@@ -78,7 +78,7 @@ class SourceTargetMappingExtractor extends MappingExtractor
                 $mapping[] = new PropertyMapping(
                     $sourceAccessor,
                     $targetMutator,
-                    $targetMutatorConstruct->getType() === WriteMutator::TYPE_CONSTRUCTOR ? $targetMutatorConstruct : null,
+                    WriteMutator::TYPE_CONSTRUCTOR === $targetMutatorConstruct->getType() ? $targetMutatorConstruct : null,
                     $transformer,
                     $property,
                     false,

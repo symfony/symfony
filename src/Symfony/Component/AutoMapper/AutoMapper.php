@@ -16,7 +16,6 @@ use PhpParser\ParserFactory;
 use Symfony\Component\AutoMapper\Exception\NoMappingFoundException;
 use Symfony\Component\AutoMapper\Extractor\FromSourceMappingExtractor;
 use Symfony\Component\AutoMapper\Extractor\FromTargetMappingExtractor;
-use Symfony\Component\AutoMapper\Extractor\PrivateReflectionExtractor;
 use Symfony\Component\AutoMapper\Extractor\SourceTargetMappingExtractor;
 use Symfony\Component\AutoMapper\Generator\Generator;
 use Symfony\Component\AutoMapper\Loader\ClassLoaderInterface;

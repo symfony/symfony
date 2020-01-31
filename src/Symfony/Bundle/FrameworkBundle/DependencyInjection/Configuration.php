@@ -1056,6 +1056,10 @@ class Configuration implements ConfigurationInterface
                                     if (!\is_array($config)) {
                                         return [];
                                     }
+                                    // If XML config with only one routing attribute
+                                    if (2 === \count($config) && isset($config['message-class']) && isset($config['sender'])) {
+                                        $config = [0 => $config];
+                                    }
 
                                     $newConfig = [];
                                     foreach ($config as $k => $v) {

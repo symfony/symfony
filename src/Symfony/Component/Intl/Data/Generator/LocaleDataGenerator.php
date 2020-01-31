@@ -164,7 +164,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
         // Discover the name of the region part of the locale
         // i.e. in de_AT, "AT" is the region
         if ($region = \Locale::getRegion($locale)) {
-            if (!RegionDataGenerator::isValidCountryCode($region)) {
+            if (ctype_alpha($region) && !RegionDataGenerator::isValidCountryCode($region)) {
                 throw new MissingResourceException('Skipping "'.$locale.'" due an invalid country.');
             }
 

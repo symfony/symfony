@@ -642,6 +642,15 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('messenger.transport.audit'), $sendersLocator->getArgument(0)['messenger.transport.audit']->getValues()[0]);
     }
 
+    public function testMessengerRoutingSingle()
+    {
+        $container = $this->createContainerFromFile('messenger_routing_single');
+        $senderLocatorDefinition = $container->getDefinition('messenger.senders_locator');
+
+        $sendersMapping = $senderLocatorDefinition->getArgument(0);
+        $this->assertEquals(['amqp'], $sendersMapping[DummyMessage::class]);
+    }
+
     public function testMessengerTransportConfiguration()
     {
         $container = $this->createContainerFromFile('messenger_transport');

@@ -92,6 +92,7 @@ class ErrorHandler
     private $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
     private $loggedErrors = 0;
     private $traceReflector;
+    private $debug;
 
     private $isRecursive = 0;
     private $isRoot = false;
@@ -180,7 +181,7 @@ class ErrorHandler
         }
     }
 
-    public function __construct(BufferingLogger $bootstrappingLogger = null)
+    public function __construct(BufferingLogger $bootstrappingLogger = null, bool $debug = false)
     {
         if ($bootstrappingLogger) {
             $this->bootstrappingLogger = $bootstrappingLogger;
@@ -188,6 +189,7 @@ class ErrorHandler
         }
         $this->traceReflector = new \ReflectionProperty('Exception', 'trace');
         $this->traceReflector->setAccessible(true);
+        $this->debug = $debug;
     }
 
     /**
@@ -697,7 +699,7 @@ class ErrorHandler
      */
     private function renderException(\Throwable $exception): void
     {
-        $renderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? new CliErrorRenderer() : new HtmlErrorRenderer(0 !== $this->scopedErrors);
+        $renderer = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? new CliErrorRenderer() : new HtmlErrorRenderer($this->debug);
 
         $exception = $renderer->render($exception);
 

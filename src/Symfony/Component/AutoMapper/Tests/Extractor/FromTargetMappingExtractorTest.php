@@ -14,9 +14,7 @@ namespace Symfony\Component\AutoMapper\Tests\Extractor;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\AutoMapper\Exception\InvalidMappingException;
 use Symfony\Component\AutoMapper\Extractor\FromTargetMappingExtractor;
-use Symfony\Component\AutoMapper\Extractor\PrivateReflectionExtractor;
 use Symfony\Component\AutoMapper\Extractor\PropertyMapping;
-use Symfony\Component\AutoMapper\Extractor\ReflectionExtractor;
 use Symfony\Component\AutoMapper\MapperMetadata;
 use Symfony\Component\AutoMapper\Tests\AutoMapperBaseTest;
 use Symfony\Component\AutoMapper\Tests\Fixtures;
@@ -29,6 +27,7 @@ use Symfony\Component\AutoMapper\Transformer\NullableTransformerFactory;
 use Symfony\Component\AutoMapper\Transformer\ObjectTransformerFactory;
 use Symfony\Component\AutoMapper\Transformer\UniqueTypeTransformerFactory;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -50,7 +49,13 @@ class FromTargetMappingExtractorTest extends AutoMapperBaseTest
     private function fromTargetMappingExtractorBootstrap(bool $private = true): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $reflectionExtractor = $private ? new PrivateReflectionExtractor() : new \Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor();
+        $flags = ReflectionExtractor::ALLOW_PUBLIC;
+
+        if ($private) {
+            $flags |= ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE;
+        }
+
+        $reflectionExtractor = new ReflectionExtractor(null, null, null, true, $flags);
 
         $phpDocExtractor = new PhpDocExtractor();
         $propertyInfoExtractor = new PropertyInfoExtractor(
@@ -60,12 +65,12 @@ class FromTargetMappingExtractorTest extends AutoMapperBaseTest
             [$reflectionExtractor]
         );
 
-        $accessorExtractor = new ReflectionExtractor($private);
         $transformerFactory = new ChainTransformerFactory();
 
         $this->fromTargetMappingExtractor = new FromTargetMappingExtractor(
             $propertyInfoExtractor,
-            $accessorExtractor,
+            $reflectionExtractor,
+            $reflectionExtractor,
             $transformerFactory,
             $classMetadataFactory
         );

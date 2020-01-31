@@ -37,5 +37,5 @@ interface MappingExtractorInterface
     /**
      * Extracts write mutator for a given source, target and property.
      */
-    public function getWriteMutator(string $source, string $target, string $property): ?WriteMutator;
+    public function getWriteMutator(string $source, string $target, string $property, array $context = []): ?WriteMutator;
 }

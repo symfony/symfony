@@ -369,7 +369,7 @@ final class Generator
 
             /** @var PropertyMapping $propertyMapping */
             foreach ($propertiesMapping as $propertyMapping) {
-                if (null === ($parameter = $propertyMapping->getWriteMutator()->getParameter())) {
+                if (null === $propertyMapping->getWriteMutatorConstructor() || null === ($parameter = $propertyMapping->getWriteMutatorConstructor()->getParameter())) {
                     continue;
                 }
 

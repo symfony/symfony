@@ -26,6 +26,8 @@ final class PropertyMapping
 
     private $writeMutator;
 
+    private $writeMutatorConstructor;
+
     private $transformer;
 
     private $checkExists;
@@ -40,7 +42,8 @@ final class PropertyMapping
 
     public function __construct(
         ReadAccessor $readAccessor,
-        WriteMutator $writeMutator,
+        ?WriteMutator $writeMutator,
+        ?WriteMutator $writeMutatorConstructor,
         TransformerInterface $transformer,
         string $property,
         bool $checkExists = false,
@@ -50,6 +53,7 @@ final class PropertyMapping
     ) {
         $this->readAccessor = $readAccessor;
         $this->writeMutator = $writeMutator;
+        $this->writeMutatorConstructor = $writeMutatorConstructor;
         $this->transformer = $transformer;
         $this->property = $property;
         $this->checkExists = $checkExists;
@@ -63,9 +67,14 @@ final class PropertyMapping
         return $this->readAccessor;
     }
 
-    public function getWriteMutator(): WriteMutator
+    public function getWriteMutator(): ?WriteMutator
     {
         return $this->writeMutator;
+    }
+
+    public function getWriteMutatorConstructor(): ?WriteMutator
+    {
+        return $this->writeMutatorConstructor;
     }
 
     public function getTransformer(): TransformerInterface

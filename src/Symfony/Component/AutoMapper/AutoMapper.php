@@ -194,7 +194,19 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             ));
         }
 
-        $reflectionExtractor = $private ? new PrivateReflectionExtractor() : new ReflectionExtractor();
+        $flags = ReflectionExtractor::ALLOW_PUBLIC;
+
+        if ($private) {
+            $flags |= ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE;
+        }
+
+        $reflectionExtractor = new ReflectionExtractor(
+            null,
+            null,
+            null,
+            true,
+            $flags
+        );
 
         $phpDocExtractor = new PhpDocExtractor();
         $propertyInfoExtractor = new PropertyInfoExtractor(
@@ -204,18 +216,19 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             [$reflectionExtractor]
         );
 
-        $accessorExtractor = new Extractor\ReflectionExtractor($private);
         $transformerFactory = new ChainTransformerFactory();
         $sourceTargetMappingExtractor = new SourceTargetMappingExtractor(
             $propertyInfoExtractor,
-            $accessorExtractor,
+            $reflectionExtractor,
+            $reflectionExtractor,
             $transformerFactory,
             $classMetadataFactory
         );
 
         $fromTargetMappingExtractor = new FromTargetMappingExtractor(
             $propertyInfoExtractor,
-            $accessorExtractor,
+            $reflectionExtractor,
+            $reflectionExtractor,
             $transformerFactory,
             $classMetadataFactory,
             $nameConverter
@@ -223,7 +236,8 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
 
         $fromSourceMappingExtractor = new FromSourceMappingExtractor(
             $propertyInfoExtractor,
-            $accessorExtractor,
+            $reflectionExtractor,
+            $reflectionExtractor,
             $transformerFactory,
             $classMetadataFactory,
             $nameConverter

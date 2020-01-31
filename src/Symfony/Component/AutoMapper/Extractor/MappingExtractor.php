@@ -13,6 +13,10 @@ namespace Symfony\Component\AutoMapper\Extractor;
 
 use Symfony\Component\AutoMapper\Transformer\TransformerFactoryInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfo;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfo;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
@@ -26,14 +30,17 @@ abstract class MappingExtractor implements MappingExtractorInterface
 
     protected $transformerFactory;
 
-    protected $accessorExtractor;
+    protected $readInfoExtractor;
+
+    protected $writeInfoExtractor;
 
     protected $classMetadataFactory;
 
-    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, AccessorExtractorInterface $accessorExtractor, TransformerFactoryInterface $transformerFactory, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, PropertyReadInfoExtractorInterface $readInfoExtractor, PropertyWriteInfoExtractorInterface $writeInfoExtractor, TransformerFactoryInterface $transformerFactory, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
         $this->propertyInfoExtractor = $propertyInfoExtractor;
-        $this->accessorExtractor = $accessorExtractor;
+        $this->readInfoExtractor = $readInfoExtractor;
+        $this->writeInfoExtractor = $writeInfoExtractor;
         $this->transformerFactory = $transformerFactory;
         $this->classMetadataFactory = $classMetadataFactory;
     }
@@ -43,15 +50,57 @@ abstract class MappingExtractor implements MappingExtractorInterface
      */
     public function getReadAccessor(string $source, string $target, string $property): ?ReadAccessor
     {
-        return $this->accessorExtractor->getReadAccessor($source, $property);
+        $readInfo = $this->readInfoExtractor->getReadInfo($source, $property);
+
+        if (null === $readInfo) {
+            return null;
+        }
+
+        $type = ReadAccessor::TYPE_PROPERTY;
+
+        if (PropertyReadInfo::TYPE_METHOD === $readInfo->getType()) {
+            $type = ReadAccessor::TYPE_METHOD;
+        }
+
+        return new ReadAccessor(
+            $type,
+            $readInfo->getName(),
+            $readInfo->getVisibility() !== PropertyReadInfo::VISIBILITY_PUBLIC
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getWriteMutator(string $source, string $target, string $property): ?WriteMutator
+    public function getWriteMutator(string $source, string $target, string $property, array $context = []): ?WriteMutator
     {
-        return $this->accessorExtractor->getWriteMutator($target, $property);
+        $writeInfo = $this->writeInfoExtractor->getWriteInfo($target, $property, $context);
+
+        if (null === $writeInfo) {
+            return null;
+        }
+
+        if (PropertyWriteInfo::TYPE_NONE === $writeInfo->getType()) {
+            return null;
+        }
+
+        if (PropertyWriteInfo::TYPE_CONSTRUCTOR === $writeInfo->getType()) {
+            $parameter = new \ReflectionParameter([$target, '__construct'], $writeInfo->getName());
+
+            return new WriteMutator(WriteMutator::TYPE_CONSTRUCTOR, $writeInfo->getName(), false, $parameter);
+        }
+
+        $type = WriteMutator::TYPE_PROPERTY;
+
+        if (PropertyWriteInfo::TYPE_METHOD === $writeInfo->getType()) {
+            $type = WriteMutator::TYPE_METHOD;
+        }
+
+        return new WriteMutator(
+            $type,
+            $writeInfo->getName(),
+            $writeInfo->getVisibility() !== PropertyReadInfo::VISIBILITY_PUBLIC
+        );
     }
 
     protected function getMaxDepth($class, $property): ?int

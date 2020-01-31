@@ -119,7 +119,7 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
         $mandatoryParameters = [];
 
         foreach ($parameters as $parameter) {
-            if (!$parameter->isOptional()) {
+            if (!$parameter->isOptional() && !$parameter->allowsNull()) {
                 $mandatoryParameters[] = $parameter;
             }
         }
@@ -288,6 +288,7 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
             $this->propertiesMapping[$property] = new PropertyMapping(
                 new ReadAccessor(ReadAccessor::TYPE_SOURCE, $property),
                 $this->mappingExtractor->getWriteMutator($this->source, $this->target, $property),
+                null,
                 new CallbackTransformer($property),
                 $property,
                 false

@@ -15,6 +15,8 @@ use Symfony\Component\AutoMapper\Exception\InvalidMappingException;
 use Symfony\Component\AutoMapper\MapperMetadataInterface;
 use Symfony\Component\AutoMapper\Transformer\TransformerFactoryInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
@@ -34,9 +36,9 @@ final class FromTargetMappingExtractor extends MappingExtractor
 
     private $nameConverter;
 
-    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, AccessorExtractorInterface $accessorExtractor, TransformerFactoryInterface $transformerFactory, ClassMetadataFactoryInterface $classMetadataFactory = null, AdvancedNameConverterInterface $nameConverter = null)
+    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, PropertyReadInfoExtractorInterface $readInfoExtractor, PropertyWriteInfoExtractorInterface $writeInfoExtractor, TransformerFactoryInterface $transformerFactory, ClassMetadataFactoryInterface $classMetadataFactory = null, AdvancedNameConverterInterface $nameConverter = null)
     {
-        parent::__construct($propertyInfoExtractor, $accessorExtractor, $transformerFactory, $classMetadataFactory);
+        parent::__construct($propertyInfoExtractor, $readInfoExtractor, $writeInfoExtractor, $transformerFactory, $classMetadataFactory);
 
         $this->nameConverter = $nameConverter;
     }
@@ -83,7 +85,12 @@ final class FromTargetMappingExtractor extends MappingExtractor
 
             $mapping[] = new PropertyMapping(
                 $this->getReadAccessor($mapperMetadata->getSource(), $mapperMetadata->getTarget(), $property),
-                $this->getWriteMutator($mapperMetadata->getSource(), $mapperMetadata->getTarget(), $property),
+                $this->getWriteMutator($mapperMetadata->getSource(), $mapperMetadata->getTarget(), $property, [
+                    'enable_constructor_extraction' => false,
+                ]),
+                $this->getWriteMutator($mapperMetadata->getSource(), $mapperMetadata->getTarget(), $property, [
+                    'enable_constructor_extraction' => true,
+                ]),
                 $transformer,
                 $property,
                 true,

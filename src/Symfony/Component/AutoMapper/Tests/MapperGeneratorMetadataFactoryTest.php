@@ -14,9 +14,7 @@ namespace Symfony\Component\AutoMapper\Tests;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\AutoMapper\Extractor\FromSourceMappingExtractor;
 use Symfony\Component\AutoMapper\Extractor\FromTargetMappingExtractor;
-use Symfony\Component\AutoMapper\Extractor\PrivateReflectionExtractor;
 use Symfony\Component\AutoMapper\Extractor\PropertyMapping;
-use Symfony\Component\AutoMapper\Extractor\ReflectionExtractor;
 use Symfony\Component\AutoMapper\Extractor\SourceTargetMappingExtractor;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataFactory;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataFactoryInterface;
@@ -29,6 +27,7 @@ use Symfony\Component\AutoMapper\Transformer\NullableTransformerFactory;
 use Symfony\Component\AutoMapper\Transformer\ObjectTransformerFactory;
 use Symfony\Component\AutoMapper\Transformer\UniqueTypeTransformerFactory;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -46,7 +45,7 @@ class MapperGeneratorMetadataFactoryTest extends AutoMapperBaseTest
         parent::setUp();
 
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $reflectionExtractor = new PrivateReflectionExtractor();
+        $reflectionExtractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
 
         $phpDocExtractor = new PhpDocExtractor();
         $propertyInfoExtractor = new PropertyInfoExtractor(
@@ -56,25 +55,27 @@ class MapperGeneratorMetadataFactoryTest extends AutoMapperBaseTest
             [$reflectionExtractor]
         );
 
-        $accessorExtractor = new ReflectionExtractor(true);
         $transformerFactory = new ChainTransformerFactory();
         $sourceTargetMappingExtractor = new SourceTargetMappingExtractor(
             $propertyInfoExtractor,
-            $accessorExtractor,
+            $reflectionExtractor,
+            $reflectionExtractor,
             $transformerFactory,
             $classMetadataFactory
         );
 
         $fromTargetMappingExtractor = new FromTargetMappingExtractor(
             $propertyInfoExtractor,
-            $accessorExtractor,
+            $reflectionExtractor,
+            $reflectionExtractor,
             $transformerFactory,
             $classMetadataFactory
         );
 
         $fromSourceMappingExtractor = new FromSourceMappingExtractor(
             $propertyInfoExtractor,
-            $accessorExtractor,
+            $reflectionExtractor,
+            $reflectionExtractor,
             $transformerFactory,
             $classMetadataFactory
         );

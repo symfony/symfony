@@ -42,7 +42,9 @@ class SourceTargetMappingExtractor extends MappingExtractor
             }
 
             if (\in_array($property, $targetProperties, true)) {
-                $targetMutatorConstruct = $this->accessorExtractor->getWriteMutator($mapperMetadata->getTarget(), $property, true);
+                $targetMutatorConstruct = $this->getWriteMutator($mapperMetadata->getSource(), $mapperMetadata->getTarget(), $property, [
+                    'enable_constructor_extraction' => true,
+                ]);
 
                 if ((null === $targetMutatorConstruct || null === $targetMutatorConstruct->getParameter()) && !$this->propertyInfoExtractor->isWritable($mapperMetadata->getTarget(), $property)) {
                     continue;
@@ -56,8 +58,10 @@ class SourceTargetMappingExtractor extends MappingExtractor
                     continue;
                 }
 
-                $sourceAccessor = $this->accessorExtractor->getReadAccessor($mapperMetadata->getSource(), $property);
-                $targetMutator = $this->accessorExtractor->getWriteMutator($mapperMetadata->getTarget(), $property, false);
+                $sourceAccessor = $this->getReadAccessor($mapperMetadata->getSource(), $mapperMetadata->getTarget(), $property);
+                $targetMutator = $this->getWriteMutator($mapperMetadata->getSource(), $mapperMetadata->getTarget(), $property, [
+                    'enable_constructor_extraction' => false,
+                ]);
 
                 $maxDepthSource = $this->getMaxDepth($mapperMetadata->getSource(), $property);
                 $maxDepthTarget = $this->getMaxDepth($mapperMetadata->getTarget(), $property);
@@ -73,7 +77,8 @@ class SourceTargetMappingExtractor extends MappingExtractor
 
                 $mapping[] = new PropertyMapping(
                     $sourceAccessor,
-                    $targetMutator ?? $targetMutatorConstruct,
+                    $targetMutator,
+                    $targetMutatorConstruct->getType() === WriteMutator::TYPE_CONSTRUCTOR ? $targetMutatorConstruct : null,
                     $transformer,
                     $property,
                     false,

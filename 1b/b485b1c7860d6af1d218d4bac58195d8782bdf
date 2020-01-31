@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-01-01T09:55:02Z
+
+Adding this makes sense to me. We did something similar for the `CountryType` and `LanguageType` in the Form component in #33791.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-01-01T09:56:08Z
+
+So in addition we should probably also think about adding the same option to the `Language` constraint.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-01-30T15:57:44Z
+
+@maxperrimond Do you have time to finish this PR?
+
+---------------------------------------------------------------------------
+
+by maxperrimond at 2020-01-31T04:11:38Z
+
+@fabpot Thank you to remind me about this PR. I push some changes

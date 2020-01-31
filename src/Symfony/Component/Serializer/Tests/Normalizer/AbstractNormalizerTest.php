@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorInstantiator;
 use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDummy;
 
 /**
@@ -106,7 +106,8 @@ class AbstractNormalizerTest extends TestCase
 
     public function testObjectWithStaticConstructor()
     {
-        $normalizer = new StaticConstructorNormalizer();
+        $instantiator = new StaticConstructorInstantiator();
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, [], null, $instantiator);
         $dummy = $normalizer->denormalize(['foo' => 'baz'], StaticConstructorDummy::class);
 
         $this->assertInstanceOf(StaticConstructorDummy::class, $dummy);

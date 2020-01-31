@@ -15,11 +15,15 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Context\ChildContextFactoryInterface;
+use Symfony\Component\Serializer\Context\ObjectChildContextFactory;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Instantiator\Instantiator;
+use Symfony\Component\Serializer\Instantiator\InstantiatorInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -31,8 +35,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractObjectNormalizer extends AbstractNormalizer
+abstract class AbstractObjectNormalizer extends AbstractNormalizer implements DenormalizerAwareInterface
 {
+    use DenormalizerAwareTrait;
+
     /**
      * Set to true to respect the max depth metadata on fields.
      */
@@ -91,6 +97,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
     private $propertyTypeExtractor;
+    private $instantiator;
     private $typesCache = [];
     private $attributesCache = [];
 
@@ -101,7 +108,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected $classDiscriminatorResolver;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [], ChildContextFactoryInterface $childContextFactory = null, InstantiatorInterface $instantiator = null)
     {
         parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
 
@@ -118,6 +125,26 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
         $this->classDiscriminatorResolver = $classDiscriminatorResolver;
         $this->objectClassResolver = $objectClassResolver;
+
+        $this->childContextFactory = $childContextFactory ?? new ObjectChildContextFactory();
+
+        if (null === $instantiator) {
+            $instantiator = new Instantiator($classMetadataFactory, $this->classDiscriminatorResolver, $propertyTypeExtractor, null, $nameConverter, null, $this->childContextFactory);
+
+            if ($this->denormalizer instanceof DenormalizerInterface) {
+                $instantiator->setDenormalizer($this->denormalizer);
+            }
+        }
+        $this->instantiator = $instantiator;
+    }
+
+    public function setDenormalizer(DenormalizerInterface $denormalizer)
+    {
+        $this->denormalizer = $denormalizer;
+
+        // because we need a denormalizer for the instantiator & when doing a new AbstractObjectNormalizer THEN new
+        // Serializer, the DenormalizerAwareInterface propagation will be done after Instantiator creation.
+        $this->instantiator->setDenormalizer($denormalizer);
     }
 
     /**
@@ -209,28 +236,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
-    {
-        if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
-            if (!isset($data[$mapping->getTypeProperty()])) {
-                throw new RuntimeException(sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class));
-            }
-
-            $type = $data[$mapping->getTypeProperty()];
-            if (null === ($mappedClass = $mapping->getClassForType($type))) {
-                throw new RuntimeException(sprintf('The type "%s" has no mapped class for the abstract object "%s".', $type, $class));
-            }
-
-            $class = $mappedClass;
-            $reflectionClass = new \ReflectionClass($class);
-        }
-
-        return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);
-    }
-
-    /**
      * Gets and caches attributes for the given object, format and context.
      *
      * @param object $object
@@ -304,8 +309,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = [];
 
-        $reflectionClass = new \ReflectionClass($type);
-        $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
+        $instantiatorResult = $this->instantiator->instantiate($type, $normalizedData, $context, $format);
+        if ($instantiatorResult->hasFailed()) {
+            throw new MissingConstructorArgumentsException($instantiatorResult->getError());
+        }
+        $object = $instantiatorResult->getObject();
+        $normalizedData = $instantiatorResult->getUnusedData();
+        $context = $instantiatorResult->getUnusedContext();
+
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
         foreach ($normalizedData as $attribute => $value) {
@@ -332,7 +343,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {
-                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": ', $attribute, $type).$e->getMessage(), $e->getCode(), $e);
+                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": "%s".', $attribute, $type, $e->getMessage()), $e->getCode(), $e);
             }
         }
 
@@ -554,13 +565,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * {@inheritdoc}
      *
      * @internal
+     *
+     * @deprecated the "createChildContext" method is deprecated, use Symfony\Component\Serializer\Context\ObjectChildContextFactory::create() instead
      */
     protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
-        $context = parent::createChildContext($parentContext, $attribute, $format);
-        $context['cache_key'] = $this->getCacheKey($format, $context);
-
-        return $context;
+        return $this->childContextFactory->create($parentContext, $attribute, $format);
     }
 
     /**

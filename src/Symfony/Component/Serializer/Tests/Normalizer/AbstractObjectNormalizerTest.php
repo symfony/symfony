@@ -47,17 +47,6 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('baz', $normalizedData->baz);
     }
 
-    public function testInstantiateObjectDenormalizer()
-    {
-        $data = ['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'];
-        $class = Dummy::class;
-        $context = [];
-
-        $normalizer = new AbstractObjectNormalizerDummy();
-
-        $this->assertInstanceOf(Dummy::class, $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), []));
-    }
-
     public function testDenormalizeWithExtraAttributes()
     {
         $this->expectException('Symfony\Component\Serializer\Exception\ExtraAttributesException');
@@ -275,17 +264,17 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 
     protected function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
     {
-        $object->$attribute = $value;
+        $reflClass = new \ReflectionClass($object);
+        $reflProp = $reflClass->getProperty($attribute);
+
+        if ($reflProp->isPublic()) {
+            $object->$attribute = $value;
+        }
     }
 
     protected function isAllowedAttribute($classOrObject, string $attribute, string $format = null, array $context = []): bool
     {
         return \in_array($attribute, ['foo', 'baz', 'quux', 'value']);
-    }
-
-    public function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null): object
-    {
-        return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes, $format);
     }
 }
 

@@ -213,11 +213,9 @@ class ObjectNormalizerTest extends TestCase
             ],
         ];
 
-        $normalizer = new ObjectNormalizer();
-        $serializer = new Serializer([$normalizer]);
-        $normalizer->setSerializer($serializer);
+        $serializer = new Serializer([new ObjectNormalizer()]);
 
-        $obj = $normalizer->denormalize($data, DummyWithConstructorObject::class);
+        $obj = $serializer->denormalize($data, DummyWithConstructorObject::class);
         $this->assertInstanceOf(DummyWithConstructorObject::class, $obj);
         $this->assertEquals(10, $obj->getId());
         $this->assertInstanceOf(ObjectInner::class, $obj->getInner());

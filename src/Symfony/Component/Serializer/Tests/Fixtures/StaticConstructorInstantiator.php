@@ -11,22 +11,24 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Instantiator\Instantiator;
 
 /**
- * @author Guilhem N. <egetick@gmail.com>
+ * @author Baptite Leduc <baptiste.leduc@gmail.com>
  */
-class StaticConstructorNormalizer extends ObjectNormalizer
+class StaticConstructorInstantiator extends Instantiator
 {
     /**
      * {@inheritdoc}
      */
-    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes): ?\ReflectionMethod
+    protected function getConstructor(\ReflectionClass $reflectionClass): ?\ReflectionMethod
     {
+        $class = $reflectionClass->getName();
+
         if (is_a($class, StaticConstructorDummy::class, true)) {
             return new \ReflectionMethod($class, 'create');
         }
 
-        return parent::getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
+        return parent::getConstructor($reflectionClass);
     }
 }

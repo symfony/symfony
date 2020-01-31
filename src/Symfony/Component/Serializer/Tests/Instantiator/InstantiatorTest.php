@@ -13,65 +13,66 @@ class InstantiatorTest extends TestCase
     {
         $instantiator = new Instantiator();
         $data = ['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'];
+        $context = [];
 
-        $dummy = $instantiator->instantiate(DummyWithoutConstructor::class, $data);
+        $dummyResult = $instantiator->instantiate(DummyWithoutConstructor::class, $data, $context);
 
-        $this->assertInstanceOf(DummyWithoutConstructor::class, $dummy);
+        $this->assertInstanceOf(DummyWithoutConstructor::class, $dummyResult->getObject());
     }
 
     public function testInstantiateWithConstructor()
     {
         $instantiator = new Instantiator();
         $data = ['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'];
+        $context = [];
 
-        $dummy = $instantiator->instantiate(DummyWithConstructor::class, $data);
+        $dummyResult = $instantiator->instantiate(DummyWithConstructor::class, $data, $context);
+        $dummy = $dummyResult->getObject();
 
         $this->assertInstanceOf(DummyWithConstructor::class, $dummy);
         $this->assertSame('foo', $dummy->foo);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException
-     * @expectedExceptionMessage Cannot create an instance of Symfony\Component\Serializer\Tests\Instantiator\DummyWithExtraConstructor from serialized data because its constructor requires parameter "extra" to be present.
-     */
     public function testCannotInstantiate()
     {
         $instantiator = new Instantiator();
         $data = ['foo' => 'foo'];
+        $context = [];
 
-        $instantiator->instantiate(DummyWithExtraConstructor::class, $data);
+        $dummyResult = $instantiator->instantiate(DummyWithExtraConstructor::class, $data, $context);
+
+        $this->assertNull($dummyResult->getObject());
+        $this->assertEquals('Cannot create an instance of "Symfony\\Component\\Serializer\\Tests\\Instantiator\\DummyWithExtraConstructor" from serialized data because its constructor requires parameter "extra" to be present.', $dummyResult->getError());
     }
 
     public function testInstantiateWithDefaultArguments()
     {
         $instantiator = new Instantiator();
         $data = ['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'];
-
-        $dummy = $instantiator->instantiate(DummyWithExtraConstructor::class, $data, null, [
+        $context = [
             AbstractObjectNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS => [
                 DummyWithExtraConstructor::class => ['extra' => 'extraData'],
             ],
-        ]);
+        ];
+
+        $dummyResult = $instantiator->instantiate(DummyWithExtraConstructor::class, $data, $context, null);
+        $dummy = $dummyResult->getObject();
 
         $this->assertInstanceOf(DummyWithExtraConstructor::class, $dummy);
         $this->assertSame('foo', $dummy->foo);
         $this->assertSame('extraData', $dummy->extra);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException
-     * @expectedExceptionMessage Could not create object of class "Symfony\Component\Serializer\Tests\Instantiator\DummyBar" of the parameter "bar".
-     */
     public function testInstantiateWithDenormalizationAndDenormalizer()
     {
         $instantiator = new Instantiator();
         $data = ['foo' => 'foo', 'bar' => ['baz' => 'baz']];
+        $context = [];
 
-        $dummy = $instantiator->instantiate(DummyWithObjectArgument::class, $data);
+        $dummyResult = $instantiator->instantiate(DummyWithObjectArgument::class, $data, $context);
 
-        $this->assertInstanceOf(DummyWithExtraConstructor::class, $dummy);
-        $this->assertSame('foo', $dummy->foo);
-        $this->assertSame('extraData', $dummy->extra);
+        $this->assertNull($dummyResult->getObject());
+        $this->assertEquals('Could not create object of class "Symfony\\Component\\Serializer\\Tests\\Instantiator\\DummyBar" of the parameter "bar".', $dummyResult->getError());
     }
 
     public function testInstantiateWithDenormalization()
@@ -80,8 +81,10 @@ class InstantiatorTest extends TestCase
         $instantiator->setDenormalizer(new ObjectNormalizer());
 
         $data = ['foo' => 'foo', 'bar' => ['baz' => 'baz']];
+        $context = [];
 
-        $dummy = $instantiator->instantiate(DummyWithObjectArgument::class, $data);
+        $dummyResult = $instantiator->instantiate(DummyWithObjectArgument::class, $data, $context);
+        $dummy = $dummyResult->getObject();
 
         $this->assertInstanceOf(DummyWithObjectArgument::class, $dummy);
         $this->assertSame('foo', $dummy->foo);

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Context\ChildContextFactoryInterface;
+use Symfony\Component\Serializer\Context\ObjectChildContextFactory;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -133,10 +135,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     protected $nameConverter;
 
+    protected $childContextFactory;
+
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [], ChildContextFactoryInterface $childContextFactory = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
@@ -157,6 +161,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         if (isset($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER]) && !\is_callable($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
             throw new InvalidArgumentException(sprintf('Invalid callback found in the "%s" default context option.', self::CIRCULAR_REFERENCE_HANDLER));
         }
+
+        $this->childContextFactory = $childContextFactory ?? new ObjectChildContextFactory();
     }
 
     /**
@@ -306,6 +312,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     }
 
     /**
+<<<<<<< HEAD
      * Returns the method to use to construct an object. This method must be either
      * the object constructor or static.
      *
@@ -436,15 +443,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * @internal
+     *
+     * @deprecated the "createChildContext" method is deprecated, use Symfony\Component\Serializer\Context\ChildContextFactory::create() instead
      */
     protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
-        if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
-            $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
-        } else {
-            unset($parentContext[self::ATTRIBUTES]);
-        }
-
-        return $parentContext;
+        return $this->childContextFactory->create($parentContext, $attribute, $format);
     }
 }

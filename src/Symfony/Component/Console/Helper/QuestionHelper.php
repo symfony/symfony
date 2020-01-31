@@ -22,6 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Terminal;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * The QuestionHelper class provides helpers to interact with the user.
@@ -278,9 +279,10 @@ class QuestionHelper extends Helper
             } elseif ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
-                    $fullChoice = self::substr($fullChoice, 0, $i);
                     // Move cursor backwards
-                    $output->write("\033[1D");
+                    $output->write(sprintf("\033[%dD", class_exists(UnicodeString::class) ? (new UnicodeString(self::substr($fullChoice, -1)))->width(false) : 1));
+
+                    $fullChoice = self::substr($fullChoice, 0, $i);
                 }
 
                 if (0 === $i) {

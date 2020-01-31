@@ -292,7 +292,7 @@ class ContextListener extends AbstractListener implements ListenerInterface
             return null;
         }
 
-        throw new \RuntimeException(sprintf('There is no user provider for user "%s".', $userClass));
+        throw new \RuntimeException(sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', $userClass));
     }
 
     private function safelyUnserialize(string $serializedToken)

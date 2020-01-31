@@ -24,15 +24,47 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
 
     static $phpunitConfig = null;
     if (null === $phpunitConfig) {
-        $opt = min(array_search('-c', $opts = array_reverse($argv), true) ?: INF, array_search('--configuration', $opts, true) ?: INF);
         $phpunitConfigFilename = null;
-        if (INF !== $opt && isset($opts[$opt - 1])) {
-            $phpunitConfigFilename = $opts[$opt - 1];
-        } elseif (file_exists('phpunit.xml')) {
-            $phpunitConfigFilename = 'phpunit.xml';
-        } elseif (file_exists('phpunit.xml.dist')) {
-            $phpunitConfigFilename = 'phpunit.xml.dist';
+        $getPhpUnitConfig = function ($probableConfig) use (&$getPhpUnitConfig) {
+            if (!$probableConfig) {
+                return null;
+            }
+            if (is_dir($probableConfig)) {
+                return $getPhpUnitConfig($probableConfig.DIRECTORY_SEPARATOR.'phpunit.xml');
+            }
+
+            if (file_exists($probableConfig)) {
+                return $probableConfig;
+            }
+            if (file_exists($probableConfig.'.dist')) {
+                return $probableConfig.'.dist';
+            }
+
+            return null;
+        };
+
+        foreach ($argv as $cliArgumentIndex => $cliArgument) {
+            if ('--' === $cliArgument) {
+                break;
+            }
+            // long option
+            if ('--configuration' === $cliArgument && array_key_exists($cliArgumentIndex + 1, $argv)) {
+                $phpunitConfigFilename = $getPhpUnitConfig($argv[$cliArgumentIndex + 1]);
+                break;
+            }
+            // short option
+            if (0 === strpos($cliArgument, '-c')) {
+                if ('-c' === $cliArgument && array_key_exists($cliArgumentIndex + 1, $argv)) {
+                    $phpunitConfigFilename = $getPhpUnitConfig($argv[$cliArgumentIndex + 1]);
+                } else {
+                    $phpunitConfigFilename = $getPhpUnitConfig(substr($cliArgument, 2));
+                }
+                break;
+            }
         }
+
+        $phpunitConfigFilename = $phpunitConfigFilename ?: $getPhpUnitConfig('phpunit.xml');
+
         if ($phpunitConfigFilename) {
             $phpunitConfig = new DomDocument();
             $phpunitConfig->load($phpunitConfigFilename);

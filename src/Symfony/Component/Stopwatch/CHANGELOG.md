@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.1
+-----
+
+ * Added missing type hints.
+
 5.0.0
 -----
 

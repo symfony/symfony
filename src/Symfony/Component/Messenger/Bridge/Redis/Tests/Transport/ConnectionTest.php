@@ -109,7 +109,7 @@ class ConnectionTest extends TestCase
     }
 
     /**
-     * @expectedDeprecation Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated since Symfony 5.1.
+     * @expectedDeprecation Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated.
      * @group legacy
      */
     public function testDeprecationIfInvalidOptionIsPassedWithDsn()

@@ -743,7 +743,7 @@ class InlineTest extends TestCase
      *
      * @group legacy
      *
-     * @expectedDeprecation Using the !php/object tag without a value is deprecated since Symfony 5.1.
+     * @expectedDeprecation Since symfony/yaml 5.1: Using the !php/object tag without a value is deprecated.
      */
     public function testPhpObjectWithEmptyValue($expected, $value)
     {
@@ -767,7 +767,7 @@ class InlineTest extends TestCase
      *
      * @group legacy
      *
-     * @expectedDeprecation Using the !php/const tag without a value is deprecated since Symfony 5.1.
+     * @expectedDeprecation Since symfony/yaml 5.1: Using the !php/const tag without a value is deprecated.
      */
     public function testPhpConstTagWithEmptyValue($expected, $value)
     {

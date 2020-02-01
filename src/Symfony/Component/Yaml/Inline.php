@@ -591,7 +591,7 @@ class Inline
                     case 0 === strncmp($scalar, '!php/object', 11):
                         if (self::$objectSupport) {
                             if (!isset($scalar[12])) {
-                                @trigger_error('Using the !php/object tag without a value is deprecated since Symfony 5.1.', E_USER_DEPRECATED);
+                                trigger_deprecation('symfony/yaml', '5.1', 'Using the !php/object tag without a value is deprecated.');
 
                                 return false;
                             }
@@ -607,7 +607,7 @@ class Inline
                     case 0 === strncmp($scalar, '!php/const', 10):
                         if (self::$constantSupport) {
                             if (!isset($scalar[11])) {
-                                @trigger_error('Using the !php/const tag without a value is deprecated since Symfony 5.1.', E_USER_DEPRECATED);
+                                trigger_deprecation('symfony/yaml', '5.1', 'Using the !php/const tag without a value is deprecated.');
 
                                 return '';
                             }

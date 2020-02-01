@@ -214,7 +214,7 @@ class FrameworkExtension extends Extension
             }
 
             if (!\extension_loaded('intl') && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
-                @trigger_error('Please install the "intl" PHP extension for best performance.', E_USER_DEPRECATED);
+                trigger_deprecation('', '', 'Please install the "intl" PHP extension for best performance.');
             }
         }
 
@@ -857,7 +857,7 @@ class FrameworkExtension extends Extension
         $loader->load('routing.xml');
 
         if (null === $config['utf8']) {
-            @trigger_error('Not setting the "framework.router.utf8" configuration option is deprecated since Symfony 5.1, it will default to "true" in Symfony 6.0.', E_USER_DEPRECATED);
+            trigger_deprecation('symfony/framework-bundle', '5.1', 'Not setting the "framework.router.utf8" configuration option is deprecated, it will default to "true" in version 6.0.');
         }
 
         if ($config['utf8']) {

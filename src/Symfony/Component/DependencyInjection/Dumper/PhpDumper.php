@@ -803,7 +803,7 @@ EOF;
         $this->inlinedDefinitions = $this->getDefinitionsFromArguments([$definition], null, $this->serviceCalls);
 
         if ($definition->isDeprecated()) {
-            $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
+            $code .= sprintf("        trigger_deprecation('', '', %s);\n\n", $this->export($definition->getDeprecationMessage($id)));
         }
 
         if ($this->getProxyDumper()->isProxyCandidate($definition)) {
@@ -1312,7 +1312,7 @@ EOF;
      */
     protected function {$methodNameAlias}()
     {
-        @trigger_error($messageExported, E_USER_DEPRECATED);
+        trigger_deprecation('', '', $messageExported);
 
         return \$this->get($idExported);
     }

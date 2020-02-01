@@ -727,7 +727,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         if (!method_exists($this->config, 'getIsEmptyCallback')) {
-            @trigger_error(sprintf('Not implementing the "%s::getIsEmptyCallback()" method in "%s" is deprecated since Symfony 5.1.', FormConfigInterface::class, \get_class($this->config)), E_USER_DEPRECATED);
+            trigger_deprecation('symfony/form', '5.1', 'Not implementing the "%s::getIsEmptyCallback()" method in "%s" is deprecated.', FormConfigInterface::class, \get_class($this->config));
 
             $isEmptyCallback = null;
         } else {

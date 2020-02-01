@@ -210,7 +210,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getDeprecatedServiceService()
     {
-        @trigger_error('The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.', E_USER_DEPRECATED);
+        trigger_deprecation('', '', 'The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.');
 
         return $this->services['deprecated_service'] = new \stdClass();
     }
@@ -404,7 +404,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactorySimpleService()
     {
-        @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.', E_USER_DEPRECATED);
+        trigger_deprecation('', '', 'The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.');
 
         return new \SimpleFactoryClass('foo');
     }

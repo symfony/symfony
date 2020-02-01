@@ -61,7 +61,7 @@ class FormType extends BaseType
         }
 
         if (!method_exists($builder, 'setIsEmptyCallback')) {
-            @trigger_error(sprintf('Not implementing the "%s::setIsEmptyCallback()" method in "%s" is deprecated since Symfony 5.1.', FormConfigBuilderInterface::class, \get_class($builder)), E_USER_DEPRECATED);
+            trigger_deprecation('symfony/form', '5.1', 'Not implementing the "%s::setIsEmptyCallback()" method in "%s" is deprecated.', FormConfigBuilderInterface::class, \get_class($builder));
 
             return;
         }

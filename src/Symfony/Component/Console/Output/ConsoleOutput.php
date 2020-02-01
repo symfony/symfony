@@ -57,6 +57,11 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
         return new ConsoleSectionOutput($this->getStream(), $this->consoleSectionOutputs, $this->getVerbosity(), $this->isDecorated(), $this->getFormatter());
     }
 
+    public function animate(int $slowDown = 1): ConsoleAnimateOutput
+    {
+        return new ConsoleAnimateOutput($this->getStream(), $this->getVerbosity(), $this->isDecorated(), $this->getFormatter(), $slowDown);
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -17,23 +17,45 @@ use Symfony\Component\Console\Terminal;
 
 class ConsoleAnimateOutput extends StreamOutput
 {
-    private $content = [];
-    private $lines = 0;
-    private $terminal;
-    private $slowDown;
+    public const NO_PROGRESSIVE = 0;
+    public const PROGRESSIVE_VERY_QUICK = 1;
+    public const PROGRESSIVE_QUICK = 5;
+    public const PROGRESSIVE_NORMAL = 10;
+    public const PROGRESSIVE_SLOW = 15;
+    public const PROGRESSIVE_VERY_SLOW = 20;
 
-    private const ANIMATE_LETTER_TIME = 10000;
+    private const ANIMATE_LETTER_TIME = 5000;
+
+    private $progressive = false;
+    private $slowDown = 0;
+    private $cursorVisible = true;
+
+    private $terminal;
 
     public function __construct($stream, int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = null, OutputFormatterInterface $formatter = null, int $slowDown = 0)
     {
         parent::__construct($stream, $verbosity, $decorated, $formatter);
         $this->terminal = new Terminal();
-        $this->slowDown = $slowDown;
+    }
+
+    /**
+     * Set progressive writing speed. (NO_PROGRESSIVE write instantanly)
+     *
+     * @param int $progressive
+     */
+    public function setProgressive(int $progressive = self::NO_PROGRESSIVE)
+    {
+        $this->progressive = true;
+        if ($progressive === self::NO_PROGRESSIVE) {
+            $this->progressive = false;
+        }
+
+        $this->slowDown = $progressive;
     }
 
     public function clearScreen()
     {
-        parent::doWrite($this->popStreamContentUntilCurrentSection($this->terminal->getHeight()), false);
+        $this->clearLines($this->terminal->getHeight());
     }
 
     /**
@@ -41,23 +63,13 @@ class ConsoleAnimateOutput extends StreamOutput
      *
      * @param int $lines Number of lines to clear. If null, then the entire output of this section is cleared
      */
-    public function clear(int $lines = null)
+    public function clear(int $lines = 0)
     {
-        if (empty($this->content) || !$this->isDecorated()) {
+        if (!$this->isDecorated()) {
             return;
         }
 
-        if ($lines) {
-            array_splice($this->content, -($lines * 2)); // Multiply lines by 2 to cater for each new line added between content
-        } else {
-            $lines = $this->lines;
-            $this->content = [];
-        }
-
-        $this->lines -= $lines;
-
-        parent::doWrite($this->popStreamContentUntilCurrentSection($lines), false);
-
+        $this->clearLines($lines);
     }
 
     public function wait(float $time = 1)
@@ -65,60 +77,52 @@ class ConsoleAnimateOutput extends StreamOutput
         usleep(1000000 * $time);
     }
 
+    public function showCursor()
+    {
+        $this->cursorVisible = true;
+        parent::doWrite("\033[?25h", false);
+    }
+
+    public function hideCursor()
+    {
+        $this->cursorVisible = false;
+        parent::doWrite("\033[?25l", false);
+    }
+
     /**
      * Overwrites the previous output with a new message.
      *
      * @param array|string $message
      */
-    public function overwriteln($message, ?int $slowDown = null)
+    public function overwriteln($message, ?int $progressive = null, int $linesToClear = 0)
     {
-        $this->writeln('');
-        $this->clear($this->lines);
-        if (null !== $slowDown) {
-            $this->setSlowDown($slowDown);
+        $this->clear($linesToClear);
+        if (null !== $progressive) {
+            $this->setProgressive($progressive);
         }
 
         $this->writeln($message);
     }
 
     /**
-     * Overwrites the previous output with a new message.
+     * Overwrites the current line with a new message.
      *
      * @param array|string $message
      */
-    public function overwrite($message, ?int $slowDown = null)
+    public function overwrite($message, ?int $progressive = null, int $linesToClear = 0)
     {
-        // Add new line to force clean current line
-        $this->writeln('');
-        $this->clear($this->lines);
-        if (null !== $slowDown) {
-            $this->setSlowDown($slowDown);
+        $this->clear($linesToClear);
+        if (null !== $progressive) {
+            $this->setProgressive($progressive);
         }
 
         $this->write($message);
     }
 
-    public function getContent(): string
+    public function __destruct()
     {
-        return implode('', $this->content);
-    }
-
-    public function setSlowDown(int $slowDown) {
-        $this->slowDown = $slowDown;
-    }
-
-    /**
-     * @internal
-     */
-    public function addContent(string $input, bool $newline)
-    {
-        foreach (explode(PHP_EOL, $input) as $lineContent) {
-            $this->content[] = $lineContent;
-            if ($newline) {
-                $this->lines += ceil($this->getDisplayLength($lineContent) / $this->terminal->getWidth()) ?: 1;
-                $this->content[] = PHP_EOL;
-            }
-        }
+        // Restore cursor in case it has been hidden
+        $this->showCursor();
     }
 
     /**
@@ -132,10 +136,6 @@ class ConsoleAnimateOutput extends StreamOutput
             return;
         }
 
-        $erasedContent = $this->popStreamContentUntilCurrentSection();
-
-        $this->addContent($message, $newline);
-
         foreach (str_split($message) as $char) {
             parent::doWrite($char, false);
             usleep(self::ANIMATE_LETTER_TIME * $this->slowDown);
@@ -144,31 +144,25 @@ class ConsoleAnimateOutput extends StreamOutput
         if ($newline) {
             parent::doWrite('', $newline);
         }
-
-        parent::doWrite($erasedContent, false);
     }
 
-    /**
-     * At initial stage, cursor is at the end of stream output. This method makes cursor crawl upwards until it hits
-     * current section. Then it erases content it crawled through. Optionally, it erases part of current section too.
-     */
-    private function popStreamContentUntilCurrentSection(int $numberOfLinesToClearFromCurrentSection = 0): string
+    private function clearLines(int $numberOfLinesToClear = 0): void
     {
-        $numberOfLinesToClear = $numberOfLinesToClearFromCurrentSection;
-        $erasedContent = [];
+        // erase current line
+        if ($numberOfLinesToClear === 0) {
+            // add a new Line
+            parent::doWrite(PHP_EOL, false);
+            // jump cursor to beginning of previous line
+            parent::doWrite("\033[0A", false);
+            // erase the end of line
+            parent::doWrite("\033[2K", false);
+        }
 
         if ($numberOfLinesToClear > 0) {
-            // move cursor up n lines
+            // move cursor up n lines at beginning
             parent::doWrite(sprintf("\x1b[%dA", $numberOfLinesToClear), false);
             // erase to end of screen
             parent::doWrite("\x1b[0J", false);
         }
-
-        return implode('', array_reverse($erasedContent));
-    }
-
-    private function getDisplayLength(string $text): string
-    {
-        return Helper::strlenWithoutDecoration($this->getFormatter(), str_replace("\t", '        ', $text));
     }
 }

@@ -29,4 +29,6 @@ interface ConsoleOutputInterface extends OutputInterface
     public function setErrorOutput(OutputInterface $error);
 
     public function section(): ConsoleSectionOutput;
+
+    public function animate(): ConsoleAnimateOutput;
 }

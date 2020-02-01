@@ -65,6 +65,9 @@ class FormValidator extends ConstraintValidator
 
             if ($groups instanceof GroupSequence) {
                 $validator->atPath('data')->validate($form->getData(), $constraints, $groups);
+
+                $this->filterFormFieldsGroupSequenceViolations($groups);
+
                 // Otherwise validate a constraint only once for the first
                 // matching group
                 foreach ($groups as $group) {
@@ -139,6 +142,52 @@ class FormValidator extends ConstraintValidator
                 ->setInvalidValue($form->getExtraData())
                 ->setCode(Form::NO_SUCH_FIELD_ERROR)
                 ->addViolation();
+        }
+    }
+
+    /**
+     * Filter out form field violations to meet the requirements of the sequence of groups.
+     *
+     * If there is a violation with a group of current groups of the sequence,
+     * remove all other violations that don't belong this groups.
+     *
+     * This is necessary because each form field is validated independently.
+     */
+    private function filterFormFieldsGroupSequenceViolations(GroupSequence $groupSequence)
+    {
+        if (\count($violations = $this->context->getViolations()) < 2) {
+            return;
+        }
+
+        $violationGroups = [];
+
+        foreach ($violations as $offset => $violation) {
+            $violationGroups[$offset] = array_map(static function ($group) {
+                return $group;
+            }, $violation->getConstraint()->groups);
+        }
+
+        $groupsToKeep = [];
+
+        foreach ($groupSequence->groups as $seqGroups) {
+            $seqGroups = !\is_array($seqGroups) ? [$seqGroups] : $seqGroups;
+
+            if (array_filter($violationGroups, static function ($groups) use ($seqGroups) {
+                return array_filter($groups, static function ($group) use ($seqGroups) {
+                    return \in_array($group, $seqGroups, true);
+                });
+            })) {
+                $groupsToKeep = $seqGroups;
+                break;
+            }
+        }
+
+        foreach ($violationGroups as $offset => $groups) {
+            if (!array_filter($groups, static function ($group) use ($groupsToKeep) {
+                return \in_array($group, $groupsToKeep, true);
+            })) {
+                $violations->remove($offset);
+            }
         }
     }
 

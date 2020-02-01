@@ -41,12 +41,17 @@ class NotificationEmail extends TemplatedEmail
 
     public function __construct(Headers $headers = null, AbstractPart $body = null)
     {
+        $missingPackages = [];
         if (!class_exists(CssInlinerExtension::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s" if the CSS Inliner Twig extension is not available; try running "composer require twig/cssinliner-extra".', static::class));
+            $missingPackages['twig/cssinliner-extra'] = ' CSS Inliner';
         }
 
         if (!class_exists(InkyExtension::class)) {
-            throw new \LogicException(sprintf('You cannot use "%s" if the Inky Twig extension is not available; try running "composer require twig/inky-extra".', static::class));
+            $missingPackages['twig/inky-extra'] = 'Inky';
+        }
+
+        if ([] !== $missingPackages) {
+            throw new \LogicException(sprintf('You cannot use "%s" if the %s Twig extension%s not available; try running "composer require %s".', static::class, implode(' and ', $missingPackages), \count($missingPackages) > 1 ? 's are' : ' is', implode(' ', array_keys($missingPackages))));
         }
 
         parent::__construct($headers, $body);
